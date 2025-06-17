@@ -35,67 +35,86 @@ export function BulkDeleteDialog({
 
   return (
     <AlertDialog open={isOpen} onOpenChange={onClose}>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-center gap-2">
-            <Trash2 className="h-5 w-5 text-destructive" />
-            Move to Trash
-          </AlertDialogTitle>
-          <AlertDialogDescription className="space-y-3">
+          <AlertDialogTitle className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+              <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
+            </div>
             <div>
-              Are you sure you want to move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} to trash?
+              <div className="text-lg font-semibold">Move to Trash</div>
+              <div className="text-sm font-normal text-muted-foreground">
+                Bulk delete operation
+              </div>
+            </div>
+          </AlertDialogTitle>
+          <AlertDialogDescription className="space-y-4 pt-2">
+            <div className="text-base">
+              Are you sure you want to move <span className="font-semibold">{selectedItems.length}</span> item{selectedItems.length > 1 ? 's' : ''} to trash?
             </div>
             
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               {fileCount > 0 && (
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
                   {fileCount} file{fileCount > 1 ? 's' : ''}
                 </Badge>
               )}
               {folderCount > 0 && (
-                <Badge variant="secondary">
+                <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
                   {folderCount} folder{folderCount > 1 ? 's' : ''}
                 </Badge>
               )}
             </div>
 
             {selectedItems.length <= 5 ? (
-              <div className="space-y-1">
-                <div className="text-sm font-medium">Items to be deleted:</div>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  {selectedItems.map((item) => (
-                    <li key={item.id} className="truncate">
-                      • {item.name}
-                    </li>
-                  ))}
-                </ul>
+              <div className="space-y-2">
+                <div className="text-sm font-semibold">Items to be deleted:</div>
+                <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 dark:bg-slate-900/50 p-3">
+                  <ul className="text-sm space-y-1">
+                    {selectedItems.map((item) => (
+                      <li key={item.id} className="flex items-center gap-2 truncate">
+                        <div className="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                        <span className="truncate">{item.name}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             ) : (
-              <div className="space-y-1">
-                <div className="text-sm font-medium">First 3 items:</div>
-                <ul className="text-sm text-muted-foreground space-y-1">
-                  {selectedItems.slice(0, 3).map((item) => (
-                    <li key={item.id} className="truncate">
-                      • {item.name}
+              <div className="space-y-2">
+                <div className="text-sm font-semibold">Preview (first 3 items):</div>
+                <div className="rounded-md bg-slate-50 dark:bg-slate-900/50 p-3">
+                  <ul className="text-sm space-y-1">
+                    {selectedItems.slice(0, 3).map((item) => (
+                      <li key={item.id} className="flex items-center gap-2 truncate">
+                        <div className="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                        <span className="truncate">{item.name}</span>
+                      </li>
+                    ))}
+                    <li className="flex items-center gap-2 text-muted-foreground/70 italic">
+                      <div className="h-1.5 w-1.5 rounded-full bg-slate-300 flex-shrink-0" />
+                      and {selectedItems.length - 3} more items...
                     </li>
-                  ))}
-                  <li className="text-muted-foreground/70">
-                    ... and {selectedItems.length - 3} more items
-                  </li>
-                </ul>
+                  </ul>
+                </div>
               </div>
             )}
 
-            <div className="text-sm text-muted-foreground">
-              These items will be moved to your Google Drive trash and can be restored later.
+            <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 p-3 border border-amber-200 dark:border-amber-800">
+              <div className="h-4 w-4 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="h-1.5 w-1.5 rounded-full bg-white" />
+              </div>
+              <div className="text-sm text-amber-800 dark:text-amber-200">
+                These items will be moved to your Google Drive trash and can be restored later.
+              </div>
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+          <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
           <AlertDialogAction 
             onClick={onConfirm}
-            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            className="w-full sm:w-auto bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800"
           >
             Move to Trash
           </AlertDialogAction>
