@@ -11,9 +11,7 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  allowedDevOrigins: [
-    "*.replit.dev", 
-  ],
+  
 };
 
 export default nextConfig;
