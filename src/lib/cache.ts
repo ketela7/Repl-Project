@@ -1,0 +1,111 @@
+/**
+ * Simple in-memory cache for Google Drive API responses
+ * This helps reduce API calls and improve loading performance
+ */
+
+interface CacheEntry<T> {
+  data: T;
+  timestamp: number;
+  ttl: number; // Time to live in milliseconds
+}
+
+class MemoryCache {
+  private cache = new Map<string, CacheEntry<any>>();
+  private maxSize = 100; // Maximum number of entries
+
+  set<T>(key: string, data: T, ttlMinutes: number = 5): void {
+    // Clean up old entries if cache is getting too large
+    if (this.cache.size >= this.maxSize) {
+      this.cleanup();
+    }
+
+    const ttl = ttlMinutes * 60 * 1000; // Convert to milliseconds
+    this.cache.set(key, {
+      data,
+      timestamp: Date.now(),
+      ttl,
+    });
+  }
+
+  get<T>(key: string): T | null {
+    const entry = this.cache.get(key);
+    
+    if (!entry) {
+      return null;
+    }
+
+    // Check if entry has expired
+    if (Date.now() - entry.timestamp > entry.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return entry.data as T;
+  }
+
+  has(key: string): boolean {
+    const entry = this.cache.get(key);
+    
+    if (!entry) {
+      return false;
+    }
+
+    // Check if entry has expired
+    if (Date.now() - entry.timestamp > entry.ttl) {
+      this.cache.delete(key);
+      return false;
+    }
+
+    return true;
+  }
+
+  delete(key: string): void {
+    this.cache.delete(key);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
+  private cleanup(): void {
+    const now = Date.now();
+    const toDelete: string[] = [];
+
+    for (const [key, entry] of this.cache.entries()) {
+      if (now - entry.timestamp > entry.ttl) {
+        toDelete.push(key);
+      }
+    }
+
+    toDelete.forEach(key => this.cache.delete(key));
+
+    // If still too large, remove oldest entries
+    if (this.cache.size >= this.maxSize) {
+      const entries = Array.from(this.cache.entries());
+      entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+      
+      const toRemove = entries.slice(0, entries.length - this.maxSize + 10);
+      toRemove.forEach(([key]) => this.cache.delete(key));
+    }
+  }
+
+  // Generate cache key for Drive API requests
+  generateDriveKey(params: {
+    parentId?: string;
+    query?: string;
+    mimeType?: string;
+    pageToken?: string;
+    userId: string;
+  }): string {
+    const { parentId = 'root', query = '', mimeType = '', pageToken = '', userId } = params;
+    return `drive:${userId}:${parentId}:${query}:${mimeType}:${pageToken}`;
+  }
+
+  // Generate cache key for file details
+  generateFileDetailsKey(fileId: string, userId: string): string {
+    return `details:${userId}:${fileId}`;
+  }
+}
+
+// Export singleton instance
+export const driveCache = new MemoryCache();
