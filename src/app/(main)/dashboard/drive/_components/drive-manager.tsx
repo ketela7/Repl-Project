@@ -1314,8 +1314,23 @@ export function DriveManager() {
                 {folders.length + files.length} items
               </Badge>
               {(folders.length > 0 || files.length > 0) && (
-                <Badge variant="outline" className="text-xs">
-                  {folders.length}📁 {files.length}📄
+                <Badge variant="outline" className="text-xs flex items-center gap-1">
+                  <span className="flex items-center gap-1">
+                    {folders.length > 0 && (
+                      <>
+                        {folders.length}
+                        <Folder className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                      </>
+                    )}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    {files.length > 0 && (
+                      <>
+                        {files.length}
+                        <FileText className="h-3 w-3 text-gray-600 dark:text-gray-400" />
+                      </>
+                    )}
+                  </span>
                 </Badge>
               )}
               {(folders.length > 0 || files.length > 0) && (
@@ -1495,7 +1510,9 @@ export function DriveManager() {
             <DriveGridSkeleton />
           ) : folders.length === 0 && files.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
-              <div className="text-6xl mb-4">📁</div>
+              <div className="flex justify-center mb-4">
+                {getFileIcon('application/vnd.google-apps.folder', 'h-16 w-16')}
+              </div>
               <h3 className="text-lg font-medium mb-2">
                 {searchQuery ? 'No files found' : currentFolderId ? 'This folder is empty' : 'Your Google Drive is ready!'}
               </h3>
@@ -1529,7 +1546,9 @@ export function DriveManager() {
                     </div>
                   )}
                   <div className="flex items-start justify-between mb-2">
-                    <div className={`text-lg sm:text-xl md:text-2xl ${isSelectMode ? 'ml-6' : ''}`}>📁</div>
+                    <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
+                      {getFileIcon('application/vnd.google-apps.folder', 'h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8')}
+                    </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -1830,7 +1849,7 @@ export function DriveManager() {
                               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
-                          <div className="text-lg">📁</div>
+                          {getFileIcon('application/vnd.google-apps.folder', 'h-5 w-5')}
                         </div>
                       </TableCell>
                       {visibleColumns.name && (
@@ -1960,7 +1979,7 @@ export function DriveManager() {
                               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
-                          <div className="text-lg">{getFileIcon(file.mimeType)}</div>
+                          {getFileIcon(file.mimeType, 'h-5 w-5')}
                         </div>
                       </TableCell>
                       {visibleColumns.name && (
