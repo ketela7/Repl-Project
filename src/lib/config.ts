@@ -67,19 +67,50 @@ export const getPublicConfig = () => ({
 })
 
 /**
- * Validates required environment variables
+ * Enhanced environment variable validation for Replit secrets
+ * Professional error handling with actionable messages
  */
 export const validateConfig = () => {
   const requiredVars = [
-    'SUPABASE_URL',
-    'SUPABASE_ANON_KEY', 
-    'TURNSTILE_SITE_KEY',
-    'TURNSTILE_SECRET_KEY',
+    { key: 'SUPABASE_URL', description: 'Supabase project URL' },
+    { key: 'SUPABASE_ANON_KEY', description: 'Supabase anonymous key' },
+    { key: 'TURNSTILE_SITE_KEY', description: 'Cloudflare Turnstile site key' },
+    { key: 'TURNSTILE_SECRET_KEY', description: 'Cloudflare Turnstile secret key' },
+    { key: 'GOOGLE_CLIENT_ID', description: 'Google OAuth client ID' },
+    { key: 'GOOGLE_CLIENT_SECRET', description: 'Google OAuth client secret' },
   ];
 
-  const missing = requiredVars.filter(varName => !process.env[varName]);
+  const missing = requiredVars.filter(({ key }) => !process.env[key]);
   
   if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+    const missingList = missing.map(({ key, description }) => `${key} (${description})`).join('\n  - ');
+    throw new Error(
+      `Missing required environment variables in Replit secrets:\n  - ${missingList}\n\nPlease add these to your Replit project secrets.`
+    );
+  }
+
+  // Additional validation for proper URL formats
+  if (config.supabase.url && !config.supabase.url.startsWith('http')) {
+    throw new Error('SUPABASE_URL must be a valid URL starting with http or https');
+  }
+
+  return true;
+};
+
+/**
+ * Safe configuration getter with fallbacks
+ * Prevents application crashes from missing environment variables
+ */
+export const getSafeConfig = () => {
+  try {
+    validateConfig();
+    return { success: true, config, error: null };
+  } catch (error) {
+    console.error('Configuration validation failed:', error);
+    return { 
+      success: false, 
+      config: null, 
+      error: error instanceof Error ? error.message : 'Unknown configuration error' 
+    };
   }
 };
