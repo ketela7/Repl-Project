@@ -134,6 +134,7 @@ export function BulkActionsToolbar({
             size="sm"
             onClick={onBulkDownload}
             className="flex items-center gap-2 hover:bg-green-50 hover:border-green-300 hover:text-green-700 dark:hover:bg-green-950/20 dark:hover:border-green-700 dark:hover:text-green-400 transition-colors"
+            title="Download selected files (folders cannot be downloaded)"
           >
             <Download className="h-4 w-4" />
             <span className="hidden sm:inline">Download</span>

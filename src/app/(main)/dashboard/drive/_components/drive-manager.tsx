@@ -470,10 +470,21 @@ export function DriveManager() {
   };
 
   const handleBulkDownload = async () => {
-    const selectedItemsData = getSelectedItemsData().filter(item => item.type === 'file');
+    const allSelectedItems = getSelectedItemsData();
+    const selectedItemsData = allSelectedItems.filter(item => item.type === 'file');
+    const folderCount = allSelectedItems.length - selectedItemsData.length;
+    
     if (selectedItemsData.length === 0) {
-      toast.warning('No files selected for download. Only files can be downloaded.');
+      if (folderCount > 0) {
+        toast.warning(`Cannot download folders. Only files can be downloaded. ${folderCount} folder${folderCount > 1 ? 's' : ''} selected.`);
+      } else {
+        toast.warning('No files selected for download.');
+      }
       return;
+    }
+    
+    if (folderCount > 0) {
+      toast.info(`Downloading ${selectedItemsData.length} file${selectedItemsData.length > 1 ? 's' : ''}. Skipping ${folderCount} folder${folderCount > 1 ? 's' : ''}.`);
     }
 
     setBulkOperationProgress({
@@ -1482,7 +1493,7 @@ export function DriveManager() {
                       <Checkbox
                         checked={selectedItems.has(folder.id)}
                         onCheckedChange={() => toggleItemSelection(folder.id)}
-                        className="bg-background h-4 w-4"
+                        className="bg-background !h-4 !w-4 !size-4"
                       />
                     </div>
                   )}
@@ -1577,7 +1588,7 @@ export function DriveManager() {
                       <Checkbox
                         checked={selectedItems.has(file.id)}
                         onCheckedChange={() => toggleItemSelection(file.id)}
-                        className="bg-background h-4 w-4"
+                        className="bg-background !h-4 !w-4 !size-4"
                       />
                     </div>
                   )}
@@ -1697,7 +1708,7 @@ export function DriveManager() {
                         <Checkbox
                           checked={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
                           onCheckedChange={selectedItems.size === folders.length + files.length ? deselectAll : selectAll}
-                          className="ml-2 h-4 w-4"
+                          className="ml-2 !h-4 !w-4 !size-4"
                         />
                       )}
                     </TableHead>
@@ -1783,7 +1794,7 @@ export function DriveManager() {
                               checked={selectedItems.has(folder.id)}
                               onCheckedChange={() => toggleItemSelection(folder.id)}
                               onClick={(e) => e.stopPropagation()}
-                              className="h-4 w-4"
+                              className="!h-4 !w-4 !size-4"
                             />
                           )}
                           <div className="text-lg">📁</div>
@@ -1913,7 +1924,7 @@ export function DriveManager() {
                               checked={selectedItems.has(file.id)}
                               onCheckedChange={() => toggleItemSelection(file.id)}
                               onClick={(e) => e.stopPropagation()}
-                              className="h-4 w-4"
+                              className="!h-4 !w-4 !size-4"
                             />
                           )}
                           <div className="text-lg">{getFileIcon(file.mimeType)}</div>
