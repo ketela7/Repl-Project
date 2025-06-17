@@ -110,7 +110,7 @@ export function DriveManager() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
-  
+
   // Table column visibility state
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
@@ -162,11 +162,11 @@ export function DriveManager() {
   // Sort files and folders based on current sort configuration
   const sortedFiles = React.useMemo(() => {
     if (!sortConfig) return files;
-    
+
     return [...files].sort((a, b) => {
       const { key, direction } = sortConfig;
       let aValue: any, bValue: any;
-      
+
       switch (key) {
         case 'name':
           aValue = a.name.toLowerCase();
@@ -191,7 +191,7 @@ export function DriveManager() {
         default:
           return 0;
       }
-      
+
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
       return 0;
@@ -200,11 +200,11 @@ export function DriveManager() {
 
   const sortedFolders = React.useMemo(() => {
     if (!sortConfig) return folders;
-    
+
     return [...folders].sort((a, b) => {
       const { key, direction } = sortConfig;
       let aValue: any, bValue: any;
-      
+
       switch (key) {
         case 'name':
           aValue = a.name.toLowerCase();
@@ -229,7 +229,7 @@ export function DriveManager() {
         default:
           return 0;
       }
-      
+
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
       return 0;
@@ -238,7 +238,7 @@ export function DriveManager() {
 
   // Bulk operations utility functions
   const getAllItems = () => [...folders, ...files];
-  
+
   const getSelectedItemsData = () => {
     const allItems = getAllItems();
     return Array.from(selectedItems).map(id => {
@@ -299,7 +299,7 @@ export function DriveManager() {
       for (let i = 0; i < selectedItemsData.length; i++) {
         const item = selectedItemsData[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
-        
+
         const response = await fetch(`/api/drive/files/${item.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -359,7 +359,7 @@ export function DriveManager() {
       for (let i = 0; i < selectedItemsData.length; i++) {
         const item = selectedItemsData[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
-        
+
         const response = await fetch(`/api/drive/files/${item.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -427,7 +427,7 @@ export function DriveManager() {
       for (let i = 0; i < selectedItemsData.length; i++) {
         const item = selectedItemsData[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
-        
+
         const response = await fetch(`/api/drive/files/${item.id}/copy`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -476,7 +476,7 @@ export function DriveManager() {
     const allSelectedItems = getSelectedItemsData();
     const selectedItemsData = allSelectedItems.filter(item => item.type === 'file');
     const folderCount = allSelectedItems.length - selectedItemsData.length;
-    
+
     if (selectedItemsData.length === 0) {
       if (folderCount > 0) {
         toast.warning(`Cannot download folders. Only files can be downloaded. ${folderCount} folder${folderCount > 1 ? 's' : ''} selected.`);
@@ -485,7 +485,7 @@ export function DriveManager() {
       }
       return;
     }
-    
+
     if (folderCount > 0) {
       toast.info(`Downloading ${selectedItemsData.length} file${selectedItemsData.length > 1 ? 's' : ''}. Skipping ${folderCount} folder${folderCount > 1 ? 's' : ''}.`);
     }
@@ -504,7 +504,7 @@ export function DriveManager() {
       for (let i = 0; i < selectedItemsData.length; i++) {
         const item = selectedItemsData[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
-        
+
         try {
           const downloadUrl = `/api/drive/download/${item.id}`;
           const link = document.createElement('a');
@@ -515,7 +515,7 @@ export function DriveManager() {
           link.click();
           document.body.removeChild(link);
           successCount++;
-          
+
           // Add delay between downloads to avoid overwhelming the browser
           if (i < selectedItemsData.length - 1) {
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -549,22 +549,22 @@ export function DriveManager() {
     try {
       if (!append) setLoading(true);
       else setLoadingMore(true);
-      
+
       const params = new URLSearchParams();
       if (parentId) params.append('parentId', parentId);
       if (query) params.append('query', query);
       if (pageToken) params.append('pageToken', pageToken);
       // Reduced page size for faster initial load
       params.append('pageSize', '20');
-      
+
       console.log('=== Fetching files with params:', params.toString(), '===');
-      
+
       const response = await fetch(`/api/drive/files?${params}`);
       console.log('Drive API response status:', response.status);
-      
+
       const responseText = await response.text();
       console.log('Drive API raw response:', responseText);
-      
+
       if (!response.ok) {
         let errorData;
         try {
@@ -573,7 +573,7 @@ export function DriveManager() {
           errorData = { error: responseText };
         }
         console.error('Drive API error:', errorData);
-        
+
         if (response.status === 400 && (errorData.error?.includes('Google Drive access not found') || errorData.needsReauth)) {
           setHasAccess(false);
           if (!append) {
@@ -582,7 +582,7 @@ export function DriveManager() {
           }
           return;
         }
-        
+
         if (response.status === 401 || response.status === 403 || errorData.needsReauth) {
           setHasAccess(false);
           toast.error(errorData.error || 'Google Drive access expired. Please reconnect your account.');
@@ -592,21 +592,21 @@ export function DriveManager() {
           }
           return;
         }
-        
+
         throw new Error(errorData.error || 'Failed to fetch files');
       }
-      
+
       const data = JSON.parse(responseText);
       console.log('Drive API data received:', data);
-      
+
       if (!data.files || !Array.isArray(data.files)) {
         console.error('Invalid response format:', data);
         throw new Error('Invalid response format from Drive API');
       }
-      
+
       // Store next page token for pagination
       setNextPageToken(data.nextPageToken || null);
-      
+
       // Separate files and folders
       const fileList = data.files.filter((item: DriveFile) => 
         item.mimeType !== 'application/vnd.google-apps.folder'
@@ -614,9 +614,9 @@ export function DriveManager() {
       const folderList = data.files.filter((item: DriveFile) => 
         item.mimeType === 'application/vnd.google-apps.folder'
       );
-      
+
       console.log('Processed - Files:', fileList.length, 'Folders:', folderList.length);
-      
+
       // Handle pagination: append or replace
       if (append) {
         setFiles(prev => [...prev, ...fileList]);
@@ -626,7 +626,7 @@ export function DriveManager() {
         setFolders(folderList);
       }
       setHasAccess(true);
-      
+
       if (fileList.length === 0 && folderList.length === 0 && !query && !parentId && !append) {
         console.log('No files found in root directory');
         toast.info('Google Drive connected! Your drive appears to be empty or all files are in subfolders.');
@@ -650,12 +650,12 @@ export function DriveManager() {
   // Debounced search function
   const handleSearchInput = (value: string) => {
     setSearchQuery(value);
-    
+
     // Clear existing timeout
     if (searchTimeout) {
       clearTimeout(searchTimeout);
     }
-    
+
     // Set new timeout for debounced search
     const timeout = setTimeout(() => {
       if (value.trim()) {
@@ -664,7 +664,7 @@ export function DriveManager() {
         fetchFiles(currentFolderId || undefined);
       }
     }, 300); // 300ms delay
-    
+
     setSearchTimeout(timeout);
   };
 
@@ -699,7 +699,7 @@ export function DriveManager() {
   const handleFileAction = async (action: string, fileId: string, fileName: string, additionalData?: any) => {
     try {
       console.log(`Performing action: ${action} on file: ${fileName} (${fileId})`);
-      
+
       switch (action) {
         case 'preview':
           const previewFile = files.find(f => f.id === fileId);
@@ -716,7 +716,7 @@ export function DriveManager() {
             }
           }
           break;
-          
+
         case 'download':
           try {
             // Create a temporary anchor element to trigger download
@@ -728,29 +728,29 @@ export function DriveManager() {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
+
             toast.success(`"${fileName}" download started`);
           } catch (downloadError) {
             console.error('Download error:', downloadError);
             toast.error(`Failed to download "${fileName}"`);
           }
           break;
-          
+
         case 'rename':
           // Open rename dialog for both files and folders
           console.log('=== Rename Action Triggered ===');
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
-          
+
           // Check if it's a file or folder
           const renameFile = files.find(f => f.id === fileId);
           const renameFolder = folders.find(f => f.id === fileId);
           const itemToRename = renameFile || renameFolder;
-          
+
           console.log('Found file for rename:', renameFile);
           console.log('Found folder for rename:', renameFolder);
           console.log('Item to rename:', itemToRename);
-          
+
           if (itemToRename) {
             const fileForAction = { 
               id: fileId, 
@@ -759,7 +759,7 @@ export function DriveManager() {
             };
             console.log('Setting selected item for action:', fileForAction);
             setSelectedFileForAction(fileForAction);
-            
+
             console.log('Opening rename dialog...');
             setIsRenameDialogOpen(true);
           } else {
@@ -767,20 +767,20 @@ export function DriveManager() {
             toast.error('Item not found');
           }
           break;
-          
+
         case 'move':
           // Open move dialog for both files and folders
           console.log('=== Move Action Triggered ===');
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
-          
+
           const moveFile = files.find(f => f.id === fileId);
           const moveFolder = folders.find(f => f.id === fileId);
           const itemToMove = moveFile || moveFolder;
-          
+
           console.log('Found file for move:', moveFile);
           console.log('Found folder for move:', moveFolder);
-          
+
           if (itemToMove) {
             const fileForAction = { 
               id: fileId, 
@@ -795,20 +795,20 @@ export function DriveManager() {
             toast.error('Item not found');
           }
           break;
-          
+
         case 'copy':
           // Open copy dialog for both files and folders
           console.log('=== Copy Action Triggered ===');
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
-          
+
           const copyFile = files.find(f => f.id === fileId);
           const copyFolder = folders.find(f => f.id === fileId);
           const itemToCopy = copyFile || copyFolder;
-          
+
           console.log('Found file for copy:', copyFile);
           console.log('Found folder for copy:', copyFolder);
-          
+
           if (itemToCopy) {
             const fileForAction = { 
               id: fileId, 
@@ -823,20 +823,20 @@ export function DriveManager() {
             toast.error('Item not found');
           }
           break;
-          
+
         case 'trash':
           console.log('=== Trash Action Triggered ===');
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
-          
+
           const trashResponse = await fetch(`/api/drive/files/${fileId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'trash' })
           });
-          
+
           console.log('Trash response status:', trashResponse.status);
-          
+
           if (!trashResponse.ok) {
             const errorData = await trashResponse.json();
             console.error('Trash failed:', errorData);
@@ -845,34 +845,34 @@ export function DriveManager() {
               window.location.reload();
               return;
             }
-            
+
             // Handle permission errors gracefully
             if (trashResponse.status === 403) {
               toast.error(`You don't have permission to move "${fileName}" to trash. This may be a shared file or folder with restricted access.`);
               return;
             }
-            
+
             if (trashResponse.status === 404) {
               toast.error(`"${fileName}" was not found. It may have already been moved or deleted.`);
               await handleRefresh();
               return;
             }
-            
+
             throw new Error(errorData.error || 'Failed to move to trash');
           }
-          
+
           console.log('Trash successful');
           toast.success(`${fileName} moved to trash`);
           await handleRefresh();
           break;
-          
+
         case 'restore':
           const restoreResponse = await fetch(`/api/drive/files/${fileId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'restore' })
           });
-          
+
           if (!restoreResponse.ok) {
             const errorData = await restoreResponse.json();
             if (errorData.needsReauth) {
@@ -880,58 +880,58 @@ export function DriveManager() {
               window.location.reload();
               return;
             }
-            
+
             if (restoreResponse.status === 403) {
               toast.error(`You don't have permission to restore "${fileName}". This may be a shared file or folder with restricted access.`);
               return;
             }
-            
+
             if (restoreResponse.status === 404) {
               toast.error(`"${fileName}" was not found in trash. It may have already been restored or permanently deleted.`);
               await handleRefresh();
               return;
             }
-            
+
             throw new Error(errorData.error || 'Failed to restore file');
           }
-          
+
           toast.success(`${fileName} restored from trash`);
           await handleRefresh();
           break;
-          
+
         case 'permanentDelete':
           // Open permanent delete confirmation dialog
           console.log('=== Permanent Delete Action Triggered ===');
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
-          
+
           const deleteFile = files.find(f => f.id === fileId);
           const deleteFolder = folders.find(f => f.id === fileId);
           const itemType = deleteFile ? 'file' : 'folder';
-          
+
           setSelectedItemForDelete({ id: fileId, name: fileName, type: itemType });
           setIsPermanentDeleteDialogOpen(true);
           break;
-          
+
         case 'details':
           // Open details dialog for both files and folders
           console.log('=== Details Action Triggered ===');
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
-          
+
           const detailsFile = files.find(f => f.id === fileId);
           const detailsFolder = folders.find(f => f.id === fileId);
           const detailsItemType = detailsFile ? 'file' : 'folder';
-          
+
           setSelectedItemForDetails({ id: fileId, name: fileName, type: detailsItemType });
           setIsDetailsDialogOpen(true);
           break;
-          
+
         case 'share':
           console.log('=== Share Action Triggered ===');
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
-          
+
           const shareResponse = await fetch(`/api/drive/files/${fileId}/share`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -941,36 +941,36 @@ export function DriveManager() {
               type: 'anyone' 
             })
           });
-          
+
           console.log('Share response status:', shareResponse.status);
-          
+
           if (!shareResponse.ok) {
             const errorData = await shareResponse.json();
             console.error('Share failed:', errorData);
-            
+
             if (errorData.needsReauth) {
               toast.error('Google Drive access expired. Please reconnect your account.');
               window.location.reload();
               return;
             }
-            
+
             if (shareResponse.status === 403) {
               toast.error(`You don't have permission to share "${fileName}". This may be a file or folder with restricted sharing access.`);
               return;
             }
-            
+
             if (shareResponse.status === 404) {
               toast.error(`"${fileName}" was not found. It may have been moved or deleted.`);
               await handleRefresh();
               return;
             }
-            
+
             throw new Error(errorData.error || 'Failed to get share link');
           }
-          
+
           const shareResult = await shareResponse.json();
           console.log('Share successful:', shareResult);
-          
+
           if (shareResult.webViewLink) {
             // Copy to clipboard
             try {
@@ -985,7 +985,7 @@ export function DriveManager() {
             toast.error('Failed to generate share link');
           }
           break;
-          
+
         default:
           console.warn(`Unknown action: ${action}`);
           toast.error('Unknown action');
@@ -1003,21 +1003,21 @@ export function DriveManager() {
       console.log('=== Rename File Operation ===');
       console.log('Selected file for action:', selectedFileForAction);
       console.log('New name:', newName);
-      
+
       if (!selectedFileForAction) {
         console.error('No file selected for rename');
         toast.error('No file selected for rename');
         return;
       }
-      
+
       if (!newName.trim()) {
         console.error('Empty filename provided');
         toast.error('Please provide a valid filename');
         return;
       }
-      
+
       console.log(`Renaming file ${selectedFileForAction.id} to "${newName}"`);
-      
+
       const renameResponse = await fetch(`/api/drive/files/${selectedFileForAction.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -1026,25 +1026,25 @@ export function DriveManager() {
           name: newName.trim()
         })
       });
-      
+
       console.log('Rename response status:', renameResponse.status);
-      
+
       if (!renameResponse.ok) {
         const errorData = await renameResponse.json();
         console.error('Rename failed:', errorData);
-        
+
         if (errorData.needsReauth) {
           toast.error('Google Drive access expired. Please reconnect your account.');
           window.location.reload();
           return;
         }
-        
+
         // Handle permission errors gracefully
         if (renameResponse.status === 403) {
           toast.error(`You don't have permission to rename "${selectedFileForAction.name}". This may be a shared file or folder with restricted access.`);
           return;
         }
-        
+
         if (renameResponse.status === 404) {
           toast.error(`"${selectedFileForAction.name}" was not found. It may have already been moved or deleted.`);
           setIsRenameDialogOpen(false);
@@ -1052,19 +1052,19 @@ export function DriveManager() {
           await handleRefresh();
           return;
         }
-        
+
         throw new Error(errorData.error || 'Failed to rename file');
       }
-      
+
       const result = await renameResponse.json();
       console.log('Rename successful:', result);
-      
+
       toast.success(`File renamed to "${newName}"`);
-      
+
       // Close the dialog
       setIsRenameDialogOpen(false);
       setSelectedFileForAction(null);
-      
+
       // Refresh the file list
       await handleRefresh();
     } catch (error) {
@@ -1075,7 +1075,7 @@ export function DriveManager() {
 
   const handleMoveFile = async (newParentId: string, currentParentId?: string) => {
     if (!selectedFileForAction) return;
-    
+
     const moveResponse = await fetch(`/api/drive/files/${selectedFileForAction.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -1085,7 +1085,7 @@ export function DriveManager() {
         currentParentId: currentParentId
       })
     });
-    
+
     if (!moveResponse.ok) {
       const errorData = await moveResponse.json();
       if (errorData.needsReauth) {
@@ -1093,22 +1093,22 @@ export function DriveManager() {
         window.location.reload();
         return;
       }
-      
+
       // Handle permission errors gracefully
       if (moveResponse.status === 403) {
         toast.error(`You don't have permission to move "${selectedFileForAction.name}". This may be a shared file or folder with restricted access.`);
         return;
       }
-      
+
       if (moveResponse.status === 404) {
         toast.error(`"${selectedFileForAction.name}" was not found. It may have already been moved or deleted.`);
         await handleRefresh();
         return;
       }
-      
+
       throw new Error(errorData.error || 'Failed to move file');
     }
-    
+
     toast.success(`File moved successfully`);
     await handleRefresh();
   };
@@ -1120,12 +1120,12 @@ export function DriveManager() {
         toast.error('No file selected for copy');
         return;
       }
-      
+
       console.log('=== Copy File Operation ===');
       console.log('Selected file for copy:', selectedFileForAction);
       console.log('New name:', newName);
       console.log('Target parent ID:', parentId);
-      
+
       const copyResponse = await fetch(`/api/drive/files/${selectedFileForAction.id}/copy`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1134,43 +1134,43 @@ export function DriveManager() {
           parentId: parentId
         })
       });
-      
+
       console.log('Copy response status:', copyResponse.status);
-      
+
       if (!copyResponse.ok) {
         const errorData = await copyResponse.json();
         console.error('Copy failed:', errorData);
-        
+
         if (errorData.needsReauth) {
           toast.error('Google Drive access expired. Please reconnect your account.');
           window.location.reload();
           return;
         }
-        
+
         // Handle permission errors gracefully
         if (copyResponse.status === 403) {
           toast.error(`You don't have permission to copy "${selectedFileForAction.name}". This may be a shared file or folder with restricted access.`);
           return;
         }
-        
+
         if (copyResponse.status === 404) {
           toast.error(`"${selectedFileForAction.name}" was not found. It may have already been moved or deleted.`);
           await handleRefresh();
           return;
         }
-        
+
         throw new Error(errorData.error || 'Failed to copy file');
       }
-      
+
       const result = await copyResponse.json();
       console.log('Copy successful:', result);
-      
+
       toast.success(`File copied as "${newName}"`);
-      
+
       // Close the dialog
       setIsCopyDialogOpen(false);
       setSelectedFileForAction(null);
-      
+
       // Refresh the file list
       await handleRefresh();
     } catch (error) {
@@ -1183,7 +1183,7 @@ export function DriveManager() {
     const checkAccessAndFetch = async () => {
       try {
         console.log('=== DriveManager: Starting access check ===');
-        
+
         // Check if user just connected Drive (from URL parameter)
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('connected') === 'true') {
@@ -1192,21 +1192,21 @@ export function DriveManager() {
           // Show success message
           toast.success('Google Drive connected successfully!');
         }
-        
+
         // First check if we have Drive access
         console.log('Checking Drive access...');
         const accessResponse = await fetch('/api/auth/check-drive-access');
         const accessData = await accessResponse.json();
-        
+
         console.log('Access check result:', accessData);
-        
+
         if (!accessData.hasAccess) {
           console.log('No Drive access detected');
           setHasAccess(false);
           setLoading(false);
           return;
         }
-        
+
         console.log('Drive access confirmed, fetching files...');
         // If we have access, fetch files
         await fetchFiles();
@@ -1217,7 +1217,7 @@ export function DriveManager() {
         setLoading(false);
       }
     };
-    
+
     checkAccessAndFetch();
   }, []);
 
@@ -1250,7 +1250,7 @@ export function DriveManager() {
             <Search className="h-4 w-4" />
           </Button>
         </div>
-        
+
         <div className="flex items-center gap-2 overflow-x-auto">
           <Button 
             onClick={handleRefresh} 
@@ -1338,7 +1338,7 @@ export function DriveManager() {
                       <List className="h-4 w-4" />
                     </ToggleGroupItem>
                   </ToggleGroup>
-                  
+
                   {viewMode === 'table' && (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -1951,7 +1951,7 @@ export function DriveManager() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  
+
                   {/* Files in table */}
                   {sortedFiles.map((file) => (
                     <TableRow 
@@ -2114,7 +2114,7 @@ export function DriveManager() {
               </Table>
             </div>
           )}
-          
+
           {/* Load More Button */}
           {nextPageToken && !loading && (
             <div className="flex justify-center mt-6">
