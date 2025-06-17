@@ -34,7 +34,9 @@ import {
   Square,
   CheckSquare,
   MousePointer,
-  SquareCheck
+  SquareCheck,
+  Folder,
+  FileText
 } from "lucide-react";
 import {
   DropdownMenu,
