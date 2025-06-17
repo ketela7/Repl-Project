@@ -209,11 +209,15 @@ The application implements comprehensive error handling:
 - **Monitoring**: Error tracking and performance monitoring
 
 ### Environment Configuration
-Required environment variables:
-- `DATABASE_URL` - Database connection string
-- `NEXT_PUBLIC_SUPABASE_URL` - Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anonymous key
-- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key
+Required environment variables (stored in Replit secrets):
+- `DATABASE_URL` - PostgreSQL database connection string
+- `SUPABASE_URL` - Supabase project URL
+- `SUPABASE_ANON_KEY` - Supabase anonymous key
+- `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (optional)
+- `TURNSTILE_SITE_KEY` - Cloudflare Turnstile site key
+- `TURNSTILE_SECRET_KEY` - Cloudflare Turnstile secret key
+
+Note: Environment variables are handled without NEXT_PUBLIC_ prefixes for better security. Configuration is managed through server-side rendering and passed to client components securely.
 
 ## License
 
