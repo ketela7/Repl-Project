@@ -1,6 +1,6 @@
 /**
  * Server-side configuration for environment variables
- * Handles Replit secrets without NEXT_PUBLIC_ prefixes
+ * Handles both Replit secrets and traditional environment variables
  */
 export const config = {
   supabase: {
@@ -18,93 +18,36 @@ export const config = {
   app: {
     nodeEnv: process.env.NODE_ENV || 'development',
     port: process.env.PORT || '3000',
-    baseUrl: getBaseUrl(),
-    isDevelopment: process.env.NODE_ENV === 'development',
-    isProduction: process.env.NODE_ENV === 'production',
+    baseUrl: process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:3000',
   },
 }
 
 /**
- * Enhanced base URL detection for cross-platform compatibility
- */
-function getBaseUrl(): string {
-  // Production: Use REPLIT_DOMAINS or custom domain
-  if (process.env.NODE_ENV === 'production') {
-    const replitDomain = process.env.REPLIT_DOMAINS?.split(',')[0];
-    if (replitDomain) {
-      return `https://${replitDomain}`;
-    }
-  }
-
-  // Development: Support various local environments
-  const host = process.env.HOST || 'localhost';
-  const port = process.env.PORT || '3000';
-  
-  // Handle different development scenarios
-  if (host.includes('replit') || host.includes('.repl.co')) {
-    return `https://${host}`;
-  }
-  
-  return `http://${host}:${port}`;
-}
-
-/**
  * Public configuration for client-side components
- * Enhanced for cross-platform compatibility
+ * These values are safe to expose to the browser
  */
 export const getPublicConfig = () => ({
-  supabaseUrl: config.supabase.url,
-  supabaseAnonKey: config.supabase.anonKey,
-  turnstileSiteKey: config.turnstile.siteKey,
+  supabaseUrl: process.env.SUPABASE_URL!,
+  supabaseAnonKey: process.env.SUPABASE_ANON_KEY!,
+  turnstileSiteKey: process.env.TURNSTILE_SITE_KEY!,
   appEnv: config.app.nodeEnv,
   baseUrl: config.app.baseUrl,
-  isDevelopment: config.app.isDevelopment,
-  version: process.env.npm_package_version || '1.0.0',
 })
 
 /**
- * Enhanced environment variable validation for Replit secrets
- * Professional error handling with actionable messages
+ * Validates required environment variables
  */
 export const validateConfig = () => {
   const requiredVars = [
-    { key: 'SUPABASE_URL', description: 'Supabase project URL' },
-    { key: 'SUPABASE_ANON_KEY', description: 'Supabase anonymous key' },
-    { key: 'TURNSTILE_SITE_KEY', description: 'Cloudflare Turnstile site key' },
-    { key: 'TURNSTILE_SECRET_KEY', description: 'Cloudflare Turnstile secret key' },
+    'SUPABASE_URL',
+    'SUPABASE_ANON_KEY', 
+    'TURNSTILE_SITE_KEY',
+    'TURNSTILE_SECRET_KEY',
   ];
 
-  const missing = requiredVars.filter(({ key }) => !process.env[key]);
+  const missing = requiredVars.filter(varName => !process.env[varName]);
   
   if (missing.length > 0) {
-    const missingList = missing.map(({ key, description }) => `${key} (${description})`).join('\n  - ');
-    throw new Error(
-      `Missing required environment variables in Replit secrets:\n  - ${missingList}\n\nPlease add these to your Replit project secrets.`
-    );
-  }
-
-  // Additional validation for proper URL formats
-  if (config.supabase.url && !config.supabase.url.startsWith('http')) {
-    throw new Error('SUPABASE_URL must be a valid URL starting with http or https');
-  }
-
-  return true;
-};
-
-/**
- * Safe configuration getter with fallbacks
- * Prevents application crashes from missing environment variables
- */
-export const getSafeConfig = () => {
-  try {
-    validateConfig();
-    return { success: true, config, error: null };
-  } catch (error) {
-    console.error('Configuration validation failed:', error);
-    return { 
-      success: false, 
-      config: null, 
-      error: error instanceof Error ? error.message : 'Unknown configuration error' 
-    };
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 };

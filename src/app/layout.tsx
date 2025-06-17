@@ -23,17 +23,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     supabaseUrl: process.env.SUPABASE_URL!,
     supabaseAnonKey: process.env.SUPABASE_ANON_KEY!,
     turnstileSiteKey: process.env.TURNSTILE_SITE_KEY!,
-    appEnv: process.env.NODE_ENV || 'development',
-    baseUrl: process.env.REPLIT_DOMAINS?.split(',')[0] ? 
-      `https://${process.env.REPLIT_DOMAINS.split(',')[0]}` : 
-      `http://localhost:${process.env.PORT || '3000'}`,
-    isDevelopment: process.env.NODE_ENV === 'development',
-    version: process.env.npm_package_version || '1.0.0',
   };
 
   return (
     <html lang="en" className="light" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen antialiased bg-background text-foreground`}>
+      <body className={`${inter.className} min-h-screen antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
           <ConfigProvider config={config}>
             {children}
