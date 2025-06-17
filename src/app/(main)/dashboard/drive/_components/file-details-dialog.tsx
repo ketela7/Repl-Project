@@ -705,7 +705,7 @@ export function FileDetailsDialog({
             {fileType === 'folder' ? (
               <Folder className="h-5 w-5 text-blue-500" />
             ) : (
-              <FileIcon mimeType={mimeType || 'application/octet-stream'} className="h-5 w-5" />
+              <FileIcon mimeType={fileDetails?.mimeType || 'application/octet-stream'} className="h-5 w-5" />
             )}
             Details: {fileName}
           </DialogTitle>
