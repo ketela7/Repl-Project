@@ -150,9 +150,9 @@ function ContextMenuCheckboxItem({
       checked={checked}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+      <span className="pointer-events-none absolute left-2 flex h-4 w-4 items-center justify-center">
         <ContextMenuPrimitive.ItemIndicator>
-          <CheckIcon className="size-4" />
+          <CheckIcon className="h-3.5 w-3.5 stroke-[2.5]" />
         </ContextMenuPrimitive.ItemIndicator>
       </span>
       {children}

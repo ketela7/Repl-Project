@@ -1341,91 +1341,122 @@ export function DriveManager() {
                           <Columns className="h-4 w-4" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-56" align="end">
+                      <PopoverContent className="w-64 p-4" align="end">
                         <div className="space-y-4">
-                          <h4 className="font-medium text-sm">Table Columns</h4>
+                          <div className="flex items-center gap-2">
+                            <Settings className="h-4 w-4 text-primary" />
+                            <h4 className="font-semibold text-sm text-foreground">Table Columns</h4>
+                          </div>
                           <div className="space-y-3">
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                               <Checkbox
                                 id="name"
                                 checked={visibleColumns.name}
                                 onCheckedChange={(checked) =>
                                   setVisibleColumns(prev => ({ ...prev, name: checked === true }))
                                 }
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label htmlFor="name" className="text-sm font-medium">
+                              <label 
+                                htmlFor="name" 
+                                className="text-sm font-medium cursor-pointer flex-1 select-none"
+                              >
                                 Name
                               </label>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                               <Checkbox
                                 id="id"
                                 checked={visibleColumns.id}
                                 onCheckedChange={(checked) =>
                                   setVisibleColumns(prev => ({ ...prev, id: checked === true }))
                                 }
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label htmlFor="id" className="text-sm font-medium">
+                              <label 
+                                htmlFor="id" 
+                                className="text-sm font-medium cursor-pointer flex-1 select-none"
+                              >
                                 ID
                               </label>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                               <Checkbox
                                 id="size"
                                 checked={visibleColumns.size}
                                 onCheckedChange={(checked) =>
                                   setVisibleColumns(prev => ({ ...prev, size: checked === true }))
                                 }
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label htmlFor="size" className="text-sm font-medium">
+                              <label 
+                                htmlFor="size" 
+                                className="text-sm font-medium cursor-pointer flex-1 select-none"
+                              >
                                 Size
                               </label>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                               <Checkbox
                                 id="owners"
                                 checked={visibleColumns.owners}
                                 onCheckedChange={(checked) =>
                                   setVisibleColumns(prev => ({ ...prev, owners: checked === true }))
                                 }
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label htmlFor="owners" className="text-sm font-medium">
+                              <label 
+                                htmlFor="owners" 
+                                className="text-sm font-medium cursor-pointer flex-1 select-none"
+                              >
                                 Owners
                               </label>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                               <Checkbox
                                 id="mimeType"
                                 checked={visibleColumns.mimeType}
                                 onCheckedChange={(checked) =>
                                   setVisibleColumns(prev => ({ ...prev, mimeType: checked === true }))
                                 }
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label htmlFor="mimeType" className="text-sm font-medium">
+                              <label 
+                                htmlFor="mimeType" 
+                                className="text-sm font-medium cursor-pointer flex-1 select-none"
+                              >
                                 MIME Type
                               </label>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                               <Checkbox
                                 id="createdTime"
                                 checked={visibleColumns.createdTime}
                                 onCheckedChange={(checked) =>
                                   setVisibleColumns(prev => ({ ...prev, createdTime: checked === true }))
                                 }
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label htmlFor="createdTime" className="text-sm font-medium">
+                              <label 
+                                htmlFor="createdTime" 
+                                className="text-sm font-medium cursor-pointer flex-1 select-none"
+                              >
                                 Created
                               </label>
                             </div>
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                               <Checkbox
                                 id="modifiedTime"
                                 checked={visibleColumns.modifiedTime}
                                 onCheckedChange={(checked) =>
                                   setVisibleColumns(prev => ({ ...prev, modifiedTime: checked === true }))
                                 }
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label htmlFor="modifiedTime" className="text-sm font-medium">
+                              <label 
+                                htmlFor="modifiedTime" 
+                                className="text-sm font-medium cursor-pointer flex-1 select-none"
+                              >
                                 Modified
                               </label>
                             </div>
