@@ -6,7 +6,6 @@ interface Config {
   supabaseUrl: string;
   supabaseAnonKey: string;
   turnstileSiteKey: string;
-  googleClientId: string;
   appEnv: string;
   baseUrl: string;
   isDevelopment: boolean;

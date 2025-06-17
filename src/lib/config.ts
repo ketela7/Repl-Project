@@ -13,10 +13,7 @@ export const config = {
     secretKey: process.env.TURNSTILE_SECRET_KEY!,
   },
   google: {
-    clientId: process.env.GOOGLE_CLIENT_ID!,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     driveScopes: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file',
-    redirectUri: process.env.GOOGLE_REDIRECT_URI || `${getBaseUrl()}/api/auth/google/callback`,
   },
   app: {
     nodeEnv: process.env.NODE_ENV || 'development',
@@ -59,7 +56,6 @@ export const getPublicConfig = () => ({
   supabaseUrl: config.supabase.url,
   supabaseAnonKey: config.supabase.anonKey,
   turnstileSiteKey: config.turnstile.siteKey,
-  googleClientId: config.google.clientId,
   appEnv: config.app.nodeEnv,
   baseUrl: config.app.baseUrl,
   isDevelopment: config.app.isDevelopment,
@@ -76,8 +72,6 @@ export const validateConfig = () => {
     { key: 'SUPABASE_ANON_KEY', description: 'Supabase anonymous key' },
     { key: 'TURNSTILE_SITE_KEY', description: 'Cloudflare Turnstile site key' },
     { key: 'TURNSTILE_SECRET_KEY', description: 'Cloudflare Turnstile secret key' },
-    { key: 'GOOGLE_CLIENT_ID', description: 'Google OAuth client ID' },
-    { key: 'GOOGLE_CLIENT_SECRET', description: 'Google OAuth client secret' },
   ];
 
   const missing = requiredVars.filter(({ key }) => !process.env[key]);

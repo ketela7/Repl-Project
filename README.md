@@ -72,7 +72,7 @@ A comprehensive web application for managing Google Drive files and folders with
 ### Environment Variables Enhancement
 - ✓ Removed NEXT_PUBLIC_ prefix dependencies for Replit secrets
 - ✓ Enhanced cross-platform environment detection
-- ✓ Improved Google Drive API configuration handling
+- ✓ Cleaned up unnecessary Google OAuth credentials (using Supabase Auth)
 - ✓ Professional error handling for missing environment variables
 
 ### Cross-Platform UI Improvements

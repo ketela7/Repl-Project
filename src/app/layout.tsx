@@ -23,7 +23,6 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     supabaseUrl: process.env.SUPABASE_URL!,
     supabaseAnonKey: process.env.SUPABASE_ANON_KEY!,
     turnstileSiteKey: process.env.TURNSTILE_SITE_KEY!,
-    googleClientId: process.env.GOOGLE_CLIENT_ID!,
     appEnv: process.env.NODE_ENV || 'development',
     baseUrl: process.env.REPLIT_DOMAINS?.split(',')[0] ? 
       `https://${process.env.REPLIT_DOMAINS.split(',')[0]}` : 
