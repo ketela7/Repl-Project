@@ -97,45 +97,29 @@
   --sidebar-ring: oklch(0.58 0.15 235);
 }
 
-/* Cross-platform typography and layout optimizations */
+/* Simple cross-platform optimizations */
 * {
   border-color: hsl(var(--border));
 }
 
 html {
   scroll-behavior: smooth;
-  -webkit-text-size-adjust: 100%;
-  text-size-adjust: 100%;
 }
 
 body {
-  font-feature-settings: "rlig" 1, "calt" 1;
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Enhanced mobile responsiveness */
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-  html {
-    font-size: 14px;
-  }
-  
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
   }
 }
 
-/* High DPI and retina display optimizations */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-  body {
-    -webkit-font-smoothing: subpixel-antialiased;
-  }
-}
-
-/* Touch-friendly interactive elements */
+/* Touch-friendly buttons */
 @media (hover: none) and (pointer: coarse) {
   button, .button, [role="button"] {
     min-height: 44px;
@@ -143,13 +127,13 @@ body {
   }
 }
 
-/* Professional focus states for accessibility */
+/* Focus states */
 :focus-visible {
   outline: 2px solid hsl(var(--ring));
   outline-offset: 2px;
 }
 
-/* Enhanced scrollbar styling */
+/* Simple scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -162,10 +146,6 @@ body {
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--muted-foreground));
   border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
 }
 
 .dark {

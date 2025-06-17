@@ -106,13 +106,13 @@ export function formatDate(date: Date | string | number, options: {
 }
 
 /**
- * Enhanced device detection utilities
- * Cross-platform compatibility helpers
+ * Simple device detection utilities
+ * Basic responsive helpers
  */
 export const deviceUtils = {
   isMobile: () => {
     if (typeof window === 'undefined') return false;
-    return window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    return window.innerWidth < 768;
   },
   
   isTablet: () => {
@@ -127,17 +127,7 @@ export const deviceUtils = {
   
   isTouchDevice: () => {
     if (typeof window === 'undefined') return false;
-    return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-  },
-  
-  isHighDPI: () => {
-    if (typeof window === 'undefined') return false;
-    return window.devicePixelRatio > 1;
-  },
-  
-  supportsHover: () => {
-    if (typeof window === 'undefined') return true;
-    return window.matchMedia('(hover: hover)').matches;
+    return 'ontouchstart' in window;
   }
 };
 

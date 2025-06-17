@@ -66,16 +66,15 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* Cross-platform indicators */}
+          {/* Simple feature indicators */}
           <div className="text-center space-y-2 opacity-75">
             <p className="text-sm text-muted-foreground">
-              Optimized for desktop, tablet, and mobile devices
+              Professional file management for all devices
             </p>
             <div className="flex justify-center space-x-4 text-xs text-muted-foreground">
-              <span>📱 Touch-friendly</span>
-              <span>🎨 High DPI ready</span>
-              <span>♿ Accessible</span>
-              <span>🌐 Cross-platform</span>
+              <span>Touch-friendly</span>
+              <span>Responsive design</span>
+              <span>Fast performance</span>
             </div>
           </div>
         </div>

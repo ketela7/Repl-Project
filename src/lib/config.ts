@@ -13,7 +13,7 @@ export const config = {
     secretKey: process.env.TURNSTILE_SECRET_KEY!,
   },
   google: {
-    driveScopes: 'https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/drive.file',
+    driveScopes: 'https://www.googleapis.com/auth/drive',
   },
   app: {
     nodeEnv: process.env.NODE_ENV || 'development',
