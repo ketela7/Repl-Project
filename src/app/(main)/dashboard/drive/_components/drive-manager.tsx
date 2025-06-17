@@ -30,7 +30,11 @@ import {
   Columns,
   ChevronUp,
   ChevronDown,
-  ChevronsUpDown
+  ChevronsUpDown,
+  Square,
+  CheckSquare,
+  MousePointer,
+  SquareCheck
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -54,6 +58,7 @@ import {
 import { 
   Checkbox 
 } from "@/components/ui/checkbox";
+import { Progress } from "@/components/ui/progress";
 import {
   Popover,
   PopoverContent,
@@ -115,6 +120,19 @@ export function DriveManager() {
     key: 'name' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType';
     direction: 'asc' | 'desc';
   } | null>(null);
+
+  // Bulk operations state
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+  const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
+  const [isBulkCopyDialogOpen, setIsBulkCopyDialogOpen] = useState(false);
+  const [bulkOperationProgress, setBulkOperationProgress] = useState<{
+    isRunning: boolean;
+    current: number;
+    total: number;
+    operation: string;
+  }>({ isRunning: false, current: 0, total: 0, operation: '' });
 
   // Sorting functionality
   const handleSort = (key: 'name' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType') => {
@@ -210,6 +228,206 @@ export function DriveManager() {
       return 0;
     });
   }, [folders, sortConfig]);
+
+  // Bulk operations utility functions
+  const getAllItems = () => [...folders, ...files];
+  
+  const getSelectedItemsData = () => {
+    const allItems = getAllItems();
+    return Array.from(selectedItems).map(id => {
+      const item = allItems.find(item => item.id === id);
+      return item ? { 
+        id: item.id, 
+        name: item.name, 
+        type: 'mimeType' in item ? 'file' : 'folder',
+        mimeType: 'mimeType' in item ? item.mimeType : 'application/vnd.google-apps.folder'
+      } : null;
+    }).filter(Boolean);
+  };
+
+  const toggleItemSelection = (itemId: string) => {
+    setSelectedItems(prev => {
+      const newSelection = new Set(prev);
+      if (newSelection.has(itemId)) {
+        newSelection.delete(itemId);
+      } else {
+        newSelection.add(itemId);
+      }
+      return newSelection;
+    });
+  };
+
+  const selectAll = () => {
+    const allItems = getAllItems();
+    setSelectedItems(new Set(allItems.map(item => item.id)));
+  };
+
+  const deselectAll = () => {
+    setSelectedItems(new Set());
+  };
+
+  const toggleSelectMode = () => {
+    setIsSelectMode(!isSelectMode);
+    if (isSelectMode) {
+      deselectAll();
+    }
+  };
+
+  // Bulk operation handlers
+  const handleBulkDelete = async () => {
+    const selectedItemsData = getSelectedItemsData();
+    if (selectedItemsData.length === 0) return;
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: selectedItemsData.length,
+      operation: 'Moving to trash'
+    });
+
+    try {
+      for (let i = 0; i < selectedItemsData.length; i++) {
+        const item = selectedItemsData[i];
+        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        const response = await fetch(`/api/drive/files/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'trash' })
+        });
+
+        if (!response.ok) {
+          console.error(`Failed to delete ${item.name}`);
+        }
+      }
+
+      await fetchFiles(currentFolderId, searchQuery);
+      deselectAll();
+      setIsSelectMode(false);
+    } catch (error) {
+      console.error('Bulk delete error:', error);
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+      setIsBulkDeleteDialogOpen(false);
+    }
+  };
+
+  const handleBulkMove = async (targetFolderId: string) => {
+    const selectedItemsData = getSelectedItemsData();
+    if (selectedItemsData.length === 0) return;
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: selectedItemsData.length,
+      operation: 'Moving files'
+    });
+
+    try {
+      for (let i = 0; i < selectedItemsData.length; i++) {
+        const item = selectedItemsData[i];
+        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        const response = await fetch(`/api/drive/files/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'move', 
+            targetFolderId,
+            currentParentId: currentFolderId 
+          })
+        });
+
+        if (!response.ok) {
+          console.error(`Failed to move ${item.name}`);
+        }
+      }
+
+      await fetchFiles(currentFolderId, searchQuery);
+      deselectAll();
+      setIsSelectMode(false);
+    } catch (error) {
+      console.error('Bulk move error:', error);
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+      setIsBulkMoveDialogOpen(false);
+    }
+  };
+
+  const handleBulkCopy = async (targetFolderId: string) => {
+    const selectedItemsData = getSelectedItemsData().filter(item => item.type === 'file');
+    if (selectedItemsData.length === 0) return;
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: selectedItemsData.length,
+      operation: 'Copying files'
+    });
+
+    try {
+      for (let i = 0; i < selectedItemsData.length; i++) {
+        const item = selectedItemsData[i];
+        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        const response = await fetch(`/api/drive/files/${item.id}/copy`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetFolderId })
+        });
+
+        if (!response.ok) {
+          console.error(`Failed to copy ${item.name}`);
+        }
+      }
+
+      await fetchFiles(currentFolderId, searchQuery);
+      deselectAll();
+      setIsSelectMode(false);
+    } catch (error) {
+      console.error('Bulk copy error:', error);
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+      setIsBulkCopyDialogOpen(false);
+    }
+  };
+
+  const handleBulkDownload = async () => {
+    const selectedItemsData = getSelectedItemsData().filter(item => item.type === 'file');
+    if (selectedItemsData.length === 0) return;
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: selectedItemsData.length,
+      operation: 'Downloading files'
+    });
+
+    try {
+      for (let i = 0; i < selectedItemsData.length; i++) {
+        const item = selectedItemsData[i];
+        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        const downloadUrl = `/api/drive/files/${item.id}/download`;
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = item.name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Add small delay between downloads to avoid overwhelming the browser
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      deselectAll();
+      setIsSelectMode(false);
+    } catch (error) {
+      console.error('Bulk download error:', error);
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+    }
+  };
 
   const fetchFiles = async (parentId?: string, query?: string, pageToken?: string, append = false) => {
     try {
