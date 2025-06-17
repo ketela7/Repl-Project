@@ -181,6 +181,26 @@ export class GoogleDriveService {
 
   async downloadFileStream(fileId: string): Promise<ReadableStream> {
     try {
+      // First check if the file is downloadable
+      const fileInfo = await this.drive.files.get({
+        fileId,
+        fields: 'mimeType, name'
+      });
+
+      const mimeType = fileInfo.data.mimeType;
+      const fileName = fileInfo.data.name;
+
+      // Check if it's a folder
+      if (mimeType === 'application/vnd.google-apps.folder') {
+        throw new Error('Cannot download folders. Folders are not downloadable files.');
+      }
+
+      // Check if it's a Google Workspace document
+      if (mimeType?.startsWith('application/vnd.google-apps.') && 
+          mimeType !== 'application/vnd.google-apps.folder') {
+        throw new Error(`Cannot download Google Workspace document "${fileName}". Use export functionality instead.`);
+      }
+
       // Use arraybuffer instead of stream for more reliable handling
       const response = await this.drive.files.get({
         fileId,
@@ -201,8 +221,22 @@ export class GoogleDriveService {
           controller.close();
         }
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error in downloadFileStream:', error);
+      
+      // Handle specific error codes
+      if (error.code === 403 || error.status === 403) {
+        throw new Error('Access denied: File cannot be downloaded (403)');
+      }
+      
+      if (error.code === 404 || error.status === 404) {
+        throw new Error('File not found (404)');
+      }
+      
+      if (error.code === 401 || error.status === 401) {
+        throw new Error('Unauthorized access (401)');
+      }
+
       throw new Error(`Failed to download file stream: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
