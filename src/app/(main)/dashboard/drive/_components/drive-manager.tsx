@@ -356,7 +356,7 @@ export function DriveManager() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             action: 'move', 
-            targetFolderId,
+            parentId: targetFolderId,
             currentParentId: currentFolderId 
           })
         });
@@ -416,7 +416,10 @@ export function DriveManager() {
         const response = await fetch(`/api/drive/files/${item.id}/copy`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetFolderId })
+          body: JSON.stringify({ 
+            name: `Copy of ${item.name}`,
+            parentId: targetFolderId 
+          })
         });
 
         if (response.ok) {
@@ -1461,7 +1464,7 @@ export function DriveManager() {
                       <Checkbox
                         checked={selectedItems.has(folder.id)}
                         onCheckedChange={() => toggleItemSelection(folder.id)}
-                        className="bg-background"
+                        className="bg-background h-4 w-4"
                       />
                     </div>
                   )}
@@ -1556,7 +1559,7 @@ export function DriveManager() {
                       <Checkbox
                         checked={selectedItems.has(file.id)}
                         onCheckedChange={() => toggleItemSelection(file.id)}
-                        className="bg-background"
+                        className="bg-background h-4 w-4"
                       />
                     </div>
                   )}
@@ -1676,7 +1679,7 @@ export function DriveManager() {
                         <Checkbox
                           checked={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
                           onCheckedChange={selectedItems.size === folders.length + files.length ? deselectAll : selectAll}
-                          className="ml-2"
+                          className="ml-2 h-4 w-4"
                         />
                       )}
                     </TableHead>
@@ -1762,6 +1765,7 @@ export function DriveManager() {
                               checked={selectedItems.has(folder.id)}
                               onCheckedChange={() => toggleItemSelection(folder.id)}
                               onClick={(e) => e.stopPropagation()}
+                              className="h-4 w-4"
                             />
                           )}
                           <div className="text-lg">📁</div>
@@ -1891,6 +1895,7 @@ export function DriveManager() {
                               checked={selectedItems.has(file.id)}
                               onCheckedChange={() => toggleItemSelection(file.id)}
                               onClick={(e) => e.stopPropagation()}
+                              className="h-4 w-4"
                             />
                           )}
                           <div className="text-lg">{getFileIcon(file.mimeType)}</div>
