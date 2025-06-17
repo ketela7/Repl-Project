@@ -4,9 +4,9 @@ export const APP_CONFIG = {
   name: "Google Drive Manager",
   version: packageJson.version,
   meta: {
-    icon: "favicon.ico",
-    title: "Studio Admin - Modern Next.js Dashboard Starter Template",
+    icon: "/favicon.ico",
+    title: "Google Drive Manager - Manage Your Files with Ease",
     description:
-      "Studio Admin is a modern, open-source dashboard starter template built with Next.js 15, Tailwind CSS v4, and shadcn/ui. Perfect for SaaS apps, admin panels, and internal tools—fully customizable and production-ready.",
+      "Google Drive Manager is a modern web application for managing your Google Drive files. Upload, organize, search, and manage your files and folders with an intuitive interface built with Next.js and Google Drive API.",
   },
 };

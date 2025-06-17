@@ -27,6 +27,11 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
 
   return (
     <html lang="en" className="light" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+      </head>
       <body className={`${inter.className} min-h-screen antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
           <ConfigProvider config={config}>
