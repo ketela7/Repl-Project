@@ -1736,11 +1736,13 @@ export function DriveManager() {
                   <TableRow>
                     <TableHead className="w-[50px]">
                       {isSelectMode && (
-                        <Checkbox
-                          checked={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
-                          onCheckedChange={selectedItems.size === folders.length + files.length ? deselectAll : selectAll}
-                          className="ml-2 !h-4 !w-4 !size-4"
-                        />
+                        <div className="flex items-center justify-center">
+                          <Checkbox
+                            checked={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
+                            onCheckedChange={selectedItems.size === folders.length + files.length ? deselectAll : selectAll}
+                            className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                          />
+                        </div>
                       )}
                     </TableHead>
                     {visibleColumns.name && (
@@ -1825,7 +1827,7 @@ export function DriveManager() {
                               checked={selectedItems.has(folder.id)}
                               onCheckedChange={() => toggleItemSelection(folder.id)}
                               onClick={(e) => e.stopPropagation()}
-                              className="!h-4 !w-4 !size-4"
+                              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
                           <div className="text-lg">📁</div>
@@ -1955,7 +1957,7 @@ export function DriveManager() {
                               checked={selectedItems.has(file.id)}
                               onCheckedChange={() => toggleItemSelection(file.id)}
                               onClick={(e) => e.stopPropagation()}
-                              className="!h-4 !w-4 !size-4"
+                              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
                           <div className="text-lg">{getFileIcon(file.mimeType)}</div>
