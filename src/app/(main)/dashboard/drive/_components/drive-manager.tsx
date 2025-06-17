@@ -243,12 +243,17 @@ export function DriveManager() {
     const allItems = getAllItems();
     return Array.from(selectedItems).map(id => {
       const item = allItems.find(item => item.id === id);
-      return item ? { 
+      if (!item) return null;
+      
+      // More reliable type detection
+      const isFolder = item.mimeType === 'application/vnd.google-apps.folder' || !('mimeType' in item);
+      
+      return { 
         id: item.id, 
         name: item.name, 
-        type: 'mimeType' in item ? 'file' : 'folder',
-        mimeType: 'mimeType' in item ? item.mimeType : 'application/vnd.google-apps.folder'
-      } : null;
+        type: isFolder ? 'folder' : 'file',
+        mimeType: item.mimeType || 'application/vnd.google-apps.folder'
+      };
     }).filter(Boolean);
   };
 
@@ -474,8 +479,25 @@ export function DriveManager() {
 
   const handleBulkDownload = async () => {
     const allSelectedItems = getSelectedItemsData();
-    const selectedItemsData = allSelectedItems.filter(item => item.type === 'file');
+    
+    // Filter out folders more thoroughly - check both type and mimeType
+    const selectedItemsData = allSelectedItems.filter(item => {
+      // Skip folders by type
+      if (item.type === 'folder') return false;
+      
+      // Skip folders by mimeType (more reliable)
+      if (item.mimeType === 'application/vnd.google-apps.folder') return false;
+      
+      // Only include files
+      return item.type === 'file' && item.mimeType !== 'application/vnd.google-apps.folder';
+    });
+    
     const folderCount = allSelectedItems.length - selectedItemsData.length;
+
+    console.log('=== Bulk Download Debug ===');
+    console.log('All selected items:', allSelectedItems);
+    console.log('Filtered file items:', selectedItemsData);
+    console.log('Folder count:', folderCount);
 
     if (selectedItemsData.length === 0) {
       if (folderCount > 0) {
@@ -506,6 +528,15 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
 
         try {
+          console.log(`Attempting to download: ${item.name} (ID: ${item.id}, Type: ${item.type}, MimeType: ${item.mimeType})`);
+          
+          // Double-check this is not a folder before downloading
+          if (item.mimeType === 'application/vnd.google-apps.folder') {
+            console.warn(`Skipping folder in download: ${item.name}`);
+            failedItems.push(`${item.name} (folder)`);
+            continue;
+          }
+
           const downloadUrl = `/api/drive/download/${item.id}`;
           const link = document.createElement('a');
           link.href = downloadUrl;
@@ -515,6 +546,8 @@ export function DriveManager() {
           link.click();
           document.body.removeChild(link);
           successCount++;
+
+          console.log(`Successfully initiated download for: ${item.name}`);
 
           // Add delay between downloads to avoid overwhelming the browser
           if (i < selectedItemsData.length - 1) {
