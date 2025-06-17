@@ -245,14 +245,15 @@ export function DriveManager() {
       const item = allItems.find(item => item.id === id);
       if (!item) return null;
       
-      // More reliable type detection
-      const isFolder = item.mimeType === 'application/vnd.google-apps.folder' || !('mimeType' in item);
+      // Check if item exists in folders array (most reliable way)
+      const isFolder = folders.some(folder => folder.id === item.id);
       
       return { 
         id: item.id, 
         name: item.name, 
         type: isFolder ? 'folder' : 'file',
-        mimeType: item.mimeType || 'application/vnd.google-apps.folder'
+        mimeType: item.mimeType,
+        isFromFolderArray: isFolder
       };
     }).filter(Boolean);
   };
@@ -480,24 +481,46 @@ export function DriveManager() {
   const handleBulkDownload = async () => {
     const allSelectedItems = getSelectedItemsData();
     
-    // Filter out folders more thoroughly - check both type and mimeType
+    console.log('=== Bulk Download Debug START ===');
+    console.log('All selected items:', allSelectedItems);
+    console.log('Folders array:', folders.map(f => ({ id: f.id, name: f.name, mimeType: f.mimeType })));
+    console.log('Files array:', files.map(f => ({ id: f.id, name: f.name, mimeType: f.mimeType })));
+    
+    // Filter out folders using multiple checks
     const selectedItemsData = allSelectedItems.filter(item => {
-      // Skip folders by type
-      if (item.type === 'folder') return false;
+      console.log(`Checking item: ${item.name} (ID: ${item.id})`);
+      console.log(`- Type: ${item.type}`);
+      console.log(`- MimeType: ${item.mimeType}`);
+      console.log(`- IsFromFolderArray: ${item.isFromFolderArray}`);
       
-      // Skip folders by mimeType (more reliable)
-      if (item.mimeType === 'application/vnd.google-apps.folder') return false;
+      // Primary check: if it's in folders array, skip it
+      if (item.isFromFolderArray) {
+        console.log(`- SKIPPED: Found in folders array`);
+        return false;
+      }
       
-      // Only include files
-      return item.type === 'file' && item.mimeType !== 'application/vnd.google-apps.folder';
+      // Secondary check: mimeType
+      if (item.mimeType === 'application/vnd.google-apps.folder') {
+        console.log(`- SKIPPED: Folder mimeType`);
+        return false;
+      }
+      
+      // Tertiary check: type
+      if (item.type === 'folder') {
+        console.log(`- SKIPPED: Type is folder`);
+        return false;
+      }
+      
+      console.log(`- INCLUDED: Will be downloaded`);
+      return true;
     });
     
     const folderCount = allSelectedItems.length - selectedItemsData.length;
 
-    console.log('=== Bulk Download Debug ===');
-    console.log('All selected items:', allSelectedItems);
-    console.log('Filtered file items:', selectedItemsData);
-    console.log('Folder count:', folderCount);
+    console.log('=== Final Results ===');
+    console.log('Items to download:', selectedItemsData);
+    console.log('Folder count (skipped):', folderCount);
+    console.log('=== Bulk Download Debug END ===');
 
     if (selectedItemsData.length === 0) {
       if (folderCount > 0) {
@@ -530,9 +553,9 @@ export function DriveManager() {
         try {
           console.log(`Attempting to download: ${item.name} (ID: ${item.id}, Type: ${item.type}, MimeType: ${item.mimeType})`);
           
-          // Double-check this is not a folder before downloading
-          if (item.mimeType === 'application/vnd.google-apps.folder') {
-            console.warn(`Skipping folder in download: ${item.name}`);
+          // Triple-check this is not a folder before downloading
+          if (item.isFromFolderArray || item.mimeType === 'application/vnd.google-apps.folder' || item.type === 'folder') {
+            console.warn(`CRITICAL: Folder detected in download queue: ${item.name}`);
             failedItems.push(`${item.name} (folder)`);
             continue;
           }
