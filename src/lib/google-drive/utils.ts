@@ -12,97 +12,134 @@ export function formatFileSize(bytes: string | number): string {
   return `${(size / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
 }
 
-import { 
-  FileText, 
-  Folder, 
-  BarChart3, 
-  TrendingUp, 
-  FileCheck, 
-  Palette, 
-  BookOpen, 
-  Image, 
-  Video, 
-  Music, 
-  Archive,
-  File,
-  FileSpreadsheet,
-  Presentation,
-  FileImage,
-  FileVideo,
-  FileAudio,
-  Code,
-  FileCode,
-  Database
-} from 'lucide-react';
-
-export function getFileIcon(mimeType: string, className: string = "h-4 w-4"): JSX.Element {
-  const iconProps = { 
-    className: `${className} text-muted-foreground drop-shadow-sm`,
-    strokeWidth: 2
-  };
-
-  const iconMap: Record<string, JSX.Element> = {
+export function getFileIconName(mimeType: string): string {
+  const iconMap: Record<string, string> = {
     // Google Workspace Files
-    'application/vnd.google-apps.folder': <Folder {...iconProps} className={`${className} text-blue-600 dark:text-blue-400`} />,
-    'application/vnd.google-apps.document': <FileText {...iconProps} className={`${className} text-blue-500 dark:text-blue-400`} />,
-    'application/vnd.google-apps.spreadsheet': <FileSpreadsheet {...iconProps} className={`${className} text-green-600 dark:text-green-400`} />,
-    'application/vnd.google-apps.presentation': <Presentation {...iconProps} className={`${className} text-orange-600 dark:text-orange-400`} />,
-    'application/vnd.google-apps.form': <FileCheck {...iconProps} className={`${className} text-purple-600 dark:text-purple-400`} />,
-    'application/vnd.google-apps.drawing': <Palette {...iconProps} className={`${className} text-pink-600 dark:text-pink-400`} />,
+    'application/vnd.google-apps.folder': 'Folder',
+    'application/vnd.google-apps.document': 'FileText',
+    'application/vnd.google-apps.spreadsheet': 'FileSpreadsheet',
+    'application/vnd.google-apps.presentation': 'Presentation',
+    'application/vnd.google-apps.form': 'FileCheck',
+    'application/vnd.google-apps.drawing': 'Palette',
     
     // PDF and Documents
-    'application/pdf': <BookOpen {...iconProps} className={`${className} text-red-600 dark:text-red-400`} />,
-    'text/plain': <FileText {...iconProps} className={`${className} text-gray-600 dark:text-gray-400`} />,
-    'application/msword': <FileText {...iconProps} className={`${className} text-blue-600 dark:text-blue-400`} />,
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': <FileText {...iconProps} className={`${className} text-blue-600 dark:text-blue-400`} />,
+    'application/pdf': 'BookOpen',
+    'text/plain': 'FileText',
+    'application/msword': 'FileText',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'FileText',
     
     // Spreadsheets
-    'application/vnd.ms-excel': <FileSpreadsheet {...iconProps} className={`${className} text-green-600 dark:text-green-400`} />,
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': <FileSpreadsheet {...iconProps} className={`${className} text-green-600 dark:text-green-400`} />,
+    'application/vnd.ms-excel': 'FileSpreadsheet',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'FileSpreadsheet',
     
     // Presentations
-    'application/vnd.ms-powerpoint': <Presentation {...iconProps} className={`${className} text-orange-600 dark:text-orange-400`} />,
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': <Presentation {...iconProps} className={`${className} text-orange-600 dark:text-orange-400`} />,
+    'application/vnd.ms-powerpoint': 'Presentation',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'Presentation',
     
     // Images
-    'image/jpeg': <FileImage {...iconProps} className={`${className} text-purple-600 dark:text-purple-400`} />,
-    'image/jpg': <FileImage {...iconProps} className={`${className} text-purple-600 dark:text-purple-400`} />,
-    'image/png': <FileImage {...iconProps} className={`${className} text-purple-600 dark:text-purple-400`} />,
-    'image/gif': <FileImage {...iconProps} className={`${className} text-purple-600 dark:text-purple-400`} />,
-    'image/svg+xml': <FileImage {...iconProps} className={`${className} text-purple-600 dark:text-purple-400`} />,
-    'image/webp': <FileImage {...iconProps} className={`${className} text-purple-600 dark:text-purple-400`} />,
+    'image/jpeg': 'FileImage',
+    'image/jpg': 'FileImage',
+    'image/png': 'FileImage',
+    'image/gif': 'FileImage',
+    'image/svg+xml': 'FileImage',
+    'image/webp': 'FileImage',
     
     // Videos
-    'video/mp4': <FileVideo {...iconProps} className={`${className} text-red-600 dark:text-red-400`} />,
-    'video/avi': <FileVideo {...iconProps} className={`${className} text-red-600 dark:text-red-400`} />,
-    'video/mov': <FileVideo {...iconProps} className={`${className} text-red-600 dark:text-red-400`} />,
-    'video/wmv': <FileVideo {...iconProps} className={`${className} text-red-600 dark:text-red-400`} />,
-    'video/webm': <FileVideo {...iconProps} className={`${className} text-red-600 dark:text-red-400`} />,
+    'video/mp4': 'FileVideo',
+    'video/avi': 'FileVideo',
+    'video/mov': 'FileVideo',
+    'video/wmv': 'FileVideo',
+    'video/webm': 'FileVideo',
     
     // Audio
-    'audio/mp3': <FileAudio {...iconProps} className={`${className} text-indigo-600 dark:text-indigo-400`} />,
-    'audio/wav': <FileAudio {...iconProps} className={`${className} text-indigo-600 dark:text-indigo-400`} />,
-    'audio/m4a': <FileAudio {...iconProps} className={`${className} text-indigo-600 dark:text-indigo-400`} />,
-    'audio/flac': <FileAudio {...iconProps} className={`${className} text-indigo-600 dark:text-indigo-400`} />,
+    'audio/mp3': 'FileAudio',
+    'audio/wav': 'FileAudio',
+    'audio/m4a': 'FileAudio',
+    'audio/flac': 'FileAudio',
     
     // Archives
-    'application/zip': <Archive {...iconProps} className={`${className} text-yellow-600 dark:text-yellow-400`} />,
-    'application/x-rar-compressed': <Archive {...iconProps} className={`${className} text-yellow-600 dark:text-yellow-400`} />,
-    'application/x-7z-compressed': <Archive {...iconProps} className={`${className} text-yellow-600 dark:text-yellow-400`} />,
-    'application/gzip': <Archive {...iconProps} className={`${className} text-yellow-600 dark:text-yellow-400`} />,
+    'application/zip': 'Archive',
+    'application/x-rar-compressed': 'Archive',
+    'application/x-7z-compressed': 'Archive',
+    'application/gzip': 'Archive',
     
     // Code files
-    'text/javascript': <FileCode {...iconProps} className={`${className} text-yellow-500 dark:text-yellow-400`} />,
-    'application/json': <FileCode {...iconProps} className={`${className} text-yellow-500 dark:text-yellow-400`} />,
-    'text/html': <FileCode {...iconProps} className={`${className} text-orange-500 dark:text-orange-400`} />,
-    'text/css': <FileCode {...iconProps} className={`${className} text-blue-500 dark:text-blue-400`} />,
-    'text/xml': <FileCode {...iconProps} className={`${className} text-green-500 dark:text-green-400`} />,
+    'text/javascript': 'FileCode',
+    'application/json': 'FileCode',
+    'text/html': 'FileCode',
+    'text/css': 'FileCode',
+    'text/xml': 'FileCode',
     
     // Database
-    'application/x-sqlite3': <Database {...iconProps} className={`${className} text-slate-600 dark:text-slate-400`} />,
+    'application/x-sqlite3': 'Database',
   };
   
-  return iconMap[mimeType] || <File {...iconProps} className={`${className} text-gray-500 dark:text-gray-400`} />;
+  return iconMap[mimeType] || 'File';
+}
+
+export function getFileIconColor(mimeType: string): string {
+  const colorMap: Record<string, string> = {
+    // Google Workspace Files
+    'application/vnd.google-apps.folder': 'text-blue-600 dark:text-blue-400',
+    'application/vnd.google-apps.document': 'text-blue-500 dark:text-blue-400',
+    'application/vnd.google-apps.spreadsheet': 'text-green-600 dark:text-green-400',
+    'application/vnd.google-apps.presentation': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.google-apps.form': 'text-purple-600 dark:text-purple-400',
+    'application/vnd.google-apps.drawing': 'text-pink-600 dark:text-pink-400',
+    
+    // PDF and Documents
+    'application/pdf': 'text-red-600 dark:text-red-400',
+    'text/plain': 'text-gray-600 dark:text-gray-400',
+    'application/msword': 'text-blue-600 dark:text-blue-400',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'text-blue-600 dark:text-blue-400',
+    
+    // Spreadsheets
+    'application/vnd.ms-excel': 'text-green-600 dark:text-green-400',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'text-green-600 dark:text-green-400',
+    
+    // Presentations
+    'application/vnd.ms-powerpoint': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'text-orange-600 dark:text-orange-400',
+    
+    // Images
+    'image/jpeg': 'text-purple-600 dark:text-purple-400',
+    'image/jpg': 'text-purple-600 dark:text-purple-400',
+    'image/png': 'text-purple-600 dark:text-purple-400',
+    'image/gif': 'text-purple-600 dark:text-purple-400',
+    'image/svg+xml': 'text-purple-600 dark:text-purple-400',
+    'image/webp': 'text-purple-600 dark:text-purple-400',
+    
+    // Videos
+    'video/mp4': 'text-red-600 dark:text-red-400',
+    'video/avi': 'text-red-600 dark:text-red-400',
+    'video/mov': 'text-red-600 dark:text-red-400',
+    'video/wmv': 'text-red-600 dark:text-red-400',
+    'video/webm': 'text-red-600 dark:text-red-400',
+    
+    // Audio
+    'audio/mp3': 'text-indigo-600 dark:text-indigo-400',
+    'audio/wav': 'text-indigo-600 dark:text-indigo-400',
+    'audio/m4a': 'text-indigo-600 dark:text-indigo-400',
+    'audio/flac': 'text-indigo-600 dark:text-indigo-400',
+    
+    // Archives
+    'application/zip': 'text-yellow-600 dark:text-yellow-400',
+    'application/x-rar-compressed': 'text-yellow-600 dark:text-yellow-400',
+    'application/x-7z-compressed': 'text-yellow-600 dark:text-yellow-400',
+    'application/gzip': 'text-yellow-600 dark:text-yellow-400',
+    
+    // Code files
+    'text/javascript': 'text-yellow-500 dark:text-yellow-400',
+    'application/json': 'text-yellow-500 dark:text-yellow-400',
+    'text/html': 'text-orange-500 dark:text-orange-400',
+    'text/css': 'text-blue-500 dark:text-blue-400',
+    'text/xml': 'text-green-500 dark:text-green-400',
+    
+    // Database
+    'application/x-sqlite3': 'text-slate-600 dark:text-slate-400',
+  };
+  
+  return colorMap[mimeType] || 'text-gray-500 dark:text-gray-400';
 }
 
 export function isGoogleWorkspaceFile(mimeType: string): boolean {

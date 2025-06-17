@@ -65,7 +65,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
-import { formatFileSize, getFileIcon, formatDate, isPreviewable } from '@/lib/google-drive/utils';
+import { formatFileSize, formatDate, isPreviewable } from '@/lib/google-drive/utils';
+import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { FileUploadDialog } from './file-upload-dialog';
 import { CreateFolderDialog } from './create-folder-dialog';
@@ -1511,7 +1512,7 @@ export function DriveManager() {
           ) : folders.length === 0 && files.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <div className="flex justify-center mb-4">
-                {getFileIcon('application/vnd.google-apps.folder', 'h-16 w-16')}
+                <FileIcon mimeType="application/vnd.google-apps.folder" className="h-16 w-16" />
               </div>
               <h3 className="text-lg font-medium mb-2">
                 {searchQuery ? 'No files found' : currentFolderId ? 'This folder is empty' : 'Your Google Drive is ready!'}
@@ -1547,7 +1548,7 @@ export function DriveManager() {
                   )}
                   <div className="flex items-start justify-between mb-2">
                     <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
-                      {getFileIcon('application/vnd.google-apps.folder', 'h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8')}
+                      <FileIcon mimeType="application/vnd.google-apps.folder" className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -1643,7 +1644,9 @@ export function DriveManager() {
                     </div>
                   )}
                   <div className="flex items-start justify-between mb-2">
-                    <div className={`text-lg sm:text-xl md:text-2xl ${isSelectMode ? 'ml-6' : ''}`}>{getFileIcon(file.mimeType)}</div>
+                    <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
+                      <FileIcon mimeType={file.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
+                    </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
