@@ -718,34 +718,21 @@ export function DriveManager() {
           break;
           
         case 'download':
-          const downloadResponse = await fetch(`/api/drive/files/${fileId}`);
-          if (!downloadResponse.ok) {
-            const errorData = await downloadResponse.json();
-            if (errorData.needsReauth) {
-              toast.error('Google Drive access expired. Please reconnect your account.');
-              window.location.reload();
-              return;
-            }
+          try {
+            // Create a temporary anchor element to trigger download
+            const downloadUrl = `/api/drive/download/${fileId}`;
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = fileName;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
-            if (downloadResponse.status === 403) {
-              toast.error(`You don't have permission to download "${fileName}". This may be a shared file with restricted access.`);
-              return;
-            }
-            
-            if (downloadResponse.status === 404) {
-              toast.error(`"${fileName}" was not found. It may have been moved or deleted.`);
-              await handleRefresh();
-              return;
-            }
-            
-            throw new Error(errorData.error || 'Failed to get file info');
-          }
-          
-          const fileData = await downloadResponse.json();
-          if (fileData.webContentLink) {
-            window.open(fileData.webContentLink, '_blank');
-          } else {
-            toast.error(`"${fileName}" cannot be downloaded directly. This file type may require special handling or viewing in Google Drive.`);
+            toast.success(`"${fileName}" download started`);
+          } catch (downloadError) {
+            console.error('Download error:', downloadError);
+            toast.error(`Failed to download "${fileName}"`);
           }
           break;
           

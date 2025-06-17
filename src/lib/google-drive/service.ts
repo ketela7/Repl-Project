@@ -419,29 +419,31 @@ export class GoogleDriveService {
   }
 
   async downloadFileStream(fileId: string): Promise<ReadableStream> {
-    const response = await this.drive.files.get({
-      fileId,
-      alt: 'media',
-    }, { responseType: 'stream' });
+    try {
+      // Use arraybuffer instead of stream for more reliable handling
+      const response = await this.drive.files.get({
+        fileId,
+        alt: 'media',
+      }, { responseType: 'arraybuffer' });
 
-    // Convert Node.js readable stream to Web ReadableStream
-    const nodeStream = response.data as any;
-    
-    return new ReadableStream({
-      start(controller) {
-        nodeStream.on('data', (chunk: any) => {
-          controller.enqueue(chunk);
-        });
-        
-        nodeStream.on('end', () => {
-          controller.close();
-        });
-        
-        nodeStream.on('error', (error: any) => {
-          controller.error(error);
-        });
+      if (!response.data) {
+        throw new Error('No file data received from Google Drive');
       }
-    });
+
+      // Convert ArrayBuffer to ReadableStream
+      const buffer = response.data as ArrayBuffer;
+      const uint8Array = new Uint8Array(buffer);
+      
+      return new ReadableStream({
+        start(controller) {
+          controller.enqueue(uint8Array);
+          controller.close();
+        }
+      });
+    } catch (error) {
+      console.error('Error in downloadFileStream:', error);
+      throw new Error(`Failed to download file stream: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   // Unified permanent delete operation for both files and folders
@@ -640,63 +642,5 @@ export class GoogleDriveService {
     return response.data.files?.map(convertGoogleDriveFile) || [];
   }
 
-  // Unified share operation for both files and folders
-  async shareFile(fileId: string, permission: DrivePermission): Promise<void> {
-    try {
-      console.log('Creating permission for file:', fileId, 'with permission:', permission);
-      
-      const permissionRequest = {
-        role: permission.role,
-        type: permission.type,
-        ...(permission.emailAddress && { emailAddress: permission.emailAddress }),
-        ...(permission.domain && { domain: permission.domain })
-      };
 
-      await this.drive.permissions.create({
-        fileId,
-        requestBody: permissionRequest,
-        sendNotificationEmail: false // Don't send email notifications for link sharing
-      });
-
-      console.log('Permission created successfully for file:', fileId);
-    } catch (error) {
-      console.error('Error creating permission:', error);
-      throw error;
-    }
-  }
-
-  // Alias for clarity - same operation works for both files and folders
-  async shareFolder(folderId: string, permission: DrivePermission): Promise<void> {
-    return this.shareFile(folderId, permission);
-  }
-
-  // Get file permissions
-  async getFilePermissions(fileId: string): Promise<any[]> {
-    try {
-      const response = await this.drive.permissions.list({
-        fileId,
-        fields: 'permissions(id, type, role, emailAddress, domain, displayName)'
-      });
-
-      return response.data.permissions || [];
-    } catch (error) {
-      console.error('Error getting file permissions:', error);
-      throw error;
-    }
-  }
-
-  // Remove file permission
-  async removeFilePermission(fileId: string, permissionId: string): Promise<void> {
-    try {
-      await this.drive.permissions.delete({
-        fileId,
-        permissionId
-      });
-
-      console.log('Permission removed successfully for file:', fileId);
-    } catch (error) {
-      console.error('Error removing permission:', error);
-      throw error;
-    }
-  }
 }

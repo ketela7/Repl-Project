@@ -46,9 +46,12 @@ export async function GET(
     // Return the file stream with appropriate headers
     return new NextResponse(fileStream, {
       headers: {
-        'Content-Type': fileDetails.mimeType,
-        'Content-Disposition': `inline; filename="${fileDetails.name}"`,
+        'Content-Type': fileDetails.mimeType || 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${encodeURIComponent(fileDetails.name || 'download')}"`,
         'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET',
+        'Access-Control-Allow-Headers': 'Content-Type',
       },
     });
   } catch (error) {
