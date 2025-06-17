@@ -78,6 +78,10 @@ import { PermanentDeleteDialog } from './permanent-delete-dialog';
 import { FileDetailsDialog } from './file-details-dialog';
 import { FilePreviewDialog } from './file-preview-dialog';
 import { DriveGridSkeleton, BreadcrumbSkeleton } from './drive-skeleton';
+import { BulkActionsToolbar } from './bulk-actions-toolbar';
+import { BulkDeleteDialog } from './bulk-delete-dialog';
+import { BulkMoveDialog } from './bulk-move-dialog';
+import { BulkCopyDialog } from './bulk-copy-dialog';
 
 export function DriveManager() {
   const [files, setFiles] = useState<DriveFile[]>([]);
@@ -1327,6 +1331,26 @@ export function DriveManager() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Bulk Actions Toolbar */}
+          {(folders.length > 0 || files.length > 0) && (
+            <div className="mb-4">
+              <BulkActionsToolbar
+                selectedCount={selectedItems.size}
+                totalCount={folders.length + files.length}
+                isSelectMode={isSelectMode}
+                isAllSelected={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
+                bulkOperationProgress={bulkOperationProgress}
+                onToggleSelectMode={toggleSelectMode}
+                onSelectAll={selectAll}
+                onDeselectAll={deselectAll}
+                onBulkDownload={handleBulkDownload}
+                onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
+                onBulkMove={() => setIsBulkMoveDialogOpen(true)}
+                onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
+              />
+            </div>
+          )}
+
           {loading ? (
             <DriveGridSkeleton />
           ) : folders.length === 0 && files.length === 0 ? (
@@ -1350,11 +1374,22 @@ export function DriveManager() {
               {folders.map((folder) => (
                 <div
                   key={folder.id}
-                  className="border rounded-lg p-2 sm:p-3 md:p-4 hover:bg-accent cursor-pointer transition-colors"
-                  onClick={() => handleFolderClick(folder.id)}
+                  className={`border rounded-lg p-2 sm:p-3 md:p-4 hover:bg-accent cursor-pointer transition-colors relative ${
+                    selectedItems.has(folder.id) ? 'ring-2 ring-primary bg-primary/5' : ''
+                  }`}
+                  onClick={() => isSelectMode ? toggleItemSelection(folder.id) : handleFolderClick(folder.id)}
                 >
+                  {isSelectMode && (
+                    <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedItems.has(folder.id)}
+                        onCheckedChange={() => toggleItemSelection(folder.id)}
+                        className="bg-background"
+                      />
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
-                    <div className="text-lg sm:text-xl md:text-2xl">📁</div>
+                    <div className={`text-lg sm:text-xl md:text-2xl ${isSelectMode ? 'ml-6' : ''}`}>📁</div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -1434,10 +1469,22 @@ export function DriveManager() {
               {files.map((file) => (
                 <div
                   key={file.id}
-                  className="border rounded-lg p-2 sm:p-3 md:p-4 hover:bg-accent transition-colors"
+                  className={`border rounded-lg p-2 sm:p-3 md:p-4 hover:bg-accent transition-colors relative cursor-pointer ${
+                    selectedItems.has(file.id) ? 'ring-2 ring-primary bg-primary/5' : ''
+                  }`}
+                  onClick={() => isSelectMode ? toggleItemSelection(file.id) : undefined}
                 >
+                  {isSelectMode && (
+                    <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedItems.has(file.id)}
+                        onCheckedChange={() => toggleItemSelection(file.id)}
+                        className="bg-background"
+                      />
+                    </div>
+                  )}
                   <div className="flex items-start justify-between mb-2">
-                    <div className="text-lg sm:text-xl md:text-2xl">{getFileIcon(file.mimeType)}</div>
+                    <div className={`text-lg sm:text-xl md:text-2xl ${isSelectMode ? 'ml-6' : ''}`}>{getFileIcon(file.mimeType)}</div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
