@@ -46,7 +46,8 @@ import {
   Archive
 } from "lucide-react";
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
-import { formatFileSize, getFileIcon, formatDate } from '@/lib/google-drive/utils';
+import { formatFileSize, formatDate } from '@/lib/google-drive/utils';
+import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { getInitials } from '@/lib/utils';
 
@@ -704,7 +705,7 @@ export function FileDetailsDialog({
             {fileType === 'folder' ? (
               <Folder className="h-5 w-5 text-blue-500" />
             ) : (
-              getFileIcon(fileName, 'h-5 w-5')
+              <FileIcon mimeType={mimeType || 'application/octet-stream'} className="h-5 w-5" />
             )}
             Details: {fileName}
           </DialogTitle>

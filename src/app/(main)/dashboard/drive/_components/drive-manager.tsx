@@ -1852,7 +1852,7 @@ export function DriveManager() {
                               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
-                          {getFileIcon('application/vnd.google-apps.folder', 'h-5 w-5')}
+                          <FileIcon mimeType="application/vnd.google-apps.folder" className="h-5 w-5" />
                         </div>
                       </TableCell>
                       {visibleColumns.name && (
@@ -1982,7 +1982,7 @@ export function DriveManager() {
                               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
-                          {getFileIcon(file.mimeType, 'h-5 w-5')}
+                          <FileIcon mimeType={file.mimeType} className="h-5 w-5" />
                         </div>
                       </TableCell>
                       {visibleColumns.name && (
