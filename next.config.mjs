@@ -5,12 +5,12 @@ const nextConfig = {
   },
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
+  },
+  turbopack: {
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
       },
     },
   },
@@ -39,6 +39,7 @@ const nextConfig = {
       },
     ];
   },
+  allowedDevOrigins: ['*.replit.dev'],
   async redirects() {
     return [
       {
@@ -50,7 +51,6 @@ const nextConfig = {
   },
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
 }
 
 export default nextConfig
