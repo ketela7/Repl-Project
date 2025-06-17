@@ -86,6 +86,7 @@ export class GoogleDriveService {
     return {
       files,
       nextPageToken: response.data.nextPageToken,
+      incompleteSearch: false,
     };
   }
 
@@ -113,6 +114,20 @@ export class GoogleDriveService {
     });
 
     return convertGoogleDriveFolder(response.data);
+  }
+
+  async getFolders(parentId?: string): Promise<DriveFolder[]> {
+    const query = parentId 
+      ? `'${parentId}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false`
+      : `mimeType='application/vnd.google-apps.folder' and trashed=false`;
+
+    const response = await this.drive.files.list({
+      q: query,
+      orderBy: 'name',
+      fields: 'files(id, name, createdTime, modifiedTime, parents)',
+    });
+
+    return response.data.files?.map(convertGoogleDriveFolder) || [];
   }
 
   async uploadFile(
