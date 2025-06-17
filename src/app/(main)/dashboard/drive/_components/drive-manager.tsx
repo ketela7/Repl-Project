@@ -289,6 +289,9 @@ export function DriveManager() {
       operation: 'Moving to trash'
     });
 
+    let successCount = 0;
+    let failedItems: string[] = [];
+
     try {
       for (let i = 0; i < selectedItemsData.length; i++) {
         const item = selectedItemsData[i];
@@ -300,7 +303,10 @@ export function DriveManager() {
           body: JSON.stringify({ action: 'trash' })
         });
 
-        if (!response.ok) {
+        if (response.ok) {
+          successCount++;
+        } else {
+          failedItems.push(item.name);
           console.error(`Failed to delete ${item.name}`);
         }
       }
@@ -308,8 +314,18 @@ export function DriveManager() {
       await fetchFiles(currentFolderId, searchQuery);
       deselectAll();
       setIsSelectMode(false);
+
+      // Show result notification
+      if (successCount === selectedItemsData.length) {
+        toast.success(`Successfully moved ${successCount} item${successCount > 1 ? 's' : ''} to trash`);
+      } else if (successCount > 0) {
+        toast.warning(`Moved ${successCount} items to trash. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else {
+        toast.error(`Failed to move items to trash: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
     } catch (error) {
       console.error('Bulk delete error:', error);
+      toast.error('An error occurred during bulk delete operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
       setIsBulkDeleteDialogOpen(false);
@@ -324,8 +340,11 @@ export function DriveManager() {
       isRunning: true,
       current: 0,
       total: selectedItemsData.length,
-      operation: 'Moving files'
+      operation: 'Moving items'
     });
+
+    let successCount = 0;
+    let failedItems: string[] = [];
 
     try {
       for (let i = 0; i < selectedItemsData.length; i++) {
@@ -342,7 +361,10 @@ export function DriveManager() {
           })
         });
 
-        if (!response.ok) {
+        if (response.ok) {
+          successCount++;
+        } else {
+          failedItems.push(item.name);
           console.error(`Failed to move ${item.name}`);
         }
       }
@@ -350,8 +372,18 @@ export function DriveManager() {
       await fetchFiles(currentFolderId, searchQuery);
       deselectAll();
       setIsSelectMode(false);
+
+      // Show result notification
+      if (successCount === selectedItemsData.length) {
+        toast.success(`Successfully moved ${successCount} item${successCount > 1 ? 's' : ''}`);
+      } else if (successCount > 0) {
+        toast.warning(`Moved ${successCount} items. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else {
+        toast.error(`Failed to move items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
     } catch (error) {
       console.error('Bulk move error:', error);
+      toast.error('An error occurred during bulk move operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
       setIsBulkMoveDialogOpen(false);
@@ -360,7 +392,11 @@ export function DriveManager() {
 
   const handleBulkCopy = async (targetFolderId: string) => {
     const selectedItemsData = getSelectedItemsData().filter(item => item.type === 'file');
-    if (selectedItemsData.length === 0) return;
+    if (selectedItemsData.length === 0) {
+      toast.warning('No files selected for copying. Only files can be copied.');
+      setIsBulkCopyDialogOpen(false);
+      return;
+    }
 
     setBulkOperationProgress({
       isRunning: true,
@@ -368,6 +404,9 @@ export function DriveManager() {
       total: selectedItemsData.length,
       operation: 'Copying files'
     });
+
+    let successCount = 0;
+    let failedItems: string[] = [];
 
     try {
       for (let i = 0; i < selectedItemsData.length; i++) {
@@ -380,7 +419,10 @@ export function DriveManager() {
           body: JSON.stringify({ targetFolderId })
         });
 
-        if (!response.ok) {
+        if (response.ok) {
+          successCount++;
+        } else {
+          failedItems.push(item.name);
           console.error(`Failed to copy ${item.name}`);
         }
       }
@@ -388,8 +430,18 @@ export function DriveManager() {
       await fetchFiles(currentFolderId, searchQuery);
       deselectAll();
       setIsSelectMode(false);
+
+      // Show result notification
+      if (successCount === selectedItemsData.length) {
+        toast.success(`Successfully copied ${successCount} file${successCount > 1 ? 's' : ''}`);
+      } else if (successCount > 0) {
+        toast.warning(`Copied ${successCount} files. ${failedItems.length} files failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else {
+        toast.error(`Failed to copy files: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
     } catch (error) {
       console.error('Bulk copy error:', error);
+      toast.error('An error occurred during bulk copy operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
       setIsBulkCopyDialogOpen(false);
@@ -398,7 +450,10 @@ export function DriveManager() {
 
   const handleBulkDownload = async () => {
     const selectedItemsData = getSelectedItemsData().filter(item => item.type === 'file');
-    if (selectedItemsData.length === 0) return;
+    if (selectedItemsData.length === 0) {
+      toast.warning('No files selected for download. Only files can be downloaded.');
+      return;
+    }
 
     setBulkOperationProgress({
       isRunning: true,
@@ -407,27 +462,49 @@ export function DriveManager() {
       operation: 'Downloading files'
     });
 
+    let successCount = 0;
+    let failedItems: string[] = [];
+
     try {
       for (let i = 0; i < selectedItemsData.length; i++) {
         const item = selectedItemsData[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
         
-        const downloadUrl = `/api/drive/files/${item.id}/download`;
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = item.name;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        // Add small delay between downloads to avoid overwhelming the browser
-        await new Promise(resolve => setTimeout(resolve, 500));
+        try {
+          const downloadUrl = `/api/drive/files/${item.id}/download`;
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = item.name;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          successCount++;
+          
+          // Add delay between downloads to avoid overwhelming the browser
+          if (i < selectedItemsData.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        } catch (downloadError) {
+          failedItems.push(item.name);
+          console.error(`Failed to download ${item.name}:`, downloadError);
+        }
       }
 
       deselectAll();
       setIsSelectMode(false);
+
+      // Show result notification
+      if (successCount === selectedItemsData.length) {
+        toast.success(`Successfully started download for ${successCount} file${successCount > 1 ? 's' : ''}`);
+      } else if (successCount > 0) {
+        toast.warning(`Started download for ${successCount} files. ${failedItems.length} files failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else {
+        toast.error(`Failed to download files: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
     } catch (error) {
       console.error('Bulk download error:', error);
+      toast.error('An error occurred during bulk download operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
     }
@@ -1594,7 +1671,15 @@ export function DriveManager() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead className="w-[50px]">
+                      {isSelectMode && (
+                        <Checkbox
+                          checked={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
+                          onCheckedChange={selectedItems.size === folders.length + files.length ? deselectAll : selectAll}
+                          className="ml-2"
+                        />
+                      )}
+                    </TableHead>
                     {visibleColumns.name && (
                       <TableHead>
                         <Button
@@ -1665,11 +1750,22 @@ export function DriveManager() {
                   {sortedFolders.map((folder) => (
                     <TableRow 
                       key={folder.id}
-                      className="cursor-pointer hover:bg-accent"
-                      onClick={() => handleFolderClick(folder.id)}
+                      className={`cursor-pointer hover:bg-accent transition-colors ${
+                        selectedItems.has(folder.id) ? 'bg-primary/5 border-primary/20' : ''
+                      }`}
+                      onClick={() => isSelectMode ? toggleItemSelection(folder.id) : handleFolderClick(folder.id)}
                     >
                       <TableCell>
-                        <div className="text-lg">📁</div>
+                        <div className="flex items-center gap-2">
+                          {isSelectMode && (
+                            <Checkbox
+                              checked={selectedItems.has(folder.id)}
+                              onCheckedChange={() => toggleItemSelection(folder.id)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          )}
+                          <div className="text-lg">📁</div>
+                        </div>
                       </TableCell>
                       {visibleColumns.name && (
                         <TableCell className="font-medium">
@@ -1783,10 +1879,22 @@ export function DriveManager() {
                   {sortedFiles.map((file) => (
                     <TableRow 
                       key={file.id}
-                      className="cursor-pointer hover:bg-accent"
+                      className={`cursor-pointer hover:bg-accent transition-colors ${
+                        selectedItems.has(file.id) ? 'bg-primary/5 border-primary/20' : ''
+                      }`}
+                      onClick={() => isSelectMode ? toggleItemSelection(file.id) : undefined}
                     >
                       <TableCell>
-                        <div className="text-lg">{getFileIcon(file.mimeType)}</div>
+                        <div className="flex items-center gap-2">
+                          {isSelectMode && (
+                            <Checkbox
+                              checked={selectedItems.has(file.id)}
+                              onCheckedChange={() => toggleItemSelection(file.id)}
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          )}
+                          <div className="text-lg">{getFileIcon(file.mimeType)}</div>
+                        </div>
                       </TableCell>
                       {visibleColumns.name && (
                         <TableCell className="font-medium">
