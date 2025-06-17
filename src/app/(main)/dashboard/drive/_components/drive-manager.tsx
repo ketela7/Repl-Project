@@ -306,8 +306,14 @@ export function DriveManager() {
         if (response.ok) {
           successCount++;
         } else {
+          const errorData = await response.text();
           failedItems.push(item.name);
-          console.error(`Failed to delete ${item.name}`);
+          console.error(`Failed to delete ${item.name}:`, response.status, errorData);
+        }
+
+        // Add small delay to prevent rate limiting
+        if (i < selectedItemsData.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -364,8 +370,14 @@ export function DriveManager() {
         if (response.ok) {
           successCount++;
         } else {
+          const errorData = await response.text();
           failedItems.push(item.name);
-          console.error(`Failed to move ${item.name}`);
+          console.error(`Failed to move ${item.name}:`, response.status, errorData);
+        }
+
+        // Add small delay to prevent rate limiting
+        if (i < selectedItemsData.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -425,8 +437,14 @@ export function DriveManager() {
         if (response.ok) {
           successCount++;
         } else {
+          const errorData = await response.text();
           failedItems.push(item.name);
-          console.error(`Failed to copy ${item.name}`);
+          console.error(`Failed to copy ${item.name}:`, response.status, errorData);
+        }
+
+        // Add small delay to prevent rate limiting
+        if (i < selectedItemsData.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -474,7 +492,7 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
         
         try {
-          const downloadUrl = `/api/drive/files/${item.id}/download`;
+          const downloadUrl = `/api/drive/download/${item.id}`;
           const link = document.createElement('a');
           link.href = downloadUrl;
           link.download = item.name;
