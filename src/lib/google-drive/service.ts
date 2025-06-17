@@ -60,9 +60,13 @@ export class GoogleDriveService {
 
     let q = buildSearchQuery({ parentId, query, mimeType });
     
-    // Exclude trashed files unless specifically searching in trash
+    // Always exclude trashed files unless specifically searching in trash
     if (!q.includes('trashed=true')) {
-      q += ' and trashed=false';
+      if (q.length > 0) {
+        q += ' and trashed=false';
+      } else {
+        q = 'trashed=false';
+      }
     }
 
     console.log('Drive API: Fetching files with options:', options);
