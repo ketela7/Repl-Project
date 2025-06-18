@@ -835,7 +835,7 @@ export function DriveManager() {
       } else {
         fetchFiles(currentFolderId || undefined);
       }
-    }, 300); // 300ms delay
+    }, 3000); // 3000ms delay
     
     setSearchTimeout(timeout);
   };
