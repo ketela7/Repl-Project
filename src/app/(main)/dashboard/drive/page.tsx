@@ -7,9 +7,9 @@ export default function DrivePage() {
     <div className="flex-1 space-y-6 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Google Drive Manager</h1>
+          <h1 className="text-3xl font-bold">Professional Google Drive Management</h1>
           <p className="text-muted-foreground">
-            Manage your Google Drive files and folders with ease
+            Professional file management solution for enterprise Google Drive operations
           </p>
         </div>
       </div>

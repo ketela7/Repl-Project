@@ -94,7 +94,7 @@ class GoogleDriveService {
 
 ## Implementation Guidelines
 
-### 1. Drive Manager Context Specific:
+### 1. Professional Drive Manager Context Specific:
 - **File operations**: Extend existing file action handlers
 - **UI components**: Reuse shadcn components dengan customization
 - **Data fetching**: Add methods ke GoogleDriveService
@@ -189,5 +189,5 @@ class GoogleDriveService {
 ---
 
 **Last Updated**: June 17, 2025  
-**Applies To**: Google Drive Manager Project  
+**Applies To**: Professional Google Drive Management Project  
 **Review Frequency**: Monthly atau saat major feature additions

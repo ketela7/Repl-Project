@@ -1,6 +1,6 @@
-# Google Drive Manager
+# Professional Google Drive Management
 
-A comprehensive web application for managing Google Drive files and folders with enhanced cross-platform compatibility and professional UI design. Built with Next.js 15, TypeScript, and optimized for all device types with a balanced professional color scheme.
+A professional web application for managing Google Drive files and folders with enhanced cross-platform compatibility and enterprise UI design. Built with Next.js 15, TypeScript, and optimized for all device types with a balanced professional color scheme.
 
 ## Features
 
