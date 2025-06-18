@@ -7,8 +7,8 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Shield, Zap, Users, Globe, Code, Database } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "About - Google Drive Manager",
-  description: "Learn more about Google Drive Manager, our mission, features, and the technology behind our comprehensive file management solution.",
+  title: "About - Professional Google Drive Management",
+  description: "Learn more about Professional Google Drive Management, our mission, features, and the technology behind our enterprise file management solution.",
 };
 
 export default function AboutPage() {
@@ -24,10 +24,10 @@ export default function AboutPage() {
           
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              About Google Drive Manager
+              About Professional Google Drive Management
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              A comprehensive file management solution that revolutionizes how you interact with Google Drive
+              An enterprise file management solution that revolutionizes how professionals interact with Google Drive
             </p>
           </div>
         </div>
@@ -42,9 +42,9 @@ export default function AboutPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-lg">
-              We believe file management should be intuitive, efficient, and powerful. Google Drive Manager bridges 
-              the gap between Google Drive's capabilities and user expectations, providing enterprise-grade features 
-              with consumer-friendly simplicity.
+              We believe professional file management should be intuitive, efficient, and powerful. Professional Google Drive Management bridges 
+              the gap between Google Drive's capabilities and enterprise expectations, providing advanced features 
+              with professional-grade reliability.
             </p>
             <p>
               Our goal is to empower individuals and teams to organize, access, and collaborate on their files 
@@ -61,7 +61,7 @@ export default function AboutPage() {
               Key Features
             </CardTitle>
             <CardDescription>
-              What makes Google Drive Manager special
+              What makes Professional Google Drive Management special
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -252,7 +252,7 @@ export default function AboutPage() {
             <Link href="/" className="hover:text-foreground">Home</Link>
           </div>
           <p className="text-xs text-muted-foreground">
-            © 2025 Google Drive Manager. Built with ❤️ for better file management.
+            © 2025 Professional Google Drive Management. Built for enterprise file management excellence.
           </p>
         </div>
       </div>

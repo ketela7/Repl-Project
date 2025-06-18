@@ -16,10 +16,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: APP_CONFIG.meta.title,
   description: APP_CONFIG.meta.description,
-  keywords: ["Google Drive", "File Management", "Document Management", "Cloud Storage", "Next.js", "React"],
-  authors: [{ name: "Google Drive Manager Team" }],
-  creator: "Google Drive Manager",
-  publisher: "Google Drive Manager",
+  keywords: ["Professional Google Drive", "Enterprise File Management", "Document Management", "Cloud Storage", "Business Solutions", "Next.js", "React"],
+  authors: [{ name: "Professional Google Drive Management Team" }],
+  creator: "Professional Google Drive Management",
+  publisher: "Professional Google Drive Management",
   robots: {
     index: true,
     follow: true,
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://drive-manager.replit.app",
+    url: "https://professional-drive-manager.replit.app",
     title: APP_CONFIG.meta.title,
     description: APP_CONFIG.meta.description,
     siteName: APP_CONFIG.name,
@@ -40,13 +40,14 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/favicon.svg",
-        type: "image/svg+xml",
-      },
-      {
         url: "/favicon.png",
         type: "image/png",
         sizes: "32x32",
+      },
+      {
+        url: "/icon.png",
+        type: "image/png",
+        sizes: "192x192",
       },
     ],
     shortcut: "/favicon.png",
