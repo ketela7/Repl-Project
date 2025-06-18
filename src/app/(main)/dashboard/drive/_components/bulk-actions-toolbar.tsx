@@ -34,6 +34,9 @@ interface BulkActionsToolbarProps {
   isSelectMode: boolean;
   isAllSelected: boolean;
   isInTrash?: boolean;
+  selectedItems: BulkOperationItem[];
+  activeView: string;
+  userId: string;
   bulkOperationProgress: {
     isRunning: boolean;
     current: number;
@@ -51,6 +54,7 @@ interface BulkActionsToolbarProps {
   onBulkRename: () => void;
   onBulkRestore?: () => void;
   onBulkPermanentDelete?: () => void;
+  onRefresh?: () => void;
 }
 
 export function BulkActionsToolbar({
