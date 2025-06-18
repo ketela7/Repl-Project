@@ -218,21 +218,29 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Handle advanced filters
+    // Handle advanced filters with proper Google Drive API syntax
     if (createdAfter) {
-      driveQuery += ` and createdTime > '${createdAfter}'`;
+      driveQuery += ` and createdTime >= '${createdAfter}'`;
     }
     if (createdBefore) {
-      driveQuery += ` and createdTime < '${createdBefore}'`;
+      driveQuery += ` and createdTime <= '${createdBefore}'`;
     }
     if (modifiedAfter) {
-      driveQuery += ` and modifiedTime > '${modifiedAfter}'`;
+      driveQuery += ` and modifiedTime >= '${modifiedAfter}'`;
     }
     if (modifiedBefore) {
-      driveQuery += ` and modifiedTime < '${modifiedBefore}'`;
+      driveQuery += ` and modifiedTime <= '${modifiedBefore}'`;
     }
     if (owner) {
-      driveQuery += ` and '${owner}' in owners`;
+      driveQuery += ` and '${owner.replace(/'/g, "\\'")}' in owners`;
+    }
+    
+    // Handle size filters - Google Drive API supports size queries
+    if (sizeMin) {
+      driveQuery += ` and size >= ${sizeMin}`;
+    }
+    if (sizeMax) {
+      driveQuery += ` and size <= ${sizeMax}`;
     }
 
     console.log('Google Drive API Query:', driveQuery);

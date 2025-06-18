@@ -1974,22 +1974,22 @@ export function DriveManager() {
             <span className="text-lg sm:text-xl">Files & Folders</span>
             <div className="flex items-center gap-2 flex-wrap">
               <Badge variant="secondary" className="text-xs">
-                {folders.length + files.length} items
+                {sortedFolders.length + sortedFiles.length} items
               </Badge>
-              {(folders.length > 0 || files.length > 0) && (
+              {(sortedFolders.length > 0 || sortedFiles.length > 0) && (
                 <Badge variant="outline" className="text-xs flex items-center gap-1">
                   <span className="flex items-center gap-1">
-                    {folders.length > 0 && (
+                    {sortedFolders.length > 0 && (
                       <>
-                        {folders.length}
+                        {sortedFolders.length}
                         <Folder className="h-3 w-3 text-blue-600 dark:text-blue-400" />
                       </>
                     )}
                   </span>
                   <span className="flex items-center gap-1">
-                    {files.length > 0 && (
+                    {sortedFiles.length > 0 && (
                       <>
-                        {files.length}
+                        {sortedFiles.length}
                         <FileText className="h-3 w-3 text-gray-600 dark:text-gray-400" />
                       </>
                     )}
@@ -2171,8 +2171,8 @@ export function DriveManager() {
             </div>
           ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
-              {/* Folders */}
-              {folders.map((folder) => (
+              {/* Folders - using filtered/sorted data */}
+              {sortedFolders.map((folder) => (
                 <div
                   key={folder.id}
                   className={`border rounded-lg p-2 sm:p-3 md:p-4 hover:bg-accent cursor-pointer transition-colors relative ${
@@ -2309,8 +2309,8 @@ export function DriveManager() {
                 </div>
               ))}
 
-              {/* Files */}
-              {files.map((file) => (
+              {/* Files - using filtered/sorted data */}
+              {sortedFiles.map((file) => (
                 <div
                   key={file.id}
                   className={`border rounded-lg p-2 sm:p-3 md:p-4 hover:bg-accent transition-colors relative cursor-pointer ${
