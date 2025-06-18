@@ -50,21 +50,15 @@ const viewOptions = [
 ] as const;
 
 const fileTypeOptions = [
-  { key: 'folder', label: 'Folders', icon: Folder, mimeTypes: ['application/vnd.google-apps.folder'] },
-  { key: 'document', label: 'Documents', icon: FileText, 
-    mimeTypes: ['application/vnd.google-apps.document', 'application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] },
-  { key: 'spreadsheet', label: 'Spreadsheets', icon: FileText, 
-    mimeTypes: ['application/vnd.google-apps.spreadsheet', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] },
-  { key: 'presentation', label: 'Presentations', icon: FileText, 
-    mimeTypes: ['application/vnd.google-apps.presentation', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] },
-  { key: 'image', label: 'Images', icon: Image, 
-    mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/bmp', 'image/tiff'] },
-  { key: 'video', label: 'Videos', icon: Video, 
-    mimeTypes: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm', 'video/quicktime', 'video/x-msvideo'] },
-  { key: 'audio', label: 'Audio', icon: Music, 
-    mimeTypes: ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg', 'audio/mp4', 'audio/aac', 'audio/flac'] },
-  { key: 'archive', label: 'Archives', icon: Archive, 
-    mimeTypes: ['application/zip', 'application/x-rar-compressed', 'application/x-tar', 'application/gzip', 'application/x-7z-compressed'] },
+  { key: 'folder', label: 'Folders', icon: Folder, count: 0, description: 'Google Drive folders' },
+  { key: 'document', label: 'Documents', icon: FileText, count: 0, description: 'Text documents, PDFs, Word files' },
+  { key: 'spreadsheet', label: 'Spreadsheets', icon: FileText, count: 0, description: 'Excel files, Google Sheets, CSV' },
+  { key: 'presentation', label: 'Presentations', icon: FileText, count: 0, description: 'PowerPoint, Google Slides' },
+  { key: 'image', label: 'Images', icon: Image, count: 0, description: 'Photos, graphics, icons' },
+  { key: 'video', label: 'Videos', icon: Video, count: 0, description: 'Movies, clips, recordings' },
+  { key: 'audio', label: 'Audio', icon: Music, count: 0, description: 'Music, podcasts, recordings' },
+  { key: 'archive', label: 'Archives', icon: Archive, count: 0, description: 'ZIP, RAR, compressed files' },
+  { key: 'code', label: 'Code Files', icon: FileText, count: 0, description: 'Programming files, scripts' },
 ];
 
 export function DriveFiltersSidebar({ 

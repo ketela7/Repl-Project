@@ -272,11 +272,20 @@ export function DriveManager() {
       : <ChevronDown className="h-4 w-4" />;
   };
 
+  // Apply client-side filters first, then sort
+  const { filteredFiles: clientFilteredFiles, filteredFolders: clientFilteredFolders } = React.useMemo(() => {
+    return applyClientSideFilters(files, folders, {
+      fileTypeFilter,
+      searchQuery: debouncedSearchQuery,
+      activeView
+    });
+  }, [files, folders, fileTypeFilter, debouncedSearchQuery, activeView]);
+
   // Sort files and folders based on current sort configuration
   const sortedFiles = React.useMemo(() => {
-    if (!sortConfig) return files;
+    if (!sortConfig) return clientFilteredFiles;
 
-    return [...files].sort((a, b) => {
+    return [...clientFilteredFiles].sort((a, b) => {
       const { key, direction } = sortConfig;
       let aValue: any, bValue: any;
 
@@ -309,12 +318,12 @@ export function DriveManager() {
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [files, sortConfig]);
+  }, [clientFilteredFiles, sortConfig]);
 
   const sortedFolders = React.useMemo(() => {
-    if (!sortConfig) return folders;
+    if (!sortConfig) return clientFilteredFolders;
 
-    return [...folders].sort((a, b) => {
+    return [...clientFilteredFolders].sort((a, b) => {
       const { key, direction } = sortConfig;
       let aValue: any, bValue: any;
 
@@ -347,10 +356,10 @@ export function DriveManager() {
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [folders, sortConfig]);
+  }, [clientFilteredFolders, sortConfig]);
 
-  // Bulk operations utility functions
-  const getAllItems = () => [...folders, ...files];
+  // Bulk operations utility functions - use filtered results
+  const getAllItems = () => [...sortedFolders, ...sortedFiles];
 
   const getSelectedItemsData = () => {
     const allItems = getAllItems();

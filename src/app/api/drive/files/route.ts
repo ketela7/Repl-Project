@@ -6,7 +6,7 @@ import { performanceMonitor } from '@/lib/performance-monitor';
 
 // Client-side filter helper function
 function applyClientSideFilters(result: any, filters: { view?: string | null, fileTypes?: string | null, query?: string | null }) {
-  if (!result || !result.files) return result;
+  if (!result || !result.files || !Array.isArray(result.files)) return result;
 
   let filteredFiles = [...result.files];
 
@@ -210,13 +210,11 @@ export async function GET(request: NextRequest) {
     // Generate cache key including all filter parameters
     const cacheKey = driveCache.generateDriveKey({
       parentId: parentId || undefined,
-      query: query || undefined,
+      query: driveQuery || undefined,
       mimeType: mimeType || undefined,
       pageToken: pageToken || undefined,
-      view: view || undefined,
-      fileTypes: fileTypes || undefined,
       userId: user.id,
-    });
+    }) + `_${view || 'all'}_${fileTypes || ''}`;
 
     // Enhanced cache check with performance logging
     const cachedResult = driveCache.get(cacheKey);
