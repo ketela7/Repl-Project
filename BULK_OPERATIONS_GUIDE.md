@@ -17,10 +17,14 @@ The Google Drive Management Application includes a comprehensive bulk operations
 ### 2. Bulk Download
 
 **Purpose**: Download multiple files simultaneously
-- **File Filtering**: Only files can be downloaded (folders are skipped)
+- **File Filtering**: Only files can be downloaded (folders automatically skipped)
+- **Smart Skip Logic**: 
+  - Folders skipped with reason "Folders cannot be downloaded (only individual files)"
+  - Google Workspace files skipped with suggestion to use Export feature
+  - Restricted files skipped with permission message
 - **Progress Tracking**: Real-time progress bar and status
-- **Error Handling**: Failed downloads are reported with retry options
-- **Rate Limiting**: 500ms delay between downloads to prevent browser overload
+- **Error Handling**: Failed downloads reported with detailed error messages
+- **Rate Limiting**: 300ms delay between downloads to prevent browser overload
 
 ### 3. Bulk Export
 
@@ -125,17 +129,25 @@ The Google Drive Management Application includes a comprehensive bulk operations
 
 ### Performance Optimizations
 
-- **Rate Limiting**: 300-500ms delays between operations
-- **Error Recovery**: Individual item error handling
+- **Rate Limiting**: 300ms delays between downloads to prevent browser overload
+- **Error Recovery**: Individual item error handling with detailed logging
 - **Memory Management**: Efficient blob handling for downloads
 - **API Optimization**: Sequential processing to prevent rate limits
+- **Database Logging**: All operations logged to database for audit trail
 
-### Error Handling
+### Enhanced Error Handling
 
 - **Individual Tracking**: Each item's success/failure tracked separately
-- **User Feedback**: Clear error messages with item names
-- **Partial Success**: Reports mixed results (some succeeded, some failed)
-- **Retry Capability**: Failed operations can be retried
+- **Smart Skip Logic**: Items automatically skipped with clear reasons:
+  - Folders cannot be downloaded (only individual files supported)
+  - Google Workspace files require export instead of download
+  - Items already in trash cannot be trashed again
+  - Items not in trash cannot be restored
+  - Folders cannot be copied due to API limitations
+  - Items in trash cannot be shared
+- **Detailed User Feedback**: Clear error messages grouped by type with item names
+- **Partial Success**: Reports mixed results with detailed breakdown
+- **Activity Logging**: All operations saved to database with timestamps and user info
 
 ### Security Features
 

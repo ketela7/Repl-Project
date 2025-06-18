@@ -182,53 +182,69 @@ class BulkOperationsManager {
     switch (operation) {
       case 'bulk_download':
         if (item.type === 'folder') {
-          return { shouldSkip: true, reason: 'Folders cannot be downloaded individually' };
+          return { shouldSkip: true, reason: 'Folders cannot be downloaded (only individual files)' };
         }
         if (!actions.canDownload) {
-          return { shouldSkip: true, reason: 'Download not permitted for this file' };
+          return { shouldSkip: true, reason: 'Download not permitted (restricted by file owner)' };
+        }
+        // Skip Google Workspace files that need export
+        if (item.mimeType && item.mimeType.startsWith('application/vnd.google-apps.')) {
+          return { shouldSkip: true, reason: 'Google Workspace files require export (use Export feature instead)' };
         }
         break;
 
       case 'bulk_delete':
       case 'bulk_trash':
+        if (item.trashed) {
+          return { shouldSkip: true, reason: 'Item is already in trash' };
+        }
         if (!actions.canTrash) {
-          return { shouldSkip: true, reason: 'Delete/trash not permitted for this item' };
+          return { shouldSkip: true, reason: 'Delete/trash not permitted (insufficient permissions)' };
         }
         break;
 
       case 'bulk_permanent_delete':
         if (!actions.canPermanentDelete) {
-          return { shouldSkip: true, reason: 'Permanent delete not permitted for this item' };
+          return { shouldSkip: true, reason: 'Permanent delete not permitted (insufficient permissions)' };
         }
         break;
 
       case 'bulk_restore':
+        if (!item.trashed) {
+          return { shouldSkip: true, reason: 'Item is not in trash (already restored)' };
+        }
         if (!actions.canRestore) {
-          return { shouldSkip: true, reason: 'Restore not permitted for this item' };
+          return { shouldSkip: true, reason: 'Restore not permitted (insufficient permissions)' };
         }
         break;
 
       case 'bulk_copy':
+        if (item.type === 'folder') {
+          return { shouldSkip: true, reason: 'Folders cannot be copied (Google Drive API limitation)' };
+        }
         if (!actions.canCopy) {
-          return { shouldSkip: true, reason: 'Copy not permitted for this item' };
+          return { shouldSkip: true, reason: 'Copy not permitted (insufficient permissions)' };
         }
         break;
 
       case 'bulk_move':
         if (!actions.canMove) {
-          return { shouldSkip: true, reason: 'Move not permitted for this item' };
+          return { shouldSkip: true, reason: 'Move not permitted (insufficient permissions)' };
         }
         break;
 
       case 'bulk_rename':
         if (!actions.canRename) {
-          return { shouldSkip: true, reason: 'Rename not permitted for this item' };
+          return { shouldSkip: true, reason: 'Rename not permitted (insufficient permissions)' };
         }
         break;
 
       case 'bulk_share':
         if (!actions.canShare) {
-          return { shouldSkip: true, reason: 'Share not permitted for this item' };
+          return { shouldSkip: true, reason: 'Share not permitted (insufficient permissions)' };
+        }
+        if (item.trashed) {
+          return { shouldSkip: true, reason: 'Cannot share items in trash' };
         }
         break;
 
@@ -247,23 +263,32 @@ class BulkOperationsManager {
     
     switch (operation) {
       case 'bulk_download':
-        // For downloads, we'll trigger the download via the existing endpoint
-        const downloadResponse = await fetch(`${baseUrl}/${item.id}/download`, {
-          method: 'GET',
-        });
-        if (!downloadResponse.ok) {
-          throw new Error(`Download failed: ${downloadResponse.statusText}`);
+        // For file downloads, create a download link and trigger download
+        if (item.type === 'file') {
+          const link = document.createElement('a');
+          link.href = `/api/drive/download/${item.id}`;
+          link.download = item.name;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          // Add a small delay to prevent browser overload
+          await new Promise(resolve => setTimeout(resolve, 300));
+        } else {
+          throw new Error('Folders cannot be downloaded');
         }
         break;
 
       case 'bulk_trash':
         const trashResponse = await fetch(`${baseUrl}/${item.id}`, {
-          method: 'PATCH',
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trashed: true }),
+          body: JSON.stringify({ action: 'trash' }),
         });
         if (!trashResponse.ok) {
-          throw new Error(`Trash failed: ${trashResponse.statusText}`);
+          const errorData = await trashResponse.json().catch(() => ({}));
+          throw new Error(errorData.error || `Failed to move "${item.name}" to trash`);
         }
         break;
 
@@ -272,18 +297,20 @@ class BulkOperationsManager {
           method: 'DELETE',
         });
         if (!deleteResponse.ok) {
-          throw new Error(`Permanent delete failed: ${deleteResponse.statusText}`);
+          const errorData = await deleteResponse.json().catch(() => ({}));
+          throw new Error(errorData.error || `Failed to permanently delete "${item.name}"`);
         }
         break;
 
       case 'bulk_restore':
         const restoreResponse = await fetch(`${baseUrl}/${item.id}`, {
-          method: 'PATCH',
+          method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ trashed: false }),
+          body: JSON.stringify({ action: 'restore' }),
         });
         if (!restoreResponse.ok) {
-          throw new Error(`Restore failed: ${restoreResponse.statusText}`);
+          const errorData = await restoreResponse.json().catch(() => ({}));
+          throw new Error(errorData.error || `Failed to restore "${item.name}"`);
         }
         break;
 
@@ -294,16 +321,34 @@ class BulkOperationsManager {
           body: JSON.stringify({ name: `Copy of ${item.name}` }),
         });
         if (!copyResponse.ok) {
-          throw new Error(`Copy failed: ${copyResponse.statusText}`);
+          const errorData = await copyResponse.json().catch(() => ({}));
+          throw new Error(errorData.error || `Failed to copy "${item.name}"`);
         }
         break;
 
-      // For operations like move, rename, share - we'll need additional parameters
-      // These would typically require user input, so we'll throw for now
       case 'bulk_move':
+        // This operation requires a target folder ID which should be provided
+        throw new Error('Move operation requires target folder selection');
+
       case 'bulk_rename':
+        // This operation requires a new name pattern which should be provided
+        throw new Error('Rename operation requires new name pattern');
+
       case 'bulk_share':
-        throw new Error(`${operation} requires additional parameters`);
+        const shareResponse = await fetch(`${baseUrl}/${item.id}/share`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            action: 'get_share_link',
+            role: 'reader',
+            type: 'anyone' 
+          }),
+        });
+        if (!shareResponse.ok) {
+          const errorData = await shareResponse.json().catch(() => ({}));
+          throw new Error(errorData.error || `Failed to share "${item.name}"`);
+        }
+        break;
 
       default:
         throw new Error(`Unknown operation: ${operation}`);
@@ -315,30 +360,71 @@ class BulkOperationsManager {
    */
   private showCompletionToast(operation: string, result: BulkOperationResult): void {
     const { success, failed, skipped, total } = result;
+    const operationName = operation.replace('bulk_', '').replace('_', ' ');
     
     if (failed.length === 0 && skipped.length === 0) {
       // All successful
-      toast.success(`${operation} completed successfully for all ${total} items`);
+      toast.success(`✅ ${operationName} completed successfully for all ${total} items`);
     } else if (success.length === 0) {
       // All failed or skipped
-      toast.error(`${operation} failed for all items`);
+      if (skipped.length > 0) {
+        toast.warning(`⚠️ ${operationName}: All ${total} items were skipped (unsupported operation)`);
+      } else {
+        toast.error(`❌ ${operationName} failed for all ${total} items`);
+      }
     } else {
-      // Mixed results
-      let message = `${operation} completed: ${success.length} successful`;
-      if (failed.length > 0) message += `, ${failed.length} failed`;
-      if (skipped.length > 0) message += `, ${skipped.length} skipped`;
+      // Mixed results - show detailed breakdown
+      const parts = [`✅ ${success.length} successful`];
+      if (failed.length > 0) parts.push(`❌ ${failed.length} failed`);
+      if (skipped.length > 0) parts.push(`⚠️ ${skipped.length} skipped`);
       
-      toast.info(message);
+      toast.info(`${operationName} completed: ${parts.join(', ')}`);
+    }
+
+    // Show detailed skip reasons for user education
+    if (skipped.length > 0) {
+      const skipReasons = new Map<string, string[]>();
+      skipped.forEach(({ item, reason }) => {
+        if (!skipReasons.has(reason)) {
+          skipReasons.set(reason, []);
+        }
+        skipReasons.get(reason)!.push(item.name);
+      });
+
+      // Show detailed skip information
+      skipReasons.forEach((items, reason) => {
+        const itemList = items.length > 3 
+          ? `${items.slice(0, 3).join(', ')} and ${items.length - 3} more`
+          : items.join(', ');
+        
+        toast.info(`Skipped: ${itemList} - ${reason}`, {
+          duration: 5000,
+        });
+      });
     }
 
     // Show detailed error information if there are failures
     if (failed.length > 0) {
       console.error('Bulk operation failures:', failed);
-    }
-    
-    // Show skip information
-    if (skipped.length > 0) {
-      console.info('Bulk operation skipped items:', skipped);
+      
+      // Group errors by type for better user feedback
+      const errorGroups = new Map<string, string[]>();
+      failed.forEach(({ item, error }) => {
+        if (!errorGroups.has(error)) {
+          errorGroups.set(error, []);
+        }
+        errorGroups.get(error)!.push(item.name);
+      });
+
+      errorGroups.forEach((items, error) => {
+        const itemList = items.length > 2 
+          ? `${items.slice(0, 2).join(', ')} and ${items.length - 2} more`
+          : items.join(', ');
+        
+        toast.error(`Failed: ${itemList} - ${error}`, {
+          duration: 8000,
+        });
+      });
     }
   }
 

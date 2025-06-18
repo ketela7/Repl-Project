@@ -18,7 +18,10 @@ A professional web application for managing Google Drive files and folders with 
 - **Rename Files/Folders**: Interactive rename dialog with smart text selection
 - **Move Files/Folders**: Move items between folders with folder selection dialog
 - **Copy Files**: Duplicate files with automatic naming
-- **Delete Operations**: Move to trash or permanently delete files
+- **Delete Operations**: 
+  - **Move to Trash**: Standard trash operation for files and folders
+  - **Permanently Delete**: Available for both normal and trash views with enhanced security
+  - Smart menu display based on file permissions and current view
 - **Restore Files**: Restore files from trash
 - **Details View**: Comprehensive information display including:
   - Basic file information (name, type, size, ID, version)
@@ -32,7 +35,10 @@ A professional web application for managing Google Drive files and folders with 
 
 ### Bulk Operations
 - **Bulk Selection**: Multi-select mode with floating action toolbar
-- **Bulk Download**: Download multiple files simultaneously with progress tracking
+- **Bulk Download**: Download multiple files simultaneously with intelligent skip logic:
+  - Folders automatically skipped (only individual files supported)
+  - Google Workspace files skipped with export suggestion
+  - Progress tracking with 300ms delays to prevent browser overload
 - **Bulk Export**: Export Google Workspace files (Docs, Sheets, Slides) to various formats:
   - PDF, DOCX, XLSX, PPTX, ODT, ODS, PNG, JPEG
   - Smart format filtering based on file types
@@ -43,12 +49,16 @@ A professional web application for managing Google Drive files and folders with 
   - Timestamp addition for organization
   - Live preview of rename results
 - **Bulk Move**: Move multiple files and folders to new locations
-- **Bulk Copy**: Copy multiple files (folders not supported by API)
+- **Bulk Copy**: Copy multiple files (folders skipped due to API limitations)
 - **Bulk Delete**: Move multiple items to trash with confirmation
 - **Bulk Restore**: Restore multiple items from trash to original locations
 - **Bulk Permanent Delete**: Permanently delete items with enhanced security confirmation
+- **Enhanced Error Handling**: 
+  - Smart skip logic with detailed reasons for each unsupported operation
+  - Grouped error messages for better user understanding
+  - Individual item tracking with success/failure status
+  - Database logging for all operations with audit trail
 - **Progress Tracking**: Real-time progress indicators for all bulk operations
-- **Error Handling**: Comprehensive error reporting with retry mechanisms
   - Export links for Google Workspace files
   - Extended metadata (drive IDs, spaces, content restrictions)
 
