@@ -62,7 +62,8 @@ export async function POST(request: NextRequest) {
         redirectTo: redirectUrl,
         scopes: 'openid email profile https://www.googleapis.com/auth/drive',
         queryParams: {
-          access_type: 'offline'
+          access_type: 'offline',
+          prompt: 'consent'
         }
       },
     })

@@ -1,9 +1,9 @@
 {
-  "name": "studio-admin",
+  "name": "gdrive-pro",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
