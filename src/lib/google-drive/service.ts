@@ -562,42 +562,7 @@ export class GoogleDriveService {
     });
   }
 
-  // Unified sharing operation for both files and folders
-  async shareFile(fileId: string, permission: DrivePermission): Promise<void> {
-    await this.drive.permissions.create({
-      fileId,
-      requestBody: permission,
-      sendNotificationEmail: permission.sendNotificationEmail,
-    });
-  }
 
-  // Alias for clarity - same operation works for both files and folders
-  async shareFolder(folderId: string, permission: DrivePermission): Promise<void> {
-    return this.shareFile(folderId, permission);
-  }
-
-  // Unified permissions retrieval for both files and folders
-  async getFilePermissions(fileId: string) {
-    const response = await this.drive.permissions.list({
-      fileId,
-      fields: 'permissions(id, type, role, emailAddress, domain)',
-    });
-
-    return response.data.permissions || [];
-  }
-
-  // Alias for clarity - same operation works for both files and folders
-  async getFolderPermissions(folderId: string) {
-    return this.getFilePermissions(folderId);
-  }
-
-  // Unified permission removal for both files and folders
-  async removeFilePermission(fileId: string, permissionId: string): Promise<void> {
-    await this.drive.permissions.delete({
-      fileId,
-      permissionId,
-    });
-  }
 
   // Alias for clarity - same operation works for both files and folders
   async removeFolderPermission(folderId: string, permissionId: string): Promise<void> {

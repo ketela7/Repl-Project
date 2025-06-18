@@ -70,6 +70,8 @@ import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
 import { formatFileSize, formatDate, isPreviewable } from '@/lib/google-drive/utils';
 import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
+import { requestQueue } from '@/lib/request-queue';
 import { FileUploadDialog } from './file-upload-dialog';
 import { CreateFolderDialog } from './create-folder-dialog';
 import { FileRenameDialog } from './file-rename-dialog';
@@ -109,6 +111,9 @@ export function DriveManager() {
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  
+  // Debounced search query for performance
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   
   // Table column visibility state
@@ -718,6 +723,8 @@ export function DriveManager() {
   };
 
   const fetchFiles = async (parentId?: string, query?: string, pageToken?: string, append = false) => {
+    const requestId = `fetch-files-${parentId || 'root'}-${query || ''}-${pageToken || ''}`;
+    
     try {
       if (!append) setLoading(true);
       else setLoadingMore(true);
@@ -726,12 +733,18 @@ export function DriveManager() {
       if (parentId) params.append('parentId', parentId);
       if (query) params.append('query', query);
       if (pageToken) params.append('pageToken', pageToken);
-      // Reduced page size for faster initial load
-      params.append('pageSize', '20');
+      // Optimized page size for better performance
+      params.append('pageSize', '50');
       
       console.log('=== Fetching files with params:', params.toString(), '===');
       
-      const response = await fetch(`/api/drive/files?${params}`);
+      // Use request queue for better API call management
+      const response = await requestQueue.enqueue(
+        requestId,
+        () => fetch(`/api/drive/files?${params}`),
+        query ? 'medium' : 'high' // Search requests have lower priority
+      );
+      
       console.log('Drive API response status:', response.status);
       
       const responseText = await response.text();
@@ -819,25 +832,10 @@ export function DriveManager() {
     }
   };
 
-  // Debounced search function
+  // Optimized search input handler
   const handleSearchInput = (value: string) => {
     setSearchQuery(value);
-    
-    // Clear existing timeout
-    if (searchTimeout) {
-      clearTimeout(searchTimeout);
-    }
-    
-    // Set new timeout for debounced search
-    const timeout = setTimeout(() => {
-      if (value.trim()) {
-        fetchFiles(undefined, value);
-      } else {
-        fetchFiles(currentFolderId || undefined);
-      }
-    }, 3000); // 3000ms delay
-    
-    setSearchTimeout(timeout);
+    // No timeout needed - using debounced value hook instead
   };
 
   const handleSearch = () => {
