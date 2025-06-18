@@ -530,132 +530,24 @@ export function DriveManager() {
             continue;
           }
 
-          // Hybrid download strategy based on file size
-          try {
-            const fileSizeBytes = parseInt(item.size || '0');
-            const fileSizeMB = fileSizeBytes / (1024 * 1024);
-            const isLargeFile = fileSizeMB > 10; // 10MB threshold
-            
-            if (isLargeFile) {
-              // For large files >10MB, use streaming download without creating blob
-              console.log(`Large file detected (${fileSizeMB.toFixed(1)}MB): ${item.name}, using stream download`);
-              
-              try {
-                // Use streaming download with direct parameter
-                const downloadResponse = await fetch(`/api/drive/download/${item.id}?stream=true`);
-                
-                if (!downloadResponse.ok) {
-                  if (downloadResponse.status === 401) {
-                    const errorData = await downloadResponse.json();
-                    if (errorData.needsReauth) {
-                      toast.error('Google Drive access expired. Please reconnect your account.');
-                      window.location.reload();
-                      return;
-                    }
-                  }
-                  
-                  if (downloadResponse.status === 403) {
-                    failedItems.push(`${item.name} (permission denied)`);
-                    continue;
-                  }
-                  
-                  if (downloadResponse.status === 404) {
-                    failedItems.push(`${item.name} (not found)`);
-                    continue;
-                  }
-                  
-                  failedItems.push(`${item.name} (download failed)`);
-                  continue;
-                }
-                
-                // Create download link directly from response stream
-                const blob = await downloadResponse.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = blobUrl;
-                link.download = item.name;
-                link.style.display = 'none';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                // Clean up blob URL immediately
-                setTimeout(() => {
-                  window.URL.revokeObjectURL(blobUrl);
-                }, 100);
-                
-                successCount++;
-                console.log(`Stream download completed for large file: ${item.name}`);
-                
-              } catch (error) {
-                console.error(`Failed to download large file ${item.name}:`, error);
-                failedItems.push(`${item.name} (large file download failed)`);
-              }
-            } else {
-              // For small files <10MB, use standard blob approach
-              console.log(`Small file (${fileSizeMB.toFixed(1)}MB): ${item.name}, using blob download`);
-              
-              const downloadResponse = await fetch(`/api/drive/download/${item.id}`);
-              
-              if (!downloadResponse.ok) {
-                if (downloadResponse.status === 401) {
-                  const errorData = await downloadResponse.json();
-                  if (errorData.needsReauth) {
-                    toast.error('Google Drive access expired. Please reconnect your account.');
-                    window.location.reload();
-                    return;
-                  }
-                }
-                
-                if (downloadResponse.status === 403) {
-                  failedItems.push(`${item.name} (permission denied)`);
-                  continue;
-                }
-                
-                if (downloadResponse.status === 404) {
-                  failedItems.push(`${item.name} (not found)`);
-                  continue;
-                }
-                
-                if (downloadResponse.status === 400) {
-                  const errorData = await downloadResponse.json();
-                  if (errorData.error?.includes('folder')) {
-                    skippedItems.push(item.name);
-                    continue;
-                  }
-                }
-                
-                failedItems.push(`${item.name} (download failed)`);
-                continue;
-              }
-              
-              // Standard blob download for small files
-              const blob = await downloadResponse.blob();
-              
-              const blobUrl = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = blobUrl;
-              link.download = item.name;
-              link.style.display = 'none';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              // Clean up blob URL
-              setTimeout(() => {
-                window.URL.revokeObjectURL(blobUrl);
-              }, 1000);
-              
-              successCount++;
-            }
-          } catch (downloadError) {
-            failedItems.push(`${item.name} (network error)`);
-            console.error(`Failed to download ${item.name}:`, downloadError);
-          }
+          // Direct download for all files (no hybrid strategy)
+          console.log(`Downloading file: ${item.name}`);
+          
+          // Create download link directly to API endpoint
+          const link = document.createElement('a');
+          link.href = `/api/drive/download/${item.id}`;
+          link.download = item.name;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          
+          successCount++;
+          console.log(`Direct download initiated for: ${item.name}`);
           
           // Add delay between downloads to avoid overwhelming the browser
           if (i < selectedItemsData.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 500));
           }
         } catch (downloadError) {
           failedItems.push(item.name);
@@ -667,11 +559,10 @@ export function DriveManager() {
       setIsSelectMode(false);
 
       // Show comprehensive result notification
-      const totalProcessed = successCount + failedItems.length + skippedItems.length;
       let message = '';
       
       if (successCount > 0) {
-        message += `${successCount} file${successCount > 1 ? 's' : ''} downloaded`;
+        message += `${successCount} file${successCount > 1 ? 's' : ''} download initiated`;
       }
       
       if (skippedItems.length > 0) {
@@ -685,7 +576,7 @@ export function DriveManager() {
       }
 
       if (successCount === selectedItemsData.length && skippedItems.length === 0) {
-        toast.success(`Successfully downloaded ${successCount} file${successCount > 1 ? 's' : ''}`);
+        toast.success(`Download initiated for ${successCount} file${successCount > 1 ? 's' : ''}`);
       } else if (successCount > 0) {
         toast.warning(`Download completed: ${message}`);
         if (failedItems.length > 0) {
@@ -889,78 +780,19 @@ export function DriveManager() {
             return;
           }
           
-          // Get file details for size-based strategy
-          const fileItem = downloadFile || files.find(f => f.id === fileId);
-          const fileSizeBytes = parseInt(fileItem?.size || '0');
-          const fileSizeMB = fileSizeBytes / (1024 * 1024);
-          const isLargeFile = fileSizeMB > 10; // 10MB threshold
+          // Direct download for all files (no hybrid strategy)
+          console.log(`Downloading file: ${fileName}`);
           
-          if (isLargeFile) {
-            toast.info(`Downloading large file (${fileSizeMB.toFixed(1)}MB): "${fileName}" using stream`);
-          }
+          // Create download link directly to API endpoint
+          const link = document.createElement('a');
+          link.href = `/api/drive/download/${fileId}`;
+          link.download = fileName;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
           
-          // Use stream parameter for large files
-          const downloadUrl = `/api/drive/download/${fileId}${isLargeFile ? '?stream=true' : ''}`;
-          const downloadResponse = await fetch(downloadUrl);
-          if (!downloadResponse.ok) {
-            if (downloadResponse.status === 401) {
-              const errorData = await downloadResponse.json();
-              if (errorData.needsReauth) {
-                toast.error('Google Drive access expired. Please reconnect your account.');
-                window.location.reload();
-                return;
-              }
-            }
-            
-            if (downloadResponse.status === 403) {
-              toast.error(`You don't have permission to download "${fileName}". This may be a shared file with restricted access.`);
-              return;
-            }
-            
-            if (downloadResponse.status === 404) {
-              toast.error(`"${fileName}" was not found. It may have been moved or deleted.`);
-              await handleRefresh();
-              return;
-            }
-            
-            if (downloadResponse.status === 400) {
-              const errorData = await downloadResponse.json();
-              if (errorData.error?.includes('folder')) {
-                toast.warning(`Cannot download folders. "${fileName}" is a folder.`);
-                return;
-              }
-            }
-            
-            const errorData = await downloadResponse.text();
-            toast.error(`Failed to download "${fileName}": ${errorData}`);
-            return;
-          }
-          
-          try {
-            // Both large and small files use blob, but large files are streamed on server-side
-            console.log(`Single file download: ${fileName} (${fileSizeMB.toFixed(1)}MB) - using ${isLargeFile ? 'server stream' : 'blob'} method`);
-            
-            const blob = await downloadResponse.blob();
-            
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = fileName;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Clean up blob URL immediately for large files, with delay for small files
-            setTimeout(() => {
-              window.URL.revokeObjectURL(blobUrl);
-            }, isLargeFile ? 100 : 1000);
-            
-            toast.success(`Download completed: "${fileName}"`);
-          } catch (error) {
-            console.error('Download error:', error);
-            toast.error(`Failed to download "${fileName}"`);
-          }
+          toast.success(`Download initiated: "${fileName}"`);
           break;
           
         case 'rename':

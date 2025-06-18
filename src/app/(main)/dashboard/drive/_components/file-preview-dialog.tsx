@@ -60,9 +60,14 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
   const isDocument = isDocumentFile(file.mimeType);
 
   const handleDownload = () => {
-    if (file.webContentLink) {
-      window.open(file.webContentLink, '_blank');
-    }
+    // Use direct download API endpoint instead of export link
+    const link = document.createElement('a');
+    link.href = `/api/drive/download/${file.id}`;
+    link.download = file.name;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleOpenInDrive = () => {
