@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Turnstile } from "@/components/ui/turnstile";
-import { useConfig } from "@/components/providers/config-provider";
 import { toast } from "sonner";
 
 interface GoogleAuthButtonProps {
@@ -12,16 +10,8 @@ interface GoogleAuthButtonProps {
 
 export function GoogleAuthButton({ className }: GoogleAuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const [showTurnstile, setShowTurnstile] = useState(false);
-  const config = useConfig();
 
   const handleGoogleAuth = async () => {
-    if (!turnstileToken) {
-      setShowTurnstile(true);
-      return;
-    }
-
     setIsLoading(true);
     try {
       const response = await fetch('/api/auth/google', {
@@ -29,7 +19,6 @@ export function GoogleAuthButton({ className }: GoogleAuthButtonProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ turnstileToken }),
       });
 
       const data = await response.json();
@@ -38,57 +27,13 @@ export function GoogleAuthButton({ className }: GoogleAuthButtonProps) {
         window.location.href = data.url;
       } else {
         toast.error(data.error || 'Authentication failed');
-        setTurnstileToken(null);
-        setShowTurnstile(true);
       }
     } catch (error) {
       toast.error('An error occurred during authentication');
-      setTurnstileToken(null);
-      setShowTurnstile(true);
     } finally {
       setIsLoading(false);
     }
   };
-
-  const handleTurnstileVerify = (token: string) => {
-    setTurnstileToken(token);
-    setShowTurnstile(false);
-    // Automatically proceed with Google auth after Turnstile verification
-    setTimeout(() => {
-      handleGoogleAuth();
-    }, 100);
-  };
-
-  const handleTurnstileError = () => {
-    toast.error('CAPTCHA verification failed. Please try again.');
-    setTurnstileToken(null);
-  };
-
-  if (showTurnstile && !turnstileToken) {
-    return (
-      <div className="space-y-4">
-        <div className="text-center">
-          <p className="text-sm text-muted-foreground mb-4">
-            Please complete the security check to continue with Google Sign-In
-          </p>
-          <Turnstile
-            siteKey={config.turnstileSiteKey}
-            onVerify={handleTurnstileVerify}
-            onError={handleTurnstileError}
-            className="flex justify-center"
-          />
-        </div>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setShowTurnstile(false)}
-          className="w-full"
-        >
-          Cancel
-        </Button>
-      </div>
-    );
-  }
 
   return (
     <Button

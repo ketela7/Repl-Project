@@ -1,46 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
-async function verifyTurnstile(token: string): Promise<boolean> {
-  try {
-    // Skip verification in development for testing
-    if (process.env.NODE_ENV === 'development' && token === 'test') {
-      console.log('Skipping Turnstile verification in development mode');
-      return true;
-    }
-
-    const formData = new FormData()
-    formData.append('secret', process.env.TURNSTILE_SECRET_KEY!)
-    formData.append('response', token)
-
-    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      body: formData,
-    })
-
-    const result = await response.json()
-    console.log('Turnstile verification result:', result);
-    return result.success
-  } catch (error) {
-    console.error('Turnstile verification error:', error)
-    return false
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const { turnstileToken } = await request.json()
-    console.log('Google auth request received, token:', turnstileToken)
-
-    // Verify Turnstile token first
-    const isValidTurnstile = await verifyTurnstile(turnstileToken)
-    
-    if (!isValidTurnstile) {
-      console.log('Turnstile verification failed')
-      return NextResponse.json({ error: 'CAPTCHA verification failed' }, { status: 400 })
-    }
-
-    console.log('Turnstile verification passed, proceeding with Google OAuth')
+    console.log('Google auth request received')
 
     // Proceed with Google OAuth (include Drive scope from start)
     const supabase = await createClient()

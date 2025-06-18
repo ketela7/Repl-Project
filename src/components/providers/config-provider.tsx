@@ -5,7 +5,6 @@ import { createContext, useContext, ReactNode } from "react";
 interface Config {
   supabaseUrl: string;
   supabaseAnonKey: string;
-  turnstileSiteKey: string;
 }
 
 const ConfigContext = createContext<Config | null>(null);
