@@ -52,10 +52,10 @@ export async function GET(request: NextRequest) {
       userId: user.id,
     });
 
-    // Check cache first (2 minute TTL for fast loading)
+    // Enhanced cache check with performance logging
     const cachedResult = driveCache.get(cacheKey);
     if (cachedResult && !pageToken) { // Don't cache paginated results
-      console.log('Drive API: Returning cached result');
+      console.log('Drive API: Returning cached result, items:', cachedResult.files?.length || 0);
       return NextResponse.json(cachedResult);
     }
 

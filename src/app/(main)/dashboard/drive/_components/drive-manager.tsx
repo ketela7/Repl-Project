@@ -83,6 +83,7 @@ import { PermanentDeleteDialog } from './permanent-delete-dialog';
 import { FileDetailsDialog } from './file-details-dialog';
 import { FilePreviewDialog } from './file-preview-dialog';
 import { DriveGridSkeleton, BreadcrumbSkeleton } from './drive-skeleton';
+import { LoadingSkeleton, BreadcrumbLoadingSkeleton } from '@/components/ui/loading-skeleton';
 import { BulkActionsToolbar } from './bulk-actions-toolbar';
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
@@ -1508,6 +1509,22 @@ export function DriveManager() {
     checkAccessAndFetch();
   }, []);
 
+  // Handle debounced search with optimized API calls
+  useEffect(() => {
+    if (debouncedSearchQuery.trim() !== searchQuery.trim()) {
+      return; // Only trigger when debounced value matches current input
+    }
+    
+    if (debouncedSearchQuery.trim()) {
+      // Cancel any existing folder requests when searching
+      requestQueue.cancel(`fetch-files-${currentFolderId || 'root'}--`);
+      fetchFiles(currentFolderId, debouncedSearchQuery.trim());
+    } else if (debouncedSearchQuery === '' && searchQuery === '') {
+      // When search is completely cleared, reload current folder
+      fetchFiles(currentFolderId);
+    }
+  }, [debouncedSearchQuery, currentFolderId]);
+
   // Show connection card if no access to Google Drive
   if (hasAccess === false) {
     return <DriveConnectionCard />;
@@ -1515,8 +1532,31 @@ export function DriveManager() {
 
   if (loading && files.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 animate-spin" />
+      <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 flex-1 sm:max-w-md">
+            <Input
+              placeholder="Search files and folders..."
+              value=""
+              disabled
+              className="text-sm"
+            />
+            <Button size="sm" variant="outline" disabled>
+              <Search className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <BreadcrumbLoadingSkeleton />
+        <Card>
+          <CardHeader className="pb-4">
+            <CardTitle>
+              <LoadingSkeleton count={1} type="list" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <LoadingSkeleton count={8} type={viewMode} />
+          </CardContent>
+        </Card>
       </div>
     );
   }
