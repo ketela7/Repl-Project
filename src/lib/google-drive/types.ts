@@ -1,3 +1,19 @@
+export interface DriveFileCapabilities {
+  canCopy?: boolean;
+  canDelete?: boolean;
+  canDownload?: boolean;
+  canEdit?: boolean;
+  canRename?: boolean;
+  canShare?: boolean;
+  canTrash?: boolean;
+  canUntrash?: boolean;
+  canMoveItemWithinDrive?: boolean;
+  canMoveItemOutOfDrive?: boolean;
+  canAddChildren?: boolean;
+  canListChildren?: boolean;
+  canRemoveChildren?: boolean;
+}
+
 export interface DriveFile {
   id: string;
   name: string;
@@ -22,6 +38,7 @@ export interface DriveFile {
   }>;
   shared?: boolean;
   trashed?: boolean;
+  capabilities?: DriveFileCapabilities;
 }
 
 export interface DriveFolder {
@@ -32,6 +49,7 @@ export interface DriveFolder {
   parents?: string[];
   shared?: boolean;
   trashed?: boolean;
+  capabilities?: DriveFileCapabilities;
 }
 
 export interface DriveFileMetadata {

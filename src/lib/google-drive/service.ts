@@ -94,7 +94,7 @@ export class GoogleDriveService {
       orderBy,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
-      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, viewedByMeTime)',
+      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, viewedByMeTime, capabilities)',
     });
 
     const files = response.data.files?.map(convertGoogleDriveFile) || [];
