@@ -1,5 +1,5 @@
 import { db } from './db';
-import { users, userSessions, type User, type NewUser } from './schema';
+import { users, userSessions, activityLogs, bulkOperations, type User, type NewUser, type ActivityLog, type NewActivityLog, type BulkOperation, type NewBulkOperation } from './schema';
 import { eq, desc } from 'drizzle-orm';
 
 // User functions
@@ -58,4 +58,42 @@ export async function getSession(sessionToken: string) {
 
 export async function deleteSession(sessionToken: string) {
   await db.delete(userSessions).where(eq(userSessions.sessionToken, sessionToken));
+}
+
+// Activity logging functions
+export async function createBulkOperation(operationData: NewBulkOperation): Promise<BulkOperation> {
+  const [operation] = await db.insert(bulkOperations).values(operationData).returning();
+  return operation;
+}
+
+export async function updateBulkOperation(batchId: string, updates: Partial<BulkOperation>): Promise<BulkOperation> {
+  const [operation] = await db
+    .update(bulkOperations)
+    .set(updates)
+    .where(eq(bulkOperations.batchId, batchId))
+    .returning();
+  return operation;
+}
+
+export async function logActivity(activityData: NewActivityLog): Promise<ActivityLog> {
+  const [activity] = await db.insert(activityLogs).values(activityData).returning();
+  return activity;
+}
+
+export async function getActivityLogs(userId: string, limit: number = 50): Promise<ActivityLog[]> {
+  return await db
+    .select()
+    .from(activityLogs)
+    .where(eq(activityLogs.userId, userId))
+    .orderBy(desc(activityLogs.createdAt))
+    .limit(limit);
+}
+
+export async function getBulkOperations(userId: string, limit: number = 20): Promise<BulkOperation[]> {
+  return await db
+    .select()
+    .from(bulkOperations)
+    .where(eq(bulkOperations.userId, userId))
+    .orderBy(desc(bulkOperations.createdAt))
+    .limit(limit);
 }

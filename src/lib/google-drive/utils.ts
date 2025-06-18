@@ -469,7 +469,8 @@ export function getFileActions(
     // Restore only if in trash view and has permission
     canRestore: isTrashView && isTrashed && (finalCapabilities.canUntrash ?? false),
     
-    // Permanent delete only if in trash view and has delete permission
-    canPermanentDelete: isTrashView && isTrashed && (finalCapabilities.canDelete ?? false),
+    // Permanent delete - available in trash view OR for files with delete permission (owner files)
+    canPermanentDelete: (isTrashView && isTrashed && (finalCapabilities.canDelete ?? false)) || 
+                       (!isTrashView && !isTrashed && (finalCapabilities.canDelete ?? false)),
   };
 }
