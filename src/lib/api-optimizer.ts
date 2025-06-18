@@ -15,7 +15,7 @@ class APIOptimizer {
   private requestQueue = new Map<string, BatchableRequest>();
   private batchTimer: NodeJS.Timeout | null = null;
   private readonly batchDelay = 50; // Very fast batching for free tier
-  private readonly maxBatchSize = 10; // Limit to avoid timeout
+  private maxBatchSize = 10; // Limit to avoid timeout
 
   // Queue request for batching
   enqueueRequest<T>(type: string, params: any): Promise<T> {

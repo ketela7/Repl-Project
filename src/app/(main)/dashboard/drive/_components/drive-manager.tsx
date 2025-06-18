@@ -1547,6 +1547,8 @@ export function DriveManager() {
     return () => {
       backgroundCacheManager.destroy();
       apiOptimizer.clear();
+      performanceMonitor.destroy();
+      resourceOptimizer.destroy();
     };
   }, []);
 

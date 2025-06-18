@@ -2,8 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 import { driveCache } from '@/lib/cache';
+import { performanceMonitor } from '@/lib/performance-monitor';
 
 export async function GET(request: NextRequest) {
+  const callId = performanceMonitor.startAPICall('/api/drive/files');
+  
   try {
     console.log('=== Drive Files API Called ===');
     const supabase = await createClient();

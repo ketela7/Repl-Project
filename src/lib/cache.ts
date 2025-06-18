@@ -128,3 +128,13 @@ class MemoryCache {
 
 // Export singleton instance
 export const driveCache = new MemoryCache();
+
+// Add setMaxSize method to the exported instance
+if (!driveCache.setMaxSize) {
+  (driveCache as any).setMaxSize = function(newMaxSize: number) {
+    (this as any).maxSize = newMaxSize;
+    if ((this as any).cache.size > (this as any).maxSize) {
+      (this as any).cleanup();
+    }
+  };
+}
