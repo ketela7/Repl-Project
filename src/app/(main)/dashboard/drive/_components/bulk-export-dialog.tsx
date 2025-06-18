@@ -22,7 +22,7 @@ import {
   Image,
   Info
 } from "lucide-react";
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "sonner";
 import { errorRecovery } from '@/lib/error-recovery';
 
 interface BulkExportDialogProps {
@@ -107,7 +107,6 @@ export function BulkExportDialog({
   selectedItems
 }: BulkExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState('pdf');
-  const { toast } = useToast();
   const [progress, setProgress] = useState(0);
   const [currentFile, setCurrentFile] = useState('');
 
@@ -176,19 +175,11 @@ export function BulkExportDialog({
                 ...exportStrategy,
                 onRetry: (attempt, error) => {
                   console.log(`Retrying export for ${file.name}, attempt ${attempt}:`, error.message);
-                  toast({
-                    title: "Retrying Export",
-                    description: `Retrying ${file.name} (attempt ${attempt})`,
-                    duration: 2000,
-                  });
+                  toast.info(`Retrying ${file.name} (attempt ${attempt})`);
                 },
                 onFallback: (error) => {
                   console.log(`Using fallback export for ${file.name}:`, error.message);
-                  toast({
-                    title: "Using Fallback Format",
-                    description: `Exporting ${file.name} as PDF instead`,
-                    duration: 3000,
-                  });
+                  toast.warning(`Exporting ${file.name} as PDF instead`);
                 }
               }
             );
@@ -228,11 +219,7 @@ export function BulkExportDialog({
           if (result.success) {
             successfulExports++;
             if (result.data?.usedFallback) {
-              toast({
-                title: "Fallback Used",
-                description: `${result.data.fileName} exported using fallback format`,
-                duration: 3000,
-              });
+              toast.warning(`${result.data.fileName} exported using fallback format`);
             }
           } else {
             failedExports.push({
@@ -244,15 +231,9 @@ export function BulkExportDialog({
 
     // Show completion message
     if (failedExports.length === 0) {
-      toast({
-        title: "Export Complete",
-        description: `Successfully exported ${successfulExports} files.`,
-      });
+      toast.success(`Successfully exported ${successfulExports} files.`);
     } else {
-      toast({
-        title: "Export Incomplete",
-        description: `Exported ${successfulExports} files with ${failedExports.length} failures.`,
-      });
+      toast.warning(`Exported ${successfulExports} files with ${failedExports.length} failures.`);
     }
   };
 
