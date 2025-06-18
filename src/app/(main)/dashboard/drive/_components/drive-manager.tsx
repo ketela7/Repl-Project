@@ -207,6 +207,16 @@ const applyClientSideFilters = (
         
         return fileSize >= minBytes && fileSize <= maxBytes;
       });
+      
+      // Filter folders by size (folders have size = 0)
+      filteredFolders = filteredFolders.filter(folder => {
+        const folderSize = 0; // Folders always have size 0
+        const multiplier = getSizeMultiplier(sizeRange.unit);
+        const minBytes = sizeRange.min ? sizeRange.min * multiplier : 0;
+        const maxBytes = sizeRange.max ? sizeRange.max * multiplier : Number.MAX_SAFE_INTEGER;
+        
+        return folderSize >= minBytes && folderSize <= maxBytes;
+      });
     }
 
     // Date range filters

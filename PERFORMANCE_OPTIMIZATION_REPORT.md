@@ -3,7 +3,7 @@
 
 ## Overview
 
-Comprehensive performance profiling and optimization system implemented for resource efficiency targeting 1000 concurrent users on free-tier platforms (Vercel/Netlify).
+Comprehensive performance profiling and optimization system implemented for resource efficiency targeting 1000 concurrent users on free-tier platforms. Features intelligent client-side filtering due to Google Drive API limitations and optimized real-time data processing.
 
 ## Performance Monitoring System Implemented
 

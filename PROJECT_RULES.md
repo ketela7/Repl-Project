@@ -136,10 +136,11 @@ TURNSTILE_SECRET_KEY
 - **CSRF Protection**: Built-in Next.js protection
 - **Error Information**: Limited details in production
 
-### File Handling Restrictions
-- **No Archive Usage**: Do not use any archive libraries (zip, tar, etc.)
-- **Memory Efficiency**: Use direct download links for efficient file transfer
-- **Bulk Operations**: Process multiple files sequentially with rate limiting
+### File Handling Implementation
+- **No Archive Libraries**: Direct download links for memory-efficient file transfer
+- **Size Filtering**: Client-side implementation since Google Drive API lacks server-side size filtering support
+- **Bulk Operations**: Sequential processing with comprehensive error handling and progress tracking
+- **Folder Size**: Folders treated as 0 bytes in size range filtering
 
 ---
 

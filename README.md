@@ -5,8 +5,8 @@ A professional web application for managing Google Drive files and folders with 
 ## Features
 
 ### File Operations
-- **Upload Files**: Drag-and-drop or browse to upload files to Google Drive
 - **Create Folders**: Create new folders with intuitive naming
+- **File Management**: Comprehensive file and folder operations
 - **View Files**: Preview files directly in Google Drive's web viewer
 - **Preview Media**: Enhanced preview functionality for media files with support for:
   - **Images**: Direct display with zoom and high-quality rendering
@@ -76,13 +76,25 @@ A professional web application for managing Google Drive files and folders with 
 - **Search Functionality**: Search across all files and folders
 - **Real-time Refresh**: Manual and automatic content updates
 
+### Smart Filtering & Views
+- **View Modes**: Grid view for visual browsing and Table view with sortable columns
+- **Quick Filters**: All Files, My Drive, Shared with Me, Starred, Recent, Trash
+- **File Type Filters**: Documents, Spreadsheets, Presentations, Images, Videos, Audio, Archives, Code
+- **Advanced Filters**: 
+  - Size range filtering (client-side implementation as Google Drive API doesn't support server-side size filtering)
+  - Created/Modified date range with intuitive date picker and easy year navigation
+  - Owner filtering by name or email address
+- **Real-time Filtering**: Instant results applied to both grid and table views consistently
+
 ### User Interface
+- **Dual View Experience**: Toggle between grid and table layouts with column customization
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 - **Dark/Light Mode**: Theme switching support with next-themes
-- **Loading States**: Progress indicators for all operations
+- **Smart Navigation**: Breadcrumb navigation with clickable folder hierarchy
+- **Loading States**: Skeleton loaders and progress indicators for all operations
 - **Error Handling**: Comprehensive error messages with actionable feedback
-- **Toast Notifications**: Real-time success and error notifications
-- **Performance Dashboard**: Real-time monitoring with 4 tabs (Overview, Performance, Usage Stats, Error Tracking)
+- **Toast Notifications**: Contextual success/error notifications with operation details
+- **Performance Dashboard**: Real-time monitoring with comprehensive metrics tracking
 
 ### Performance Monitoring
 - **Real-time Metrics**: Memory usage, API performance, cache efficiency
