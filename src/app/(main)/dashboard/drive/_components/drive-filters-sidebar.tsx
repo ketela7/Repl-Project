@@ -7,6 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
 import { 
   Home,
   Share,
@@ -24,20 +28,42 @@ import {
   Filter,
   ChevronDown,
   ChevronUp,
-  X
+  X,
+  HardDrive,
+  Calendar as CalendarIcon,
+  User
 } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { format } from "date-fns";
 
 interface DriveFiltersSidebarProps {
   activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash';
   fileTypeFilter: string[];
   onViewChange: (view: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash') => void;
   onFileTypeChange: (fileTypes: string[]) => void;
+  onAdvancedFiltersChange?: (filters: AdvancedFilters) => void;
   isCollapsed?: boolean;
+}
+
+interface AdvancedFilters {
+  sizeRange?: {
+    min?: number;
+    max?: number;
+    unit: 'B' | 'KB' | 'MB' | 'GB';
+  };
+  createdDateRange?: {
+    from?: Date;
+    to?: Date;
+  };
+  modifiedDateRange?: {
+    from?: Date;
+    to?: Date;
+  };
+  owner?: string;
 }
 
 const viewOptions = [
@@ -66,10 +92,35 @@ export function DriveFiltersSidebar({
   fileTypeFilter, 
   onViewChange, 
   onFileTypeChange,
+  onAdvancedFiltersChange,
   isCollapsed = false 
 }: DriveFiltersSidebarProps) {
   
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isAdvancedExpanded, setIsAdvancedExpanded] = useState(false);
+  
+  // Advanced filter states
+  const [sizeFilter, setSizeFilter] = useState<{
+    min: string;
+    max: string;
+    unit: 'B' | 'KB' | 'MB' | 'GB';
+  }>({
+    min: '',
+    max: '',
+    unit: 'MB'
+  });
+  
+  const [createdDateRange, setCreatedDateRange] = useState<{
+    from?: Date;
+    to?: Date;
+  }>({});
+  
+  const [modifiedDateRange, setModifiedDateRange] = useState<{
+    from?: Date;
+    to?: Date;
+  }>({});
+  
+  const [ownerFilter, setOwnerFilter] = useState('');
 
   const handleFileTypeToggle = (fileTypeKey: string) => {
     const newFilter = fileTypeFilter.includes(fileTypeKey)
@@ -78,9 +129,43 @@ export function DriveFiltersSidebar({
     onFileTypeChange(newFilter);
   };
 
+  // Utility functions for advanced filters
+  const updateAdvancedFilters = () => {
+    if (onAdvancedFiltersChange) {
+      const filters: AdvancedFilters = {};
+      
+      if (sizeFilter.min || sizeFilter.max) {
+        filters.sizeRange = {
+          min: sizeFilter.min ? parseFloat(sizeFilter.min) : undefined,
+          max: sizeFilter.max ? parseFloat(sizeFilter.max) : undefined,
+          unit: sizeFilter.unit
+        };
+      }
+      
+      if (createdDateRange.from || createdDateRange.to) {
+        filters.createdDateRange = createdDateRange;
+      }
+      
+      if (modifiedDateRange.from || modifiedDateRange.to) {
+        filters.modifiedDateRange = modifiedDateRange;
+      }
+      
+      if (ownerFilter.trim()) {
+        filters.owner = ownerFilter.trim();
+      }
+      
+      onAdvancedFiltersChange(filters);
+    }
+  };
+
   const clearAllFilters = () => {
     onViewChange('all');
     onFileTypeChange([]);
+    setSizeFilter({ min: '', max: '', unit: 'MB' });
+    setCreatedDateRange({});
+    setModifiedDateRange({});
+    setOwnerFilter('');
+    updateAdvancedFilters();
   };
 
   const removeFileTypeFilter = (fileTypeKey: string) => {
@@ -88,7 +173,17 @@ export function DriveFiltersSidebar({
     onFileTypeChange(newFilter);
   };
 
-  const hasActiveFilters = activeView !== 'all' || fileTypeFilter.length > 0;
+  const hasAdvancedFilters = sizeFilter.min || sizeFilter.max || 
+                           createdDateRange.from || createdDateRange.to ||
+                           modifiedDateRange.from || modifiedDateRange.to ||
+                           ownerFilter.trim();
+
+  const hasActiveFilters = activeView !== 'all' || fileTypeFilter.length > 0 || hasAdvancedFilters;
+
+  // Apply advanced filters when they change
+  React.useEffect(() => {
+    updateAdvancedFilters();
+  }, [sizeFilter, createdDateRange, modifiedDateRange, ownerFilter]);
 
   return (
     <Card className="border-primary/20 bg-gradient-to-r from-background to-accent/5">
@@ -244,6 +339,176 @@ export function DriveFiltersSidebar({
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Advanced Filters Section */}
+              <Separator />
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-primary" />
+                    <span className="font-medium text-sm">Advanced Filters</span>
+                    {hasAdvancedFilters && (
+                      <Badge variant="secondary" className="text-xs px-2 py-1">
+                        Active
+                      </Badge>
+                    )}
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setIsAdvancedExpanded(!isAdvancedExpanded)}
+                    className="h-7 px-2"
+                  >
+                    {isAdvancedExpanded ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+
+                {isAdvancedExpanded && (
+                  <div className="space-y-4">
+                    {/* Size Range Filter */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <HardDrive className="h-4 w-4 text-muted-foreground" />
+                        <Label className="text-sm font-medium">File Size Range</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          placeholder="Min"
+                          value={sizeFilter.min}
+                          onChange={(e) => setSizeFilter(prev => ({ ...prev, min: e.target.value }))}
+                          className="h-8 text-xs"
+                        />
+                        <span className="text-xs text-muted-foreground">to</span>
+                        <Input
+                          type="number"
+                          placeholder="Max"
+                          value={sizeFilter.max}
+                          onChange={(e) => setSizeFilter(prev => ({ ...prev, max: e.target.value }))}
+                          className="h-8 text-xs"
+                        />
+                        <Select
+                          value={sizeFilter.unit}
+                          onValueChange={(value: 'B' | 'KB' | 'MB' | 'GB') => 
+                            setSizeFilter(prev => ({ ...prev, unit: value }))
+                          }
+                        >
+                          <SelectTrigger className="h-8 w-16">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="B">B</SelectItem>
+                            <SelectItem value="KB">KB</SelectItem>
+                            <SelectItem value="MB">MB</SelectItem>
+                            <SelectItem value="GB">GB</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Created Date Range Filter */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                        <Label className="text-sm font-medium">Created Date Range</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 text-xs">
+                              {createdDateRange.from ? format(createdDateRange.from, 'MMM dd, yyyy') : 'From'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={createdDateRange.from}
+                              onSelect={(date) => setCreatedDateRange(prev => ({ ...prev, from: date }))}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <span className="text-xs text-muted-foreground">to</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 text-xs">
+                              {createdDateRange.to ? format(createdDateRange.to, 'MMM dd, yyyy') : 'To'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={createdDateRange.to}
+                              onSelect={(date) => setCreatedDateRange(prev => ({ ...prev, to: date }))}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+
+                    {/* Modified Date Range Filter */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <Label className="text-sm font-medium">Modified Date Range</Label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 text-xs">
+                              {modifiedDateRange.from ? format(modifiedDateRange.from, 'MMM dd, yyyy') : 'From'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={modifiedDateRange.from}
+                              onSelect={(date) => setModifiedDateRange(prev => ({ ...prev, from: date }))}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <span className="text-xs text-muted-foreground">to</span>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button variant="outline" size="sm" className="h-8 text-xs">
+                              {modifiedDateRange.to ? format(modifiedDateRange.to, 'MMM dd, yyyy') : 'To'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={modifiedDateRange.to}
+                              onSelect={(date) => setModifiedDateRange(prev => ({ ...prev, to: date }))}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                    </div>
+
+                    {/* Owner Filter */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <Label className="text-sm font-medium">Owner</Label>
+                      </div>
+                      <Input
+                        type="text"
+                        placeholder="Enter owner name or email"
+                        value={ownerFilter}
+                        onChange={(e) => setOwnerFilter(e.target.value)}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}
