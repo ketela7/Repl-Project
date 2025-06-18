@@ -42,7 +42,31 @@ interface APICallMetric {
 }
 
 class PerformanceMonitor {
-  private metrics: PerformanceMetrics = {
+  private metrics: any = {
+    timestamp: Date.now(),
+    memory: {
+      used: 0,
+      heapUsed: 0,
+      heapTotal: 0,
+      external: 0
+    },
+    api: {
+      totalCalls: 0,
+      averageResponseTime: 0,
+      timeoutCount: 0,
+      errorRate: 0
+    },
+    cache: {
+      hitRate: 0,
+      size: 0,
+      memoryUsage: 0
+    },
+    session: {
+      duration: 0,
+      userActivity: 0,
+      backgroundTasks: 0
+    },
+    // Legacy structure for compatibility
     memoryUsage: { used: 0, total: 0 },
     apiCalls: { count: 0, averageTime: 0, errors: 0 },
     cacheStats: { hits: 0, misses: 0, hitRate: 0 },
@@ -71,7 +95,7 @@ class PerformanceMonitor {
 
   private startMemoryMonitoring() {
     const updateMemory = () => {
-      if ('memory' in performance) {
+      if (typeof window !== 'undefined' && 'memory' in performance) {
         const memory = (performance as any).memory;
         if (memory) {
           const usedMB = Math.round(memory.usedJSHeapSize / 1024 / 1024);
@@ -87,8 +111,18 @@ class PerformanceMonitor {
             this.notifySubscribers();
           }
         }
+      } else if (typeof process !== 'undefined' && process.memoryUsage) {
+        // Server-side memory monitoring
+        const memory = process.memoryUsage();
+        const usedMB = Math.round(memory.heapUsed / 1024 / 1024);
+        const totalMB = Math.round(memory.heapTotal / 1024 / 1024);
+        
+        this.metrics.memoryUsage = {
+          used: usedMB,
+          total: totalMB
+        };
       } else {
-        // Fallback for browsers without memory API
+        // Fallback estimation
         const estimatedUsage = this.estimateMemoryUsage();
         this.metrics.memoryUsage = {
           used: estimatedUsage,
@@ -218,6 +252,30 @@ class PerformanceMonitor {
     this.notifySubscribers();
   }
 
+  startAPICall(endpoint: string): string {
+    const callId = `${endpoint}_${Date.now()}_${Math.random()}`;
+    // Store call start time for tracking
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`api_call_${callId}`, Date.now().toString());
+    }
+    return callId;
+  }
+
+  endAPICall(callId: string, success: boolean, error?: string) {
+    if (typeof window !== 'undefined') {
+      const startTimeStr = localStorage.getItem(`api_call_${callId}`);
+      if (startTimeStr) {
+        const startTime = parseInt(startTimeStr);
+        const duration = Date.now() - startTime;
+        this.trackApiCall(duration, !success);
+        localStorage.removeItem(`api_call_${callId}`);
+      }
+    } else {
+      // Server-side fallback
+      this.trackApiCall(1000, !success);
+    }
+  }
+
   trackUserAction(isError = false) {
     this.metrics.userActions.total++;
     if (isError) this.metrics.userActions.errors++;
@@ -281,12 +339,12 @@ class PerformanceMonitor {
   }
 }
 
-export const performanceMonitor = typeof window !== 'undefined' ? new PerformanceMonitor() : null;
+export const performanceMonitor = typeof window !== 'undefined' ? new PerformanceMonitor() : new PerformanceMonitor();
 
 // Auto-initialize
 if (typeof window !== 'undefined') {
   // Client-side initialization
-  performanceMonitor.init();
+  performanceMonitor?.init();
 
   // Track user activity
   ['click', 'keydown', 'scroll', 'touchstart'].forEach(event => {
@@ -295,6 +353,6 @@ if (typeof window !== 'undefined') {
     }, { passive: true });
   });
 } else if (typeof process !== 'undefined') {
-  // Server-side initialization
-  performanceMonitor.init();
+  // Server-side initialization - safe initialization
+  performanceMonitor?.init();
 }
