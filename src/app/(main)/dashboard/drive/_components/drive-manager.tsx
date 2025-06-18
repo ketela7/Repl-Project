@@ -77,8 +77,7 @@ import { batchAPI } from '@/lib/batch-api';
 import { prefetchManager } from '@/lib/prefetch-manager';
 import { clientStorage } from '@/lib/client-storage';
 import { apiOptimizer } from '@/lib/api-optimizer';
-import { performanceMonitor } from '@/lib/performance-monitor';
-import { resourceOptimizer } from '@/lib/resource-optimizer';
+
 import { FileUploadDialog } from './file-upload-dialog';
 import { CreateFolderDialog } from './create-folder-dialog';
 import { FileRenameDialog } from './file-rename-dialog';

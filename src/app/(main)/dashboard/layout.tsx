@@ -47,7 +47,6 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
         </header>
         <div className="p-4 md:p-6">{children}</div>
       </SidebarInset>
-      <PerformanceDashboard />
     </SidebarProvider>
   );
 }
