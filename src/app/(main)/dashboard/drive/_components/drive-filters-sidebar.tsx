@@ -417,38 +417,17 @@ export function DriveFiltersSidebar({
                         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                         <Label className="text-sm font-medium">Created Date Range</Label>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 text-xs">
-                              {createdDateRange.from ? format(createdDateRange.from, 'MMM dd, yyyy') : 'From'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={createdDateRange.from}
-                              onSelect={(date) => setCreatedDateRange(prev => ({ ...prev, from: date }))}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <span className="text-xs text-muted-foreground">to</span>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 text-xs">
-                              {createdDateRange.to ? format(createdDateRange.to, 'MMM dd, yyyy') : 'To'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={createdDateRange.to}
-                              onSelect={(date) => setCreatedDateRange(prev => ({ ...prev, to: date }))}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                      <div className="grid grid-cols-2 gap-2">
+                        <SimpleDatePicker
+                          date={createdDateRange.from}
+                          onDateChange={(date) => setCreatedDateRange(prev => ({ ...prev, from: date }))}
+                          placeholder="From date"
+                        />
+                        <SimpleDatePicker
+                          date={createdDateRange.to}
+                          onDateChange={(date) => setCreatedDateRange(prev => ({ ...prev, to: date }))}
+                          placeholder="To date"
+                        />
                       </div>
                     </div>
 
@@ -458,38 +437,17 @@ export function DriveFiltersSidebar({
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <Label className="text-sm font-medium">Modified Date Range</Label>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 text-xs">
-                              {modifiedDateRange.from ? format(modifiedDateRange.from, 'MMM dd, yyyy') : 'From'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={modifiedDateRange.from}
-                              onSelect={(date) => setModifiedDateRange(prev => ({ ...prev, from: date }))}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        <span className="text-xs text-muted-foreground">to</span>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button variant="outline" size="sm" className="h-8 text-xs">
-                              {modifiedDateRange.to ? format(modifiedDateRange.to, 'MMM dd, yyyy') : 'To'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={modifiedDateRange.to}
-                              onSelect={(date) => setModifiedDateRange(prev => ({ ...prev, to: date }))}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                      <div className="grid grid-cols-2 gap-2">
+                        <SimpleDatePicker
+                          date={modifiedDateRange.from}
+                          onDateChange={(date) => setModifiedDateRange(prev => ({ ...prev, from: date }))}
+                          placeholder="From date"
+                        />
+                        <SimpleDatePicker
+                          date={modifiedDateRange.to}
+                          onDateChange={(date) => setModifiedDateRange(prev => ({ ...prev, to: date }))}
+                          placeholder="To date"
+                        />
                       </div>
                     </div>
 

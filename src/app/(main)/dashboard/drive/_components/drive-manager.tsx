@@ -113,6 +113,12 @@ const applyClientSideFilters = (
     fileTypeFilter: string[];
     searchQuery: string;
     activeView: string;
+    advancedFilters?: {
+      sizeRange?: { min?: number; max?: number; unit: 'B' | 'KB' | 'MB' | 'GB' };
+      createdDateRange?: { from?: Date; to?: Date };
+      modifiedDateRange?: { from?: Date; to?: Date };
+      owner?: string;
+    };
   }
 ) => {
   let filteredFiles = [...files];
@@ -183,6 +189,88 @@ const applyClientSideFilters = (
       folder.name?.toLowerCase().includes(searchTerm) ||
       folder.description?.toLowerCase().includes(searchTerm)
     );
+  }
+
+  // Apply advanced filters
+  if (filters.advancedFilters) {
+    const { sizeRange, createdDateRange, modifiedDateRange, owner } = filters.advancedFilters;
+
+    // Size range filter (client-side only since Google Drive API doesn't support it)
+    if (sizeRange && (sizeRange.min || sizeRange.max)) {
+      filteredFiles = filteredFiles.filter(file => {
+        if (!file.size) return true; // Include files without size info
+        
+        const fileSize = parseInt(file.size);
+        const multiplier = getSizeMultiplier(sizeRange.unit);
+        const minBytes = sizeRange.min ? sizeRange.min * multiplier : 0;
+        const maxBytes = sizeRange.max ? sizeRange.max * multiplier : Number.MAX_SAFE_INTEGER;
+        
+        return fileSize >= minBytes && fileSize <= maxBytes;
+      });
+    }
+
+    // Date range filters
+    if (createdDateRange && (createdDateRange.from || createdDateRange.to)) {
+      filteredFiles = filteredFiles.filter(file => {
+        const fileDate = new Date(file.createdTime);
+        const fromDate = createdDateRange.from;
+        const toDate = createdDateRange.to;
+        
+        if (fromDate && fileDate < fromDate) return false;
+        if (toDate && fileDate > toDate) return false;
+        return true;
+      });
+      
+      filteredFolders = filteredFolders.filter(folder => {
+        const folderDate = new Date(folder.createdTime);
+        const fromDate = createdDateRange.from;
+        const toDate = createdDateRange.to;
+        
+        if (fromDate && folderDate < fromDate) return false;
+        if (toDate && folderDate > toDate) return false;
+        return true;
+      });
+    }
+
+    if (modifiedDateRange && (modifiedDateRange.from || modifiedDateRange.to)) {
+      filteredFiles = filteredFiles.filter(file => {
+        const fileDate = new Date(file.modifiedTime);
+        const fromDate = modifiedDateRange.from;
+        const toDate = modifiedDateRange.to;
+        
+        if (fromDate && fileDate < fromDate) return false;
+        if (toDate && fileDate > toDate) return false;
+        return true;
+      });
+      
+      filteredFolders = filteredFolders.filter(folder => {
+        const folderDate = new Date(folder.modifiedTime);
+        const fromDate = modifiedDateRange.from;
+        const toDate = modifiedDateRange.to;
+        
+        if (fromDate && folderDate < fromDate) return false;
+        if (toDate && folderDate > toDate) return false;
+        return true;
+      });
+    }
+
+    // Owner filter
+    if (owner && owner.trim()) {
+      const ownerTerm = owner.toLowerCase();
+      filteredFiles = filteredFiles.filter(file => 
+        file.owners?.some(ownerInfo => 
+          ownerInfo.displayName?.toLowerCase().includes(ownerTerm) ||
+          ownerInfo.emailAddress?.toLowerCase().includes(ownerTerm)
+        )
+      );
+      
+      filteredFolders = filteredFolders.filter(folder => 
+        folder.owners?.some(ownerInfo => 
+          ownerInfo.displayName?.toLowerCase().includes(ownerTerm) ||
+          ownerInfo.emailAddress?.toLowerCase().includes(ownerTerm)
+        )
+      );
+    }
   }
 
   return { filteredFiles, filteredFolders };
@@ -297,9 +385,10 @@ export function DriveManager() {
     return applyClientSideFilters(files, folders, {
       fileTypeFilter,
       searchQuery: debouncedSearchQuery,
-      activeView
+      activeView,
+      advancedFilters
     });
-  }, [files, folders, fileTypeFilter, debouncedSearchQuery, activeView]);
+  }, [files, folders, fileTypeFilter, debouncedSearchQuery, activeView, advancedFilters]);
 
   // Sort files and folders based on current sort configuration
   const sortedFiles = React.useMemo(() => {

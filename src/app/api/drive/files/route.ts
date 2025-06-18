@@ -5,7 +5,16 @@ import { driveCache } from '@/lib/cache';
 import { performanceMonitor } from '@/lib/performance-monitor';
 
 // Client-side filter helper function
-function applyClientSideFilters(result: any, filters: { view?: string | null, fileTypes?: string | null, query?: string | null }) {
+function applyClientSideFilters(
+  result: any, 
+  filters: { 
+    view?: string | null, 
+    fileTypes?: string | null, 
+    query?: string | null,
+    sizeMin?: string | null,
+    sizeMax?: string | null
+  }
+) {
   if (!result || !result.files || !Array.isArray(result.files)) return result;
 
   let filteredFiles = [...result.files];
@@ -65,6 +74,22 @@ function applyClientSideFilters(result: any, filters: { view?: string | null, fi
       file.name?.toLowerCase().includes(searchTerm) ||
       file.description?.toLowerCase().includes(searchTerm)
     );
+  }
+
+  // Apply size filtering (client-side since Google Drive API doesn't support it)
+  if (filters.sizeMin || filters.sizeMax) {
+    filteredFiles = filteredFiles.filter(file => {
+      // Skip folders and files without size information
+      if (!file.size || file.mimeType === 'application/vnd.google-apps.folder') {
+        return true;
+      }
+      
+      const fileSize = parseInt(file.size);
+      const sizeMin = filters.sizeMin ? parseInt(filters.sizeMin) : 0;
+      const sizeMax = filters.sizeMax ? parseInt(filters.sizeMax) : Number.MAX_SAFE_INTEGER;
+      
+      return fileSize >= sizeMin && fileSize <= sizeMax;
+    });
   }
 
   return {
@@ -235,13 +260,8 @@ export async function GET(request: NextRequest) {
       driveQuery += ` and '${owner.replace(/'/g, "\\'")}' in owners`;
     }
     
-    // Handle size filters - Google Drive API supports size queries
-    if (sizeMin) {
-      driveQuery += ` and size >= ${sizeMin}`;
-    }
-    if (sizeMax) {
-      driveQuery += ` and size <= ${sizeMax}`;
-    }
+    // Note: Google Drive API does not support size filtering directly
+    // Size filtering will be handled client-side after data retrieval
 
     console.log('Google Drive API Query:', driveQuery);
 
@@ -284,7 +304,13 @@ export async function GET(request: NextRequest) {
     });
 
     // Apply client-side filters to enhance API results
-    const filteredResult = applyClientSideFilters(result, { view, fileTypes, query });
+    const filteredResult = applyClientSideFilters(result, { 
+      view, 
+      fileTypes, 
+      query,
+      sizeMin,
+      sizeMax
+    });
 
     // Cache the filtered result with smart TTL based on content type
     if (!pageToken) {
