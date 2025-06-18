@@ -141,8 +141,8 @@ export async function GET(request: NextRequest) {
       useCustomParameters = true;
     } else if (view === 'trash') {
       driveQuery = "trashed=true";
-    } else {
-      // Default view (all/my-drive)
+    } else if (view === 'my-drive') {
+      // My Drive view - show only root files when no parent specified
       driveQuery = "trashed=false";
       
       // Handle folder navigation
@@ -151,6 +151,14 @@ export async function GET(request: NextRequest) {
       } else if (!query) {
         // Show root files only when no search query and no parent
         driveQuery += " and 'root' in parents";
+      }
+    } else {
+      // All Files view - show everything without root restriction
+      driveQuery = "trashed=false";
+      
+      // Handle folder navigation only
+      if (parentId) {
+        driveQuery += ` and '${parentId}' in parents`;
       }
     }
 
