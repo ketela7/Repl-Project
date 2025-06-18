@@ -103,6 +103,7 @@ import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { PerformanceDashboard } from '@/components/performance-dashboard';
 import { ErrorRecoveryStatus } from '@/components/error-recovery-status';
+import { ErrorRecoveryDashboard } from '@/components/error-recovery-dashboard';
 import { errorRecovery } from '@/lib/error-recovery';
 
 export function DriveManager() {

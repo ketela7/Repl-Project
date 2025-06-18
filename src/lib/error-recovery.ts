@@ -1,6 +1,6 @@
 /**
- * Error Recovery System for Google Drive Management
- * Provides retry mechanisms, fallback strategies, and error tracking
+ * Enhanced Error Recovery System for Google Drive Management
+ * Provides intelligent retry mechanisms, circuit breaker, fallback strategies, and advanced error tracking
  */
 
 interface RetryConfig {
@@ -9,6 +9,38 @@ interface RetryConfig {
   maxDelay: number;
   backoffMultiplier: number;
   retryableErrors: string[];
+  adaptiveRetry?: boolean;
+  circuitBreakerThreshold?: number;
+}
+
+interface ErrorClassification {
+  category: 'network' | 'authentication' | 'permission' | 'quota' | 'rate_limit' | 'server' | 'client' | 'unknown';
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  retryable: boolean;
+  suggestedAction?: string;
+  recoveryHint?: string;
+}
+
+interface CircuitBreakerState {
+  isOpen: boolean;
+  failureCount: number;
+  lastFailureTime: number;
+  nextAttemptTime: number;
+  successCount: number;
+}
+
+interface EnhancedErrorContext {
+  operation: string;
+  errorHistory: Array<{
+    timestamp: number;
+    error: string;
+    classification: ErrorClassification;
+  }>;
+  userContext?: {
+    userId?: string;
+    sessionId?: string;
+    clientInfo?: string;
+  };
 }
 
 interface ErrorRecoveryOptions {
@@ -34,6 +66,8 @@ class ErrorRecoveryManager {
     baseDelay: 1000, // 1 second
     maxDelay: 10000, // 10 seconds
     backoffMultiplier: 2,
+    adaptiveRetry: true,
+    circuitBreakerThreshold: 5,
     retryableErrors: [
       'network',
       'timeout',
@@ -51,7 +85,229 @@ class ErrorRecoveryManager {
     successfulRetries: number;
     fallbackUsed: number;
     commonErrors: Map<string, number>;
+    averageRecoveryTime: number;
+    circuitBreakerActivations: number;
   }>();
+
+  private circuitBreakers = new Map<string, CircuitBreakerState>();
+  private errorContexts = new Map<string, EnhancedErrorContext>();
+
+  /**
+   * Advanced error classifier with machine learning-like pattern recognition
+   */
+  private classifyError(error: Error, context?: string): ErrorClassification {
+    const message = error.message.toLowerCase();
+    const stack = error.stack?.toLowerCase() || '';
+
+    // Network-related errors
+    if (message.includes('network') || message.includes('fetch') || message.includes('connection') || 
+        message.includes('timeout') || message.includes('refused') || message.includes('unreachable')) {
+      return {
+        category: 'network',
+        severity: message.includes('timeout') ? 'medium' : 'high',
+        retryable: true,
+        suggestedAction: 'Check internet connection and retry',
+        recoveryHint: 'Network issues are usually temporary'
+      };
+    }
+
+    // Authentication errors
+    if (message.includes('unauthorized') || message.includes('invalid_token') || 
+        message.includes('invalid_grant') || message.includes('authentication') ||
+        message.includes('401')) {
+      return {
+        category: 'authentication',
+        severity: 'high',
+        retryable: true,
+        suggestedAction: 'Re-authenticate with Google Drive',
+        recoveryHint: 'Token may have expired or been revoked'
+      };
+    }
+
+    // Permission errors
+    if (message.includes('permission') || message.includes('forbidden') || 
+        message.includes('access') || message.includes('403')) {
+      return {
+        category: 'permission',
+        severity: 'medium',
+        retryable: false,
+        suggestedAction: 'Check file/folder permissions',
+        recoveryHint: 'User may not have required permissions'
+      };
+    }
+
+    // Rate limiting and quota
+    if (message.includes('429') || message.includes('rate') || message.includes('quota') || 
+        message.includes('limit')) {
+      return {
+        category: message.includes('quota') ? 'quota' : 'rate_limit',
+        severity: 'medium',
+        retryable: true,
+        suggestedAction: 'Wait before retrying',
+        recoveryHint: 'API limits exceeded, exponential backoff recommended'
+      };
+    }
+
+    // Server errors
+    if (message.includes('500') || message.includes('502') || message.includes('503') || 
+        message.includes('504') || message.includes('internal') || message.includes('server')) {
+      return {
+        category: 'server',
+        severity: 'high',
+        retryable: true,
+        suggestedAction: 'Retry with exponential backoff',
+        recoveryHint: 'Server-side issue, likely temporary'
+      };
+    }
+
+    // Client errors
+    if (message.includes('400') || message.includes('bad request') || 
+        message.includes('invalid') || message.includes('malformed')) {
+      return {
+        category: 'client',
+        severity: 'medium',
+        retryable: false,
+        suggestedAction: 'Check request parameters',
+        recoveryHint: 'Request format or parameters are incorrect'
+      };
+    }
+
+    // Default classification
+    return {
+      category: 'unknown',
+      severity: 'medium',
+      retryable: true,
+      suggestedAction: 'Review error details and retry',
+      recoveryHint: 'Unknown error type, proceed with caution'
+    };
+  }
+
+  /**
+   * Circuit breaker implementation
+   */
+  private checkCircuitBreaker(operation: string): boolean {
+    const breaker = this.circuitBreakers.get(operation);
+    if (!breaker) {
+      this.circuitBreakers.set(operation, {
+        isOpen: false,
+        failureCount: 0,
+        lastFailureTime: 0,
+        nextAttemptTime: 0,
+        successCount: 0
+      });
+      return true; // Allow first attempt
+    }
+
+    const now = Date.now();
+
+    // If circuit is open, check if we should try again
+    if (breaker.isOpen) {
+      if (now >= breaker.nextAttemptTime) {
+        console.log(`Circuit breaker for ${operation} attempting recovery`);
+        return true; // Allow one attempt to test recovery
+      }
+      console.log(`Circuit breaker for ${operation} is open, blocking operation`);
+      return false;
+    }
+
+    return true; // Circuit is closed, allow operation
+  }
+
+  private updateCircuitBreaker(operation: string, success: boolean, config: RetryConfig): void {
+    const breaker = this.circuitBreakers.get(operation);
+    if (!breaker) return;
+
+    const threshold = config.circuitBreakerThreshold || 5;
+
+    if (success) {
+      breaker.successCount++;
+      breaker.failureCount = Math.max(0, breaker.failureCount - 1);
+      
+      // Close circuit if it was open and we had success
+      if (breaker.isOpen) {
+        console.log(`Circuit breaker for ${operation} closing after successful recovery`);
+        breaker.isOpen = false;
+        breaker.nextAttemptTime = 0;
+      }
+    } else {
+      breaker.failureCount++;
+      breaker.lastFailureTime = Date.now();
+
+      // Open circuit if threshold exceeded
+      if (breaker.failureCount >= threshold && !breaker.isOpen) {
+        breaker.isOpen = true;
+        // Exponential backoff for circuit breaker recovery
+        const backoffTime = Math.min(30000, 1000 * Math.pow(2, breaker.failureCount - threshold));
+        breaker.nextAttemptTime = Date.now() + backoffTime;
+        
+        console.log(`Circuit breaker for ${operation} opened after ${breaker.failureCount} failures. Next attempt in ${backoffTime}ms`);
+        
+        // Update stats
+        const stats = this.errorStats.get(operation);
+        if (stats) {
+          stats.circuitBreakerActivations++;
+        }
+      }
+    }
+  }
+
+  /**
+   * Adaptive retry delay calculation based on error history and context
+   */
+  private calculateAdaptiveDelay(
+    attempt: number, 
+    config: RetryConfig, 
+    errorClassification: ErrorClassification,
+    operation: string
+  ): number {
+    if (!config.adaptiveRetry) {
+      return Math.min(
+        config.baseDelay * Math.pow(config.backoffMultiplier, attempt - 1),
+        config.maxDelay
+      );
+    }
+
+    let baseDelay = config.baseDelay;
+
+    // Adjust base delay based on error category
+    switch (errorClassification.category) {
+      case 'rate_limit':
+      case 'quota':
+        baseDelay = Math.max(baseDelay, 5000); // Minimum 5s for rate limits
+        break;
+      case 'network':
+        baseDelay = Math.max(baseDelay, 2000); // Network issues need more time
+        break;
+      case 'authentication':
+        baseDelay = Math.max(baseDelay, 3000); // Auth issues need time
+        break;
+      case 'server':
+        baseDelay = Math.max(baseDelay, 1500); // Server issues moderate delay
+        break;
+    }
+
+    // Consider error history for this operation
+    const context = this.errorContexts.get(operation);
+    if (context && context.errorHistory.length > 0) {
+      const recentErrors = context.errorHistory.slice(-3); // Last 3 errors
+      const hasRepeatedCategory = recentErrors.every(e => 
+        e.classification.category === errorClassification.category
+      );
+      
+      if (hasRepeatedCategory) {
+        baseDelay *= 1.5; // Increase delay for repeated error categories
+      }
+    }
+
+    const calculatedDelay = Math.min(
+      baseDelay * Math.pow(config.backoffMultiplier, attempt - 1),
+      config.maxDelay
+    );
+
+    // Add jitter (±20%)
+    const jitter = calculatedDelay * 0.2 * (Math.random() - 0.5);
+    return Math.max(100, calculatedDelay + jitter);
+  }
 
   /**
    * Execute operation with error recovery
