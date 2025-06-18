@@ -103,6 +103,7 @@ import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { PerformanceDashboard } from '@/components/performance-dashboard';
 import { ErrorRecoveryStatus } from '@/components/error-recovery-status';
+import { errorRecovery } from '@/lib/error-recovery';
 
 export function DriveManager() {
   const [files, setFiles] = useState<DriveFile[]>([]);
@@ -127,6 +128,7 @@ export function DriveManager() {
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [needsReauth, setNeedsReauth] = useState(false);
 
   // Debounced search query for performance
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
@@ -820,7 +822,7 @@ export function DriveManager() {
         toast.error(`Failed to restore items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
     } catch (error) {
-      console.error('Bulk restore error:', error);```python
+      console.error('Bulk restore error:', error);
       toast.error('An error occurred during bulk restore operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
@@ -990,7 +992,7 @@ export function DriveManager() {
       }
     } catch (error) {
       console.error('Error fetching files:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to fetch files');
+      handleError(error, 'Failed to fetch files');
       if (!append) {
         setFiles([]);
         setFolders([]);
@@ -1343,7 +1345,7 @@ export function DriveManager() {
       }
     } catch (error) {
       console.error('Error performing file action:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to perform action');
+      handleError(error, 'Failed to perform action');
     }
   };
 
@@ -1419,7 +1421,7 @@ export function DriveManager() {
       await handleRefresh();
     } catch (error) {
       console.error('Error during rename operation:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to rename file');
+      handleError(error, 'Failed to rename file');
     }
   };
 
@@ -1525,8 +1527,47 @@ export function DriveManager() {
       await handleRefresh();
     } catch (error) {
       console.error('Error during copy operation:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to copy file');
+      handleError(error, 'Failed to copy file');
     }
+  };
+
+  const handleError = async (error: any, context: string) => {
+    console.error(`${context}:`, error);
+
+    // Use error recovery system for authentication issues
+    if (error.message?.includes('401') || 
+        error.message?.includes('unauthorized') || 
+        error.message?.includes('invalid_credentials') ||
+        error.message?.includes('authentication')) {
+
+      try {
+        const recovery = errorRecovery.createDriveOperationStrategies().driveAuth();
+        const result = await errorRecovery.executeWithRecovery(
+          async () => { throw error; }, // Re-throw to trigger fallback
+          recovery
+        );
+
+        if (result?.refreshed) {
+          toast.success('Google Drive access refreshed. Please try again.');
+          // Refresh the page to get new tokens
+          window.location.reload();
+          return;
+        }
+      } catch (recoveryError) {
+        console.error('Error recovery failed:', recoveryError);
+      }
+
+      toast.error('Google Drive access expired. Please reconnect your account.');
+      setNeedsReauth(true);
+      return;
+    }
+
+    if (error.message?.includes('403') || error.message?.includes('forbidden')) {
+      toast.error('Insufficient permissions. Please check your Google Drive access.');
+      return;
+    }
+
+    toast.error(`${context}: ${error.message || 'An error occurred'}`);
   };
 
   useEffect(() => {
@@ -1649,7 +1690,7 @@ export function DriveManager() {
 
   return (
     <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
-      
+
       <div className="space-y-6">
           <div className="grid gap-4 md:grid-cols-2">
             <PerformanceDashboard />

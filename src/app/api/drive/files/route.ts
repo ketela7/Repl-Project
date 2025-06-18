@@ -24,10 +24,19 @@ export async function GET(request: NextRequest) {
     console.log('User metadata:', user.user_metadata);
     console.log('Session keys:', Object.keys(session));
 
-    // Try multiple possible token locations
+    // Enhanced token detection with debugging
     const accessToken = session.provider_token || 
                        user.user_metadata?.provider_token ||
+                       user.user_metadata?.access_token ||
                        session.access_token;
+    
+    console.log('Token search results:', {
+      session_provider_token: !!session.provider_token,
+      user_metadata_provider_token: !!user.user_metadata?.provider_token,
+      user_metadata_access_token: !!user.user_metadata?.access_token,
+      session_access_token: !!session.access_token,
+      final_token_found: !!accessToken
+    });
     
     console.log('Access token exists:', !!accessToken);
     

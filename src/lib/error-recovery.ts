@@ -296,7 +296,47 @@ class ErrorRecoveryManager {
           if (!response.ok) throw new Error('Move to root fallback failed');
           return response.json();
         }
-      })
+      }),
+      // Google Drive authentication with re-auth fallback
+      driveAuth: () => ({
+        operation: 'drive_auth',
+        retryConfig: {
+          maxRetries: 1,
+          baseDelay: 1000,
+          retryableErrors: ['invalid_token', 'invalid_grant', 'unauthorized', 'invalid_credentials']
+        },
+        fallbackStrategy: async () => {
+          console.log('Google Drive auth failed, attempting token refresh first');
+
+          try {
+            // Try to refresh the session first
+            const response = await fetch('/api/auth/callback', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'refresh' })
+            });
+
+            if (response.ok) {
+              console.log('Session refreshed successfully');
+              return { success: true, refreshed: true };
+            }
+          } catch (error) {
+            console.log('Session refresh failed:', error);
+          }
+
+          console.log('Redirecting to Google Drive re-authentication');
+
+          // Clear any stale tokens
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('supabase.auth.token');
+            sessionStorage.clear();
+          }
+
+          // Redirect to Google Drive auth
+          window.location.href = '/api/auth/google-drive';
+          return null;
+        }
+      }),
     };
   }
 
