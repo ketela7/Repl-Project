@@ -138,10 +138,8 @@ TURNSTILE_SECRET_KEY
 
 ### File Handling Restrictions
 - **No Archive Usage**: Do not use any archive libraries (zip, tar, etc.)
-- **Direct Download Only**: All downloads must be direct file streams or blobs
-- **Individual File Processing**: Handle each file separately, no bundling
 - **Memory Efficiency**: Use direct download links for efficient file transfer
-- **Bulk Operations**: Process multiple files sequentially with rate limiting and progress tracking
+- **Bulk Operations**: Process multiple files sequentially with rate limiting
 
 ---
 
