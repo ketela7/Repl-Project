@@ -12,6 +12,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      position="top-right"
+      expand={true}
+      richColors
+      closeButton
       toastOptions={{
         classNames: {
           toast:
