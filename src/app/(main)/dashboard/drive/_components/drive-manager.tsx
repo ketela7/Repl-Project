@@ -188,6 +188,17 @@ const applyClientSideFilters = (
   return { filteredFiles, filteredFolders };
 };
 
+// Utility function to convert size units to bytes
+const getSizeMultiplier = (unit: 'B' | 'KB' | 'MB' | 'GB'): number => {
+  switch (unit) {
+    case 'B': return 1;
+    case 'KB': return 1024;
+    case 'MB': return 1024 * 1024;
+    case 'GB': return 1024 * 1024 * 1024;
+    default: return 1;
+  }
+};
+
 // This function is deprecated - now using getFileActions from utils
 
 export function DriveManager() {
@@ -239,6 +250,12 @@ export function DriveManager() {
   // View filters state
   const [activeView, setActiveView] = useState<'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'>('all');
   const [fileTypeFilter, setFileTypeFilter] = useState<string[]>([]);
+  const [advancedFilters, setAdvancedFilters] = useState<{
+    sizeRange?: { min?: number; max?: number; unit: 'B' | 'KB' | 'MB' | 'GB' };
+    createdDateRange?: { from?: Date; to?: Date };
+    modifiedDateRange?: { from?: Date; to?: Date };
+    owner?: string;
+  }>({});
   
   // Bulk operations state
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
@@ -1022,6 +1039,34 @@ export function DriveManager() {
         params.append('fileTypes', fileTypeFilter.join(','));
       }
       
+      // Add advanced filters
+      if (advancedFilters.sizeRange && (advancedFilters.sizeRange.min || advancedFilters.sizeRange.max)) {
+        if (advancedFilters.sizeRange.min) {
+          params.append('sizeMin', (advancedFilters.sizeRange.min * getSizeMultiplier(advancedFilters.sizeRange.unit)).toString());
+        }
+        if (advancedFilters.sizeRange.max) {
+          params.append('sizeMax', (advancedFilters.sizeRange.max * getSizeMultiplier(advancedFilters.sizeRange.unit)).toString());
+        }
+      }
+      
+      if (advancedFilters.createdDateRange?.from) {
+        params.append('createdAfter', advancedFilters.createdDateRange.from.toISOString());
+      }
+      if (advancedFilters.createdDateRange?.to) {
+        params.append('createdBefore', advancedFilters.createdDateRange.to.toISOString());
+      }
+      
+      if (advancedFilters.modifiedDateRange?.from) {
+        params.append('modifiedAfter', advancedFilters.modifiedDateRange.from.toISOString());
+      }
+      if (advancedFilters.modifiedDateRange?.to) {
+        params.append('modifiedBefore', advancedFilters.modifiedDateRange.to.toISOString());
+      }
+      
+      if (advancedFilters.owner) {
+        params.append('owner', advancedFilters.owner);
+      }
+      
       // Optimized page size for better performance
       params.append('pageSize', '50');
 
@@ -1154,6 +1199,12 @@ export function DriveManager() {
   const handleFileTypeFilterChange = (newFileTypes: string[]) => {
     setFileTypeFilter(newFileTypes);
     // Refresh files with new filter
+    fetchFiles(currentFolderId || undefined, searchQuery || undefined);
+  };
+
+  const handleAdvancedFiltersChange = (filters: any) => {
+    setAdvancedFilters(filters);
+    // Refresh files with new advanced filters
     fetchFiles(currentFolderId || undefined, searchQuery || undefined);
   };
 
@@ -1854,6 +1905,7 @@ export function DriveManager() {
         fileTypeFilter={fileTypeFilter}
         onViewChange={handleViewChange}
         onFileTypeChange={handleFileTypeFilterChange}
+        onAdvancedFiltersChange={handleAdvancedFiltersChange}
         isCollapsed={false}
       />
 

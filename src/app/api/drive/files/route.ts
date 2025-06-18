@@ -13,7 +13,7 @@ function applyClientSideFilters(result: any, filters: { view?: string | null, fi
   // Apply additional client-side filters for complex scenarios
   if (filters.fileTypes) {
     const types = filters.fileTypes.split(',').filter(Boolean);
-    
+
     filteredFiles = filteredFiles.filter(file => {
       return types.some(type => {
         switch (type.toLowerCase()) {
@@ -75,11 +75,11 @@ function applyClientSideFilters(result: any, filters: { view?: string | null, fi
 
 export async function GET(request: NextRequest) {
   const callId = performanceMonitor.startAPICall('/api/drive/files');
-  
+
   try {
     console.log('=== Drive Files API Called ===');
     const supabase = await createClient();
-    
+
     // Get fresh session instead of just user
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
                        user.user_metadata?.provider_token ||
                        user.user_metadata?.access_token ||
                        session.access_token;
-    
+
     console.log('Token search results:', {
       session_provider_token: !!session.provider_token,
       user_metadata_provider_token: !!user.user_metadata?.provider_token,
@@ -106,9 +106,9 @@ export async function GET(request: NextRequest) {
       session_access_token: !!session.access_token,
       final_token_found: !!accessToken
     });
-    
+
     console.log('Access token exists:', !!accessToken);
-    
+
     if (!accessToken) {
       console.log('No access token found anywhere');
       return NextResponse.json({ 
@@ -125,6 +125,13 @@ export async function GET(request: NextRequest) {
     const pageSize = parseInt(searchParams.get('pageSize') || '20');
     const view = searchParams.get('view');
     const fileTypes = searchParams.get('fileTypes');
+    const createdAfter = searchParams.get('createdAfter');
+    const createdBefore = searchParams.get('createdBefore');
+    const modifiedAfter = searchParams.get('modifiedAfter');
+    const modifiedBefore = searchParams.get('modifiedBefore');
+    const owner = searchParams.get('owner');
+    const sizeMin = searchParams.get('sizeMin');
+    const sizeMax = searchParams.get('sizeMax');
 
     // Build proper Google Drive API query based on official documentation
     let driveQuery = "";
@@ -144,7 +151,7 @@ export async function GET(request: NextRequest) {
     } else if (view === 'my-drive') {
       // My Drive view - show only root files when no parent specified
       driveQuery = "trashed=false";
-      
+
       // Handle folder navigation
       if (parentId) {
         driveQuery += ` and '${parentId}' in parents`;
@@ -155,7 +162,7 @@ export async function GET(request: NextRequest) {
     } else {
       // All Files view - show everything without root restriction
       driveQuery = "trashed=false";
-      
+
       // Handle folder navigation only
       if (parentId) {
         driveQuery += ` and '${parentId}' in parents`;
@@ -172,7 +179,7 @@ export async function GET(request: NextRequest) {
       driveQuery += ` and mimeType='${mimeType}'`;
     }
 
-    // Handle file type filters - use simpler approach that works with Google Drive API
+    // Handle file type filters
     if (fileTypes) {
       const types = fileTypes.split(',').filter(Boolean);
       const mimeTypeConditions: string[] = [];
@@ -183,24 +190,25 @@ export async function GET(request: NextRequest) {
             mimeTypeConditions.push("mimeType='application/vnd.google-apps.folder'");
             break;
           case 'document':
-            mimeTypeConditions.push("mimeType='application/vnd.google-apps.document'");
-            mimeTypeConditions.push("mimeType='application/pdf'");
-            mimeTypeConditions.push("mimeType='text/plain'");
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.document' or mimeType='application/pdf' or mimeType='text/plain' or mimeType='application/msword' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')");
             break;
           case 'spreadsheet':
-            mimeTypeConditions.push("mimeType='application/vnd.google-apps.spreadsheet'");
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.ms-excel' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')");
             break;
           case 'presentation':
-            mimeTypeConditions.push("mimeType='application/vnd.google-apps.presentation'");
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.presentation' or mimeType='application/vnd.ms-powerpoint' or mimeType='application/vnd.openxmlformats-officedocument.presentationml.presentation')");
             break;
           case 'image':
-            mimeTypeConditions.push("mimeType contains 'image/'");
+            mimeTypeConditions.push("(mimeType contains 'image/')");
             break;
           case 'video':
-            mimeTypeConditions.push("mimeType contains 'video/'");
+            mimeTypeConditions.push("(mimeType contains 'video/')");
             break;
           case 'audio':
-            mimeTypeConditions.push("mimeType contains 'audio/'");
+            mimeTypeConditions.push("(mimeType contains 'audio/')");
+            break;
+          case 'archive':
+            mimeTypeConditions.push("(mimeType='application/zip' or mimeType='application/x-rar-compressed' or mimeType='application/x-tar' or mimeType='application/gzip' or mimeType='application/x-7z-compressed')");
             break;
         }
       });
@@ -208,6 +216,23 @@ export async function GET(request: NextRequest) {
       if (mimeTypeConditions.length > 0) {
         driveQuery += ` and (${mimeTypeConditions.join(' or ')})`;
       }
+    }
+
+    // Handle advanced filters
+    if (createdAfter) {
+      driveQuery += ` and createdTime > '${createdAfter}'`;
+    }
+    if (createdBefore) {
+      driveQuery += ` and createdTime < '${createdBefore}'`;
+    }
+    if (modifiedAfter) {
+      driveQuery += ` and modifiedTime > '${modifiedAfter}'`;
+    }
+    if (modifiedBefore) {
+      driveQuery += ` and modifiedTime < '${modifiedBefore}'`;
+    }
+    if (owner) {
+      driveQuery += ` and '${owner}' in owners`;
     }
 
     console.log('Google Drive API Query:', driveQuery);
@@ -230,7 +255,7 @@ export async function GET(request: NextRequest) {
     // }
 
     const driveService = new GoogleDriveService(accessToken);
-    
+
     console.log('Drive API: Fetching files with enhanced options:', {
       parentId: parentId || undefined,
       query: driveQuery,
@@ -239,10 +264,10 @@ export async function GET(request: NextRequest) {
       view,
       fileTypes
     });
-    
+
     // Use the constructed query instead of individual parameters with proper ordering
     const orderBy = view === 'recent' ? 'viewedByMeTime desc' : 'modifiedTime desc';
-    
+
     const result = await driveService.listFiles({
       query: driveQuery,
       pageToken: pageToken || undefined,
@@ -260,13 +285,13 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('Drive API: Files fetched and filtered successfully, count:', filteredResult.files.length);
-    
+
     performanceMonitor.endAPICall(callId, true);
     return NextResponse.json(filteredResult);
   } catch (error: any) {
     console.error('Drive files API error:', error);
     performanceMonitor.endAPICall(callId, false, error instanceof Error ? error.message : 'Unknown error');
-    
+
     // Handle specific Google API errors
     if (error.code === 403) {
       return NextResponse.json(
@@ -274,14 +299,14 @@ export async function GET(request: NextRequest) {
         { status: 403 }
       );
     }
-    
+
     if (error.code === 401) {
       return NextResponse.json(
         { error: 'Google Drive access expired. Please reconnect your account.' },
         { status: 401 }
       );
     }
-    
+
     return NextResponse.json(
       { error: error.message || 'Failed to fetch files' },
       { status: 500 }
@@ -306,7 +331,7 @@ export async function POST(request: NextRequest) {
     const accessToken = session.provider_token || 
                        session.user.user_metadata?.provider_token ||
                        session.access_token;
-    
+
     if (!accessToken) {
       console.log('No access token found for upload');
       return NextResponse.json({ 
@@ -339,7 +364,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('Drive upload API error:', error);
-    
+
     if (error instanceof Error) {
       // Handle Google API specific errors
       if (error.message.includes('Invalid Credentials') || error.message.includes('unauthorized')) {
@@ -362,7 +387,7 @@ export async function POST(request: NextRequest) {
         }, { status: 429 });
       }
     }
-    
+
     return NextResponse.json(
       { error: 'Failed to upload file' },
       { status: 500 }
