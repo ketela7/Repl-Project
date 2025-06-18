@@ -402,3 +402,74 @@ export function getMimeTypeFromFileName(fileName: string): string {
   
   return mimeTypes[extension || ''] || 'application/octet-stream';
 }
+
+/**
+ * Get available actions for a file based on its capabilities and current view
+ */
+export function getFileActions(
+  file: { capabilities?: DriveFileCapabilities; trashed?: boolean }, 
+  activeView: string
+): {
+  canPreview: boolean;
+  canDownload: boolean;
+  canRename: boolean;
+  canMove: boolean;
+  canCopy: boolean;
+  canShare: boolean;
+  canDetails: boolean;
+  canTrash: boolean;
+  canRestore: boolean;
+  canPermanentDelete: boolean;
+} {
+  const isTrashView = activeView === 'trash';
+  const isSharedView = activeView === 'shared';
+  const isTrashed = file.trashed === true;
+  const capabilities = file.capabilities || {};
+
+  // If we don't have capabilities data, provide conservative defaults
+  const defaultCapabilities = {
+    canDownload: true,
+    canCopy: false,
+    canDelete: false,
+    canEdit: false,
+    canRename: false,
+    canShare: false,
+    canTrash: false,
+    canUntrash: false,
+    canMoveItemWithinDrive: false,
+  };
+
+  const finalCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities;
+
+  return {
+    // Preview is always available for supported file types
+    canPreview: true,
+    
+    // Download based on capabilities
+    canDownload: finalCapabilities.canDownload ?? true,
+    
+    // Rename only if not in trash/shared and has permission
+    canRename: !isTrashView && !isSharedView && !isTrashed && (finalCapabilities.canRename ?? false),
+    
+    // Move only if not in trash/shared and has permission
+    canMove: !isTrashView && !isSharedView && !isTrashed && (finalCapabilities.canMoveItemWithinDrive ?? false),
+    
+    // Copy based on capabilities (can copy even in shared view)
+    canCopy: !isTrashView && !isTrashed && (finalCapabilities.canCopy ?? false),
+    
+    // Share only if not in trash and has permission
+    canShare: !isTrashView && !isTrashed && (finalCapabilities.canShare ?? false),
+    
+    // Details is always available
+    canDetails: true,
+    
+    // Trash only if not already trashed and has permission
+    canTrash: !isTrashView && !isTrashed && (finalCapabilities.canTrash ?? false),
+    
+    // Restore only if in trash view and has permission
+    canRestore: isTrashView && isTrashed && (finalCapabilities.canUntrash ?? false),
+    
+    // Permanent delete only if in trash view and has delete permission
+    canPermanentDelete: isTrashView && isTrashed && (finalCapabilities.canDelete ?? false),
+  };
+}

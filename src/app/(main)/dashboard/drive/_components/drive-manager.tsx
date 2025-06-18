@@ -67,7 +67,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
-import { formatFileSize, formatDate, isPreviewable } from '@/lib/google-drive/utils';
+import { formatFileSize, formatDate, isPreviewable, getFileActions } from '@/lib/google-drive/utils';
 import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
@@ -187,27 +187,7 @@ const applyClientSideFilters = (
   return { filteredFiles, filteredFolders };
 };
 
-// Utility function to get available actions based on current view
-const getAvailableActions = (activeView: string) => {
-  const isTrashView = activeView === 'trash';
-  const isSharedView = activeView === 'shared';
-  
-  return {
-    canPreview: true,
-    canDownload: !isTrashView,
-    canView: true,
-    canDetails: true,
-    canRename: !isTrashView && !isSharedView,
-    canMove: !isTrashView && !isSharedView,
-    canCopy: !isTrashView,
-    canShare: !isTrashView,
-    canTrash: !isTrashView,
-    canRestore: isTrashView,
-    canPermanentDelete: isTrashView,
-    showTrashActions: isTrashView,
-    showNormalActions: !isTrashView
-  };
-};
+// This function is deprecated - now using getFileActions from utils
 
 export function DriveManager() {
   const [files, setFiles] = useState<DriveFile[]>([]);
@@ -2168,7 +2148,7 @@ export function DriveManager() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {(() => {
-                          const actions = getAvailableActions(activeView);
+                          const actions = getFileActions(folder, activeView);
                           return (
                             <>
                               {actions.canRename && (
@@ -2306,15 +2286,15 @@ export function DriveManager() {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         {(() => {
-                          const actions = getAvailableActions(activeView);
+                          const actions = getFileActions(file, activeView);
                           return (
                             <>
-                              {actions.canPreview && (
+                              {actions.canPreview && isPreviewable(file.mimeType) && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
                                   handleFileAction('preview', file.id, file.name);
                                 }}>
-                                  <Play className="h-4 w-4 mr-2" />
+                                  <Eye className="h-4 w-4 mr-2" />
                                   Preview
                                 </DropdownMenuItem>
                               )}
@@ -2600,7 +2580,7 @@ export function DriveManager() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {(() => {
-                              const actions = getAvailableActions(activeView);
+                              const actions = getFileActions(folder, activeView);
                               return (
                                 <>
                                   {actions.canRename && (
