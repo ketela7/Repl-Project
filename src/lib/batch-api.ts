@@ -1,6 +1,8 @@
+import { errorRecovery, type OperationResult } from './error-recovery';
+
 /**
- * Batch API system for Google Drive operations
- * Combines multiple API requests into single batch calls
+ * Enhanced Batch API system with error recovery
+ * Combines multiple API requests with intelligent retry and fallback strategies
  */
 
 interface BatchRequest {
@@ -104,7 +106,7 @@ class BatchAPIManager {
     }
 
     const response = await fetch(request.path, options);
-    
+
     if (!response.ok) {
       throw new Error(`Request failed: ${response.status} ${response.statusText}`);
     }
@@ -155,7 +157,7 @@ class BatchAPIManager {
     results.forEach((result, index) => {
       const operation = operations[index];
       const key = `${operation.fileId}-${operation.action}`;
-      
+
       if (result.status === 'fulfilled') {
         responses[key] = result.value;
       } else {

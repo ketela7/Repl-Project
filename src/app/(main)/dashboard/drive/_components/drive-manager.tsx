@@ -101,6 +101,8 @@ import { BulkRenameDialog } from './bulk-rename-dialog';
 import { BulkRestoreDialog } from './bulk-restore-dialog';
 import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
+import { PerformanceDashboard } from '@/components/performance-dashboard';
+import { ErrorRecoveryStatus } from '@/components/error-recovery-status';
 
 export function DriveManager() {
   const [files, setFiles] = useState<DriveFile[]>([]);
@@ -818,11 +820,10 @@ export function DriveManager() {
         toast.error(`Failed to restore items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
     } catch (error) {
-      console.error('Bulk restore error:', error);
+      console.error('Bulk restore error:', error);```python
       toast.error('An error occurred during bulk restore operation');
     } finally {
-      ```text
-setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
       setIsBulkRestoreDialogOpen(false);
     }
   };
@@ -1648,6 +1649,15 @@ setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: ''
 
   return (
     <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+      
+      <div className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2">
+            <PerformanceDashboard />
+            <ErrorRecoveryStatus />
+          </div>
+
+          {/* Search and Actions Bar */}
+
       {/* Actions Bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 flex-1 sm:max-w-md">
@@ -1751,7 +1761,6 @@ setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: ''
                     </ToggleGroupItem>
                   </ToggleGroup>
 
-                  ```text
                   {viewMode === 'table' && (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -2639,6 +2648,7 @@ setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: ''
         selectedItems={getSelectedItemsData()}
       />
 
+      ```python
       <BulkExportDialog
         isOpen={isBulkExportDialogOpen}
         onClose={() => setIsBulkExportDialogOpen(false)}

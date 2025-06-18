@@ -22,6 +22,8 @@ import {
   Image,
   Info
 } from "lucide-react";
+import { useToast } from '@/hooks/use-toast';
+import { errorRecovery } from '@/lib/error-recovery';
 
 interface BulkExportDialogProps {
   isOpen: boolean;
@@ -105,6 +107,9 @@ export function BulkExportDialog({
   selectedItems
 }: BulkExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState('pdf');
+  const { toast } = useToast();
+  const [progress, setProgress] = useState(0);
+  const [currentFile, setCurrentFile] = useState('');
 
   // Filter exportable files (Google Workspace files only)
   const exportableFiles = selectedItems.filter(item => 
@@ -132,9 +137,122 @@ export function BulkExportDialog({
     !selectedFormatData?.supportedTypes.includes(file.mimeType || '')
   );
 
-  const handleExport = () => {
-    if (compatibleFiles.length > 0) {
-      onConfirm(selectedFormat);
+  const handleExport = async () => {
+    if (compatibleFiles.length === 0) return;
+
+    let successfulExports = 0;
+    const failedExports: { fileName: string; error: string }[] = [];
+
+    const format = selectedFormat;
+
+    // Function to determine the filename based on the export format
+    const getExportFilename = (filename: string, format: string) => {
+      const baseName = filename.replace(/\.[^/.]+$/, ""); // Remove existing extension
+      return `${baseName}.${format}`;
+    };
+        // Use error recovery for bulk export
+        const exportResult = await errorRecovery.executeBulkWithRecovery(
+          compatibleFiles,
+          async (file) => {
+            const strategies = errorRecovery.createDriveOperationStrategies();
+            const exportStrategy = strategies.fileExport(file.id, format);
+
+            const result = await errorRecovery.executeWithRecovery(
+              async () => {
+                const response = await fetch(
+                  `/api/drive/files/${file.id}/export?format=${format}`,
+                  { method: 'GET' }
+                );
+
+                if (!response.ok) {
+                  const error = new Error(`Export failed: ${response.statusText}`);
+                  (error as any).status = response.status;
+                  throw error;
+                }
+
+                return response.blob();
+              },
+              {
+                ...exportStrategy,
+                onRetry: (attempt, error) => {
+                  console.log(`Retrying export for ${file.name}, attempt ${attempt}:`, error.message);
+                  toast({
+                    title: "Retrying Export",
+                    description: `Retrying ${file.name} (attempt ${attempt})`,
+                    duration: 2000,
+                  });
+                },
+                onFallback: (error) => {
+                  console.log(`Using fallback export for ${file.name}:`, error.message);
+                  toast({
+                    title: "Using Fallback Format",
+                    description: `Exporting ${file.name} as PDF instead`,
+                    duration: 3000,
+                  });
+                }
+              }
+            );
+
+            if (result.success && result.data) {
+              // Download the exported file
+              const filename = getExportFilename(file.name, result.usedFallback ? 'pdf' : format);
+              const url = URL.createObjectURL(result.data);
+              const link = document.createElement('a');
+              link.href = url;
+              link.download = filename;
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              URL.revokeObjectURL(url);
+
+              return { fileName: file.name, exported: true, usedFallback: result.usedFallback };
+            } else {
+              throw result.error || new Error('Export failed');
+            }
+          },
+          {
+            operation: 'bulk_export',
+            continueOnError: true,
+            batchSize: 2, // Smaller batch for exports
+            progressCallback: (completed, total) => {
+              setProgress((completed / total) * 100);
+              if (completed < total) {
+                setCurrentFile(compatibleFiles[completed]?.name || '');
+              }
+            }
+          }
+        );
+
+        // Process results
+        exportResult.results.forEach((result, index) => {
+          if (result.success) {
+            successfulExports++;
+            if (result.data?.usedFallback) {
+              toast({
+                title: "Fallback Used",
+                description: `${result.data.fileName} exported using fallback format`,
+                duration: 3000,
+              });
+            }
+          } else {
+            failedExports.push({
+              fileName: compatibleFiles[index].name,
+              error: result.error?.message || 'Unknown error'
+            });
+          }
+        });
+
+    // Show completion message
+    if (failedExports.length === 0) {
+      toast({
+        title: "Export Complete",
+        description: `Successfully exported ${successfulExports} files.`,
+      });
+    } else {
+      toast({
+        title: "Export Incomplete",
+        description: `Exported ${successfulExports} files with ${failedExports.length} failures.`,
+      });
     }
   };
 
@@ -157,7 +275,7 @@ export function BulkExportDialog({
             <div className="text-base">
               Export <span className="font-semibold">{exportableFiles.length}</span> Google Workspace file{exportableFiles.length > 1 ? 's' : ''} to your selected format.
             </div>
-            
+
             <div className="flex flex-wrap gap-2">
               {exportableFiles.length > 0 && (
                 <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
@@ -224,7 +342,7 @@ export function BulkExportDialog({
                       {compatibleFiles.length} file{compatibleFiles.length > 1 ? 's' : ''} compatible with {selectedFormatData?.label}
                     </span>
                   </div>
-                  
+
                   {incompatibleFiles.length > 0 && (
                     <div className="text-sm text-muted-foreground">
                       {incompatibleFiles.length} file{incompatibleFiles.length > 1 ? 's' : ''} will be skipped (incompatible format)
