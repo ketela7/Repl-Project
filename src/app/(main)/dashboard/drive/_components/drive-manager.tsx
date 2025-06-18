@@ -101,9 +101,7 @@ import { BulkRenameDialog } from './bulk-rename-dialog';
 import { BulkRestoreDialog } from './bulk-restore-dialog';
 import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
-import { PerformanceDashboard } from '@/components/performance-dashboard';
-import { ErrorRecoveryStatus } from '@/components/error-recovery-status';
-import { ErrorRecoveryDashboard } from '@/components/error-recovery-dashboard';
+
 import { errorRecovery } from '@/lib/error-recovery';
 
 export function DriveManager() {
@@ -1731,12 +1729,6 @@ export function DriveManager() {
 
   return (
     <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
-      <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2">
-          <PerformanceDashboard />
-          <ErrorRecoveryStatus />
-        </div>
-      </div>
 
       {/* Search and Actions Bar */}
 

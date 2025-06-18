@@ -103,6 +103,11 @@ class PerformanceMonitor {
   }
 
   private estimateMemoryUsage(): number {
+    // Check if we're in browser environment
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return 50; // Default value for SSR
+    }
+    
     // Rough estimation based on DOM nodes and data
     const nodeCount = document.querySelectorAll('*').length;
     const estimatedMB = Math.max(50, Math.min(500, nodeCount / 10));
