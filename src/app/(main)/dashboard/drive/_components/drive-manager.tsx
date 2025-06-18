@@ -515,61 +515,154 @@ export function DriveManager() {
             continue;
           }
 
-          // Use direct stream download for better reliability
+          // Hybrid download strategy based on file size
           try {
-            const downloadResponse = await fetch(`/api/drive/download/${item.id}`);
+            const fileSizeBytes = parseInt(item.size || '0');
+            const fileSizeMB = fileSizeBytes / (1024 * 1024);
+            const isLargeFile = fileSizeMB > 50; // 50MB threshold
             
-            if (!downloadResponse.ok) {
-              if (downloadResponse.status === 401) {
-                const errorData = await downloadResponse.json();
-                if (errorData.needsReauth) {
-                  toast.error('Google Drive access expired. Please reconnect your account.');
-                  window.location.reload();
-                  return;
+            if (isLargeFile) {
+              // For large files, use streaming download with progress
+              console.log(`Large file detected (${fileSizeMB.toFixed(1)}MB): ${item.name}, using stream download`);
+              
+              const downloadResponse = await fetch(`/api/drive/download/${item.id}`);
+              
+              if (!downloadResponse.ok) {
+                if (downloadResponse.status === 401) {
+                  const errorData = await downloadResponse.json();
+                  if (errorData.needsReauth) {
+                    toast.error('Google Drive access expired. Please reconnect your account.');
+                    window.location.reload();
+                    return;
+                  }
                 }
-              }
-              
-              if (downloadResponse.status === 403) {
-                failedItems.push(`${item.name} (permission denied)`);
-                continue;
-              }
-              
-              if (downloadResponse.status === 404) {
-                failedItems.push(`${item.name} (not found)`);
-                continue;
-              }
-              
-              if (downloadResponse.status === 400) {
-                const errorData = await downloadResponse.json();
-                if (errorData.error?.includes('folder')) {
-                  skippedItems.push(item.name);
+                
+                if (downloadResponse.status === 403) {
+                  failedItems.push(`${item.name} (permission denied)`);
                   continue;
                 }
+                
+                if (downloadResponse.status === 404) {
+                  failedItems.push(`${item.name} (not found)`);
+                  continue;
+                }
+                
+                if (downloadResponse.status === 400) {
+                  const errorData = await downloadResponse.json();
+                  if (errorData.error?.includes('folder')) {
+                    skippedItems.push(item.name);
+                    continue;
+                  }
+                }
+                
+                failedItems.push(`${item.name} (download failed)`);
+                continue;
               }
               
-              failedItems.push(`${item.name} (download failed)`);
-              continue;
+              // Stream processing for large files
+              const reader = downloadResponse.body?.getReader();
+              const contentLength = downloadResponse.headers.get('Content-Length');
+              const totalSize = contentLength ? parseInt(contentLength) : fileSizeBytes;
+              
+              if (!reader) {
+                failedItems.push(`${item.name} (stream error)`);
+                continue;
+              }
+              
+              const chunks: Uint8Array[] = [];
+              let receivedLength = 0;
+              
+              while (true) {
+                const { done, value } = await reader.read();
+                
+                if (done) break;
+                
+                chunks.push(value);
+                receivedLength += value.length;
+                
+                // Update progress for large file
+                const progress = (receivedLength / totalSize) * 100;
+                console.log(`Download progress for ${item.name}: ${progress.toFixed(1)}%`);
+              }
+              
+              // Combine chunks and create blob
+              const blob = new Blob(chunks, { 
+                type: downloadResponse.headers.get('Content-Type') || 'application/octet-stream' 
+              });
+              
+              // Create download link
+              const blobUrl = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.download = item.name;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              
+              // Clean up blob URL
+              setTimeout(() => {
+                window.URL.revokeObjectURL(blobUrl);
+              }, 1000);
+              
+              successCount++;
+            } else {
+              // For small files, use standard blob approach
+              console.log(`Small file (${fileSizeMB.toFixed(1)}MB): ${item.name}, using blob download`);
+              
+              const downloadResponse = await fetch(`/api/drive/download/${item.id}`);
+              
+              if (!downloadResponse.ok) {
+                if (downloadResponse.status === 401) {
+                  const errorData = await downloadResponse.json();
+                  if (errorData.needsReauth) {
+                    toast.error('Google Drive access expired. Please reconnect your account.');
+                    window.location.reload();
+                    return;
+                  }
+                }
+                
+                if (downloadResponse.status === 403) {
+                  failedItems.push(`${item.name} (permission denied)`);
+                  continue;
+                }
+                
+                if (downloadResponse.status === 404) {
+                  failedItems.push(`${item.name} (not found)`);
+                  continue;
+                }
+                
+                if (downloadResponse.status === 400) {
+                  const errorData = await downloadResponse.json();
+                  if (errorData.error?.includes('folder')) {
+                    skippedItems.push(item.name);
+                    continue;
+                  }
+                }
+                
+                failedItems.push(`${item.name} (download failed)`);
+                continue;
+              }
+              
+              // Standard blob download for small files
+              const blob = await downloadResponse.blob();
+              
+              const blobUrl = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.download = item.name;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              
+              // Clean up blob URL
+              setTimeout(() => {
+                window.URL.revokeObjectURL(blobUrl);
+              }, 1000);
+              
+              successCount++;
             }
-            
-            // Get the file as blob for direct download
-            const blob = await downloadResponse.blob();
-            
-            // Create download link with blob URL
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = item.name;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Clean up blob URL after a short delay
-            setTimeout(() => {
-              window.URL.revokeObjectURL(blobUrl);
-            }, 1000);
-            
-            successCount++;
           } catch (downloadError) {
             failedItems.push(`${item.name} (network error)`);
             console.error(`Failed to download ${item.name}:`, downloadError);
@@ -806,7 +899,16 @@ export function DriveManager() {
             return;
           }
           
-          // Use direct stream download
+          // Get file details for size-based strategy
+          const fileItem = downloadFile || files.find(f => f.id === fileId);
+          const fileSizeBytes = parseInt(fileItem?.size || '0');
+          const fileSizeMB = fileSizeBytes / (1024 * 1024);
+          const isLargeFile = fileSizeMB > 50; // 50MB threshold
+          
+          if (isLargeFile) {
+            toast.info(`Downloading large file (${fileSizeMB.toFixed(1)}MB): "${fileName}"`);
+          }
+          
           const downloadResponse = await fetch(`/api/drive/download/${fileId}`);
           if (!downloadResponse.ok) {
             if (downloadResponse.status === 401) {
@@ -843,25 +945,80 @@ export function DriveManager() {
           }
           
           try {
-            // Get the file as blob for direct download
-            const blob = await downloadResponse.blob();
-            
-            // Create download link with blob URL
-            const blobUrl = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = fileName;
-            link.style.display = 'none';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            // Clean up blob URL
-            setTimeout(() => {
-              window.URL.revokeObjectURL(blobUrl);
-            }, 1000);
-            
-            toast.success(`Download started for "${fileName}"`);
+            if (isLargeFile) {
+              // Stream processing for large files
+              console.log(`Using stream download for large file: ${fileName} (${fileSizeMB.toFixed(1)}MB)`);
+              
+              const reader = downloadResponse.body?.getReader();
+              const contentLength = downloadResponse.headers.get('Content-Length');
+              const totalSize = contentLength ? parseInt(contentLength) : fileSizeBytes;
+              
+              if (!reader) {
+                toast.error(`Failed to create stream for "${fileName}"`);
+                return;
+              }
+              
+              const chunks: Uint8Array[] = [];
+              let receivedLength = 0;
+              
+              while (true) {
+                const { done, value } = await reader.read();
+                
+                if (done) break;
+                
+                chunks.push(value);
+                receivedLength += value.length;
+                
+                // Log progress for large files
+                const progress = (receivedLength / totalSize) * 100;
+                if (progress % 10 < 1) { // Log every 10%
+                  console.log(`Download progress for ${fileName}: ${progress.toFixed(1)}%`);
+                }
+              }
+              
+              // Combine chunks and create blob
+              const blob = new Blob(chunks, { 
+                type: downloadResponse.headers.get('Content-Type') || 'application/octet-stream' 
+              });
+              
+              // Create download link
+              const blobUrl = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.download = fileName;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              
+              // Clean up blob URL
+              setTimeout(() => {
+                window.URL.revokeObjectURL(blobUrl);
+              }, 1000);
+              
+              toast.success(`Large file downloaded: "${fileName}"`);
+            } else {
+              // Standard blob download for small files
+              console.log(`Using blob download for small file: ${fileName} (${fileSizeMB.toFixed(1)}MB)`);
+              
+              const blob = await downloadResponse.blob();
+              
+              const blobUrl = window.URL.createObjectURL(blob);
+              const link = document.createElement('a');
+              link.href = blobUrl;
+              link.download = fileName;
+              link.style.display = 'none';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+              
+              // Clean up blob URL
+              setTimeout(() => {
+                window.URL.revokeObjectURL(blobUrl);
+              }, 1000);
+              
+              toast.success(`Download started for "${fileName}"`);
+            }
           } catch (error) {
             console.error('Download error:', error);
             toast.error(`Failed to download "${fileName}"`);
