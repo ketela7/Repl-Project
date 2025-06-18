@@ -82,7 +82,7 @@ export function BulkActionsToolbar({
 
   if (!isSelectMode) {
     return (
-      <div className="fixed bottom-6 right-6 z-40">
+      <div className="fixed bottom-6 left-6 z-40">
         <Button 
           variant="default" 
           size="lg" 
@@ -97,7 +97,7 @@ export function BulkActionsToolbar({
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
+    <div className="fixed bottom-6 left-6 z-40 flex flex-col items-start gap-3">
       {/* Selection Info Badge */}
       <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 shadow-lg">
         <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
@@ -107,19 +107,15 @@ export function BulkActionsToolbar({
 
       {/* Floating Action Buttons */}
       <div className="flex items-center gap-3">
-        {/* Select All/None Button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={isAllSelected ? onDeselectAll : onSelectAll}
-          className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 shadow-lg rounded-full h-12 w-12 p-0"
-          title={isAllSelected ? 'Deselect All' : 'Select All'}
+        {/* Exit Selection Mode Button */}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onToggleSelectMode}
+          className="bg-white dark:bg-gray-900 border-red-200 dark:border-red-700 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 shadow-lg rounded-full h-12 w-12 p-0"
+          title="Exit selection mode"
         >
-          {isAllSelected ? (
-            <CheckSquare className="h-5 w-5" />
-          ) : (
-            <Square className="h-5 w-5" />
-          )}
+          <X className="h-5 w-5" />
         </Button>
 
         {/* Bulk Actions Menu */}
@@ -135,7 +131,7 @@ export function BulkActionsToolbar({
                 <MoreHorizontal className="h-6 w-6" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="start" className="w-48">
               <DropdownMenuItem onClick={onBulkDownload} className="cursor-pointer">
                 <Download className="h-4 w-4 mr-2" />
                 Download Files
@@ -158,15 +154,19 @@ export function BulkActionsToolbar({
           </DropdownMenu>
         )}
 
-        {/* Exit Selection Mode Button */}
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={onToggleSelectMode}
-          className="bg-white dark:bg-gray-900 border-red-200 dark:border-red-700 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 shadow-lg rounded-full h-12 w-12 p-0"
-          title="Exit selection mode"
+        {/* Select All/None Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={isAllSelected ? onDeselectAll : onSelectAll}
+          className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 shadow-lg rounded-full h-12 w-12 p-0"
+          title={isAllSelected ? 'Deselect All' : 'Select All'}
         >
-          <X className="h-5 w-5" />
+          {isAllSelected ? (
+            <CheckSquare className="h-5 w-5" />
+          ) : (
+            <Square className="h-5 w-5" />
+          )}
         </Button>
       </div>
     </div>

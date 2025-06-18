@@ -101,15 +101,15 @@ export function PerformanceDashboard() {
 
   if (!isVisible) {
     return (
-      <div className="fixed bottom-4 right-4 z-50">
+      <div className="fixed bottom-6 right-6 z-50">
         <Button
           onClick={() => setIsVisible(true)}
           variant="outline"
           size="sm"
-          className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+          className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-lg rounded-full h-12 w-12 p-0"
+          title="Performance Monitor"
         >
-          <Activity className="h-4 w-4 mr-2" />
-          Performance
+          <Activity className="h-4 w-4" />
         </Button>
       </div>
     );
