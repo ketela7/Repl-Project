@@ -922,6 +922,7 @@ export function DriveManager() {
         params.append('view', currentView);
       }
       
+      // Add file type filters
       if (fileTypeFilter.length > 0) {
         params.append('fileTypes', fileTypeFilter.join(','));
       }
@@ -1053,6 +1054,12 @@ export function DriveManager() {
     setCurrentFolderId(null); // Reset to root when changing views
     setSearchQuery(''); // Clear search
     fetchFiles(undefined, undefined, undefined, false, view);
+  };
+
+  const handleFileTypeFilterChange = (newFileTypes: string[]) => {
+    setFileTypeFilter(newFileTypes);
+    // Refresh files with new filter
+    fetchFiles(currentFolderId || undefined, searchQuery || undefined);
   };
 
   const handleFolderClick = (folderId: string) => {
@@ -1751,7 +1758,7 @@ export function DriveManager() {
         activeView={activeView}
         fileTypeFilter={fileTypeFilter}
         onViewChange={handleViewChange}
-        onFileTypeChange={setFileTypeFilter}
+        onFileTypeChange={handleFileTypeFilterChange}
         isCollapsed={false}
       />
 

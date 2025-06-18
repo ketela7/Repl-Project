@@ -43,34 +43,34 @@ const { searchParams } = new URL(request.url);
 
     // Handle file type filters
     if (fileTypes) {
-      const types = fileTypes.split(',');
+      const types = fileTypes.split(',').filter(Boolean);
       const mimeTypeConditions: string[] = [];
 
       types.forEach(type => {
-        switch (type) {
-          case 'folders':
+        switch (type.toLowerCase()) {
+          case 'folder':
             mimeTypeConditions.push("mimeType='application/vnd.google-apps.folder'");
             break;
-          case 'documents':
-            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.document' or mimeType='application/pdf' or mimeType='text/plain' or mimeType='application/msword')");
+          case 'document':
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.document' or mimeType='application/pdf' or mimeType='text/plain' or mimeType='application/msword' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')");
             break;
-          case 'spreadsheets':
-            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.ms-excel')");
+          case 'spreadsheet':
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.ms-excel' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')");
             break;
-          case 'presentations':
-            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.presentation' or mimeType='application/vnd.ms-powerpoint')");
+          case 'presentation':
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.presentation' or mimeType='application/vnd.ms-powerpoint' or mimeType='application/vnd.openxmlformats-officedocument.presentationml.presentation')");
             break;
-          case 'images':
+          case 'image':
             mimeTypeConditions.push("(mimeType contains 'image/')");
             break;
-          case 'videos':
+          case 'video':
             mimeTypeConditions.push("(mimeType contains 'video/')");
             break;
           case 'audio':
             mimeTypeConditions.push("(mimeType contains 'audio/')");
             break;
-          case 'archives':
-            mimeTypeConditions.push("(mimeType='application/zip' or mimeType='application/x-rar' or mimeType='application/x-tar' or mimeType='application/gzip')");
+          case 'archive':
+            mimeTypeConditions.push("(mimeType='application/zip' or mimeType='application/x-rar-compressed' or mimeType='application/x-tar' or mimeType='application/gzip' or mimeType='application/x-7z-compressed')");
             break;
         }
       });

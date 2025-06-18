@@ -50,21 +50,21 @@ const viewOptions = [
 ] as const;
 
 const fileTypeOptions = [
-  { key: 'folders', label: 'Folders', icon: Folder, mimeTypes: ['application/vnd.google-apps.folder'] },
-  { key: 'documents', label: 'Documents', icon: FileText, 
-    mimeTypes: ['application/vnd.google-apps.document', 'application/pdf', 'text/plain', 'application/msword'] },
-  { key: 'spreadsheets', label: 'Spreadsheets', icon: FileText, 
-    mimeTypes: ['application/vnd.google-apps.spreadsheet', 'application/vnd.ms-excel'] },
-  { key: 'presentations', label: 'Presentations', icon: FileText, 
-    mimeTypes: ['application/vnd.google-apps.presentation', 'application/vnd.ms-powerpoint'] },
-  { key: 'images', label: 'Images', icon: Image, 
-    mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'] },
-  { key: 'videos', label: 'Videos', icon: Video, 
-    mimeTypes: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm'] },
+  { key: 'folder', label: 'Folders', icon: Folder, mimeTypes: ['application/vnd.google-apps.folder'] },
+  { key: 'document', label: 'Documents', icon: FileText, 
+    mimeTypes: ['application/vnd.google-apps.document', 'application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'] },
+  { key: 'spreadsheet', label: 'Spreadsheets', icon: FileText, 
+    mimeTypes: ['application/vnd.google-apps.spreadsheet', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'] },
+  { key: 'presentation', label: 'Presentations', icon: FileText, 
+    mimeTypes: ['application/vnd.google-apps.presentation', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'] },
+  { key: 'image', label: 'Images', icon: Image, 
+    mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/bmp', 'image/tiff'] },
+  { key: 'video', label: 'Videos', icon: Video, 
+    mimeTypes: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm', 'video/quicktime', 'video/x-msvideo'] },
   { key: 'audio', label: 'Audio', icon: Music, 
-    mimeTypes: ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg'] },
-  { key: 'archives', label: 'Archives', icon: Archive, 
-    mimeTypes: ['application/zip', 'application/x-rar', 'application/x-tar', 'application/gzip'] },
+    mimeTypes: ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg', 'audio/mp4', 'audio/aac', 'audio/flac'] },
+  { key: 'archive', label: 'Archives', icon: Archive, 
+    mimeTypes: ['application/zip', 'application/x-rar-compressed', 'application/x-tar', 'application/gzip', 'application/x-7z-compressed'] },
 ];
 
 export function DriveFiltersSidebar({ 
