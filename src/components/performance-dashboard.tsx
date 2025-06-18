@@ -117,3 +117,241 @@ export function PerformanceDashboard() {
     </div>
   );
 }
+"use client";
+
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Separator } from "@/components/ui/separator";
+import { 
+  Activity, 
+  Zap, 
+  Database, 
+  Clock, 
+  TrendingUp, 
+  AlertTriangle,
+  CheckCircle,
+  RefreshCw,
+  BarChart3,
+  Cpu,
+  HardDrive,
+  Network,
+  Gauge
+} from "lucide-react";
+
+interface PerformanceMetrics {
+  memoryUsage: {
+    used: number;
+    total: number;
+    percentage: number;
+  };
+  apiCalls: {
+    total: number;
+    successful: number;
+    failed: number;
+    avgResponseTime: number;
+  };
+  cacheStats: {
+    hits: number;
+    misses: number;
+    hitRate: number;
+  };
+  resourceScore: number;
+  status: 'excellent' | 'good' | 'warning' | 'critical';
+}
+
+export function PerformanceDashboard() {
+  const [metrics, setMetrics] = useState<PerformanceMetrics>({
+    memoryUsage: { used: 0, total: 0, percentage: 0 },
+    apiCalls: { total: 0, successful: 0, failed: 0, avgResponseTime: 0 },
+    cacheStats: { hits: 0, misses: 0, hitRate: 0 },
+    resourceScore: 0,
+    status: 'good'
+  });
+  const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await fetch('/api/performance');
+      if (response.ok) {
+        const data = await response.json();
+        setMetrics(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch performance metrics:', error);
+    } finally {
+      setLoading(false);
+      setLastUpdated(new Date());
+    }
+  };
+
+  useEffect(() => {
+    fetchMetrics();
+    const interval = setInterval(fetchMetrics, 30000); // Update every 30 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'excellent': return 'text-green-600';
+      case 'good': return 'text-blue-600';
+      case 'warning': return 'text-yellow-600';
+      case 'critical': return 'text-red-600';
+      default: return 'text-gray-600';
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'excellent': return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'good': return <TrendingUp className="h-4 w-4 text-blue-600" />;
+      case 'warning': return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
+      case 'critical': return <AlertTriangle className="h-4 w-4 text-red-600" />;
+      default: return <Activity className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Gauge className="h-5 w-5" />
+            Performance Monitor
+          </CardTitle>
+          <CardDescription>Loading performance metrics...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="h-4 bg-muted animate-pulse rounded" />
+            <div className="h-4 bg-muted animate-pulse rounded" />
+            <div className="h-4 bg-muted animate-pulse rounded" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Gauge className="h-5 w-5" />
+              Performance Monitor
+            </CardTitle>
+            <CardDescription>
+              Real-time system performance metrics
+            </CardDescription>
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={fetchMetrics}
+            disabled={loading}
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Overall Status */}
+        <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
+          <div className="flex items-center gap-3">
+            {getStatusIcon(metrics.status)}
+            <div>
+              <p className="font-medium">System Status</p>
+              <p className={`text-sm capitalize ${getStatusColor(metrics.status)}`}>
+                {metrics.status}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-2xl font-bold">{metrics.resourceScore}/100</p>
+            <p className="text-xs text-muted-foreground">Efficiency Score</p>
+          </div>
+        </div>
+
+        {/* Memory Usage */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Cpu className="h-4 w-4 text-blue-600" />
+            <h4 className="font-medium">Memory Usage</h4>
+            <Badge variant="secondary" className="text-xs">
+              {metrics.memoryUsage.used}MB / {metrics.memoryUsage.total}MB
+            </Badge>
+          </div>
+          <Progress value={metrics.memoryUsage.percentage} className="h-2" />
+          <p className="text-xs text-muted-foreground">
+            {metrics.memoryUsage.percentage.toFixed(1)}% of available memory
+          </p>
+        </div>
+
+        <Separator />
+
+        {/* API Performance */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Network className="h-4 w-4 text-green-600" />
+            <h4 className="font-medium">API Performance</h4>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center p-3 bg-muted/30 rounded-lg">
+              <p className="text-2xl font-bold text-green-600">
+                {metrics.apiCalls.successful}
+              </p>
+              <p className="text-xs text-muted-foreground">Successful</p>
+            </div>
+            <div className="text-center p-3 bg-muted/30 rounded-lg">
+              <p className="text-2xl font-bold text-red-600">
+                {metrics.apiCalls.failed}
+              </p>
+              <p className="text-xs text-muted-foreground">Failed</p>
+            </div>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span>Average Response Time</span>
+            <Badge variant="outline">
+              {metrics.apiCalls.avgResponseTime}ms
+            </Badge>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Cache Performance */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <HardDrive className="h-4 w-4 text-purple-600" />
+            <h4 className="font-medium">Cache Performance</h4>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <span>Hit Rate</span>
+              <Badge variant="secondary">
+                {metrics.cacheStats.hitRate.toFixed(1)}%
+              </Badge>
+            </div>
+            <Progress value={metrics.cacheStats.hitRate} className="h-2" />
+            <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
+              <div>Hits: {metrics.cacheStats.hits}</div>
+              <div>Misses: {metrics.cacheStats.misses}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Last Updated */}
+        <div className="pt-2 border-t">
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            Last updated: {lastUpdated.toLocaleTimeString()}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
