@@ -355,3 +355,103 @@ export function PerformanceDashboard() {
     </Card>
   );
 }
+"use client";
+
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Activity, AlertTriangle, CheckCircle, Clock } from "lucide-react";
+
+interface PerformanceMetrics {
+  apiLatency: number;
+  cacheHitRate: number;
+  errorRate: number;
+  lastUpdated: Date;
+}
+
+export function PerformanceDashboard() {
+  const [metrics, setMetrics] = useState<PerformanceMetrics>({
+    apiLatency: 0,
+    cacheHitRate: 0,
+    errorRate: 0,
+    lastUpdated: new Date()
+  });
+
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Listen for performance alerts
+    const handlePerformanceAlert = (event: CustomEvent) => {
+      if (event.detail?.type === 'high_latency') {
+        setMetrics(prev => ({
+          ...prev,
+          apiLatency: event.detail.value,
+          lastUpdated: new Date()
+        }));
+        setIsVisible(true);
+      }
+    };
+
+    window.addEventListener('performanceAlert', handlePerformanceAlert as EventListener);
+
+    return () => {
+      window.removeEventListener('performanceAlert', handlePerformanceAlert as EventListener);
+    };
+  }, []);
+
+  // Auto-hide after 10 seconds
+  useEffect(() => {
+    if (isVisible) {
+      const timer = setTimeout(() => setIsVisible(false), 10000);
+      return () => clearTimeout(timer);
+    }
+  }, [isVisible]);
+
+  if (!isVisible || metrics.apiLatency < 5000) {
+    return null;
+  }
+
+  const getLatencyStatus = (latency: number) => {
+    if (latency < 1000) return { status: 'good', color: 'bg-green-500', icon: CheckCircle };
+    if (latency < 3000) return { status: 'warning', color: 'bg-yellow-500', icon: Clock };
+    return { status: 'critical', color: 'bg-red-500', icon: AlertTriangle };
+  };
+
+  const latencyStatus = getLatencyStatus(metrics.apiLatency);
+  const Icon = latencyStatus.icon;
+
+  return (
+    <div className="fixed bottom-4 right-4 z-50 max-w-sm">
+      <Card className="border-2 shadow-lg">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Activity className="h-4 w-4" />
+            Performance Alert
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">API Latency</span>
+            <div className="flex items-center gap-2">
+              <Icon className="h-4 w-4 text-red-500" />
+              <Badge variant="destructive" className="text-xs">
+                {metrics.apiLatency}ms
+              </Badge>
+            </div>
+          </div>
+          
+          <div className="text-xs text-muted-foreground">
+            High latency detected. Performance may be affected.
+          </div>
+          
+          <button
+            onClick={() => setIsVisible(false)}
+            className="text-xs text-blue-600 hover:underline"
+          >
+            Dismiss
+          </button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

@@ -1687,13 +1687,12 @@ export function DriveManager() {
     }
   }, [debouncedSearchQuery, currentFolderId]);
 
-  // Handle view mode change
-    const handleViewChange = (value: string) => {
-      const validModes = ['grid', 'list', 'compact'];
-      if (validModes.includes(value)) {
-        setViewMode(value as ViewMode);
-      }
-    };
+  // Handle view mode change for toggle group
+  const handleViewModeChange = (value: string) => {
+    if (value && (value === 'grid' || value === 'table')) {
+      setViewMode(value as 'grid' | 'table');
+    }
+  };
 
     // Fix server action issue
     useEffect(() => {
@@ -1851,7 +1850,7 @@ export function DriveManager() {
                   <ToggleGroup 
                     type="single" 
                     value={viewMode} 
-                    onValueChange={(value: 'grid' | 'table') => value && setViewMode(value)}
+                    onValueChange={handleViewModeChange}
                     className="bg-background border rounded-md"
                   >
                     <ToggleGroupItem value="grid" aria-label="Grid view" size="sm">
