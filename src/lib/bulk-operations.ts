@@ -7,7 +7,14 @@ import { toast } from 'sonner';
 import { DriveFile, DriveFolder } from './google-drive/types';
 import { getFileActions } from './google-drive/utils';
 import { createBulkOperation, updateBulkOperation, logActivity } from './db-utils';
-import { v4 as uuidv4 } from 'uuid';
+// Use a simple UUID generator for client-side compatibility
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
 
 export interface BulkOperationItem {
   id: string;
@@ -42,7 +49,7 @@ class BulkOperationsManager {
    */
   async executeBulkOperation(config: BulkOperationConfig): Promise<BulkOperationResult> {
     const { operation, items, userId, activeView, onProgress, onComplete } = config;
-    const batchId = uuidv4();
+    const batchId = generateUUID();
     
     // Prevent duplicate operations
     if (this.activeOperations.has(batchId)) {

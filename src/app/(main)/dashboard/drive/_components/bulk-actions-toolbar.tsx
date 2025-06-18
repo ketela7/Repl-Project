@@ -23,8 +23,10 @@ import {
   FileDown,
   Edit3,
   RotateCcw,
-  ShieldX
+  ShieldX,
+  AlertTriangle
 } from "lucide-react";
+import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
 
 interface BulkActionsToolbarProps {
   selectedCount: number;

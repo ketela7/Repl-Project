@@ -103,6 +103,7 @@ import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
 
 import { errorRecovery } from '@/lib/error-recovery';
+import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
 
 // Enhanced client-side filtering utilities
 const applyClientSideFilters = (
