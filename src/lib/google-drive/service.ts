@@ -502,16 +502,43 @@ export class GoogleDriveService {
     return this.renameFile(folderId, newName);
   }
 
-  // Unified move operation for both files and folders
+  // Unified move operation for both files and folders with error recovery
   async moveFile(fileId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
-    const response = await this.drive.files.update({
-      fileId,
-      addParents: newParentId,
-      removeParents: currentParentId,
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
-    });
+    try {
+      const response = await this.drive.files.update({
+        fileId,
+        addParents: newParentId,
+        removeParents: currentParentId,
+        fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      });
 
-    return convertGoogleDriveFile(response.data);
+      return convertGoogleDriveFile(response.data);
+    } catch (error) {
+      console.error(`Move operation failed for file ${fileId}:`, error);
+      
+      // Enhanced error handling - check if it's a recoverable error
+      const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
+      
+      if (errorMessage.includes('not found') || 
+          errorMessage.includes('permission') || 
+          errorMessage.includes('access')) {
+        
+        // Return current file state instead of throwing
+        console.log(`Keeping file ${fileId} in current location due to move failure`);
+        const currentFile = await this.getFile(fileId);
+        
+        return {
+          ...currentFile,
+          // Add custom properties to indicate the move attempt
+          moveAttempted: true,
+          moveFailureReason: errorMessage,
+          targetFolderId: newParentId
+        } as any;
+      }
+      
+      // Re-throw for non-recoverable errors
+      throw error;
+    }
   }
 
   // Alias for clarity - same operation works for both files and folders

@@ -1,4 +1,3 @@
-
 /**
  * Error Recovery System for Google Drive Management
  * Provides retry mechanisms, fallback strategies, and error tracking
@@ -72,12 +71,12 @@ class ErrorRecoveryManager {
     for (attempts = 1; attempts <= config.maxRetries + 1; attempts++) {
       try {
         const result = await operation();
-        
+
         // Success - update stats and return
         if (attempts > 1) {
           this.updateStats(options.operation, 'retry_success');
         }
-        
+
         return {
           success: true,
           data: result,
@@ -107,7 +106,7 @@ class ErrorRecoveryManager {
 
         // Add jitter to prevent thundering herd
         const jitteredDelay = delay + Math.random() * 1000;
-        
+
         console.log(`Retry attempt ${attempts} for ${options.operation} after ${jitteredDelay}ms delay`);
         await this.sleep(jitteredDelay);
       }
@@ -175,7 +174,7 @@ class ErrorRecoveryManager {
     // Process items in batches to prevent overwhelming the API
     for (let i = 0; i < items.length; i += batchSize) {
       const batch = items.slice(i, i + batchSize);
-      
+
       const batchPromises = batch.map(async (item, index) => {
         const itemOperation = () => operation(item);
         const itemOptions = {
@@ -184,7 +183,7 @@ class ErrorRecoveryManager {
         };
 
         const result = await this.executeWithRecovery(itemOperation, itemOptions);
-        
+
         completed++;
         if (progressCallback) {
           progressCallback(completed, items.length, [...results, result]);
@@ -269,13 +268,13 @@ class ErrorRecoveryManager {
           const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
           const fallbackName = `${newName} (${timestamp})`;
           console.log(`Using timestamped name fallback: ${fallbackName}`);
-          
+
           const response = await fetch(`/api/drive/files/${fileId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'rename', name: fallbackName })
           });
-          
+
           if (!response.ok) throw new Error('Rename fallback failed');
           return response.json();
         }
@@ -287,15 +286,162 @@ class ErrorRecoveryManager {
         fallbackStrategy: async () => {
           // Move to root if target folder is inaccessible
           console.log(`Moving file ${fileId} to root folder as fallback`);
-          
+
           const response = await fetch(`/api/drive/files/${fileId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'move', parentId: null })
           });
-          
+
           if (!response.ok) throw new Error('Move to root fallback failed');
           return response.json();
+        }
+      })
+    };
+  }
+
+  /**
+   * Advanced recovery strategies for file operations
+   */
+  createAdvancedDriveStrategies() {
+    return {
+      // Enhanced file move with multiple fallback options
+      fileMoveSafe: (fileId: string, targetFolderId: string, currentParentId?: string, fileName?: string) => ({
+        operation: 'file_move_safe',
+        retryConfig: {
+          maxRetries: 3,
+          baseDelay: 2000,
+          retryableErrors: [
+            ...this.defaultRetryConfig.retryableErrors, 
+            'folder_not_found', 
+            'permission_denied',
+            'quota_exceeded',
+            'parent_not_found'
+          ]
+        },
+        fallbackStrategy: async () => {
+          console.log(`Advanced fallback for moving file ${fileId} (${fileName})`);
+
+          try {
+            // First, verify current file accessibility
+            const fileCheck = await fetch(`/api/drive/files/${fileId}`);
+            if (!fileCheck.ok) {
+              throw new Error('Source file no longer accessible');
+            }
+
+            // Check if target folder exists and is accessible
+            const targetCheck = await fetch(`/api/drive/files/${targetFolderId}`);
+            if (!targetCheck.ok) {
+              // Target folder is not accessible - keep file in place
+              const fileData = await fileCheck.json();
+              return {
+                ...fileData,
+                moveResult: 'target_inaccessible',
+                message: `Target folder is not accessible. File "${fileName}" remains in current location.`,
+                originalTargetId: targetFolderId
+              };
+            }
+
+            // If we reach here, both source and target are accessible
+            // Try a gentle retry with longer timeout
+            const moveResponse = await fetch(`/api/drive/files/${fileId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ 
+                action: 'move', 
+                parentId: targetFolderId,
+                removeParents: currentParentId 
+              })
+            });
+
+            if (moveResponse.ok) {
+              const result = await moveResponse.json();
+              return {
+                ...result,
+                moveResult: 'fallback_success',
+                message: 'File moved successfully after retry'
+              };
+            }
+
+            // Final fallback - preserve current location
+            const fileData = await fileCheck.json();
+            return {
+              ...fileData,
+              moveResult: 'preserved_location',
+              message: `Unable to move file "${fileName}". File remains in current location for safety.`,
+              attemptedTargetId: targetFolderId
+            };
+
+          } catch (error) {
+            console.error('Advanced file move fallback failed:', error);
+            throw new Error(`File move operation failed completely: ${error}`);
+          }
+        }
+      }),
+
+      // Batch file move with individual error handling
+      batchFileMove: (operations: Array<{fileId: string, targetFolderId: string, currentParentId?: string, fileName?: string}>) => ({
+        operation: 'batch_file_move',
+        retryConfig: {
+          maxRetries: 1, // Lower retries for batch operations
+          baseDelay: 1000
+        },
+        fallbackStrategy: async () => {
+          console.log(`Batch move fallback for ${operations.length} files`);
+
+          const results = [];
+
+          for (const op of operations) {
+            try {
+              // Use individual safe move strategy for each file
+              const safeStrategy = this.createAdvancedDriveStrategies().fileMoveSafe(
+                op.fileId, 
+                op.targetFolderId, 
+                op.currentParentId, 
+                op.fileName
+              );
+
+              const result = await this.executeWithRecovery(
+                () => fetch(`/api/drive/files/${op.fileId}`, {
+                  method: 'PUT',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                    action: 'move', 
+                    parentId: op.targetFolderId,
+                    removeParents: op.currentParentId 
+                  })
+                }).then(res => res.ok ? res.json() : Promise.reject(new Error('Move failed'))),
+                safeStrategy
+              );
+
+              results.push({
+                fileId: op.fileId,
+                fileName: op.fileName,
+                success: result.success,
+                data: result.data,
+                error: result.error?.message
+              });
+
+            } catch (error) {
+              results.push({
+                fileId: op.fileId,
+                fileName: op.fileName,
+                success: false,
+                error: error instanceof Error ? error.message : String(error)
+              });
+            }
+
+            // Small delay between operations
+            await this.sleep(200);
+          }
+
+          return {
+            batchResult: 'completed',
+            totalFiles: operations.length,
+            successful: results.filter(r => r.success).length,
+            failed: results.filter(r => !r.success).length,
+            results
+          };
         }
       })
     };
@@ -347,7 +493,7 @@ class ErrorRecoveryManager {
 
   getErrorStats(): Record<string, any> {
     const stats: Record<string, any> = {};
-    
+
     this.errorStats.forEach((value, key) => {
       stats[key] = {
         ...value,
