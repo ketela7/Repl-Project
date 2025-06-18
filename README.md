@@ -60,10 +60,17 @@ A professional web application for managing Google Drive files and folders with 
 
 ### User Interface
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Dark/Light Mode**: Theme switching support
+- **Dark/Light Mode**: Theme switching support with next-themes
 - **Loading States**: Progress indicators for all operations
 - **Error Handling**: Comprehensive error messages with actionable feedback
 - **Toast Notifications**: Real-time success and error notifications
+- **Performance Dashboard**: Real-time monitoring with 4 tabs (Overview, Performance, Usage Stats, Error Tracking)
+
+### Performance Monitoring
+- **Real-time Metrics**: Memory usage, API performance, cache efficiency
+- **Resource Optimization**: Automatic optimization for 1000+ concurrent users
+- **Alert System**: Proactive alerts for high latency (>5s), memory usage (>400MB)
+- **Free-tier Optimized**: Designed for Replit deployment with resource constraints
 
 ### Authentication & Security
 - **Google OAuth Integration**: Secure authentication with Google accounts
@@ -75,17 +82,26 @@ A professional web application for managing Google Drive files and folders with 
 
 ### Frontend
 - **Next.js 15**: React framework with App Router
-- **TypeScript**: Type-safe development
+- **TypeScript**: Type-safe development with strict mode
 - **Tailwind CSS**: Utility-first CSS framework
-- **Radix UI**: Accessible component primitives
+- **Shadcn/ui**: Built on Radix UI primitives
 - **Lucide React**: Modern icon library
 - **Sonner**: Toast notification system
+- **next-themes**: Dark/light mode support
 
 ### Backend
 - **Next.js API Routes**: Server-side API endpoints
 - **Google APIs**: Official Google Drive API integration
 - **Supabase**: Authentication and session management
-- **Drizzle ORM**: Type-safe database operations
+- **Drizzle ORM**: Type-safe database operations with PostgreSQL
+- **Cloudflare Turnstile**: CAPTCHA protection
+
+### Performance & Optimization
+- **Performance Monitor**: Real-time resource tracking
+- **Resource Optimizer**: Intelligent optimization for free-tier deployment
+- **Cache System**: Multi-layer caching with TTL management
+- **Request Queue**: Concurrent request management
+- **API Optimizer**: Batch processing and rate limiting
 
 ### Development Tools
 - **ESLint**: Code quality and consistency
@@ -234,6 +250,8 @@ Required environment variables (stored in Replit secrets):
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_ANON_KEY` - Supabase anonymous key
 - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (optional)
+- `TURNSTILE_SITE_KEY` - Cloudflare Turnstile site key
+- `TURNSTILE_SECRET_KEY` - Cloudflare Turnstile secret key
 
 Note: Environment variables are handled without NEXT_PUBLIC_ prefixes for better security. Configuration is managed through server-side rendering and passed to client components securely.
 

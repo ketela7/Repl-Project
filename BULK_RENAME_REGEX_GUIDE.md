@@ -1,5 +1,12 @@
+# Bulk Rename with Regex Support Guide
 
-# Bulk Rename - Regex Guide
+## Overview
+
+The Google Drive Management Application now supports advanced regex (Regular Expression) patterns for bulk renaming operations, providing powerful pattern-based renaming capabilities for multiple files and folders simultaneously.
+
+**Status**: ✅ **Implemented and Ready**  
+**Location**: `/src/app/(main)/dashboard/drive/_components/bulk-rename-dialog.tsx`  
+**Features**: Full regex support with amateur user guide
 
 ## Pengenalan Regex
 
