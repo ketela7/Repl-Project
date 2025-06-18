@@ -1744,21 +1744,18 @@ export function DriveManager() {
   }
 
   return (
-    <div className="flex gap-6">
-      {/* Filters Sidebar */}
+    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+
+      {/* Integrated Filters Bar */}
       <DriveFiltersSidebar
         activeView={activeView}
         fileTypeFilter={fileTypeFilter}
         onViewChange={handleViewChange}
         onFileTypeChange={setFileTypeFilter}
+        isCollapsed={false}
       />
-      
-      {/* Main Content */}
-      <div className="flex-1 space-y-4 sm:space-y-6 px-2 sm:px-0">
 
       {/* Search and Actions Bar */}
-
-      {/* Actions Bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 flex-1 sm:max-w-md">
           <Input
@@ -2800,7 +2797,6 @@ Action(null);
           onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         />
       )}
-      </div>
     </div>
   );
 }

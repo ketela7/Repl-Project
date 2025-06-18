@@ -1,10 +1,10 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
@@ -21,8 +21,16 @@ import {
   Archive,
   File,
   Users,
-  Filter
+  Filter,
+  ChevronDown,
+  ChevronUp,
+  X
 } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface DriveFiltersSidebarProps {
   activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash';
@@ -67,6 +75,8 @@ export function DriveFiltersSidebar({
   isCollapsed = false 
 }: DriveFiltersSidebarProps) {
   
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const handleFileTypeToggle = (fileTypeKey: string) => {
     const newFilter = fileTypeFilter.includes(fileTypeKey)
       ? fileTypeFilter.filter(type => type !== fileTypeKey)
@@ -79,123 +89,172 @@ export function DriveFiltersSidebar({
     onFileTypeChange([]);
   };
 
-  if (isCollapsed) {
-    return (
-      <div className="w-12 p-2 space-y-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="w-full p-2 h-10"
-          title="Filters"
-        >
-          <Filter className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
+  const removeFileTypeFilter = (fileTypeKey: string) => {
+    const newFilter = fileTypeFilter.filter(type => type !== fileTypeKey);
+    onFileTypeChange(newFilter);
+  };
+
+  const hasActiveFilters = activeView !== 'all' || fileTypeFilter.length > 0;
 
   return (
-    <div className="w-64 p-4 space-y-4 border-r bg-card">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-primary" />
-          <h3 className="font-semibold text-sm">Filters</h3>
-        </div>
-        {(activeView !== 'all' || fileTypeFilter.length > 0) && (
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={clearAllFilters}
-            className="text-xs h-6 px-2"
-          >
-            Clear
-          </Button>
-        )}
-      </div>
-
-      {/* Active Filters Summary */}
-      {(activeView !== 'all' || fileTypeFilter.length > 0) && (
-        <div className="space-y-2">
-          <div className="flex flex-wrap gap-1">
-            {activeView !== 'all' && (
-              <Badge variant="secondary" className="text-xs">
-                {viewOptions.find(v => v.key === activeView)?.label}
-              </Badge>
-            )}
-            {fileTypeFilter.map(type => (
-              <Badge key={type} variant="outline" className="text-xs">
-                {fileTypeOptions.find(ft => ft.key === type)?.label}
-              </Badge>
-            ))}
-          </div>
-          <Separator />
-        </div>
-      )}
-
-      {/* View Filters */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <Folder className="h-4 w-4" />
-            Views
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-1 pt-0">
-          {viewOptions.map(({ key, label, icon: Icon, description }) => (
-            <Button
-              key={key}
-              variant={activeView === key ? "secondary" : "ghost"}
-              className="w-full justify-start h-8 px-3 text-sm"
-              onClick={() => onViewChange(key as any)}
-            >
-              <Icon className="h-4 w-4 mr-3 flex-shrink-0" />
-              <div className="flex-1 text-left">
-                <div className="font-medium">{label}</div>
-                {activeView === key && (
-                  <div className="text-xs text-muted-foreground truncate">
-                    {description}
-                  </div>
-                )}
+    <Card className="border-primary/20 bg-gradient-to-r from-background to-accent/5">
+      <CardContent className="p-4">
+        <div className="space-y-4">
+          {/* Header with Toggle */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
+                <Filter className="h-5 w-5 text-primary" />
+                <h3 className="font-semibold text-lg">Smart Filters</h3>
               </div>
-              {activeView === key && (
-                <div className="ml-2">
-                  <div className="w-2 h-2 bg-primary rounded-full" />
-                </div>
+              
+              {hasActiveFilters && (
+                <Badge variant="secondary" className="text-xs px-2 py-1">
+                  {(activeView !== 'all' ? 1 : 0) + fileTypeFilter.length} active
+                </Badge>
               )}
-            </Button>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* File Type Filters */}
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center gap-2">
-            <File className="h-4 w-4" />
-            File Types
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 pt-0">
-          {fileTypeOptions.map(({ key, label, icon: Icon }) => (
-            <div key={key} className="flex items-center space-x-3">
-              <Checkbox
-                id={key}
-                checked={fileTypeFilter.includes(key)}
-                onCheckedChange={() => handleFileTypeToggle(key)}
-                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-              />
-              <label 
-                htmlFor={key} 
-                className="flex items-center space-x-2 text-sm font-medium cursor-pointer flex-1"
-              >
-                <Icon className="h-4 w-4 text-muted-foreground" />
-                <span>{label}</span>
-              </label>
             </div>
-          ))}
-        </CardContent>
-      </Card>
-    </div>
+
+            <div className="flex items-center gap-2">
+              {hasActiveFilters && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={clearAllFilters}
+                  className="text-xs h-7 px-2 text-destructive hover:bg-destructive/10"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Clear All
+                </Button>
+              )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="h-7 px-2"
+              >
+                {isExpanded ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Quick View Filters - Always Visible */}
+          <div className="flex flex-wrap gap-2">
+            {viewOptions.map(({ key, label, icon: Icon }) => {
+              const isActive = activeView === key;
+              return (
+                <Button
+                  key={key}
+                  variant={isActive ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => onViewChange(key as any)}
+                  className={`h-8 px-3 text-xs transition-all duration-200 ${
+                    isActive 
+                      ? 'bg-primary text-primary-foreground shadow-sm scale-105' 
+                      : 'hover:bg-accent hover:scale-105'
+                  }`}
+                >
+                  <Icon className="h-3 w-3 mr-2" />
+                  {label}
+                  {isActive && <div className="ml-1 w-1 h-1 bg-primary-foreground rounded-full" />}
+                </Button>
+              );
+            })}
+          </div>
+
+          {/* Active Filters Summary */}
+          {hasActiveFilters && (
+            <div className="flex flex-wrap gap-2 items-center">
+              <span className="text-sm font-medium text-muted-foreground">Active:</span>
+              {activeView !== 'all' && (
+                <Badge 
+                  variant="secondary" 
+                  className="text-xs px-2 py-1 bg-primary/10 text-primary border-primary/20"
+                >
+                  {viewOptions.find(v => v.key === activeView)?.label}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => onViewChange('all')}
+                    className="ml-1 h-3 w-3 p-0 hover:bg-destructive/20"
+                  >
+                    <X className="h-2 w-2" />
+                  </Button>
+                </Badge>
+              )}
+              {fileTypeFilter.map(type => (
+                <Badge 
+                  key={type} 
+                  variant="outline" 
+                  className="text-xs px-2 py-1 bg-accent/50 hover:bg-accent"
+                >
+                  {fileTypeOptions.find(ft => ft.key === type)?.label}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeFileTypeFilter(type)}
+                    className="ml-1 h-3 w-3 p-0 hover:bg-destructive/20"
+                  >
+                    <X className="h-2 w-2" />
+                  </Button>
+                </Badge>
+              ))}
+            </div>
+          )}
+
+          {/* Expanded File Type Filters */}
+          {isExpanded && (
+            <>
+              <Separator />
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <File className="h-4 w-4 text-primary" />
+                  <span className="font-medium text-sm">File Types</span>
+                </div>
+                
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+                  {fileTypeOptions.map(({ key, label, icon: Icon }) => {
+                    const isActive = fileTypeFilter.includes(key);
+                    return (
+                      <div 
+                        key={key} 
+                        className={`flex items-center space-x-2 p-2 rounded-md border transition-all duration-200 cursor-pointer hover:bg-accent hover:scale-105 ${
+                          isActive 
+                            ? 'bg-primary/10 border-primary/30 shadow-sm' 
+                            : 'border-border hover:border-primary/20'
+                        }`}
+                        onClick={() => handleFileTypeToggle(key)}
+                      >
+                        <Checkbox
+                          id={key}
+                          checked={isActive}
+                          onCheckedChange={() => handleFileTypeToggle(key)}
+                          className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        />
+                        <div className="flex items-center space-x-2 flex-1 min-w-0">
+                          <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                          <label 
+                            htmlFor={key} 
+                            className={`text-xs font-medium cursor-pointer truncate ${
+                              isActive ? 'text-primary' : 'text-foreground'
+                            }`}
+                          >
+                            {label}
+                          </label>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
