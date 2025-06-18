@@ -104,6 +104,10 @@ class RequestQueue {
     };
   }
 
+  setMaxConcurrent(newMax: number): void {
+    this.maxConcurrent = newMax;
+  }
+
   clear(): void {
     this.queue = [];
     this.activeRequests.clear();

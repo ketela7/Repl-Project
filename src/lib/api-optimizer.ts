@@ -208,6 +208,10 @@ class APIOptimizer {
       this.batchTimer = null;
     }
   }
+
+  setBatchSize(newBatchSize: number): void {
+    this.maxBatchSize = Math.min(20, Math.max(3, newBatchSize));
+  }
 }
 
 export const apiOptimizer = new APIOptimizer();
