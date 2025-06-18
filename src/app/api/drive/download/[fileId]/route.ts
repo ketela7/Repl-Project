@@ -36,24 +36,6 @@ export async function GET(
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
 
-    // Check if it's a folder - folders cannot be downloaded
-    if (fileDetails.mimeType === 'application/vnd.google-apps.folder') {
-      return NextResponse.json({ 
-        error: 'Cannot download folders. Please download individual files instead.',
-        isFolder: true 
-      }, { status: 400 });
-    }
-
-    // Check if it's a Google Workspace document that needs to be exported
-    const isGoogleDoc = fileDetails.mimeType?.startsWith('application/vnd.google-apps.');
-    if (isGoogleDoc && fileDetails.mimeType !== 'application/vnd.google-apps.folder') {
-      return NextResponse.json({ 
-        error: 'Google Workspace documents cannot be downloaded directly. Please use the export feature instead.',
-        isGoogleDoc: true,
-        mimeType: fileDetails.mimeType
-      }, { status: 400 });
-    }
-
     // Get the file stream
     const fileStream = await driveService.downloadFileStream(fileId);
     
@@ -64,12 +46,9 @@ export async function GET(
     // Return the file stream with appropriate headers
     return new NextResponse(fileStream, {
       headers: {
-        'Content-Type': fileDetails.mimeType || 'application/octet-stream',
-        'Content-Disposition': `attachment; filename="${encodeURIComponent(fileDetails.name || 'download')}"`,
+        'Content-Type': fileDetails.mimeType,
+        'Content-Disposition': `inline; filename="${fileDetails.name}"`,
         'Cache-Control': 'public, max-age=3600',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET',
-        'Access-Control-Allow-Headers': 'Content-Type',
       },
     });
   } catch (error) {
@@ -83,23 +62,10 @@ export async function GET(
         }, { status: 401 });
       }
 
-      if (error.message.includes('403') || error.message.includes('forbidden')) {
-        return NextResponse.json({ 
-          error: 'Access denied. This file cannot be downloaded. It might be a folder, a restricted file, or a Google Workspace document.',
-          code: 'ACCESS_DENIED'
-        }, { status: 403 });
-      }
-
       if (error.message.includes('not found') || error.message.includes('404')) {
         return NextResponse.json({ 
           error: 'File not found' 
         }, { status: 404 });
-      }
-
-      if (error.message.includes('quota') || error.message.includes('limit')) {
-        return NextResponse.json({ 
-          error: 'Download quota exceeded. Please try again later.' 
-        }, { status: 429 });
       }
     }
 

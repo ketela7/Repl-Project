@@ -293,7 +293,6 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
 
 export function buildSearchQuery(options: {
   name?: string;
-  query?: string;
   mimeType?: string;
   parentId?: string;
   trashed?: boolean;
@@ -303,10 +302,6 @@ export function buildSearchQuery(options: {
   
   if (options.name) {
     conditions.push(`name contains '${options.name.replace(/'/g, "\\'")}'`);
-  }
-  
-  if (options.query) {
-    conditions.push(`name contains '${options.query.replace(/'/g, "\\'")}'`);
   }
   
   if (options.mimeType) {

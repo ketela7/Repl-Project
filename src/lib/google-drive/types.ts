@@ -42,6 +42,8 @@ export interface DriveFileMetadata {
 }
 
 export interface DriveUploadOptions {
+  file: File;
+  metadata: DriveFileMetadata;
   parentId?: string;
   onProgress?: (progress: number) => void;
 }
