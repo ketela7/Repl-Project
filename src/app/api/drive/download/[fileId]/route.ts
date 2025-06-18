@@ -9,7 +9,7 @@ export async function GET(
   try {
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
-    const isDirect = searchParams.get('direct') === 'true';
+    const isStream = searchParams.get('stream') === 'true';
     
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
@@ -46,15 +46,31 @@ export async function GET(
       }, { status: 400 });
     }
 
-    // For direct downloads (large files), redirect to Google Drive
-    if (isDirect) {
-      const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+    // Check file size to determine download strategy
+    const fileSizeBytes = parseInt(fileDetails.size || '0');
+    const fileSizeMB = fileSizeBytes / (1024 * 1024);
+    const isLargeFile = fileSizeMB > 10; // 10MB threshold
+    
+    // For streaming downloads (large files >10MB or when explicitly requested)
+    if (isStream || isLargeFile) {
+      console.log(`Streaming download for ${isLargeFile ? 'large' : 'requested'} file: ${fileDetails.name} (${fileSizeMB.toFixed(1)}MB)`);
       
-      return NextResponse.redirect(downloadUrl, {
-        status: 302,
+      // Get the file stream directly from Google Drive
+      const fileStream = await driveService.downloadFileStream(fileId);
+      
+      if (!fileStream) {
+        return NextResponse.json({ error: 'Failed to get file stream' }, { status: 500 });
+      }
+
+      // Return the stream with appropriate headers for efficient downloading
+      return new NextResponse(fileStream, {
+        status: 200,
         headers: {
-          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': fileDetails.mimeType || 'application/octet-stream',
           'Content-Disposition': `attachment; filename="${encodeURIComponent(fileDetails.name)}"`,
+          'Content-Length': fileDetails.size || '',
+          'Cache-Control': 'no-cache',
+          'Accept-Ranges': 'bytes',
         }
       });
     }

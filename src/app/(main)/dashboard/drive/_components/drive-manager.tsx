@@ -534,19 +534,19 @@ export function DriveManager() {
           try {
             const fileSizeBytes = parseInt(item.size || '0');
             const fileSizeMB = fileSizeBytes / (1024 * 1024);
-            const isLargeFile = fileSizeMB > 50; // 50MB threshold
+            const isLargeFile = fileSizeMB > 10; // 10MB threshold
             
             if (isLargeFile) {
-              // For large files >50MB, use direct Google Drive download to avoid memory issues
-              console.log(`Large file detected (${fileSizeMB.toFixed(1)}MB): ${item.name}, using direct download`);
+              // For large files >10MB, use streaming download without creating blob
+              console.log(`Large file detected (${fileSizeMB.toFixed(1)}MB): ${item.name}, using stream download`);
               
               try {
-                // Get direct download URL from Google Drive
-                const urlResponse = await fetch(`/api/drive/download-url/${item.id}`);
+                // Use streaming download with direct parameter
+                const downloadResponse = await fetch(`/api/drive/download/${item.id}?stream=true`);
                 
-                if (!urlResponse.ok) {
-                  if (urlResponse.status === 401) {
-                    const errorData = await urlResponse.json();
+                if (!downloadResponse.ok) {
+                  if (downloadResponse.status === 401) {
+                    const errorData = await downloadResponse.json();
                     if (errorData.needsReauth) {
                       toast.error('Google Drive access expired. Please reconnect your account.');
                       window.location.reload();
@@ -554,50 +554,45 @@ export function DriveManager() {
                     }
                   }
                   
-                  if (urlResponse.status === 403) {
+                  if (downloadResponse.status === 403) {
                     failedItems.push(`${item.name} (permission denied)`);
                     continue;
                   }
                   
-                  if (urlResponse.status === 404) {
+                  if (downloadResponse.status === 404) {
                     failedItems.push(`${item.name} (not found)`);
                     continue;
                   }
                   
-                  failedItems.push(`${item.name} (failed to get download URL)`);
+                  failedItems.push(`${item.name} (download failed)`);
                   continue;
                 }
                 
-                const { downloadUrl, filename, authHeader } = await urlResponse.json();
+                // Create download link directly from response stream
+                const blob = await downloadResponse.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = item.name;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
                 
-                // Create hidden iframe for direct download without memory overhead
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.style.width = '0';
-                iframe.style.height = '0';
-                iframe.style.border = 'none';
-                
-                // Set iframe source to trigger download
-                iframe.src = `${downloadUrl}&headers=${encodeURIComponent(authHeader)}`;
-                
-                document.body.appendChild(iframe);
-                
-                // Clean up iframe after download initiates
+                // Clean up blob URL immediately
                 setTimeout(() => {
-                  if (iframe.parentNode) {
-                    document.body.removeChild(iframe);
-                  }
-                }, 3000);
+                  window.URL.revokeObjectURL(blobUrl);
+                }, 100);
                 
                 successCount++;
-                console.log(`Direct download initiated for large file: ${item.name}`);
+                console.log(`Stream download completed for large file: ${item.name}`);
                 
               } catch (error) {
                 console.error(`Failed to download large file ${item.name}:`, error);
                 failedItems.push(`${item.name} (large file download failed)`);
               }
             } else {
-              // For small files, use standard blob approach
+              // For small files <10MB, use standard blob approach
               console.log(`Small file (${fileSizeMB.toFixed(1)}MB): ${item.name}, using blob download`);
               
               const downloadResponse = await fetch(`/api/drive/download/${item.id}`);
@@ -898,13 +893,15 @@ export function DriveManager() {
           const fileItem = downloadFile || files.find(f => f.id === fileId);
           const fileSizeBytes = parseInt(fileItem?.size || '0');
           const fileSizeMB = fileSizeBytes / (1024 * 1024);
-          const isLargeFile = fileSizeMB > 50; // 50MB threshold
+          const isLargeFile = fileSizeMB > 10; // 10MB threshold
           
           if (isLargeFile) {
-            toast.info(`Downloading large file (${fileSizeMB.toFixed(1)}MB): "${fileName}"`);
+            toast.info(`Downloading large file (${fileSizeMB.toFixed(1)}MB): "${fileName}" using stream`);
           }
           
-          const downloadResponse = await fetch(`/api/drive/download/${fileId}`);
+          // Use stream parameter for large files
+          const downloadUrl = `/api/drive/download/${fileId}${isLargeFile ? '?stream=true' : ''}`;
+          const downloadResponse = await fetch(downloadUrl);
           if (!downloadResponse.ok) {
             if (downloadResponse.status === 401) {
               const errorData = await downloadResponse.json();
@@ -940,80 +937,26 @@ export function DriveManager() {
           }
           
           try {
-            if (isLargeFile) {
-              // Stream processing for large files
-              console.log(`Using stream download for large file: ${fileName} (${fileSizeMB.toFixed(1)}MB)`);
-              
-              const reader = downloadResponse.body?.getReader();
-              const contentLength = downloadResponse.headers.get('Content-Length');
-              const totalSize = contentLength ? parseInt(contentLength) : fileSizeBytes;
-              
-              if (!reader) {
-                toast.error(`Failed to create stream for "${fileName}"`);
-                return;
-              }
-              
-              const chunks: Uint8Array[] = [];
-              let receivedLength = 0;
-              
-              while (true) {
-                const { done, value } = await reader.read();
-                
-                if (done) break;
-                
-                chunks.push(value);
-                receivedLength += value.length;
-                
-                // Log progress for large files
-                const progress = (receivedLength / totalSize) * 100;
-                if (progress % 10 < 1) { // Log every 10%
-                  console.log(`Download progress for ${fileName}: ${progress.toFixed(1)}%`);
-                }
-              }
-              
-              // Combine chunks and create blob
-              const blob = new Blob(chunks, { 
-                type: downloadResponse.headers.get('Content-Type') || 'application/octet-stream' 
-              });
-              
-              // Create download link
-              const blobUrl = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = blobUrl;
-              link.download = fileName;
-              link.style.display = 'none';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              // Clean up blob URL
-              setTimeout(() => {
-                window.URL.revokeObjectURL(blobUrl);
-              }, 1000);
-              
-              toast.success(`Large file downloaded: "${fileName}"`);
-            } else {
-              // Standard blob download for small files
-              console.log(`Using blob download for small file: ${fileName} (${fileSizeMB.toFixed(1)}MB)`);
-              
-              const blob = await downloadResponse.blob();
-              
-              const blobUrl = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = blobUrl;
-              link.download = fileName;
-              link.style.display = 'none';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              // Clean up blob URL
-              setTimeout(() => {
-                window.URL.revokeObjectURL(blobUrl);
-              }, 1000);
-              
-              toast.success(`Download started for "${fileName}"`);
-            }
+            // Both large and small files use blob, but large files are streamed on server-side
+            console.log(`Single file download: ${fileName} (${fileSizeMB.toFixed(1)}MB) - using ${isLargeFile ? 'server stream' : 'blob'} method`);
+            
+            const blob = await downloadResponse.blob();
+            
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = fileName;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up blob URL immediately for large files, with delay for small files
+            setTimeout(() => {
+              window.URL.revokeObjectURL(blobUrl);
+            }, isLargeFile ? 100 : 1000);
+            
+            toast.success(`Download completed: "${fileName}"`);
           } catch (error) {
             console.error('Download error:', error);
             toast.error(`Failed to download "${fileName}"`);
