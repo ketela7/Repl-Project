@@ -234,8 +234,6 @@ Required environment variables (stored in Replit secrets):
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_ANON_KEY` - Supabase anonymous key
 - `SUPABASE_SERVICE_ROLE_KEY` - Supabase service role key (optional)
-- `TURNSTILE_SITE_KEY` - Cloudflare Turnstile site key
-- `TURNSTILE_SECRET_KEY` - Cloudflare Turnstile secret key
 
 Note: Environment variables are handled without NEXT_PUBLIC_ prefixes for better security. Configuration is managed through server-side rendering and passed to client components securely.
 

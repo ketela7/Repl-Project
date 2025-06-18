@@ -64,7 +64,7 @@ This is a Next.js 15 admin dashboard application based on shadcn/ui components, 
 - **Home**: `/` - Landing page with authentication status
 - **Main Dashboard**: `/dashboard` - Protected admin interface
 - **Google Drive**: `/dashboard/drive` - File management interface
-- **Authentication**: `/auth/v1/login` - Google OAuth login with Turnstile
+- **Authentication**: `/auth/v1/login` - Google OAuth login
 - **Auth Callback**: `/api/auth/callback` - OAuth callback handler
 - **Auth Error**: `/auth/auth-code-error` - Authentication error handling
 - **Drive API**: `/api/drive/*` - Google Drive operations endpoints
@@ -80,12 +80,11 @@ This is a Next.js 15 admin dashboard application based on shadcn/ui components, 
 
 The application follows a secure Next.js App Router pattern with authentication:
 1. **Authentication Flow**: Users sign in via Google OAuth through Supabase
-2. **CAPTCHA Verification**: Cloudflare Turnstile validates requests before authentication
-3. **Session Management**: Supabase handles secure session tokens and refresh
-4. **Route Protection**: Middleware checks authentication status for protected routes
-5. **Real-time Updates**: Client-side auth state synchronization across components
-6. **API Integration**: Secure API routes for authentication actions (login, logout, callback)
-7. **PostgreSQL Database**: Available for future user data and application state persistence
+2. **Session Management**: Supabase handles secure session tokens and refresh
+3. **Route Protection**: Middleware checks authentication status for protected routes
+4. **Real-time Updates**: Client-side auth state synchronization across components
+5. **API Integration**: Secure API routes for authentication actions (login, logout, callback)
+6. **PostgreSQL Database**: Available for future user data and application state persistence
 
 ## External Dependencies
 
