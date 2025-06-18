@@ -20,7 +20,9 @@ import {
   Calendar, 
   AlignLeft,
   AlertTriangle,
-  Info
+  Info,
+  Code2,
+  HelpCircle
 } from "lucide-react";
 
 interface BulkRenameDialogProps {
@@ -62,6 +64,13 @@ const RENAME_TYPES = [
     icon: Calendar,
     description: 'Add current date and time',
     example: 'OriginalName_2024-06-18_14-30.ext'
+  },
+  {
+    id: 'regex',
+    label: 'Regex Replace',
+    icon: Code2,
+    description: 'Find and replace using regular expressions',
+    example: 'Replace patterns with custom text'
   }
 ];
 
@@ -73,12 +82,27 @@ export function BulkRenameDialog({
 }: BulkRenameDialogProps) {
   const [renameType, setRenameType] = useState('prefix');
   const [renamePattern, setRenamePattern] = useState('');
+  const [regexPattern, setRegexPattern] = useState('');
+  const [regexReplacement, setRegexReplacement] = useState('');
+  const [regexFlags, setRegexFlags] = useState('g');
+  const [showRegexGuide, setShowRegexGuide] = useState(false);
 
   const fileCount = selectedItems.filter(item => item.type === 'file').length;
   const folderCount = selectedItems.filter(item => item.type === 'folder').length;
 
   const getPreviewName = (originalName: string, index: number = 0) => {
-    if (!renamePattern.trim()) return originalName;
+    if (renameType === 'regex') {
+      if (!regexPattern.trim()) return originalName;
+      
+      try {
+        const regex = new RegExp(regexPattern, regexFlags);
+        return originalName.replace(regex, regexReplacement);
+      } catch (error) {
+        return `[Invalid Regex] ${originalName}`;
+      }
+    }
+
+    if (!renamePattern.trim() && renameType !== 'timestamp') return originalName;
 
     const fileExtension = originalName.includes('.') ? 
       originalName.substring(originalName.lastIndexOf('.')) : '';
@@ -113,7 +137,17 @@ export function BulkRenameDialog({
   };
 
   const handleRename = () => {
-    if (renamePattern.trim() || renameType === 'timestamp') {
+    if (renameType === 'regex') {
+      if (regexPattern.trim()) {
+        // Pass regex data as JSON string in the pattern parameter
+        const regexData = JSON.stringify({
+          pattern: regexPattern.trim(),
+          replacement: regexReplacement,
+          flags: regexFlags
+        });
+        onConfirm(regexData, renameType);
+      }
+    } else if (renamePattern.trim() || renameType === 'timestamp') {
       onConfirm(renamePattern.trim(), renameType);
     }
   };
@@ -191,7 +225,111 @@ export function BulkRenameDialog({
                 </RadioGroup>
               </div>
 
-              {renameType !== 'timestamp' && (
+              {renameType === 'regex' ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-semibold">Regex Configuration:</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowRegexGuide(!showRegexGuide)}
+                      className="text-xs"
+                    >
+                      <HelpCircle className="h-3 w-3 mr-1" />
+                      Guide
+                    </Button>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div>
+                      <Label htmlFor="regex-pattern" className="text-xs font-medium text-muted-foreground">
+                        Find Pattern (Regex):
+                      </Label>
+                      <Input
+                        id="regex-pattern"
+                        value={regexPattern}
+                        onChange={(e) => setRegexPattern(e.target.value)}
+                        placeholder="e.g., \d{4} or [A-Z]+ or \s+"
+                        className="font-mono text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="regex-replacement" className="text-xs font-medium text-muted-foreground">
+                        Replace With:
+                      </Label>
+                      <Input
+                        id="regex-replacement"
+                        value={regexReplacement}
+                        onChange={(e) => setRegexReplacement(e.target.value)}
+                        placeholder="e.g., NewText or $1 or leave empty to remove"
+                        className="font-mono text-sm"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="regex-flags" className="text-xs font-medium text-muted-foreground">
+                        Flags:
+                      </Label>
+                      <Input
+                        id="regex-flags"
+                        value={regexFlags}
+                        onChange={(e) => setRegexFlags(e.target.value)}
+                        placeholder="g, i, m, etc."
+                        className="font-mono text-sm"
+                        maxLength={10}
+                      />
+                      <div className="text-xs text-muted-foreground mt-1">
+                        g = global, i = case insensitive, m = multiline
+                      </div>
+                    </div>
+                  </div>
+
+                  {showRegexGuide && (
+                    <div className="rounded-lg border bg-slate-50 dark:bg-slate-900/50 p-4 space-y-3">
+                      <div className="font-semibold text-sm">Regex Guide for Beginners:</div>
+                      
+                      <div className="space-y-2 text-xs">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <div className="font-medium text-green-600 dark:text-green-400">Common Patterns:</div>
+                            <div className="space-y-1 mt-1">
+                              <div><code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">\d+</code> - Numbers</div>
+                              <div><code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">[A-Z]+</code> - Uppercase letters</div>
+                              <div><code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">[a-z]+</code> - Lowercase letters</div>
+                              <div><code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">\s+</code> - Spaces</div>
+                              <div><code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">_+</code> - Underscores</div>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <div className="font-medium text-blue-600 dark:text-blue-400">Examples:</div>
+                            <div className="space-y-1 mt-1">
+                              <div><strong>Remove numbers:</strong></div>
+                              <div>Find: <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">\d+</code>, Replace: <em>(empty)</em></div>
+                              <div><strong>Replace spaces with dashes:</strong></div>
+                              <div>Find: <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">\s+</code>, Replace: <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">-</code></div>
+                              <div><strong>Remove file extension:</strong></div>
+                              <div>Find: <code className="bg-slate-200 dark:bg-slate-800 px-1 rounded">\.[^.]+$</code>, Replace: <em>(empty)</em></div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="border-t pt-2 mt-3">
+                          <div className="font-medium text-amber-600 dark:text-amber-400">Pro Tips:</div>
+                          <div className="space-y-1 mt-1">
+                            <div>• Use parentheses () to capture groups, then reference with $1, $2, etc.</div>
+                            <div>• Add 'i' flag for case-insensitive matching</div>
+                            <div>• Test your regex on a few files first before applying to all</div>
+                            <div>• Escape special characters with backslash: \. \+ \* \? \[ \] \( \)</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : renameType !== 'timestamp' && (
                 <div className="space-y-2">
                   <Label htmlFor="rename-pattern" className="text-sm font-semibold">
                     {renameType === 'numbering' ? 'Base Name:' : 'Text to Add:'}
@@ -211,7 +349,7 @@ export function BulkRenameDialog({
               )}
 
               {/* Preview section */}
-              {(renamePattern.trim() || renameType === 'timestamp') && (
+              {(renamePattern.trim() || renameType === 'timestamp' || (renameType === 'regex' && regexPattern.trim())) && (
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Info className="h-4 w-4 text-blue-500" />
@@ -267,7 +405,11 @@ export function BulkRenameDialog({
           </Button>
           <Button 
             onClick={handleRename}
-            disabled={!renamePattern.trim() && renameType !== 'timestamp'}
+            disabled={
+              renameType === 'regex' 
+                ? !regexPattern.trim() 
+                : !renamePattern.trim() && renameType !== 'timestamp'
+            }
             className="w-full sm:w-auto bg-orange-600 text-white hover:bg-orange-700 focus:ring-orange-500 dark:bg-orange-700 dark:hover:bg-orange-800"
           >
             Rename {selectedItems.length} Item{selectedItems.length > 1 ? 's' : ''}

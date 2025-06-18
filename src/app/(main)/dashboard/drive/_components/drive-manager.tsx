@@ -701,34 +701,48 @@ export function DriveManager() {
         const item = selectedItemsData[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
 
-        let newName = item.name;
-        const fileExtension = item.name.includes('.') ? 
-          item.name.substring(item.name.lastIndexOf('.')) : '';
-        const baseName = fileExtension ? 
-          item.name.substring(0, item.name.lastIndexOf('.')) : item.name;
+        let newName = '';
 
-        switch (renameType) {
-          case 'prefix':
-            newName = `${renamePattern}_${item.name}`;
-            break;
-          case 'suffix':
-            newName = fileExtension ? 
-              `${baseName}_${renamePattern}${fileExtension}` : 
-              `${item.name}_${renamePattern}`;
-            break;
-          case 'numbering':
-            const number = String(i + 1).padStart(3, '0');
-            newName = fileExtension ? 
-              `${renamePattern}_${number}${fileExtension}` : 
-              `${renamePattern}_${number}`;
-            break;
-          case 'timestamp':
-            const now = new Date();
-            const timestamp = now.toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
-            newName = fileExtension ? 
-              `${baseName}_${timestamp}${fileExtension}` : 
-              `${item.name}_${timestamp}`;
-            break;
+        if (renameType === 'regex') {
+          try {
+            const regexData = JSON.parse(renamePattern);
+            const regex = new RegExp(regexData.pattern, regexData.flags);
+            newName = item.name.replace(regex, regexData.replacement);
+          } catch (error) {
+            console.error(`Failed to apply regex to ${item.name}:`, error);
+            newName = item.name; // Keep original name if regex fails
+          }
+        } else {
+          const fileExtension = item.name.includes('.') ? 
+            item.name.substring(item.name.lastIndexOf('.')) : '';
+          const baseName = fileExtension ? 
+            item.name.substring(0, item.name.lastIndexOf('.')) : item.name;
+
+          switch (renameType) {
+            case 'prefix':
+              newName = `${renamePattern}_${item.name}`;
+              break;
+            case 'suffix':
+              newName = fileExtension ? 
+                `${baseName}_${renamePattern}${fileExtension}` : 
+                `${item.name}_${renamePattern}`;
+              break;
+            case 'numbering':
+              const number = String(i + 1).padStart(3, '0');
+              newName = fileExtension ? 
+                `${renamePattern}_${number}${fileExtension}` : 
+                `${renamePattern}_${number}`;
+              break;
+            case 'timestamp':
+              const now = new Date();
+              const timestamp = now.toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+              newName = fileExtension ? 
+                `${baseName}_${timestamp}${fileExtension}` : 
+                `${item.name}_${timestamp}`;
+              break;
+            default:
+              newName = item.name;
+          }
         }
 
         const response = await fetch(`/api/drive/files/${item.id}`, {
@@ -991,7 +1005,7 @@ export function DriveManager() {
       }
     } catch (error) {
       console.error('Error fetching files:', error);
-      
+
       handleError(error, 'Failed to fetch files');
       if (!append) {
         setFiles([]);
@@ -2630,7 +2644,8 @@ export function DriveManager() {
         isOpen={isMoveDialogOpen}
         onClose={() => {
           setIsMoveDialogOpen(false);
-          setSelectedFileForAction(null);
+          setSelectedFileFor// This file updates the handleBulkRename function to support regex renaming in the DriveManager component.
+Action(null);
         }}
         fileName={selectedFileForAction?.name || ''}
         currentParentId={selectedFileForAction?.parentId || null}
