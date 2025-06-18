@@ -16,8 +16,6 @@ import {
   Fingerprint,
   SquareArrowUpRight,
   HardDrive,
-  Activity,
-  MousePointer,
   type LucideIcon,
 } from "lucide-react";
 
@@ -60,7 +58,6 @@ export const sidebarItems: NavGroup[] = [
           { title: "eCommerce", url: "/dashboard/e-commerce", icon: ShoppingBag, comingSoon: true },
           { title: "Academy", url: "/dashboard/academy", icon: BookA, comingSoon: true },
           { title: "Logistics", url: "/dashboard/logistics", icon: Forklift, comingSoon: true },
-          { title: "Performance Monitor", url: "/dashboard/performance", icon: Activity },
         ],
       },
     ],
@@ -73,10 +70,6 @@ export const sidebarItems: NavGroup[] = [
         title: "Google Drive",
         url: "/dashboard/drive",
         icon: HardDrive,
-        subItems: [
-          { title: "Files", url: "/dashboard/drive", icon: HardDrive },
-          { title: "Bulk Selection", url: "/dashboard/drive?view=bulk", icon: MousePointer },
-        ],
       },
     ],
   },
