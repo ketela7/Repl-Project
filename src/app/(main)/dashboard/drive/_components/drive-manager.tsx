@@ -1598,25 +1598,6 @@ export function DriveManager() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {/* Bulk Actions Toolbar */}
-          {(folders.length > 0 || files.length > 0) && (
-            <div className="mb-4">
-              <BulkActionsToolbar
-                selectedCount={selectedItems.size}
-                totalCount={folders.length + files.length}
-                isSelectMode={isSelectMode}
-                isAllSelected={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
-                bulkOperationProgress={bulkOperationProgress}
-                onToggleSelectMode={toggleSelectMode}
-                onSelectAll={selectAll}
-                onDeselectAll={deselectAll}
-                onBulkDownload={handleBulkDownload}
-                onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
-                onBulkMove={() => setIsBulkMoveDialogOpen(true)}
-                onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
-              />
-            </div>
-          )}
 
           {loading ? (
             <DriveGridSkeleton />
@@ -2344,6 +2325,24 @@ export function DriveManager() {
         }}
         file={selectedFileForPreview}
       />
+
+      {/* Floating Bulk Actions Toolbar */}
+      {(folders.length > 0 || files.length > 0) && (
+        <BulkActionsToolbar
+          selectedCount={selectedItems.size}
+          totalCount={folders.length + files.length}
+          isSelectMode={isSelectMode}
+          isAllSelected={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
+          bulkOperationProgress={bulkOperationProgress}
+          onToggleSelectMode={toggleSelectMode}
+          onSelectAll={selectAll}
+          onDeselectAll={deselectAll}
+          onBulkDownload={handleBulkDownload}
+          onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
+          onBulkMove={() => setIsBulkMoveDialogOpen(true)}
+          onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
+        />
+      )}
     </div>
   );
 }

@@ -3,6 +3,13 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   Download, 
   Trash2, 
@@ -10,7 +17,9 @@ import {
   Copy, 
   X,
   CheckSquare,
-  Square
+  Square,
+  MoreHorizontal,
+  MousePointer
 } from "lucide-react";
 
 interface BulkActionsToolbarProps {
@@ -73,104 +82,93 @@ export function BulkActionsToolbar({
 
   if (!isSelectMode) {
     return (
-      <div className="flex items-center justify-start">
+      <div className="fixed bottom-6 right-6 z-40">
         <Button 
-          variant="outline" 
-          size="sm" 
+          variant="default" 
+          size="lg" 
           onClick={onToggleSelectMode}
-          className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300 dark:hover:bg-blue-950/20 dark:hover:border-blue-700 transition-colors"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full h-14 w-14 p-0"
+          title="Start bulk selection"
         >
-          <Square className="h-4 w-4" />
-          <span className="hidden sm:inline">Select Items</span>
-          <span className="sm:hidden">Select</span>
+          <MousePointer className="h-5 w-5" />
         </Button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4 p-4 bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-900/50 dark:to-gray-900/50 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
-      <div className="flex items-center space-x-3 min-w-0 flex-1">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={onToggleSelectMode}
-          className="h-8 w-8 p-0 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
-          title="Exit selection mode"
-        >
-          <X className="h-4 w-4" />
-        </Button>
-        
-        <div className="flex items-center space-x-3 min-w-0">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={isAllSelected ? onDeselectAll : onSelectAll}
-            className="flex items-center gap-2 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-blue-900/20 dark:hover:text-blue-300 transition-colors"
-          >
-            {isAllSelected ? (
-              <CheckSquare className="h-4 w-4" />
-            ) : (
-              <Square className="h-4 w-4" />
-            )}
-            <span className="hidden sm:inline">
-              {isAllSelected ? 'Deselect All' : 'Select All'}
-            </span>
-            <span className="sm:hidden">
-              {isAllSelected ? 'None' : 'All'}
-            </span>
-          </Button>
-          
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 whitespace-nowrap">
-            {selectedCount} of {totalCount} selected
-          </Badge>
-        </div>
+    <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
+      {/* Selection Info Badge */}
+      <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-full px-4 py-2 shadow-lg">
+        <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+          {selectedCount} of {totalCount} selected
+        </Badge>
       </div>
 
-      {selectedCount > 0 && (
-        <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onBulkDownload}
-            className="flex items-center gap-2 hover:bg-green-50 hover:border-green-300 hover:text-green-700 dark:hover:bg-green-950/20 dark:hover:border-green-700 dark:hover:text-green-400 transition-colors"
-            title="Download selected files (folders cannot be downloaded)"
-          >
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Download</span>
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onBulkMove}
-            className="flex items-center gap-2 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 dark:hover:bg-blue-950/20 dark:hover:border-blue-700 dark:hover:text-blue-400 transition-colors"
-          >
-            <Move className="h-4 w-4" />
-            <span className="hidden sm:inline">Move</span>
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onBulkCopy}
-            className="flex items-center gap-2 hover:bg-purple-50 hover:border-purple-300 hover:text-purple-700 dark:hover:bg-purple-950/20 dark:hover:border-purple-700 dark:hover:text-purple-400 transition-colors"
-          >
-            <Copy className="h-4 w-4" />
-            <span className="hidden sm:inline">Copy</span>
-          </Button>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onBulkDelete}
-            className="flex items-center gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 hover:text-red-700 dark:text-red-400 dark:border-red-800 dark:hover:bg-red-950/20 dark:hover:border-red-700 dark:hover:text-red-300 transition-colors"
-          >
-            <Trash2 className="h-4 w-4" />
-            <span className="hidden sm:inline">Delete</span>
-          </Button>
-        </div>
-      )}
+      {/* Floating Action Buttons */}
+      <div className="flex items-center gap-3">
+        {/* Select All/None Button */}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={isAllSelected ? onDeselectAll : onSelectAll}
+          className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700 shadow-lg rounded-full h-12 w-12 p-0"
+          title={isAllSelected ? 'Deselect All' : 'Select All'}
+        >
+          {isAllSelected ? (
+            <CheckSquare className="h-5 w-5" />
+          ) : (
+            <Square className="h-5 w-5" />
+          )}
+        </Button>
+
+        {/* Bulk Actions Menu */}
+        {selectedCount > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="default" 
+                size="lg" 
+                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg rounded-full h-14 w-14 p-0"
+                title="Bulk Actions"
+              >
+                <MoreHorizontal className="h-6 w-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={onBulkDownload} className="cursor-pointer">
+                <Download className="h-4 w-4 mr-2" />
+                Download Files
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onBulkMove} className="cursor-pointer">
+                <Move className="h-4 w-4 mr-2" />
+                Move Items
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onBulkCopy} className="cursor-pointer">
+                <Copy className="h-4 w-4 mr-2" />
+                Copy Items
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={onBulkDelete} className="cursor-pointer text-red-600 dark:text-red-400">
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Items
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        {/* Exit Selection Mode Button */}
+        <Button 
+          variant="outline" 
+          size="sm" 
+          onClick={onToggleSelectMode}
+          className="bg-white dark:bg-gray-900 border-red-200 dark:border-red-700 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400 shadow-lg rounded-full h-12 w-12 p-0"
+          title="Exit selection mode"
+        >
+          <X className="h-5 w-5" />
+        </Button>
+      </div>
     </div>
   );
 }
