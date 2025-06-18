@@ -889,14 +889,10 @@ export function DriveManager() {
 
   const fetchFiles = async (parentId?: string, query?: string, pageToken?: string, append = false) => {
     const requestId = `fetch-files-${parentId || 'root'}-${query || ''}-${pageToken || ''}`;
-    const startTime = Date.now();
 
     try {
       if (!append) setLoading(true);
       else setLoadingMore(true);
-
-      // Track network request start
-      performanceMonitor.trackNetworkRequest('start');
 
       const params = new URLSearchParams();
       if (parentId) params.append('parentId', parentId);
@@ -919,13 +915,7 @@ export function DriveManager() {
       const responseText = await response.text();
       console.log('Drive API raw response:', responseText);
 
-      // Track API call performance
-      const duration = Date.now() - startTime;
-      performanceMonitor.trackApiCall(duration, !response.ok);
-
       if (!response.ok) {
-        // Track network request error
-        performanceMonitor.trackNetworkRequest('error');
         let errorData;
         try {
           errorData = JSON.parse(responseText);
@@ -995,9 +985,6 @@ export function DriveManager() {
       }
       setHasAccess(true);
 
-      // Track successful network request
-      performanceMonitor.trackNetworkRequest('complete');
-
       if (fileList.length === 0 && folderList.length === 0 && !query && !parentId && !append) {
         console.log('No files found in root directory');
         toast.info('Google Drive connected! Your drive appears to be empty or all files are in subfolders.');
@@ -1006,12 +993,6 @@ export function DriveManager() {
       }
     } catch (error) {
       console.error('Error fetching files:', error);
-      
-      // Track API call error if not already tracked
-      const duration = Date.now() - startTime;
-      performanceMonitor.trackApiCall(duration, true);
-      performanceMonitor.trackNetworkRequest('error');
-      
       handleError(error, 'Failed to fetch files');
       if (!append) {
         setFiles([]);
@@ -2752,7 +2733,6 @@ export function DriveManager() {
         selectedItems={getSelectedItemsData()}
       />
 
-      {/* Enhanced Bulk Permanent Delete Dialog with Security Features */}
       <BulkPermanentDeleteDialog
         isOpen={isBulkPermanentDeleteDialogOpen}
         onClose={() => setIsBulkPermanentDeleteDialogOpen(false)}
