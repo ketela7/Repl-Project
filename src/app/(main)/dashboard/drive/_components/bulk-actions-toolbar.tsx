@@ -145,9 +145,13 @@ export function BulkActionsToolbar({
                 <MoreHorizontal className="h-6 w-6" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-56">
+            <DropdownMenuContent align="start" className="w-64">
               {!isInTrash ? (
                 <>
+                  {/* File Operations */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    File Operations
+                  </div>
                   <DropdownMenuItem onClick={onBulkDownload} className="cursor-pointer">
                     <Download className="h-4 w-4 mr-2" />
                     Download Files
@@ -156,7 +160,13 @@ export function BulkActionsToolbar({
                     <FileDown className="h-4 w-4 mr-2" />
                     Export As...
                   </DropdownMenuItem>
+                  
                   <DropdownMenuSeparator />
+                  
+                  {/* Organization */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Organization
+                  </div>
                   <DropdownMenuItem onClick={onBulkRename} className="cursor-pointer">
                     <Edit3 className="h-4 w-4 mr-2" />
                     Bulk Rename
@@ -169,28 +179,48 @@ export function BulkActionsToolbar({
                     <Copy className="h-4 w-4 mr-2" />
                     Copy Items
                   </DropdownMenuItem>
+                  
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={onBulkDelete} className="cursor-pointer text-red-600 dark:text-red-400">
+                  
+                  {/* Destructive Actions */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">
+                    Danger Zone
+                  </div>
+                  <DropdownMenuItem onClick={onBulkDelete} className="cursor-pointer text-orange-600 dark:text-orange-400">
                     <Trash2 className="h-4 w-4 mr-2" />
                     Move to Trash
                   </DropdownMenuItem>
+                  {onBulkPermanentDelete && (
+                    <DropdownMenuItem onClick={onBulkPermanentDelete} className="cursor-pointer text-red-600 dark:text-red-400 font-medium">
+                      <ShieldX className="h-4 w-4 mr-2" />
+                      Permanently Delete
+                    </DropdownMenuItem>
+                  )}
                 </>
               ) : (
                 <>
+                  {/* Trash Operations */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Trash Operations
+                  </div>
                   {onBulkRestore && (
                     <DropdownMenuItem onClick={onBulkRestore} className="cursor-pointer text-green-600 dark:text-green-400">
                       <RotateCcw className="h-4 w-4 mr-2" />
                       Restore Items
                     </DropdownMenuItem>
                   )}
+                  
+                  <DropdownMenuSeparator />
+                  
+                  {/* Destructive Actions */}
+                  <div className="px-2 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">
+                    ⚠️ Danger Zone
+                  </div>
                   {onBulkPermanentDelete && (
-                    <>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={onBulkPermanentDelete} className="cursor-pointer text-red-600 dark:text-red-400">
-                        <ShieldX className="h-4 w-4 mr-2" />
-                        Permanently Delete
-                      </DropdownMenuItem>
-                    </>
+                    <DropdownMenuItem onClick={onBulkPermanentDelete} className="cursor-pointer text-red-600 dark:text-red-400 font-medium">
+                      <ShieldX className="h-4 w-4 mr-2" />
+                      Permanently Delete
+                    </DropdownMenuItem>
                   )}
                 </>
               )}

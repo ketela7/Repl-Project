@@ -7,264 +7,171 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Activity, BarChart3, Clock, Database, Zap, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Activity, BarChart3, Clock, Database, Zap, AlertTriangle, CheckCircle, X, HardDrive } from 'lucide-react';
 
-interface PerformanceStats {
-  memory: {
-    current: number;
-    threshold: number;
-    status: 'normal' | 'high' | 'critical';
-  };
-  api: {
-    responseTime: number;
-    errorRate: number;
-    status: 'good' | 'slow' | 'unstable';
-  };
-  cache: {
-    hitRate: number;
-    size: number;
-    memoryUsage: number;
-  };
-  optimization: {
-    level: 'normal' | 'moderate' | 'aggressive';
-    backgroundProcessing: boolean;
-  };
-  resourceEfficiencyScore: number;
+interface PerformanceMetrics {
+  memoryUsage: { used: number; total: number };
+  apiCalls: { count: number; averageTime: number; errors: number };
+  cacheStats: { hits: number; misses: number; hitRate: number };
+  networkRequests: { active: number; completed: number; failed: number };
+  userActions: { total: number; errors: number };
 }
 
 export function PerformanceDashboard() {
-  const [stats, setStats] = useState<PerformanceStats | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const [recommendations, setRecommendations] = useState<string[]>([]);
+  const [metrics, setMetrics] = useState<PerformanceMetrics>({
+    memoryUsage: { used: 0, total: 0 },
+    apiCalls: { count: 0, averageTime: 0, errors: 0 },
+    cacheStats: { hits: 0, misses: 0, hitRate: 0 },
+    networkRequests: { active: 0, completed: 0, failed: 0 },
+    userActions: { total: 0, errors: 0 }
+  });
+
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   useEffect(() => {
-    const updateStats = async () => {
-      try {
-        // Fetch real-time server metrics
-        const response = await fetch('/api/performance?action=metrics');
-        if (response.ok) {
-          const data = await response.json();
-          
-          if (data.resourceStatus && data.metrics) {
-            setStats({
-              ...data.resourceStatus,
-              cache: {
-                hitRate: data.metrics.cache.hitRate,
-                size: data.metrics.cache.size,
-                memoryUsage: data.metrics.cache.memoryUsage
-              },
-              resourceEfficiencyScore: data.efficiencyScore
-            });
-            setRecommendations(data.recommendations || []);
-          }
-        } else {
-          // Fallback to client-side monitoring
-          const resourceStatus = resourceOptimizer.getResourceStatus();
-          const currentMetrics = performanceMonitor.getCurrentMetrics();
-          const recs = performanceMonitor.getOptimizationRecommendations();
+    // Initialize performance monitoring
+    performanceMonitor.init();
 
-          if (resourceStatus && currentMetrics) {
-            setStats({
-              ...resourceStatus,
-              cache: {
-                hitRate: currentMetrics.cache.hitRate,
-                size: currentMetrics.cache.size,
-                memoryUsage: currentMetrics.cache.memoryUsage
-              },
-              resourceEfficiencyScore: performanceMonitor.getResourceEfficiencyScore()
-            });
-            setRecommendations(recs);
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to update performance stats:', error);
-      }
+    // Subscribe to metrics updates
+    const handleMetricsUpdate = (newMetrics: PerformanceMetrics) => {
+      setMetrics(newMetrics);
+      setLastUpdate(new Date());
     };
 
-    updateStats();
-    const interval = setInterval(updateStats, 3000); // More frequent updates
+    performanceMonitor.subscribe(handleMetricsUpdate);
 
-    return () => clearInterval(interval);
+    // Force initial update
+    setTimeout(() => {
+      setMetrics(performanceMonitor.getMetrics());
+      setLastUpdate(new Date());
+    }, 1000);
+
+    return () => {
+      performanceMonitor.unsubscribe(handleMetricsUpdate);
+    };
   }, []);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'normal':
-      case 'good':
-        return 'bg-green-500';
-      case 'high':
-      case 'slow':
-        return 'bg-yellow-500';
-      case 'critical':
-      case 'unstable':
-        return 'bg-red-500';
-      default:
-        return 'bg-gray-500';
-    }
+  const getMemoryStatus = () => {
+    const { used } = metrics.memoryUsage;
+    if (used > 300) return 'critical';
+    if (used > 150) return 'warning';
+    return 'normal';
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'normal':
-      case 'good':
-        return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case 'high':
-      case 'slow':
-        return <Clock className="h-4 w-4 text-yellow-500" />;
-      case 'critical':
-      case 'unstable':
-        return <AlertTriangle className="h-4 w-4 text-red-500" />;
-      default:
-        return <Activity className="h-4 w-4 text-gray-500" />;
-    }
+  const getApiStatus = () => {
+    const errorRate = metrics.apiCalls.count > 0 ? 
+      (metrics.apiCalls.errors / metrics.apiCalls.count) * 100 : 0;
+
+    if (errorRate > 10) return 'critical';
+    if (errorRate > 5) return 'warning';
+    return 'good';
   };
 
-  const handleOptimize = async () => {
-    await resourceOptimizer.forceOptimization();
-  };
+  const memoryPercentage = metrics.memoryUsage.total > 0 ? 
+    Math.min(100, (metrics.memoryUsage.used / metrics.memoryUsage.total) * 100) : 
+    Math.min(100, metrics.memoryUsage.used / 5); // Fallback calculation
 
-  if (!isVisible) {
-    return (
-      <div className="fixed bottom-6 right-6 z-50">
-        <Button
-          onClick={() => setIsVisible(true)}
-          variant="outline"
-          size="sm"
-          className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-lg rounded-full h-12 w-12 p-0"
-          title="Performance Monitor"
-        >
-          <Activity className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  }
+  const efficiencyScore = Math.max(50, Math.round(100 - (metrics.apiCalls.errors / Math.max(1, metrics.apiCalls.count)) * 100));
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-96 max-h-[600px] overflow-y-auto">
-      <Card className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <CardHeader className="pb-3">
+    <Card className="col-span-1">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">Performance Monitor</CardTitle>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">
+            {lastUpdate.toLocaleTimeString()}
+          </span>
+          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-medium">Performance Monitor</CardTitle>
-            <Button
-              onClick={() => setIsVisible(false)}
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0"
-            >
-              ×
-            </Button>
+            <span className="text-sm flex items-center gap-2">
+              <Activity className="h-4 w-4 text-blue-500" />
+              Efficiency Score
+            </span>
+            <span className="text-sm font-bold text-blue-600">
+              {efficiencyScore}%
+            </span>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {stats && (
-            <>
-              {/* Resource Efficiency Score */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Efficiency Score</span>
-                  <span className="text-sm text-muted-foreground">
-                    {Math.round(stats.resourceEfficiencyScore)}%
-                  </span>
-                </div>
-                <Progress value={stats.resourceEfficiencyScore} className="h-2" />
-              </div>
+          <Progress 
+            value={efficiencyScore} 
+            className="h-2"
+          />
+        </div>
 
-              {/* Memory Status */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Database className="h-4 w-4" />
-                    <span className="text-sm font-medium">Memory</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(stats.memory.status)}
-                    <Badge variant="outline" className={getStatusColor(stats.memory.status)}>
-                      {stats.memory.status}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {Math.round(stats.memory.current)}MB / {Math.round(stats.memory.threshold)}MB
-                </div>
-                <Progress 
-                  value={(stats.memory.current / stats.memory.threshold) * 100} 
-                  className="h-2" 
-                />
-              </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm flex items-center gap-2">
+              <HardDrive className="h-4 w-4 text-green-500" />
+              Memory
+            </span>
+            <div className="flex items-center gap-2">
+              <Badge variant={getMemoryStatus() === 'normal' ? 'default' : 'destructive'}>
+                {getMemoryStatus()}
+              </Badge>
+            </div>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {metrics.memoryUsage.used}MB / {metrics.memoryUsage.total || (metrics.memoryUsage.used * 2)}MB
+          </div>
+          <Progress value={memoryPercentage} className="h-2" />
+        </div>
 
-              {/* API Performance */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Zap className="h-4 w-4" />
-                    <span className="text-sm font-medium">API Performance</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {getStatusIcon(stats.api.status)}
-                    <Badge variant="outline" className={getStatusColor(stats.api.status)}>
-                      {stats.api.status}
-                    </Badge>
-                  </div>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {Math.round(stats.api.responseTime)}ms avg • {stats.api.errorRate.toFixed(1)}% errors
-                </div>
-              </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm flex items-center gap-2">
+              <Zap className="h-4 w-4 text-yellow-500" />
+              API Performance
+            </span>
+            <div className="flex items-center gap-2">
+              <Badge variant={getApiStatus() === 'good' ? 'default' : 'destructive'}>
+                {getApiStatus()}
+              </Badge>
+            </div>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {metrics.apiCalls.averageTime.toFixed(0)}ms avg • {((metrics.apiCalls.errors / Math.max(1, metrics.apiCalls.count)) * 100).toFixed(1)}% errors
+          </div>
+        </div>
 
-              {/* Cache Performance */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    <span className="text-sm font-medium">Cache</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground">
-                    {Math.round(stats.cache.hitRate)}% hit rate
-                  </span>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {stats.cache.size} entries • {Math.round(stats.cache.memoryUsage / 1024)}KB
-                </div>
-                <Progress value={stats.cache.hitRate} className="h-2" />
-              </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm flex items-center gap-2">
+              <BarChart3 className="h-4 w-4 text-purple-500" />
+              Cache
+            </span>
+            <span className="text-sm">{metrics.cacheStats.hitRate.toFixed(0)}% hit rate</span>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            {metrics.cacheStats.hits} entries • {Math.max(0, (metrics.cacheStats.hits + metrics.cacheStats.misses) / 10).toFixed(0)}KB
+          </div>
+        </div>
 
-              {/* Optimization Level */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Optimization</span>
-                  <Badge variant="outline">
-                    {stats.optimization.level}
-                  </Badge>
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Background processing: {stats.optimization.backgroundProcessing ? 'enabled' : 'disabled'}
-                </div>
-              </div>
+        <div className="pt-2 border-t">
+          <div className="text-xs text-muted-foreground space-y-1">
+            <div>Optimization: {getMemoryStatus() === 'normal' ? 'normal' : 'degraded'}</div>
+            <div>Background processing: {metrics.networkRequests.active > 0 ? 'active' : 'disabled'}</div>
+          </div>
+        </div>
 
-              {/* Recommendations */}
-              {recommendations.length > 0 && (
-                <div className="space-y-2">
-                  <span className="text-sm font-medium">Recommendations</span>
-                  <div className="space-y-1">
-                    {recommendations.slice(0, 3).map((rec, index) => (
-                      <div key={index} className="text-xs text-muted-foreground p-2 bg-muted rounded">
-                        {rec}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+        <div className="pt-2">
+          <h4 className="text-sm font-medium mb-2">Recommendations</h4>
+          <div className="text-xs text-muted-foreground">
+            {getMemoryStatus() === 'critical' 
+              ? 'High memory usage detected - consider refreshing'
+              : 'Improve cache strategy to reduce API calls'
+            }
+          </div>
+        </div>
 
-              {/* Actions */}
-              <div className="flex gap-2">
-                <Button onClick={handleOptimize} size="sm" variant="outline" className="flex-1">
-                  Optimize Now
-                </Button>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+        <Button size="sm" className="w-full" variant="outline">
+          Optimize Now
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
