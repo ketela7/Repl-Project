@@ -2783,78 +2783,123 @@ export function DriveManager() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            {isPreviewable(file.mimeType) && (
-                              <DropdownMenuItem onClick={(e) => {
-                                e.stopPropagation();
-                                handleFileAction('preview', file.id, file.name);
-                              }}>
-                                <Eye className="h-4 w-4 mr-2" />
-                                Preview
-                              </DropdownMenuItem>
-                            )}
-                            <DropdownMenuItem onClick={(e) => {
-                              e.stopPropagation();
-                              handleFileAction('download', file.id, file.name);
-                            }}>
-                              <Download className="h-4 w-4 mr-2" />
-                              Download
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => {
-                              e.stopPropagation();
-                              handleFileAction('rename', file.id, file.name);
-                            }}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Rename
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => {
-                              e.stopPropagation();
-                              handleFileAction('move', file.id, file.name);
-                            }}>
-                              <Move className="h-4 w-4 mr-2" />
-                              Move
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => {
-                              e.stopPropagation();
-                              handleFileAction('copy', file.id, file.name);
-                            }}>
-                              <Copy className="h-4 w-4 mr-2" />
-                              Copy
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => {
-                              e.stopPropagation();
-                              handleFileAction('share', file.id, file.name);
-                            }}>
-                              <Share className="h-4 w-4 mr-2" />
-                              Share
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => {
-                              e.stopPropagation();
-                              handleFileAction('details', file.id, file.name);
-                            }}>
-                              <Info className="h-4 w-4 mr-2" />
-                              Details
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem 
-                              className="text-orange-600"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFileAction('trash', file.id, file.name);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Move to Trash
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              className="text-destructive"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFileAction('permanentDelete', file.id, file.name);
-                              }}
-                            >
-                              <AlertTriangle className="h-4 w-4 mr-2" />
-                              Permanently Delete
-                            </DropdownMenuItem>
+                            {(() => {
+                              const actions = getAvailableActions(activeView);
+                              return (
+                                <>
+                                  {actions.canPreview && isPreviewable(file.mimeType) && (
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFileAction('preview', file.id, file.name);
+                                    }}>
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      Preview
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {actions.canDownload && (
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFileAction('download', file.id, file.name);
+                                    }}>
+                                      <Download className="h-4 w-4 mr-2" />
+                                      Download
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {actions.canRename && (
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFileAction('rename', file.id, file.name);
+                                    }}>
+                                      <Edit className="h-4 w-4 mr-2" />
+                                      Rename
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {actions.canMove && (
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFileAction('move', file.id, file.name);
+                                    }}>
+                                      <Move className="h-4 w-4 mr-2" />
+                                      Move
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {actions.canCopy && (
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFileAction('copy', file.id, file.name);
+                                    }}>
+                                      <Copy className="h-4 w-4 mr-2" />
+                                      Copy
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {actions.canShare && (
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFileAction('share', file.id, file.name);
+                                    }}>
+                                      <Share className="h-4 w-4 mr-2" />
+                                      Share
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {actions.canDetails && (
+                                    <DropdownMenuItem onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFileAction('details', file.id, file.name);
+                                    }}>
+                                      <Info className="h-4 w-4 mr-2" />
+                                      Details
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
+                                  
+                                  {actions.canRestore && (
+                                    <DropdownMenuItem 
+                                      className="text-green-600"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleFileAction('restore', file.id, file.name);
+                                      }}
+                                    >
+                                      <RefreshCw className="h-4 w-4 mr-2" />
+                                      Restore
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {actions.canTrash && (
+                                    <DropdownMenuItem 
+                                      className="text-orange-600"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleFileAction('trash', file.id, file.name);
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4 mr-2" />
+                                      Move to Trash
+                                    </DropdownMenuItem>
+                                  )}
+                                  
+                                  {actions.canPermanentDelete && (
+                                    <DropdownMenuItem 
+                                      className="text-destructive"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleFileAction('permanentDelete', file.id, file.name);
+                                      }}
+                                    >
+                                      <AlertTriangle className="h-4 w-4 mr-2" />
+                                      Permanently Delete
+                                    </DropdownMenuItem>
+                                  )}
+                                </>
+                              );
+                            })()}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
