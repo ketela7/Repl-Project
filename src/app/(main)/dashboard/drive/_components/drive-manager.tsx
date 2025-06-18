@@ -820,7 +820,7 @@ export function DriveManager() {
       } else if (successCount > 0) {
         toast.warning(`Restored ${successCount} items. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       } else {
-        toast.error(`Failed to restore items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+        toast.error(`Failed torestore items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
     } catch (error) {
       console.error('Bulk restore error:', error);
@@ -1652,6 +1652,27 @@ export function DriveManager() {
       fetchFiles(currentFolderId);
     }
   }, [debouncedSearchQuery, currentFolderId]);
+
+  // Handle view mode change
+    const handleViewChange = (value: string) => {
+      const validModes = ['grid', 'list', 'compact'];
+      if (validModes.includes(value)) {
+        setViewMode(value as ViewMode);
+      }
+    };
+
+    // Fix server action issue
+    useEffect(() => {
+      // Clear any stale form data that might cause server action errors
+      if (typeof window !== 'undefined') {
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+          if (form.getAttribute('action')?.includes('70dc89edfafce2312ceaab16a53e7187127e12a779')) {
+            form.removeAttribute('action');
+          }
+        });
+      }
+    }, []);
 
   // Show connection card if no access to Google Drive
   if (hasAccess === false) {
@@ -2615,7 +2636,8 @@ export function DriveManager() {
       />
 
       <FileMoveDialog
-        isOpen={isMoveDialogOpen}
+        isOpen<replit_final_file>
+={isMoveDialogOpen}
         onClose={() => {
           setIsMoveDialogOpen(false);
           setSelectedFileForAction(null);

@@ -91,24 +91,60 @@ class PerformanceMonitor {
       jsHeapSizeLimit: 0
     };
 
-    const metric: PerformanceMetrics = {
-      timestamp: Date.now(),
-      memory: {
-        used: memory.usedJSHeapSize || 0,
-        heapUsed: memory.usedJSHeapSize || 0,
-        heapTotal: memory.totalJSHeapSize || 0,
-        external: 0
-      },
-      api: this.calculateAPIMetrics(),
-      cache: this.calculateCacheMetrics(),
-      session: {
-        duration: Date.now() - this.sessionStart,
-        userActivity: this.getUserActivityScore(),
-        backgroundTasks: this.getBackgroundTaskCount()
-      }
-    };
+    // Get server-side memory from API if available
+    this.fetchServerMemory().then(serverMemory => {
+      const metric: PerformanceMetrics = {
+        timestamp: Date.now(),
+        memory: {
+          used: serverMemory?.heapUsed || memory.usedJSHeapSize || 0,
+          heapUsed: serverMemory?.heapUsed || memory.usedJSHeapSize || 0,
+          heapTotal: serverMemory?.heapTotal || memory.totalJSHeapSize || 0,
+          external: serverMemory?.external || 0
+        },
+        api: this.calculateAPIMetrics(),
+        cache: this.calculateCacheMetrics(),
+        session: {
+          duration: Date.now() - this.sessionStart,
+          userActivity: this.getUserActivityScore(),
+          backgroundTasks: this.getBackgroundTaskCount()
+        }
+      };
 
-    this.addMetric(metric);
+      this.addMetric(metric);
+    }).catch(() => {
+      // Fallback to client-side memory if server API fails
+      const metric: PerformanceMetrics = {
+        timestamp: Date.now(),
+        memory: {
+          used: memory.usedJSHeapSize || 0,
+          heapUsed: memory.usedJSHeapSize || 0,
+          heapTotal: memory.totalJSHeapSize || 0,
+          external: 0
+        },
+        api: this.calculateAPIMetrics(),
+        cache: this.calculateCacheMetrics(),
+        session: {
+          duration: Date.now() - this.sessionStart,
+          userActivity: this.getUserActivityScore(),
+          backgroundTasks: this.getBackgroundTaskCount()
+        }
+      };
+
+      this.addMetric(metric);
+    });
+  }
+
+  private async fetchServerMemory(): Promise<any> {
+    try {
+      const response = await fetch('/api/performance?action=memory');
+      if (response.ok) {
+        const data = await response.json();
+        return data.memory;
+      }
+    } catch (error) {
+      console.warn('Failed to fetch server memory:', error);
+    }
+    return null;
   }
 
   private collectServerMetrics() {

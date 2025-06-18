@@ -20,6 +20,17 @@ export async function GET(request: NextRequest) {
           efficiencyScore: performanceMonitor.getResourceEfficiencyScore()
         });
 
+      case 'memory':
+        const memUsage = process.memoryUsage();
+        return NextResponse.json({
+          memory: {
+            rss: memUsage.rss,
+            heapUsed: memUsage.heapUsed,
+            heapTotal: memUsage.heapTotal,
+            external: memUsage.external
+          }
+        });
+
       case 'optimize':
         await resourceOptimizer.forceOptimization();
         return NextResponse.json({ success: true, message: 'Optimization completed' });

@@ -29,7 +29,7 @@ class MemoryCache {
 
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       return null;
     }
@@ -45,7 +45,7 @@ class MemoryCache {
 
   has(key: string): boolean {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       return false;
     }
@@ -83,7 +83,7 @@ class MemoryCache {
     if (this.cache.size >= this.maxSize) {
       const entries = Array.from(this.cache.entries());
       entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-      
+
       const toRemove = entries.slice(0, entries.length - this.maxSize + 10);
       toRemove.forEach(([key]) => this.cache.delete(key));
     }

@@ -38,27 +38,51 @@ export function PerformanceDashboard() {
   const [recommendations, setRecommendations] = useState<string[]>([]);
 
   useEffect(() => {
-    const updateStats = () => {
-      const resourceStatus = resourceOptimizer.getResourceStatus();
-      const currentMetrics = performanceMonitor.getCurrentMetrics();
-      const recs = performanceMonitor.getOptimizationRecommendations();
+    const updateStats = async () => {
+      try {
+        // Fetch real-time server metrics
+        const response = await fetch('/api/performance?action=metrics');
+        if (response.ok) {
+          const data = await response.json();
+          
+          if (data.resourceStatus && data.metrics) {
+            setStats({
+              ...data.resourceStatus,
+              cache: {
+                hitRate: data.metrics.cache.hitRate,
+                size: data.metrics.cache.size,
+                memoryUsage: data.metrics.cache.memoryUsage
+              },
+              resourceEfficiencyScore: data.efficiencyScore
+            });
+            setRecommendations(data.recommendations || []);
+          }
+        } else {
+          // Fallback to client-side monitoring
+          const resourceStatus = resourceOptimizer.getResourceStatus();
+          const currentMetrics = performanceMonitor.getCurrentMetrics();
+          const recs = performanceMonitor.getOptimizationRecommendations();
 
-      if (resourceStatus && currentMetrics) {
-        setStats({
-          ...resourceStatus,
-          cache: {
-            hitRate: currentMetrics.cache.hitRate,
-            size: currentMetrics.cache.size,
-            memoryUsage: currentMetrics.cache.memoryUsage
-          },
-          resourceEfficiencyScore: performanceMonitor.getResourceEfficiencyScore()
-        });
-        setRecommendations(recs);
+          if (resourceStatus && currentMetrics) {
+            setStats({
+              ...resourceStatus,
+              cache: {
+                hitRate: currentMetrics.cache.hitRate,
+                size: currentMetrics.cache.size,
+                memoryUsage: currentMetrics.cache.memoryUsage
+              },
+              resourceEfficiencyScore: performanceMonitor.getResourceEfficiencyScore()
+            });
+            setRecommendations(recs);
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to update performance stats:', error);
       }
     };
 
     updateStats();
-    const interval = setInterval(updateStats, 5000);
+    const interval = setInterval(updateStats, 3000); // More frequent updates
 
     return () => clearInterval(interval);
   }, []);
