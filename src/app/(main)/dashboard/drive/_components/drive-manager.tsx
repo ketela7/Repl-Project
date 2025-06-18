@@ -515,54 +515,64 @@ export function DriveManager() {
             continue;
           }
 
-          // First, get file details to ensure it can be downloaded
-          const fileResponse = await fetch(`/api/drive/files/${item.id}`);
-          if (!fileResponse.ok) {
-            const errorData = await fileResponse.json();
+          // Use direct stream download for better reliability
+          try {
+            const downloadResponse = await fetch(`/api/drive/download/${item.id}`);
             
-            if (errorData.needsReauth) {
-              toast.error('Google Drive access expired. Please reconnect your account.');
-              window.location.reload();
-              return;
-            }
-            
-            if (fileResponse.status === 403) {
-              failedItems.push(`${item.name} (permission denied)`);
+            if (!downloadResponse.ok) {
+              if (downloadResponse.status === 401) {
+                const errorData = await downloadResponse.json();
+                if (errorData.needsReauth) {
+                  toast.error('Google Drive access expired. Please reconnect your account.');
+                  window.location.reload();
+                  return;
+                }
+              }
+              
+              if (downloadResponse.status === 403) {
+                failedItems.push(`${item.name} (permission denied)`);
+                continue;
+              }
+              
+              if (downloadResponse.status === 404) {
+                failedItems.push(`${item.name} (not found)`);
+                continue;
+              }
+              
+              if (downloadResponse.status === 400) {
+                const errorData = await downloadResponse.json();
+                if (errorData.error?.includes('folder')) {
+                  skippedItems.push(item.name);
+                  continue;
+                }
+              }
+              
+              failedItems.push(`${item.name} (download failed)`);
               continue;
             }
             
-            if (fileResponse.status === 404) {
-              failedItems.push(`${item.name} (not found)`);
-              continue;
-            }
+            // Get the file as blob for direct download
+            const blob = await downloadResponse.blob();
             
-            throw new Error(errorData.error || 'Failed to get file info');
-          }
-          
-          const fileData = await fileResponse.json();
-          
-          // Use webContentLink for direct download if available
-          if (fileData.webContentLink) {
+            // Create download link with blob URL
+            const blobUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = fileData.webContentLink;
-            link.download = item.name;
-            link.style.display = 'none';
-            link.target = '_blank';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            successCount++;
-          } else {
-            // Fallback to custom download endpoint
-            const downloadUrl = `/api/drive/download/${item.id}`;
-            const link = document.createElement('a');
-            link.href = downloadUrl;
+            link.href = blobUrl;
             link.download = item.name;
             link.style.display = 'none';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+            
+            // Clean up blob URL after a short delay
+            setTimeout(() => {
+              window.URL.revokeObjectURL(blobUrl);
+            }, 1000);
+            
             successCount++;
+          } catch (downloadError) {
+            failedItems.push(`${item.name} (network error)`);
+            console.error(`Failed to download ${item.name}:`, downloadError);
           }
           
           // Add delay between downloads to avoid overwhelming the browser
@@ -796,13 +806,16 @@ export function DriveManager() {
             return;
           }
           
-          const downloadResponse = await fetch(`/api/drive/files/${fileId}`);
+          // Use direct stream download
+          const downloadResponse = await fetch(`/api/drive/download/${fileId}`);
           if (!downloadResponse.ok) {
-            const errorData = await downloadResponse.json();
-            if (errorData.needsReauth) {
-              toast.error('Google Drive access expired. Please reconnect your account.');
-              window.location.reload();
-              return;
+            if (downloadResponse.status === 401) {
+              const errorData = await downloadResponse.json();
+              if (errorData.needsReauth) {
+                toast.error('Google Drive access expired. Please reconnect your account.');
+                window.location.reload();
+                return;
+              }
             }
             
             if (downloadResponse.status === 403) {
@@ -816,22 +829,42 @@ export function DriveManager() {
               return;
             }
             
-            throw new Error(errorData.error || 'Failed to get file info');
-          }
-          
-          const fileData = await downloadResponse.json();
-          
-          // Additional check for folder mimeType from API response
-          if (fileData.mimeType === 'application/vnd.google-apps.folder') {
-            toast.warning(`Cannot download folders. "${fileName}" is a folder.`);
+            if (downloadResponse.status === 400) {
+              const errorData = await downloadResponse.json();
+              if (errorData.error?.includes('folder')) {
+                toast.warning(`Cannot download folders. "${fileName}" is a folder.`);
+                return;
+              }
+            }
+            
+            const errorData = await downloadResponse.text();
+            toast.error(`Failed to download "${fileName}": ${errorData}`);
             return;
           }
           
-          if (fileData.webContentLink) {
-            window.open(fileData.webContentLink, '_blank');
+          try {
+            // Get the file as blob for direct download
+            const blob = await downloadResponse.blob();
+            
+            // Create download link with blob URL
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = fileName;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Clean up blob URL
+            setTimeout(() => {
+              window.URL.revokeObjectURL(blobUrl);
+            }, 1000);
+            
             toast.success(`Download started for "${fileName}"`);
-          } else {
-            toast.error(`"${fileName}" cannot be downloaded directly. This file type may require special handling or viewing in Google Drive.`);
+          } catch (error) {
+            console.error('Download error:', error);
+            toast.error(`Failed to download "${fileName}"`);
           }
           break;
           

@@ -12,7 +12,10 @@ const nextConfig: NextConfig = {
     },
   },
   allowedDevOrigins: [
-    "*.replit.dev", 
+    "*.replit.dev",
+    "*.pike.replit.dev",
+    "127.0.0.1",
+    "localhost"
   ],
 };
 
