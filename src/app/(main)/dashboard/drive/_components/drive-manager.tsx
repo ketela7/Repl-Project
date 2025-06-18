@@ -75,6 +75,8 @@ import { requestQueue } from '@/lib/request-queue';
 import { backgroundCacheManager } from '@/lib/background-cache';
 import { batchAPI } from '@/lib/batch-api';
 import { prefetchManager } from '@/lib/prefetch-manager';
+import { clientStorage } from '@/lib/client-storage';
+import { apiOptimizer } from '@/lib/api-optimizer';
 import { FileUploadDialog } from './file-upload-dialog';
 import { CreateFolderDialog } from './create-folder-dialog';
 import { FileRenameDialog } from './file-rename-dialog';
@@ -1525,12 +1527,26 @@ export function DriveManager() {
     
     checkAccessAndFetch();
     
-    // Initialize background cache manager
+    // Initialize systems for free tier optimization
     backgroundCacheManager.init();
+    clientStorage.init();
+    
+    // Register service worker for offline functionality
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(
+        (registration) => {
+          console.log('Service Worker registered:', registration);
+        },
+        (error) => {
+          console.warn('Service Worker registration failed:', error);
+        }
+      );
+    }
     
     // Cleanup on unmount
     return () => {
       backgroundCacheManager.destroy();
+      apiOptimizer.clear();
     };
   }, []);
 

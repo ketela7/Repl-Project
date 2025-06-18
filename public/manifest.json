@@ -1,0 +1,39 @@
+{
+  "name": "Google Drive Manager",
+  "short_name": "Drive Manager",
+  "description": "Manage your Google Drive files efficiently",
+  "start_url": "/dashboard/drive",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "Open Drive",
+      "short_name": "Drive",
+      "description": "Browse your Google Drive files",
+      "url": "/dashboard/drive",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
