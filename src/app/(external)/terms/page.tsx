@@ -6,8 +6,8 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, FileText, Shield, AlertCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Terms of Service - Google Drive Manager",
-  description: "Terms of Service for Google Drive Manager. Please read these terms carefully before using our service.",
+  title: "Terms of Service - Professional Google Drive Management",
+  description: "Terms of Service for Professional Google Drive Management. Please read these terms carefully before using our service.",
 };
 
 export default function TermsPage() {
@@ -42,7 +42,7 @@ export default function TermsPage() {
               <div>
                 <h3 className="font-semibold text-amber-900 mb-2">Important Notice</h3>
                 <p className="text-sm text-amber-800">
-                  By accessing and using Google Drive Manager, you accept and agree to be bound by the terms 
+                  By accessing and using Professional Google Drive Management, you accept and agree to be bound by the terms 
                   and provision of this agreement. Please read these terms carefully.
                 </p>
               </div>
@@ -57,7 +57,7 @@ export default function TermsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              These Terms of Service ("Terms") govern your use of Google Drive Manager ("the Service"), 
+              These Terms of Service ("Terms") govern your use of Professional Google Drive Management ("the Service"), 
               operated by our team ("we", "us", or "our").
             </p>
             <p>
@@ -74,7 +74,7 @@ export default function TermsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              Google Drive Manager is a web-based application that provides enhanced file management 
+              Professional Google Drive Management is a web-based application that provides enterprise-grade file management 
               capabilities for Google Drive. Our Service includes:
             </p>
             <ul className="list-disc list-inside space-y-2 ml-4">
@@ -203,7 +203,7 @@ export default function TermsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p>
-              In no event shall Google Drive Manager, nor its directors, employees, partners, agents, 
+              In no event shall Professional Google Drive Management, nor its directors, employees, partners, agents, 
               suppliers, or affiliates, be liable for any indirect, incidental, special, consequential, 
               or punitive damages, including without limitation, loss of profits, data, use, goodwill, 
               or other intangible losses.
@@ -305,7 +305,7 @@ export default function TermsPage() {
 
         {/* Footer */}
         <div className="mt-12 pt-8 border-t text-center text-xs text-muted-foreground">
-          <p>© 2025 Google Drive Manager. All rights reserved.</p>
+          <p>© 2025 Professional Google Drive Management. All rights reserved.</p>
         </div>
       </div>
     </div>

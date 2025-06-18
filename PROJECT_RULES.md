@@ -1,9 +1,9 @@
 # Project Rules & Guidelines
 
-## Google Drive Management Application
+## Professional Google Drive Management Application
 
 **Last Updated**: June 17, 2025  
-**Project Type**: Next.js + Google Drive API Integration  
+**Project Type**: Professional Next.js + Google Drive API Integration  
 **Architecture**: Full-stack web application with Supabase authentication
 
 ---

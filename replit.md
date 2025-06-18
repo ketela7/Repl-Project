@@ -42,7 +42,7 @@ This is a Next.js 15 admin dashboard application based on shadcn/ui components, 
 - **Sidebar Navigation**: Collapsible sidebar with route-based navigation including Google Drive section
 - **Layout System**: Responsive layout with header, sidebar, and main content areas
 - **User Management**: Real-time user authentication status and profile display
-- **Google Drive Manager**: Complete file management system with:
+- **Professional Google Drive Management**: Complete file management system with:
   - File and folder browsing with grid view
   - Upload functionality with progress tracking
   - Search and filtering capabilities

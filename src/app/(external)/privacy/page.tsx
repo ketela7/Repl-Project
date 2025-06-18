@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Shield, Eye, Lock, Database, Globe, Users } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy - Google Drive Manager",
-  description: "Privacy Policy for Google Drive Manager. Learn how we protect your privacy and handle your data.",
+  title: "Privacy Policy - Professional Google Drive Management",
+  description: "Privacy Policy for Professional Google Drive Management. Learn how we protect your privacy and handle your data.",
 };
 
 export default function PrivacyPage() {
@@ -43,7 +43,7 @@ export default function PrivacyPage() {
               <div>
                 <h3 className="font-semibold text-green-900 mb-2">Our Privacy Commitment</h3>
                 <p className="text-sm text-green-800">
-                  Your privacy is fundamental to our mission. We've designed Google Drive Manager to be 
+                  Your privacy is fundamental to our mission. We've designed Professional Google Drive Management to be 
                   privacy-first, ensuring your files remain exclusively under your control at all times.
                 </p>
               </div>
@@ -421,7 +421,7 @@ export default function PrivacyPage() {
 
         {/* Footer */}
         <div className="mt-12 pt-8 border-t text-center text-xs text-muted-foreground">
-          <p>© 2025 Google Drive Manager. Your privacy is our priority.</p>
+          <p>© 2025 Professional Google Drive Management. Your privacy is our priority.</p>
         </div>
       </div>
     </div>
