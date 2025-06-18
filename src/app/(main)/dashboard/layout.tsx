@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { getSidebarVariant, getSidebarCollapsible, getContentLayout } from "@/lib/layout-preferences";
 import { cn } from "@/lib/utils";
-import { PerformanceDashboard } from "@/components/performance-dashboard";
+
 
 import { LayoutControls } from "./_components/sidebar/layout-controls";
 import { SearchDialog } from "./_components/sidebar/search-dialog";
@@ -47,7 +47,6 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
         </header>
         <div className="p-4 md:p-6">{children}</div>
       </SidebarInset>
-      <PerformanceDashboard />
     </SidebarProvider>
   );
 }
