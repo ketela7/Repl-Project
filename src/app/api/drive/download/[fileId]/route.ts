@@ -36,6 +36,13 @@ export async function GET(
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
 
+    // Check if it's a folder - folders cannot be downloaded
+    if (fileDetails.mimeType === 'application/vnd.google-apps.folder') {
+      return NextResponse.json({ 
+        error: 'Cannot download folders. Only files can be downloaded.' 
+      }, { status: 400 });
+    }
+
     // Get the file stream
     const fileStream = await driveService.downloadFileStream(fileId);
     

@@ -474,8 +474,9 @@ export function DriveManager() {
 
   const handleBulkDownload = async () => {
     const allSelectedItems = getSelectedItemsData();
-    const selectedItemsData = allSelectedItems.filter(item => item.type === 'file');
-    const folderCount = allSelectedItems.length - selectedItemsData.length;
+    // Filter out folders - only allow files to be downloaded
+    const selectedItemsData = allSelectedItems.filter(item => item.type === 'file' && item.mimeType !== 'application/vnd.google-apps.folder');
+    const folderCount = allSelectedItems.filter(item => item.type === 'folder' || item.mimeType === 'application/vnd.google-apps.folder').length;
     
     if (selectedItemsData.length === 0) {
       if (folderCount > 0) {
@@ -499,6 +500,7 @@ export function DriveManager() {
 
     let successCount = 0;
     let failedItems: string[] = [];
+    let skippedItems: string[] = [];
 
     try {
       for (let i = 0; i < selectedItemsData.length; i++) {
@@ -506,15 +508,62 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
         
         try {
-          const downloadUrl = `/api/drive/download/${item.id}`;
-          const link = document.createElement('a');
-          link.href = downloadUrl;
-          link.download = item.name;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          successCount++;
+          // Double check that it's not a folder before downloading
+          if (item.mimeType === 'application/vnd.google-apps.folder') {
+            skippedItems.push(item.name);
+            console.log(`Skipping folder: ${item.name}`);
+            continue;
+          }
+
+          // First, get file details to ensure it can be downloaded
+          const fileResponse = await fetch(`/api/drive/files/${item.id}`);
+          if (!fileResponse.ok) {
+            const errorData = await fileResponse.json();
+            
+            if (errorData.needsReauth) {
+              toast.error('Google Drive access expired. Please reconnect your account.');
+              window.location.reload();
+              return;
+            }
+            
+            if (fileResponse.status === 403) {
+              failedItems.push(`${item.name} (permission denied)`);
+              continue;
+            }
+            
+            if (fileResponse.status === 404) {
+              failedItems.push(`${item.name} (not found)`);
+              continue;
+            }
+            
+            throw new Error(errorData.error || 'Failed to get file info');
+          }
+          
+          const fileData = await fileResponse.json();
+          
+          // Use webContentLink for direct download if available
+          if (fileData.webContentLink) {
+            const link = document.createElement('a');
+            link.href = fileData.webContentLink;
+            link.download = item.name;
+            link.style.display = 'none';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            successCount++;
+          } else {
+            // Fallback to custom download endpoint
+            const downloadUrl = `/api/drive/download/${item.id}`;
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = item.name;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            successCount++;
+          }
           
           // Add delay between downloads to avoid overwhelming the browser
           if (i < selectedItemsData.length - 1) {
@@ -529,13 +578,33 @@ export function DriveManager() {
       deselectAll();
       setIsSelectMode(false);
 
-      // Show result notification
-      if (successCount === selectedItemsData.length) {
-        toast.success(`Successfully started download for ${successCount} file${successCount > 1 ? 's' : ''}`);
+      // Show comprehensive result notification
+      const totalProcessed = successCount + failedItems.length + skippedItems.length;
+      let message = '';
+      
+      if (successCount > 0) {
+        message += `${successCount} file${successCount > 1 ? 's' : ''} downloaded`;
+      }
+      
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} folder${skippedItems.length > 1 ? 's' : ''} skipped`;
+      }
+      
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} failed`;
+      }
+
+      if (successCount === selectedItemsData.length && skippedItems.length === 0) {
+        toast.success(`Successfully downloaded ${successCount} file${successCount > 1 ? 's' : ''}`);
       } else if (successCount > 0) {
-        toast.warning(`Started download for ${successCount} files. ${failedItems.length} files failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+        toast.warning(`Download completed: ${message}`);
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
       } else {
-        toast.error(`Failed to download files: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+        toast.error(`Download failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
     } catch (error) {
       console.error('Bulk download error:', error);
@@ -718,6 +787,15 @@ export function DriveManager() {
           break;
           
         case 'download':
+          // Check if it's a folder - folders cannot be downloaded
+          const downloadFile = files.find(f => f.id === fileId);
+          const downloadFolder = folders.find(f => f.id === fileId);
+          
+          if (downloadFolder || (downloadFile && downloadFile.mimeType === 'application/vnd.google-apps.folder')) {
+            toast.warning(`Cannot download folders. "${fileName}" is a folder.`);
+            return;
+          }
+          
           const downloadResponse = await fetch(`/api/drive/files/${fileId}`);
           if (!downloadResponse.ok) {
             const errorData = await downloadResponse.json();
@@ -742,8 +820,16 @@ export function DriveManager() {
           }
           
           const fileData = await downloadResponse.json();
+          
+          // Additional check for folder mimeType from API response
+          if (fileData.mimeType === 'application/vnd.google-apps.folder') {
+            toast.warning(`Cannot download folders. "${fileName}" is a folder.`);
+            return;
+          }
+          
           if (fileData.webContentLink) {
             window.open(fileData.webContentLink, '_blank');
+            toast.success(`Download started for "${fileName}"`);
           } else {
             toast.error(`"${fileName}" cannot be downloaded directly. This file type may require special handling or viewing in Google Drive.`);
           }
