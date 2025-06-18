@@ -96,6 +96,10 @@ import { VirtualList } from '@/components/ui/virtual-list';
 import { BulkActionsToolbar } from './bulk-actions-toolbar';
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
+import { BulkExportDialog } from './bulk-export-dialog';
+import { BulkRenameDialog } from './bulk-rename-dialog';
+import { BulkRestoreDialog } from './bulk-restore-dialog';
+import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 
 export function DriveManager() {
@@ -149,6 +153,10 @@ export function DriveManager() {
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkCopyDialogOpen, setIsBulkCopyDialogOpen] = useState(false);
+  const [isBulkExportDialogOpen, setIsBulkExportDialogOpen] = useState(false);
+  const [isBulkRenameDialogOpen, setIsBulkRenameDialogOpen] = useState(false);
+  const [isBulkRestoreDialogOpen, setIsBulkRestoreDialogOpen] = useState(false);
+  const [isBulkPermanentDeleteDialogOpen, setIsBulkPermanentDeleteDialogOpen] = useState(false);
   const [bulkOperationProgress, setBulkOperationProgress] = useState<{
     isRunning: boolean;
     current: number;
@@ -590,6 +598,288 @@ export function DriveManager() {
       toast.error('An error occurred during bulk download operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+    }
+  };
+
+  const handleBulkExport = async (exportFormat: string) => {
+    const selectedItemsData = getSelectedItemsData();
+    const exportableFiles = selectedItemsData.filter(item => 
+      item.type === 'file' && 
+      item.mimeType && 
+      item.mimeType.startsWith('application/vnd.google-apps.') &&
+      !item.mimeType.includes('folder') &&
+      !item.mimeType.includes('shortcut')
+    );
+
+    if (exportableFiles.length === 0) {
+      toast.warning('No Google Workspace files selected for export.');
+      setIsBulkExportDialogOpen(false);
+      return;
+    }
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: exportableFiles.length,
+      operation: 'Exporting files'
+    });
+
+    let successCount = 0;
+    let failedItems: string[] = [];
+
+    try {
+      for (let i = 0; i < exportableFiles.length; i++) {
+        const item = exportableFiles[i];
+        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        try {
+          const response = await fetch(`/api/drive/files/${item.id}/export?format=${exportFormat}`);
+          
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${item.name}.${exportFormat}`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+            
+            successCount++;
+          } else {
+            failedItems.push(item.name);
+            console.error(`Failed to export ${item.name}:`, response.status);
+          }
+        } catch (error) {
+          failedItems.push(item.name);
+          console.error(`Export error for ${item.name}:`, error);
+        }
+
+        if (i < exportableFiles.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      deselectAll();
+      setIsSelectMode(false);
+
+      if (successCount === exportableFiles.length) {
+        toast.success(`Successfully exported ${successCount} file${successCount > 1 ? 's' : ''}`);
+      } else if (successCount > 0) {
+        toast.warning(`Exported ${successCount} files. ${failedItems.length} files failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else {
+        toast.error(`Failed to export files: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
+    } catch (error) {
+      console.error('Bulk export error:', error);
+      toast.error('An error occurred during bulk export operation');
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+      setIsBulkExportDialogOpen(false);
+    }
+  };
+
+  const handleBulkRename = async (renamePattern: string, renameType: string) => {
+    const selectedItemsData = getSelectedItemsData();
+    if (selectedItemsData.length === 0) return;
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: selectedItemsData.length,
+      operation: 'Renaming items'
+    });
+
+    let successCount = 0;
+    let failedItems: string[] = [];
+
+    try {
+      for (let i = 0; i < selectedItemsData.length; i++) {
+        const item = selectedItemsData[i];
+        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        let newName = item.name;
+        const fileExtension = item.name.includes('.') ? 
+          item.name.substring(item.name.lastIndexOf('.')) : '';
+        const baseName = fileExtension ? 
+          item.name.substring(0, item.name.lastIndexOf('.')) : item.name;
+
+        switch (renameType) {
+          case 'prefix':
+            newName = `${renamePattern}_${item.name}`;
+            break;
+          case 'suffix':
+            newName = fileExtension ? 
+              `${baseName}_${renamePattern}${fileExtension}` : 
+              `${item.name}_${renamePattern}`;
+            break;
+          case 'numbering':
+            const number = String(i + 1).padStart(3, '0');
+            newName = fileExtension ? 
+              `${renamePattern}_${number}${fileExtension}` : 
+              `${renamePattern}_${number}`;
+            break;
+          case 'timestamp':
+            const now = new Date();
+            const timestamp = now.toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+            newName = fileExtension ? 
+              `${baseName}_${timestamp}${fileExtension}` : 
+              `${item.name}_${timestamp}`;
+            break;
+        }
+        
+        const response = await fetch(`/api/drive/files/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'rename', name: newName })
+        });
+
+        if (response.ok) {
+          successCount++;
+        } else {
+          const errorData = await response.text();
+          failedItems.push(item.name);
+          console.error(`Failed to rename ${item.name}:`, response.status, errorData);
+        }
+
+        if (i < selectedItemsData.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+      }
+
+      await fetchFiles(currentFolderId, searchQuery);
+      deselectAll();
+      setIsSelectMode(false);
+
+      if (successCount === selectedItemsData.length) {
+        toast.success(`Successfully renamed ${successCount} item${successCount > 1 ? 's' : ''}`);
+      } else if (successCount > 0) {
+        toast.warning(`Renamed ${successCount} items. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else {
+        toast.error(`Failed to rename items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
+    } catch (error) {
+      console.error('Bulk rename error:', error);
+      toast.error('An error occurred during bulk rename operation');
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+      setIsBulkRenameDialogOpen(false);
+    }
+  };
+
+  const handleBulkRestore = async () => {
+    const selectedItemsData = getSelectedItemsData();
+    if (selectedItemsData.length === 0) return;
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: selectedItemsData.length,
+      operation: 'Restoring items'
+    });
+
+    let successCount = 0;
+    let failedItems: string[] = [];
+
+    try {
+      for (let i = 0; i < selectedItemsData.length; i++) {
+        const item = selectedItemsData[i];
+        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        const response = await fetch(`/api/drive/files/${item.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'restore' })
+        });
+
+        if (response.ok) {
+          successCount++;
+        } else {
+          const errorData = await response.text();
+          failedItems.push(item.name);
+          console.error(`Failed to restore ${item.name}:`, response.status, errorData);
+        }
+
+        if (i < selectedItemsData.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+      }
+
+      await fetchFiles(currentFolderId, searchQuery);
+      deselectAll();
+      setIsSelectMode(false);
+
+      if (successCount === selectedItemsData.length) {
+        toast.success(`Successfully restored ${successCount} item${successCount > 1 ? 's' : ''}`);
+      } else if (successCount > 0) {
+        toast.warning(`Restored ${successCount} items. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else {
+        toast.error(`Failed to restore items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
+    } catch (error) {
+      console.error('Bulk restore error:', error);
+      toast.error('An error occurred during bulk restore operation');
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+      setIsBulkRestoreDialogOpen(false);
+    }
+  };
+
+  const handleBulkPermanentDelete = async () => {
+    const selectedItemsData = getSelectedItemsData();
+    if (selectedItemsData.length === 0) return;
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: selectedItemsData.length,
+      operation: 'Permanently deleting items'
+    });
+
+    let successCount = 0;
+    let failedItems: string[] = [];
+
+    try {
+      for (let i = 0; i < selectedItemsData.length; i++) {
+        const item = selectedItemsData[i];
+        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        
+        const response = await fetch(`/api/drive/files/${item.id}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          successCount++;
+        } else {
+          const errorData = await response.text();
+          failedItems.push(item.name);
+          console.error(`Failed to permanently delete ${item.name}:`, response.status, errorData);
+        }
+
+        if (i < selectedItemsData.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+      }
+
+      await fetchFiles(currentFolderId, searchQuery);
+      deselectAll();
+      setIsSelectMode(false);
+
+      if (successCount === selectedItemsData.length) {
+        toast.success(`Successfully deleted ${successCount} item${successCount > 1 ? 's' : ''} permanently`);
+      } else if (successCount > 0) {
+        toast.warning(`Deleted ${successCount} items permanently. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else {
+        toast.error(`Failed to delete items permanently: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
+    } catch (error) {
+      console.error('Bulk permanent delete error:', error);
+      toast.error('An error occurred during bulk permanent delete operation');
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+      setIsBulkPermanentDeleteDialogOpen(false);
     }
   };
 
@@ -2326,6 +2616,56 @@ export function DriveManager() {
         file={selectedFileForPreview}
       />
 
+      {/* Bulk Operation Dialogs */}
+      <BulkDeleteDialog
+        isOpen={isBulkDeleteDialogOpen}
+        onClose={() => setIsBulkDeleteDialogOpen(false)}
+        onConfirm={handleBulkDelete}
+        selectedItems={getSelectedItemsData()}
+      />
+
+      <BulkMoveDialog
+        isOpen={isBulkMoveDialogOpen}
+        onClose={() => setIsBulkMoveDialogOpen(false)}
+        onConfirm={handleBulkMove}
+        selectedItems={getSelectedItemsData()}
+      />
+
+      <BulkCopyDialog
+        isOpen={isBulkCopyDialogOpen}
+        onClose={() => setIsBulkCopyDialogOpen(false)}
+        onConfirm={handleBulkCopy}
+        selectedItems={getSelectedItemsData()}
+      />
+
+      <BulkExportDialog
+        isOpen={isBulkExportDialogOpen}
+        onClose={() => setIsBulkExportDialogOpen(false)}
+        onConfirm={handleBulkExport}
+        selectedItems={getSelectedItemsData()}
+      />
+
+      <BulkRenameDialog
+        isOpen={isBulkRenameDialogOpen}
+        onClose={() => setIsBulkRenameDialogOpen(false)}
+        onConfirm={handleBulkRename}
+        selectedItems={getSelectedItemsData()}
+      />
+
+      <BulkRestoreDialog
+        isOpen={isBulkRestoreDialogOpen}
+        onClose={() => setIsBulkRestoreDialogOpen(false)}
+        onConfirm={handleBulkRestore}
+        selectedItems={getSelectedItemsData()}
+      />
+
+      <BulkPermanentDeleteDialog
+        isOpen={isBulkPermanentDeleteDialogOpen}
+        onClose={() => setIsBulkPermanentDeleteDialogOpen(false)}
+        onConfirm={handleBulkPermanentDelete}
+        selectedItems={getSelectedItemsData()}
+      />
+
       {/* Floating Bulk Actions Toolbar */}
       {(folders.length > 0 || files.length > 0) && (
         <BulkActionsToolbar
@@ -2333,6 +2673,7 @@ export function DriveManager() {
           totalCount={folders.length + files.length}
           isSelectMode={isSelectMode}
           isAllSelected={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
+          isInTrash={searchQuery === 'trashed:true'}
           bulkOperationProgress={bulkOperationProgress}
           onToggleSelectMode={toggleSelectMode}
           onSelectAll={selectAll}
@@ -2341,6 +2682,10 @@ export function DriveManager() {
           onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
           onBulkMove={() => setIsBulkMoveDialogOpen(true)}
           onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
+          onBulkExport={() => setIsBulkExportDialogOpen(true)}
+          onBulkRename={() => setIsBulkRenameDialogOpen(true)}
+          onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
+          onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         />
       )}
     </div>
