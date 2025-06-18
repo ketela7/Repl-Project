@@ -19,7 +19,11 @@ import {
   CheckSquare,
   Square,
   MoreHorizontal,
-  MousePointer
+  MousePointer,
+  FileDown,
+  Edit3,
+  RotateCcw,
+  ShieldX
 } from "lucide-react";
 
 interface BulkActionsToolbarProps {
@@ -27,6 +31,7 @@ interface BulkActionsToolbarProps {
   totalCount: number;
   isSelectMode: boolean;
   isAllSelected: boolean;
+  isInTrash?: boolean;
   bulkOperationProgress: {
     isRunning: boolean;
     current: number;
@@ -40,6 +45,10 @@ interface BulkActionsToolbarProps {
   onBulkDelete: () => void;
   onBulkMove: () => void;
   onBulkCopy: () => void;
+  onBulkExport: () => void;
+  onBulkRename: () => void;
+  onBulkRestore?: () => void;
+  onBulkPermanentDelete?: () => void;
 }
 
 export function BulkActionsToolbar({
@@ -47,6 +56,7 @@ export function BulkActionsToolbar({
   totalCount,
   isSelectMode,
   isAllSelected,
+  isInTrash = false,
   bulkOperationProgress,
   onToggleSelectMode,
   onSelectAll,
@@ -54,7 +64,11 @@ export function BulkActionsToolbar({
   onBulkDownload,
   onBulkDelete,
   onBulkMove,
-  onBulkCopy
+  onBulkCopy,
+  onBulkExport,
+  onBulkRename,
+  onBulkRestore,
+  onBulkPermanentDelete
 }: BulkActionsToolbarProps) {
   if (bulkOperationProgress.isRunning) {
     return (
@@ -131,25 +145,55 @@ export function BulkActionsToolbar({
                 <MoreHorizontal className="h-6 w-6" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-48">
-              <DropdownMenuItem onClick={onBulkDownload} className="cursor-pointer">
-                <Download className="h-4 w-4 mr-2" />
-                Download Files
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onBulkMove} className="cursor-pointer">
-                <Move className="h-4 w-4 mr-2" />
-                Move Items
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onBulkCopy} className="cursor-pointer">
-                <Copy className="h-4 w-4 mr-2" />
-                Copy Items
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={onBulkDelete} className="cursor-pointer text-red-600 dark:text-red-400">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Items
-              </DropdownMenuItem>
+            <DropdownMenuContent align="start" className="w-56">
+              {!isInTrash ? (
+                <>
+                  <DropdownMenuItem onClick={onBulkDownload} className="cursor-pointer">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Files
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onBulkExport} className="cursor-pointer">
+                    <FileDown className="h-4 w-4 mr-2" />
+                    Export As...
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onBulkRename} className="cursor-pointer">
+                    <Edit3 className="h-4 w-4 mr-2" />
+                    Bulk Rename
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onBulkMove} className="cursor-pointer">
+                    <Move className="h-4 w-4 mr-2" />
+                    Move Items
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={onBulkCopy} className="cursor-pointer">
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copy Items
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={onBulkDelete} className="cursor-pointer text-red-600 dark:text-red-400">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Move to Trash
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  {onBulkRestore && (
+                    <DropdownMenuItem onClick={onBulkRestore} className="cursor-pointer text-green-600 dark:text-green-400">
+                      <RotateCcw className="h-4 w-4 mr-2" />
+                      Restore Items
+                    </DropdownMenuItem>
+                  )}
+                  {onBulkPermanentDelete && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={onBulkPermanentDelete} className="cursor-pointer text-red-600 dark:text-red-400">
+                        <ShieldX className="h-4 w-4 mr-2" />
+                        Permanently Delete
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}
