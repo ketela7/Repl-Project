@@ -124,6 +124,13 @@ class MemoryCache {
       keys: Array.from(this.cache.keys())
     };
   }
+
+  setMaxSize(newMaxSize: number): void {
+    this.maxSize = newMaxSize;
+    if (this.cache.size > this.maxSize) {
+      this.cleanup();
+    }
+  }
 }
 
 // Export singleton instance

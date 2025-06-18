@@ -88,9 +88,11 @@ export async function GET(request: NextRequest) {
 
     console.log('Drive API: Files fetched successfully, count:', result.files.length);
     
+    performanceMonitor.endAPICall(callId, true);
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('Drive files API error:', error);
+    performanceMonitor.endAPICall(callId, false, error instanceof Error ? error.message : 'Unknown error');
     
     // Handle specific Google API errors
     if (error.code === 403) {
