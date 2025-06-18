@@ -100,6 +100,7 @@ import { BulkRenameDialog } from './bulk-rename-dialog';
 import { BulkRestoreDialog } from './bulk-restore-dialog';
 import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
+import { DriveFiltersSidebar } from './drive-filters-sidebar';
 
 import { errorRecovery } from '@/lib/error-recovery';
 
@@ -149,6 +150,10 @@ export function DriveManager() {
     direction: 'asc' | 'desc';
   } | null>(null);
 
+  // View filters state
+  const [activeView, setActiveView] = useState<'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'>('all');
+  const [fileTypeFilter, setFileTypeFilter] = useState<string[]>([]);
+  
   // Bulk operations state
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
@@ -898,7 +903,7 @@ export function DriveManager() {
     }
   };
 
-  const fetchFiles = async (parentId?: string, query?: string, pageToken?: string, append = false) => {
+  const fetchFiles = async (parentId?: string, query?: string, pageToken?: string, append = false, viewFilter?: string) => {
     const requestId = `fetch-files-${parentId || 'root'}-${query || ''}-${pageToken || ''}`;
     const startTime = Date.now();
 
@@ -910,6 +915,17 @@ export function DriveManager() {
       if (parentId) params.append('parentId', parentId);
       if (query) params.append('query', query);
       if (pageToken) params.append('pageToken', pageToken);
+      
+      // Add view filter parameters
+      const currentView = viewFilter || activeView;
+      if (currentView !== 'all') {
+        params.append('view', currentView);
+      }
+      
+      if (fileTypeFilter.length > 0) {
+        params.append('fileTypes', fileTypeFilter.join(','));
+      }
+      
       // Optimized page size for better performance
       params.append('pageSize', '50');
 
@@ -1030,6 +1046,13 @@ export function DriveManager() {
     } else {
       fetchFiles(currentFolderId || undefined);
     }
+  };
+
+  const handleViewChange = (view: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash') => {
+    setActiveView(view);
+    setCurrentFolderId(null); // Reset to root when changing views
+    setSearchQuery(''); // Clear search
+    fetchFiles(undefined, undefined, undefined, false, view);
   };
 
   const handleFolderClick = (folderId: string) => {
@@ -1722,7 +1745,17 @@ export function DriveManager() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+    <div className="flex gap-6">
+      {/* Filters Sidebar */}
+      <DriveFiltersSidebar
+        activeView={activeView}
+        fileTypeFilter={fileTypeFilter}
+        onViewChange={handleViewChange}
+        onFileTypeChange={setFileTypeFilter}
+      />
+      
+      {/* Main Content */}
+      <div className="flex-1 space-y-4 sm:space-y-6 px-2 sm:px-0">
 
       {/* Search and Actions Bar */}
 
@@ -2768,6 +2801,7 @@ Action(null);
           onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         />
       )}
+      </div>
     </div>
   );
 }
