@@ -187,7 +187,7 @@ class PerformanceMonitor {
   }
 
   private setupPerformanceObserver() {
-    if (!('PerformanceObserver' in window)) return;
+    if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
 
     try {
       const observer = new PerformanceObserver((list) => {
@@ -281,7 +281,7 @@ class PerformanceMonitor {
   }
 }
 
-export const performanceMonitor = new PerformanceMonitor();
+export const performanceMonitor = typeof window !== 'undefined' ? new PerformanceMonitor() : null;
 
 // Auto-initialize
 if (typeof window !== 'undefined') {

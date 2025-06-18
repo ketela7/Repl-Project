@@ -2647,8 +2647,7 @@ export function DriveManager() {
       />
 
       <FileMoveDialog
-        isOpen<replit_final_file>
-={isMoveDialogOpen}
+        isOpen={isMoveDialogOpen}
         onClose={() => {
           setIsMoveDialogOpen(false);
           setSelectedFileForAction(null);
