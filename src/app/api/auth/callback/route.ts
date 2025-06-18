@@ -10,12 +10,29 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('next') ?? '/dashboard'
 
   console.log('Callback params:', { 
-    code: code ? 'present' : 'missing', 
+    code: code ? `present: ${code}` : 'missing', 
     error, 
     errorDescription,
     next,
-    origin 
+    origin,
+    fullUrl: request.url
   })
+
+  // Check if this is actually an error code from Supabase
+  if (code && code.includes('-')) {
+    console.log('Detected error code format, treating as error')
+    const forwardedHost = request.headers.get('x-forwarded-host')
+    const isLocalEnv = process.env.NODE_ENV === 'development'
+    let errorRedirectUrl
+    
+    if (isLocalEnv && forwardedHost) {
+      errorRedirectUrl = `https://${forwardedHost}/auth/auth-code-error?error=invalid_code&description=${encodeURIComponent('Authentication failed with error code: ' + code)}`
+    } else {
+      errorRedirectUrl = `${origin}/auth/auth-code-error?error=invalid_code&description=${encodeURIComponent('Authentication failed with error code: ' + code)}`
+    }
+    
+    return NextResponse.redirect(errorRedirectUrl)
+  }
 
   if (error) {
     console.error('OAuth error in callback:', error, errorDescription)
