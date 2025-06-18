@@ -4,6 +4,75 @@ import { GoogleDriveService } from '@/lib/google-drive/service';
 import { driveCache } from '@/lib/cache';
 import { performanceMonitor } from '@/lib/performance-monitor';
 
+// Client-side filter helper function
+function applyClientSideFilters(result: any, filters: { view?: string | null, fileTypes?: string | null, query?: string | null }) {
+  if (!result || !result.files) return result;
+
+  let filteredFiles = [...result.files];
+
+  // Apply additional client-side filters for complex scenarios
+  if (filters.fileTypes) {
+    const types = filters.fileTypes.split(',').filter(Boolean);
+    
+    filteredFiles = filteredFiles.filter(file => {
+      return types.some(type => {
+        switch (type.toLowerCase()) {
+          case 'folder':
+            return file.mimeType === 'application/vnd.google-apps.folder';
+          case 'document':
+            return file.mimeType?.includes('document') || 
+                   file.mimeType?.includes('pdf') || 
+                   file.mimeType?.includes('text') ||
+                   file.mimeType?.includes('word');
+          case 'spreadsheet':
+            return file.mimeType?.includes('spreadsheet') || 
+                   file.mimeType?.includes('excel') ||
+                   file.mimeType?.includes('csv');
+          case 'presentation':
+            return file.mimeType?.includes('presentation') || 
+                   file.mimeType?.includes('powerpoint');
+          case 'image':
+            return file.mimeType?.startsWith('image/');
+          case 'video':
+            return file.mimeType?.startsWith('video/');
+          case 'audio':
+            return file.mimeType?.startsWith('audio/');
+          case 'archive':
+            return file.mimeType?.includes('zip') || 
+                   file.mimeType?.includes('rar') ||
+                   file.mimeType?.includes('tar') ||
+                   file.mimeType?.includes('gzip') ||
+                   file.mimeType?.includes('7z');
+          case 'code':
+            return file.mimeType?.includes('javascript') ||
+                   file.mimeType?.includes('html') ||
+                   file.mimeType?.includes('css') ||
+                   file.mimeType?.includes('json') ||
+                   file.mimeType?.includes('xml') ||
+                   (file.mimeType?.startsWith('text/') && 
+                    !file.mimeType?.includes('plain'));
+          default:
+            return true;
+        }
+      });
+    });
+  }
+
+  // Apply additional query filtering for more complex searches
+  if (filters.query && filters.query.trim()) {
+    const searchTerm = filters.query.toLowerCase();
+    filteredFiles = filteredFiles.filter(file => 
+      file.name?.toLowerCase().includes(searchTerm) ||
+      file.description?.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  return {
+    ...result,
+    files: filteredFiles
+  };
+}
+
 export async function GET(request: NextRequest) {
   const callId = performanceMonitor.startAPICall('/api/drive/files');
   
@@ -53,14 +122,99 @@ export async function GET(request: NextRequest) {
     const query = searchParams.get('query');
     const mimeType = searchParams.get('mimeType');
     const pageToken = searchParams.get('pageToken');
-    const pageSize = parseInt(searchParams.get('pageSize') || '20'); // Reduced default page size
+    const pageSize = parseInt(searchParams.get('pageSize') || '20');
+    const view = searchParams.get('view');
+    const fileTypes = searchParams.get('fileTypes');
 
-    // Generate cache key
+    // Build Google Drive API query with enhanced filtering
+    let driveQuery = "trashed=false";
+
+    // Handle view filters
+    if (view === 'my-drive') {
+      driveQuery += " and 'me' in owners";
+    } else if (view === 'shared') {
+      driveQuery += " and sharedWithMe=true";
+    } else if (view === 'starred') {
+      driveQuery += " and starred=true";
+    } else if (view === 'recent') {
+      // Get files accessed in last 30 days
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      driveQuery += ` and viewedByMeTime > '${thirtyDaysAgo.toISOString()}'`;
+    } else if (view === 'trash') {
+      driveQuery = "trashed=true"; // Override the default trashed=false
+    }
+
+    // Handle folder navigation for specific views
+    if (parentId && view !== 'shared' && view !== 'starred' && view !== 'recent' && view !== 'trash') {
+      driveQuery += ` and '${parentId}' in parents`;
+    } else if (!query && !parentId && view !== 'shared' && view !== 'starred' && view !== 'recent' && view !== 'trash') {
+      // If no parent and no search query, get root files
+      driveQuery += " and 'root' in parents";
+    }
+
+    // Handle search query
+    if (query) {
+      driveQuery += ` and name contains '${query.replace(/'/g, "\\'")}'`;
+    }
+
+    // Handle legacy mimeType parameter
+    if (mimeType) {
+      driveQuery += ` and mimeType='${mimeType}'`;
+    }
+
+    // Handle file type filters with enhanced support
+    if (fileTypes) {
+      const types = fileTypes.split(',').filter(Boolean);
+      const mimeTypeConditions: string[] = [];
+
+      types.forEach(type => {
+        switch (type.toLowerCase()) {
+          case 'folder':
+            mimeTypeConditions.push("mimeType='application/vnd.google-apps.folder'");
+            break;
+          case 'document':
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.document' or mimeType='application/pdf' or mimeType='text/plain' or mimeType='application/msword' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document' or mimeType='application/rtf')");
+            break;
+          case 'spreadsheet':
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.ms-excel' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' or mimeType='text/csv')");
+            break;
+          case 'presentation':
+            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.presentation' or mimeType='application/vnd.ms-powerpoint' or mimeType='application/vnd.openxmlformats-officedocument.presentationml.presentation')");
+            break;
+          case 'image':
+            mimeTypeConditions.push("(mimeType contains 'image/')");
+            break;
+          case 'video':
+            mimeTypeConditions.push("(mimeType contains 'video/')");
+            break;
+          case 'audio':
+            mimeTypeConditions.push("(mimeType contains 'audio/')");
+            break;
+          case 'archive':
+            mimeTypeConditions.push("(mimeType='application/zip' or mimeType='application/x-rar-compressed' or mimeType='application/x-tar' or mimeType='application/gzip' or mimeType='application/x-7z-compressed')");
+            break;
+          case 'code':
+            mimeTypeConditions.push("(mimeType='text/javascript' or mimeType='text/html' or mimeType='text/css' or mimeType='application/json' or mimeType='text/xml' or mimeType contains 'text/')");
+            break;
+        }
+      });
+
+      if (mimeTypeConditions.length > 0) {
+        driveQuery += ` and (${mimeTypeConditions.join(' or ')})`;
+      }
+    }
+
+    console.log('Enhanced Drive Query:', driveQuery);
+
+    // Generate cache key including all filter parameters
     const cacheKey = driveCache.generateDriveKey({
       parentId: parentId || undefined,
       query: query || undefined,
       mimeType: mimeType || undefined,
       pageToken: pageToken || undefined,
+      view: view || undefined,
+      fileTypes: fileTypes || undefined,
       userId: user.id,
     });
 
@@ -68,37 +222,44 @@ export async function GET(request: NextRequest) {
     const cachedResult = driveCache.get(cacheKey);
     if (cachedResult && !pageToken) { // Don't cache paginated results
       console.log('Drive API: Returning cached result, items:', cachedResult.files?.length || 0);
-      return NextResponse.json(cachedResult);
+      
+      // Apply client-side filters for cached results if needed
+      const filteredResult = applyClientSideFilters(cachedResult, { view, fileTypes, query });
+      return NextResponse.json(filteredResult);
     }
 
     const driveService = new GoogleDriveService(accessToken);
     
-    console.log('Drive API: Fetching files with options:', {
+    console.log('Drive API: Fetching files with enhanced options:', {
       parentId: parentId || undefined,
-      query: query || undefined,
-      mimeType: mimeType || undefined,
+      query: driveQuery,
       pageToken: pageToken || undefined,
       pageSize,
+      view,
+      fileTypes
     });
     
+    // Use the constructed query instead of individual parameters
     const result = await driveService.listFiles({
-      parentId: parentId || undefined,
-      query: query || undefined,
-      mimeType: mimeType || undefined,
+      parentId: view === 'shared' || view === 'starred' || view === 'recent' || view === 'trash' ? undefined : (parentId || undefined),
+      query: driveQuery,
       pageToken: pageToken || undefined,
       pageSize,
     });
 
-    // Cache the result with smart TTL based on content type
+    // Apply client-side filters to enhance API results
+    const filteredResult = applyClientSideFilters(result, { view, fileTypes, query });
+
+    // Cache the filtered result with smart TTL based on content type
     if (!pageToken) {
       const cacheTTL = query ? 5 : 15; // Search results: 5min, Folder contents: 15min
-      driveCache.set(cacheKey, result, cacheTTL);
+      driveCache.set(cacheKey, filteredResult, cacheTTL);
     }
 
-    console.log('Drive API: Files fetched successfully, count:', result.files.length);
+    console.log('Drive API: Files fetched and filtered successfully, count:', filteredResult.files.length);
     
     performanceMonitor.endAPICall(callId, true);
-    return NextResponse.json(result);
+    return NextResponse.json(filteredResult);
   } catch (error: any) {
     console.error('Drive files API error:', error);
     performanceMonitor.endAPICall(callId, false, error instanceof Error ? error.message : 'Unknown error');

@@ -104,6 +104,89 @@ import { DriveFiltersSidebar } from './drive-filters-sidebar';
 
 import { errorRecovery } from '@/lib/error-recovery';
 
+// Enhanced client-side filtering utilities
+const applyClientSideFilters = (
+  files: DriveFile[], 
+  folders: DriveFolder[], 
+  filters: {
+    fileTypeFilter: string[];
+    searchQuery: string;
+    activeView: string;
+  }
+) => {
+  let filteredFiles = [...files];
+  let filteredFolders = [...folders];
+
+  // Apply file type filters
+  if (filters.fileTypeFilter.length > 0) {
+    filteredFiles = filteredFiles.filter(file => {
+      return filters.fileTypeFilter.some(type => {
+        switch (type.toLowerCase()) {
+          case 'document':
+            return file.mimeType?.includes('document') || 
+                   file.mimeType?.includes('pdf') || 
+                   file.mimeType?.includes('text') ||
+                   file.mimeType?.includes('word') ||
+                   file.mimeType?.includes('rtf');
+          case 'spreadsheet':
+            return file.mimeType?.includes('spreadsheet') || 
+                   file.mimeType?.includes('excel') ||
+                   file.mimeType?.includes('csv');
+          case 'presentation':
+            return file.mimeType?.includes('presentation') || 
+                   file.mimeType?.includes('powerpoint');
+          case 'image':
+            return file.mimeType?.startsWith('image/');
+          case 'video':
+            return file.mimeType?.startsWith('video/');
+          case 'audio':
+            return file.mimeType?.startsWith('audio/');
+          case 'archive':
+            return file.mimeType?.includes('zip') || 
+                   file.mimeType?.includes('rar') ||
+                   file.mimeType?.includes('tar') ||
+                   file.mimeType?.includes('gzip') ||
+                   file.mimeType?.includes('7z');
+          case 'code':
+            return file.mimeType?.includes('javascript') ||
+                   file.mimeType?.includes('html') ||
+                   file.mimeType?.includes('css') ||
+                   file.mimeType?.includes('json') ||
+                   file.mimeType?.includes('xml') ||
+                   file.name?.match(/\.(js|ts|jsx|tsx|py|java|cpp|c|cs|php|rb|go|rs|swift|kt)$/i);
+          case 'folder':
+            // Handle folders separately
+            return false;
+          default:
+            return true;
+        }
+      });
+    });
+
+    // Filter folders if 'folder' type is selected
+    if (!filters.fileTypeFilter.includes('folder')) {
+      filteredFolders = [];
+    }
+  }
+
+  // Apply additional search filtering for better results
+  if (filters.searchQuery && filters.searchQuery.trim()) {
+    const searchTerm = filters.searchQuery.toLowerCase();
+    
+    filteredFiles = filteredFiles.filter(file => 
+      file.name?.toLowerCase().includes(searchTerm) ||
+      file.description?.toLowerCase().includes(searchTerm)
+    );
+    
+    filteredFolders = filteredFolders.filter(folder => 
+      folder.name?.toLowerCase().includes(searchTerm) ||
+      folder.description?.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  return { filteredFiles, filteredFolders };
+};
+
 export function DriveManager() {
   const [files, setFiles] = useState<DriveFile[]>([]);
   const [folders, setFolders] = useState<DriveFolder[]>([]);
