@@ -29,6 +29,26 @@ A comprehensive web application for managing Google Drive files and folders with
   - Video metadata (resolution, duration, aspect ratio)
   - File capabilities and restrictions
   - Custom properties and app-specific data
+
+### Bulk Operations
+- **Bulk Selection**: Multi-select mode with floating action toolbar
+- **Bulk Download**: Download multiple files simultaneously with progress tracking
+- **Bulk Export**: Export Google Workspace files (Docs, Sheets, Slides) to various formats:
+  - PDF, DOCX, XLSX, PPTX, ODT, ODS, PNG, JPEG
+  - Smart format filtering based on file types
+  - Automatic download of exported files
+- **Bulk Rename**: Rename multiple items using consistent patterns:
+  - Add prefix or suffix to existing names
+  - Sequential numbering with custom base names
+  - Timestamp addition for organization
+  - Live preview of rename results
+- **Bulk Move**: Move multiple files and folders to new locations
+- **Bulk Copy**: Copy multiple files (folders not supported by API)
+- **Bulk Delete**: Move multiple items to trash with confirmation
+- **Bulk Restore**: Restore multiple items from trash to original locations
+- **Bulk Permanent Delete**: Permanently delete items with enhanced security confirmation
+- **Progress Tracking**: Real-time progress indicators for all bulk operations
+- **Error Handling**: Comprehensive error reporting with retry mechanisms
   - Export links for Google Workspace files
   - Extended metadata (drive IDs, spaces, content restrictions)
 
