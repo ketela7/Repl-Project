@@ -77,9 +77,10 @@ export async function GET(request: NextRequest) {
       pageSize,
     });
 
-    // Cache the result (only for first page to avoid cache bloat)
+    // Cache the result with smart TTL based on content type
     if (!pageToken) {
-      driveCache.set(cacheKey, result, 2); // 2 minute cache
+      const cacheTTL = query ? 5 : 15; // Search results: 5min, Folder contents: 15min
+      driveCache.set(cacheKey, result, cacheTTL);
     }
 
     console.log('Drive API: Files fetched successfully, count:', result.files.length);

@@ -11,9 +11,9 @@ interface CacheEntry<T> {
 
 class MemoryCache {
   private cache = new Map<string, CacheEntry<any>>();
-  private maxSize = 100; // Maximum number of entries
+  private maxSize = 500; // Maximum number of entries
 
-  set<T>(key: string, data: T, ttlMinutes: number = 5): void {
+  set<T>(key: string, data: T, ttlMinutes: number = 15): void {
     // Clean up old entries if cache is getting too large
     if (this.cache.size >= this.maxSize) {
       this.cleanup();
@@ -104,6 +104,25 @@ class MemoryCache {
   // Generate cache key for file details
   generateFileDetailsKey(fileId: string, userId: string): string {
     return `details:${userId}:${fileId}`;
+  }
+
+  // Generate cache key for folder structure
+  generateFolderStructureKey(userId: string): string {
+    return `folder-structure:${userId}`;
+  }
+
+  // Generate cache key for search results
+  generateSearchKey(query: string, userId: string): string {
+    return `search:${userId}:${encodeURIComponent(query)}`;
+  }
+
+  // Get cache statistics for debugging
+  getStats(): { size: number; maxSize: number; keys: string[] } {
+    return {
+      size: this.cache.size,
+      maxSize: this.maxSize,
+      keys: Array.from(this.cache.keys())
+    };
   }
 }
 
