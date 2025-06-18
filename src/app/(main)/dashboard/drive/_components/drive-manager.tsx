@@ -72,6 +72,9 @@ import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { requestQueue } from '@/lib/request-queue';
+import { backgroundCacheManager } from '@/lib/background-cache';
+import { batchAPI } from '@/lib/batch-api';
+import { prefetchManager } from '@/lib/prefetch-manager';
 import { FileUploadDialog } from './file-upload-dialog';
 import { CreateFolderDialog } from './create-folder-dialog';
 import { FileRenameDialog } from './file-rename-dialog';
@@ -84,6 +87,8 @@ import { FileDetailsDialog } from './file-details-dialog';
 import { FilePreviewDialog } from './file-preview-dialog';
 import { DriveGridSkeleton, BreadcrumbSkeleton } from './drive-skeleton';
 import { LoadingSkeleton, BreadcrumbLoadingSkeleton } from '@/components/ui/loading-skeleton';
+import { LazyImage } from '@/components/ui/lazy-image';
+import { VirtualList } from '@/components/ui/virtual-list';
 import { BulkActionsToolbar } from './bulk-actions-toolbar';
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
@@ -805,11 +810,19 @@ export function DriveManager() {
       
       // Handle pagination: append or replace
       if (append) {
-        setFiles(prev => [...prev, ...fileList]);
+        setFiles(prev => {
+          const newFiles = [...prev, ...fileList];
+          // Prefetch thumbnails for newly loaded files
+          prefetchManager.prefetchThumbnails(newFiles.slice(-fileList.length));
+          return newFiles;
+        });
         setFolders(prev => [...prev, ...folderList]);
       } else {
         setFiles(fileList);
         setFolders(folderList);
+        
+        // Prefetch thumbnails for visible files
+        prefetchManager.prefetchThumbnails(fileList.slice(0, 12));
       }
       setHasAccess(true);
       
@@ -851,6 +864,10 @@ export function DriveManager() {
     setCurrentFolderId(folderId);
     setSearchQuery('');
     setNextPageToken(null); // Reset pagination
+    
+    // Track access pattern for prefetching
+    prefetchManager.trackFolderAccess(folderId);
+    
     fetchFiles(folderId);
   };
 
@@ -1507,6 +1524,14 @@ export function DriveManager() {
     };
     
     checkAccessAndFetch();
+    
+    // Initialize background cache manager
+    backgroundCacheManager.init();
+    
+    // Cleanup on unmount
+    return () => {
+      backgroundCacheManager.destroy();
+    };
   }, []);
 
   // Handle debounced search with optimized API calls
