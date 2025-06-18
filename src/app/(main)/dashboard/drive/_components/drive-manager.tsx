@@ -1690,14 +1690,14 @@ export function DriveManager() {
 
   return (
     <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
-
       <div className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <PerformanceDashboard />
-            <ErrorRecoveryStatus />
-          </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <PerformanceDashboard />
+          <ErrorRecoveryStatus />
+        </div>
+      </div>
 
-          {/* Search and Actions Bar */}
+      {/* Search and Actions Bar */}
 
       {/* Actions Bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -2689,7 +2689,6 @@ export function DriveManager() {
         selectedItems={getSelectedItemsData()}
       />
 
-      ```python
       <BulkExportDialog
         isOpen={isBulkExportDialogOpen}
         onClose={() => setIsBulkExportDialogOpen(false)}
