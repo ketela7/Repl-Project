@@ -2764,7 +2764,7 @@ export function DriveManager() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {(() => {
-                              const actions = getAvailableActions(activeView);
+                              const actions = getFileActions(file, activeView);
                               return (
                                 <>
                                   {actions.canPreview && isPreviewable(file.mimeType) && (
