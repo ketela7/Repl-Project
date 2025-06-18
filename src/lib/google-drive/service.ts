@@ -59,11 +59,24 @@ export class GoogleDriveService {
       includeTeamDriveItems = false,
     } = options;
 
+    // Use the query parameter directly if provided, otherwise build one
     let searchQuery = '';
     
-    if (query || parentId || mimeType) {
+    if (query) {
+      // If query is already formatted (contains operators), use it directly
+      if (query.includes('=') || query.includes('and') || query.includes('or')) {
+        searchQuery = query;
+      } else {
+        // Otherwise treat it as a search term
+        searchQuery = buildSearchQuery({
+          name: query,
+          parentId,
+          mimeType,
+          trashed: false,
+        });
+      }
+    } else if (parentId || mimeType) {
       searchQuery = buildSearchQuery({
-        name: query,
         parentId,
         mimeType,
         trashed: false,
@@ -72,6 +85,8 @@ export class GoogleDriveService {
       searchQuery = 'trashed=false';
     }
 
+    console.log('Google Drive Service - Final Query:', searchQuery);
+
     const response = await this.drive.files.list({
       q: searchQuery,
       pageSize,
@@ -79,10 +94,12 @@ export class GoogleDriveService {
       orderBy,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
-      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed)',
+      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, viewedByMeTime)',
     });
 
     const files = response.data.files?.map(convertGoogleDriveFile) || [];
+
+    console.log(`Google Drive Service - Retrieved ${files.length} files`);
 
     return {
       files,
