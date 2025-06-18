@@ -2330,7 +2330,7 @@ export function DriveManager() {
       {isPerformanceVisible && (
         <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm" onClick={() => setIsPerformanceVisible(false)}>
           <div className="fixed bottom-4 right-4 z-60" onClick={(e) => e.stopPropagation()}>
-            <PerformanceDashboard />
+            <PerformanceDashboard isFloating={true} />
             <button 
               onClick={() => setIsPerformanceVisible(false)}
               className="absolute top-2 right-2 bg-white dark:bg-gray-900 rounded-full p-1 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-800"
