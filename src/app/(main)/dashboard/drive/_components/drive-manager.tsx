@@ -93,10 +93,11 @@ import { DriveGridSkeleton, BreadcrumbSkeleton } from './drive-skeleton';
 import { LoadingSkeleton, BreadcrumbLoadingSkeleton } from '@/components/ui/loading-skeleton';
 import { LazyImage } from '@/components/ui/lazy-image';
 import { VirtualList } from '@/components/ui/virtual-list';
-import { BulkActionsToolbar } from './bulk-actions-toolbar';
+import { UnifiedFloatingMenu } from './unified-floating-menu';
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
+import { PerformanceDashboard } from '@/components/performance-dashboard';
 
 export function DriveManager() {
   const [files, setFiles] = useState<DriveFile[]>([]);
@@ -149,6 +150,7 @@ export function DriveManager() {
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkCopyDialogOpen, setIsBulkCopyDialogOpen] = useState(false);
+  const [isPerformanceVisible, setIsPerformanceVisible] = useState(false);
   const [bulkOperationProgress, setBulkOperationProgress] = useState<{
     isRunning: boolean;
     current: number;
@@ -2326,9 +2328,9 @@ export function DriveManager() {
         file={selectedFileForPreview}
       />
 
-      {/* Floating Bulk Actions Toolbar */}
+      {/* Unified Floating Menu */}
       {(folders.length > 0 || files.length > 0) && (
-        <BulkActionsToolbar
+        <UnifiedFloatingMenu
           selectedCount={selectedItems.size}
           totalCount={folders.length + files.length}
           isSelectMode={isSelectMode}
@@ -2341,7 +2343,24 @@ export function DriveManager() {
           onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
           onBulkMove={() => setIsBulkMoveDialogOpen(true)}
           onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
+          onShowPerformance={() => setIsPerformanceVisible(true)}
         />
+      )}
+
+      {/* Performance Dashboard - Controlled by unified menu */}
+      {isPerformanceVisible && (
+        <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm" onClick={() => setIsPerformanceVisible(false)}>
+          <div className="fixed bottom-4 right-4 z-60" onClick={(e) => e.stopPropagation()}>
+            <PerformanceDashboard />
+            <button 
+              onClick={() => setIsPerformanceVisible(false)}
+              className="absolute top-2 right-2 bg-white dark:bg-gray-900 rounded-full p-1 shadow-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              title="Close Performance Dashboard"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
