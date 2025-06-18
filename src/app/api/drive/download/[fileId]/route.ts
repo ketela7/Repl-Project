@@ -8,6 +8,9 @@ export async function GET(
 ) {
   try {
     const supabase = await createClient();
+    const { searchParams } = new URL(request.url);
+    const isDirect = searchParams.get('direct') === 'true';
+    
     const { data: { session }, error: authError } = await supabase.auth.getSession();
 
     if (authError || !session?.user) {
@@ -43,7 +46,20 @@ export async function GET(
       }, { status: 400 });
     }
 
-    // Get the file stream
+    // For direct downloads (large files), redirect to Google Drive
+    if (isDirect) {
+      const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+      
+      return NextResponse.redirect(downloadUrl, {
+        status: 302,
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Disposition': `attachment; filename="${encodeURIComponent(fileDetails.name)}"`,
+        }
+      });
+    }
+
+    // Get the file stream for regular downloads
     const fileStream = await driveService.downloadFileStream(fileId);
     
     if (!fileStream) {

@@ -537,90 +537,65 @@ export function DriveManager() {
             const isLargeFile = fileSizeMB > 50; // 50MB threshold
             
             if (isLargeFile) {
-              // For large files, use streaming download with progress
-              console.log(`Large file detected (${fileSizeMB.toFixed(1)}MB): ${item.name}, using stream download`);
+              // For large files >50MB, use direct Google Drive download to avoid memory issues
+              console.log(`Large file detected (${fileSizeMB.toFixed(1)}MB): ${item.name}, using direct download`);
               
-              const downloadResponse = await fetch(`/api/drive/download/${item.id}`);
-              
-              if (!downloadResponse.ok) {
-                if (downloadResponse.status === 401) {
-                  const errorData = await downloadResponse.json();
-                  if (errorData.needsReauth) {
-                    toast.error('Google Drive access expired. Please reconnect your account.');
-                    window.location.reload();
-                    return;
+              try {
+                // Get direct download URL from Google Drive
+                const urlResponse = await fetch(`/api/drive/download-url/${item.id}`);
+                
+                if (!urlResponse.ok) {
+                  if (urlResponse.status === 401) {
+                    const errorData = await urlResponse.json();
+                    if (errorData.needsReauth) {
+                      toast.error('Google Drive access expired. Please reconnect your account.');
+                      window.location.reload();
+                      return;
+                    }
                   }
-                }
-                
-                if (downloadResponse.status === 403) {
-                  failedItems.push(`${item.name} (permission denied)`);
-                  continue;
-                }
-                
-                if (downloadResponse.status === 404) {
-                  failedItems.push(`${item.name} (not found)`);
-                  continue;
-                }
-                
-                if (downloadResponse.status === 400) {
-                  const errorData = await downloadResponse.json();
-                  if (errorData.error?.includes('folder')) {
-                    skippedItems.push(item.name);
+                  
+                  if (urlResponse.status === 403) {
+                    failedItems.push(`${item.name} (permission denied)`);
                     continue;
                   }
+                  
+                  if (urlResponse.status === 404) {
+                    failedItems.push(`${item.name} (not found)`);
+                    continue;
+                  }
+                  
+                  failedItems.push(`${item.name} (failed to get download URL)`);
+                  continue;
                 }
                 
-                failedItems.push(`${item.name} (download failed)`);
-                continue;
-              }
-              
-              // Stream processing for large files
-              const reader = downloadResponse.body?.getReader();
-              const contentLength = downloadResponse.headers.get('Content-Length');
-              const totalSize = contentLength ? parseInt(contentLength) : fileSizeBytes;
-              
-              if (!reader) {
-                failedItems.push(`${item.name} (stream error)`);
-                continue;
-              }
-              
-              const chunks: Uint8Array[] = [];
-              let receivedLength = 0;
-              
-              while (true) {
-                const { done, value } = await reader.read();
+                const { downloadUrl, filename, authHeader } = await urlResponse.json();
                 
-                if (done) break;
+                // Create hidden iframe for direct download without memory overhead
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.style.border = 'none';
                 
-                chunks.push(value);
-                receivedLength += value.length;
+                // Set iframe source to trigger download
+                iframe.src = `${downloadUrl}&headers=${encodeURIComponent(authHeader)}`;
                 
-                // Update progress for large file
-                const progress = (receivedLength / totalSize) * 100;
-                console.log(`Download progress for ${item.name}: ${progress.toFixed(1)}%`);
+                document.body.appendChild(iframe);
+                
+                // Clean up iframe after download initiates
+                setTimeout(() => {
+                  if (iframe.parentNode) {
+                    document.body.removeChild(iframe);
+                  }
+                }, 3000);
+                
+                successCount++;
+                console.log(`Direct download initiated for large file: ${item.name}`);
+                
+              } catch (error) {
+                console.error(`Failed to download large file ${item.name}:`, error);
+                failedItems.push(`${item.name} (large file download failed)`);
               }
-              
-              // Combine chunks and create blob
-              const blob = new Blob(chunks, { 
-                type: downloadResponse.headers.get('Content-Type') || 'application/octet-stream' 
-              });
-              
-              // Create download link
-              const blobUrl = window.URL.createObjectURL(blob);
-              const link = document.createElement('a');
-              link.href = blobUrl;
-              link.download = item.name;
-              link.style.display = 'none';
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              
-              // Clean up blob URL
-              setTimeout(() => {
-                window.URL.revokeObjectURL(blobUrl);
-              }, 1000);
-              
-              successCount++;
             } else {
               // For small files, use standard blob approach
               console.log(`Small file (${fileSizeMB.toFixed(1)}MB): ${item.name}, using blob download`);
