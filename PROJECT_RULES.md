@@ -136,6 +136,12 @@ TURNSTILE_SECRET_KEY
 - **CSRF Protection**: Built-in Next.js protection
 - **Error Information**: Limited details in production
 
+### File Handling Restrictions
+- **No Archive Usage**: Do not use any archive libraries (zip, tar, etc.)
+- **Direct Download Only**: All downloads must be direct file streams or blobs
+- **Individual File Processing**: Handle each file separately, no bundling
+- **Memory Efficiency**: Use streaming or blob-based downloads for large files
+
 ---
 
 ## 🚀 Performance & Optimization
