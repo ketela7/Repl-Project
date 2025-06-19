@@ -383,7 +383,7 @@ export function DriveManager() {
   }>({ isRunning: false, current: 0, total: 0, operation: '' });
 
   // Sorting functionality
-  const handleSort = (key: 'name' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType') => {
+  const handleSort = (key: 'name' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -436,8 +436,8 @@ export function DriveManager() {
           bValue = new Date(b.createdTime).getTime();
           break;
         case 'mimeType':
-          aValue = a.mimeType.toLowerCase();
-          bValue = b.mimeType.toLowerCase();
+          aValue = (a.mimeType || '').toLowerCase();
+          bValue = (b.mimeType || '').toLowerCase();
           break;
         case 'owners':
           aValue = a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '';
@@ -446,6 +446,10 @@ export function DriveManager() {
         default:
           return 0;
       }
+
+      // Handle null/undefined values
+      if (aValue === null || aValue === undefined) aValue = '';
+      if (bValue === null || bValue === undefined) bValue = '';
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
@@ -474,8 +478,8 @@ export function DriveManager() {
           bValue = new Date(b.createdTime).getTime();
           break;
         case 'mimeType':
-          aValue = 'folder';
-          bValue = 'folder';
+          aValue = a.mimeType || 'application/vnd.google-apps.folder';
+          bValue = b.mimeType || 'application/vnd.google-apps.folder';
           break;
         case 'size':
           aValue = 0;
@@ -488,6 +492,10 @@ export function DriveManager() {
         default:
           return 0;
       }
+
+      // Handle null/undefined values
+      if (aValue === null || aValue === undefined) aValue = '';
+      if (bValue === null || bValue === undefined) bValue = '';
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
