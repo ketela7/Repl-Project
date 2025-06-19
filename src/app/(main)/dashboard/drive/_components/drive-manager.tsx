@@ -112,11 +112,11 @@ const normalizeFileSize = (size: any): number => {
   // Handle null, undefined, empty values
   if (size === null || size === undefined || size === '' || size === '-') return 0;
   if (!size && size !== 0) return 0;
-  
+
   // Convert to string and check for invalid values
   const sizeStr = size.toString().trim();
   if (sizeStr === '-' || sizeStr === '' || sizeStr === 'undefined' || sizeStr === 'null') return 0;
-  
+
   // Parse as number
   const parsedSize = parseInt(sizeStr);
   return isNaN(parsedSize) || parsedSize < 0 ? 0 : parsedSize;
@@ -219,12 +219,12 @@ const applyClientSideFilters = (
   // Apply additional search filtering for better results
   if (filters.searchQuery && filters.searchQuery.trim()) {
     const searchTerm = filters.searchQuery.toLowerCase();
-    
+
     filteredFiles = filteredFiles.filter(file => 
       file.name?.toLowerCase().includes(searchTerm) ||
       file.description?.toLowerCase().includes(searchTerm)
     );
-    
+
     filteredFolders = filteredFolders.filter(folder => 
       folder.name?.toLowerCase().includes(searchTerm) ||
       folder.description?.toLowerCase().includes(searchTerm)
@@ -240,7 +240,7 @@ const applyClientSideFilters = (
       filteredFiles = filteredFiles.filter(file => {
         return isFileSizeInRange(file.size, sizeRange.min, sizeRange.max, sizeRange.unit);
       });
-      
+
       // Filter folders by size (folders have size = 0)
       filteredFolders = filteredFolders.filter(folder => {
         return isFileSizeInRange(0, sizeRange.min, sizeRange.max, sizeRange.unit);
@@ -253,17 +253,17 @@ const applyClientSideFilters = (
         const fileDate = new Date(file.createdTime);
         const fromDate = createdDateRange.from;
         const toDate = createdDateRange.to;
-        
+
         if (fromDate && fileDate < fromDate) return false;
         if (toDate && fileDate > toDate) return false;
         return true;
       });
-      
+
       filteredFolders = filteredFolders.filter(folder => {
         const folderDate = new Date(folder.createdTime);
         const fromDate = createdDateRange.from;
         const toDate = createdDateRange.to;
-        
+
         if (fromDate && folderDate < fromDate) return false;
         if (toDate && folderDate > toDate) return false;
         return true;
@@ -275,17 +275,17 @@ const applyClientSideFilters = (
         const fileDate = new Date(file.modifiedTime);
         const fromDate = modifiedDateRange.from;
         const toDate = modifiedDateRange.to;
-        
+
         if (fromDate && fileDate < fromDate) return false;
         if (toDate && fileDate > toDate) return false;
         return true;
       });
-      
+
       filteredFolders = filteredFolders.filter(folder => {
         const folderDate = new Date(folder.modifiedTime);
         const fromDate = modifiedDateRange.from;
         const toDate = modifiedDateRange.to;
-        
+
         if (fromDate && folderDate < fromDate) return false;
         if (toDate && folderDate > toDate) return false;
         return true;
@@ -301,7 +301,7 @@ const applyClientSideFilters = (
           ownerInfo.emailAddress?.toLowerCase().includes(ownerTerm)
         )
       );
-      
+
       filteredFolders = filteredFolders.filter(folder => 
         folder.owners?.some(ownerInfo => 
           ownerInfo.displayName?.toLowerCase().includes(ownerTerm) ||
@@ -371,7 +371,7 @@ export function DriveManager() {
     modifiedDateRange?: { from?: Date; to?: Date };
     owner?: string;
   }>({});
-  
+
   // Bulk operations state
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
@@ -1137,18 +1137,18 @@ export function DriveManager() {
       if (parentId) params.append('parentId', parentId);
       if (query) params.append('query', query);
       if (pageToken) params.append('pageToken', pageToken);
-      
+
       // Add view filter parameters
       const currentView = viewFilter || activeView;
       if (currentView !== 'all') {
         params.append('view', currentView);
       }
-      
+
       // Add file type filters
       if (fileTypeFilter.length > 0) {
         params.append('fileTypes', fileTypeFilter.join(','));
       }
-      
+
       // Add advanced filters
       if (advancedFilters.sizeRange && (advancedFilters.sizeRange.min || advancedFilters.sizeRange.max)) {
         if (advancedFilters.sizeRange.min) {
@@ -1158,25 +1158,25 @@ export function DriveManager() {
           params.append('sizeMax', (advancedFilters.sizeRange.max * getSizeMultiplier(advancedFilters.sizeRange.unit)).toString());
         }
       }
-      
+
       if (advancedFilters.createdDateRange?.from) {
         params.append('createdAfter', advancedFilters.createdDateRange.from.toISOString());
       }
       if (advancedFilters.createdDateRange?.to) {
         params.append('createdBefore', advancedFilters.createdDateRange.to.toISOString());
       }
-      
+
       if (advancedFilters.modifiedDateRange?.from) {
         params.append('modifiedAfter', advancedFilters.modifiedDateRange.from.toISOString());
       }
       if (advancedFilters.modifiedDateRange?.to) {
         params.append('modifiedBefore', advancedFilters.modifiedDateRange.to.toISOString());
       }
-      
+
       if (advancedFilters.owner) {
         params.append('owner', advancedFilters.owner);
       }
-      
+
       // Optimized page size for better performance
       params.append('pageSize', '50');
 
@@ -1261,6 +1261,11 @@ export function DriveManager() {
 
         // Prefetch thumbnails for visible files
         prefetchManager.prefetchThumbnails(fileList.slice(0, 12));
+
+        // Process file organization for visible files
+        [...fileList, ...folderList].forEach(item => {
+          processFileOrganization(item);
+        });
       }
       setHasAccess(true);
 
@@ -1492,6 +1497,7 @@ export function DriveManager() {
           if (!trashResponse.ok) {
             const errorData = await trashResponse.json();
             console.error('Trash failed:', errorData);
+
             if (errorData.needsReauth) {
               toast.error('Google Drive access expired. Please reconnect your account.');
               window.location.reload();
@@ -1673,8 +1679,7 @@ export function DriveManager() {
       const renameResponse = await fetch(`/api/drive/files/${selectedFileForAction.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          action: 'rename',
+        body: JSON.stringify({          action: 'rename',
           name: newName.trim()
         })
       });
@@ -1868,6 +1873,32 @@ export function DriveManager() {
     }
 
     toast.error(`${context}: ${error.message || 'An error occurred'}`);
+  };
+
+  // Auto-tagging and smart categorization function
+  const processFileOrganization = (item: DriveFile | DriveFolder) => {
+    // Example: Auto-tagging based on file type
+    let tags: string[] = [];
+    if (item.mimeType?.includes('document')) {
+      tags.push('document');
+    } else if (item.mimeType?.includes('spreadsheet')) {
+      tags.push('spreadsheet');
+    } else if (item.mimeType?.startsWith('image/')) {
+      tags.push('image');
+    }
+
+    // Example: Smart categorization based on file name
+    if (item.name?.toLowerCase().includes('report')) {
+      tags.push('report');
+    }
+
+    // Add tags to the file's description or metadata
+    if (tags.length > 0) {
+      console.log(`Auto-tagging ${item.name}:`, tags);
+      // You can implement a function to update the file's description
+      // or metadata with these tags using the Google Drive API.
+      // Example: updateFileMetadata(item.id, { tags: tags });
+    }
   };
 
   useEffect(() => {
@@ -2323,7 +2354,7 @@ export function DriveManager() {
                                   Rename
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canMove && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2333,7 +2364,7 @@ export function DriveManager() {
                                   Move
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canCopy && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2343,7 +2374,7 @@ export function DriveManager() {
                                   Copy
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canShare && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2353,7 +2384,7 @@ export function DriveManager() {
                                   Share
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canDetails && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2363,9 +2394,9 @@ export function DriveManager() {
                                   Details
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
-                              
+
                               {actions.canRestore && (
                                 <DropdownMenuItem 
                                   className="text-green-600"
@@ -2378,7 +2409,7 @@ export function DriveManager() {
                                   Restore
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canTrash && (
                                 <DropdownMenuItem 
                                   className="text-orange-600"
@@ -2391,7 +2422,7 @@ export function DriveManager() {
                                   Move to Trash
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canPermanentDelete && (
                                 <DropdownMenuItem 
                                   className="text-destructive"
@@ -2468,7 +2499,7 @@ export function DriveManager() {
                                   Preview
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canDownload && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2478,7 +2509,7 @@ export function DriveManager() {
                                   Download
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canRename && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2488,7 +2519,7 @@ export function DriveManager() {
                                   Rename
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canMove && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2498,7 +2529,7 @@ export function DriveManager() {
                                   Move
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canCopy && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2508,7 +2539,7 @@ export function DriveManager() {
                                   Copy
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canShare && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2518,7 +2549,7 @@ export function DriveManager() {
                                   Share
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canDetails && (
                                 <DropdownMenuItem onClick={(e) => {
                                   e.stopPropagation();
@@ -2528,9 +2559,9 @@ export function DriveManager() {
                                   Details
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
-                              
+
                               {actions.canRestore && (
                                 <DropdownMenuItem 
                                   className="text-green-600"
@@ -2543,7 +2574,7 @@ export function DriveManager() {
                                   Restore
                                 </DropdownMenuItem>
                               )}
-                              
+
                               {actions.canTrash && (
                                 <DropdownMenuItem 
                                   className="text-orange-600"
@@ -2554,9 +2585,10 @@ export function DriveManager() {
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Move to Trash
-                                </DropdownMenuItem>
+                                </DropdownMenuItem>```text
+
                               )}
-                              
+
                               {actions.canPermanentDelete && (
                                 <DropdownMenuItem 
                                   className="text-destructive"
@@ -2816,7 +2848,7 @@ export function DriveManager() {
                                       Preview
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {item.itemType === 'file' && actions.canDownload && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
@@ -2826,7 +2858,7 @@ export function DriveManager() {
                                       Download
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {actions.canRename && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
@@ -2836,7 +2868,7 @@ export function DriveManager() {
                                       Rename
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {actions.canMove && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
@@ -2846,7 +2878,7 @@ export function DriveManager() {
                                       Move
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {actions.canCopy && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
@@ -2856,7 +2888,7 @@ export function DriveManager() {
                                       Copy
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {actions.canShare && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
@@ -2866,7 +2898,7 @@ export function DriveManager() {
                                       Share
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {actions.canDetails && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
@@ -2876,9 +2908,9 @@ export function DriveManager() {
                                       Details
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
-                                  
+
                                   {actions.canRestore && (
                                     <DropdownMenuItem 
                                       className="text-green-600"
@@ -2891,7 +2923,7 @@ export function DriveManager() {
                                       Restore
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {actions.canTrash && (
                                     <DropdownMenuItem 
                                       className="text-orange-600"
@@ -2904,7 +2936,7 @@ export function DriveManager() {
                                       Move to Trash
                                     </DropdownMenuItem>
                                   )}
-                                  
+
                                   {actions.canPermanentDelete && (
                                     <DropdownMenuItem 
                                       className="text-destructive"
@@ -2988,8 +3020,7 @@ export function DriveManager() {
         isOpen={isMoveDialogOpen}
         onClose={() => {
           setIsMoveDialogOpen(false);
-          setSelectedFileFor// This file updates the handleBulkRename function to support regex renaming in the DriveManager component.
-Action(null);
+          setSelectedFileForAction(null);
         }}
         fileName={selectedFileForAction?.name || ''}
         currentParentId={selectedFileForAction?.parentId || null}
