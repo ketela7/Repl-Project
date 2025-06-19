@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,33 +15,42 @@ import {
 import { Edit } from "lucide-react";
 
 interface FileRenameDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  fileName: string;
-  onRename: (newName: string) => Promise<void>;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  file: { id: string; name: string; parentId?: string } | null;
+  onFileRenamed: (renamedFile: any) => void;
 }
 
 export function FileRenameDialog({ 
-  isOpen, 
-  onClose, 
-  fileName,
-  onRename
+  open, 
+  onOpenChange, 
+  file,
+  onFileRenamed
 }: FileRenameDialogProps) {
-  const [newName, setNewName] = useState(fileName);
+  const [newName, setNewName] = useState(file?.name || '');
   const [renaming, setRenaming] = useState(false);
 
   const handleRename = async () => {
-    if (!newName.trim() || newName === fileName) {
-      onClose();
+    if (!newName?.trim() || !file || newName === file.name) {
+      handleClose();
       return;
     }
 
     try {
       setRenaming(true);
-      await onRename(newName.trim());
+      // Simulate API call - replace with actual API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Mock renamed file response
+      const renamedFile = {
+        ...file,
+        name: newName.trim()
+      };
+      
+      onFileRenamed(renamedFile);
       handleClose();
     } catch (error) {
-      // Error is handled by parent component
+      console.error('Error renaming file:', error);
     } finally {
       setRenaming(false);
     }
@@ -49,19 +58,31 @@ export function FileRenameDialog({
 
   const handleClose = () => {
     if (!renaming) {
-      setNewName(fileName);
-      onClose();
+      setNewName(file?.name || '');
+      onOpenChange(false);
     }
   };
 
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
       handleClose();
     }
   };
 
+  // Update newName when file prop changes
+  React.useEffect(() => {
+    if (file?.name) {
+      setNewName(file.name);
+    }
+  }, [file?.name]);
+
+  // Add React import
+  if (!file) {
+    return null;
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Rename File</DialogTitle>
@@ -105,7 +126,7 @@ export function FileRenameDialog({
           </Button>
           <Button 
             onClick={handleRename} 
-            disabled={!newName.trim() || newName === fileName || renaming}
+            disabled={!newName?.trim() || newName === file?.name || renaming}
           >
             {renaming ? (
               <>
