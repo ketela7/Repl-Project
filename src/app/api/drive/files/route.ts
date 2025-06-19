@@ -119,8 +119,9 @@ export async function GET(request: NextRequest) {
     console.log('Session keys:', Object.keys(session));
 
     // Enhanced token detection with debugging
-    const accessToken = user.user_metadata?.provider_token || 
-                       session.provider_token ||
+    const accessToken = session.provider_token || 
+                       user.user_metadata?.provider_token ||
+                       user.user_metadata?.access_token ||
                        session.access_token;
 
     console.log('Token search results:', {

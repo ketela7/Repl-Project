@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Home, Folder, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { requestDeduplicator } from "@/lib/request-deduplicator";
 
 interface BreadcrumbItemData {
   id: string;
@@ -28,70 +27,56 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastFetchedId, setLastFetchedId] = useState<string | null>(null);
 
   const fetchFolderPath = async (folderId: string) => {
-    const requestKey = `breadcrumb-${folderId}`;
-    
-    return requestDeduplicator.execute(requestKey, async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await fetch(`/api/drive/files/${folderId}`);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch folder: ${response.status}`);
-        }
-
-        const folder = await response.json();
-        const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }];
-
-        // Build path by traversing parent folders
-        let currentParent = folder.parents?.[0];
-        let depth = 0;
-        const maxDepth = 10; // Prevent infinite loops
-        
-        while (currentParent && currentParent !== 'root' && depth < maxDepth) {
-          try {
-            const parentResponse = await fetch(`/api/drive/files/${currentParent}`);
-            if (!parentResponse.ok) break;
-
-            const parentFolder = await parentResponse.json();
-            items.unshift({ id: parentFolder.id, name: parentFolder.name });
-            currentParent = parentFolder.parents?.[0];
-            depth++;
-          } catch (err) {
-            console.warn('Failed to fetch parent folder:', err);
-            break;
-          }
-        }
-
-        setBreadcrumbItems(items);
-        return items;
-      } catch (error) {
-        console.error('Error fetching folder path:', error);
-        setError('Failed to load folder path');
-        setBreadcrumbItems([]);
-        throw error;
-      } finally {
-        setLoading(false);
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`/api/drive/files/${folderId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch folder: ${response.status}`);
       }
-    });
+
+      const folder = await response.json();
+      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }];
+
+      // Build path by traversing parent folders
+      let currentParent = folder.parents?.[0];
+      let depth = 0;
+      const maxDepth = 10; // Prevent infinite loops
+      
+      while (currentParent && currentParent !== 'root' && depth < maxDepth) {
+        try {
+          const parentResponse = await fetch(`/api/drive/files/${currentParent}`);
+          if (!parentResponse.ok) break;
+
+          const parentFolder = await parentResponse.json();
+          items.unshift({ id: parentFolder.id, name: parentFolder.name });
+          currentParent = parentFolder.parents?.[0];
+          depth++;
+        } catch (err) {
+          console.warn('Failed to fetch parent folder:', err);
+          break;
+        }
+      }
+
+      setBreadcrumbItems(items);
+    } catch (error) {
+      console.error('Error fetching folder path:', error);
+      setError('Failed to load folder path');
+      setBreadcrumbItems([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    // Prevent duplicate requests for the same folder
-    if (currentFolderId === lastFetchedId) {
-      return;
-    }
-
-    if (currentFolderId && currentFolderId !== 'root') {
-      setLastFetchedId(currentFolderId);
+    if (currentFolderId) {
       fetchFolderPath(currentFolderId);
     } else {
       setBreadcrumbItems([]);
       setError(null);
-      setLastFetchedId(null);
     }
   }, [currentFolderId]);
 
