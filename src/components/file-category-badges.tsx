@@ -370,32 +370,47 @@ export function FileCategoryBadges({
   }
 
   return (
-    <div className={`${className}`}>
-      <div className="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-start">
-        {categories.map((category) => (
+    <div className={`w-full ${className}`}>
+      <div className="flex flex-wrap gap-2 sm:gap-3 p-2 sm:p-3 bg-background/50 rounded-lg border">
+        {categories.slice(0, 6).map((category) => (
           <Badge
             key={category.name}
             variant="outline"
             className={`
               px-3 py-2 sm:px-4 sm:py-2.5 cursor-pointer transition-all duration-200 
-              hover:scale-105 hover:shadow-md active:scale-95
+              hover:scale-105 hover:shadow-md active:scale-95 select-none
               ${category.color} ${category.bgColor} ${category.textColor}
-              border-2 rounded-full font-medium text-sm sm:text-base
-              flex items-center gap-2 min-w-fit
-              shadow-sm hover:shadow-lg
-              backdrop-blur-sm
-              touch-manipulation
+              border-2 rounded-full font-semibold text-xs sm:text-sm
+              flex items-center gap-1.5 sm:gap-2 min-w-fit max-w-fit
+              shadow-sm hover:shadow-lg backdrop-blur-sm touch-manipulation
+              focus:outline-none focus:ring-2 focus:ring-primary/20
             `}
             onClick={() => onCategoryClick?.(category.name)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onCategoryClick?.(category.name);
+              }
+            }}
           >
-            <span className="flex-shrink-0">
+            <span className="flex-shrink-0 text-current">
               {category.icon}
             </span>
-            <span className="whitespace-nowrap font-semibold">
+            <span className="whitespace-nowrap font-semibold text-current">
               {category.name} {category.count}
             </span>
           </Badge>
         ))}
+        {categories.length > 6 && (
+          <Badge
+            variant="outline"
+            className="px-3 py-2 text-xs text-muted-foreground border-dashed"
+          >
+            +{categories.length - 6} more
+          </Badge>
+        )}
       </div>
     </div>
   );

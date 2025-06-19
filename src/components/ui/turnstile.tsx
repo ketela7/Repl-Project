@@ -1,1 +1,0 @@
-// This file has been removed as Turnstile functionality is no longer needed

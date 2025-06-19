@@ -45,100 +45,12 @@ export interface NavGroup {
 export const sidebarItems: NavGroup[] = [
   {
     id: 1,
-    label: "Dashboards",
+    label: "Google Drive Management",
     items: [
       {
-        title: "Dashboards",
-        url: "/dashboard",
-        icon: Home,
-        subItems: [
-          { title: "Default", url: "/dashboard/default", icon: ChartPie },
-          { title: "CRM", url: "/dashboard", icon: Grid2X2, comingSoon: true },
-          { title: "Analytics", url: "/dashboard/analytics", icon: ChartLine },
-          { title: "eCommerce", url: "/dashboard/e-commerce", icon: ShoppingBag, comingSoon: true },
-          { title: "Academy", url: "/dashboard/academy", icon: BookA, comingSoon: true },
-          { title: "Logistics", url: "/dashboard/logistics", icon: Forklift, comingSoon: true },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    label: "File Management",
-    items: [
-      {
-        title: "Google Drive",
+        title: "My Drive",
         url: "/dashboard/drive",
         icon: HardDrive,
-      },
-    ],
-  },
-  {
-    id: 3,
-    label: "Pages",
-    items: [
-      {
-        title: "Authentication",
-        url: "/auth",
-        icon: Fingerprint,
-        subItems: [
-          { title: "Login v1", url: "/auth/v1/login", newTab: true },
-          { title: "Register v1", url: "/auth/v1/register", newTab: true },
-        ],
-      },
-      {
-        title: "Email",
-        url: "/mail",
-        icon: Mail,
-        comingSoon: true,
-      },
-      {
-        title: "Chat",
-        url: "/chat",
-        icon: MessageSquare,
-        comingSoon: true,
-      },
-      {
-        title: "Calendar",
-        url: "/calendar",
-        icon: Calendar,
-        comingSoon: true,
-      },
-      {
-        title: "Kanban",
-        url: "/kanban",
-        icon: Kanban,
-        comingSoon: true,
-      },
-      {
-        title: "Invoice",
-        url: "/invoice",
-        icon: ReceiptText,
-        comingSoon: true,
-      },
-      {
-        title: "Users",
-        url: "/users",
-        icon: Users,
-        comingSoon: true,
-      },
-      {
-        title: "Roles",
-        url: "/roles",
-        icon: Lock,
-        comingSoon: true,
-      },
-    ],
-  },
-  {
-    id: 4,
-    label: "Misc",
-    items: [
-      {
-        title: "Others",
-        url: "/others",
-        icon: SquareArrowUpRight,
-        comingSoon: true,
       },
     ],
   },

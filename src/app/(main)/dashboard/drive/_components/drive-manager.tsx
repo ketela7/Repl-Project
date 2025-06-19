@@ -74,7 +74,6 @@ import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { requestQueue } from '@/lib/request-queue';
 import { backgroundCacheManager } from '@/lib/background-cache';
 import { batchAPI } from '@/lib/batch-api';
-import { prefetchManager } from '@/lib/prefetch-manager';
 import { clientStorage } from '@/lib/client-storage';
 import { apiOptimizer } from '@/lib/api-optimizer';
 
@@ -91,7 +90,6 @@ import { FilePreviewDialog } from './file-preview-dialog';
 import { DriveGridSkeleton, BreadcrumbSkeleton } from './drive-skeleton';
 import { LoadingSkeleton, BreadcrumbLoadingSkeleton } from '@/components/ui/loading-skeleton';
 import { LazyImage } from '@/components/ui/lazy-image';
-import { VirtualList } from '@/components/ui/virtual-list';
 import { BulkActionsToolbar } from './bulk-actions-toolbar';
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
@@ -2039,9 +2037,44 @@ export function DriveManager() {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
+    <div className="w-full space-y-3 sm:space-y-4">
+      {/* Compact Header with Search and Actions */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2 flex-1">
+          <Input
+            placeholder="Search your Google Drive..."
+            value={searchQuery}
+            onChange={(e) => handleSearchInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            className="text-sm flex-1"
+          />
+          <Button onClick={handleSearch} size="sm" variant="outline">
+            <Search className="h-4 w-4" />
+          </Button>
+        </div>
 
-      {/* Integrated Filters Bar */}
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={handleRefresh} 
+            variant="outline" 
+            size="sm"
+            disabled={refreshing}
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:ml-2 sm:inline">Refresh</span>
+          </Button>
+          <Button 
+            onClick={() => setIsCreateFolderDialogOpen(true)} 
+            variant="outline" 
+            size="sm"
+          >
+            <FolderPlus className="h-4 w-4" />
+            <span className="hidden sm:ml-2 sm:inline">New Folder</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick Filters */}
       <DriveFiltersSidebar
         activeView={activeView}
         fileTypeFilter={fileTypeFilter}
@@ -2051,55 +2084,7 @@ export function DriveManager() {
         isCollapsed={false}
       />
 
-      {/* Search and Actions Bar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 flex-1 sm:max-w-md">
-          <Input
-            placeholder="Search files and folders..."
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="text-sm"
-          />
-          <Button onClick={handleSearch} size="sm" variant="outline">
-            <Search className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2 overflow-x-auto">
-          <Button 
-            onClick={handleRefresh} 
-            variant="outline" 
-            size="sm"
-            disabled={refreshing}
-            className="whitespace-nowrap"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:ml-2 sm:inline">Refresh</span>
-          </Button>
-          <Button 
-            onClick={() => setIsCreateFolderDialogOpen(true)} 
-            variant="outline" 
-            size="sm"
-            className="whitespace-nowrap"
-          >
-            <FolderPlus className="h-4 w-4" />
-            <span className="hidden sm:ml-2 sm:inline">New Folder</span>
-          </Button>
-          <Button 
-            onClick={() => toast.info("Upload feature coming soon!")} 
-            size="sm"
-            variant="outline"
-            disabled
-            className="whitespace-nowrap opacity-60"
-          >
-            <Upload className="h-4 w-4" />
-            <span className="hidden sm:ml-2 sm:inline">Upload Soon</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Breadcrumb */}
+      {/* Navigation Breadcrumb */}
       <FileBreadcrumb 
         currentFolderId={currentFolderId}
         loading={loading || refreshing}
@@ -2109,18 +2094,15 @@ export function DriveManager() {
         }}
       />
 
-      {/* File Category Badges */}
+      {/* File Category Overview */}
       {(sortedFiles.length > 0 || sortedFolders.length > 0) && (
         <FileCategoryBadges 
           files={sortedFiles}
           folders={sortedFolders}
           onCategoryClick={(category) => {
-            // Filter by category when badge is clicked
             if (category === 'Folders') {
-              // Show only folders
               setFileTypeFilter(['folder']);
             } else {
-              // Set filter based on category
               const categoryFilters = {
                 'Videos': ['video'],
                 'Documents': ['document', 'pdf'],
@@ -2134,10 +2116,9 @@ export function DriveManager() {
               };
               const filter = categoryFilters[category as keyof typeof categoryFilters] || ['other'];
               setFileTypeFilter(filter);
-              toast.info(`Filtering by ${category}`);
+              toast.info(`Showing ${category} files`);
             }
           }}
-          className="transition-all duration-200"
         />
       )}
 
