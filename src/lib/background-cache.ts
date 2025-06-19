@@ -3,7 +3,7 @@
  * Optimized for free tier deployment constraints
  */
 
-import { cache } from './cache';
+import { driveCache } from './cache';
 
 // Background cache refresh configuration
 const BACKGROUND_REFRESH_CONFIG = {
@@ -120,7 +120,7 @@ class BackgroundCacheManager {
 
       if (response.ok) {
         // Update our cache timestamp
-        cache.set(`${endpoint}:lastRefreshed`, Date.now().toString(), 60 * 60); // 1 hour
+        driveCache.set(`${endpoint}:lastRefreshed`, Date.now().toString(), 60 * 60); // 1 hour
       }
     } catch (error) {
       // Fallback to GET request if HEAD fails
@@ -132,7 +132,7 @@ class BackgroundCacheManager {
         if (response.ok) {
           const data = await response.text();
           // Update cache with fresh data
-          cache.set(endpoint, data, 15 * 60); // 15 minutes
+          driveCache.set(endpoint, data, 15 * 60); // 15 minutes
         }
       } catch (fallbackError) {
         throw fallbackError;
