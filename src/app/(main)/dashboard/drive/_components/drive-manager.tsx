@@ -108,9 +108,15 @@ import { useDriveErrorHandler } from '@/components/ui/drive-error-handler';
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 // File size utilities inline
 const normalizeFileSize = (size: any): number => {
+  // Handle null, undefined, empty values
+  if (size === null || size === undefined || size === '' || size === '-') return 0;
   if (!size && size !== 0) return 0;
+  
+  // Convert to string and check for invalid values
   const sizeStr = size.toString().trim();
   if (sizeStr === '-' || sizeStr === '' || sizeStr === 'undefined' || sizeStr === 'null') return 0;
+  
+  // Parse as number
   const parsedSize = parseInt(sizeStr);
   return isNaN(parsedSize) || parsedSize < 0 ? 0 : parsedSize;
 };
@@ -351,7 +357,7 @@ export function DriveManager() {
 
   // Table sorting state
   const [sortConfig, setSortConfig] = useState<{
-    key: 'name' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType';
+    key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners';
     direction: 'asc' | 'desc';
   } | null>(null);
 
@@ -383,7 +389,7 @@ export function DriveManager() {
   }>({ isRunning: false, current: 0, total: 0, operation: '' });
 
   // Sorting functionality
-  const handleSort = (key: 'name' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType') => {
+  const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -420,32 +426,40 @@ export function DriveManager() {
 
       switch (key) {
         case 'name':
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
+          aValue = (a.name || '').toLowerCase();
+          bValue = (b.name || '').toLowerCase();
+          break;
+        case 'id':
+          aValue = (a.id || '').toLowerCase();
+          bValue = (b.id || '').toLowerCase();
           break;
         case 'size':
           aValue = normalizeFileSize(a.size);
           bValue = normalizeFileSize(b.size);
           break;
         case 'modifiedTime':
-          aValue = new Date(a.modifiedTime).getTime();
-          bValue = new Date(b.modifiedTime).getTime();
+          aValue = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0;
+          bValue = b.modifiedTime ? new Date(b.modifiedTime).getTime() : 0;
           break;
         case 'createdTime':
-          aValue = new Date(a.createdTime).getTime();
-          bValue = new Date(b.createdTime).getTime();
+          aValue = a.createdTime ? new Date(a.createdTime).getTime() : 0;
+          bValue = b.createdTime ? new Date(b.createdTime).getTime() : 0;
           break;
         case 'mimeType':
-          aValue = a.mimeType.toLowerCase();
-          bValue = b.mimeType.toLowerCase();
+          aValue = (a.mimeType || '').toLowerCase();
+          bValue = (b.mimeType || '').toLowerCase();
           break;
         case 'owners':
-          aValue = a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '';
-          bValue = b.owners?.[0]?.displayName || b.owners?.[0]?.emailAddress || '';
+          aValue = (a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '').toLowerCase();
+          bValue = (b.owners?.[0]?.displayName || b.owners?.[0]?.emailAddress || '').toLowerCase();
           break;
         default:
           return 0;
       }
+
+      // Handle null, undefined, empty string, or "-" as 0 for consistent sorting
+      if (aValue === null || aValue === undefined || aValue === '' || aValue === '-') aValue = key === 'size' ? 0 : '';
+      if (bValue === null || bValue === undefined || bValue === '' || bValue === '-') bValue = key === 'size' ? 0 : '';
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
@@ -462,32 +476,40 @@ export function DriveManager() {
 
       switch (key) {
         case 'name':
-          aValue = a.name.toLowerCase();
-          bValue = b.name.toLowerCase();
+          aValue = (a.name || '').toLowerCase();
+          bValue = (b.name || '').toLowerCase();
+          break;
+        case 'id':
+          aValue = (a.id || '').toLowerCase();
+          bValue = (b.id || '').toLowerCase();
           break;
         case 'modifiedTime':
-          aValue = new Date(a.modifiedTime).getTime();
-          bValue = new Date(b.modifiedTime).getTime();
+          aValue = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0;
+          bValue = b.modifiedTime ? new Date(b.modifiedTime).getTime() : 0;
           break;
         case 'createdTime':
-          aValue = new Date(a.createdTime).getTime();
-          bValue = new Date(b.createdTime).getTime();
+          aValue = a.createdTime ? new Date(a.createdTime).getTime() : 0;
+          bValue = b.createdTime ? new Date(b.createdTime).getTime() : 0;
           break;
         case 'mimeType':
           aValue = 'folder';
           bValue = 'folder';
           break;
         case 'size':
-          aValue = 0;
+          aValue = 0; // Folders always have size 0
           bValue = 0;
           break;
         case 'owners':
-          aValue = a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '';
-          bValue = b.owners?.[0]?.displayName || b.owners?.[0]?.emailAddress || '';
+          aValue = (a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '').toLowerCase();
+          bValue = (b.owners?.[0]?.displayName || b.owners?.[0]?.emailAddress || '').toLowerCase();
           break;
         default:
           return 0;
       }
+
+      // Handle null, undefined, empty string, or "-" as appropriate default values
+      if (aValue === null || aValue === undefined || aValue === '' || aValue === '-') aValue = key === 'size' ? 0 : '';
+      if (bValue === null || bValue === undefined || bValue === '' || bValue === '-') bValue = key === 'size' ? 0 : '';
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1;
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
@@ -2627,7 +2649,18 @@ export function DriveManager() {
                         </Button>
                       </TableHead>
                     )}
-                    {visibleColumns.id && <TableHead>ID</TableHead>}
+                    {visibleColumns.id && (
+                      <TableHead>
+                        <Button
+                          variant="ghost"
+                          onClick={() => handleSort('id')}
+                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
+                        >
+                          ID
+                          <span className="ml-1 opacity-60">{getSortIcon('id')}</span>
+                        </Button>
+                      </TableHead>
+                    )}
                     {visibleColumns.size && (
                       <TableHead>
                         <Button
