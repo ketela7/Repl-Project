@@ -13,6 +13,7 @@ interface DriveLayoutNewProps {
   initialFiles?: DriveFile[];
   initialFolders?: DriveFolder[];
   hasAccess?: boolean;
+  isLoading?: boolean;
   onRefresh?: () => void;
   onCreateFolder?: () => void;
   className?: string;
@@ -22,6 +23,7 @@ export function DriveLayoutNew({
   initialFiles = [],
   initialFolders = [],
   hasAccess = true,
+  isLoading = false,
   onRefresh,
   onCreateFolder,
   className
@@ -34,7 +36,6 @@ export function DriveLayoutNew({
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
   
   // Filter states
   const [activeView, setActiveView] = useState<'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'>('all');
@@ -138,12 +139,10 @@ export function DriveLayoutNew({
 
   // Handle refresh
   const handleRefresh = () => {
-    setLoading(true);
     if (onRefresh) {
       onRefresh();
     }
     toast.success("Drive refreshed");
-    setTimeout(() => setLoading(false), 1000);
   };
 
   // Handle create folder
@@ -156,10 +155,16 @@ export function DriveLayoutNew({
 
   // Update files and folders when props change
   useEffect(() => {
+    console.log('DriveLayoutNew received props:', {
+      initialFiles: initialFiles.length,
+      initialFolders: initialFolders.length
+    });
     setFiles(initialFiles);
     setFolders(initialFolders);
   }, [initialFiles, initialFolders]);
 
+  console.log('DriveLayoutNew render - hasAccess:', hasAccess, 'files:', files.length, 'folders:', folders.length);
+  
   if (!hasAccess) {
     return <DriveConnectionCard />;
   }
@@ -198,7 +203,7 @@ export function DriveLayoutNew({
         onItemSelect={handleItemSelect}
         onItemDoubleClick={handleItemDoubleClick}
         onItemAction={handleItemAction}
-        isLoading={loading}
+        isLoading={isLoading}
       />
     </div>
   );

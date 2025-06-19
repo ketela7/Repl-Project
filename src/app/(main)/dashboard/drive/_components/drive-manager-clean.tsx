@@ -98,12 +98,15 @@ export function DriveManagerClean() {
 
       const data = await response.json();
       
+      console.log('API Response:', { success: data.success, filesCount: data.files?.length, foldersCount: data.folders?.length });
+      
       if (data.success) {
         setFiles(data.files || []);
         setFolders(data.folders || []);
         setNextPageToken(data.nextPageToken || null);
         setHasAccess(true);
         setNeedsReauth(false);
+        console.log('State updated - Files:', data.files?.length, 'Folders:', data.folders?.length);
       } else {
         throw new Error(data.error || 'Failed to fetch files');
       }
@@ -182,12 +185,21 @@ export function DriveManagerClean() {
     fetchFiles();
   }, []);
 
+  // Debug logging to check if data is being received
+  console.log('DriveManagerClean state:', {
+    files: files.length,
+    folders: folders.length,
+    loading,
+    hasAccess
+  });
+
   return (
     <div className="w-full min-h-screen">
       <DriveLayoutNew
         initialFiles={files}
         initialFolders={folders}
         hasAccess={hasAccess ?? true}
+        isLoading={loading}
         onRefresh={handleRefresh}
         onCreateFolder={handleCreateFolder}
       />

@@ -71,6 +71,14 @@ export function DriveContentArea({
     });
   };
 
+  // Debug logging
+  console.log('DriveContentArea render:', {
+    files: files.length,
+    folders: folders.length,
+    isLoading,
+    allItems: allItems.length
+  });
+
   if (isLoading) {
     return (
       <div className={cn("p-6", className)}>
@@ -89,7 +97,7 @@ export function DriveContentArea({
     );
   }
 
-  if (allItems.length === 0) {
+  if (allItems.length === 0 && !isLoading) {
     return (
       <div className={cn("flex items-center justify-center h-64", className)}>
         <div className="text-center">
