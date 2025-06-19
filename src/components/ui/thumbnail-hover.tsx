@@ -36,39 +36,42 @@ export function ThumbnailHover({
   }
 
   return (
-    <HoverCard openDelay={200} closeDelay={150}>
+    <HoverCard openDelay={300} closeDelay={100}>
       <HoverCardTrigger asChild>
-        <div className={className}>
+        <div className={`cursor-pointer transition-transform hover:scale-105 ${className}`}>
           {children}
         </div>
       </HoverCardTrigger>
       <HoverCardContent 
-        className="w-auto p-3 max-w-xs shadow-lg border" 
+        className="w-auto p-2 max-w-sm shadow-xl border-2 border-border/50 bg-background/95 backdrop-blur-sm" 
         side="right" 
         align="start"
-        sideOffset={15}
+        sideOffset={10}
+        alignOffset={-10}
       >
-        <div className="space-y-3">
-          {/* File name header */}
-          <div className="text-sm font-medium text-foreground truncate max-w-[280px]" title={fileName}>
+        <div className="space-y-2">
+          {/* File name header dengan styling lebih baik */}
+          <div className="text-xs font-semibold text-foreground/90 truncate max-w-[320px] px-1" title={fileName}>
             {fileName}
           </div>
           
-          {/* Thumbnail container */}
-          <div className="relative bg-muted/30 rounded-md overflow-hidden">
+          {/* Thumbnail container dengan ukuran optimal cross-platform */}
+          <div className="relative bg-gradient-to-br from-muted/20 to-muted/40 rounded-lg overflow-hidden shadow-inner">
             {!imageError ? (
               <img
                 src={thumbnailLink}
                 alt={`Preview of ${fileName}`}
                 className={`
-                  w-full h-auto max-w-[280px] max-h-[200px] 
-                  object-contain rounded-md
-                  transition-opacity duration-300 ease-in-out
-                  ${imageLoaded ? 'opacity-100' : 'opacity-0'}
+                  w-full h-auto max-w-[320px] max-h-[240px] 
+                  object-contain rounded-lg
+                  transition-all duration-500 ease-out
+                  ${imageLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}
                 `}
                 style={{
-                  minHeight: '120px',
-                  minWidth: '200px'
+                  minHeight: '140px',
+                  minWidth: '220px',
+                  maxWidth: '320px',
+                  maxHeight: '240px'
                 }}
                 onLoad={() => setImageLoaded(true)}
                 onError={() => {
@@ -78,21 +81,37 @@ export function ThumbnailHover({
                 loading="lazy"
               />
             ) : (
-              <div className="w-[200px] h-[120px] bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
-                <div className="text-center">
-                  <div className="text-lg mb-1">📷</div>
-                  <div>Preview not available</div>
+              <div className="w-[220px] h-[140px] bg-gradient-to-br from-muted to-muted/60 rounded-lg flex items-center justify-center text-muted-foreground">
+                <div className="text-center space-y-2">
+                  <div className="text-2xl opacity-60">🖼️</div>
+                  <div className="text-xs font-medium">Preview unavailable</div>
                 </div>
               </div>
             )}
             
-            {/* Loading skeleton */}
+            {/* Loading skeleton dengan animasi yang lebih smooth */}
             {!imageLoaded && !imageError && (
-              <div className="absolute inset-0 w-[200px] h-[120px] bg-muted rounded-md animate-pulse flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-muted-foreground/20 border-t-muted-foreground rounded-full animate-spin" />
+              <div className="absolute inset-0 w-[220px] h-[140px] bg-gradient-to-br from-muted/40 to-muted/60 rounded-lg animate-pulse flex items-center justify-center">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  <div className="w-3 h-3 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                  <div className="w-3 h-3 bg-primary/60 rounded-full animate-bounce"></div>
+                </div>
               </div>
             )}
+            
+            {/* Overlay gradient untuk efek profesional */}
+            {imageLoaded && !imageError && (
+              <div className="absolute inset-0 bg-gradient-to-t from-black/5 via-transparent to-transparent pointer-events-none rounded-lg" />
+            )}
           </div>
+          
+          {/* File info footer */}
+          {imageLoaded && !imageError && (
+            <div className="text-[10px] text-muted-foreground/70 text-center px-1 font-medium">
+              Image Preview • {mimeType.split('/')[1]?.toUpperCase()}
+            </div>
+          )}
         </div>
       </HoverCardContent>
     </HoverCard>

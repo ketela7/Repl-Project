@@ -2443,6 +2443,7 @@ export function DriveManager() {
                         thumbnailLink={file.thumbnailLink}
                         fileName={file.name}
                         mimeType={file.mimeType}
+                        className="transition-all duration-200"
                       >
                         <FileIcon mimeType={file.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
                       </ThumbnailHover>
@@ -2725,6 +2726,7 @@ export function DriveManager() {
                             thumbnailLink={item.itemType === 'file' ? item.thumbnailLink : undefined}
                             fileName={item.name}
                             mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType}
+                            className="transition-all duration-200"
                           >
                             <FileIcon 
                               mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType} 
