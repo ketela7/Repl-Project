@@ -1983,173 +1983,148 @@ export function DriveManager() {
 
   return (
     <div className="w-full space-y-3 sm:space-y-4">
-      {/* Floating Toolbar - Sticky Horizontal Scroll */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm mb-6" style={{ position: 'sticky', top: '0px' }}>
-        <div className="flex items-center justify-between p-4">
-          {/* Horizontal Scrollable Tabs */}
-          <div className="flex items-center gap-2 overflow-x-scroll scrollbar-hide scroll-smooth flex-1" 
-               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      {/* Simplified Floating Toolbar - Fixed Sticky Position */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
+        <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
+          {/* Main Menu - 5 Items */}
+          <div className="flex items-center gap-3">
             
-            {/* Search Tab */}
+            {/* Search */}
             <Button
               variant={searchQuery ? 'default' : 'ghost'}
               size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
               onClick={() => {
-                if (!searchQuery) {
-                  // Focus on search when activated
-                  setTimeout(() => {
-                    const input = document.querySelector('#floating-search-input') as HTMLInputElement;
-                    if (input) input.focus();
-                  }, 100);
+                const searchExpanded = document.querySelector('#search-expanded') as HTMLElement;
+                if (searchExpanded) {
+                  searchExpanded.style.display = searchExpanded.style.display === 'none' ? 'block' : 'none';
+                  if (searchExpanded.style.display === 'block') {
+                    setTimeout(() => {
+                      const input = searchExpanded.querySelector('input') as HTMLInputElement;
+                      if (input) input.focus();
+                    }, 100);
+                  }
                 }
               }}
             >
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4 mr-2" />
               Search
             </Button>
 
-            {/* Batch Operations Tab */}
-            <Button
-              variant={selectedItems.size > 0 ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => setIsSelectMode(!isSelectMode)}
-              disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
-            >
-              <Square className="h-4 w-4" />
-              Batch
-              {selectedItems.size > 0 && (
-                <Badge variant="secondary" className="ml-1">
-                  {selectedItems.size}
-                </Badge>
-              )}
-            </Button>
+            {/* Batch */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant={isSelectMode ? 'default' : 'ghost'}
+                  size="sm"
+                  disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
+                >
+                  <Square className="h-4 w-4 mr-2" />
+                  Batch
+                  {selectedItems.size > 0 && (
+                    <Badge variant="secondary" className="ml-2">
+                      {selectedItems.size}
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuItem onClick={() => setIsSelectMode(!isSelectMode)}>
+                  <Square className="h-4 w-4 mr-2" />
+                  {isSelectMode ? 'Exit Select Mode' : 'Enter Select Mode'}
+                </DropdownMenuItem>
+                {isSelectMode && selectedItems.size > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => handleBulkAction('download')}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Selected
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkAction('delete')}>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete Selected
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkAction('move')}>
+                      <Move className="h-4 w-4 mr-2" />
+                      Move Selected
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleBulkAction('copy')}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy Selected
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            {/* Quick Filter Buttons */}
-            <Button
-              variant={activeView === 'starred' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => handleViewChange(activeView === 'starred' ? 'all' : 'starred')}
-            >
-              <Star className="h-4 w-4" />
-              Starred
-            </Button>
+            {/* Filter */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Filter
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-64">
+                {/* Basic Filters */}
+                <div className="px-2 py-1.5 text-sm font-semibold">Basic Filter</div>
+                <DropdownMenuItem onClick={() => handleViewChange('all')}>
+                  <HardDrive className="h-4 w-4 mr-2" />
+                  All Files
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleViewChange('my-drive')}>
+                  <Folder className="h-4 w-4 mr-2" />
+                  My Drive
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleViewChange('recent')}>
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Recent
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleViewChange('trash')}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Trash
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleViewChange('starred')}>
+                  <Star className="h-4 w-4 mr-2" />
+                  Starred
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleViewChange('shared')}>
+                  <Share className="h-4 w-4 mr-2" />
+                  Shared with me
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* File Types */}
+                <div className="px-2 py-1.5 text-sm font-semibold">File Types</div>
+                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['document'])}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Documents
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['image'])}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Images
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['video'])}>
+                  <Play className="h-4 w-4 mr-2" />
+                  Videos
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['spreadsheet'])}>
+                  <Grid3X3 className="h-4 w-4 mr-2" />
+                  Spreadsheets
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['presentation'])}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  Presentations
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['audio'])}>
+                  <Play className="h-4 w-4 mr-2" />
+                  Audio
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-            <Button
-              variant={activeView === 'shared' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => handleViewChange(activeView === 'shared' ? 'all' : 'shared')}
-            >
-              <Share className="h-4 w-4" />
-              Shared
-            </Button>
-
-            <Button
-              variant={activeView === 'recent' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => handleViewChange(activeView === 'recent' ? 'all' : 'recent')}
-            >
-              <Calendar className="h-4 w-4" />
-              Recent
-            </Button>
-
-            <Button
-              variant={activeView === 'trash' ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => handleViewChange(activeView === 'trash' ? 'all' : 'trash')}
-            >
-              <Trash2 className="h-4 w-4" />
-              Trash
-            </Button>
-
-            {/* File Type Filters */}
-            <Button
-              variant={fileTypeFilter.includes('document') ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => {
-                const newFilter = fileTypeFilter.includes('document') 
-                  ? fileTypeFilter.filter(f => f !== 'document')
-                  : [...fileTypeFilter, 'document'];
-                handleFileTypeFilterChange(newFilter);
-              }}
-            >
-              <FileText className="h-4 w-4" />
-              Docs
-              {fileTypeFilter.includes('document') && (
-                <Badge variant="secondary" className="ml-1 text-xs">
-                  {sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
-                </Badge>
-              )}
-            </Button>
-
-            <Button
-              variant={fileTypeFilter.includes('image') ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => {
-                const newFilter = fileTypeFilter.includes('image') 
-                  ? fileTypeFilter.filter(f => f !== 'image')
-                  : [...fileTypeFilter, 'image'];
-                handleFileTypeFilterChange(newFilter);
-              }}
-            >
-              <FileText className="h-4 w-4" />
-              Images
-              {fileTypeFilter.includes('image') && (
-                <Badge variant="secondary" className="ml-1 text-xs">
-                  {sortedFiles.filter(f => f.mimeType?.includes('image')).length}
-                </Badge>
-              )}
-            </Button>
-
-            <Button
-              variant={fileTypeFilter.includes('video') ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => {
-                const newFilter = fileTypeFilter.includes('video') 
-                  ? fileTypeFilter.filter(f => f !== 'video')
-                  : [...fileTypeFilter, 'video'];
-                handleFileTypeFilterChange(newFilter);
-              }}
-            >
-              <Play className="h-4 w-4" />
-              Videos
-              {fileTypeFilter.includes('video') && (
-                <Badge variant="secondary" className="ml-1 text-xs">
-                  {sortedFiles.filter(f => f.mimeType?.includes('video')).length}
-                </Badge>
-              )}
-            </Button>
-
-            <Button
-              variant={fileTypeFilter.includes('spreadsheet') ? 'default' : 'ghost'}
-              size="sm"
-              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
-              onClick={() => {
-                const newFilter = fileTypeFilter.includes('spreadsheet') 
-                  ? fileTypeFilter.filter(f => f !== 'spreadsheet')
-                  : [...fileTypeFilter, 'spreadsheet'];
-                handleFileTypeFilterChange(newFilter);
-              }}
-            >
-              <Grid3X3 className="h-4 w-4" />
-              Sheets
-              {fileTypeFilter.includes('spreadsheet') && (
-                <Badge variant="secondary" className="ml-1 text-xs">
-                  {sortedFiles.filter(f => f.mimeType?.includes('spreadsheet')).length}
-                </Badge>
-              )}
-            </Button>
-
-            {/* MIME Type Badge Counters */}
-            <div className="flex items-center gap-1 flex-shrink-0">
+            {/* Badge - Floating counters */}
+            <div className="flex items-center gap-2">
               <Badge variant="outline" className="flex items-center gap-1">
                 <HardDrive className="h-3 w-3" />
                 <span className="text-xs">{sortedFiles.length + sortedFolders.length}</span>
@@ -2185,81 +2160,70 @@ export function DriveManager() {
             </div>
           </div>
 
-          {/* Actions Menu */}
-          <div className="flex items-center gap-2 ml-4">
-            <Button 
-              onClick={handleRefresh} 
-              variant="ghost" 
-              size="sm"
-              disabled={refreshing}
-              className="flex-shrink-0"
-            >
-              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            </Button>
-            <Button 
-              onClick={() => setIsCreateFolderDialogOpen(true)} 
-              variant="ghost" 
-              size="sm"
-              className="flex-shrink-0"
-            >
-              <FolderPlus className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="flex-shrink-0">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                {/* View Mode */}
-                <DropdownMenuItem onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
-                  {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Grid3X3 className="h-4 w-4 mr-2" />}
-                  {viewMode === 'grid' ? 'Table View' : 'Grid View'}
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                
-                {/* Advanced Filters */}
-                <DropdownMenuItem onClick={() => handleViewChange('my-drive')}>
-                  <HardDrive className="h-4 w-4 mr-2" />
-                  My Drive Only
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleViewChange('all')}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  All Files
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                
-                {/* Actions */}
-                <DropdownMenuItem onClick={() => setIsUploadDialogOpen(true)}>
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload Files
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setIsCreateFolderDialogOpen(true)}>
-                  <FolderPlus className="h-4 w-4 mr-2" />
-                  New Folder
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                
-                {/* Batch Operations */}
-                <DropdownMenuItem 
-                  onClick={() => setIsSelectMode(!isSelectMode)}
-                  disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
-                >
-                  <Square className="h-4 w-4 mr-2" />
-                  Select Mode
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          {/* More (Settings) - Fixed position on the right */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm">
+                <Settings className="h-4 w-4 mr-2" />
+                More
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {/* View Mode */}
+              <DropdownMenuItem onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
+                {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Grid3X3 className="h-4 w-4 mr-2" />}
+                {viewMode === 'grid' ? 'Table View' : 'Grid View'}
+              </DropdownMenuItem>
+              
+              {/* Table Column Settings - Only show in table mode */}
+              {viewMode === 'table' && (
+                <>
+                  <DropdownMenuSeparator />
+                  <div className="px-2 py-1.5 text-sm font-semibold">Table Columns</div>
+                  <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, size: !prev.size }))}>
+                    <Checkbox checked={visibleColumns.size} className="mr-2" />
+                    Size
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, mimeType: !prev.mimeType }))}>
+                    <Checkbox checked={visibleColumns.mimeType} className="mr-2" />
+                    MIME Type
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, createdTime: !prev.createdTime }))}>
+                    <Checkbox checked={visibleColumns.createdTime} className="mr-2" />
+                    Created
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, modifiedTime: !prev.modifiedTime }))}>
+                    <Checkbox checked={visibleColumns.modifiedTime} className="mr-2" />
+                    Modified
+                  </DropdownMenuItem>
+                </>
+              )}
+              
+              <DropdownMenuSeparator />
+              
+              {/* Actions */}
+              <DropdownMenuItem onClick={handleRefresh} disabled={refreshing}>
+                <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                Refresh
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsCreateFolderDialogOpen(true)}>
+                <FolderPlus className="h-4 w-4 mr-2" />
+                Create New Folder
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsUploadDialogOpen(true)}>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Files
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        {/* Expandable Search Bar */}
-        <div className="border-t bg-muted/30 p-4">
-          <div className="flex items-center gap-4">
+        {/* Hidden Search Bar - Expandable */}
+        <div id="search-expanded" style={{ display: 'none' }} className="border-t bg-muted/30 p-4">
+          <div className="flex items-center gap-4 max-w-7xl mx-auto">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                id="floating-search-input"
                 type="text"
                 placeholder="Search files and folders..."
                 value={searchQuery}
@@ -2282,6 +2246,9 @@ export function DriveManager() {
           </div>
         </div>
       </div>
+
+      {/* Spacer for fixed toolbar */}
+      <div className="h-16 mb-6"></div>
 
       {/* Navigation Breadcrumb - Moved below toolbar */}
       <div className="px-4 -mt-2 mb-4">
