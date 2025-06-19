@@ -101,7 +101,7 @@ import { BulkRestoreDialog } from './bulk-restore-dialog';
 import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
-import { ThumbnailHover } from '@/components/ui/thumbnail-hover';
+import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
 
 import { errorRecovery } from '@/lib/error-recovery';
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
@@ -2470,14 +2470,14 @@ export function DriveManager() {
                   )}
                   <div className="flex items-start justify-between mb-2">
                     <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
-                      <ThumbnailHover
+                      <FileThumbnailPreview
                         thumbnailLink={file.thumbnailLink}
                         fileName={file.name}
                         mimeType={file.mimeType}
                         className="transition-all duration-200"
                       >
                         <FileIcon mimeType={file.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
-                      </ThumbnailHover>
+                      </FileThumbnailPreview>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -2753,7 +2753,7 @@ export function DriveManager() {
                               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
-                          <ThumbnailHover
+                          <FileThumbnailPreview
                             thumbnailLink={item.itemType === 'file' ? item.thumbnailLink : undefined}
                             fileName={item.name}
                             mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType}
@@ -2763,7 +2763,7 @@ export function DriveManager() {
                               mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType} 
                               className="h-5 w-5" 
                             />
-                          </ThumbnailHover>
+                          </FileThumbnailPreview>
                         </div>
                       </TableCell>
                       {visibleColumns.name && (

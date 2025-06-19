@@ -37,6 +37,7 @@ export function ThumbnailHover({
 }: ThumbnailHoverProps) {
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   // Show thumbnail for any file that has thumbnailLink, regardless of type
   if (!thumbnailLink) {
@@ -44,9 +45,24 @@ export function ThumbnailHover({
   }
 
   return (
-    <HoverCard openDelay={300} closeDelay={100}>
+    <HoverCard open={isOpen} onOpenChange={setIsOpen}>
       <HoverCardTrigger asChild>
-        <div className={`cursor-pointer transition-transform hover:scale-105 ${className}`}>
+        <div 
+          className={`cursor-pointer transition-transform hover:scale-105 ${className}`}
+          onMouseEnter={() => setIsOpen(true)}
+          onMouseLeave={() => setIsOpen(false)}
+          onTouchStart={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsOpen(true);
+            // Auto close after 3 seconds on mobile
+            setTimeout(() => setIsOpen(false), 3000);
+          }}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
           {children}
         </div>
       </HoverCardTrigger>
