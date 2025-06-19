@@ -217,22 +217,15 @@ export function isDocumentFile(mimeType: string): boolean {
  * Check if a file type supports preview functionality
  */
 export const isPreviewable = (mimeType: string): boolean => {
-  const previewableMimeTypes = [
-    'image/',
-    'text/',
-    'application/pdf',
-    'application/json',
-    'application/vnd.google-apps.document',
-    'application/vnd.google-apps.spreadsheet',
-    'application/vnd.google-apps.presentation',
-    'video/mp4',
-    'video/webm',
-    'audio/mpeg',
-    'audio/wav',
-    'audio/ogg'
-  ];
-
-  return previewableMimeTypes.some(type => mimeType.startsWith(type));
+  // Use proper mimeType category checking instead of specific formats
+  return isImageFile(mimeType) ||
+         isVideoFile(mimeType) ||
+         isAudioFile(mimeType) ||
+         isDocumentFile(mimeType) ||
+         mimeType.startsWith('text/') ||
+         mimeType === 'application/pdf' ||
+         mimeType === 'application/json' ||
+         mimeType.includes('google-apps');
 };
 
 // Auto-tagging and Smart Categorization Utils
@@ -573,29 +566,40 @@ export const applyOrganizationRules = (file: { name: string; mimeType: string; s
  * Generate preview URL for different media types
  */
 export function getPreviewUrl(fileId: string, mimeType: string, webContentLink?: string): string {
+  // Images including GIF - use direct download for better quality
   if (isImageFile(mimeType)) {
-    // Use our direct download API for images
     return `/api/drive/download/${fileId}`;
   }
 
+  // All video formats - Google Drive preview supports most video formats
   if (isVideoFile(mimeType)) {
-    // Simple Google Drive iframe streaming
     return `https://drive.google.com/file/d/${fileId}/preview`;
   }
 
+  // Audio files - use audio proxy for better compatibility
   if (isAudioFile(mimeType)) {
-    // Use proxy audio for better streaming compatibility
     return `/api/audio-proxy/${fileId}`;
   }
 
-  if (isDocumentFile(mimeType)) {
-    if (mimeType.includes("google-apps")) {
+  // Google Workspace documents
+  if (mimeType.includes("google-apps")) {
+    if (mimeType.includes("document")) {
       return `https://docs.google.com/document/d/${fileId}/preview`;
     }
-    // For documents, use Google Docs Viewer or Drive preview
-    return webContentLink
-      ? `https://docs.google.com/gview?pid=explorer&efh=false&a=v&chrome=false&embedded=true&url=${encodeURIComponent(webContentLink)}`
-      : `https://drive.google.com/file/d/${fileId}/preview`;
+    if (mimeType.includes("spreadsheet")) {
+      return `https://docs.google.com/spreadsheets/d/${fileId}/preview`;
+    }
+    if (mimeType.includes("presentation")) {
+      return `https://docs.google.com/presentation/d/${fileId}/preview`;
+    }
+    if (mimeType.includes("drawing")) {
+      return `https://docs.google.com/drawings/d/${fileId}/preview`;
+    }
+  }
+
+  // Other document types (PDF, text files, etc.)
+  if (isDocumentFile(mimeType) || mimeType.startsWith('text/') || mimeType === 'application/json') {
+    return `https://drive.google.com/file/d/${fileId}/preview`;
   }
 
   // Default fallback to Google Drive preview

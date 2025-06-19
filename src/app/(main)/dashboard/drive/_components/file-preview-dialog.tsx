@@ -58,6 +58,20 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
   const isVideo = isVideoFile(file.mimeType);
   const isAudio = isAudioFile(file.mimeType);
   const isDocument = isDocumentFile(file.mimeType);
+  const isGif = file.mimeType === 'image/gif';
+
+  // Debug logging for troubleshooting
+  console.log('File Preview Debug:', {
+    fileName: file.name,
+    mimeType: file.mimeType,
+    isImage,
+    isVideo,
+    isAudio,
+    isDocument,
+    isGif,
+    previewUrl,
+    hasWebContentLink: !!file.webContentLink
+  });
 
   const handleDownload = () => {
     // Use direct download API endpoint instead of export link
@@ -99,6 +113,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
             className={imageClasses}
             onError={() => setImageError(true)}
             onLoad={() => setImageError(false)}
+            loading="lazy"
           />
         </div>
       );
@@ -136,7 +151,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
       );
     }
 
-    if (isDocument) {
+    if (isDocument || file.mimeType.startsWith('text/') || file.mimeType === 'application/json') {
       const docHeight = isFullscreen ? "h-screen" : "min-h-[300px] sm:min-h-[500px] max-h-[60vh] sm:max-h-[70vh]";
       const docClasses = isFullscreen ? "w-full h-full" : "w-full h-full min-h-[300px] sm:min-h-[500px]";
       
@@ -146,24 +161,42 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
             src={previewUrl}
             className={docClasses}
             title={`Document preview: ${file.name}`}
+            sandbox="allow-scripts allow-same-origin"
           />
         </div>
       );
     }
 
-    // Fallback for unsupported file types
+    // Enhanced fallback for unsupported file types or preview errors
     return (
       <div className="flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg p-4 sm:p-8 min-h-[200px] sm:min-h-[300px]">
-        <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">📄</div>
-        <h3 className="text-sm sm:text-lg font-medium mb-2 text-center">{file.name}</h3>
-        <p className="text-muted-foreground mb-4 text-center text-xs sm:text-sm">
-          This file type cannot be previewed directly.
+        <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">
+          {isImage ? '🖼️' : 
+           isVideo ? '🎥' : 
+           isAudio ? '🎵' : 
+           isDocument ? '📄' : '📁'}
+        </div>
+        <h3 className="text-sm sm:text-lg font-medium mb-2 text-center truncate max-w-full">{file.name}</h3>
+        <p className="text-muted-foreground mb-2 text-center text-xs sm:text-sm">
+          {imageError ? 'Preview failed to load' : 'Preview not available for this file type'}
         </p>
-        <Button onClick={handleOpenInDrive} variant="outline" size="sm">
-          <ExternalLink className="h-4 w-4 mr-2" />
-          <span className="hidden sm:inline">Open in Google Drive</span>
-          <span className="sm:hidden">Open in Drive</span>
-        </Button>
+        <p className="text-muted-foreground mb-4 text-center text-xs">
+          Type: {file.mimeType}
+        </p>
+        <div className="flex gap-2 flex-wrap justify-center">
+          <Button onClick={handleOpenInDrive} variant="outline" size="sm">
+            <ExternalLink className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Open in Google Drive</span>
+            <span className="sm:hidden">Open in Drive</span>
+          </Button>
+          {file.webContentLink && (
+            <Button onClick={handleDownload} variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Download</span>
+              <span className="sm:hidden">Download</span>
+            </Button>
+          )}
+        </div>
       </div>
     );
   };
