@@ -1,180 +1,186 @@
 /**
  * Background cache refresh system
- * Refreshes cache data when user is idle without blocking UI
+ * Optimized for free tier deployment constraints
  */
 
-import { driveCache } from './cache';
-import { requestQueue } from './request-queue';
+import { cache } from './cache';
 
-interface BackgroundRefreshConfig {
-  idleTimeout: number;
-  refreshInterval: number;
-  maxConcurrentRefresh: number;
-}
+// Background cache refresh configuration
+const BACKGROUND_REFRESH_CONFIG = {
+  // Refresh interval when user is idle (minutes)
+  idleRefreshInterval: 10,
+
+  // Maximum time to spend on background refresh (seconds)
+  maxRefreshTime: 30,
+
+  // Priority order for cache refresh
+  refreshPriority: [
+    '/api/drive/files',
+    '/api/auth/check-drive-access',
+    '/api/drive/user'
+  ],
+
+  // User activity detection
+  activityEvents: ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'],
+
+  // Idle threshold in minutes
+  idleThreshold: 5
+};
 
 class BackgroundCacheManager {
-  private idleTimer: NodeJS.Timeout | null = null;
-  private refreshTimer: NodeJS.Timeout | null = null;
-  private isIdle = false;
+  private isUserIdle = false;
   private lastActivity = Date.now();
-  private config: BackgroundRefreshConfig = {
-    idleTimeout: 30000, // 30 seconds of inactivity
-    refreshInterval: 300000, // 5 minutes refresh interval
-    maxConcurrentRefresh: 2
-  };
+  private refreshInterval: NodeJS.Timeout | null = null;
+  private activityListeners: (() => void)[] = [];
+  private isPaused = false;
 
-  private activeRefreshes = new Set<string>();
-
-  init() {
-    this.setupIdleDetection();
-    this.startPeriodicRefresh();
+  constructor() {
+    this.initializeActivityDetection();
+    this.startBackgroundRefresh();
   }
 
-  private setupIdleDetection() {
-    // Track user activity
-    const resetIdleTimer = () => {
+  private initializeActivityDetection() {
+    if (typeof window === 'undefined') return;
+
+    const updateActivity = () => {
       this.lastActivity = Date.now();
-      this.isIdle = false;
-      
-      if (this.idleTimer) {
-        clearTimeout(this.idleTimer);
-      }
-      
-      this.idleTimer = setTimeout(() => {
-        this.isIdle = true;
-        this.performBackgroundRefresh();
-      }, this.config.idleTimeout);
+      this.isUserIdle = false;
     };
 
-    // Listen for user interactions
-    if (typeof window !== 'undefined') {
-      ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
-        document.addEventListener(event, resetIdleTimer, { passive: true });
+    // Add activity listeners
+    BACKGROUND_REFRESH_CONFIG.activityEvents.forEach(event => {
+      const listener = () => updateActivity();
+      window.addEventListener(event, listener, { passive: true });
+      this.activityListeners.push(() => {
+        window.removeEventListener(event, listener);
       });
-    }
+    });
 
-    resetIdleTimer();
+    // Check for idle state every minute
+    setInterval(() => {
+      const idleTime = Date.now() - this.lastActivity;
+      this.isUserIdle = idleTime > (BACKGROUND_REFRESH_CONFIG.idleThreshold * 60 * 1000);
+    }, 60000);
   }
 
-  private startPeriodicRefresh() {
-    this.refreshTimer = setInterval(() => {
-      if (this.isIdle) {
-        this.performBackgroundRefresh();
+  private startBackgroundRefresh() {
+    if (this.refreshInterval) return;
+
+    this.refreshInterval = setInterval(async () => {
+      if (this.isPaused || !this.isUserIdle) return;
+
+      try {
+        await this.performBackgroundRefresh();
+      } catch (error) {
+        console.warn('Background cache refresh failed:', error);
       }
-    }, this.config.refreshInterval);
+    }, BACKGROUND_REFRESH_CONFIG.idleRefreshInterval * 60 * 1000);
   }
 
   private async performBackgroundRefresh() {
-    if (!this.isIdle || this.activeRefreshes.size >= this.config.maxConcurrentRefresh) {
-      return;
+    const startTime = Date.now();
+    const maxTime = BACKGROUND_REFRESH_CONFIG.maxRefreshTime * 1000;
+
+    console.log('Starting background cache refresh...');
+
+    for (const endpoint of BACKGROUND_REFRESH_CONFIG.refreshPriority) {
+      // Check if we've exceeded max refresh time
+      if (Date.now() - startTime > maxTime) {
+        console.log('Background refresh time limit reached');
+        break;
+      }
+
+      // Check if user became active
+      if (!this.isUserIdle) {
+        console.log('User became active, stopping background refresh');
+        break;
+      }
+
+      try {
+        // Refresh cache for this endpoint
+        await this.refreshEndpointCache(endpoint);
+
+        // Small delay between requests to avoid overwhelming
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      } catch (error) {
+        console.warn(`Failed to refresh cache for ${endpoint}:`, error);
+      }
     }
 
-    const cacheStats = driveCache.getStats();
-    const staleKeys = this.identifyStaleEntries(cacheStats.keys);
-    
-    // Refresh most important cache entries
-    const priorityKeys = staleKeys.slice(0, this.config.maxConcurrentRefresh);
-    
-    for (const key of priorityKeys) {
-      if (!this.isIdle) break; // Stop if user becomes active
-      
-      this.refreshCacheEntry(key);
-    }
+    console.log(`Background cache refresh completed in ${Date.now() - startTime}ms`);
   }
 
-  private identifyStaleEntries(keys: string[]): string[] {
-    // Prioritize folder listings and frequently accessed data
-    return keys.filter(key => {
-      // Focus on folder contents and root directory
-      return key.includes('drive:') && 
-             (key.includes(':root:') || key.includes(':::')); // Empty query = folder listing
-    }).sort((a, b) => {
-      // Prioritize root folder and recently accessed
-      if (a.includes(':root:')) return -1;
-      if (b.includes(':root:')) return 1;
-      return 0;
-    });
-  }
-
-  private async refreshCacheEntry(cacheKey: string) {
-    if (this.activeRefreshes.has(cacheKey)) return;
-    
-    this.activeRefreshes.add(cacheKey);
-    
+  private async refreshEndpointCache(endpoint: string) {
     try {
-      // Parse cache key to extract parameters
-      const params = this.parseCacheKey(cacheKey);
-      if (!params) return;
+      // Use a lightweight request to refresh cache
+      const response = await fetch(endpoint, {
+        method: 'HEAD', // Use HEAD request when possible to save bandwidth
+        cache: 'no-cache'
+      });
 
-      // Perform background refresh
-      const requestId = `bg-refresh-${cacheKey}`;
-      await requestQueue.enqueue(
-        requestId,
-        () => this.fetchFreshData(params),
-        'low' // Background refreshes have lowest priority
-      );
-      
-      console.log(`Background refresh completed for: ${cacheKey}`);
+      if (response.ok) {
+        // Update our cache timestamp
+        cache.set(`${endpoint}:lastRefreshed`, Date.now().toString(), 60 * 60); // 1 hour
+      }
     } catch (error) {
-      console.warn(`Background refresh failed for ${cacheKey}:`, error);
-    } finally {
-      this.activeRefreshes.delete(cacheKey);
+      // Fallback to GET request if HEAD fails
+      try {
+        const response = await fetch(endpoint, {
+          cache: 'no-cache'
+        });
+
+        if (response.ok) {
+          const data = await response.text();
+          // Update cache with fresh data
+          cache.set(endpoint, data, 15 * 60); // 15 minutes
+        }
+      } catch (fallbackError) {
+        throw fallbackError;
+      }
     }
   }
 
-  private parseCacheKey(key: string): { parentId?: string; query?: string } | null {
-    // Parse "drive:userId:parentId:query:mimeType:pageToken" format
-    const parts = key.split(':');
-    if (parts.length < 3 || parts[0] !== 'drive') return null;
-    
-    return {
-      parentId: parts[2] || undefined,
-      query: parts[3] || undefined
-    };
+  // Public methods for external control
+  pause() {
+    this.isPaused = true;
+    console.log('Background cache refresh paused');
   }
 
-  private async fetchFreshData(params: { parentId?: string; query?: string }) {
-    const searchParams = new URLSearchParams();
-    if (params.parentId && params.parentId !== 'root') {
-      searchParams.append('parentId', params.parentId);
-    }
-    if (params.query) {
-      searchParams.append('query', params.query);
-    }
-    searchParams.append('pageSize', '30');
-    
-    const response = await fetch(`/api/drive/files?${searchParams}`);
-    if (response.ok) {
-      const data = await response.json();
-      return data;
-    }
-    throw new Error(`Background refresh failed: ${response.status}`);
+  resume() {
+    this.isPaused = false;
+    console.log('Background cache refresh resumed');
   }
 
-  updateActivity() {
-    this.lastActivity = Date.now();
-    this.isIdle = false;
+  forceRefresh() {
+    if (!this.isPaused) {
+      this.performBackgroundRefresh();
+    }
   }
 
   destroy() {
-    if (this.idleTimer) clearTimeout(this.idleTimer);
-    if (this.refreshTimer) clearInterval(this.refreshTimer);
-    
-    // Remove event listeners
-    if (typeof window !== 'undefined') {
-      ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
-        document.removeEventListener(event, () => {});
-      });
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+      this.refreshInterval = null;
     }
+
+    // Remove activity listeners
+    this.activityListeners.forEach(removeListener => removeListener());
+    this.activityListeners = [];
   }
 
-  getStats() {
+  // Status methods
+  getStatus() {
     return {
-      isIdle: this.isIdle,
-      activeRefreshes: this.activeRefreshes.size,
-      lastActivity: this.lastActivity
+      isUserIdle: this.isUserIdle,
+      isPaused: this.isPaused,
+      lastActivity: new Date(this.lastActivity).toISOString(),
+      isActive: !!this.refreshInterval
     };
   }
 }
 
+// Create singleton instance
 export const backgroundCacheManager = new BackgroundCacheManager();
+
+// Export for use in other modules
+export { BackgroundCacheManager, BACKGROUND_REFRESH_CONFIG };

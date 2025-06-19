@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon.png",
     apple: "/favicon.png",
   },
-  manifest: "/site.webmanifest",
+  
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
