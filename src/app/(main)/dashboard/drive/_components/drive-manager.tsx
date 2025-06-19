@@ -107,6 +107,7 @@ import { errorRecovery } from '@/lib/error-recovery';
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
 import { useDriveErrorHandler } from '@/components/ui/drive-error-handler';
 import { DriveErrorDisplay } from '@/components/drive-error-display';
+import { FileCategoryBadges } from '@/components/file-category-badges';
 // File size utilities inline
 const normalizeFileSize = (size: any): number => {
   // Handle null, undefined, empty values
@@ -2107,6 +2108,38 @@ export function DriveManager() {
           fetchFiles(folderId || undefined);
         }}
       />
+
+      {/* File Category Badges */}
+      {(sortedFiles.length > 0 || sortedFolders.length > 0) && (
+        <FileCategoryBadges 
+          files={sortedFiles}
+          folders={sortedFolders}
+          onCategoryClick={(category) => {
+            // Filter by category when badge is clicked
+            if (category === 'Folders') {
+              // Show only folders
+              setFileTypeFilter(['folder']);
+            } else {
+              // Set filter based on category
+              const categoryFilters = {
+                'Videos': ['video'],
+                'Documents': ['document', 'pdf'],
+                'Images': ['image'],
+                'Audio': ['audio'],
+                'Spreadsheets': ['spreadsheet'],
+                'Presentations': ['presentation'],
+                'Archives': ['archive'],
+                'Code': ['code'],
+                'Others': ['other']
+              };
+              const filter = categoryFilters[category as keyof typeof categoryFilters] || ['other'];
+              setFileTypeFilter(filter);
+              toast.info(`Filtering by ${category}`);
+            }
+          }}
+          className="transition-all duration-200"
+        />
+      )}
 
       {/* Files and Folders Grid */}
       <Card>
