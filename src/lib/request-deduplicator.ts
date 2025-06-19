@@ -19,11 +19,11 @@ class RequestDeduplicator {
       return this.activeRequests.get(key) as Promise<T>;
     }
 
-    // Check if we have a recent result (within TTL)
+    // Check if we have a recent result (within TTL) - but still allow the request
     const timestamp = this.requestTimestamps.get(key);
     if (timestamp && Date.now() - timestamp < ttl) {
-      // Return a resolved promise to maintain consistency
-      return Promise.resolve(null as T);
+      // For very recent requests, skip deduplication to prevent blocking valid requests
+      console.log(`Skipping deduplication for recent request: ${key}`);
     }
 
     // Create and store the request
