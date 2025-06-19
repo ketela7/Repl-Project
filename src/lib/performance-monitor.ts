@@ -78,6 +78,8 @@ class PerformanceMonitor {
   private isMonitoring = false;
   private monitoringInterval?: NodeJS.Timeout;
   private memoryCheckInterval?: NodeJS.Timeout;
+  private lastAlertTime = 0;
+  private alertCooldown = 30000; // 30 seconds cooldown between alerts
 
   init() {
     if (this.isMonitoring) return;
@@ -86,11 +88,11 @@ class PerformanceMonitor {
     this.startMemoryMonitoring();
     this.setupPerformanceObserver();
 
-    // Monitor every 3 seconds for better responsiveness
+    // Monitor every 15 seconds to reduce noise
     this.monitoringInterval = setInterval(() => {
       this.updateMetrics();
       this.checkAlerts();
-    }, 3000);
+    }, 15000);
   }
 
   private startMemoryMonitoring() {
@@ -132,8 +134,8 @@ class PerformanceMonitor {
     };
 
     updateMemory();
-    // More frequent memory checks
-    this.memoryCheckInterval = setInterval(updateMemory, 1000);
+    // Less frequent memory checks to reduce load
+    this.memoryCheckInterval = setInterval(updateMemory, 5000);
   }
 
   private estimateMemoryUsage(): number {
@@ -149,11 +151,18 @@ class PerformanceMonitor {
   }
 
   private checkAlerts() {
+    const now = Date.now();
     const { memoryUsage, apiCalls } = this.metrics;
 
-    // Alert if memory usage > 300MB (lowered threshold for better detection)
-    if (memoryUsage.used > 300) {
+    // Check cooldown period
+    if (now - this.lastAlertTime < this.alertCooldown) {
+      return;
+    }
+
+    // Alert if memory usage > 400MB (raised threshold to reduce noise)
+    if (memoryUsage.used > 400) {
       console.warn(`Performance Alert: High Memory Usage ${memoryUsage.used}MB+`);
+      this.lastAlertTime = now;
       this.notifySubscribers();
     }
 
@@ -163,12 +172,14 @@ class PerformanceMonitor {
 
     if (errorRate > 10) {
       console.warn(`Performance Alert: High Error Rate ${errorRate.toFixed(1)}%`);
+      this.lastAlertTime = now;
       this.notifySubscribers();
     }
 
     // Alert on high API latency
     if (apiCalls.averageTime > 5000) {
       console.warn(`Performance Alert: High API Latency ${apiCalls.averageTime.toFixed(0)}ms`);
+      this.lastAlertTime = now;
       this.notifySubscribers();
     }
   }
