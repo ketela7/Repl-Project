@@ -36,7 +36,9 @@ import {
   MousePointer,
   SquareCheck,
   Folder,
-  FileText
+  FileText,
+  Wand2,
+  Brain
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -102,6 +104,10 @@ import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
+import { AutoTaggingPanel } from '@/components/file-organization/auto-tagging-panel';
+import { SmartCategoryViewer } from '@/components/file-organization/smart-category-viewer';
+import { MobileAutoTagging } from '@/components/file-organization/mobile-auto-tagging';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import { errorRecovery } from '@/lib/error-recovery';
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
@@ -344,6 +350,9 @@ export function DriveManager() {
   // Debounced search query for performance
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  
+  // Mobile detection for responsive layout
+  const isMobile = useIsMobile();
 
   // Table column visibility state
   const [visibleColumns, setVisibleColumns] = useState({
@@ -382,6 +391,12 @@ export function DriveManager() {
   const [isBulkRenameDialogOpen, setIsBulkRenameDialogOpen] = useState(false);
   const [isBulkRestoreDialogOpen, setIsBulkRestoreDialogOpen] = useState(false);
   const [isBulkPermanentDeleteDialogOpen, setIsBulkPermanentDeleteDialogOpen] = useState(false);
+  
+  // Auto-tagging and Smart Categorization state
+  const [showAutoTaggingPanel, setShowAutoTaggingPanel] = useState(false);
+  const [showSmartCategoryViewer, setShowSmartCategoryViewer] = useState(false);
+  const [fileTags, setFileTags] = useState<Map<string, string[]>>(new Map());
+  
   const [bulkOperationProgress, setBulkOperationProgress] = useState<{
     isRunning: boolean;
     current: number;
@@ -1875,22 +1890,39 @@ export function DriveManager() {
     toast.error(`${context}: ${error.message || 'An error occurred'}`);
   };
 
-  // Auto-tagging and smart categorization function
-  const processFileOrganization = (item: DriveFile | DriveFolder) => {
-    // Example: Auto-tagging based on file type
-    let tags: string[] = [];
-    if (item.mimeType?.includes('document')) {
-      tags.push('document');
-    } else if (item.mimeType?.includes('spreadsheet')) {
-      tags.push('spreadsheet');
-    } else if (item.mimeType?.startsWith('image/')) {
-      tags.push('image');
-    }
+  // Auto-tagging and smart categorization handlers
+  const handleTagsUpdate = (fileId: string, newTags: string[]) => {
+    setFileTags(prev => {
+      const updated = new Map(prev);
+      const existingTags = updated.get(fileId) || [];
+      const combinedTags = [...new Set([...existingTags, ...newTags])];
+      updated.set(fileId, combinedTags);
+      return updated;
+    });
+    
+    toast.success(`Tags updated for file`);
+  };
 
-    // Example: Smart categorization based on file name
-    if (item.name?.toLowerCase().includes('report')) {
-      tags.push('report');
+  const handleSmartCategorySelect = (fileIds: string[]) => {
+    setSelectedItems(new Set(fileIds));
+    if (fileIds.length > 0) {
+      setIsSelectMode(true);
     }
+  };
+
+  const toggleAutoTaggingPanel = () => {
+    setShowAutoTaggingPanel(!showAutoTaggingPanel);
+    if (!showAutoTaggingPanel) {
+      setShowSmartCategoryViewer(false);
+    }
+  };
+
+  const toggleSmartCategoryViewer = () => {
+    setShowSmartCategoryViewer(!showSmartCategoryViewer);
+    if (!showSmartCategoryViewer) {
+      setShowAutoTaggingPanel(false);
+    }
+  };
 
     // Add tags to the file's description or metadata
     if (tags.length > 0) {
@@ -2095,6 +2127,30 @@ export function DriveManager() {
             <Upload className="h-4 w-4" />
             <span className="hidden sm:ml-2 sm:inline">Upload Soon</span>
           </Button>
+          
+          {/* Auto-tagging and Smart Categorization Buttons - Responsive */}
+          <div className="flex items-center gap-2 border-l border-border pl-2 ml-2">
+            <Button 
+              onClick={toggleAutoTaggingPanel}
+              size="sm"
+              variant={showAutoTaggingPanel ? "default" : "outline"}
+              className="whitespace-nowrap"
+              title="Auto-tag files using AI"
+            >
+              <Wand2 className="h-4 w-4" />
+              <span className="hidden md:ml-2 md:inline">Auto-tag</span>
+            </Button>
+            <Button 
+              onClick={toggleSmartCategoryViewer}
+              size="sm"
+              variant={showSmartCategoryViewer ? "default" : "outline"}
+              className="whitespace-nowrap"
+              title="Smart categorization view"
+            >
+              <Brain className="h-4 w-4" />
+              <span className="hidden md:ml-2 md:inline">Categories</span>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -2107,6 +2163,53 @@ export function DriveManager() {
           fetchFiles(folderId || undefined);
         }}
       />
+
+      {/* Auto-tagging Panel - Responsive */}
+      {showAutoTaggingPanel && (
+        <div className="mb-6">
+          {isMobile ? (
+            <MobileAutoTagging
+              files={files.map(f => ({
+                id: f.id,
+                name: f.name,
+                mimeType: f.mimeType,
+                size: f.size
+              }))}
+              selectedFiles={Array.from(selectedItems)}
+              onTagsUpdate={handleTagsUpdate}
+            />
+          ) : (
+            <AutoTaggingPanel
+              files={files.map(f => ({
+                id: f.id,
+                name: f.name,
+                mimeType: f.mimeType,
+                size: f.size
+              }))}
+              selectedFiles={Array.from(selectedItems)}
+              onTagsUpdate={handleTagsUpdate}
+              className="animate-in slide-in-from-top-2 duration-300"
+            />
+          )}
+        </div>
+      )}
+
+      {/* Smart Category Viewer */}
+      {showSmartCategoryViewer && (
+        <div className="mb-6">
+          <SmartCategoryViewer
+            files={files.map(f => ({
+              id: f.id,
+              name: f.name,
+              mimeType: f.mimeType,
+              size: f.size,
+              modifiedTime: f.modifiedTime
+            }))}
+            onFileSelect={handleSmartCategorySelect}
+            className="animate-in slide-in-from-top-2 duration-300"
+          />
+        </div>
+      )}
 
       {/* Files and Folders Grid */}
       <Card>
