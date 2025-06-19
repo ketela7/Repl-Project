@@ -2613,7 +2613,7 @@ export function DriveManager() {
                     >
                       {file.name}
                     </p>
-                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-muted-foreground<string>
+                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-muted-foreground">
                       <span>{file.size ? formatFileSize(file.size) : '-'}</span>
                       <span>{formatDate(file.modifiedTime)}</span>
                     </div>
@@ -3248,5 +3248,6 @@ export function DriveManager() {
           onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         />
       )}
+    </div>
   );
 }
