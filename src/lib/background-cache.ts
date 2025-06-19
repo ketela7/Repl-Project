@@ -168,6 +168,16 @@ class BackgroundCacheManager {
     this.activityListeners = [];
   }
 
+  // Initialize method for explicit setup
+  init() {
+    // This method can be called to ensure initialization
+    // Constructor already handles initialization, so this is just for compatibility
+    if (!this.refreshInterval) {
+      this.startBackgroundRefresh();
+    }
+    return this;
+  }
+
   // Status methods
   getStatus() {
     return {
