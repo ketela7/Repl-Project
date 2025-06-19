@@ -104,6 +104,39 @@ import { DriveFiltersSidebar } from './drive-filters-sidebar';
 
 import { errorRecovery } from '@/lib/error-recovery';
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
+import { useDriveErrorHandler } from '@/components/ui/drive-error-handler';
+import { DriveErrorDisplay } from '@/components/drive-error-display';
+// File size utilities inline
+const normalizeFileSize = (size: any): number => {
+  if (!size && size !== 0) return 0;
+  const sizeStr = size.toString().trim();
+  if (sizeStr === '-' || sizeStr === '' || sizeStr === 'undefined' || sizeStr === 'null') return 0;
+  const parsedSize = parseInt(sizeStr);
+  return isNaN(parsedSize) || parsedSize < 0 ? 0 : parsedSize;
+};
+
+const getSizeMultiplier = (unit: 'B' | 'KB' | 'MB' | 'GB'): number => {
+  switch (unit) {
+    case 'B': return 1;
+    case 'KB': return 1024;
+    case 'MB': return 1024 * 1024;
+    case 'GB': return 1024 * 1024 * 1024;
+    default: return 1;
+  }
+};
+
+const isFileSizeInRange = (
+  fileSize: any,
+  minSize?: number,
+  maxSize?: number,
+  unit: 'B' | 'KB' | 'MB' | 'GB' = 'MB'
+): boolean => {
+  const normalizedFileSize = normalizeFileSize(fileSize);
+  const multiplier = getSizeMultiplier(unit);
+  const minBytes = minSize ? minSize * multiplier : 0;
+  const maxBytes = maxSize ? maxSize * multiplier : Number.MAX_SAFE_INTEGER;
+  return normalizedFileSize >= minBytes && normalizedFileSize <= maxBytes;
+};
 
 // Enhanced client-side filtering utilities
 const applyClientSideFilters = (
@@ -198,24 +231,12 @@ const applyClientSideFilters = (
     // Size range filter (client-side only since Google Drive API doesn't support it)
     if (sizeRange && (sizeRange.min || sizeRange.max)) {
       filteredFiles = filteredFiles.filter(file => {
-        if (!file.size) return true; // Include files without size info
-        
-        const fileSize = parseInt(file.size);
-        const multiplier = getSizeMultiplier(sizeRange.unit);
-        const minBytes = sizeRange.min ? sizeRange.min * multiplier : 0;
-        const maxBytes = sizeRange.max ? sizeRange.max * multiplier : Number.MAX_SAFE_INTEGER;
-        
-        return fileSize >= minBytes && fileSize <= maxBytes;
+        return isFileSizeInRange(file.size, sizeRange.min, sizeRange.max, sizeRange.unit);
       });
       
       // Filter folders by size (folders have size = 0)
       filteredFolders = filteredFolders.filter(folder => {
-        const folderSize = 0; // Folders always have size 0
-        const multiplier = getSizeMultiplier(sizeRange.unit);
-        const minBytes = sizeRange.min ? sizeRange.min * multiplier : 0;
-        const maxBytes = sizeRange.max ? sizeRange.max * multiplier : Number.MAX_SAFE_INTEGER;
-        
-        return folderSize >= minBytes && folderSize <= maxBytes;
+        return isFileSizeInRange(0, sizeRange.min, sizeRange.max, sizeRange.unit);
       });
     }
 
