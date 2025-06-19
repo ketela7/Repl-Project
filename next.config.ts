@@ -11,6 +11,18 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  webpack: (config, { dev, isServer }) => {
+    if (!dev && !isServer) {
+      config.cache = {
+        type: 'filesystem',
+        compression: 'gzip',
+        buildDependencies: {
+          config: [__filename]
+        }
+      };
+    }
+    return config;
+  },
   allowedDevOrigins: [
     "*.replit.dev",
      "127.0.0.1",
