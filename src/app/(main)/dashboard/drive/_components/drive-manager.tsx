@@ -420,6 +420,18 @@ export function DriveManager() {
       : <ChevronDown className="h-4 w-4" />;
   };
 
+  // Apply organization processing to files when settings are enabled
+  const processedFiles = React.useMemo(() => {
+    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
+      return files;
+    }
+    
+    return files.map(file => {
+      const processed = processFileOrganization(file);
+      return processed || file;
+    });
+  }, [files, organizationSettings]);
+
   // Apply client-side filters first, then sort
   const { filteredFiles: clientFilteredFiles, filteredFolders: clientFilteredFolders } = React.useMemo(() => {
     return applyClientSideFilters(processedFiles, folders, {
@@ -1932,7 +1944,9 @@ export function DriveManager() {
 
   // Auto-tagging and smart categorization function
   const processFileOrganization = (item: DriveFile | DriveFolder) => {
-    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) return;
+    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
+      return item;
+    }
     
     const autoTags = organizationSettings.autoTagging ? generateAutoTags(item) : [];
     const category = organizationSettings.smartCategorization ? getSmartCategory(item) : null;
@@ -1947,18 +1961,6 @@ export function DriveManager() {
       }
     };
   };
-
-  // Apply organization processing to files when settings are enabled
-  const processedFiles = React.useMemo(() => {
-    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
-      return files;
-    }
-    
-    return files.map(file => {
-      const processed = processFileOrganization(file);
-      return processed || file;
-    });
-  }, [files, organizationSettings]);
 
   useEffect(() => {
     // Load organization settings from localStorage
