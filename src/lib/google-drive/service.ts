@@ -42,7 +42,7 @@ export class GoogleDriveService {
       storageQuota: about.storageQuota ? {
         limit: about.storageQuota.limit!,
         usage: about.storageQuota.usage!,
-        usageInDrive: about.storageQuota.usageInDrive!,
+        usageInDrive: about.storageQuota.usage!,
         usageInDriveTrash: about.storageQuota.usageInDriveTrash!,
       } : undefined,
     };
@@ -61,7 +61,7 @@ export class GoogleDriveService {
 
     // Use the query parameter directly if provided, otherwise build one
     let searchQuery = '';
-    
+
     if (query) {
       // If query is already formatted (contains operators), use it directly
       if (query.includes('=') || query.includes('and') || query.includes('or')) {
@@ -94,7 +94,7 @@ export class GoogleDriveService {
       orderBy,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
-      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, viewedByMeTime, capabilities, owners)',
+      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, parents, shared, trashed, starred, viewedByMeTime, capabilities, owners)',
     });
 
     const files = response.data.files?.map(convertGoogleDriveFile) || [];
@@ -111,7 +111,7 @@ export class GoogleDriveService {
   async getFile(fileId: string): Promise<DriveFile> {
     const response = await this.drive.files.get({
       fileId,
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, owners',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, parents, shared, trashed, owners',
     });
 
     return convertGoogleDriveFile(response.data);
@@ -262,7 +262,7 @@ export class GoogleDriveService {
     });
 
     const file = convertGoogleDriveFile(response.data);
-    
+
     return {
       ...file,
       description: response.data.description || undefined,
@@ -420,7 +420,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.create({
       requestBody: fileMetadata,
       media,
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, parents, owners, shared, trashed',
     });
 
     return convertGoogleDriveFile(response.data);
@@ -443,17 +443,17 @@ export class GoogleDriveService {
 
     // Convert Node.js readable stream to Web ReadableStream
     const nodeStream = response.data as any;
-    
+
     return new ReadableStream({
       start(controller) {
         nodeStream.on('data', (chunk: any) => {
           controller.enqueue(chunk);
         });
-        
+
         nodeStream.on('end', () => {
           controller.close();
         });
-        
+
         nodeStream.on('error', (error: any) => {
           controller.error(error);
         });
@@ -476,7 +476,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: true },
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, parents, owners, shared, trashed',
     });
 
     return convertGoogleDriveFile(response.data);
@@ -492,7 +492,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: false },
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, parents, owners, shared, trashed',
     });
 
     return convertGoogleDriveFile(response.data);
@@ -508,7 +508,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { name: newName },
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, parents, owners, shared, trashed',
     });
 
     return convertGoogleDriveFile(response.data);
@@ -526,24 +526,24 @@ export class GoogleDriveService {
         fileId,
         addParents: newParentId,
         removeParents: currentParentId,
-        fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+        fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, parents, owners, shared, trashed',
       });
 
       return convertGoogleDriveFile(response.data);
     } catch (error) {
       console.error(`Move operation failed for file ${fileId}:`, error);
-      
+
       // Enhanced error handling - check if it's a recoverable error
       const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-      
+
       if (errorMessage.includes('not found') || 
           errorMessage.includes('permission') || 
           errorMessage.includes('access')) {
-        
+
         // Return current file state instead of throwing
         console.log(`Keeping file ${fileId} in current location due to move failure`);
         const currentFile = await this.getFile(fileId);
-        
+
         return {
           ...currentFile,
           // Add custom properties to indicate the move attempt
@@ -552,7 +552,7 @@ export class GoogleDriveService {
           targetFolderId: newParentId
         } as any;
       }
-      
+
       // Re-throw for non-recoverable errors
       throw error;
     }
@@ -567,7 +567,7 @@ export class GoogleDriveService {
   async copyFile(fileId: string, metadata: Partial<DriveFileMetadata>): Promise<DriveFile> {
     // First check if this is a folder
     const originalFile = await this.getFile(fileId);
-    
+
     if (originalFile.mimeType === 'application/vnd.google-apps.folder') {
       // For folders, we need to create a new folder and copy contents
       return this.copyFolder(fileId, metadata);
@@ -576,7 +576,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.copy({
       fileId,
       requestBody: metadata,
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, parents, owners, shared, trashed',
     });
 
     return convertGoogleDriveFile(response.data);
@@ -585,7 +585,7 @@ export class GoogleDriveService {
   // Special handling for folder copying
   async copyFolder(folderId: string, metadata: Partial<DriveFileMetadata>): Promise<DriveFile> {
     const originalFolder = await this.getFile(folderId);
-    
+
     // Create new folder with the specified metadata
     const newFolder = await this.createFolder(
       metadata.name || `${originalFolder.name} - Copy`,
@@ -633,7 +633,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.list({
       q: 'sharedWithMe=true and trashed=false',
       orderBy: 'modifiedTime desc',
-      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed)',
+      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, parents, owners, shared, trashed)',
     });
 
     return response.data.files?.map(convertGoogleDriveFile) || [];
@@ -643,7 +643,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.list({
       q: 'trashed=true',
       orderBy: 'modifiedTime desc',
-      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed)',
+      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, parents, owners, shared, trashed)',
     });
 
     return response.data.files?.map(convertGoogleDriveFile) || [];
@@ -653,7 +653,7 @@ export class GoogleDriveService {
   async shareFile(fileId: string, permission: DrivePermission): Promise<void> {
     try {
       console.log('Creating permission for file:', fileId, 'with permission:', permission);
-      
+
       const permissionRequest = {
         role: permission.role,
         type: permission.type,
