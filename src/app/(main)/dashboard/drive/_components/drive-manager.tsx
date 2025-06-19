@@ -1932,18 +1932,18 @@ export function DriveManager() {
     }
   };
 
-    // Fix server action issue
-    useEffect(() => {
-      // Clear any stale form data that might cause server action errors
-      if (typeof window !== 'undefined') {
-        const forms = document.querySelectorAll('form');
-        forms.forEach(form => {
-          if (form.getAttribute('action')?.includes('70dc89edfafce2312ceaab16a53e7187127e12a779')) {
-            form.removeAttribute('action');
-          }
-        });
-      }
-    }, []);
+  // Fix server action issue
+  useEffect(() => {
+    // Clear any stale form data that might cause server action errors
+    if (typeof window !== 'undefined') {
+      const forms = document.querySelectorAll('form');
+      forms.forEach(form => {
+        if (form.getAttribute('action')?.includes('70dc89edfafce2312ceaab16a53e7187127e12a779')) {
+          form.removeAttribute('action');
+        }
+      });
+    }
+  }, []);
 
   // Show connection card if no access to Google Drive
   if (hasAccess === false) {
@@ -2414,114 +2414,7 @@ export function DriveManager() {
 
       {/* Clean Data Container */}
       <Card>
-        <CardContent className="p-6">
-                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                              <Checkbox
-                                id="id"
-                                checked={visibleColumns.id}
-                                onCheckedChange={(checked) =>
-                                  setVisibleColumns(prev => ({ ...prev, id: checked === true }))
-                                }
-                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                              />
-                              <label 
-                                htmlFor="id" 
-                                className="text-sm font-medium cursor-pointer flex-1 select-none"
-                              >
-                                ID
-                              </label>
-                            </div>
-                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                              <Checkbox
-                                id="size"
-                                checked={visibleColumns.size}
-                                onCheckedChange={(checked) =>
-                                  setVisibleColumns(prev => ({ ...prev, size: checked === true }))
-                                }
-                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                              />
-                              <label 
-                                htmlFor="size" 
-                                className="text-sm font-medium cursor-pointer flex-1 select-none"
-                              >
-                                Size
-                              </label>
-                            </div>
-                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                              <Checkbox
-                                id="owners"
-                                checked={visibleColumns.owners}
-                                onCheckedChange={(checked) =>
-                                  setVisibleColumns(prev => ({ ...prev, owners: checked === true }))
-                                }
-                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                              />
-                              <label 
-                                htmlFor="owners" 
-                                className="text-sm font-medium cursor-pointer flex-1 select-none"
-                              >
-                                Owners
-                              </label>
-                            </div>
-                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                              <Checkbox
-                                id="mimeType"
-                                checked={visibleColumns.mimeType}
-                                onCheckedChange={(checked) =>
-                                  setVisibleColumns(prev => ({ ...prev, mimeType: checked === true }))
-                                }
-                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                              />
-                              <label 
-                                htmlFor="mimeType" 
-                                className="text-sm font-medium cursor-pointer flex-1 select-none"
-                              >
-                                MIME Type
-                              </label>
-                            </div>
-                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                              <Checkbox
-                                id="createdTime"
-                                checked={visibleColumns.createdTime}
-                                onCheckedChange={(checked) =>
-                                  setVisibleColumns(prev => ({ ...prev, createdTime: checked === true }))
-                                }
-                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                              />
-                              <label 
-                                htmlFor="createdTime" 
-                                className="text-sm font-medium cursor-pointer flex-1 select-none"
-                              >
-                                Created
-                              </label>
-                            </div>
-                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                              <Checkbox
-                                id="modifiedTime"
-                                checked={visibleColumns.modifiedTime}
-                                onCheckedChange={(checked) =>
-                                  setVisibleColumns(prev => ({ ...prev, modifiedTime: checked === true }))
-                                }
-                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                              />
-                              <label 
-                                htmlFor="modifiedTime" 
-                                className="text-sm font-medium cursor-pointer flex-1 select-none"
-                              >
-                                Modified
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                </div>
-              )}
-            </div>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
 
           {loading ? (
             <DriveGridSkeleton />
