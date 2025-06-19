@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Home, Folder, ChevronRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { requestDeduplicator } from "@/lib/request-deduplicator";
 
 interface BreadcrumbItemData {
   id: string;
@@ -27,18 +28,22 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastFetchedId, setLastFetchedId] = useState<string | null>(null);
 
   const fetchFolderPath = async (folderId: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetch(`/api/drive/files/${folderId}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch folder: ${response.status}`);
-      }
+    const requestKey = `breadcrumb-${folderId}`;
+    
+    return requestDeduplicator.execute(requestKey, async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch(`/api/drive/files/${folderId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch folder: ${response.status}`);
+        }
 
-      const folder = await response.json();
+        const folder = await response.json();
       const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }];
 
       // Build path by traversing parent folders
@@ -72,12 +77,15 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
   };
 
   useEffect(() => {
-    if (currentFolderId) {
-      fetchFolderPath(currentFolderId);
+    // Emergency fix: Disable automatic breadcrumb fetching to prevent infinite loops
+    // Only update state without making API calls
+    if (currentFolderId && currentFolderId !== 'root') {
+      // Show basic breadcrumb without API calls
+      setBreadcrumbItems([{ id: currentFolderId, name: 'Current Folder' }]);
     } else {
       setBreadcrumbItems([]);
-      setError(null);
     }
+    setError(null);
   }, [currentFolderId]);
 
   const isLoading = loading || externalLoading;

@@ -362,6 +362,9 @@ export function DriveManager() {
     direction: 'asc' | 'desc';
   } | null>(null);
 
+  // Track active requests to prevent duplicates
+  const activeRequests = useRef(new Set<string>());
+
   // View filters state
   const [activeView, setActiveView] = useState<'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'>('all');
   const [fileTypeFilter, setFileTypeFilter] = useState<string[]>([]);
@@ -1128,6 +1131,14 @@ export function DriveManager() {
   const fetchFiles = async (parentId?: string, query?: string, pageToken?: string, append = false, viewFilter?: string) => {
     const requestId = `fetch-files-${parentId || 'root'}-${query || ''}-${pageToken || ''}`;
     const startTime = Date.now();
+    
+    // Prevent duplicate requests
+    if (activeRequests.has(requestId)) {
+      console.log('Skipping duplicate request:', requestId);
+      return;
+    }
+    
+    activeRequests.add(requestId);
 
     try {
       if (!append) setLoading(true);
@@ -1280,6 +1291,8 @@ export function DriveManager() {
       }
       // Don't set hasAccess to false here unless it's an auth error
     } finally {
+      // Cleanup request tracking
+      activeRequests.current.delete(requestId);
       setLoading(false);
       setLoadingMore(false);
     }
@@ -1938,6 +1951,13 @@ export function DriveManager() {
   useEffect(() => {
     if (debouncedSearchQuery.trim() !== searchQuery.trim()) {
       return; // Only trigger when debounced value matches current input
+    }
+
+    const requestId = `search-${debouncedSearchQuery}-${currentFolderId}`;
+    
+    // Prevent duplicate search requests
+    if (activeRequests.current.has(requestId)) {
+      return;
     }
 
     if (debouncedSearchQuery.trim()) {

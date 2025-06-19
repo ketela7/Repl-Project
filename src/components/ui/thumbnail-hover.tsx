@@ -29,6 +29,8 @@ export function ThumbnailHover({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
 
+
+
   // Only show thumbnail for images with thumbnailLink
   if (!thumbnailLink || !isImageMimeType(mimeType)) {
     return <>{children}</>;
