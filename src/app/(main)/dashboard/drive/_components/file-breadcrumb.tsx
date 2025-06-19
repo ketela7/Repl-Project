@@ -44,48 +44,55 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
         }
 
         const folder = await response.json();
-      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }];
+        const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }];
 
-      // Build path by traversing parent folders
-      let currentParent = folder.parents?.[0];
-      let depth = 0;
-      const maxDepth = 10; // Prevent infinite loops
-      
-      while (currentParent && currentParent !== 'root' && depth < maxDepth) {
-        try {
-          const parentResponse = await fetch(`/api/drive/files/${currentParent}`);
-          if (!parentResponse.ok) break;
+        // Build path by traversing parent folders
+        let currentParent = folder.parents?.[0];
+        let depth = 0;
+        const maxDepth = 10; // Prevent infinite loops
+        
+        while (currentParent && currentParent !== 'root' && depth < maxDepth) {
+          try {
+            const parentResponse = await fetch(`/api/drive/files/${currentParent}`);
+            if (!parentResponse.ok) break;
 
-          const parentFolder = await parentResponse.json();
-          items.unshift({ id: parentFolder.id, name: parentFolder.name });
-          currentParent = parentFolder.parents?.[0];
-          depth++;
-        } catch (err) {
-          console.warn('Failed to fetch parent folder:', err);
-          break;
+            const parentFolder = await parentResponse.json();
+            items.unshift({ id: parentFolder.id, name: parentFolder.name });
+            currentParent = parentFolder.parents?.[0];
+            depth++;
+          } catch (err) {
+            console.warn('Failed to fetch parent folder:', err);
+            break;
+          }
         }
-      }
 
-      setBreadcrumbItems(items);
-    } catch (error) {
-      console.error('Error fetching folder path:', error);
-      setError('Failed to load folder path');
-      setBreadcrumbItems([]);
-    } finally {
-      setLoading(false);
-    }
+        setBreadcrumbItems(items);
+        return items;
+      } catch (error) {
+        console.error('Error fetching folder path:', error);
+        setError('Failed to load folder path');
+        setBreadcrumbItems([]);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    });
   };
 
   useEffect(() => {
-    // Emergency fix: Disable automatic breadcrumb fetching to prevent infinite loops
-    // Only update state without making API calls
+    // Prevent duplicate requests for the same folder
+    if (currentFolderId === lastFetchedId) {
+      return;
+    }
+
     if (currentFolderId && currentFolderId !== 'root') {
-      // Show basic breadcrumb without API calls
-      setBreadcrumbItems([{ id: currentFolderId, name: 'Current Folder' }]);
+      setLastFetchedId(currentFolderId);
+      fetchFolderPath(currentFolderId);
     } else {
       setBreadcrumbItems([]);
+      setError(null);
+      setLastFetchedId(null);
     }
-    setError(null);
   }, [currentFolderId]);
 
   const isLoading = loading || externalLoading;
