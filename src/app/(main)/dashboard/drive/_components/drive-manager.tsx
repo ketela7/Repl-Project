@@ -36,7 +36,8 @@ import {
   MousePointer,
   SquareCheck,
   Folder,
-  FileText
+  FileText,
+  Star
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -1982,51 +1983,213 @@ export function DriveManager() {
 
   return (
     <div className="w-full space-y-3 sm:space-y-4">
-      {/* Compact Header with Search and Actions */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 flex-1">
-          <Input
-            placeholder="Search your Google Drive..."
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="text-sm flex-1"
-          />
-          <Button onClick={handleSearch} size="sm" variant="outline">
-            <Search className="h-4 w-4" />
-          </Button>
+      {/* Floating Toolbar - Sticky Horizontal Scroll */}
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm mb-6">
+        <div className="flex items-center justify-between p-4">
+          {/* Horizontal Scrollable Tabs */}
+          <div className="flex items-center gap-2 overflow-x-scroll scrollbar-hide scroll-smooth flex-1" 
+               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            
+            {/* Search Tab */}
+            <Button
+              variant={searchQuery ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => {
+                if (!searchQuery) {
+                  // Focus on search when activated
+                  setTimeout(() => {
+                    const input = document.querySelector('#floating-search-input') as HTMLInputElement;
+                    if (input) input.focus();
+                  }, 100);
+                }
+              }}
+            >
+              <Search className="h-4 w-4" />
+              Search
+            </Button>
+
+            {/* Batch Operations Tab */}
+            <Button
+              variant={selectedItems.size > 0 ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => setIsSelectMode(!isSelectMode)}
+              disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
+            >
+              <Square className="h-4 w-4" />
+              Batch
+              {selectedItems.size > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {selectedItems.size}
+                </Badge>
+              )}
+            </Button>
+
+            {/* Quick Filter Buttons */}
+            <Button
+              variant={activeView === 'starred' ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => handleViewChange(activeView === 'starred' ? 'all' : 'starred')}
+            >
+              <Star className="h-4 w-4" />
+              Starred
+            </Button>
+
+            <Button
+              variant={activeView === 'shared' ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => handleViewChange(activeView === 'shared' ? 'all' : 'shared')}
+            >
+              <Share className="h-4 w-4" />
+              Shared
+            </Button>
+
+            <Button
+              variant={activeView === 'recent' ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => handleViewChange(activeView === 'recent' ? 'all' : 'recent')}
+            >
+              <Calendar className="h-4 w-4" />
+              Recent
+            </Button>
+
+            <Button
+              variant={activeView === 'trash' ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => handleViewChange(activeView === 'trash' ? 'all' : 'trash')}
+            >
+              <Trash2 className="h-4 w-4" />
+              Trash
+            </Button>
+
+            {/* File Type Filters */}
+            <Button
+              variant={fileTypeFilter.includes('document') ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => {
+                const newFilter = fileTypeFilter.includes('document') 
+                  ? fileTypeFilter.filter(f => f !== 'document')
+                  : [...fileTypeFilter, 'document'];
+                handleFileTypeFilterChange(newFilter);
+              }}
+            >
+              <FileText className="h-4 w-4" />
+              Docs
+            </Button>
+
+            <Button
+              variant={fileTypeFilter.includes('image') ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => {
+                const newFilter = fileTypeFilter.includes('image') 
+                  ? fileTypeFilter.filter(f => f !== 'image')
+                  : [...fileTypeFilter, 'image'];
+                handleFileTypeFilterChange(newFilter);
+              }}
+            >
+              <FileText className="h-4 w-4" />
+              Images
+            </Button>
+
+            {/* File Counter Badge */}
+            <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-full flex-shrink-0">
+              <FileText className="h-3 w-3 text-muted-foreground" />
+              <span className="text-sm font-medium">{sortedFiles.length + sortedFolders.length}</span>
+            </div>
+
+            {/* Folder Counter */}
+            {sortedFolders.length > 0 && (
+              <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
+                <Folder className="h-3 w-3" />
+                <span>{sortedFolders.length}</span>
+              </Badge>
+            )}
+
+            {/* File Counter */}
+            {sortedFiles.length > 0 && (
+              <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
+                <FileText className="h-3 w-3" />
+                <span>{sortedFiles.length}</span>
+              </Badge>
+            )}
+          </div>
+
+          {/* Actions Menu */}
+          <div className="flex items-center gap-2 ml-4">
+            <Button 
+              onClick={handleRefresh} 
+              variant="ghost" 
+              size="sm"
+              disabled={refreshing}
+              className="flex-shrink-0"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            </Button>
+            <Button 
+              onClick={() => setIsCreateFolderDialogOpen(true)} 
+              variant="ghost" 
+              size="sm"
+              className="flex-shrink-0"
+            >
+              <FolderPlus className="h-4 w-4" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="flex-shrink-0">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
+                  {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Grid3X3 className="h-4 w-4 mr-2" />}
+                  {viewMode === 'grid' ? 'Table View' : 'Grid View'}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setIsUploadDialogOpen(true)}>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload Files
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button 
-            onClick={handleRefresh} 
-            variant="outline" 
-            size="sm"
-            disabled={refreshing}
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:ml-2 sm:inline">Refresh</span>
-          </Button>
-          <Button 
-            onClick={() => setIsCreateFolderDialogOpen(true)} 
-            variant="outline" 
-            size="sm"
-          >
-            <FolderPlus className="h-4 w-4" />
-            <span className="hidden sm:ml-2 sm:inline">New Folder</span>
-          </Button>
+        {/* Expandable Search Bar */}
+        <div className="border-t bg-muted/30 p-4">
+          <div className="flex items-center gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="floating-search-input"
+                type="text"
+                placeholder="Search files and folders..."
+                value={searchQuery}
+                onChange={(e) => handleSearchInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="pl-10"
+                disabled={loading}
+              />
+              {searchQuery && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
+                  onClick={() => setSearchQuery('')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Quick Filters */}
-      <DriveFiltersSidebar
-        activeView={activeView}
-        fileTypeFilter={fileTypeFilter}
-        onViewChange={handleViewChange}
-        onFileTypeChange={handleFileTypeFilterChange}
-        onAdvancedFiltersChange={handleAdvancedFiltersChange}
-        isCollapsed={false}
-      />
 
       {/* Navigation Breadcrumb */}
       <FileBreadcrumb 
