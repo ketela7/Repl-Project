@@ -1238,8 +1238,7 @@ export function DriveManager() {
       if (append) {
         setFiles(prev => {
           const newFiles = [...prev, ...fileList];
-          // Prefetch thumbnails for newly loaded files
-          prefetchManager.prefetchThumbnails(newFiles.slice(-fileList.length));
+          // Files loaded for pagination
           return newFiles;
         });
         setFolders(prev => [...prev, ...folderList]);
@@ -1247,8 +1246,7 @@ export function DriveManager() {
         setFiles(fileList);
         setFolders(folderList);
 
-        // Prefetch thumbnails for visible files
-        prefetchManager.prefetchThumbnails(fileList.slice(0, 12));
+        // Initial files loaded
 
         // Process file organization for visible files
         [...fileList, ...folderList].forEach(item => {
@@ -1316,8 +1314,7 @@ export function DriveManager() {
     setSearchQuery('');
     setNextPageToken(null); // Reset pagination
 
-    // Track access pattern for prefetching
-    prefetchManager.trackFolderAccess(folderId);
+    // Track folder access for navigation
 
     fetchFiles(folderId);
   };
