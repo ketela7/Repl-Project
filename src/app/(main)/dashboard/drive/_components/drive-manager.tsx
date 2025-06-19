@@ -424,8 +424,8 @@ export function DriveManager() {
           bValue = b.name.toLowerCase();
           break;
         case 'size':
-          aValue = a.size || 0;
-          bValue = b.size || 0;
+          aValue = normalizeFileSize(a.size);
+          bValue = normalizeFileSize(b.size);
           break;
         case 'modifiedTime':
           aValue = new Date(a.modifiedTime).getTime();
@@ -438,6 +438,10 @@ export function DriveManager() {
         case 'mimeType':
           aValue = a.mimeType.toLowerCase();
           bValue = b.mimeType.toLowerCase();
+          break;
+        case 'owners':
+          aValue = a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '';
+          bValue = b.owners?.[0]?.displayName || b.owners?.[0]?.emailAddress || '';
           break;
         default:
           return 0;
@@ -476,6 +480,10 @@ export function DriveManager() {
         case 'size':
           aValue = 0;
           bValue = 0;
+          break;
+        case 'owners':
+          aValue = a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '';
+          bValue = b.owners?.[0]?.displayName || b.owners?.[0]?.emailAddress || '';
           break;
         default:
           return 0;
@@ -2632,7 +2640,18 @@ export function DriveManager() {
                         </Button>
                       </TableHead>
                     )}
-                    {visibleColumns.owners && <TableHead>Owners</TableHead>}
+                    {visibleColumns.owners && (
+                      <TableHead>
+                        <Button
+                          variant="ghost"
+                          onClick={() => handleSort('owners')}
+                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
+                        >
+                          Owners
+                          <span className="ml-1 opacity-60">{getSortIcon('owners')}</span>
+                        </Button>
+                      </TableHead>
+                    )}
                     {visibleColumns.mimeType && (
                       <TableHead>
                         <Button

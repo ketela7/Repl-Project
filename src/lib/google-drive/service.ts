@@ -94,7 +94,7 @@ export class GoogleDriveService {
       orderBy,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
-      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, viewedByMeTime, capabilities)',
+      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, viewedByMeTime, capabilities, owners)',
     });
 
     const files = response.data.files?.map(convertGoogleDriveFile) || [];
@@ -111,7 +111,7 @@ export class GoogleDriveService {
   async getFile(fileId: string): Promise<DriveFile> {
     const response = await this.drive.files.get({
       fileId,
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, owners',
     });
 
     return convertGoogleDriveFile(response.data);
