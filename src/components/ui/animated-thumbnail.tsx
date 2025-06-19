@@ -53,7 +53,7 @@ export function AnimatedThumbnail({
   }, [isIntersecting, thumbnailLink, imageSrc]);
 
   const sizeClasses = {
-    sm: 'h-8 w-8',
+    sm: 'h-6 w-6',
     md: 'h-12 w-12',
     lg: 'h-16 w-16'
   };
@@ -150,7 +150,7 @@ export function AnimatedThumbnail({
               mimeType={mimeType} 
               className={cn(
                 'transition-colors duration-300',
-                size === 'sm' ? 'h-5 w-5' : size === 'md' ? 'h-8 w-8' : 'h-10 w-10',
+                size === 'sm' ? 'h-4 w-4' : size === 'md' ? 'h-8 w-8' : 'h-10 w-10',
                 isHovered && 'text-blue-600 dark:text-blue-400'
               )}
             />

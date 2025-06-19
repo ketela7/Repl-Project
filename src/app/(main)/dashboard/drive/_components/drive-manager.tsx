@@ -2695,27 +2695,29 @@ export function DriveManager() {
                     className={`cursor-pointer hover:bg-accent ${selectedItems.has(folder.id) ? 'bg-primary/5' : ''}`}
                     onClick={() => isSelectMode ? toggleItemSelection(folder.id) : handleFolderClick(folder.id)}
                   >
-                    <TableCell>
-                      {isSelectMode && (
+                    {isSelectMode && (
+                      <TableCell>
                         <Checkbox
                           checked={selectedItems.has(folder.id)}
                           onCheckedChange={() => toggleItemSelection(folder.id)}
                           onClick={(e) => e.stopPropagation()}
                           className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                         />
-                      )}
-                    </TableCell>
+                      </TableCell>
+                    )}
                     {visibleColumns.name && (
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <FileIcon mimeType="application/vnd.google-apps.folder" className="h-4 w-4" />
-                          <span className="font-medium truncate" title={folder.name}>
-                            {folder.name}
-                          </span>
+                          <FileIcon mimeType="application/vnd.google-apps.folder" className="h-6 w-6 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <span className="font-medium truncate block" title={folder.name}>
+                              {folder.name}
+                            </span>
+                            <Badge variant="secondary" className="text-xs mt-1">
+                              Folder
+                            </Badge>
+                          </div>
                         </div>
-                        <Badge variant="secondary" className="text-xs mt-1">
-                          Folder
-                        </Badge>
                       </TableCell>
                     )}
                     {visibleColumns.id && (
@@ -2868,36 +2870,51 @@ export function DriveManager() {
                     className={`cursor-pointer hover:bg-accent ${selectedItems.has(file.id) ? 'bg-primary/5' : ''}`}
                     onClick={() => isSelectMode ? toggleItemSelection(file.id) : undefined}
                   >
-                    <TableCell>
-                      {isSelectMode && (
+                    {isSelectMode && (
+                      <TableCell>
                         <Checkbox
                           checked={selectedItems.has(file.id)}
                           onCheckedChange={() => toggleItemSelection(file.id)}
                           onClick={(e) => e.stopPropagation()}
                           className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                         />
-                      )}
-                    </TableCell>
+                      </TableCell>
+                    )}
                     {visibleColumns.name && (
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <FileIcon mimeType={file.mimeType} className="h-4 w-4" />
-                          <span 
-                            className="font-medium truncate cursor-pointer hover:text-blue-600 hover:underline" 
-                            title={`Click to preview: ${file.name}`}
-                            onClick={(e) => {
-                              e.stopPropagation();
+                          <AnimatedThumbnail
+                            fileId={file.id}
+                            fileName={file.name}
+                            mimeType={file.mimeType}
+                            thumbnailLink={file.thumbnailLink}
+                            size="sm"
+                            previewable={isPreviewable(file.mimeType)}
+                            onClick={() => {
                               if (isPreviewable(file.mimeType)) {
                                 handleFileAction('preview', file.id, file.name);
-                              } else {
-                                handleFileAction('download', file.id, file.name);
                               }
                             }}
-                          >
-                            {file.name}
-                          </span>
+                            className="flex-shrink-0"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <span 
+                              className="font-medium truncate cursor-pointer hover:text-blue-600 hover:underline block" 
+                              title={`Click to preview: ${file.name}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (isPreviewable(file.mimeType)) {
+                                  handleFileAction('preview', file.id, file.name);
+                                } else {
+                                  handleFileAction('download', file.id, file.name);
+                                }
+                              }}
+                            >
+                              {file.name}
+                            </span>
+                            {file.shared && <Badge variant="outline" className="text-xs mt-1">Shared</Badge>}
+                          </div>
                         </div>
-                        {file.shared && <Badge variant="outline" className="text-xs mt-1">Shared</Badge>}
                       </TableCell>
                     )}
                     {visibleColumns.id && (
