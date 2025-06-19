@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from 'react';
+import { Video, Image, FileText } from 'lucide-react';
 
 interface FileThumbnailPreviewProps {
   children: React.ReactNode;
@@ -130,13 +131,13 @@ export function FileThumbnailPreview({
               ) : (
                 <div className="w-[200px] h-[120px] bg-gradient-to-br from-muted to-muted/60 rounded-lg flex items-center justify-center text-muted-foreground">
                   <div className="text-center space-y-2">
-                    <div className="text-2xl opacity-60">
-                      {mimeType?.startsWith('video/') ? '🎥' : 
-                       mimeType?.startsWith('image/') ? '🖼️' :
-                       mimeType?.includes('pdf') ? '📄' :
-                       mimeType?.includes('document') ? '📝' :
-                       mimeType?.includes('presentation') ? '📊' :
-                       mimeType?.includes('spreadsheet') ? '📈' : '📁'}
+                    <div className="opacity-60">
+                      {mimeType?.startsWith('video/') ? <Video className="h-8 w-8" /> : 
+                       mimeType?.startsWith('image/') ? <Image className="h-8 w-8" /> :
+                       mimeType?.includes('pdf') ? <FileText className="h-8 w-8" /> :
+                       mimeType?.includes('document') ? <FileText className="h-8 w-8" /> :
+                       mimeType?.includes('presentation') ? <FileText className="h-8 w-8" /> :
+                       mimeType?.includes('spreadsheet') ? <FileText className="h-8 w-8" /> : <FileText className="h-8 w-8" />}
                     </div>
                     <div className="text-xs font-medium">Preview unavailable</div>
                   </div>

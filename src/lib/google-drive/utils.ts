@@ -566,43 +566,8 @@ export const applyOrganizationRules = (file: { name: string; mimeType: string; s
  * Generate preview URL for different media types
  */
 export function getPreviewUrl(fileId: string, mimeType: string, webContentLink?: string): string {
-  // Images including GIF - use direct download for better quality
-  if (isImageFile(mimeType)) {
-    return `/api/drive/download/${fileId}`;
-  }
-
-  // All video formats - Google Drive preview supports most video formats
-  if (isVideoFile(mimeType)) {
-    return `https://drive.google.com/file/d/${fileId}/preview`;
-  }
-
-  // Audio files - use audio proxy for better compatibility
-  if (isAudioFile(mimeType)) {
-    return `/api/audio-proxy/${fileId}`;
-  }
-
-  // Google Workspace documents
-  if (mimeType.includes("google-apps")) {
-    if (mimeType.includes("document")) {
-      return `https://docs.google.com/document/d/${fileId}/preview`;
-    }
-    if (mimeType.includes("spreadsheet")) {
-      return `https://docs.google.com/spreadsheets/d/${fileId}/preview`;
-    }
-    if (mimeType.includes("presentation")) {
-      return `https://docs.google.com/presentation/d/${fileId}/preview`;
-    }
-    if (mimeType.includes("drawing")) {
-      return `https://docs.google.com/drawings/d/${fileId}/preview`;
-    }
-  }
-
-  // Other document types (PDF, text files, etc.)
-  if (isDocumentFile(mimeType) || mimeType.startsWith('text/') || mimeType === 'application/json') {
-    return `https://drive.google.com/file/d/${fileId}/preview`;
-  }
-
-  // Default fallback to Google Drive preview
+  // Universal Google Drive preview - supports all file types
+  // If Google Drive can't preview the file, it will show appropriate message
   return `https://drive.google.com/file/d/${fileId}/preview`;
 }
 
@@ -772,7 +737,7 @@ export function getMimeTypeFromFileName(fileName: string): string {
  * Get available actions for a file based on its capabilities and current view
  */
 export function getFileActions(
-  file: { capabilities?: DriveFileCapabilities; trashed?: boolean }, 
+  file: { capabilities?: DriveFileCapabilities; trashed?: boolean; mimeType?: string; itemType?: string }, 
   activeView: string
 ): {
   canPreview: boolean;
@@ -789,6 +754,7 @@ export function getFileActions(
   const isTrashView = activeView === 'trash';
   const isSharedView = activeView === 'shared';
   const isTrashed = file.trashed === true;
+  const isFolder = file.itemType === 'folder' || file.mimeType === 'application/vnd.google-apps.folder';
   const capabilities = file.capabilities || {};
 
   // If we don't have capabilities data, provide conservative defaults
@@ -807,8 +773,8 @@ export function getFileActions(
   const finalCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities;
 
   return {
-    // Preview is always available for supported file types
-    canPreview: true,
+    // Preview available for all files (not folders) - Google Drive can handle all file types
+    canPreview: !isFolder,
 
     // Download based on capabilities
     canDownload: finalCapabilities.canDownload ?? true,

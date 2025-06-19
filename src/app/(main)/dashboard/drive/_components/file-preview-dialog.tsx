@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Download, ExternalLink, Maximize2, Minimize2 } from "lucide-react";
+import { X, Download, ExternalLink, Maximize2, Minimize2, FileText, Image, Video, Music, AlertCircle } from "lucide-react";
 import { DriveFile } from '@/lib/google-drive/types';
 import { getPreviewUrl, isImageFile, isVideoFile, isAudioFile, isDocumentFile } from '@/lib/google-drive/utils';
 
@@ -19,7 +19,6 @@ interface FilePreviewDialogProps {
 }
 
 export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProps) {
-  const [imageError, setImageError] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Handle escape key to exit fullscreen
@@ -54,24 +53,6 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
   if (!file) return null;
 
   const previewUrl = getPreviewUrl(file.id, file.mimeType, file.webContentLink);
-  const isImage = isImageFile(file.mimeType);
-  const isVideo = isVideoFile(file.mimeType);
-  const isAudio = isAudioFile(file.mimeType);
-  const isDocument = isDocumentFile(file.mimeType);
-  const isGif = file.mimeType === 'image/gif';
-
-  // Debug logging for troubleshooting
-  console.log('File Preview Debug:', {
-    fileName: file.name,
-    mimeType: file.mimeType,
-    isImage,
-    isVideo,
-    isAudio,
-    isDocument,
-    isGif,
-    previewUrl,
-    hasWebContentLink: !!file.webContentLink
-  });
 
   const handleDownload = () => {
     // Use direct download API endpoint instead of export link
@@ -91,112 +72,22 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
   };
 
   const renderPreviewContent = () => {
-    const fullscreenClasses = isFullscreen 
-      ? "h-screen w-screen bg-black" 
-      : "bg-gray-50 dark:bg-gray-900 rounded-lg";
-    
-    const imageClasses = isFullscreen
-      ? "h-full w-full object-contain"
-      : "max-w-full max-h-full object-contain";
-    
-    const containerHeight = isFullscreen 
-      ? "h-screen" 
-      : "min-h-[250px] sm:min-h-[400px] max-h-[60vh] sm:max-h-[70vh]";
+    // Universal preview using Google Drive - supports all file types
+    const previewHeight = isFullscreen ? "h-screen" : "h-[50vh] sm:h-[60vh] lg:h-[70vh] min-h-[300px] max-h-[80vh]";
+    const previewClasses = isFullscreen ? "w-full h-full" : "w-full h-full";
 
-    if (isImage && !imageError) {
-      return (
-        <div className={`flex items-center justify-center ${fullscreenClasses} ${containerHeight} overflow-hidden ${isFullscreen ? '' : 'cursor-pointer'}`}
-             onClick={isFullscreen ? undefined : () => setIsFullscreen(true)}>
-          <img
-            src={previewUrl}
-            alt={file.name}
-            className={imageClasses}
-            onError={() => setImageError(true)}
-            onLoad={() => setImageError(false)}
-            loading="lazy"
-          />
-        </div>
-      );
-    }
-
-    if (isVideo) {
-      const videoHeight = isFullscreen ? "h-screen" : "min-h-[200px] sm:min-h-[400px] max-h-[60vh] sm:max-h-[70vh]";
-      const videoClasses = isFullscreen ? "w-full h-full" : "w-full h-full min-h-[200px] sm:min-h-[400px]";
-      
-      return (
-        <div className={`${isFullscreen ? 'bg-black h-screen w-screen' : 'bg-black rounded-lg'} overflow-hidden ${videoHeight}`}>
-          <iframe
-            src={previewUrl}
-            className={videoClasses}
-            allow="autoplay; encrypted-media"
-            allowFullScreen
-            title={`Video preview: ${file.name}`}
-          />
-        </div>
-      );
-    }
-
-    if (isAudio) {
-      return (
-        <div className={`flex flex-col items-center justify-center ${fullscreenClasses} p-4 sm:p-8 ${containerHeight}`}>
-          <div className={`${isFullscreen ? 'text-8xl mb-8' : 'text-4xl sm:text-6xl mb-2 sm:mb-4'}`}>🎵</div>
-          <h3 className={`${isFullscreen ? 'text-2xl mb-8' : 'text-sm sm:text-lg mb-2 sm:mb-4'} font-medium text-center truncate w-full ${isFullscreen ? 'text-white' : ''}`}>
-            {file.name}
-          </h3>
-          <audio controls className={`${isFullscreen ? 'w-full max-w-2xl' : 'w-full max-w-md'}`}>
-            <source src={previewUrl} type={file.mimeType} />
-            Your browser does not support the audio element.
-          </audio>
-        </div>
-      );
-    }
-
-    if (isDocument || file.mimeType.startsWith('text/') || file.mimeType === 'application/json') {
-      const docHeight = isFullscreen ? "h-screen" : "min-h-[300px] sm:min-h-[500px] max-h-[60vh] sm:max-h-[70vh]";
-      const docClasses = isFullscreen ? "w-full h-full" : "w-full h-full min-h-[300px] sm:min-h-[500px]";
-      
-      return (
-        <div className={`${isFullscreen ? 'bg-white h-screen w-screen' : 'bg-white rounded-lg border'} overflow-hidden ${docHeight}`}>
-          <iframe
-            src={previewUrl}
-            className={docClasses}
-            title={`Document preview: ${file.name}`}
-            sandbox="allow-scripts allow-same-origin"
-          />
-        </div>
-      );
-    }
-
-    // Enhanced fallback for unsupported file types or preview errors
+    // Universal Google Drive preview - handles all file types automatically
     return (
-      <div className="flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-lg p-4 sm:p-8 min-h-[200px] sm:min-h-[300px]">
-        <div className="text-4xl sm:text-6xl mb-2 sm:mb-4">
-          {isImage ? '🖼️' : 
-           isVideo ? '🎥' : 
-           isAudio ? '🎵' : 
-           isDocument ? '📄' : '📁'}
-        </div>
-        <h3 className="text-sm sm:text-lg font-medium mb-2 text-center truncate max-w-full">{file.name}</h3>
-        <p className="text-muted-foreground mb-2 text-center text-xs sm:text-sm">
-          {imageError ? 'Preview failed to load' : 'Preview not available for this file type'}
-        </p>
-        <p className="text-muted-foreground mb-4 text-center text-xs">
-          Type: {file.mimeType}
-        </p>
-        <div className="flex gap-2 flex-wrap justify-center">
-          <Button onClick={handleOpenInDrive} variant="outline" size="sm">
-            <ExternalLink className="h-4 w-4 mr-2" />
-            <span className="hidden sm:inline">Open in Google Drive</span>
-            <span className="sm:hidden">Open in Drive</span>
-          </Button>
-          {file.webContentLink && (
-            <Button onClick={handleDownload} variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              <span className="hidden sm:inline">Download</span>
-              <span className="sm:hidden">Download</span>
-            </Button>
-          )}
-        </div>
+      <div className={`${isFullscreen ? 'bg-white h-screen w-screen' : 'bg-white rounded-lg border'} overflow-hidden ${previewHeight}`}>
+        <iframe
+          src={previewUrl}
+          className={previewClasses}
+          title={`Preview: ${file.name}`}
+          allow="autoplay; encrypted-media; fullscreen"
+          allowFullScreen
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
+          loading="lazy"
+        />
       </div>
     );
   };
@@ -268,56 +159,54 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl w-[95vw] max-h-[95vh] h-auto overflow-hidden p-2 sm:p-6">
-        <DialogHeader className="pb-2 sm:pb-4">
+      <DialogContent className="max-w-6xl w-[95vw] max-h-[95vh] h-auto overflow-hidden p-3 sm:p-4 md:p-6">
+        <DialogHeader className="pb-2 sm:pb-3">
           <div className="flex items-start justify-between gap-2">
-            <DialogTitle className="text-sm sm:text-lg font-medium truncate flex-1 pr-2">
+            <DialogTitle className="text-sm sm:text-base md:text-lg font-medium truncate flex-1 pr-2">
               {file.name}
             </DialogTitle>
             <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-              {/* Fullscreen toggle for media files */}
-              {(isImage || isVideo || isDocument) && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsFullscreen(true)}
-                  className="hidden sm:flex"
-                >
-                  <Maximize2 className="h-4 w-4 mr-2" />
-                  Fullscreen
-                </Button>
-              )}
-              {(isImage || isVideo || isDocument) && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setIsFullscreen(true)}
-                  className="sm:hidden h-8 w-8 p-0"
-                >
-                  <Maximize2 className="h-4 w-4" />
-                </Button>
-              )}
+              {/* Fullscreen toggle */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsFullscreen(true)}
+                className="hidden sm:flex"
+              >
+                <Maximize2 className="h-4 w-4 mr-2" />
+                Fullscreen
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsFullscreen(true)}
+                className="sm:hidden h-8 w-8 p-0"
+              >
+                <Maximize2 className="h-4 w-4" />
+              </Button>
+              {/* Download button */}
               {file.webContentLink && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownload}
-                  className="hidden sm:flex"
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download
-                </Button>
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDownload}
+                    className="hidden sm:flex"
+                  >
+                    <Download className="h-4 w-4 mr-2" />
+                    Download
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDownload}
+                    className="sm:hidden h-8 w-8 p-0"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </>
               )}
-              {file.webContentLink && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDownload}
-                  className="sm:hidden h-8 w-8 p-0"
-                >
-                  <Download className="h-4 w-4" />
-                </Button>
-              )}
+              {/* Open in Drive */}
               <Button
                 variant="outline"
                 size="sm"
@@ -335,6 +224,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
               >
                 <ExternalLink className="h-4 w-4" />
               </Button>
+              {/* Close button */}
               <Button
                 variant="ghost"
                 size="sm"
@@ -347,12 +237,12 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
           </div>
         </DialogHeader>
         
-        <div className="mt-2 sm:mt-4 flex-1 overflow-hidden">
+        <div className="mt-2 sm:mt-3 flex-1 overflow-hidden">
           {renderPreviewContent()}
         </div>
 
         {/* File info */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-2 sm:pt-4 border-t text-xs sm:text-sm text-muted-foreground gap-1 sm:gap-0">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-3 border-t text-xs sm:text-sm text-muted-foreground gap-1 sm:gap-0">
           <span className="truncate">
             Type: {file.mimeType}
           </span>
