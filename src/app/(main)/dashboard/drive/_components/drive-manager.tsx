@@ -98,6 +98,16 @@ import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
 
 import { DriveErrorDisplay } from '@/components/drive-error-display';
+import { 
+  FloatingMenuProvider,
+  FloatingMenu,
+  FloatingMenuSearch,
+  FloatingMenuBatch,
+  FloatingMenuFilter,
+  FloatingMenuBadges,
+  FloatingMenuActions,
+  useFloatingMenu 
+} from '@/components/floating-menu';
 import { FileCategoryBadges } from '@/components/file-category-badges';
 // File size utilities inline
 const normalizeFileSize = (size: any): number => {
@@ -308,7 +318,8 @@ const applyClientSideFilters = (
 
 // This function is deprecated - now using getFileActions from utils
 
-export function DriveManager() {
+function DriveManagerContent() {
+  const { setSelectedCount, setActiveFilters } = useFloatingMenu();
   const [files, setFiles] = useState<DriveFile[]>([]);
   const [folders, setFolders] = useState<DriveFolder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -1944,6 +1955,22 @@ export function DriveManager() {
       }
     }, []);
 
+  // Sync floating menu state with selected items and filters
+  useEffect(() => {
+    const selectedItemsCount = Object.keys(selectedItems).length;
+    setSelectedCount(selectedItemsCount);
+  }, [selectedItems, setSelectedCount]);
+
+  useEffect(() => {
+    let activeFilterCount = 0;
+    if (activeView !== 'all') activeFilterCount++;
+    if (fileTypeFilter.length > 0) activeFilterCount++;
+    if (advancedFilters.sizeRange || advancedFilters.createdDateRange || advancedFilters.modifiedDateRange || advancedFilters.ownerFilter) {
+      activeFilterCount++;
+    }
+    setActiveFilters(activeFilterCount);
+  }, [activeView, fileTypeFilter, advancedFilters, setActiveFilters]);
+
   // Show connection card if no access to Google Drive
   if (hasAccess === false) {
     return <DriveConnectionCard />;
@@ -1982,51 +2009,81 @@ export function DriveManager() {
 
   return (
     <div className="w-full space-y-3 sm:space-y-4">
-      {/* Compact Header with Search and Actions */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 flex-1">
-          <Input
-            placeholder="Search your Google Drive..."
-            value={searchQuery}
-            onChange={(e) => handleSearchInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="text-sm flex-1"
+        {/* Floating Menu */}
+        <FloatingMenu>
+          <FloatingMenuSearch 
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchInput}
           />
-          <Button onClick={handleSearch} size="sm" variant="outline">
-            <Search className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button 
-            onClick={handleRefresh} 
-            variant="outline" 
-            size="sm"
-            disabled={refreshing}
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:ml-2 sm:inline">Refresh</span>
-          </Button>
-          <Button 
-            onClick={() => setIsCreateFolderDialogOpen(true)} 
-            variant="outline" 
-            size="sm"
-          >
-            <FolderPlus className="h-4 w-4" />
-            <span className="hidden sm:ml-2 sm:inline">New Folder</span>
-          </Button>
-        </div>
-      </div>
-
-      {/* Quick Filters */}
-      <DriveFiltersSidebar
-        activeView={activeView}
-        fileTypeFilter={fileTypeFilter}
-        onViewChange={handleViewChange}
-        onFileTypeChange={handleFileTypeFilterChange}
-        onAdvancedFiltersChange={handleAdvancedFiltersChange}
-        isCollapsed={false}
-      />
+          <FloatingMenuBatch 
+            selectedItems={getSelectedItemsData()}
+            onBulkAction={(action) => {
+              switch(action) {
+                case 'download':
+                  handleBulkDownload();
+                  break;
+                case 'move':
+                  setIsBulkMoveDialogOpen(true);
+                  break;
+                case 'copy':
+                  setIsBulkCopyDialogOpen(true);
+                  break;
+                case 'delete':
+                  setIsBulkDeleteDialogOpen(true);
+                  break;
+              }
+            }}
+          />
+          <FloatingMenuFilter 
+            filters={{ view: activeView, fileType: fileTypeFilter }}
+            onFilterChange={(newFilters) => {
+              if (newFilters.view) {
+                handleViewChange(newFilters.view);
+              }
+              if (newFilters.fileType) {
+                handleFileTypeFilterChange([newFilters.fileType]);
+              }
+              if (Object.keys(newFilters).length === 0) {
+                handleViewChange('all');
+                handleFileTypeFilterChange([]);
+              }
+            }}
+          />
+          <FloatingMenuBadges 
+            categories={[
+              { name: 'Documents', count: files.filter(f => f.mimeType?.includes('document')).length, color: '#3b82f6' },
+              { name: 'Images', count: files.filter(f => f.mimeType?.startsWith('image/')).length, color: '#10b981' },
+              { name: 'Videos', count: files.filter(f => f.mimeType?.startsWith('video/')).length, color: '#f59e0b' },
+              { name: 'Spreadsheets', count: files.filter(f => f.mimeType?.includes('spreadsheet')).length, color: '#8b5cf6' },
+              { name: 'Presentations', count: files.filter(f => f.mimeType?.includes('presentation')).length, color: '#ef4444' },
+              { name: 'Audio', count: files.filter(f => f.mimeType?.startsWith('audio/')).length, color: '#06b6d4' }
+            ]}
+            onCategoryClick={(category) => {
+              const mimeTypeMap: { [key: string]: string[] } = {
+                'Documents': ['application/vnd.google-apps.document', 'application/pdf', 'application/msword'],
+                'Images': ['image/'],
+                'Videos': ['video/'],
+                'Spreadsheets': ['application/vnd.google-apps.spreadsheet', 'application/vnd.ms-excel'],
+                'Presentations': ['application/vnd.google-apps.presentation', 'application/vnd.ms-powerpoint'],
+                'Audio': ['audio/']
+              };
+              const types = mimeTypeMap[category] || [];
+              handleFileTypeFilterChange(types);
+            }}
+          />
+          <FloatingMenuActions 
+            onAction={(action) => {
+              switch(action) {
+                case 'refresh':
+                  handleRefresh();
+                  break;
+                case 'create-folder':
+                  setIsCreateFolderDialogOpen(true);
+                  break;
+              }
+            }}
+          />
+        </FloatingMenu>
 
       {/* Navigation Breadcrumb */}
       <FileBreadcrumb 
@@ -3101,5 +3158,13 @@ export function DriveManager() {
         />
       )}
     </div>
+  );
+}
+
+export function DriveManager() {
+  return (
+    <FloatingMenuProvider>
+      <DriveManagerContent />
+    </FloatingMenuProvider>
   );
 }
