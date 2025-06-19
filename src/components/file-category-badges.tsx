@@ -43,98 +43,217 @@ interface FileCategory {
 }
 
 const getCategoryFromMimeType = (mimeType: string): string => {
-  // Video files
-  if (mimeType.startsWith('video/') || 
-      mimeType.includes('mp4') || 
-      mimeType.includes('mov') || 
-      mimeType.includes('avi') || 
-      mimeType.includes('mkv') ||
-      mimeType.includes('webm') ||
-      mimeType.includes('flv') ||
-      mimeType.includes('wmv')) {
+  const mime = mimeType.toLowerCase();
+  
+  // Video files - comprehensive list
+  if (mime.startsWith('video/') || 
+      mime.includes('mp4') || 
+      mime.includes('mov') || 
+      mime.includes('avi') || 
+      mime.includes('mkv') ||
+      mime.includes('webm') ||
+      mime.includes('flv') ||
+      mime.includes('wmv') ||
+      mime.includes('m4v') ||
+      mime.includes('3gp') ||
+      mime.includes('ogv') ||
+      mime.includes('vob') ||
+      mime.includes('ts') ||
+      mime.includes('mts') ||
+      mime.includes('divx') ||
+      mime.includes('xvid')) {
     return 'Videos';
   }
   
-  // Audio files
-  if (mimeType.startsWith('audio/') || 
-      mimeType.includes('mp3') || 
-      mimeType.includes('wav') || 
-      mimeType.includes('flac') ||
-      mimeType.includes('aac') ||
-      mimeType.includes('ogg') ||
-      mimeType.includes('wma')) {
+  // Audio files - comprehensive list
+  if (mime.startsWith('audio/') || 
+      mime.includes('mp3') || 
+      mime.includes('wav') || 
+      mime.includes('flac') ||
+      mime.includes('aac') ||
+      mime.includes('ogg') ||
+      mime.includes('wma') ||
+      mime.includes('m4a') ||
+      mime.includes('opus') ||
+      mime.includes('ac3') ||
+      mime.includes('dts') ||
+      mime.includes('amr') ||
+      mime.includes('ape') ||
+      mime.includes('au') ||
+      mime.includes('ra') ||
+      mime.includes('aiff')) {
     return 'Audio';
   }
   
-  // Image files
-  if (mimeType.startsWith('image/') || 
-      mimeType.includes('jpeg') || 
-      mimeType.includes('jpg') || 
-      mimeType.includes('png') ||
-      mimeType.includes('gif') ||
-      mimeType.includes('bmp') ||
-      mimeType.includes('svg') ||
-      mimeType.includes('webp') ||
-      mimeType.includes('tiff')) {
+  // Image files - comprehensive list
+  if (mime.startsWith('image/') || 
+      mime.includes('jpeg') || 
+      mime.includes('jpg') || 
+      mime.includes('png') ||
+      mime.includes('gif') ||
+      mime.includes('bmp') ||
+      mime.includes('svg') ||
+      mime.includes('webp') ||
+      mime.includes('tiff') ||
+      mime.includes('tif') ||
+      mime.includes('ico') ||
+      mime.includes('psd') ||
+      mime.includes('ai') ||
+      mime.includes('eps') ||
+      mime.includes('raw') ||
+      mime.includes('cr2') ||
+      mime.includes('nef') ||
+      mime.includes('orf') ||
+      mime.includes('sr2') ||
+      mime.includes('heic') ||
+      mime.includes('heif') ||
+      mime.includes('avif')) {
     return 'Images';
   }
   
-  // Document files
-  if (mimeType.includes('document') || 
-      mimeType.includes('pdf') || 
-      mimeType.includes('msword') ||
-      mimeType.includes('wordprocessingml') ||
-      mimeType.includes('rtf') ||
-      mimeType.includes('odt') ||
-      mimeType.includes('pages')) {
+  // Document files - comprehensive list
+  if (mime.includes('document') || 
+      mime.includes('pdf') || 
+      mime.includes('msword') ||
+      mime.includes('wordprocessingml') ||
+      mime.includes('rtf') ||
+      mime.includes('odt') ||
+      mime.includes('pages') ||
+      mime.includes('docx') ||
+      mime.includes('doc') ||
+      mime.includes('txt') ||
+      mime.includes('markdown') ||
+      mime.includes('md') ||
+      mime.includes('tex') ||
+      mime.includes('wps') ||
+      mime.includes('wpd') ||
+      mime.includes('abw') ||
+      mime.includes('zabw')) {
     return 'Documents';
   }
   
-  // Spreadsheet files
-  if (mimeType.includes('spreadsheet') || 
-      mimeType.includes('excel') || 
-      mimeType.includes('sheet') ||
-      mimeType.includes('csv') ||
-      mimeType.includes('ods') ||
-      mimeType.includes('numbers')) {
+  // Spreadsheet files - comprehensive list
+  if (mime.includes('spreadsheet') || 
+      mime.includes('excel') || 
+      mime.includes('sheet') ||
+      mime.includes('csv') ||
+      mime.includes('ods') ||
+      mime.includes('numbers') ||
+      mime.includes('xlsx') ||
+      mime.includes('xls') ||
+      mime.includes('xlsm') ||
+      mime.includes('xlsb') ||
+      mime.includes('xltx') ||
+      mime.includes('xltm') ||
+      mime.includes('xlt') ||
+      mime.includes('xlam') ||
+      mime.includes('xla') ||
+      mime.includes('xlw') ||
+      mime.includes('tsv')) {
     return 'Spreadsheets';
   }
   
-  // Presentation files
-  if (mimeType.includes('presentation') || 
-      mimeType.includes('powerpoint') || 
-      mimeType.includes('ppt') ||
-      mimeType.includes('odp') ||
-      mimeType.includes('keynote')) {
+  // Presentation files - comprehensive list
+  if (mime.includes('presentation') || 
+      mime.includes('powerpoint') || 
+      mime.includes('ppt') ||
+      mime.includes('odp') ||
+      mime.includes('keynote') ||
+      mime.includes('pptx') ||
+      mime.includes('pptm') ||
+      mime.includes('potx') ||
+      mime.includes('potm') ||
+      mime.includes('pot') ||
+      mime.includes('ppsx') ||
+      mime.includes('ppsm') ||
+      mime.includes('pps') ||
+      mime.includes('ppam') ||
+      mime.includes('ppa')) {
     return 'Presentations';
   }
   
-  // Archive files
-  if (mimeType.includes('zip') || 
-      mimeType.includes('rar') || 
-      mimeType.includes('tar') ||
-      mimeType.includes('gz') ||
-      mimeType.includes('7z') ||
-      mimeType.includes('archive')) {
+  // Archive files - comprehensive list
+  if (mime.includes('zip') || 
+      mime.includes('rar') || 
+      mime.includes('tar') ||
+      mime.includes('gz') ||
+      mime.includes('7z') ||
+      mime.includes('archive') ||
+      mime.includes('bz2') ||
+      mime.includes('xz') ||
+      mime.includes('lz') ||
+      mime.includes('z') ||
+      mime.includes('cab') ||
+      mime.includes('deb') ||
+      mime.includes('rpm') ||
+      mime.includes('dmg') ||
+      mime.includes('iso') ||
+      mime.includes('msi') ||
+      mime.includes('pkg') ||
+      mime.includes('apk') ||
+      mime.includes('ipa')) {
     return 'Archives';
   }
   
-  // Code files
-  if (mimeType.includes('javascript') || 
-      mimeType.includes('typescript') || 
-      mimeType.includes('json') ||
-      mimeType.includes('html') ||
-      mimeType.includes('css') ||
-      mimeType.includes('xml') ||
-      mimeType.includes('yaml') ||
-      mimeType.includes('python') ||
-      mimeType.includes('java') ||
-      mimeType.includes('cpp') ||
-      mimeType.includes('php') ||
-      mimeType.includes('ruby') ||
-      mimeType.includes('sql')) {
+  // Code files - comprehensive list
+  if (mime.includes('javascript') || 
+      mime.includes('typescript') || 
+      mime.includes('json') ||
+      mime.includes('html') ||
+      mime.includes('css') ||
+      mime.includes('xml') ||
+      mime.includes('yaml') ||
+      mime.includes('yml') ||
+      mime.includes('python') ||
+      mime.includes('java') ||
+      mime.includes('cpp') ||
+      mime.includes('php') ||
+      mime.includes('ruby') ||
+      mime.includes('sql') ||
+      mime.includes('js') ||
+      mime.includes('ts') ||
+      mime.includes('jsx') ||
+      mime.includes('tsx') ||
+      mime.includes('vue') ||
+      mime.includes('svelte') ||
+      mime.includes('go') ||
+      mime.includes('rust') ||
+      mime.includes('swift') ||
+      mime.includes('kotlin') ||
+      mime.includes('scala') ||
+      mime.includes('perl') ||
+      mime.includes('bash') ||
+      mime.includes('shell') ||
+      mime.includes('powershell') ||
+      mime.includes('dockerfile') ||
+      mime.includes('makefile') ||
+      mime.includes('gradle') ||
+      mime.includes('maven') ||
+      mime.includes('npm') ||
+      mime.includes('package.json') ||
+      mime.includes('composer.json') ||
+      mime.includes('gemfile') ||
+      mime.includes('requirements.txt') ||
+      mime.includes('pipfile')) {
     return 'Code';
   }
+  
+  // Google Drive specific mime types
+  if (mime.includes('vnd.google-apps.document')) return 'Documents';
+  if (mime.includes('vnd.google-apps.spreadsheet')) return 'Spreadsheets';
+  if (mime.includes('vnd.google-apps.presentation')) return 'Presentations';
+  if (mime.includes('vnd.google-apps.drawing')) return 'Images';
+  if (mime.includes('vnd.google-apps.form')) return 'Documents';
+  if (mime.includes('vnd.google-apps.site')) return 'Documents';
+  if (mime.includes('vnd.google-apps.script')) return 'Code';
+  
+  // Microsoft Office mime types
+  if (mime.includes('vnd.openxmlformats-officedocument.wordprocessingml')) return 'Documents';
+  if (mime.includes('vnd.openxmlformats-officedocument.spreadsheetml')) return 'Spreadsheets';
+  if (mime.includes('vnd.openxmlformats-officedocument.presentationml')) return 'Presentations';
+  if (mime.includes('vnd.ms-excel')) return 'Spreadsheets';
+  if (mime.includes('vnd.ms-powerpoint')) return 'Presentations';
+  if (mime.includes('vnd.ms-word')) return 'Documents';
   
   // Default to Others
   return 'Others';
@@ -251,30 +370,34 @@ export function FileCategoryBadges({
   }
 
   return (
-    <Card className={`${className}`}>
-      <CardContent className="p-4">
-        <div className="flex flex-wrap gap-2">
-          {categories.map((category) => (
-            <Badge
-              key={category.name}
-              variant="outline"
-              className={`
-                px-3 py-2 cursor-pointer transition-all duration-200 hover:scale-105 
-                ${category.color} ${category.bgColor} ${category.textColor}
-                border-2 rounded-full font-medium text-sm
-                flex items-center gap-2 min-w-fit
-              `}
-              onClick={() => onCategoryClick?.(category.name)}
-            >
+    <div className={`${className}`}>
+      <div className="flex flex-wrap gap-2 sm:gap-3 justify-center sm:justify-start">
+        {categories.map((category) => (
+          <Badge
+            key={category.name}
+            variant="outline"
+            className={`
+              px-3 py-2 sm:px-4 sm:py-2.5 cursor-pointer transition-all duration-200 
+              hover:scale-105 hover:shadow-md active:scale-95
+              ${category.color} ${category.bgColor} ${category.textColor}
+              border-2 rounded-full font-medium text-sm sm:text-base
+              flex items-center gap-2 min-w-fit
+              shadow-sm hover:shadow-lg
+              backdrop-blur-sm
+              touch-manipulation
+            `}
+            onClick={() => onCategoryClick?.(category.name)}
+          >
+            <span className="flex-shrink-0">
               {category.icon}
-              <span className="whitespace-nowrap">
-                {category.name} {category.count}
-              </span>
-            </Badge>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            </span>
+            <span className="whitespace-nowrap font-semibold">
+              {category.name} {category.count}
+            </span>
+          </Badge>
+        ))}
+      </div>
+    </div>
   );
 }
 
