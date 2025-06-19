@@ -102,13 +102,10 @@ import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
-import { FileOrganizationPanel } from './file-organization-panel';
 
 import { errorRecovery } from '@/lib/error-recovery';
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
 import { useDriveErrorHandler } from '@/components/ui/drive-error-handler';
-import { OrganizationSettings } from '@/lib/google-drive/types';
-import { generateAutoTags, getSmartCategory } from '@/lib/google-drive/utils';
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 // File size utilities inline
 const normalizeFileSize = (size: any): number => {
@@ -378,16 +375,6 @@ export function DriveManager() {
   // Bulk operations state
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [isSelectMode, setIsSelectMode] = useState(false);
-
-  // File organization state
-  const [isOrganizationPanelOpen, setIsOrganizationPanelOpen] = useState(false);
-  const [organizationSettings, setOrganizationSettings] = useState<OrganizationSettings>({
-    autoTagging: true,
-    smartCategorization: true,
-    customRules: [],
-    tagSuggestions: true,
-    duplicateDetection: false,
-  });
   const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
   const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
   const [isBulkCopyDialogOpen, setIsBulkCopyDialogOpen] = useState(false);
@@ -420,47 +407,15 @@ export function DriveManager() {
       : <ChevronDown className="h-4 w-4" />;
   };
 
-  // Auto-tagging and smart categorization function
-  const processFileOrganization = React.useCallback((item: DriveFile | DriveFolder) => {
-    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
-      return item;
-    }
-    
-    const autoTags = organizationSettings.autoTagging ? generateAutoTags(item) : [];
-    const category = organizationSettings.smartCategorization ? getSmartCategory(item) : null;
-
-    // Add organization data to the item for display
-    return {
-      ...item,
-      organizationData: {
-        autoTags,
-        category,
-        processed: true
-      }
-    };
-  }, [organizationSettings]);
-
-  // Apply organization processing to files when settings are enabled
-  const processedFiles = React.useMemo(() => {
-    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
-      return files;
-    }
-    
-    return files.map(file => {
-      const processed = processFileOrganization(file);
-      return processed || file;
-    });
-  }, [files, organizationSettings, processFileOrganization]);
-
   // Apply client-side filters first, then sort
   const { filteredFiles: clientFilteredFiles, filteredFolders: clientFilteredFolders } = React.useMemo(() => {
-    return applyClientSideFilters(processedFiles, folders, {
+    return applyClientSideFilters(files, folders, {
       fileTypeFilter,
       searchQuery: debouncedSearchQuery,
       activeView,
       advancedFilters
     });
-  }, [processedFiles, folders, fileTypeFilter, debouncedSearchQuery, activeView, advancedFilters]);
+  }, [files, folders, fileTypeFilter, debouncedSearchQuery, activeView, advancedFilters]);
 
   // Sort ALL items (files and folders together) based on current sort configuration
   const sortedAllItems = React.useMemo(() => {
@@ -1920,62 +1875,33 @@ export function DriveManager() {
     toast.error(`${context}: ${error.message || 'An error occurred'}`);
   };
 
-  // File organization handlers
-  const handleOrganizationSettingsChange = (newSettings: OrganizationSettings) => {
-    setOrganizationSettings(newSettings);
-    localStorage.setItem('drive-organization-settings', JSON.stringify(newSettings));
-    toast.success('Organization settings updated');
-  };
-
-  const handleReprocessFiles = async () => {
-    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
-      toast.info('Enable auto-tagging or smart categorization to reprocess files');
-      return;
+  // Auto-tagging and smart categorization function
+  const processFileOrganization = (item: DriveFile | DriveFolder) => {
+    // Example: Auto-tagging based on file type
+    let tags: string[] = [];
+    if (item.mimeType?.includes('document')) {
+      tags.push('document');
+    } else if (item.mimeType?.includes('spreadsheet')) {
+      tags.push('spreadsheet');
+    } else if (item.mimeType?.startsWith('image/')) {
+      tags.push('image');
     }
 
-    try {
-      setRefreshing(true);
-      let processedCount = 0;
-      
-      for (const file of files) {
-        if (organizationSettings.autoTagging) {
-          const autoTags = generateAutoTags(file);
-          if (autoTags.length > 0) {
-            console.log(`Auto-tags for ${file.name}:`, autoTags);
-            processedCount++;
-          }
-        }
-        
-        if (organizationSettings.smartCategorization) {
-          const category = getSmartCategory(file);
-          console.log(`Smart category for ${file.name}:`, category);
-          processedCount++;
-        }
-      }
-      
-      toast.success(`Processed ${processedCount} files with organization rules`);
-    } catch (error) {
-      console.error('Error reprocessing files:', error);
-      toast.error('Failed to reprocess files');
-    } finally {
-      setRefreshing(false);
+    // Example: Smart categorization based on file name
+    if (item.name?.toLowerCase().includes('report')) {
+      tags.push('report');
+    }
+
+    // Add tags to the file's description or metadata
+    if (tags.length > 0) {
+      console.log(`Auto-tagging ${item.name}:`, tags);
+      // You can implement a function to update the file's description
+      // or metadata with these tags using the Google Drive API.
+      // Example: updateFileMetadata(item.id, { tags: tags });
     }
   };
-
-
 
   useEffect(() => {
-    // Load organization settings from localStorage
-    const savedSettings = localStorage.getItem('drive-organization-settings');
-    if (savedSettings) {
-      try {
-        const parsedSettings = JSON.parse(savedSettings);
-        setOrganizationSettings(parsedSettings);
-      } catch (error) {
-        console.error('Error loading organization settings:', error);
-      }
-    }
-
     const checkAccessAndFetch = async () => {
       try {
         console.log('=== DriveManager: Starting access check ===');
@@ -2168,15 +2094,6 @@ export function DriveManager() {
           >
             <Upload className="h-4 w-4" />
             <span className="hidden sm:ml-2 sm:inline">Upload Soon</span>
-          </Button>
-          <Button 
-            onClick={() => setIsOrganizationPanelOpen(true)} 
-            size="sm"
-            variant="outline"
-            className="whitespace-nowrap"
-          >
-            <Tag className="h-4 w-4" />
-            <span className="hidden sm:ml-2 sm:inline">Auto-Tags</span>
           </Button>
         </div>
       </div>
@@ -3225,15 +3142,6 @@ export function DriveManager() {
           onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         />
       )}
-
-      {/* File Organization Panel */}
-      <FileOrganizationPanel
-        isOpen={isOrganizationPanelOpen}
-        onClose={() => setIsOrganizationPanelOpen(false)}
-        settings={organizationSettings}
-        onSettingsChange={handleOrganizationSettingsChange}
-        onReprocessFiles={handleReprocessFiles}
-      />
     </div>
   );
 }

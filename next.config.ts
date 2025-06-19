@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
     },
   },
   allowedDevOrigins: [
-    "*.replit.dev",    
-    "127.0.0.1",
+    "*.replit.dev",
+     "127.0.0.1",
     "localhost"
   ],
 };
