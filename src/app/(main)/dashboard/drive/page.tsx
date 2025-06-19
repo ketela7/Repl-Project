@@ -1,12 +1,12 @@
 import { Suspense } from 'react';
-import { DriveManager } from './_components/drive-manager';
+import { DriveManagerClean } from './_components/drive-manager-clean';
 import { DriveManagerSkeleton } from './_components/drive-manager-skeleton';
 
 export default function DrivePage() {
   return (
     <div className="w-full min-h-screen">
       <Suspense fallback={<DriveManagerSkeleton />}>
-        <DriveManager />
+        <DriveManagerClean />
       </Suspense>
     </div>
   );
