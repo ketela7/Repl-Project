@@ -1984,7 +1984,7 @@ export function DriveManager() {
   return (
     <div className="w-full space-y-3 sm:space-y-4">
       {/* Floating Toolbar - Sticky Horizontal Scroll */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm mb-6">
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm mb-6" style={{ position: 'sticky', top: '0px' }}>
         <div className="flex items-center justify-between p-4">
           {/* Horizontal Scrollable Tabs */}
           <div className="flex items-center gap-2 overflow-x-scroll scrollbar-hide scroll-smooth flex-1" 
@@ -2081,6 +2081,11 @@ export function DriveManager() {
             >
               <FileText className="h-4 w-4" />
               Docs
+              {fileTypeFilter.includes('document') && (
+                <Badge variant="secondary" className="ml-1 text-xs">
+                  {sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
+                </Badge>
+              )}
             </Button>
 
             <Button
@@ -2096,29 +2101,88 @@ export function DriveManager() {
             >
               <FileText className="h-4 w-4" />
               Images
+              {fileTypeFilter.includes('image') && (
+                <Badge variant="secondary" className="ml-1 text-xs">
+                  {sortedFiles.filter(f => f.mimeType?.includes('image')).length}
+                </Badge>
+              )}
             </Button>
 
-            {/* File Counter Badge */}
-            <div className="flex items-center gap-2 px-3 py-1 bg-muted rounded-full flex-shrink-0">
-              <FileText className="h-3 w-3 text-muted-foreground" />
-              <span className="text-sm font-medium">{sortedFiles.length + sortedFolders.length}</span>
+            <Button
+              variant={fileTypeFilter.includes('video') ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => {
+                const newFilter = fileTypeFilter.includes('video') 
+                  ? fileTypeFilter.filter(f => f !== 'video')
+                  : [...fileTypeFilter, 'video'];
+                handleFileTypeFilterChange(newFilter);
+              }}
+            >
+              <Play className="h-4 w-4" />
+              Videos
+              {fileTypeFilter.includes('video') && (
+                <Badge variant="secondary" className="ml-1 text-xs">
+                  {sortedFiles.filter(f => f.mimeType?.includes('video')).length}
+                </Badge>
+              )}
+            </Button>
+
+            <Button
+              variant={fileTypeFilter.includes('spreadsheet') ? 'default' : 'ghost'}
+              size="sm"
+              className="flex items-center gap-2 whitespace-nowrap flex-shrink-0"
+              onClick={() => {
+                const newFilter = fileTypeFilter.includes('spreadsheet') 
+                  ? fileTypeFilter.filter(f => f !== 'spreadsheet')
+                  : [...fileTypeFilter, 'spreadsheet'];
+                handleFileTypeFilterChange(newFilter);
+              }}
+            >
+              <Grid3X3 className="h-4 w-4" />
+              Sheets
+              {fileTypeFilter.includes('spreadsheet') && (
+                <Badge variant="secondary" className="ml-1 text-xs">
+                  {sortedFiles.filter(f => f.mimeType?.includes('spreadsheet')).length}
+                </Badge>
+              )}
+            </Button>
+
+            {/* MIME Type Badge Counters */}
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <Badge variant="outline" className="flex items-center gap-1">
+                <HardDrive className="h-3 w-3" />
+                <span className="text-xs">{sortedFiles.length + sortedFolders.length}</span>
+              </Badge>
+              
+              {sortedFolders.length > 0 && (
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Folder className="h-3 w-3 text-blue-500" />
+                  <span className="text-xs">{sortedFolders.length}</span>
+                </Badge>
+              )}
+
+              {sortedFiles.filter(f => f.mimeType?.includes('image')).length > 0 && (
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Eye className="h-3 w-3 text-green-500" />
+                  <span className="text-xs">{sortedFiles.filter(f => f.mimeType?.includes('image')).length}</span>
+                </Badge>
+              )}
+
+              {sortedFiles.filter(f => f.mimeType?.includes('video')).length > 0 && (
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Play className="h-3 w-3 text-red-500" />
+                  <span className="text-xs">{sortedFiles.filter(f => f.mimeType?.includes('video')).length}</span>
+                </Badge>
+              )}
+
+              {sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <FileText className="h-3 w-3 text-orange-500" />
+                  <span className="text-xs">{sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}</span>
+                </Badge>
+              )}
             </div>
-
-            {/* Folder Counter */}
-            {sortedFolders.length > 0 && (
-              <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
-                <Folder className="h-3 w-3" />
-                <span>{sortedFolders.length}</span>
-              </Badge>
-            )}
-
-            {/* File Counter */}
-            {sortedFiles.length > 0 && (
-              <Badge variant="outline" className="flex items-center gap-1 flex-shrink-0">
-                <FileText className="h-3 w-3" />
-                <span>{sortedFiles.length}</span>
-              </Badge>
-            )}
           </div>
 
           {/* Actions Menu */}
@@ -2146,15 +2210,43 @@ export function DriveManager() {
                   <Settings className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" className="w-56">
+                {/* View Mode */}
                 <DropdownMenuItem onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
                   {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Grid3X3 className="h-4 w-4 mr-2" />}
                   {viewMode === 'grid' ? 'Table View' : 'Grid View'}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                
+                {/* Advanced Filters */}
+                <DropdownMenuItem onClick={() => handleViewChange('my-drive')}>
+                  <HardDrive className="h-4 w-4 mr-2" />
+                  My Drive Only
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleViewChange('all')}>
+                  <FileText className="h-4 w-4 mr-2" />
+                  All Files
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                
+                {/* Actions */}
                 <DropdownMenuItem onClick={() => setIsUploadDialogOpen(true)}>
                   <Upload className="h-4 w-4 mr-2" />
                   Upload Files
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsCreateFolderDialogOpen(true)}>
+                  <FolderPlus className="h-4 w-4 mr-2" />
+                  New Folder
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                
+                {/* Batch Operations */}
+                <DropdownMenuItem 
+                  onClick={() => setIsSelectMode(!isSelectMode)}
+                  disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
+                >
+                  <Square className="h-4 w-4 mr-2" />
+                  Select Mode
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -2191,43 +2283,17 @@ export function DriveManager() {
         </div>
       </div>
 
-      {/* Navigation Breadcrumb */}
-      <FileBreadcrumb 
-        currentFolderId={currentFolderId}
-        loading={loading || refreshing}
-        onNavigate={(folderId) => {
-          setCurrentFolderId(folderId);
-          fetchFiles(folderId || undefined);
-        }}
-      />
-
-      {/* File Category Overview */}
-      {(sortedFiles.length > 0 || sortedFolders.length > 0) && (
-        <FileCategoryBadges 
-          files={sortedFiles}
-          folders={sortedFolders}
-          onCategoryClick={(category) => {
-            if (category === 'Folders') {
-              setFileTypeFilter(['folder']);
-            } else {
-              const categoryFilters = {
-                'Videos': ['video'],
-                'Documents': ['document', 'pdf'],
-                'Images': ['image'],
-                'Audio': ['audio'],
-                'Spreadsheets': ['spreadsheet'],
-                'Presentations': ['presentation'],
-                'Archives': ['archive'],
-                'Code': ['code'],
-                'Others': ['other']
-              };
-              const filter = categoryFilters[category as keyof typeof categoryFilters] || ['other'];
-              setFileTypeFilter(filter);
-              toast.info(`Showing ${category} files`);
-            }
+      {/* Navigation Breadcrumb - Moved below toolbar */}
+      <div className="px-4 -mt-2 mb-4">
+        <FileBreadcrumb 
+          currentFolderId={currentFolderId}
+          loading={loading || refreshing}
+          onNavigate={(folderId) => {
+            setCurrentFolderId(folderId);
+            fetchFiles(folderId || undefined);
           }}
         />
-      )}
+      </div>
 
       {/* Files and Folders Grid */}
       <Card>
@@ -2235,29 +2301,6 @@ export function DriveManager() {
           <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
             <span className="text-lg sm:text-xl">Files & Folders</span>
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="text-xs">
-                {sortedFolders.length + sortedFiles.length} items
-              </Badge>
-              {(sortedFolders.length > 0 || sortedFiles.length > 0) && (
-                <Badge variant="outline" className="text-xs flex items-center gap-1">
-                  <span className="flex items-center gap-1">
-                    {sortedFolders.length > 0 && (
-                      <>
-                        {sortedFolders.length}
-                        <Folder className="h-3 w-3 text-blue-600 dark:text-blue-400" />
-                      </>
-                    )}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    {sortedFiles.length > 0 && (
-                      <>
-                        {sortedFiles.length}
-                        <FileText className="h-3 w-3 text-gray-600 dark:text-gray-400" />
-                      </>
-                    )}
-                  </span>
-                </Badge>
-              )}
               {(folders.length > 0 || files.length > 0) && (
                 <div className="flex items-center gap-2">
                   <ToggleGroup 
