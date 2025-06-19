@@ -67,6 +67,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
 import { formatFileSize, formatDate, isPreviewable, getFileActions } from '@/lib/google-drive/utils';
 import { FileIcon } from '@/components/file-icon';
