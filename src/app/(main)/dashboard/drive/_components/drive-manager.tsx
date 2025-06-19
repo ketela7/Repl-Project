@@ -521,6 +521,9 @@ export function DriveManager() {
 
   const deselectAll = () => {
     setSelectedItems(new Set());
+    // Force re-render to clear visual selection
+    setFiles(prev => [...prev]);
+    setFolders(prev => [...prev]);
   };
 
   const toggleSelectMode = () => {
@@ -2336,6 +2339,10 @@ export function DriveManager() {
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="space-y-1 ml-4">
+                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, name: !prev.name }))}>
+                        <Checkbox checked={visibleColumns.name} className="mr-2 h-3 w-3" />
+                        <span className="text-xs">Name</span>
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, size: !prev.size }))}>
                         <Checkbox checked={visibleColumns.size} className="mr-2 h-3 w-3" />
                         <span className="text-xs">Size</span>
@@ -2344,6 +2351,10 @@ export function DriveManager() {
                         <Checkbox checked={visibleColumns.mimeType} className="mr-2 h-3 w-3" />
                         <span className="text-xs">MIME Type</span>
                       </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, owners: !prev.owners }))}>
+                        <Checkbox checked={visibleColumns.owners} className="mr-2 h-3 w-3" />
+                        <span className="text-xs">Owner</span>
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, createdTime: !prev.createdTime }))}>
                         <Checkbox checked={visibleColumns.createdTime} className="mr-2 h-3 w-3" />
                         <span className="text-xs">Created</span>
@@ -2351,6 +2362,14 @@ export function DriveManager() {
                       <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, modifiedTime: !prev.modifiedTime }))}>
                         <Checkbox checked={visibleColumns.modifiedTime} className="mr-2 h-3 w-3" />
                         <span className="text-xs">Modified</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, permissions: !prev.permissions }))}>
+                        <Checkbox checked={visibleColumns.permissions} className="mr-2 h-3 w-3" />
+                        <span className="text-xs">Permissions</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, starred: !prev.starred }))}>
+                        <Checkbox checked={visibleColumns.starred} className="mr-2 h-3 w-3" />
+                        <span className="text-xs">Starred</span>
                       </DropdownMenuItem>
                     </CollapsibleContent>
                   </Collapsible>
@@ -2405,9 +2424,9 @@ export function DriveManager() {
         </div>
       </div>
 
-      {/* Navigation Breadcrumb - Moved below toolbar */}
-      <div className="px-4 -mt-2 mb-4">
-        <FileBreadcrumb 
+      {/* Breadcrumb Navigation */}
+      <div className="px-4 pb-4">
+        <FileBreadcrumb
           currentFolderId={currentFolderId}
           loading={loading || refreshing}
           onNavigate={(folderId) => {
