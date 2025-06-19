@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -35,30 +36,40 @@ export function ThumbnailHover({
   }
 
   return (
-    <HoverCard openDelay={300} closeDelay={100}>
+    <HoverCard openDelay={200} closeDelay={150}>
       <HoverCardTrigger asChild>
         <div className={className}>
           {children}
         </div>
       </HoverCardTrigger>
       <HoverCardContent 
-        className="w-auto p-2 max-w-sm" 
+        className="w-auto p-3 max-w-xs shadow-lg border" 
         side="right" 
         align="start"
-        sideOffset={10}
+        sideOffset={15}
       >
-        <div className="space-y-2">
-          <div className="text-sm font-medium truncate" title={fileName}>
+        <div className="space-y-3">
+          {/* File name header */}
+          <div className="text-sm font-medium text-foreground truncate max-w-[280px]" title={fileName}>
             {fileName}
           </div>
-          <div className="relative">
+          
+          {/* Thumbnail container */}
+          <div className="relative bg-muted/30 rounded-md overflow-hidden">
             {!imageError ? (
               <img
                 src={thumbnailLink}
-                alt={`Thumbnail of ${fileName}`}
-                className={`max-w-full max-h-48 rounded border transition-opacity duration-200 ${
-                  imageLoaded ? 'opacity-100' : 'opacity-0'
-                }`}
+                alt={`Preview of ${fileName}`}
+                className={`
+                  w-full h-auto max-w-[280px] max-h-[200px] 
+                  object-contain rounded-md
+                  transition-opacity duration-300 ease-in-out
+                  ${imageLoaded ? 'opacity-100' : 'opacity-0'}
+                `}
+                style={{
+                  minHeight: '120px',
+                  minWidth: '200px'
+                }}
                 onLoad={() => setImageLoaded(true)}
                 onError={() => {
                   setImageError(true);
@@ -67,12 +78,19 @@ export function ThumbnailHover({
                 loading="lazy"
               />
             ) : (
-              <div className="w-48 h-32 bg-muted rounded border flex items-center justify-center text-muted-foreground text-sm">
-                Preview not available
+              <div className="w-[200px] h-[120px] bg-muted rounded-md flex items-center justify-center text-muted-foreground text-xs">
+                <div className="text-center">
+                  <div className="text-lg mb-1">📷</div>
+                  <div>Preview not available</div>
+                </div>
               </div>
             )}
+            
+            {/* Loading skeleton */}
             {!imageLoaded && !imageError && (
-              <div className="absolute inset-0 w-48 h-32 bg-muted rounded border animate-pulse" />
+              <div className="absolute inset-0 w-[200px] h-[120px] bg-muted rounded-md animate-pulse flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-muted-foreground/20 border-t-muted-foreground rounded-full animate-spin" />
+              </div>
             )}
           </div>
         </div>
