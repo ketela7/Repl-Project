@@ -307,17 +307,6 @@ const applyClientSideFilters = (
   return { filteredFiles, filteredFolders };
 };
 
-// Utility function to convert size units to bytes
-const getSizeMultiplier = (unit: 'B' | 'KB' | 'MB' | 'GB'): number => {
-  switch (unit) {
-    case 'B': return 1;
-    case 'KB': return 1024;
-    case 'MB': return 1024 * 1024;
-    case 'GB': return 1024 * 1024 * 1024;
-    default: return 1;
-  }
-};
-
 // This function is deprecated - now using getFileActions from utils
 
 export function DriveManager() {
