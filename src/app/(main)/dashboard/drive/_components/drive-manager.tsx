@@ -87,7 +87,7 @@ import { FilePreviewDialog } from './file-preview-dialog';
 import { DriveGridSkeleton, BreadcrumbSkeleton } from './drive-skeleton';
 import { LoadingSkeleton, BreadcrumbLoadingSkeleton } from '@/components/ui/loading-skeleton';
 import { LazyImage } from '@/components/ui/lazy-image';
-import { BulkActionsToolbar } from './bulk-actions-toolbar';
+
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
 import { BulkExportDialog } from './bulk-export-dialog';
@@ -1983,11 +1983,12 @@ export function DriveManager() {
 
   return (
     <div className="w-full space-y-3 sm:space-y-4">
-      {/* Simplified Floating Toolbar - Fixed Sticky Position */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
-        <div className="flex items-center justify-between p-4 max-w-7xl mx-auto">
-          {/* Main Menu - 5 Items */}
-          <div className="flex items-center gap-3">
+      {/* Simplified Floating Toolbar - Sticky Below Header */}
+      <div className="sticky top-16 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
+        <div className="flex items-center justify-between p-4 overflow-x-auto scrollbar-hide scroll-smooth"
+             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          {/* Main Menu - 5 Items - Horizontal Scrollable */}
+          <div className="flex items-center gap-3 flex-shrink-0 min-w-0">
             
             {/* Search */}
             <Button
@@ -2064,111 +2065,256 @@ export function DriveManager() {
                   Filter
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
-                {/* Basic Filters */}
-                <div className="px-2 py-1.5 text-sm font-semibold">Basic Filter</div>
-                <DropdownMenuItem onClick={() => handleViewChange('all')}>
-                  <HardDrive className="h-4 w-4 mr-2" />
-                  All Files
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleViewChange('my-drive')}>
-                  <Folder className="h-4 w-4 mr-2" />
-                  My Drive
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleViewChange('recent')}>
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Recent
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleViewChange('trash')}>
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Trash
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleViewChange('starred')}>
-                  <Star className="h-4 w-4 mr-2" />
-                  Starred
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleViewChange('shared')}>
-                  <Share className="h-4 w-4 mr-2" />
-                  Shared with me
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator />
-                
-                {/* File Types */}
-                <div className="px-2 py-1.5 text-sm font-semibold">File Types</div>
-                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['document'])}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Documents
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['image'])}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  Images
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['video'])}>
-                  <Play className="h-4 w-4 mr-2" />
-                  Videos
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['spreadsheet'])}>
-                  <Grid3X3 className="h-4 w-4 mr-2" />
-                  Spreadsheets
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['presentation'])}>
-                  <FileText className="h-4 w-4 mr-2" />
-                  Presentations
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['audio'])}>
-                  <Play className="h-4 w-4 mr-2" />
-                  Audio
-                </DropdownMenuItem>
+              <DropdownMenuContent align="start" className="w-80 max-h-96 overflow-y-auto">
+                <div className="p-2 space-y-2">
+                  {/* Basic Filters */}
+                  <Collapsible defaultOpen>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
+                      <span className="text-sm font-semibold">Basic Filter</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1 ml-4">
+                      <DropdownMenuItem onClick={() => handleViewChange('all')}>
+                        <HardDrive className="h-4 w-4 mr-2" />
+                        All Files
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleViewChange('my-drive')}>
+                        <Folder className="h-4 w-4 mr-2" />
+                        My Drive
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleViewChange('recent')}>
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Recent
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleViewChange('trash')}>
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Trash
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleViewChange('starred')}>
+                        <Star className="h-4 w-4 mr-2" />
+                        Starred
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleViewChange('shared')}>
+                        <Share className="h-4 w-4 mr-2" />
+                        Shared with me
+                      </DropdownMenuItem>
+                    </CollapsibleContent>
+                  </Collapsible>
+                  
+                  <DropdownMenuSeparator />
+                  
+                  {/* File Types */}
+                  <Collapsible defaultOpen>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
+                      <span className="text-sm font-semibold">File Types</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1 ml-4">
+                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['document'])}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Documents
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['image'])}>
+                        <Eye className="h-4 w-4 mr-2" />
+                        Images
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['video'])}>
+                        <Play className="h-4 w-4 mr-2" />
+                        Videos
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['spreadsheet'])}>
+                        <Grid3X3 className="h-4 w-4 mr-2" />
+                        Spreadsheets
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['presentation'])}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Presentations
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['audio'])}>
+                        <Play className="h-4 w-4 mr-2" />
+                        Audio
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['archive'])}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Archives
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['code'])}>
+                        <FileText className="h-4 w-4 mr-2" />
+                        Code Files
+                      </DropdownMenuItem>
+                    </CollapsibleContent>
+                  </Collapsible>
+
+                  <DropdownMenuSeparator />
+
+                  {/* Advanced Filters */}
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
+                      <span className="text-sm font-semibold">Advanced Filters</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-2 ml-4 p-2">
+                      {/* Size Range */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-muted-foreground">Size Range</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <DropdownMenuItem onClick={() => console.log('Filter: <1MB')}>
+                            <span className="text-xs">{"<"} 1MB</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log('Filter: 1-10MB')}>
+                            <span className="text-xs">1-10MB</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log('Filter: 10-100MB')}>
+                            <span className="text-xs">10-100MB</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log('Filter: >100MB')}>
+                            <span className="text-xs">{">"} 100MB</span>
+                          </DropdownMenuItem>
+                        </div>
+                      </div>
+
+                      {/* Date Range */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-muted-foreground">Date Range</label>
+                        <div className="space-y-1">
+                          <DropdownMenuItem onClick={() => console.log('Filter: Today')}>
+                            <Calendar className="h-3 w-3 mr-2" />
+                            <span className="text-xs">Today</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log('Filter: This Week')}>
+                            <Calendar className="h-3 w-3 mr-2" />
+                            <span className="text-xs">This Week</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log('Filter: This Month')}>
+                            <Calendar className="h-3 w-3 mr-2" />
+                            <span className="text-xs">This Month</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => console.log('Filter: This Year')}>
+                            <Calendar className="h-3 w-3 mr-2" />
+                            <span className="text-xs">This Year</span>
+                          </DropdownMenuItem>
+                        </div>
+                      </div>
+
+                      {/* Owner */}
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-muted-foreground">Owner</label>
+                        <DropdownMenuItem onClick={() => console.log('Filter: Owned by me')}>
+                          <MousePointer className="h-3 w-3 mr-2" />
+                          <span className="text-xs">Owned by me</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => console.log('Filter: Shared with me')}>
+                          <Share className="h-3 w-3 mr-2" />
+                          <span className="text-xs">Shared with me</span>
+                        </DropdownMenuItem>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Badge - Floating counters */}
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="flex items-center gap-1">
-                <HardDrive className="h-3 w-3" />
-                <span className="text-xs">{sortedFiles.length + sortedFolders.length}</span>
-              </Badge>
-              
-              {sortedFolders.length > 0 && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Folder className="h-3 w-3 text-blue-500" />
-                  <span className="text-xs">{sortedFolders.length}</span>
-                </Badge>
-              )}
+            {/* Badge - Floating Panel Toggle */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm">
+                  <HardDrive className="h-4 w-4 mr-2" />
+                  Badge
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-80 p-4">
+                <div className="space-y-4">
+                  <div className="text-sm font-semibold border-b pb-2">File Statistics</div>
+                  
+                  {/* Total Files */}
+                  <div className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <HardDrive className="h-4 w-4 text-gray-600" />
+                      <span className="text-sm">Total Items</span>
+                    </div>
+                    <Badge variant="outline" className="font-medium">
+                      {sortedFiles.length + sortedFolders.length}
+                    </Badge>
+                  </div>
 
-              {sortedFiles.filter(f => f.mimeType?.includes('image')).length > 0 && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Eye className="h-3 w-3 text-green-500" />
-                  <span className="text-xs">{sortedFiles.filter(f => f.mimeType?.includes('image')).length}</span>
-                </Badge>
-              )}
+                  {/* Folders */}
+                  {sortedFolders.length > 0 && (
+                    <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <Folder className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm">Folders</span>
+                      </div>
+                      <Badge variant="outline" className="border-blue-500 text-blue-700 dark:text-blue-300">
+                        {sortedFolders.length}
+                      </Badge>
+                    </div>
+                  )}
 
-              {sortedFiles.filter(f => f.mimeType?.includes('video')).length > 0 && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Play className="h-3 w-3 text-red-500" />
-                  <span className="text-xs">{sortedFiles.filter(f => f.mimeType?.includes('video')).length}</span>
-                </Badge>
-              )}
+                  {/* Images */}
+                  {sortedFiles.filter(f => f.mimeType?.includes('image')).length > 0 && (
+                    <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <Eye className="h-4 w-4 text-green-500" />
+                        <span className="text-sm">Images</span>
+                      </div>
+                      <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
+                        {sortedFiles.filter(f => f.mimeType?.includes('image')).length}
+                      </Badge>
+                    </div>
+                  )}
 
-              {sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <FileText className="h-3 w-3 text-orange-500" />
-                  <span className="text-xs">{sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}</span>
-                </Badge>
-              )}
-            </div>
+                  {/* Videos */}
+                  {sortedFiles.filter(f => f.mimeType?.includes('video')).length > 0 && (
+                    <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <Play className="h-4 w-4 text-red-500" />
+                        <span className="text-sm">Videos</span>
+                      </div>
+                      <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
+                        {sortedFiles.filter(f => f.mimeType?.includes('video')).length}
+                      </Badge>
+                    </div>
+                  )}
+
+                  {/* Documents */}
+                  {sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
+                    <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-950/30 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-orange-500" />
+                        <span className="text-sm">Documents</span>
+                      </div>
+                      <Badge variant="outline" className="border-orange-500 text-orange-700 dark:text-orange-300">
+                        {sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
+                      </Badge>
+                    </div>
+                  )}
+
+                  {/* Spreadsheets */}
+                  {sortedFiles.filter(f => f.mimeType?.includes('spreadsheet')).length > 0 && (
+                    <div className="flex items-center justify-between p-2 bg-purple-50 dark:bg-purple-950/30 rounded-md">
+                      <div className="flex items-center gap-2">
+                        <Grid3X3 className="h-4 w-4 text-purple-500" />
+                        <span className="text-sm">Spreadsheets</span>
+                      </div>
+                      <Badge variant="outline" className="border-purple-500 text-purple-700 dark:text-purple-300">
+                        {sortedFiles.filter(f => f.mimeType?.includes('spreadsheet')).length}
+                      </Badge>
+                    </div>
+                  )}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           {/* More (Settings) - Fixed position on the right */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className="flex-shrink-0">
                 <Settings className="h-4 w-4 mr-2" />
                 More
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuContent align="end" className="w-64">
               {/* View Mode */}
               <DropdownMenuItem onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
                 {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Grid3X3 className="h-4 w-4 mr-2" />}
@@ -2179,23 +2325,30 @@ export function DriveManager() {
               {viewMode === 'table' && (
                 <>
                   <DropdownMenuSeparator />
-                  <div className="px-2 py-1.5 text-sm font-semibold">Table Columns</div>
-                  <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, size: !prev.size }))}>
-                    <Checkbox checked={visibleColumns.size} className="mr-2" />
-                    Size
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, mimeType: !prev.mimeType }))}>
-                    <Checkbox checked={visibleColumns.mimeType} className="mr-2" />
-                    MIME Type
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, createdTime: !prev.createdTime }))}>
-                    <Checkbox checked={visibleColumns.createdTime} className="mr-2" />
-                    Created
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, modifiedTime: !prev.modifiedTime }))}>
-                    <Checkbox checked={visibleColumns.modifiedTime} className="mr-2" />
-                    Modified
-                  </DropdownMenuItem>
+                  <Collapsible>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
+                      <span className="text-sm font-semibold">Table Columns</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="space-y-1 ml-4">
+                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, size: !prev.size }))}>
+                        <Checkbox checked={visibleColumns.size} className="mr-2 h-3 w-3" />
+                        <span className="text-xs">Size</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, mimeType: !prev.mimeType }))}>
+                        <Checkbox checked={visibleColumns.mimeType} className="mr-2 h-3 w-3" />
+                        <span className="text-xs">MIME Type</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, createdTime: !prev.createdTime }))}>
+                        <Checkbox checked={visibleColumns.createdTime} className="mr-2 h-3 w-3" />
+                        <span className="text-xs">Created</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, modifiedTime: !prev.modifiedTime }))}>
+                        <Checkbox checked={visibleColumns.modifiedTime} className="mr-2 h-3 w-3" />
+                        <span className="text-xs">Modified</span>
+                      </DropdownMenuItem>
+                    </CollapsibleContent>
+                  </Collapsible>
                 </>
               )}
               
@@ -2220,7 +2373,7 @@ export function DriveManager() {
 
         {/* Hidden Search Bar - Expandable */}
         <div id="search-expanded" style={{ display: 'none' }} className="border-t bg-muted/30 p-4">
-          <div className="flex items-center gap-4 max-w-7xl mx-auto">
+          <div className="flex items-center gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -2247,9 +2400,6 @@ export function DriveManager() {
         </div>
       </div>
 
-      {/* Spacer for fixed toolbar */}
-      <div className="h-16 mb-6"></div>
-
       {/* Navigation Breadcrumb - Moved below toolbar */}
       <div className="px-4 -mt-2 mb-4">
         <FileBreadcrumb 
@@ -2262,58 +2412,9 @@ export function DriveManager() {
         />
       </div>
 
-      {/* Files and Folders Grid */}
+      {/* Clean Data Container */}
       <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <span className="text-lg sm:text-xl">Files & Folders</span>
-            <div className="flex items-center gap-2 flex-wrap">
-              {(folders.length > 0 || files.length > 0) && (
-                <div className="flex items-center gap-2">
-                  <ToggleGroup 
-                    type="single" 
-                    value={viewMode} 
-                    onValueChange={handleViewModeChange}
-                    className="bg-background border rounded-md"
-                  >
-                    <ToggleGroupItem value="grid" aria-label="Grid view" size="sm">
-                      <Grid3X3 className="h-4 w-4" />
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="table" aria-label="Table view" size="sm">
-                      <List className="h-4 w-4" />
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-
-                  {viewMode === 'table' && (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8">
-                          <Columns className="h-4 w-4" />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-64 p-4" align="end">
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2">
-                            <Settings className="h-4 w-4 text-primary" />
-                            <h4 className="font-semibold text-sm text-foreground">Table Columns</h4>
-                          </div>
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
-                              <Checkbox
-                                id="name"
-                                checked={visibleColumns.name}
-                                onCheckedChange={(checked) =>
-                                  setVisibleColumns(prev => ({ ...prev, name: checked === true }))
-                                }
-                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                              />
-                              <label 
-                                htmlFor="name" 
-                                className="text-sm font-medium cursor-pointer flex-1 select-none"
-                              >
-                                Name
-                              </label>
-                            </div>
+        <CardContent className="p-6">
                             <div className="flex items-center gap-3 p-2 rounded-md hover:bg-accent/50 transition-colors">
                               <Checkbox
                                 id="id"
@@ -3251,28 +3352,7 @@ export function DriveManager() {
         selectedItems={getSelectedItemsData()}
       />
 
-      {/* Floating Bulk Actions Toolbar */}
-      {(folders.length > 0 || files.length > 0) && (
-        <BulkActionsToolbar
-          selectedCount={selectedItems.size}
-          totalCount={folders.length + files.length}
-          isSelectMode={isSelectMode}
-          isAllSelected={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
-          isInTrash={searchQuery === 'trashed:true'}
-          bulkOperationProgress={bulkOperationProgress}
-          onToggleSelectMode={toggleSelectMode}
-          onSelectAll={selectAll}
-          onDeselectAll={deselectAll}
-          onBulkDownload={handleBulkDownload}
-          onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
-          onBulkMove={() => setIsBulkMoveDialogOpen(true)}
-          onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
-          onBulkExport={() => setIsBulkExportDialogOpen(true)}
-          onBulkRename={() => setIsBulkRenameDialogOpen(true)}
-          onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
-          onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
-        />
-      )}
+
     </div>
   );
 }
