@@ -102,7 +102,7 @@ import { BulkRestoreDialog } from './bulk-restore-dialog';
 import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
-import { AnimatedThumbnail } from './animated-thumbnail';
+import { AnimatedThumbnail } from '@/components/ui/animated-thumbnail';
 
 import { errorRecovery } from '@/lib/error-recovery';
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
