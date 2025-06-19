@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Upload,
-  FolderPlus,
-  Search,
+import { 
+  Upload, 
+  FolderPlus, 
+  Search, 
   MoreVertical,
   Download,
   Trash2,
@@ -36,9 +36,7 @@ import {
   MousePointer,
   SquareCheck,
   Folder,
-  FileText,
-  Wand2,
-  Brain
+  FileText
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -55,12 +53,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  ToggleGroup,
-  ToggleGroupItem
+import { 
+  ToggleGroup, 
+  ToggleGroupItem 
 } from "@/components/ui/toggle-group";
-import {
-  Checkbox
+import { 
+  Checkbox 
 } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -104,10 +102,6 @@ import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
-import { AutoTaggingPanel } from '@/components/file-organization/auto-tagging-panel';
-import { SmartCategoryViewer } from '@/components/file-organization/smart-category-viewer';
-import { MobileAutoTagging } from '@/components/file-organization/mobile-auto-tagging';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 import { errorRecovery } from '@/lib/error-recovery';
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
@@ -153,8 +147,8 @@ const isFileSizeInRange = (
 
 // Enhanced client-side filtering utilities
 const applyClientSideFilters = (
-  files: DriveFile[],
-  folders: DriveFolder[],
+  files: DriveFile[], 
+  folders: DriveFolder[], 
   filters: {
     fileTypeFilter: string[];
     searchQuery: string;
@@ -176,17 +170,17 @@ const applyClientSideFilters = (
       return filters.fileTypeFilter.some(type => {
         switch (type.toLowerCase()) {
           case 'document':
-            return file.mimeType?.includes('document') ||
-                   file.mimeType?.includes('pdf') ||
+            return file.mimeType?.includes('document') || 
+                   file.mimeType?.includes('pdf') || 
                    file.mimeType?.includes('text') ||
                    file.mimeType?.includes('word') ||
                    file.mimeType?.includes('rtf');
           case 'spreadsheet':
-            return file.mimeType?.includes('spreadsheet') ||
+            return file.mimeType?.includes('spreadsheet') || 
                    file.mimeType?.includes('excel') ||
                    file.mimeType?.includes('csv');
           case 'presentation':
-            return file.mimeType?.includes('presentation') ||
+            return file.mimeType?.includes('presentation') || 
                    file.mimeType?.includes('powerpoint');
           case 'image':
             return file.mimeType?.startsWith('image/');
@@ -195,7 +189,7 @@ const applyClientSideFilters = (
           case 'audio':
             return file.mimeType?.startsWith('audio/');
           case 'archive':
-            return file.mimeType?.includes('zip') ||
+            return file.mimeType?.includes('zip') || 
                    file.mimeType?.includes('rar') ||
                    file.mimeType?.includes('tar') ||
                    file.mimeType?.includes('gzip') ||
@@ -226,12 +220,12 @@ const applyClientSideFilters = (
   if (filters.searchQuery && filters.searchQuery.trim()) {
     const searchTerm = filters.searchQuery.toLowerCase();
 
-    filteredFiles = filteredFiles.filter(file =>
+    filteredFiles = filteredFiles.filter(file => 
       file.name?.toLowerCase().includes(searchTerm) ||
       file.description?.toLowerCase().includes(searchTerm)
     );
 
-    filteredFolders = filteredFolders.filter(folder =>
+    filteredFolders = filteredFolders.filter(folder => 
       folder.name?.toLowerCase().includes(searchTerm) ||
       folder.description?.toLowerCase().includes(searchTerm)
     );
@@ -301,15 +295,15 @@ const applyClientSideFilters = (
     // Owner filter
     if (owner && owner.trim()) {
       const ownerTerm = owner.toLowerCase();
-      filteredFiles = filteredFiles.filter(file =>
-        file.owners?.some(ownerInfo =>
+      filteredFiles = filteredFiles.filter(file => 
+        file.owners?.some(ownerInfo => 
           ownerInfo.displayName?.toLowerCase().includes(ownerTerm) ||
           ownerInfo.emailAddress?.toLowerCase().includes(ownerTerm)
         )
       );
 
-      filteredFolders = filteredFolders.filter(folder =>
-        folder.owners?.some(ownerInfo =>
+      filteredFolders = filteredFolders.filter(folder => 
+        folder.owners?.some(ownerInfo => 
           ownerInfo.displayName?.toLowerCase().includes(ownerTerm) ||
           ownerInfo.emailAddress?.toLowerCase().includes(ownerTerm)
         )
@@ -351,9 +345,6 @@ export function DriveManager() {
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
-  // Mobile detection for responsive layout
-  const isMobile = useIsMobile();
-
   // Table column visibility state
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
@@ -391,12 +382,6 @@ export function DriveManager() {
   const [isBulkRenameDialogOpen, setIsBulkRenameDialogOpen] = useState(false);
   const [isBulkRestoreDialogOpen, setIsBulkRestoreDialogOpen] = useState(false);
   const [isBulkPermanentDeleteDialogOpen, setIsBulkPermanentDeleteDialogOpen] = useState(false);
-
-  // Auto-tagging and Smart Categorization state
-  const [showAutoTaggingPanel, setShowAutoTaggingPanel] = useState(false);
-  const [showSmartCategoryViewer, setShowSmartCategoryViewer] = useState(false);
-  const [fileTags, setFileTags] = useState<Map<string, string[]>>(new Map());
-
   const [bulkOperationProgress, setBulkOperationProgress] = useState<{
     isRunning: boolean;
     current: number;
@@ -417,7 +402,7 @@ export function DriveManager() {
     if (!sortConfig || sortConfig.key !== columnKey) {
       return <ChevronsUpDown className="h-4 w-4" />;
     }
-    return sortConfig.direction === 'asc'
+    return sortConfig.direction === 'asc' 
       ? <ChevronUp className="h-4 w-4" />
       : <ChevronDown className="h-4 w-4" />;
   };
@@ -510,9 +495,9 @@ export function DriveManager() {
     const allItems = getAllItems();
     return Array.from(selectedItems).map(id => {
       const item = allItems.find(item => item.id === id);
-      return item ? {
-        id: item.id,
-        name: item.name,
+      return item ? { 
+        id: item.id, 
+        name: item.name, 
         type: 'mimeType' in item ? 'file' : 'folder',
         mimeType: 'mimeType' in item ? item.mimeType : 'application/vnd.google-apps.folder'
       } : null;
@@ -630,10 +615,10 @@ export function DriveManager() {
         const response = await fetch(`/api/drive/files/${item.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'move',
+          body: JSON.stringify({ 
+            action: 'move', 
             parentId: targetFolderId,
-            currentParentId: currentFolderId
+            currentParentId: currentFolderId 
           })
         });
 
@@ -698,9 +683,9 @@ export function DriveManager() {
         const response = await fetch(`/api/drive/files/${item.id}/copy`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: JSON.stringify({ 
             name: `Copy of ${item.name}`,
-            parentId: targetFolderId
+            parentId: targetFolderId 
           })
         });
 
@@ -846,9 +831,9 @@ export function DriveManager() {
   };
 
   const handleBulkExport = async (exportFormat: string) => {
-    const exportableFiles = getSelectedItemsData().filter(item =>
-      item.type === 'file' &&
-      item.mimeType &&
+    const exportableFiles = getSelectedItemsData().filter(item => 
+      item.type === 'file' && 
+      item.mimeType && 
       item.mimeType.startsWith('application/vnd.google-apps.') &&
       !item.mimeType.includes('folder') &&
       !item.mimeType.includes('shortcut')
@@ -955,9 +940,9 @@ export function DriveManager() {
             newName = item.name; // Keep original name if regex fails
           }
         } else {
-          const fileExtension = item.name.includes('.') ?
+          const fileExtension = item.name.includes('.') ? 
             item.name.substring(item.name.lastIndexOf('.')) : '';
-          const baseName = fileExtension ?
+          const baseName = fileExtension ? 
             item.name.substring(0, item.name.lastIndexOf('.')) : item.name;
 
           switch (renameType) {
@@ -965,21 +950,21 @@ export function DriveManager() {
               newName = `${renamePattern}_${item.name}`;
               break;
             case 'suffix':
-              newName = fileExtension ?
-                `${baseName}_${renamePattern}${fileExtension}` :
+              newName = fileExtension ? 
+                `${baseName}_${renamePattern}${fileExtension}` : 
                 `${item.name}_${renamePattern}`;
               break;
             case 'numbering':
               const number = String(i + 1).padStart(3, '0');
-              newName = fileExtension ?
-                `${renamePattern}_${number}${fileExtension}` :
+              newName = fileExtension ? 
+                `${renamePattern}_${number}${fileExtension}` : 
                 `${renamePattern}_${number}`;
               break;
             case 'timestamp':
               const now = new Date();
               const timestamp = now.toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
-              newName = fileExtension ?
-                `${baseName}_${timestamp}${fileExtension}` :
+              newName = fileExtension ? 
+                `${baseName}_${timestamp}${fileExtension}` : 
                 `${item.name}_${timestamp}`;
               break;
             default:
@@ -1252,10 +1237,10 @@ export function DriveManager() {
       setNextPageToken(data.nextPageToken || null);
 
       // Separate files and folders
-      const fileList = data.files.filter((item: DriveFile) =>
+      const fileList = data.files.filter((item: DriveFile) => 
         item.mimeType !== 'application/vnd.google-apps.folder'
       );
-      const folderList = data.files.filter((item: DriveFile) =>
+      const folderList = data.files.filter((item: DriveFile) => 
         item.mimeType === 'application/vnd.google-apps.folder'
       );
 
@@ -1424,10 +1409,10 @@ export function DriveManager() {
           console.log('Item to rename:', itemToRename);
 
           if (itemToRename) {
-            const fileForAction = {
-              id: fileId,
-              name: fileName,
-              parentId: itemToRename.parents?.[0]
+            const fileForAction = { 
+              id: fileId, 
+              name: fileName, 
+              parentId: itemToRename.parents?.[0] 
             };
             console.log('Setting selected item for action:', fileForAction);
             setSelectedFileForAction(fileForAction);
@@ -1454,10 +1439,10 @@ export function DriveManager() {
           console.log('Found folder for move:', moveFolder);
 
           if (itemToMove) {
-            const fileForAction = {
-              id: fileId,
-              name: fileName,
-              parentId: itemToMove.parents?.[0]
+            const fileForAction = { 
+              id: fileId, 
+              name: fileName, 
+              parentId: itemToMove.parents?.[0] 
             };
             console.log('Setting selected item for move:', fileForAction);
             setSelectedFileForAction(fileForAction);
@@ -1482,10 +1467,10 @@ export function DriveManager() {
           console.log('Found folder for copy:', copyFolder);
 
           if (itemToCopy) {
-            const fileForAction = {
-              id: fileId,
-              name: fileName,
-              parentId: itemToCopy.parents?.[0]
+            const fileForAction = { 
+              id: fileId, 
+              name: fileName, 
+              parentId: itemToCopy.parents?.[0] 
             };
             console.log('Setting selected item for copy:', fileForAction);
             setSelectedFileForAction(fileForAction);
@@ -1608,10 +1593,10 @@ export function DriveManager() {
           const shareResponse = await fetch(`/api/drive/files/${fileId}/share`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+            body: JSON.stringify({ 
               action: 'get_share_link',
               role: 'reader',
-              type: 'anyone'
+              type: 'anyone' 
             })
           });
 
@@ -1751,7 +1736,7 @@ export function DriveManager() {
     const moveResponse = await fetch(`/api/drive/files/${selectedFileForAction.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      body: JSON.stringify({ 
         action: 'move',
         parentId: newParentId,
         currentParentId: currentParentId
@@ -1855,8 +1840,8 @@ export function DriveManager() {
     console.error(`${context}:`, error);
 
     // Use error recovery system for authentication issues
-    if (error.message?.includes('401') ||
-        error.message?.includes('unauthorized') ||
+    if (error.message?.includes('401') || 
+        error.message?.includes('unauthorized') || 
         error.message?.includes('invalid_credentials') ||
         error.message?.includes('authentication')) {
 
@@ -1890,39 +1875,22 @@ export function DriveManager() {
     toast.error(`${context}: ${error.message || 'An error occurred'}`);
   };
 
-  // Auto-tagging and smart categorization handlers
-  const handleTagsUpdate = (fileId: string, newTags: string[]) => {
-    setFileTags(prev => {
-      const updated = new Map(prev);
-      const existingTags = updated.get(fileId) || [];
-      const combinedTags = [...new Set([...existingTags, ...newTags])];
-      updated.set(fileId, combinedTags);
-      return updated;
-    });
-
-    toast.success(`Tags updated for file`);
-  };
-
-  const handleSmartCategorySelect = (fileIds: string[]) => {
-    setSelectedItems(new Set(fileIds));
-    if (fileIds.length > 0) {
-      setIsSelectMode(true);
+  // Auto-tagging and smart categorization function
+  const processFileOrganization = (item: DriveFile | DriveFolder) => {
+    // Example: Auto-tagging based on file type
+    let tags: string[] = [];
+    if (item.mimeType?.includes('document')) {
+      tags.push('document');
+    } else if (item.mimeType?.includes('spreadsheet')) {
+      tags.push('spreadsheet');
+    } else if (item.mimeType?.startsWith('image/')) {
+      tags.push('image');
     }
-  };
 
-  const toggleAutoTaggingPanel = () => {
-    setShowAutoTaggingPanel(!showAutoTaggingPanel);
-    if (!showAutoTaggingPanel) {
-      setShowSmartCategoryViewer(false);
+    // Example: Smart categorization based on file name
+    if (item.name?.toLowerCase().includes('report')) {
+      tags.push('report');
     }
-  };
-
-  const toggleSmartCategoryViewer = () => {
-    setShowSmartCategoryViewer(!showSmartCategoryViewer);
-    if (!showSmartCategoryViewer) {
-      setShowAutoTaggingPanel(false);
-    }
-  };
 
     // Add tags to the file's description or metadata
     if (tags.length > 0) {
@@ -2098,9 +2066,9 @@ export function DriveManager() {
         </div>
 
         <div className="flex items-center gap-2 overflow-x-auto">
-          <Button
-            onClick={handleRefresh}
-            variant="outline"
+          <Button 
+            onClick={handleRefresh} 
+            variant="outline" 
             size="sm"
             disabled={refreshing}
             className="whitespace-nowrap"
@@ -2108,17 +2076,17 @@ export function DriveManager() {
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
             <span className="hidden sm:ml-2 sm:inline">Refresh</span>
           </Button>
-          <Button
-            onClick={() => setIsCreateFolderDialogOpen(true)}
-            variant="outline"
+          <Button 
+            onClick={() => setIsCreateFolderDialogOpen(true)} 
+            variant="outline" 
             size="sm"
             className="whitespace-nowrap"
           >
             <FolderPlus className="h-4 w-4" />
             <span className="hidden sm:ml-2 sm:inline">New Folder</span>
           </Button>
-          <Button
-            onClick={() => toast.info("Upload feature coming soon!")}
+          <Button 
+            onClick={() => toast.info("Upload feature coming soon!")} 
             size="sm"
             variant="outline"
             disabled
@@ -2127,35 +2095,11 @@ export function DriveManager() {
             <Upload className="h-4 w-4" />
             <span className="hidden sm:ml-2 sm:inline">Upload Soon</span>
           </Button>
-
-          {/* Auto-tagging and Smart Categorization Buttons - Responsive */}
-          <div className="flex items-center gap-2 border-l border-border pl-2 ml-2">
-            <Button
-              onClick={toggleAutoTaggingPanel}
-              size="sm"
-              variant={showAutoTaggingPanel ? "default" : "outline"}
-              className="whitespace-nowrap"
-              title="Auto-tag files using AI"
-            >
-              <Wand2 className="h-4 w-4" />
-              <span className="hidden md:ml-2 md:inline">Auto-tag</span>
-            </Button>
-            <Button
-              onClick={toggleSmartCategoryViewer}
-              size="sm"
-              variant={showSmartCategoryViewer ? "default" : "outline"}
-              className="whitespace-nowrap"
-              title="Smart categorization view"
-            >
-              <Brain className="h-4 w-4" />
-              <span className="hidden md:ml-2 md:inline">Categories</span>
-            </Button>
-          </div>
         </div>
       </div>
 
       {/* Breadcrumb */}
-      <FileBreadcrumb
+      <FileBreadcrumb 
         currentFolderId={currentFolderId}
         loading={loading || refreshing}
         onNavigate={(folderId) => {
@@ -2163,53 +2107,6 @@ export function DriveManager() {
           fetchFiles(folderId || undefined);
         }}
       />
-
-      {/* Auto-tagging Panel - Responsive */}
-      {showAutoTaggingPanel && (
-        <div className="mb-6">
-          {isMobile ? (
-            <MobileAutoTagging
-              files={files.map(f => ({
-                id: f.id,
-                name: f.name,
-                mimeType: f.mimeType,
-                size: f.size
-              }))}
-              selectedFiles={Array.from(selectedItems)}
-              onTagsUpdate={handleTagsUpdate}
-            />
-          ) : (
-            <AutoTaggingPanel
-              files={files.map(f => ({
-                id: f.id,
-                name: f.name,
-                mimeType: f.mimeType,
-                size: f.size
-              }))}
-              selectedFiles={Array.from(selectedItems)}
-              onTagsUpdate={handleTagsUpdate}
-              className="animate-in slide-in-from-top-2 duration-300"
-            />
-          )}
-        </div>
-      )}
-
-      {/* Smart Category Viewer */}
-      {showSmartCategoryViewer && (
-        <div className="mb-6">
-          <SmartCategoryViewer
-            files={files.map(f => ({
-              id: f.id,
-              name: f.name,
-              mimeType: f.mimeType,
-              size: f.size,
-              modifiedTime: f.modifiedTime
-            }))}
-            onFileSelect={handleSmartCategorySelect}
-            className="animate-in slide-in-from-top-2 duration-300"
-          />
-        </div>
-      )}
 
       {/* Files and Folders Grid */}
       <Card>
@@ -2242,9 +2139,9 @@ export function DriveManager() {
               )}
               {(folders.length > 0 || files.length > 0) && (
                 <div className="flex items-center gap-2">
-                  <ToggleGroup
-                    type="single"
-                    value={viewMode}
+                  <ToggleGroup 
+                    type="single" 
+                    value={viewMode} 
                     onValueChange={handleViewModeChange}
                     className="bg-background border rounded-md"
                   >
@@ -2279,8 +2176,8 @@ export function DriveManager() {
                                 }
                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label
-                                htmlFor="name"
+                              <label 
+                                htmlFor="name" 
                                 className="text-sm font-medium cursor-pointer flex-1 select-none"
                               >
                                 Name
@@ -2295,8 +2192,8 @@ export function DriveManager() {
                                 }
                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label
-                                htmlFor="id"
+                              <label 
+                                htmlFor="id" 
                                 className="text-sm font-medium cursor-pointer flex-1 select-none"
                               >
                                 ID
@@ -2311,8 +2208,8 @@ export function DriveManager() {
                                 }
                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label
-                                htmlFor="size"
+                              <label 
+                                htmlFor="size" 
                                 className="text-sm font-medium cursor-pointer flex-1 select-none"
                               >
                                 Size
@@ -2327,8 +2224,8 @@ export function DriveManager() {
                                 }
                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label
-                                htmlFor="owners"
+                              <label 
+                                htmlFor="owners" 
                                 className="text-sm font-medium cursor-pointer flex-1 select-none"
                               >
                                 Owners
@@ -2343,8 +2240,8 @@ export function DriveManager() {
                                 }
                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label
-                                htmlFor="mimeType"
+                              <label 
+                                htmlFor="mimeType" 
                                 className="text-sm font-medium cursor-pointer flex-1 select-none"
                               >
                                 MIME Type
@@ -2359,8 +2256,8 @@ export function DriveManager() {
                                 }
                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label
-                                htmlFor="createdTime"
+                              <label 
+                                htmlFor="createdTime" 
                                 className="text-sm font-medium cursor-pointer flex-1 select-none"
                               >
                                 Created
@@ -2375,8 +2272,8 @@ export function DriveManager() {
                                 }
                                 className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                               />
-                              <label
-                                htmlFor="modifiedTime"
+                              <label 
+                                htmlFor="modifiedTime" 
                                 className="text-sm font-medium cursor-pointer flex-1 select-none"
                               >
                                 Modified
@@ -2405,9 +2302,9 @@ export function DriveManager() {
                 {searchQuery ? 'No files found' : currentFolderId ? 'This folder is empty' : 'Your Google Drive is ready!'}
               </h3>
               <p className="text-sm">
-                {searchQuery
-                  ? 'Try adjusting your search terms'
-                  : currentFolderId
+                {searchQuery 
+                  ? 'Try adjusting your search terms' 
+                  : currentFolderId 
                     ? 'Upload files or create folders to get started'
                     : 'Upload files or create folders to get started, or check if your files are in subfolders'
                 }
@@ -2501,7 +2398,7 @@ export function DriveManager() {
                               {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
 
                               {actions.canRestore && (
-                                <DropdownMenuItem
+                                <DropdownMenuItem 
                                   className="text-green-600"
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -2514,7 +2411,7 @@ export function DriveManager() {
                               )}
 
                               {actions.canTrash && (
-                                <DropdownMenuItem
+                                <DropdownMenuItem 
                                   className="text-orange-600"
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -2527,7 +2424,7 @@ export function DriveManager() {
                               )}
 
                               {actions.canPermanentDelete && (
-                                <DropdownMenuItem
+                                <DropdownMenuItem 
                                   className="text-destructive"
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -2666,7 +2563,7 @@ export function DriveManager() {
                               {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
 
                               {actions.canRestore && (
-                                <DropdownMenuItem
+                                <DropdownMenuItem 
                                   className="text-green-600"
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -2679,7 +2576,7 @@ export function DriveManager() {
                               )}
 
                               {actions.canTrash && (
-                                <DropdownMenuItem
+                                <DropdownMenuItem 
                                   className="text-orange-600"
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -2692,7 +2589,7 @@ export function DriveManager() {
                               )}
 
                               {actions.canPermanentDelete && (
-                                <DropdownMenuItem
+                                <DropdownMenuItem 
                                   className="text-destructive"
                                   onClick={(e) => {
                                     e.stopPropagation();
@@ -2710,8 +2607,8 @@ export function DriveManager() {
                     </DropdownMenu>
                   </div>
                   <div className="space-y-1">
-                    <p
-                      className="font-medium truncate text-xs sm:text-sm md:text-base cursor-pointer hover:text-blue-600 hover:underline"
+                    <p 
+                      className="font-medium truncate text-xs sm:text-sm md:text-base cursor-pointer hover:text-blue-600 hover:underline" 
                       title={`Click to preview: ${file.name}`}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -2839,7 +2736,7 @@ export function DriveManager() {
                 <TableBody>
                   {/* All items (folders and files) sorted together */}
                   {sortedAllItems.map((item) => (
-                    <TableRow
+                    <TableRow 
                       key={item.id}
                       className={`cursor-pointer hover:bg-accent transition-colors ${
                         selectedItems.has(item.id) ? 'bg-primary/5 border-primary/20' : ''
@@ -2862,9 +2759,9 @@ export function DriveManager() {
                             mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType}
                             className="transition-all duration-200"
                           >
-                            <FileIcon
-                              mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType}
-                              className="h-5 w-5"
+                            <FileIcon 
+                              mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType} 
+                              className="h-5 w-5" 
                             />
                           </FileThumbnailPreview>
                         </div>
@@ -2875,7 +2772,7 @@ export function DriveManager() {
                             {item.itemType === 'folder' ? (
                               <span className="truncate">{item.name}</span>
                             ) : (
-                              <span
+                              <span 
                                 className="truncate hover:text-blue-600 hover:underline"
                                 title={`Click to preview: ${item.name}`}
                                 onClick={(e) => {
@@ -3014,7 +2911,7 @@ export function DriveManager() {
                                   {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
 
                                   {actions.canRestore && (
-                                    <DropdownMenuItem
+                                    <DropdownMenuItem 
                                       className="text-green-600"
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -3027,7 +2924,7 @@ export function DriveManager() {
                                   )}
 
                                   {actions.canTrash && (
-                                    <DropdownMenuItem
+                                    <DropdownMenuItem 
                                       className="text-orange-600"
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -3040,7 +2937,7 @@ export function DriveManager() {
                                   )}
 
                                   {actions.canPermanentDelete && (
-                                    <DropdownMenuItem
+                                    <DropdownMenuItem 
                                       className="text-destructive"
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -3067,8 +2964,8 @@ export function DriveManager() {
           {/* Load More Button */}
           {nextPageToken && !loading && (
             <div className="flex justify-center mt-6">
-              <Button
-                variant="outline"
+              <Button 
+                variant="outline" 
                 onClick={handleLoadMore}
                 disabled={loadingMore}
                 className="w-full max-w-xs"
@@ -3248,5 +3145,3 @@ export function DriveManager() {
     </div>
   );
 }
-
-export default DriveManager;
