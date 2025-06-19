@@ -420,6 +420,26 @@ export function DriveManager() {
       : <ChevronDown className="h-4 w-4" />;
   };
 
+  // Auto-tagging and smart categorization function
+  const processFileOrganization = React.useCallback((item: DriveFile | DriveFolder) => {
+    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
+      return item;
+    }
+    
+    const autoTags = organizationSettings.autoTagging ? generateAutoTags(item) : [];
+    const category = organizationSettings.smartCategorization ? getSmartCategory(item) : null;
+
+    // Add organization data to the item for display
+    return {
+      ...item,
+      organizationData: {
+        autoTags,
+        category,
+        processed: true
+      }
+    };
+  }, [organizationSettings]);
+
   // Apply organization processing to files when settings are enabled
   const processedFiles = React.useMemo(() => {
     if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
@@ -430,7 +450,7 @@ export function DriveManager() {
       const processed = processFileOrganization(file);
       return processed || file;
     });
-  }, [files, organizationSettings]);
+  }, [files, organizationSettings, processFileOrganization]);
 
   // Apply client-side filters first, then sort
   const { filteredFiles: clientFilteredFiles, filteredFolders: clientFilteredFolders } = React.useMemo(() => {
@@ -1942,25 +1962,7 @@ export function DriveManager() {
     }
   };
 
-  // Auto-tagging and smart categorization function
-  const processFileOrganization = (item: DriveFile | DriveFolder) => {
-    if (!organizationSettings.autoTagging && !organizationSettings.smartCategorization) {
-      return item;
-    }
-    
-    const autoTags = organizationSettings.autoTagging ? generateAutoTags(item) : [];
-    const category = organizationSettings.smartCategorization ? getSmartCategory(item) : null;
 
-    // Add organization data to the item for display
-    return {
-      ...item,
-      organizationData: {
-        autoTags,
-        category,
-        processed: true
-      }
-    };
-  };
 
   useEffect(() => {
     // Load organization settings from localStorage
