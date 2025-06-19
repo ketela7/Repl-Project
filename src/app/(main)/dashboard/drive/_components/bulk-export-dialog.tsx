@@ -23,7 +23,7 @@ import {
   Info
 } from "lucide-react";
 import { toast } from "sonner";
-import { errorRecovery } from '@/lib/error-recovery';
+// Simple error handling without complex recovery
 
 interface BulkExportDialogProps {
   isOpen: boolean;

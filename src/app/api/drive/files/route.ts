@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 import { driveCache } from '@/lib/cache';
-import { performanceMonitor } from '@/lib/performance-monitor';
 
 // Client-side filter helper function
 function applyClientSideFilters(
@@ -99,8 +98,6 @@ function applyClientSideFilters(
 }
 
 export async function GET(request: NextRequest) {
-  const callId = performanceMonitor.startAPICall('/api/drive/files');
-
   try {
     console.log('=== Drive Files API Called ===');
     const supabase = await createClient();
@@ -320,11 +317,9 @@ export async function GET(request: NextRequest) {
 
     console.log('Drive API: Files fetched and filtered successfully, count:', filteredResult.files.length);
 
-    performanceMonitor.endAPICall(callId, true);
     return NextResponse.json(filteredResult);
   } catch (error: any) {
     console.error('Drive files API error:', error);
-    performanceMonitor.endAPICall(callId, false, error instanceof Error ? error.message : 'Unknown error');
 
     // Handle specific Google API errors
     if (error.code === 403) {

@@ -71,11 +71,7 @@ import { formatFileSize, formatDate, isPreviewable, getFileActions } from '@/lib
 import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
-import { requestQueue } from '@/lib/request-queue';
-import { backgroundCacheManager } from '@/lib/background-cache';
-import { batchAPI } from '@/lib/batch-api';
-import { clientStorage } from '@/lib/client-storage';
-import { apiOptimizer } from '@/lib/api-optimizer';
+// Core drive management imports only
 
 import { FileUploadDialog } from './file-upload-dialog';
 import { CreateFolderDialog } from './create-folder-dialog';
@@ -101,9 +97,6 @@ import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
 
-import { errorRecovery } from '@/lib/error-recovery';
-import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
-import { useDriveErrorHandler } from '@/components/ui/drive-error-handler';
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { FileCategoryBadges } from '@/components/file-category-badges';
 // File size utilities inline
@@ -1181,12 +1174,8 @@ export function DriveManager() {
 
       console.log('=== Fetching files with params:', params.toString(), '===');
 
-      // Use request queue for better API call management
-      const response = await requestQueue.enqueue(
-        requestId,
-        () => fetch(`/api/drive/files?${params}`),
-        query ? 'medium' : 'high' // Search requests have lower priority
-      );
+      // Simple fetch without request queue
+      const response = await fetch(`/api/drive/files?${params}`);
 
       console.log('Drive API response status:', response.status);
 
@@ -1838,29 +1827,12 @@ export function DriveManager() {
   const handleError = async (error: any, context: string) => {
     console.error(`${context}:`, error);
 
-    // Use error recovery system for authentication issues
+    // Handle authentication issues
     if (error.message?.includes('401') || 
         error.message?.includes('unauthorized') || 
         error.message?.includes('invalid_credentials') ||
         error.message?.includes('authentication')) {
-
-      try {
-        const recovery = errorRecovery.createDriveOperationStrategies().driveAuth();
-        const result = await errorRecovery.executeWithRecovery(
-          async () => { throw error; }, // Re-throw to trigger fallback
-          recovery
-        );
-
-        if (result?.refreshed) {
-          toast.success('Google Drive access refreshed. Please try again.');
-          // Refresh the page to get new tokens
-          window.location.reload();
-          return;
-        }
-      } catch (recoveryError) {
-        console.error('Error recovery failed:', recoveryError);
-      }
-
+      
       toast.error('Google Drive access expired. Please reconnect your account.');
       setNeedsReauth(true);
       return;
@@ -1940,28 +1912,6 @@ export function DriveManager() {
     };
 
     checkAccessAndFetch();
-
-    // Initialize systems for free tier optimization
-    backgroundCacheManager.init();
-    clientStorage.init();
-
-    // Register service worker for offline functionality
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').then(
-        (registration) => {
-          console.log('Service Worker registered:', registration);
-        },
-        (error) => {
-          console.warn('Service Worker registration failed:', error);
-        }
-      );
-    }
-
-    // Cleanup on unmount
-    return () => {
-      backgroundCacheManager.destroy();
-      apiOptimizer.clear();
-    };
   }, []);
 
   // Handle debounced search with optimized API calls
@@ -1971,11 +1921,8 @@ export function DriveManager() {
     }
 
     if (debouncedSearchQuery.trim()) {
-      // Cancel any existing folder requests when searching
-      requestQueue.cancel(`fetch-files-${currentFolderId || 'root'}--`);
       fetchFiles(currentFolderId, debouncedSearchQuery.trim());
     } else if (debouncedSearchQuery === '' && searchQuery === '') {
-      // When search is completely cleared, reload current folder
       fetchFiles(currentFolderId);
     }
   }, [debouncedSearchQuery, currentFolderId]);
