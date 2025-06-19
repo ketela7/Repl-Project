@@ -101,6 +101,7 @@ import { BulkRestoreDialog } from './bulk-restore-dialog';
 import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
+import { ThumbnailHover } from '@/components/ui/thumbnail-hover';
 
 import { errorRecovery } from '@/lib/error-recovery';
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
@@ -416,11 +417,20 @@ export function DriveManager() {
     });
   }, [files, folders, fileTypeFilter, debouncedSearchQuery, activeView, advancedFilters]);
 
-  // Sort files and folders based on current sort configuration
-  const sortedFiles = React.useMemo(() => {
-    if (!sortConfig) return clientFilteredFiles;
+  // Sort ALL items (files and folders together) based on current sort configuration
+  const sortedAllItems = React.useMemo(() => {
+    // Combine files and folders into single array with type information
+    const allItems = [
+      ...clientFilteredFolders.map(folder => ({ ...folder, itemType: 'folder' as const })),
+      ...clientFilteredFiles.map(file => ({ ...file, itemType: 'file' as const }))
+    ];
 
-    return [...clientFilteredFiles].sort((a, b) => {
+    if (!sortConfig) {
+      // Default: folders first, then files (when no sorting is applied)
+      return allItems;
+    }
+
+    return [...allItems].sort((a, b) => {
       const { key, direction } = sortConfig;
       let aValue: any, bValue: any;
 
@@ -434,8 +444,9 @@ export function DriveManager() {
           bValue = (b.id || '').toLowerCase();
           break;
         case 'size':
-          aValue = normalizeFileSize(a.size);
-          bValue = normalizeFileSize(b.size);
+          // For folders, size is always 0; for files use normalizeFileSize
+          aValue = a.itemType === 'folder' ? 0 : normalizeFileSize(a.size);
+          bValue = b.itemType === 'folder' ? 0 : normalizeFileSize(b.size);
           break;
         case 'modifiedTime':
           aValue = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0;
@@ -446,58 +457,9 @@ export function DriveManager() {
           bValue = b.createdTime ? new Date(b.createdTime).getTime() : 0;
           break;
         case 'mimeType':
-          aValue = (a.mimeType || '').toLowerCase();
-          bValue = (b.mimeType || '').toLowerCase();
-          break;
-        case 'owners':
-          aValue = (a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '').toLowerCase();
-          bValue = (b.owners?.[0]?.displayName || b.owners?.[0]?.emailAddress || '').toLowerCase();
-          break;
-        default:
-          return 0;
-      }
-
-      // Handle null, undefined, empty string, or "-" as 0 for consistent sorting
-      if (aValue === null || aValue === undefined || aValue === '' || aValue === '-') aValue = key === 'size' ? 0 : '';
-      if (bValue === null || bValue === undefined || bValue === '' || bValue === '-') bValue = key === 'size' ? 0 : '';
-
-      if (aValue < bValue) return direction === 'asc' ? -1 : 1;
-      if (aValue > bValue) return direction === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }, [clientFilteredFiles, sortConfig]);
-
-  const sortedFolders = React.useMemo(() => {
-    if (!sortConfig) return clientFilteredFolders;
-
-    return [...clientFilteredFolders].sort((a, b) => {
-      const { key, direction } = sortConfig;
-      let aValue: any, bValue: any;
-
-      switch (key) {
-        case 'name':
-          aValue = (a.name || '').toLowerCase();
-          bValue = (b.name || '').toLowerCase();
-          break;
-        case 'id':
-          aValue = (a.id || '').toLowerCase();
-          bValue = (b.id || '').toLowerCase();
-          break;
-        case 'modifiedTime':
-          aValue = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0;
-          bValue = b.modifiedTime ? new Date(b.modifiedTime).getTime() : 0;
-          break;
-        case 'createdTime':
-          aValue = a.createdTime ? new Date(a.createdTime).getTime() : 0;
-          bValue = b.createdTime ? new Date(b.createdTime).getTime() : 0;
-          break;
-        case 'mimeType':
-          aValue = 'folder';
-          bValue = 'folder';
-          break;
-        case 'size':
-          aValue = 0; // Folders always have size 0
-          bValue = 0;
+          // For folders, use 'folder'; for files use actual mimeType
+          aValue = a.itemType === 'folder' ? 'folder' : (a.mimeType || '').toLowerCase();
+          bValue = b.itemType === 'folder' ? 'folder' : (b.mimeType || '').toLowerCase();
           break;
         case 'owners':
           aValue = (a.owners?.[0]?.displayName || a.owners?.[0]?.emailAddress || '').toLowerCase();
@@ -515,7 +477,16 @@ export function DriveManager() {
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [clientFilteredFolders, sortConfig]);
+  }, [clientFilteredFiles, clientFilteredFolders, sortConfig]);
+
+  // Separate sorted items back into files and folders for backward compatibility
+  const sortedFiles = React.useMemo(() => {
+    return sortedAllItems.filter(item => item.itemType === 'file');
+  }, [sortedAllItems]);
+
+  const sortedFolders = React.useMemo(() => {
+    return sortedAllItems.filter(item => item.itemType === 'folder');
+  }, [sortedAllItems]);
 
   // Bulk operations utility functions - use filtered results
   const getAllItems = () => [...sortedFolders, ...sortedFiles];
@@ -2468,7 +2439,13 @@ export function DriveManager() {
                   )}
                   <div className="flex items-start justify-between mb-2">
                     <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
-                      <FileIcon mimeType={file.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
+                      <ThumbnailHover
+                        thumbnailLink={file.thumbnailLink}
+                        fileName={file.name}
+                        mimeType={file.mimeType}
+                      >
+                        <FileIcon mimeType={file.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
+                      </ThumbnailHover>
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
@@ -2725,64 +2702,95 @@ export function DriveManager() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {/* Folders in table */}
-                  {sortedFolders.map((folder) => (
+                  {/* All items (folders and files) sorted together */}
+                  {sortedAllItems.map((item) => (
                     <TableRow 
-                      key={folder.id}
+                      key={item.id}
                       className={`cursor-pointer hover:bg-accent transition-colors ${
-                        selectedItems.has(folder.id) ? 'bg-primary/5 border-primary/20' : ''
+                        selectedItems.has(item.id) ? 'bg-primary/5 border-primary/20' : ''
                       }`}
-                      onClick={() => isSelectMode ? toggleItemSelection(folder.id) : handleFolderClick(folder.id)}
+                      onClick={() => isSelectMode ? toggleItemSelection(item.id) : (item.itemType === 'folder' ? handleFolderClick(item.id) : undefined)}
                     >
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {isSelectMode && (
                             <Checkbox
-                              checked={selectedItems.has(folder.id)}
-                              onCheckedChange={() => toggleItemSelection(folder.id)}
+                              checked={selectedItems.has(item.id)}
+                              onCheckedChange={() => toggleItemSelection(item.id)}
                               onClick={(e) => e.stopPropagation()}
                               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
-                          <FileIcon mimeType="application/vnd.google-apps.folder" className="h-5 w-5" />
+                          <ThumbnailHover
+                            thumbnailLink={item.itemType === 'file' ? item.thumbnailLink : undefined}
+                            fileName={item.name}
+                            mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType}
+                          >
+                            <FileIcon 
+                              mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType} 
+                              className="h-5 w-5" 
+                            />
+                          </ThumbnailHover>
                         </div>
                       </TableCell>
                       {visibleColumns.name && (
                         <TableCell className="font-medium">
                           <div className="flex items-center space-x-2">
-                            <span className="truncate">{folder.name}</span>
-                            <Badge variant="outline" className="text-xs">Folder</Badge>
+                            {item.itemType === 'folder' ? (
+                              <span className="truncate">{item.name}</span>
+                            ) : (
+                              <span 
+                                className="truncate hover:text-blue-600 hover:underline"
+                                title={`Click to preview: ${item.name}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (isPreviewable(item.mimeType)) {
+                                    handleFileAction('preview', item.id, item.name);
+                                  } else {
+                                    handleFileAction('download', item.id, item.name);
+                                  }
+                                }}
+                              >
+                                {item.name}
+                              </span>
+                            )}
+                            {item.itemType === 'folder' && <Badge variant="outline" className="text-xs">Folder</Badge>}
+                            {item.itemType === 'file' && item.shared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
                           </div>
                         </TableCell>
                       )}
                       {visibleColumns.id && (
                         <TableCell className="text-muted-foreground">
-                          <code className="text-xs bg-muted px-1 rounded">{folder.id}</code>
+                          <code className="text-xs bg-muted px-1 rounded">{item.id}</code>
                         </TableCell>
                       )}
                       {visibleColumns.size && (
                         <TableCell className="text-muted-foreground">
-                          -
+                          {item.itemType === 'folder' ? '-' : (item.size ? formatFileSize(item.size) : '-')}
                         </TableCell>
                       )}
                       {visibleColumns.owners && (
                         <TableCell className="text-muted-foreground">
-                          {folder.owners?.map(owner => owner.displayName || owner.emailAddress).join(', ') || '-'}
+                          {item.owners?.map(owner => owner.displayName || owner.emailAddress).join(', ') || '-'}
                         </TableCell>
                       )}
                       {visibleColumns.mimeType && (
                         <TableCell className="text-muted-foreground">
-                          <Badge variant="secondary" className="text-xs">Folder</Badge>
+                          {item.itemType === 'folder' ? (
+                            <Badge variant="secondary" className="text-xs">Folder</Badge>
+                          ) : (
+                            <code className="text-xs bg-muted px-1 rounded">{item.mimeType}</code>
+                          )}
                         </TableCell>
                       )}
                       {visibleColumns.createdTime && (
                         <TableCell className="text-muted-foreground">
-                          {formatDate(folder.createdTime)}
+                          {formatDate(item.createdTime)}
                         </TableCell>
                       )}
                       {visibleColumns.modifiedTime && (
                         <TableCell className="text-muted-foreground">
-                          {formatDate(folder.modifiedTime)}
+                          {formatDate(item.modifiedTime)}
                         </TableCell>
                       )}
                       <TableCell onClick={(e) => e.stopPropagation()}>
@@ -2794,207 +2802,23 @@ export function DriveManager() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {(() => {
-                              const actions = getFileActions(folder, activeView);
+                              const actions = getFileActions(item, activeView);
                               return (
                                 <>
-                                  {actions.canRename && (
+                                  {item.itemType === 'file' && actions.canPreview && isPreviewable(item.mimeType) && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('rename', folder.id, folder.name);
-                                    }}>
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      Rename
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {actions.canMove && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('move', folder.id, folder.name);
-                                    }}>
-                                      <Move className="h-4 w-4 mr-2" />
-                                      Move
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {actions.canCopy && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('copy', folder.id, folder.name);
-                                    }}>
-                                      <Copy className="h-4 w-4 mr-2" />
-                                      Copy
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {actions.canShare && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('share', folder.id, folder.name);
-                                    }}>
-                                      <Share className="h-4 w-4 mr-2" />
-                                      Share
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {actions.canDetails && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('details', folder.id, folder.name);
-                                    }}>
-                                      <Info className="h-4 w-4 mr-2" />
-                                      Details
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
-                                  
-                                  {actions.canRestore && (
-                                    <DropdownMenuItem 
-                                      className="text-green-600"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleFileAction('restore', folder.id, folder.name);
-                                      }}
-                                    >
-                                      <RefreshCw className="h-4 w-4 mr-2" />
-                                      Restore
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {actions.canTrash && (
-                                    <DropdownMenuItem 
-                                      className="text-orange-600"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleFileAction('trash', folder.id, folder.name);
-                                      }}
-                                    >
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      Move to Trash
-                                    </DropdownMenuItem>
-                                  )}
-                                  
-                                  {actions.canPermanentDelete && (
-                                    <DropdownMenuItem 
-                                      className="text-destructive"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleFileAction('permanentDelete', folder.id, folder.name);
-                                      }}
-                                    >
-                                      <AlertTriangle className="h-4 w-4 mr-2" />
-                                      Permanently Delete
-                                    </DropdownMenuItem>
-                                  )}
-                                </>
-                              );
-                            })()}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-
-                  {/* Files in table */}
-                  {sortedFiles.map((file) => (
-                    <TableRow 
-                      key={file.id}
-                      className={`cursor-pointer hover:bg-accent transition-colors ${
-                        selectedItems.has(file.id) ? 'bg-primary/5 border-primary/20' : ''
-                      }`}
-                      onClick={() => isSelectMode ? toggleItemSelection(file.id) : undefined}
-                    >
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {isSelectMode && (
-                            <Checkbox
-                              checked={selectedItems.has(file.id)}
-                              onCheckedChange={() => toggleItemSelection(file.id)}
-                              onClick={(e) => e.stopPropagation()}
-                              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                            />
-                          )}
-                          <FileIcon mimeType={file.mimeType} className="h-5 w-5" />
-                        </div>
-                      </TableCell>
-                      {visibleColumns.name && (
-                        <TableCell className="font-medium">
-                          <div className="flex items-center space-x-2">
-                            <span 
-                              className="truncate hover:text-blue-600 hover:underline"
-                              title={`Click to preview: ${file.name}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (isPreviewable(file.mimeType)) {
-                                  handleFileAction('preview', file.id, file.name);
-                                } else {
-                                  handleFileAction('download', file.id, file.name);
-                                }
-                              }}
-                            >
-                              {file.name}
-                            </span>
-                            {file.shared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
-                          </div>
-                        </TableCell>
-                      )}
-                      {visibleColumns.id && (
-                        <TableCell className="text-muted-foreground">
-                          <code className="text-xs bg-muted px-1 rounded">{file.id}</code>
-                        </TableCell>
-                      )}
-                      {visibleColumns.size && (
-                        <TableCell className="text-muted-foreground">
-                          {file.size ? formatFileSize(file.size) : '-'}
-                        </TableCell>
-                      )}
-                      {visibleColumns.owners && (
-                        <TableCell className="text-muted-foreground">
-                          {file.owners?.map(owner => owner.displayName || owner.emailAddress).join(', ') || '-'}
-                        </TableCell>
-                      )}
-                      {visibleColumns.mimeType && (
-                        <TableCell className="text-muted-foreground">
-                          <code className="text-xs bg-muted px-1 rounded">{file.mimeType}</code>
-                        </TableCell>
-                      )}
-                      {visibleColumns.createdTime && (
-                        <TableCell className="text-muted-foreground">
-                          {formatDate(file.createdTime)}
-                        </TableCell>
-                      )}
-                      {visibleColumns.modifiedTime && (
-                        <TableCell className="text-muted-foreground">
-                          {formatDate(file.modifiedTime)}
-                        </TableCell>
-                      )}
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {(() => {
-                              const actions = getFileActions(file, activeView);
-                              return (
-                                <>
-                                  {actions.canPreview && isPreviewable(file.mimeType) && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('preview', file.id, file.name);
+                                      handleFileAction('preview', item.id, item.name);
                                     }}>
                                       <Eye className="h-4 w-4 mr-2" />
                                       Preview
                                     </DropdownMenuItem>
                                   )}
                                   
-                                  {actions.canDownload && (
+                                  {item.itemType === 'file' && actions.canDownload && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('download', file.id, file.name);
+                                      handleFileAction('download', item.id, item.name);
                                     }}>
                                       <Download className="h-4 w-4 mr-2" />
                                       Download
@@ -3004,7 +2828,7 @@ export function DriveManager() {
                                   {actions.canRename && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('rename', file.id, file.name);
+                                      handleFileAction('rename', item.id, item.name);
                                     }}>
                                       <Edit className="h-4 w-4 mr-2" />
                                       Rename
@@ -3014,7 +2838,7 @@ export function DriveManager() {
                                   {actions.canMove && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('move', file.id, file.name);
+                                      handleFileAction('move', item.id, item.name);
                                     }}>
                                       <Move className="h-4 w-4 mr-2" />
                                       Move
@@ -3024,7 +2848,7 @@ export function DriveManager() {
                                   {actions.canCopy && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('copy', file.id, file.name);
+                                      handleFileAction('copy', item.id, item.name);
                                     }}>
                                       <Copy className="h-4 w-4 mr-2" />
                                       Copy
@@ -3034,7 +2858,7 @@ export function DriveManager() {
                                   {actions.canShare && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('share', file.id, file.name);
+                                      handleFileAction('share', item.id, item.name);
                                     }}>
                                       <Share className="h-4 w-4 mr-2" />
                                       Share
@@ -3044,7 +2868,7 @@ export function DriveManager() {
                                   {actions.canDetails && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('details', file.id, file.name);
+                                      handleFileAction('details', item.id, item.name);
                                     }}>
                                       <Info className="h-4 w-4 mr-2" />
                                       Details
@@ -3058,7 +2882,7 @@ export function DriveManager() {
                                       className="text-green-600"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleFileAction('restore', file.id, file.name);
+                                        handleFileAction('restore', item.id, item.name);
                                       }}
                                     >
                                       <RefreshCw className="h-4 w-4 mr-2" />
@@ -3071,7 +2895,7 @@ export function DriveManager() {
                                       className="text-orange-600"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleFileAction('trash', file.id, file.name);
+                                        handleFileAction('trash', item.id, item.name);
                                       }}
                                     >
                                       <Trash2 className="h-4 w-4 mr-2" />
@@ -3084,7 +2908,7 @@ export function DriveManager() {
                                       className="text-destructive"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleFileAction('permanentDelete', file.id, file.name);
+                                        handleFileAction('permanentDelete', item.id, item.name);
                                       }}
                                     >
                                       <AlertTriangle className="h-4 w-4 mr-2" />
