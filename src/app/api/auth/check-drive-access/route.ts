@@ -19,19 +19,22 @@ export async function GET(request: NextRequest) {
     console.log('Provider token exists:', !!user.user_metadata?.provider_token);
     console.log('Provider refresh token exists:', !!user.user_metadata?.provider_refresh_token);
 
-    // Try multiple possible token locations
-    const accessToken = user.user_metadata?.provider_token || 
-                       session.provider_token ||
-                       session.access_token;
+    // Get Google Drive access token (prioritize provider_token)
+    const accessToken = session.provider_token || 
+                       user.user_metadata?.provider_token;
     
     if (!accessToken) {
-      console.log('No access token found in:', {
+      console.log('No access token found. Session details:', {
         user_metadata: user.user_metadata,
-        session_keys: Object.keys(session)
+        session_keys: Object.keys(session),
+        provider_token: session.provider_token,
+        access_token: session.access_token
       });
+      
+      // Check if user needs to re-authorize with Drive scope
       return NextResponse.json({ 
         hasAccess: false, 
-        error: 'No access token',
+        error: 'Google Drive access not found. Please reconnect your Google Drive.',
         needsReauth: true 
       });
     }

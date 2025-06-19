@@ -118,11 +118,9 @@ export async function GET(request: NextRequest) {
     console.log('User metadata:', user.user_metadata);
     console.log('Session keys:', Object.keys(session));
 
-    // Enhanced token detection with debugging
+    // Get Google Drive access token (prioritize provider_token)
     const accessToken = session.provider_token || 
-                       user.user_metadata?.provider_token ||
-                       user.user_metadata?.access_token ||
-                       session.access_token;
+                       user.user_metadata?.provider_token;
 
     console.log('Token search results:', {
       session_provider_token: !!session.provider_token,
