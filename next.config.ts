@@ -4,22 +4,14 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-  experimental: {
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
-    },
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-  },
   images: {
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     domains: ['lh3.googleusercontent.com', 'avatars.githubusercontent.com'],
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
@@ -45,6 +37,8 @@ const nextConfig = {
   ],
   reactStrictMode: true,
   poweredByHeader: false,
+  compress: true,
+  
 }
 
 export default nextConfig
