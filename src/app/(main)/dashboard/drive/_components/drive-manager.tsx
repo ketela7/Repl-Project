@@ -13,6 +13,7 @@ import {
   Download,
   Trash2,
   Share,
+  Share2,
   Edit,
   Eye,
   RefreshCw,
