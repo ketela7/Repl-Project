@@ -773,7 +773,7 @@ export function getFileActions(
   // If we don't have capabilities data, provide conservative defaults
   const defaultCapabilities = {
     canDownload: true,
-    canCopy: false,
+    canCopy: true,
     canDelete: false,
     canEdit: false,
     canRename: false,
@@ -802,7 +802,7 @@ export function getFileActions(
 
     // Copy - Google Drive API mendukung copy untuk files, tapi tidak untuk folders
     // Dalam aplikasi Google Drive asli, folder bisa di-duplicate secara manual tapi API tidak support direct copy
-    canCopy: !isFolder && !isTrashed,
+    canCopy: true,
 
     // Share - hanya untuk file yang user punya sharing permission
     canShare: !isTrashed && (finalCapabilities.canShare ?? false),
