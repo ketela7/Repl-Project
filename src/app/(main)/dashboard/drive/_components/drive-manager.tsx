@@ -2036,30 +2036,93 @@ export function DriveManager() {
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuItem onClick={() => setIsSelectMode(!isSelectMode)}>
-                  <Square className="h-4 w-4 mr-2" />
-                  {isSelectMode ? 'Exit Select Mode' : 'Enter Select Mode'}
+              <DropdownMenuContent align="start" className="w-64">
+                <DropdownMenuItem onClick={toggleSelectMode}>
+                  {isSelectMode ? (
+                    <>
+                      <X className="h-4 w-4 mr-2" />
+                      Exit Selection
+                    </>
+                  ) : (
+                    <>
+                      <SquareCheck className="h-4 w-4 mr-2" />
+                      Select Mode
+                    </>
+                  )}
                 </DropdownMenuItem>
-                {isSelectMode && selectedItems.size > 0 && (
+                
+                {isSelectMode && (
                   <>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => handleBulkAction('download')}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Download Selected
+                    <DropdownMenuItem onClick={selectAll}>
+                      <CheckSquare className="h-4 w-4 mr-2" />
+                      Select All ({folders.length + files.length})
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleBulkAction('delete')}>
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete Selected
+                    <DropdownMenuItem onClick={deselectAll}>
+                      <Square className="h-4 w-4 mr-2" />
+                      Clear Selection
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleBulkAction('move')}>
-                      <Move className="h-4 w-4 mr-2" />
-                      Move Selected
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleBulkAction('copy')}>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy Selected
-                    </DropdownMenuItem>
+                    
+                    {selectedItems.size > 0 && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          File Operations ({selectedItems.size} selected)
+                        </div>
+                        <DropdownMenuItem onClick={handleBulkDownload}>
+                          <Download className="h-4 w-4 mr-2" />
+                          Download Selected
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setIsBulkRenameDialogOpen(true)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Rename Selected
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setIsBulkExportDialogOpen(true)}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Export Selected
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setIsBulkMoveDialogOpen(true)}>
+                          <Move className="h-4 w-4 mr-2" />
+                          Move Selected
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setIsBulkCopyDialogOpen(true)}>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copy Selected
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuSeparator />
+                        <div className="px-2 py-1.5 text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider">
+                          Actions
+                        </div>
+                        
+                        {searchQuery === 'trashed:true' ? (
+                          <>
+                            <DropdownMenuItem 
+                              onClick={() => setIsBulkRestoreDialogOpen(true)}
+                              className="text-green-600 dark:text-green-400"
+                            >
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              Restore Selected
+                            </DropdownMenuItem>
+                            <DropdownMenuItem 
+                              onClick={() => setIsBulkPermanentDeleteDialogOpen(true)}
+                              className="text-red-600 dark:text-red-400"
+                            >
+                              <AlertTriangle className="h-4 w-4 mr-2" />
+                              Permanently Delete
+                            </DropdownMenuItem>
+                          </>
+                        ) : (
+                          <DropdownMenuItem 
+                            onClick={() => setIsBulkDeleteDialogOpen(true)}
+                            className="text-orange-600 dark:text-orange-400"
+                          >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Move to Trash
+                          </DropdownMenuItem>
+                        )}
+                      </>
+                    )}
                   </>
                 )}
               </DropdownMenuContent>
@@ -2068,92 +2131,136 @@ export function DriveManager() {
             {/* Filter */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className={`${(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                    advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                    advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                    advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
+                >
                   <Calendar className="h-4 w-4 mr-2" />
                   Filter
+                  {(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                    advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                    advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                    advancedFilters.owner) && (
+                    <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
+                      Active
+                    </Badge>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-80 max-h-96 overflow-y-auto">
-                <div className="p-2 space-y-2">
-                  {/* Basic Filters */}
+              <DropdownMenuContent align="start" className="w-96">
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Settings className="h-4 w-4 text-primary" />
+                    <h4 className="font-semibold text-sm text-foreground">Filters</h4>
+                    {(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                      advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                      advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                      advancedFilters.owner) && (
+                      <Badge variant="secondary" className="ml-2 text-xs">
+                        Active
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {/* Basic Filter */}
                   <Collapsible defaultOpen>
                     <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
-                      <span className="text-sm font-semibold">Basic Filter</span>
+                      <span className="text-sm font-semibold">View Status</span>
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-1 ml-4">
-                      <DropdownMenuItem onClick={() => handleViewChange('all')}>
-                        <HardDrive className="h-4 w-4 mr-2" />
-                        All Files
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleViewChange('my-drive')}>
-                        <Folder className="h-4 w-4 mr-2" />
-                        My Drive
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleViewChange('recent')}>
-                        <Calendar className="h-4 w-4 mr-2" />
-                        Recent
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleViewChange('trash')}>
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Trash
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleViewChange('starred')}>
-                        <Star className="h-4 w-4 mr-2" />
-                        Starred
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleViewChange('shared')}>
-                        <Share className="h-4 w-4 mr-2" />
-                        Shared with me
-                      </DropdownMenuItem>
+                    <CollapsibleContent className="space-y-2 ml-2 mt-2">
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          variant={activeView === 'all' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleViewChange('all')}
+                          className="justify-start text-xs"
+                        >
+                          All Files
+                        </Button>
+                        <Button
+                          variant={activeView === 'my-drive' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleViewChange('my-drive')}
+                          className="justify-start text-xs"
+                        >
+                          My Drive
+                        </Button>
+                        <Button
+                          variant={activeView === 'recent' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleViewChange('recent')}
+                          className="justify-start text-xs"
+                        >
+                          Recent
+                        </Button>
+                        <Button
+                          variant={activeView === 'trash' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleViewChange('trash')}
+                          className="justify-start text-xs"
+                        >
+                          Trash
+                        </Button>
+                        <Button
+                          variant={activeView === 'starred' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleViewChange('starred')}
+                          className="justify-start text-xs"
+                        >
+                          Starred
+                        </Button>
+                        <Button
+                          variant={activeView === 'shared' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleViewChange('shared')}
+                          className="justify-start text-xs"
+                        >
+                          Shared
+                        </Button>
+                      </div>
                     </CollapsibleContent>
                   </Collapsible>
-                  
-                  <DropdownMenuSeparator />
-                  
+
+                  <Separator className="my-3" />
+
                   {/* File Types */}
                   <Collapsible defaultOpen>
                     <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
                       <span className="text-sm font-semibold">File Types</span>
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-1 ml-4">
-                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['document'])}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Documents
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['image'])}>
-                        <Eye className="h-4 w-4 mr-2" />
-                        Images
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['video'])}>
-                        <Play className="h-4 w-4 mr-2" />
-                        Videos
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['spreadsheet'])}>
-                        <Grid3X3 className="h-4 w-4 mr-2" />
-                        Spreadsheets
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['presentation'])}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Presentations
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['audio'])}>
-                        <Play className="h-4 w-4 mr-2" />
-                        Audio
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['archive'])}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Archives
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleFileTypeFilterChange(['code'])}>
-                        <FileText className="h-4 w-4 mr-2" />
-                        Code Files
-                      </DropdownMenuItem>
+                    <CollapsibleContent className="space-y-2 ml-2 mt-2">
+                      <div className="grid grid-cols-3 gap-2">
+                        <Button
+                          variant={fileTypeFilter.includes('folder') ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => handleFileTypeToggle('folder')}
+                          className="justify-start text-xs"
+                        >
+                          <Folder className="h-3 w-3 mr-1" />
+                          Folder
+                        </Button>
+                        {['document', 'spreadsheet', 'presentation', 'image', 'video', 'audio', 'archive', 'code'].map((type) => (
+                          <Button
+                            key={type}
+                            variant={fileTypeFilter.includes(type) ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => handleFileTypeToggle(type)}
+                            className="justify-start text-xs capitalize"
+                          >
+                            {type}
+                          </Button>
+                        ))}
+                      </div>
                     </CollapsibleContent>
                   </Collapsible>
 
-                  <DropdownMenuSeparator />
+                  <Separator className="my-3" />
 
                   {/* Advanced Filters */}
                   <Collapsible>
@@ -2161,60 +2268,146 @@ export function DriveManager() {
                       <span className="text-sm font-semibold">Advanced Filters</span>
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-2 ml-4 p-2">
+                    <CollapsibleContent className="space-y-4 ml-2 mt-3">
                       {/* Size Range */}
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-muted-foreground">Size Range</label>
-                        <div className="grid grid-cols-2 gap-2">
-                          <DropdownMenuItem onClick={() => console.log('Filter: <1MB')}>
-                            <span className="text-xs">{"<"} 1MB</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('Filter: 1-10MB')}>
-                            <span className="text-xs">1-10MB</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('Filter: 10-100MB')}>
-                            <span className="text-xs">10-100MB</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('Filter: >100MB')}>
-                            <span className="text-xs">{">"} 100MB</span>
-                          </DropdownMenuItem>
+                        <label className="text-xs font-medium text-muted-foreground">File Size Range</label>
+                        <div className="grid grid-cols-3 gap-2">
+                          <Input
+                            type="number"
+                            placeholder="Min"
+                            value={advancedFilters.sizeRange?.min || ''}
+                            onChange={(e) => setAdvancedFilters(prev => ({
+                              ...prev,
+                              sizeRange: { ...prev.sizeRange, min: parseInt(e.target.value) || undefined, unit: prev.sizeRange?.unit || 'MB' }
+                            }))}
+                            className="text-xs h-8"
+                          />
+                          <Input
+                            type="number"
+                            placeholder="Max"
+                            value={advancedFilters.sizeRange?.max || ''}
+                            onChange={(e) => setAdvancedFilters(prev => ({
+                              ...prev,
+                              sizeRange: { ...prev.sizeRange, max: parseInt(e.target.value) || undefined, unit: prev.sizeRange?.unit || 'MB' }
+                            }))}
+                            className="text-xs h-8"
+                          />
+                          <select
+                            value={advancedFilters.sizeRange?.unit || 'MB'}
+                            onChange={(e) => setAdvancedFilters(prev => ({
+                              ...prev,
+                              sizeRange: { ...prev.sizeRange, unit: e.target.value as 'B' | 'KB' | 'MB' | 'GB' }
+                            }))}
+                            className="text-xs h-8 px-2 border rounded-md bg-background"
+                          >
+                            <option value="B">B</option>
+                            <option value="KB">KB</option>
+                            <option value="MB">MB</option>
+                            <option value="GB">GB</option>
+                          </select>
                         </div>
                       </div>
 
-                      {/* Date Range */}
+                      {/* Date Ranges */}
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-muted-foreground">Date Range</label>
-                        <div className="space-y-1">
-                          <DropdownMenuItem onClick={() => console.log('Filter: Today')}>
-                            <Calendar className="h-3 w-3 mr-2" />
-                            <span className="text-xs">Today</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('Filter: This Week')}>
-                            <Calendar className="h-3 w-3 mr-2" />
-                            <span className="text-xs">This Week</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('Filter: This Month')}>
-                            <Calendar className="h-3 w-3 mr-2" />
-                            <span className="text-xs">This Month</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => console.log('Filter: This Year')}>
-                            <Calendar className="h-3 w-3 mr-2" />
-                            <span className="text-xs">This Year</span>
-                          </DropdownMenuItem>
+                        <label className="text-xs font-medium text-muted-foreground">Created Date Range</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            type="date"
+                            value={advancedFilters.createdDateRange?.from?.toISOString().split('T')[0] || ''}
+                            onChange={(e) => setAdvancedFilters(prev => ({
+                              ...prev,
+                              createdDateRange: { 
+                                ...prev.createdDateRange, 
+                                from: e.target.value ? new Date(e.target.value) : undefined 
+                              }
+                            }))}
+                            className="text-xs h-8"
+                          />
+                          <Input
+                            type="date"
+                            value={advancedFilters.createdDateRange?.to?.toISOString().split('T')[0] || ''}
+                            onChange={(e) => setAdvancedFilters(prev => ({
+                              ...prev,
+                              createdDateRange: { 
+                                ...prev.createdDateRange, 
+                                to: e.target.value ? new Date(e.target.value) : undefined 
+                              }
+                            }))}
+                            className="text-xs h-8"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-xs font-medium text-muted-foreground">Modified Date Range</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input
+                            type="date"
+                            value={advancedFilters.modifiedDateRange?.from?.toISOString().split('T')[0] || ''}
+                            onChange={(e) => setAdvancedFilters(prev => ({
+                              ...prev,
+                              modifiedDateRange: { 
+                                ...prev.modifiedDateRange, 
+                                from: e.target.value ? new Date(e.target.value) : undefined 
+                              }
+                            }))}
+                            className="text-xs h-8"
+                          />
+                          <Input
+                            type="date"
+                            value={advancedFilters.modifiedDateRange?.to?.toISOString().split('T')[0] || ''}
+                            onChange={(e) => setAdvancedFilters(prev => ({
+                              ...prev,
+                              modifiedDateRange: { 
+                                ...prev.modifiedDateRange, 
+                                to: e.target.value ? new Date(e.target.value) : undefined 
+                              }
+                            }))}
+                            className="text-xs h-8"
+                          />
                         </div>
                       </div>
 
                       {/* Owner */}
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-muted-foreground">Owner</label>
-                        <DropdownMenuItem onClick={() => console.log('Filter: Owned by me')}>
-                          <MousePointer className="h-3 w-3 mr-2" />
-                          <span className="text-xs">Owned by me</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => console.log('Filter: Shared with me')}>
-                          <Share className="h-3 w-3 mr-2" />
-                          <span className="text-xs">Shared with me</span>
-                        </DropdownMenuItem>
+                        <label className="text-xs font-medium text-muted-foreground">Owner (Name or Email)</label>
+                        <Input
+                          type="text"
+                          placeholder="Enter owner name or email"
+                          value={advancedFilters.owner || ''}
+                          onChange={(e) => setAdvancedFilters(prev => ({
+                            ...prev,
+                            owner: e.target.value || undefined
+                          }))}
+                          className="text-xs h-8"
+                        />
+                      </div>
+
+                      {/* Clear Filters */}
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setAdvancedFilters({ sizeRange: { unit: 'MB' } })}
+                          className="flex-1 text-xs"
+                        >
+                          Clear Advanced
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setActiveView('all');
+                            setFileTypeFilter([]);
+                            setAdvancedFilters({ sizeRange: { unit: 'MB' } });
+                            setSearchQuery('');
+                          }}
+                          className="flex-1 text-xs"
+                        >
+                          Clear All
+                        </Button>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -2363,14 +2556,7 @@ export function DriveManager() {
                         <Checkbox checked={visibleColumns.modifiedTime} className="mr-2 h-3 w-3" />
                         <span className="text-xs">Modified</span>
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, permissions: !prev.permissions }))}>
-                        <Checkbox checked={visibleColumns.permissions} className="mr-2 h-3 w-3" />
-                        <span className="text-xs">Permissions</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => setVisibleColumns(prev => ({ ...prev, starred: !prev.starred }))}>
-                        <Checkbox checked={visibleColumns.starred} className="mr-2 h-3 w-3" />
-                        <span className="text-xs">Starred</span>
-                      </DropdownMenuItem>
+
                     </CollapsibleContent>
                   </Collapsible>
                 </>
