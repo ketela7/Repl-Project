@@ -67,7 +67,7 @@ export function EnhancedShareDialog({
   const [emailAddress, setEmailAddress] = useState('');
   const [message, setMessage] = useState('');
   const [allowDiscovery, setAllowDiscovery] = useState(false);
-  const [expirationDays, setExpirationDays] = useState<string>('');
+  const [expirationDays, setExpirationDays] = useState<string>('none');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleShare = async () => {
@@ -85,7 +85,7 @@ export function EnhancedShareDialog({
           allowFileDiscovery: allowDiscovery,
         };
 
-        if (expirationDays) {
+        if (expirationDays && expirationDays !== 'none') {
           const expirationDate = new Date();
           expirationDate.setDate(expirationDate.getDate() + parseInt(expirationDays));
           shareData.expirationTime = expirationDate.toISOString();
@@ -146,7 +146,7 @@ export function EnhancedShareDialog({
       // Reset form
       setEmailAddress('');
       setMessage('');
-      setExpirationDays('');
+      setExpirationDays('none');
       
     } catch (error) {
       console.error('Error sharing item:', error);
@@ -287,7 +287,7 @@ export function EnhancedShareDialog({
                     <SelectValue placeholder="No expiration" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No expiration</SelectItem>
+                    <SelectItem value="none">No expiration</SelectItem>
                     <SelectItem value="1">1 day</SelectItem>
                     <SelectItem value="7">7 days</SelectItem>
                     <SelectItem value="30">30 days</SelectItem>
