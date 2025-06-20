@@ -106,7 +106,7 @@ export function MobileFiltersBottomSheet({
   };
 
   const handleFileTypeClick = (typeId: string) => {
-    const currentTypes = currentFilters.fileTypes || [];
+    const currentTypes = currentFilters?.fileTypes || [];
     const newTypes = currentTypes.includes(typeId) 
       ? currentTypes.filter((t: string) => t !== typeId)
       : [...currentTypes, typeId];
@@ -117,7 +117,7 @@ export function MobileFiltersBottomSheet({
   const handleAdvancedFilterChange = (key: string, value: any) => {
     const newFilters = { ...advancedFilters, [key]: value };
     setAdvancedFilters(newFilters);
-    onFilterChange({ ...currentFilters, advanced: newFilters });
+    onFilterChange({ ...(currentFilters || {}), advanced: newFilters });
   };
 
   const handleClearAll = () => {
@@ -164,7 +164,7 @@ export function MobileFiltersBottomSheet({
             <div className="grid grid-cols-2 gap-2">
               {basicMenuItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = currentFilters.viewFilter === item.id;
+                const isActive = currentFilters?.viewFilter === item.id;
                 return (
                   <Button
                     key={item.id}
@@ -191,7 +191,7 @@ export function MobileFiltersBottomSheet({
             <div className="grid grid-cols-2 gap-2">
               {fileTypes.map((type) => {
                 const Icon = type.icon;
-                const isSelected = currentFilters.fileTypes?.includes(type.id);
+                const isSelected = currentFilters?.fileTypes?.includes(type.id);
                 return (
                   <Button
                     key={type.id}
