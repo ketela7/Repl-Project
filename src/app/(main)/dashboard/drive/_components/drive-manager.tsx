@@ -2601,18 +2601,33 @@ export function DriveManager() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 p-2">
-                    <div className="h-4 w-4 bg-muted rounded animate-pulse flex-shrink-0" />
-                    <div className="h-4 w-4 bg-muted rounded animate-pulse flex-shrink-0" />
-                    <div className="flex-1 space-y-1">
-                      <div className="h-4 bg-muted rounded animate-pulse" style={{ width: `${60 + Math.random() * 40}%` }} />
-                      <div className="h-3 bg-muted rounded animate-pulse" style={{ width: `${30 + Math.random() * 30}%` }} />
+                {Array.from({ length: 8 }).map((_, i) => {
+                  // Fixed width patterns to avoid hydration mismatch
+                  const widthPatterns = [
+                    { main: '75%', sub: '45%' },
+                    { main: '65%', sub: '35%' },
+                    { main: '85%', sub: '50%' },
+                    { main: '70%', sub: '40%' },
+                    { main: '90%', sub: '55%' },
+                    { main: '80%', sub: '48%' },
+                    { main: '60%', sub: '38%' },
+                    { main: '95%', sub: '42%' }
+                  ];
+                  const pattern = widthPatterns[i % widthPatterns.length];
+                  
+                  return (
+                    <div key={i} className="flex items-center gap-3 p-2">
+                      <div className="h-4 w-4 bg-muted rounded animate-pulse flex-shrink-0" />
+                      <div className="h-4 w-4 bg-muted rounded animate-pulse flex-shrink-0" />
+                      <div className="flex-1 space-y-1">
+                        <div className="h-4 bg-muted rounded animate-pulse" style={{ width: pattern.main }} />
+                        <div className="h-3 bg-muted rounded animate-pulse" style={{ width: pattern.sub }} />
+                      </div>
+                      <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                      <div className="h-4 w-4 bg-muted rounded animate-pulse" />
                     </div>
-                    <div className="h-4 w-16 bg-muted rounded animate-pulse" />
-                    <div className="h-4 w-4 bg-muted rounded animate-pulse" />
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
