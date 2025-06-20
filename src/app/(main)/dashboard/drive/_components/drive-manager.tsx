@@ -2417,10 +2417,10 @@ export function DriveManager() {
     <div className="w-full space-y-3 sm:space-y-4">
       {/* DriveManager Toolbar - Sticky at top */}
       <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
-        <div className="flex items-center justify-between p-4 overflow-x-auto scrollbar-hide scroll-smooth"
+        <div className="flex items-center justify-between p-3 md:p-4 overflow-x-auto scrollbar-hide scroll-smooth"
              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Main Menu - 5 Items - Horizontal Scrollable */}
-          <div className="flex items-center gap-3 flex-shrink-0 min-w-0">
+          <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 min-w-0">
             
             {/* Search */}
             <Button
@@ -2438,9 +2438,33 @@ export function DriveManager() {
                   }
                 }
               }}
+              className="h-8 px-2 md:px-3"
             >
-              <Search className="h-4 w-4 mr-2" />
-              Search
+              <Search className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Search</span>
+              {searchQuery && (
+                <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                  •
+                </Badge>
+              )}
+            </Button>
+
+            {/* View Toggle - More prominent */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
+              className="h-8 px-2 md:px-3"
+              title={`Switch to ${viewMode === 'grid' ? 'table' : 'grid'} view`}
+            >
+              {viewMode === 'grid' ? (
+                <List className="h-4 w-4 md:mr-2" />
+              ) : (
+                <Grid3X3 className="h-4 w-4 md:mr-2" />
+              )}
+              <span className="hidden md:inline">
+                {viewMode === 'grid' ? 'Table' : 'Grid'}
+              </span>
             </Button>
 
             {/* Batch */}
@@ -2450,17 +2474,19 @@ export function DriveManager() {
                   variant={isSelectMode ? 'default' : 'ghost'}
                   size="sm"
                   disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
+                  className="h-8 px-2 md:px-3"
                 >
-                  <Square className="h-4 w-4 mr-2" />
-                  Batch
+                  <Square className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">Batch</span>
                   {selectedItems.size > 0 && (
-                    <Badge variant="secondary" className="ml-2">
+                    <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
                       {selectedItems.size}
                     </Badge>
                   )}
                   {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
-                    <Badge variant="destructive" className="ml-2 text-xs">
-                      Trash Mode
+                    <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                      <span className="hidden md:inline">Trash Mode</span>
+                      <span className="md:hidden">T</span>
                     </Badge>
                   )}
                 </Button>
@@ -2629,24 +2655,25 @@ export function DriveManager() {
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className={`${(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                  className={`h-8 px-2 md:px-3 ${(activeView !== 'all' || fileTypeFilter.length > 0 || 
                     advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
                     advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
                     advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
                 >
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Filter
+                  <Calendar className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">Filter</span>
                   {(activeView !== 'all' || fileTypeFilter.length > 0 || 
                     advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
                     advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
                     advancedFilters.owner) && (
-                    <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
-                      Active
+                    <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                      <span className="hidden md:inline">Active</span>
+                      <span className="md:hidden">•</span>
                     </Badge>
                   )}
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-96">
+              <DropdownMenuContent align="start" className="w-80 md:w-96">
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-4">
                     <Settings className="h-4 w-4 text-primary" />
@@ -2913,9 +2940,9 @@ export function DriveManager() {
             {/* Badge - Floating Panel Toggle */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <HardDrive className="h-4 w-4 mr-2" />
-                  Badge
+                <Button variant="ghost" size="sm" className="h-8 px-2 md:px-3">
+                  <HardDrive className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">Badge</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-80 p-4">
@@ -3005,12 +3032,24 @@ export function DriveManager() {
           {/* More (Settings) - Fixed position on the right */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="flex-shrink-0">
-                <Settings className="h-4 w-4 mr-2" />
-                More
+              <Button variant="ghost" size="sm" className="flex-shrink-0 h-8 px-2 md:px-3">
+                <Settings className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">More</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64">
+              {/* Quick Actions */}
+              <DropdownMenuItem onClick={() => setIsUploadDialogOpen(true)}>
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Files
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsCreateFolderDialogOpen(true)}>
+                <FolderPlus className="h-4 w-4 mr-2" />
+                Create Folder
+              </DropdownMenuItem>
+              
+              <DropdownMenuSeparator />
+              
               {/* View Mode */}
               <DropdownMenuItem onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
                 {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Grid3X3 className="h-4 w-4 mr-2" />}
@@ -3059,26 +3098,18 @@ export function DriveManager() {
               
               <DropdownMenuSeparator />
               
-              {/* Actions */}
+              {/* Additional Actions */}
               <DropdownMenuItem onClick={handleRefresh} disabled={refreshing}>
                 <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-                Refresh
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsCreateFolderDialogOpen(true)}>
-                <FolderPlus className="h-4 w-4 mr-2" />
-                Create New Folder
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsUploadDialogOpen(true)}>
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Files
+                Refresh Drive
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
 
-        {/* Hidden Search Bar - Expandable */}
-        <div id="search-expanded" style={{ display: 'none' }} className="border-t bg-muted/30 p-4">
-          <div className="flex items-center gap-4">
+        {/* Enhanced Search Bar - Expandable with better UX */}
+        <div id="search-expanded" style={{ display: 'none' }} className="border-t bg-muted/30 p-3 md:p-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -3087,20 +3118,53 @@ export function DriveManager() {
                 value={searchQuery}
                 onChange={(e) => handleSearchInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                className="pl-10"
+                className="pl-10 pr-20 h-10"
                 disabled={loading}
               />
-              {searchQuery && (
+              <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                {searchQuery && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 hover:bg-muted"
+                    onClick={() => setSearchQuery('')}
+                    title="Clear search"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0"
-                  onClick={() => setSearchQuery('')}
+                  className="h-8 w-8 p-0 hover:bg-muted"
+                  onClick={() => {
+                    const searchExpanded = document.querySelector('#search-expanded') as HTMLElement;
+                    if (searchExpanded) {
+                      searchExpanded.style.display = 'none';
+                    }
+                  }}
+                  title="Close search"
                 >
-                  <X className="h-4 w-4" />
+                  <ChevronUp className="h-4 w-4" />
                 </Button>
-              )}
+              </div>
             </div>
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleSearch}
+              disabled={loading || !searchQuery.trim()}
+              className="px-4 h-10"
+            >
+              {loading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <>
+                  <Search className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">Search</span>
+                </>
+              )}
+            </Button>
           </div>
         </div>
       </div>
@@ -3949,16 +4013,18 @@ export function DriveManager() {
 
       {/* Enhanced Bulk Operations Progress Indicator */}
       {bulkOperationProgress.isRunning && (
-        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg min-w-[320px] max-w-[400px]">
+        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg min-w-[320px] max-w-[90vw] md:max-w-[400px]">
           <div className="flex items-start gap-3">
-            <RefreshCw className="h-5 w-5 animate-spin text-primary mt-0.5 flex-shrink-0" />
+            <div className="p-1.5 rounded-full bg-primary/10">
+              <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+            </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium mb-1 truncate" title={bulkOperationProgress.operation}>
                 {bulkOperationProgress.operation}
               </div>
               <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
                 <span>{bulkOperationProgress.current} of {bulkOperationProgress.total} items</span>
-                <span>{Math.round((bulkOperationProgress.current / bulkOperationProgress.total) * 100)}%</span>
+                <span className="font-medium">{Math.round((bulkOperationProgress.current / bulkOperationProgress.total) * 100)}%</span>
               </div>
               <Progress 
                 value={(bulkOperationProgress.current / bulkOperationProgress.total) * 100} 
@@ -3976,15 +4042,20 @@ export function DriveManager() {
 
       {/* Single Operation Progress Indicator */}
       {singleOperationProgress.isRunning && !bulkOperationProgress.isRunning && (
-        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg min-w-[280px] max-w-[350px]">
+        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg min-w-[280px] max-w-[90vw] md:max-w-[350px]">
           <div className="flex items-center gap-3">
-            <RefreshCw className="h-4 w-4 animate-spin text-primary flex-shrink-0" />
+            <div className="p-1.5 rounded-full bg-primary/10">
+              <RefreshCw className="h-4 w-4 animate-spin text-primary" />
+            </div>
             <div className="flex-1 min-w-0">
               <div className="text-sm font-medium truncate" title={singleOperationProgress.operation}>
                 {singleOperationProgress.operation}
               </div>
-              <div className="text-xs text-muted-foreground mt-1">
-                Processing...
+              <div className="flex items-center gap-1 mt-1">
+                <div className="h-1 w-1 bg-primary rounded-full animate-pulse"></div>
+                <div className="h-1 w-1 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+                <div className="h-1 w-1 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+                <span className="text-xs text-muted-foreground ml-1">Processing...</span>
               </div>
             </div>
           </div>
