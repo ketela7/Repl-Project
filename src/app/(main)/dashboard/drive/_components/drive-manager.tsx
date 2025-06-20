@@ -388,6 +388,12 @@ export function DriveManager() {
     operation: string;
   }>({ isRunning: false, current: 0, total: 0, operation: '' });
 
+  // Single operation progress state
+  const [singleOperationProgress, setSingleOperationProgress] = useState<{
+    isRunning: boolean;
+    operation: string;
+  }>({ isRunning: false, operation: '' });
+
   // Sorting functionality
   const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -539,6 +545,9 @@ export function DriveManager() {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
+    // Close dialog first so user can see progress
+    setIsBulkDeleteDialogOpen(false);
+
     // Filter items that can be trashed based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
       const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
@@ -554,7 +563,6 @@ export function DriveManager() {
 
     if (itemsWithPermissions.length === 0) {
       toast.warning('No items can be moved to trash. All selected items don\'t have permission to be trashed.');
-      setIsBulkDeleteDialogOpen(false);
       return;
     }
 
@@ -644,13 +652,15 @@ export function DriveManager() {
       toast.error('An error occurred during bulk delete operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
-      setIsBulkDeleteDialogOpen(false);
     }
   };
 
   const handleBulkMove = async (targetFolderId: string) => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
+
+    // Close dialog first so user can see progress
+    setIsBulkMoveDialogOpen(false);
 
     // Filter items that can be moved based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
@@ -667,7 +677,6 @@ export function DriveManager() {
 
     if (itemsWithPermissions.length === 0) {
       toast.warning('No items can be moved. All selected items don\'t have permission to be moved.');
-      setIsBulkMoveDialogOpen(false);
       return;
     }
 
@@ -761,12 +770,14 @@ export function DriveManager() {
       toast.error('An error occurred during bulk move operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
-      setIsBulkMoveDialogOpen(false);
     }
   };
 
   const handleBulkCopy = async (targetFolderId: string) => {
     const allSelectedItems = getSelectedItemsData();
+    
+    // Close dialog first so user can see progress
+    setIsBulkCopyDialogOpen(false);
     
     // Filter for files that can be copied based on permissions
     const itemsWithPermissions = allSelectedItems.filter(item => {
@@ -791,7 +802,6 @@ export function DriveManager() {
         message += ` ${filesWithoutPermissions.length} file${filesWithoutPermissions.length > 1 ? 's' : ''} don't have copy permission.`;
       }
       toast.warning(message);
-      setIsBulkCopyDialogOpen(false);
       return;
     }
 
@@ -898,7 +908,6 @@ export function DriveManager() {
       toast.error('An error occurred during bulk copy operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
-      setIsBulkCopyDialogOpen(false);
     }
   };
 
@@ -1021,9 +1030,11 @@ export function DriveManager() {
       !item.mimeType.includes('shortcut')
     );
 
+    // Close dialog first so user can see progress
+    setIsBulkExportDialogOpen(false);
+
     if (exportableFiles.length === 0) {
       toast.warning('No Google Workspace files selected for export.');
-      setIsBulkExportDialogOpen(false);
       return;
     }
 
@@ -1091,13 +1102,15 @@ export function DriveManager() {
       toast.error('An error occurred during bulk export operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
-      setIsBulkExportDialogOpen(false);
     }
   };
 
   const handleBulkRename = async (renamePattern: string, renameType: string) => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
+
+    // Close dialog first so user can see progress
+    setIsBulkRenameDialogOpen(false);
 
     // Filter items that can be renamed based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
@@ -1114,7 +1127,6 @@ export function DriveManager() {
 
     if (itemsWithPermissions.length === 0) {
       toast.warning('No items can be renamed. All selected items don\'t have permission to be renamed.');
-      setIsBulkRenameDialogOpen(false);
       return;
     }
 
@@ -1247,13 +1259,15 @@ export function DriveManager() {
       toast.error('An error occurred during bulk rename operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
-      setIsBulkRenameDialogOpen(false);
     }
   };
 
   const handleBulkRestore = async () => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
+
+    // Close dialog first so user can see progress
+    setIsBulkRestoreDialogOpen(false);
 
     // Filter items that can be restored based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
@@ -1270,7 +1284,6 @@ export function DriveManager() {
 
     if (itemsWithPermissions.length === 0) {
       toast.warning('No items can be restored. All selected items are either not in trash or don\'t have permission to be restored.');
-      setIsBulkRestoreDialogOpen(false);
       return;
     }
 
@@ -1364,13 +1377,15 @@ export function DriveManager() {
       toast.error('An error occurred during bulk restore operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
-      setIsBulkRestoreDialogOpen(false);
     }
   };
 
   const handleBulkPermanentDelete = async () => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
+
+    // Close dialog first so user can see progress
+    setIsBulkPermanentDeleteDialogOpen(false);
 
     // Filter items that can be permanently deleted based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
@@ -1387,7 +1402,6 @@ export function DriveManager() {
 
     if (itemsWithPermissions.length === 0) {
       toast.warning('No items can be permanently deleted. All selected items either don\'t have permission or are not in trash.');
-      setIsBulkPermanentDeleteDialogOpen(false);
       return;
     }
 
@@ -1479,7 +1493,6 @@ export function DriveManager() {
       toast.error('An error occurred during bulk permanent delete operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
-      setIsBulkPermanentDeleteDialogOpen(false);
     }
   };
 
@@ -1750,19 +1763,32 @@ export function DriveManager() {
             return;
           }
 
-          // Direct download for all files (no hybrid strategy)
-          console.log(`Downloading file: ${fileName}`);
+          // Start progress tracking
+          setSingleOperationProgress({
+            isRunning: true,
+            operation: `Downloading: ${fileName}`
+          });
 
-          // Create download link directly to API endpoint
-          const link = document.createElement('a');
-          link.href = `/api/drive/download/${fileId}`;
-          link.download = fileName;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
+          try {
+            // Direct download for all files (no hybrid strategy)
+            console.log(`Downloading file: ${fileName}`);
 
-          toast.success(`Download initiated: "${fileName}"`);
+            // Create download link directly to API endpoint
+            const link = document.createElement('a');
+            link.href = `/api/drive/download/${fileId}`;
+            link.download = fileName;
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            toast.success(`Download initiated: "${fileName}"`);
+          } finally {
+            // Hide progress after 2 seconds
+            setTimeout(() => {
+              setSingleOperationProgress({ isRunning: false, operation: '' });
+            }, 2000);
+          }
           break;
 
         case 'rename':
@@ -1858,75 +1884,95 @@ export function DriveManager() {
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
 
-          const trashResponse = await fetch(`/api/drive/files/${fileId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'trash' })
+          // Start progress tracking
+          setSingleOperationProgress({
+            isRunning: true,
+            operation: `Moving to trash: ${fileName}`
           });
 
-          console.log('Trash response status:', trashResponse.status);
+          try {
+            const trashResponse = await fetch(`/api/drive/files/${fileId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'trash' })
+            });
 
-          if (!trashResponse.ok) {
-            const errorData = await trashResponse.json();
-            console.error('Trash failed:', errorData);
+            console.log('Trash response status:', trashResponse.status);
 
-            if (errorData.needsReauth) {
-              toast.error('Google Drive access expired. Please reconnect your account.');
-              window.location.reload();
-              return;
+            if (!trashResponse.ok) {
+              const errorData = await trashResponse.json();
+              console.error('Trash failed:', errorData);
+
+              if (errorData.needsReauth) {
+                toast.error('Google Drive access expired. Please reconnect your account.');
+                window.location.reload();
+                return;
+              }
+
+              // Handle permission errors gracefully
+              if (trashResponse.status === 403) {
+                toast.error(`You don't have permission to move "${fileName}" to trash. This may be a shared file or folder with restricted access.`);
+                return;
+              }
+
+              if (trashResponse.status === 404) {
+                toast.error(`"${fileName}" was not found. It may have already been moved or deleted.`);
+                await handleRefresh();
+                return;
+              }
+
+              throw new Error(errorData.error || 'Failed to move to trash');
             }
 
-            // Handle permission errors gracefully
-            if (trashResponse.status === 403) {
-              toast.error(`You don't have permission to move "${fileName}" to trash. This may be a shared file or folder with restricted access.`);
-              return;
-            }
-
-            if (trashResponse.status === 404) {
-              toast.error(`"${fileName}" was not found. It may have already been moved or deleted.`);
-              await handleRefresh();
-              return;
-            }
-
-            throw new Error(errorData.error || 'Failed to move to trash');
+            console.log('Trash successful');
+            toast.success(`${fileName} moved to trash`);
+            await handleRefresh();
+          } finally {
+            setSingleOperationProgress({ isRunning: false, operation: '' });
           }
-
-          console.log('Trash successful');
-          toast.success(`${fileName} moved to trash`);
-          await handleRefresh();
           break;
 
         case 'restore':
-          const restoreResponse = await fetch(`/api/drive/files/${fileId}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'restore' })
+          // Start progress tracking
+          setSingleOperationProgress({
+            isRunning: true,
+            operation: `Restoring: ${fileName}`
           });
 
-          if (!restoreResponse.ok) {
-            const errorData = await restoreResponse.json();
-            if (errorData.needsReauth) {
-              toast.error('Google Drive access expired. Please reconnect your account.');
-              window.location.reload();
-              return;
+          try {
+            const restoreResponse = await fetch(`/api/drive/files/${fileId}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'restore' })
+            });
+
+            if (!restoreResponse.ok) {
+              const errorData = await restoreResponse.json();
+              if (errorData.needsReauth) {
+                toast.error('Google Drive access expired. Please reconnect your account.');
+                window.location.reload();
+                return;
+              }
+
+              if (restoreResponse.status === 403) {
+                toast.error(`You don't have permission to restore "${fileName}". This may be a shared file or folder with restricted access.`);
+                return;
+              }
+
+              if (restoreResponse.status === 404) {
+                toast.error(`"${fileName}" was not found in trash. It may have already been restored or permanently deleted.`);
+                await handleRefresh();
+                return;
+              }
+
+              throw new Error(errorData.error || 'Failed to restore file');
             }
 
-            if (restoreResponse.status === 403) {
-              toast.error(`You don't have permission to restore "${fileName}". This may be a shared file or folder with restricted access.`);
-              return;
-            }
-
-            if (restoreResponse.status === 404) {
-              toast.error(`"${fileName}" was not found in trash. It may have already been restored or permanently deleted.`);
-              await handleRefresh();
-              return;
-            }
-
-            throw new Error(errorData.error || 'Failed to restore file');
+            toast.success(`${fileName} restored from trash`);
+            await handleRefresh();
+          } finally {
+            setSingleOperationProgress({ isRunning: false, operation: '' });
           }
-
-          toast.success(`${fileName} restored from trash`);
-          await handleRefresh();
           break;
 
         case 'permanentDelete':
@@ -2453,13 +2499,22 @@ export function DriveManager() {
                           File Operations ({selectedItems.size} selected)
                         </div>
                         
-                        {/* Download Selected - Always available for files */}
-                        {getSelectedItemsData().some(item => item.type === 'file') && (
-                          <DropdownMenuItem onClick={handleBulkDownload}>
-                            <Download className="h-4 w-4 mr-2" />
-                            Download Selected ({getSelectedItemsData().filter(item => item.type === 'file').length} files)
-                          </DropdownMenuItem>
-                        )}
+                        {/* Download Selected - Smart visibility: only show if there are downloadable files */}
+                        {(() => {
+                          const downloadableFiles = getSelectedItemsData().filter(item => {
+                            if (item.type !== 'file') return false;
+                            const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                            const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                            return actions?.canDownload;
+                          });
+                          
+                          return downloadableFiles.length > 0 && (
+                            <DropdownMenuItem onClick={handleBulkDownload}>
+                              <Download className="h-4 w-4 mr-2" />
+                              Download Selected ({downloadableFiles.length} file{downloadableFiles.length > 1 ? 's' : ''})
+                            </DropdownMenuItem>
+                          );
+                        })()}
                         
                         {/* Rename Selected - Available if any item can be renamed */}
                         {getSelectedItemsData().some(item => {
@@ -3914,6 +3969,23 @@ export function DriveManager() {
                   {bulkOperationProgress.total - bulkOperationProgress.current} remaining
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Single Operation Progress Indicator */}
+      {singleOperationProgress.isRunning && !bulkOperationProgress.isRunning && (
+        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg min-w-[280px] max-w-[350px]">
+          <div className="flex items-center gap-3">
+            <RefreshCw className="h-4 w-4 animate-spin text-primary flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium truncate" title={singleOperationProgress.operation}>
+                {singleOperationProgress.operation}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Processing...
+              </div>
             </div>
           </div>
         </div>
