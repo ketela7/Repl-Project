@@ -114,6 +114,8 @@ export function FiltersDialog({
 
   const handleBasicFilter = (viewId: string) => {
     onFilterChange({ activeView: viewId });
+    // Close dialog after selection
+    onOpenChange(false);
   };
 
   const handleFileTypeFilter = (typeId: string) => {

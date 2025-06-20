@@ -4535,7 +4535,7 @@ export function DriveManager() {
         onOpenChange={setIsMobileFiltersOpen}
         onFilterChange={(filters: any) => {
           if (filters.activeView) {
-            setActiveView(filters.activeView);
+            handleViewChange(filters.activeView);
           }
           if (filters.fileTypeFilter) {
             setFileTypeFilter(filters.fileTypeFilter);
