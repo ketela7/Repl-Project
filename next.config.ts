@@ -1,84 +1,42 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  // Performance optimizations
-  poweredByHeader: false,
-  compress: true,
-  swcMinify: true,
-  
-  // Image optimization
+const nextConfig = {
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   images: {
-    formats: ['image/avif', 'image/webp'],
+    formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    domains: ['lh3.googleusercontent.com', 'avatars.githubusercontent.com'],
   },
-  
-  // Experimental features for performance
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    turbo: {
-      rules: {
-        "*.svg": {
-          loaders: ["@svgr/webpack"],
-          as: "*.js",
-        },
-      },
-    },
   },
-  
-  // Webpack optimizations
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
       config.cache = {
         type: 'filesystem',
         compression: 'gzip',
-        buildDependencies: {
-          config: [__filename]
-        }
-      };
-      
-      // Tree shaking optimization
-      config.optimization.usedExports = true;
-      config.optimization.sideEffects = false;
+        buildDependencies: { config: [__filename] }
+      }
+      config.optimization.usedExports = true
+      config.optimization.sideEffects = false
     }
-    return config;
+    return config
   },
-  
-  // Headers for performance and security
   headers: async () => [
     {
       source: '/(.*)',
       headers: [
-        {
-          key: 'X-Content-Type-Options',
-          value: 'nosniff',
-        },
-        {
-          key: 'X-Frame-Options',
-          value: 'DENY',
-        },
-        {
-          key: 'X-XSS-Protection',
-          value: '1; mode=block',
-        },
-      ],
-    },
-    {
-      source: '/api/(.*)',
-      headers: [
-        {
-          key: 'Cache-Control',
-          value: 's-maxage=60, stale-while-revalidate',
-        },
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'X-Frame-Options', value: 'DENY' },
+        { key: 'X-XSS-Protection', value: '1; mode=block' }
       ],
     },
   ],
-  
-  allowedDevOrigins: [
-    "*.replit.dev",
-    "127.0.0.1",
-    "localhost"
-  ],
-};
+  reactStrictMode: true,
+  poweredByHeader: false,
+}
 
-export default nextConfig;
+export default nextConfig

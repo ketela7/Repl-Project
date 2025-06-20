@@ -2,18 +2,26 @@
   "name": "gdrive-pro",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
-    "dev": "NODE_OPTIONS='--no-deprecation' next dev",
+    "dev": "npm run check && next dev",
+    "check": "npm run typecheck && npm run lint && npm run format",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --check .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "format:fix": "prettier --write .",
+    "prepare": "husky install"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": [
-      "eslint --fix"
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
     ]
   },
   "dependencies": {
@@ -97,6 +105,7 @@
     "@typescript-eslint/parser": "^8.26.0",
     "eslint": "^9.29.0",
     "eslint-config-next": "^15.3.4",
+    "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.5.0",
     "eslint-plugin-react": "^7.37.5",
@@ -104,7 +113,7 @@
     "eslint-plugin-sonarjs": "^3.0.3",
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^15.15.0",
-    "husky": "^9.1.7",
+    "husky": "^8.0.3",
     "lint-staged": "^15.5.2",
     "postcss": "^8.5.6",
     "prettier": "^3.5.3",
