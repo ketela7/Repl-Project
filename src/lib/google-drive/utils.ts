@@ -1,5 +1,5 @@
 import { drive_v3 } from 'googleapis';
-import { DriveFile, DriveFolder } from './types';
+import { DriveFile, DriveFolder, DriveFileCapabilities } from './types';
 
 export function formatFileSize(bytes: string | number): string {
   const size = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes;
@@ -600,22 +600,6 @@ export function getPreviewUrl(fileId: string, mimeType: string, webContentLink?:
   return `https://drive.google.com/file/d/${fileId}/preview`;
 }
 
-export interface DriveFileCapabilities {
-  canCopy: boolean;
-  canDelete: boolean;
-  canDownload: boolean;
-  canEdit: boolean;
-  canRename: boolean;
-  canShare: boolean;
-  canTrash: boolean;
-  canUntrash: boolean;
-  canMoveItemWithinDrive: boolean;
-  canMoveItemOutOfDrive: boolean;
-  canAddChildren: boolean;
-  canListChildren: boolean;
-  canRemoveChildren: boolean;
-}
-
 export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
   return {
     id: file.id!,
@@ -784,7 +768,7 @@ export function getFileActions(
   const isSharedView = activeView === 'shared';
   const isTrashed = file.trashed === true;
   const isFolder = file.itemType === 'folder' || file.mimeType === 'application/vnd.google-apps.folder';
-  const capabilities = file.capabilities || {};
+  const capabilities = file.capabilities || {} as DriveFileCapabilities;
 
   // If we don't have capabilities data, provide conservative defaults
   const defaultCapabilities = {
@@ -799,7 +783,7 @@ export function getFileActions(
     canMoveItemWithinDrive: false,
   };
 
-  const finalCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities;
+  const finalCapabilities: DriveFileCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities;
 
   return {
     // Preview available for all files (not folders) - Google Drive can handle all file types
