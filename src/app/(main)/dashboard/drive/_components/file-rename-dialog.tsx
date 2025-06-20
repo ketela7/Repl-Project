@@ -60,7 +60,10 @@ export function FileRenameDialog({
       onFileRenamed(renamedFile);
       handleClose();
     } catch (error) {
-      console.error('Error renaming file:', error);
+      // Log error for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error renaming file:', error);
+      }
     } finally {
       setRenaming(false);
     }

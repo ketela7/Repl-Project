@@ -20,7 +20,6 @@ export default [
   {
     languageOptions: {
       globals: globals.browser,
-      parser: "@typescript-eslint/parser",
       parserOptions: {
         project: "./tsconfig.json",
       },

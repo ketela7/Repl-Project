@@ -99,7 +99,10 @@ export function FileUploadDialog({
       onUploadComplete();
       handleClose();
     } catch (error) {
-      console.error('Upload error:', error);
+      // Log error for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Upload error:', error);
+      }
       toast.error(error instanceof Error ? error.message : 'Upload failed');
       setUploadProgress(0);
     } finally {

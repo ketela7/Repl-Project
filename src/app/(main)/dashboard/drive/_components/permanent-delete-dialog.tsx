@@ -81,7 +81,10 @@ export function PermanentDeleteDialog({
       onSuccess();
       onOpenChange(false);
     } catch (error) {
-      console.error('Permanent delete error:', error);
+      // Log error for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Permanent delete error:', error);
+      }
       toast.error(error instanceof Error ? error.message : 'Failed to permanently delete item');
     } finally {
       setIsDeleting(false);

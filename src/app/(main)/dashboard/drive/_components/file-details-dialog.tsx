@@ -191,7 +191,10 @@ export function FileDetailsDialog({
       const details = await response.json();
       setFileDetails(details);
     } catch (error) {
-      console.error('Error fetching file details:', error);
+      // Log error for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching file details:', error);
+      }
       setError(error instanceof Error ? error.message : 'Failed to fetch file details');
       toast.error('Failed to load file details');
     } finally {

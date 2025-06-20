@@ -71,7 +71,10 @@ export function CreateFolderDialog({
       onFolderCreated();
       handleClose();
     } catch (error) {
-      console.error('Create folder error:', error);
+      // Log error for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Create folder error:', error);
+      }
       toast.error(error instanceof Error ? error.message : 'Failed to create folder');
     } finally {
       setCreating(false);

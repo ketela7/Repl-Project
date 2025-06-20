@@ -77,7 +77,10 @@ export function FileMoveDialog({
       
       setFolders(allFolders);
     } catch (error) {
-      console.error('Error fetching folders:', error);
+      // Log error for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching folders:', error);
+      }
       toast.error('Failed to load folders');
     } finally {
       setLoading(false);
@@ -109,11 +112,17 @@ export function FileMoveDialog({
 
     try {
       setMoving(true);
-      console.log(`Moving to folder ID: ${targetFolderId}`);
+      // Log for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Moving to folder ID: ${targetFolderId}`);
+      }
       await onMove(targetFolderId, currentParentId || undefined);
       handleClose();
     } catch (error) {
-      console.error('Move operation failed:', error);
+      // Log error for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Move operation failed:', error);
+      }
       // Error is handled by parent component
     } finally {
       setMoving(false);

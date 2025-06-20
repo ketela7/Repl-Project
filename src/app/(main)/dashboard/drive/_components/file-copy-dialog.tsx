@@ -78,7 +78,10 @@ export function FileCopyDialog({
       
       setFolders(allFolders);
     } catch (error) {
-      console.error('Error fetching folders:', error);
+      // Log error for debugging in development
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error fetching folders:', error);
+      }
       toast.error('Failed to load folders');
     } finally {
       setLoading(false);
