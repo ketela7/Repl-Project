@@ -572,7 +572,11 @@ export function DriveManager() {
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
         const item = itemsWithPermissions[i];
-        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Moving to trash: ${item.name}`
+        }));
 
         const response = await fetch(`/api/drive/files/${item.id}`, {
           method: 'PUT',
@@ -681,7 +685,11 @@ export function DriveManager() {
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
         const item = itemsWithPermissions[i];
-        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Moving: ${item.name}`
+        }));
 
         const response = await fetch(`/api/drive/files/${item.id}`, {
           method: 'PUT',
@@ -810,7 +818,11 @@ export function DriveManager() {
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
         const item = itemsWithPermissions[i];
-        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Copying: ${item.name}`
+        }));
 
         const response = await fetch(`/api/drive/files/${item.id}/copy`, {
           method: 'POST',
@@ -923,7 +935,11 @@ export function DriveManager() {
     try {
       for (let i = 0; i < selectedItemsData.length; i++) {
         const item = selectedItemsData[i];
-        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Downloading: ${item.name}`
+        }));
 
         try {
           // Double check that it's not a folder before downloading
@@ -1015,7 +1031,7 @@ export function DriveManager() {
       isRunning: true,
       current: 0,
       total: exportableFiles.length,
-      operation: 'Exporting files'
+      operation: `Exporting to ${exportFormat.toUpperCase()}`
     });
 
     let successCount = 0;
@@ -1024,7 +1040,11 @@ export function DriveManager() {
     try {
       for (let i = 0; i < exportableFiles.length; i++) {
         const item = exportableFiles[i];
-        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Exporting: ${item.name} (${exportFormat.toUpperCase()})`
+        }));
 
         try {
           const response = await fetch(`/api/drive/files/${item.id}/export?format=${exportFormat}`);
@@ -1060,9 +1080,9 @@ export function DriveManager() {
       setIsSelectMode(false);
 
       if (successCount === exportableFiles.length) {
-        toast.success(`Successfully exported ${successCount} file${successCount > 1 ? 's' : ''}`);
+        toast.success(`Successfully exported ${successCount} file${successCount > 1 ? 's' : ''} to ${exportFormat.toUpperCase()}`);
       } else if (successCount > 0) {
-        toast.warning(`Exported ${successCount} files. ${failedItems.length} files failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+        toast.warning(`Exported ${successCount} files to ${exportFormat.toUpperCase()}. ${failedItems.length} files failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       } else {
         toast.error(`Failed to export files: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
@@ -1112,7 +1132,11 @@ export function DriveManager() {
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
         const item = itemsWithPermissions[i];
-        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Renaming: ${item.name}`
+        }));
 
         let newName = '';
 
@@ -1264,7 +1288,11 @@ export function DriveManager() {
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
         const item = itemsWithPermissions[i];
-        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Restoring: ${item.name}`
+        }));
 
         try {
           const response = await fetch(`/api/drive/files/${item.id}`, {
@@ -1377,7 +1405,11 @@ export function DriveManager() {
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
         const item = itemsWithPermissions[i];
-        setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Permanently deleting: ${item.name}`
+        }));
 
         try {
           const response = await fetch(`/api/drive/files/${item.id}`, {
@@ -3860,22 +3892,30 @@ export function DriveManager() {
         selectedItems={getSelectedItemsData()}
       />
 
-      {/* Bulk Operations Progress Indicator */}
+      {/* Enhanced Bulk Operations Progress Indicator */}
       {bulkOperationProgress.isRunning && (
-        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg">
-          <div className="flex items-center gap-3">
-            <RefreshCw className="h-4 w-4 animate-spin" />
-            <div className="flex-1">
-              <div className="text-sm font-medium">{bulkOperationProgress.operation}</div>
-              <div className="text-xs text-muted-foreground">
-                {bulkOperationProgress.current} of {bulkOperationProgress.total} items
+        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg min-w-[320px] max-w-[400px]">
+          <div className="flex items-start gap-3">
+            <RefreshCw className="h-5 w-5 animate-spin text-primary mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium mb-1 truncate" title={bulkOperationProgress.operation}>
+                {bulkOperationProgress.operation}
               </div>
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                <span>{bulkOperationProgress.current} of {bulkOperationProgress.total} items</span>
+                <span>{Math.round((bulkOperationProgress.current / bulkOperationProgress.total) * 100)}%</span>
+              </div>
+              <Progress 
+                value={(bulkOperationProgress.current / bulkOperationProgress.total) * 100} 
+                className="h-2"
+              />
+              {bulkOperationProgress.total > 5 && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  {bulkOperationProgress.total - bulkOperationProgress.current} remaining
+                </div>
+              )}
             </div>
           </div>
-          <Progress 
-            value={(bulkOperationProgress.current / bulkOperationProgress.total) * 100} 
-            className="mt-2"
-          />
         </div>
       )}
 
