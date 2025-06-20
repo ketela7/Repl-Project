@@ -316,6 +316,44 @@ const applyClientSideFilters = (
     }
   }
 
+  // Apply view-specific filters based on activeView
+  if (filters.activeView && filters.activeView !== 'all') {
+    switch (filters.activeView) {
+      case 'my-drive':
+        // Show only files/folders in the user's Drive (not shared)
+        filteredFiles = filteredFiles.filter(file => !file.shared);
+        filteredFolders = filteredFolders.filter(folder => !folder.shared);
+        break;
+      case 'shared':
+        // Show only shared files/folders
+        filteredFiles = filteredFiles.filter(file => file.shared);
+        filteredFolders = filteredFolders.filter(folder => folder.shared);
+        break;
+      case 'starred':
+        // Show only starred files/folders (would need starred property)
+        // For now, filter based on capabilities or permissions
+        filteredFiles = filteredFiles.filter(file => file.capabilities?.canShare);
+        filteredFolders = filteredFolders.filter(folder => folder.capabilities?.canShare);
+        break;
+      case 'recent':
+        // Show recently modified files/folders (last 7 days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        filteredFiles = filteredFiles.filter(file => 
+          new Date(file.modifiedTime) > sevenDaysAgo
+        );
+        filteredFolders = filteredFolders.filter(folder => 
+          new Date(folder.modifiedTime) > sevenDaysAgo
+        );
+        break;
+      case 'trash':
+        // Show only trashed files/folders
+        filteredFiles = filteredFiles.filter(file => file.trashed);
+        filteredFolders = filteredFolders.filter(folder => folder.trashed);
+        break;
+    }
+  }
+
   return { filteredFiles, filteredFolders };
 };
 

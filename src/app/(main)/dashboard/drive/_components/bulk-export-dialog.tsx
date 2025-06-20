@@ -151,15 +151,20 @@ export function BulkExportDialog({
       const baseName = filename.replace(/\.[^/.]+$/, ""); // Remove existing extension
       return `${baseName}.${format}`;
     };
-        // Use error recovery for bulk export
-        const exportResult = await errorRecovery.executeBulkWithRecovery(
-          compatibleFiles,
-          async (file) => {
-            const strategies = errorRecovery.createDriveOperationStrategies();
-            const exportStrategy = strategies.fileExport(file.id, format);
-
-            const result = await errorRecovery.executeWithRecovery(
-              async () => {
+        // Process files with simple error handling
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (let i = 0; i < compatibleFiles.length; i++) {
+          const file = compatibleFiles[i];
+          try {
+            setProgress(prev => ({ 
+              ...prev, 
+              current: i + 1,
+              currentFile: file.name
+            }));
+            
+            // Attempt to export the file
                 const response = await fetch(
                   `/api/drive/files/${file.id}/export?format=${format}`,
                   { method: 'GET' }
@@ -171,72 +176,36 @@ export function BulkExportDialog({
                   throw error;
                 }
 
-                return response.blob();
-              },
-              {
-                ...exportStrategy,
-                onRetry: (attempt, error) => {
-                  console.log(`Retrying export for ${file.name}, attempt ${attempt}:`, error.message);
-                  toast.info(`Retrying ${file.name} (attempt ${attempt})`);
-                },
-                onFallback: (error) => {
-                  console.log(`Using fallback export for ${file.name}:`, error.message);
-                  toast.warning(`Exporting ${file.name} as PDF instead`);
-                }
-              }
-            );
-
-            if (result.success && result.data) {
-              // Download the exported file
-              const filename = getExportFilename(file.name, result.usedFallback ? 'pdf' : format);
-              const url = URL.createObjectURL(result.data);
-              const link = document.createElement('a');
-              link.href = url;
-              link.download = filename;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-              URL.revokeObjectURL(url);
-
-              return { fileName: file.name, exported: true, usedFallback: result.usedFallback };
-            } else {
-              throw result.error || new Error('Export failed');
+            if (!response.ok) {
+              throw new Error(`Export failed: ${response.statusText}`);
             }
-          },
-          {
-            operation: 'bulk_export',
-            continueOnError: true,
-            batchSize: 2, // Smaller batch for exports
-            progressCallback: (completed, total) => {
-              setProgress((completed / total) * 100);
-              if (completed < total) {
-                setCurrentFile(compatibleFiles[completed]?.name || '');
-              }
-            }
+
+            const blob = await response.blob();
+            
+            // Download the exported file
+            const filename = getExportFilename(file.name, format);
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            successCount++;
+          } catch (error) {
+            console.error(`Export failed for ${file.name}:`, error);
+            errorCount++;
           }
-        );
+        }
 
-        // Process results
-        exportResult.results.forEach((result, index) => {
-          if (result.success) {
-            successfulExports++;
-            if (result.data?.usedFallback) {
-              toast.warning(`${result.data.fileName} exported using fallback format`);
-            }
-          } else {
-            failedExports.push({
-              fileName: compatibleFiles[index].name,
-              error: result.error?.message || 'Unknown error'
-            });
-          }
-        });
-
-    // Show completion message
-    if (failedExports.length === 0) {
-      toast.success(`Successfully exported ${successfulExports} files.`);
-    } else {
-      toast.warning(`Exported ${successfulExports} files with ${failedExports.length} failures.`);
-    }
+        // Show completion message
+        if (successCount > 0) {
+          toast.success(`Successfully exported ${successCount} file(s)`);
+        }
+        if (errorCount > 0) {
+          toast.error(`Failed to export ${errorCount} file(s)`);
+        }
   };
 
   const renderContent = () => (
