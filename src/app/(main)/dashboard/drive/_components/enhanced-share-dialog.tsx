@@ -51,6 +51,7 @@ interface EnhancedShareDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item: { id: string; name: string; type: 'file' | 'folder' } | null;
+  items?: { id: string; name: string; type: 'file' | 'folder' }[];
   onShare?: (shareData: ShareData) => void;
 }
 
@@ -68,6 +69,7 @@ export function EnhancedShareDialog({
   open, 
   onOpenChange, 
   item, 
+  items,
   onShare 
 }: EnhancedShareDialogProps) {
   const [shareType, setShareType] = useState<'link' | 'email'>('link');
@@ -81,7 +83,7 @@ export function EnhancedShareDialog({
   const isMobile = useIsMobile();
 
   const handleShare = async () => {
-    if (!item) return;
+    if (!item && !items) return;
 
     setIsLoading(true);
     try {
@@ -115,7 +117,43 @@ export function EnhancedShareDialog({
         };
       }
 
-      const response = await fetch(`/api/drive/files/${item.id}/share`, {
+      // Handle bulk operations
+      if (items && items.length > 1) {
+        const results = [];
+        for (const currentItem of items) {
+          try {
+            const response = await fetch(`/api/drive/files/${currentItem.id}/share`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(shareData)
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              results.push({ item: currentItem, success: true, result });
+            } else {
+              results.push({ item: currentItem, success: false, error: await response.text() });
+            }
+          } catch (error) {
+            results.push({ item: currentItem, success: false, error: String(error) });
+          }
+        }
+
+        const successCount = results.filter(r => r.success).length;
+        const failCount = results.filter(r => !r.success).length;
+
+        if (successCount > 0) {
+          toast.success(`Successfully shared ${successCount} item(s)${failCount > 0 ? `, ${failCount} failed` : ''}`);
+        } else {
+          toast.error(`Failed to share all ${failCount} item(s)`);
+        }
+
+        onOpenChange(false);
+        return;
+      }
+
+      // Handle single item
+      const response = await fetch(`/api/drive/files/${item?.id}/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(shareData)
@@ -172,20 +210,29 @@ export function EnhancedShareDialog({
     <>
       <div className="space-y-4 pt-2">
         <div className="text-base">
-          Configure sharing settings and privacy options for this {item.type}.
+          {items && items.length > 1 
+            ? `Configure sharing settings for ${items.length} selected items.`
+            : `Configure sharing settings and privacy options for this ${item.type}.`
+          }
         </div>
 
         <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
           <div className="flex h-8 w-8 items-center justify-center rounded bg-slate-200 dark:bg-slate-700 flex-shrink-0">
-            {item.type === 'folder' ? (
+            {items && items.length > 1 ? (
+              <Users className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+            ) : item.type === 'folder' ? (
               <Users className="h-4 w-4 text-slate-600 dark:text-slate-300" />
             ) : (
               <Share2 className="h-4 w-4 text-slate-600 dark:text-slate-300" />
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-medium text-sm truncate">{item.name}</div>
-            <div className="text-xs text-muted-foreground capitalize">{item.type}</div>
+            <div className="font-medium text-sm truncate">
+              {items && items.length > 1 ? `${items.length} selected items` : item.name}
+            </div>
+            <div className="text-xs text-muted-foreground capitalize">
+              {items && items.length > 1 ? 'bulk operation' : item.type}
+            </div>
           </div>
         </div>
 
@@ -368,7 +415,9 @@ export function EnhancedShareDialog({
                 <Share2 className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <div className="text-lg font-semibold">Share {item.type}</div>
+                <div className="text-lg font-semibold">
+                  {items && items.length > 1 ? `Share ${items.length} Items` : `Share ${item.type}`}
+                </div>
                 <div className="text-sm font-normal text-muted-foreground">
                   Configure sharing settings
                 </div>

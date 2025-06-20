@@ -117,7 +117,21 @@ export function FiltersDialog({
   };
 
   const handleFileTypeFilter = (typeId: string) => {
-    onFilterChange({ fileTypeFilter: typeId });
+    // Check if this filter is already active
+    const currentFilter = currentFilters?.fileTypeFilter;
+    const isArray = Array.isArray(currentFilter);
+    
+    if (isArray) {
+      // Handle array-based filter (toggle behavior)
+      const newFilter = currentFilter.includes(typeId)
+        ? currentFilter.filter((type: string) => type !== typeId)
+        : [...currentFilter, typeId];
+      onFilterChange({ fileTypeFilter: newFilter });
+    } else {
+      // Handle single value filter (replacement behavior)
+      const newFilter = currentFilter === typeId ? '' : typeId;
+      onFilterChange({ fileTypeFilter: newFilter });
+    }
   };
 
   const handleAdvancedFiltersChange = (newFilters: AdvancedFilters) => {
@@ -194,7 +208,11 @@ export function FiltersDialog({
             <div className="grid grid-cols-2 gap-2 pt-2">
               {fileTypeFilters.map((filter) => {
                 const Icon = filter.icon;
-                const isActive = currentFilters?.fileTypeFilter === filter.id;
+                const currentFilter = currentFilters?.fileTypeFilter;
+                const isArray = Array.isArray(currentFilter);
+                const isActive = isArray 
+                  ? currentFilter.includes(filter.id)
+                  : currentFilter === filter.id;
                 
                 return (
                   <Button

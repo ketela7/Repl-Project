@@ -4379,6 +4379,8 @@ export function DriveManager() {
         open={isShareDialogOpen}
         onOpenChange={setIsShareDialogOpen}
         item={selectedItemForShare}
+        items={selectedItemForShare?.id === 'bulk' ? getSelectedItemsData() : undefined}
+        onShare={handleShare}
       />
 
       {/* Bulk Share Dialog */}
@@ -4402,7 +4404,24 @@ export function DriveManager() {
         onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
         onBulkRename={() => setIsBulkRenameDialogOpen(true)}
         onBulkExport={() => setIsBulkExportDialogOpen(true)}
-        onBulkShare={() => setIsBulkShareDialogOpen(true)}
+        onBulkShare={() => {
+          // Always use enhanced share dialog for better UI
+          const selectedItemsData = getSelectedItemsData();
+          if (selectedItemsData.length === 1) {
+            setSelectedItemForShare({
+              id: selectedItemsData[0].id,
+              name: selectedItemsData[0].name,
+              type: selectedItemsData[0].type
+            });
+          } else {
+            setSelectedItemForShare({
+              id: 'bulk',
+              name: `${selectedItemsData.length} items`,
+              type: 'file'
+            });
+          }
+          setIsShareDialogOpen(true);
+        }}
         onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
         onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         onDeselectAll={deselectAll}
