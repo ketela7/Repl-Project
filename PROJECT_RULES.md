@@ -2,7 +2,7 @@
 
 ## Professional Google Drive Management Application
 
-**Last Updated**: June 17, 2025  
+**Last Updated**: June 20, 2025  
 **Project Type**: Professional Next.js + Google Drive API Integration  
 **Architecture**: Full-stack web application with Supabase authentication
 
@@ -141,6 +141,9 @@ TURNSTILE_SECRET_KEY
 - **Size Filtering**: Client-side implementation since Google Drive API lacks server-side size filtering support
 - **Bulk Operations**: Sequential processing with comprehensive error handling and progress tracking
 - **Folder Size**: Folders treated as 0 bytes in size range filtering
+- **Smart Menu Logic**: Download operations only available for files, not folders
+- **Permission-Based Actions**: Trash/Delete operations based on ownership and sharing status
+- **Cross-Platform Toolbar**: Responsive design with mobile-first approach and consistent icon sizing
 
 ---
 

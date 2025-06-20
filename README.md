@@ -366,6 +366,16 @@ This project is built for educational and professional demonstration purposes. P
 ---
 
 **Status**: Production Ready ✅  
-**Last Updated**: December 2024  
+**Last Updated**: June 2025  
 **Platform**: Replit Optimized  
-**Version**: 1.0.0
+**Version**: 1.1.0
+
+## 🔄 Recent Updates (v1.1.0)
+
+### Enhanced Toolbar & UX Improvements
+- **Smart Menu Logic**: Download operations intelligently hide for folder-only selections
+- **Permission-Based Actions**: Trash/Delete menus respect ownership and sharing status
+- **Cross-Platform Toolbar**: Mobile-optimized with responsive icon sizing (16px standard)
+- **Enhanced Filter UI**: Icon-only file type filters for cleaner, space-efficient design
+- **Progress Consistency**: Unified progress indicators with blur overlay and better mobile responsiveness
+- **View Toggle Prominence**: Grid/Table view switcher moved to main toolbar for better accessibility

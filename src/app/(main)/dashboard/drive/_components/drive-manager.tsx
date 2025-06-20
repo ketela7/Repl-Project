@@ -2525,13 +2525,13 @@ export function DriveManager() {
                           File Operations ({selectedItems.size} selected)
                         </div>
                         
-                        {/* Download Selected - Smart visibility: only show if there are downloadable files */}
+                        {/* Download Selected - Smart visibility: only show if there are actual downloadable files (not folders) */}
                         {(() => {
-                          const downloadableFiles = getSelectedItemsData().filter(item => {
-                            if (item.type !== 'file') return false;
-                            const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
-                            const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
-                            return actions?.canDownload;
+                          const selectedItems = getSelectedItemsData();
+                          const downloadableFiles = selectedItems.filter(item => {
+                            // Only files can be downloaded, not folders
+                            return item.type === 'file' && 
+                                   item.mimeType !== 'application/vnd.google-apps.folder';
                           });
                           
                           return downloadableFiles.length > 0 && (
@@ -2613,11 +2613,15 @@ export function DriveManager() {
                           </DropdownMenuItem>
                         )}
                         
-                        {/* Check if any selected item can be moved to trash */}
+                        {/* Check if any selected item can be moved to trash - owner is me, not shared */}
                         {getSelectedItemsData().some(item => {
                           const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
-                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
-                          return actions?.canTrash;
+                          if (!fileOrFolder) return false;
+                          // Can trash if: owner is me, not shared, not already in trash
+                          const isOwner = fileOrFolder.owners && fileOrFolder.owners.some(owner => owner.me === true);
+                          const isShared = fileOrFolder.shared;
+                          const isTrashed = fileOrFolder.trashed;
+                          return isOwner && !isShared && !isTrashed;
                         }) && (
                           <DropdownMenuItem 
                             onClick={() => setIsBulkDeleteDialogOpen(true)}
@@ -2628,11 +2632,15 @@ export function DriveManager() {
                           </DropdownMenuItem>
                         )}
                         
-                        {/* Check if any selected item can be permanently deleted */}
+                        {/* Check if any selected item can be permanently deleted - in trash, owner is me, not shared */}
                         {getSelectedItemsData().some(item => {
                           const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
-                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
-                          return actions?.canPermanentDelete;
+                          if (!fileOrFolder) return false;
+                          // Can permanently delete if: in trash, owner is me, not shared
+                          const isOwner = fileOrFolder.owners && fileOrFolder.owners.some(owner => owner.me === true);
+                          const isShared = fileOrFolder.shared;
+                          const isTrashed = fileOrFolder.trashed;
+                          return isTrashed && isOwner && !isShared;
                         }) && (
                           <DropdownMenuItem 
                             onClick={() => setIsBulkPermanentDeleteDialogOpen(true)}
@@ -2762,22 +2770,35 @@ export function DriveManager() {
                           variant={fileTypeFilter.includes('folder') ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => handleFileTypeToggle('folder')}
-                          className="justify-start text-xs"
+                          className="justify-center text-xs p-2"
+                          title="Folders"
                         >
-                          <Folder className="h-3 w-3 mr-1" />
-                          Folder
+                          <Folder className="h-4 w-4" />
                         </Button>
-                        {['document', 'spreadsheet', 'presentation', 'image', 'video', 'audio', 'archive', 'code'].map((type) => (
-                          <Button
-                            key={type}
-                            variant={fileTypeFilter.includes(type) ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => handleFileTypeToggle(type)}
-                            className="justify-start text-xs capitalize"
-                          >
-                            {type}
-                          </Button>
-                        ))}
+                        {[
+                          { type: 'document', icon: FileText, title: 'Documents' },
+                          { type: 'spreadsheet', icon: Grid3X3, title: 'Spreadsheets' },
+                          { type: 'presentation', icon: Play, title: 'Presentations' },
+                          { type: 'image', icon: Eye, title: 'Images' },
+                          { type: 'video', icon: Play, title: 'Videos' },
+                          { type: 'audio', icon: Play, title: 'Audio' },
+                          { type: 'archive', icon: Download, title: 'Archives' },
+                          { type: 'code', icon: Settings, title: 'Code Files' }
+                        ].map((filter) => {
+                          const IconComponent = filter.icon;
+                          return (
+                            <Button
+                              key={filter.type}
+                              variant={fileTypeFilter.includes(filter.type) ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => handleFileTypeToggle(filter.type)}
+                              className="justify-center text-xs p-2"
+                              title={filter.title}
+                            >
+                              <IconComponent className="h-4 w-4" />
+                            </Button>
+                          );
+                        })}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -3049,12 +3070,6 @@ export function DriveManager() {
               </DropdownMenuItem>
               
               <DropdownMenuSeparator />
-              
-              {/* View Mode */}
-              <DropdownMenuItem onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}>
-                {viewMode === 'grid' ? <List className="h-4 w-4 mr-2" /> : <Grid3X3 className="h-4 w-4 mr-2" />}
-                {viewMode === 'grid' ? 'Table View' : 'Grid View'}
-              </DropdownMenuItem>
               
               {/* Table Column Settings - Only show in table mode */}
               {viewMode === 'table' && (
