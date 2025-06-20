@@ -31,6 +31,8 @@ import {
   Folder
 } from "lucide-react";
 import { FileIcon } from '@/components/file-icon';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetDescription, BottomSheetFooter } from '@/components/ui/bottom-sheet';
 
 interface BulkShareDialogProps {
   open: boolean;
@@ -71,21 +73,10 @@ export function BulkShareDialog({
 
   const fileCount = selectedItems.filter(item => item.type === 'file').length;
   const folderCount = selectedItems.filter(item => item.type === 'folder').length;
+  const isMobile = useIsMobile();
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Share2 className="h-5 w-5" />
-            Share {selectedItems.length} Items
-          </DialogTitle>
-          <DialogDescription>
-            Generate share links for the selected items with customizable privacy settings.
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="space-y-4">
+  const renderContent = () => (
+    <div className="space-y-4">
           {/* Selected Items Summary */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Selected items</Label>
@@ -210,12 +201,76 @@ export function BulkShareDialog({
             </Select>
           </div>
         </div>
+    </div>
+  );
 
-        <DialogFooter className="flex justify-between">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+  if (isMobile) {
+    return (
+      <BottomSheet open={open} onOpenChange={onOpenChange}>
+        <BottomSheetContent className="max-h-[90vh]">
+          <BottomSheetHeader className="pb-4">
+            <BottomSheetTitle className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
+                <Share2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold">Share {selectedItems.length} Items</div>
+                <div className="text-sm font-normal text-muted-foreground">
+                  Generate share links
+                </div>
+              </div>
+            </BottomSheetTitle>
+          </BottomSheetHeader>
+
+          <div className="px-4 pb-4 overflow-y-auto">
+            {renderContent()}
+          </div>
+
+          <BottomSheetFooter className="flex-row gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="flex-1">
+              Cancel
+            </Button>
+            <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="flex-1">
+              {isLoading ? (
+                <>
+                  <Share2 className="h-4 w-4 mr-2 animate-pulse" />
+                  Sharing...
+                </>
+              ) : (
+                <>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Generate {selectedItems.length} Links
+                </>
+              )}
+            </Button>
+          </BottomSheetFooter>
+        </BottomSheetContent>
+      </BottomSheet>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Share2 className="h-5 w-5" />
+            Share {selectedItems.length} Items
+          </DialogTitle>
+          <DialogDescription>
+            Generate share links for the selected items with customizable privacy settings.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="px-1">
+          {renderContent()}
+        </div>
+
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="w-full sm:w-auto">
             Cancel
           </Button>
-          <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0}>
+          <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="w-full sm:w-auto">
             {isLoading ? 'Sharing...' : `Generate ${selectedItems.length} Share Links`}
           </Button>
         </DialogFooter>
