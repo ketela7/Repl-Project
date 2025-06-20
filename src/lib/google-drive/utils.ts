@@ -56,6 +56,10 @@ export function getFileIconName(mimeType: string): string {
     'audio/wav': 'FileAudio',
     'audio/m4a': 'FileAudio',
     'audio/flac': 'FileAudio',
+    'audio/aac': 'FileAudio',
+    'audio/ogg': 'FileAudio',
+    'audio/wma': 'FileAudio',
+    'audio/opus': 'FileAudio',
 
     // Archives
     'application/zip': 'Archive',
@@ -69,9 +73,19 @@ export function getFileIconName(mimeType: string): string {
     'text/html': 'FileCode',
     'text/css': 'FileCode',
     'text/xml': 'FileCode',
+    'application/javascript': 'FileCode',
+    'text/typescript': 'FileCode',
+    'application/typescript': 'FileCode',
+    'text/x-python': 'FileCode',
+    'application/x-python-code': 'FileCode',
+    'text/x-java-source': 'FileCode',
+    'text/x-c': 'FileCode',
+    'text/x-c++': 'FileCode',
 
     // Database
     'application/x-sqlite3': 'Database',
+    'application/sql': 'Database',
+    'text/x-sql': 'Database',
   };
 
   return iconMap[mimeType] || 'File';
@@ -121,6 +135,10 @@ export function getFileIconColor(mimeType: string): string {
     'audio/wav': 'text-indigo-600 dark:text-indigo-400',
     'audio/m4a': 'text-indigo-600 dark:text-indigo-400',
     'audio/flac': 'text-indigo-600 dark:text-indigo-400',
+    'audio/aac': 'text-indigo-600 dark:text-indigo-400',
+    'audio/ogg': 'text-indigo-600 dark:text-indigo-400',
+    'audio/wma': 'text-indigo-600 dark:text-indigo-400',
+    'audio/opus': 'text-indigo-600 dark:text-indigo-400',
 
     // Archives
     'application/zip': 'text-yellow-600 dark:text-yellow-400',
@@ -134,9 +152,19 @@ export function getFileIconColor(mimeType: string): string {
     'text/html': 'text-orange-500 dark:text-orange-400',
     'text/css': 'text-blue-500 dark:text-blue-400',
     'text/xml': 'text-green-500 dark:text-green-400',
+    'application/javascript': 'text-yellow-500 dark:text-yellow-400',
+    'text/typescript': 'text-blue-500 dark:text-blue-400',
+    'application/typescript': 'text-blue-500 dark:text-blue-400',
+    'text/x-python': 'text-green-500 dark:text-green-400',
+    'application/x-python-code': 'text-green-500 dark:text-green-400',
+    'text/x-java-source': 'text-red-500 dark:text-red-400',
+    'text/x-c': 'text-gray-500 dark:text-gray-400',
+    'text/x-c++': 'text-gray-500 dark:text-gray-400',
 
     // Database
     'application/x-sqlite3': 'text-slate-600 dark:text-slate-400',
+    'application/sql': 'text-slate-600 dark:text-slate-400',
+    'text/x-sql': 'text-slate-600 dark:text-slate-400',
   };
 
   return colorMap[mimeType] || 'text-gray-500 dark:text-gray-400';

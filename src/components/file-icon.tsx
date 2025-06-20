@@ -21,7 +21,10 @@ import {
   FileAudio,
   Code,
   FileCode,
-  Database
+  Database,
+  Music2,
+  Music3,
+  Music4
 } from 'lucide-react';
 import { getFileIconName, getFileIconColor } from '@/lib/google-drive/utils';
 
@@ -54,7 +57,11 @@ export function FileIcon({ mimeType, className = "h-4 w-4", strokeWidth = 2 }: F
     Archive,
     FileCode,
     Database,
-    File
+    File,
+    Music,
+    Music2,
+    Music3,
+    Music4
   };
 
   const IconComponent = iconComponents[iconName] || File;
