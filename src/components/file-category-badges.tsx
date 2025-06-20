@@ -4,18 +4,19 @@ import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
-  Video, 
+  FileVideo, 
   FileText, 
-  Image, 
+  FileImage, 
   Music, 
   Archive, 
-  Code, 
+  FileCode, 
   FileSpreadsheet,
   Presentation,
   File,
   Folder,
-  Camera
+  BookOpen
 } from "lucide-react";
+import { getCategoryIcon, getCategoryColor, getFileCategory } from '@/lib/google-drive/utils';
 
 interface DriveFile {
   id: string;

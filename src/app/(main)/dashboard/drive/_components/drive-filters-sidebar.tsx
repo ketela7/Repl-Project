@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -12,26 +11,30 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SimpleDatePicker } from "@/components/ui/simple-date-picker";
 import { 
-  Home,
-  Share,
-  Star,
-  Clock,
-  Trash2,
   Folder,
   FileText,
-  Image,
-  Video,
+  FileSpreadsheet,
+  Presentation,
+  FileImage,
+  FileVideo,
   Music,
   Archive,
-  File,
-  Users,
+  FileCode,
   Filter,
+  X,
   ChevronDown,
   ChevronUp,
-  X,
+  Calendar,
   HardDrive,
-  Calendar as CalendarIcon,
-  User
+  User,
+  Clock,
+  SlidersHorizontal,
+  Search,
+  Trash2,
+  Share2,
+  Star,
+  Download,
+  Plus
 } from "lucide-react";
 import {
   Popover,
@@ -95,10 +98,10 @@ export function DriveFiltersSidebar({
   onAdvancedFiltersChange,
   isCollapsed = false 
 }: DriveFiltersSidebarProps) {
-  
+
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAdvancedExpanded, setIsAdvancedExpanded] = useState(false);
-  
+
   // Advanced filter states
   const [sizeFilter, setSizeFilter] = useState<{
     min: string;
@@ -109,17 +112,17 @@ export function DriveFiltersSidebar({
     max: '',
     unit: 'MB'
   });
-  
+
   const [createdDateRange, setCreatedDateRange] = useState<{
     from?: Date;
     to?: Date;
   }>({});
-  
+
   const [modifiedDateRange, setModifiedDateRange] = useState<{
     from?: Date;
     to?: Date;
   }>({});
-  
+
   const [ownerFilter, setOwnerFilter] = useState('');
 
   const handleFileTypeToggle = (fileTypeKey: string) => {
@@ -133,7 +136,7 @@ export function DriveFiltersSidebar({
   const updateAdvancedFilters = () => {
     if (onAdvancedFiltersChange) {
       const filters: AdvancedFilters = {};
-      
+
       if (sizeFilter.min || sizeFilter.max) {
         filters.sizeRange = {
           min: sizeFilter.min ? parseFloat(sizeFilter.min) : undefined,
@@ -141,19 +144,19 @@ export function DriveFiltersSidebar({
           unit: sizeFilter.unit
         };
       }
-      
+
       if (createdDateRange.from || createdDateRange.to) {
         filters.createdDateRange = createdDateRange;
       }
-      
+
       if (modifiedDateRange.from || modifiedDateRange.to) {
         filters.modifiedDateRange = modifiedDateRange;
       }
-      
+
       if (ownerFilter.trim()) {
         filters.owner = ownerFilter.trim();
       }
-      
+
       onAdvancedFiltersChange(filters);
     }
   };
@@ -196,7 +199,7 @@ export function DriveFiltersSidebar({
                 <Filter className="h-5 w-5 text-primary" />
                 <h3 className="font-semibold text-lg">Smart Filters</h3>
               </div>
-              
+
               {hasActiveFilters && (
                 <Badge variant="secondary" className="text-xs px-2 py-1">
                   {(activeView !== 'all' ? 1 : 0) + fileTypeFilter.length} active
@@ -304,7 +307,7 @@ export function DriveFiltersSidebar({
                   <File className="h-4 w-4 text-primary" />
                   <span className="font-medium text-sm">File Types</span>
                 </div>
-                
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
                   {fileTypeOptions.map(({ key, label, icon: Icon }) => {
                     const isActive = fileTypeFilter.includes(key);

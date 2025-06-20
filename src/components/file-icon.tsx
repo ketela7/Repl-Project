@@ -4,13 +4,9 @@ import React from 'react';
 import { 
   FileText, 
   Folder, 
-  BarChart3, 
-  TrendingUp, 
   FileCheck, 
   Palette, 
   BookOpen, 
-  Image, 
-  Video, 
   Music, 
   Archive,
   File,
@@ -18,28 +14,42 @@ import {
   Presentation,
   FileImage,
   FileVideo,
-  FileAudio,
-  Code,
   FileCode,
   Database,
-  Music2,
-  Music3,
-  Music4
+  MapPin,
+  Globe
 } from 'lucide-react';
-import { getFileIconName, getFileIconColor } from '@/lib/google-drive/utils';
+import { getFileIconProps } from '@/lib/google-drive/utils';
 
 interface FileIconProps {
   mimeType: string;
+  fileName?: string;
   className?: string;
   strokeWidth?: number;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
 }
 
-export function FileIcon({ mimeType, className = "h-4 w-4", strokeWidth = 2 }: FileIconProps) {
-  const iconName = getFileIconName(mimeType);
-  const colorClass = getFileIconColor(mimeType);
+export function FileIcon({ 
+  mimeType, 
+  fileName,
+  className, 
+  strokeWidth = 2,
+  size = 'md'
+}: FileIconProps) {
+  const { iconName, colorClass } = getFileIconProps(mimeType, fileName);
+  
+  // Size mapping for consistency
+  const sizeMap = {
+    'sm': 'h-3 w-3',
+    'md': 'h-4 w-4', 
+    'lg': 'h-5 w-5',
+    'xl': 'h-6 w-6'
+  };
+  
+  const sizeClass = className || sizeMap[size];
   
   const iconProps = {
-    className: `${className} ${colorClass} drop-shadow-sm`,
+    className: `${sizeClass} ${colorClass} drop-shadow-sm transition-colors duration-200`,
     strokeWidth
   };
 
@@ -53,15 +63,13 @@ export function FileIcon({ mimeType, className = "h-4 w-4", strokeWidth = 2 }: F
     BookOpen,
     FileImage,
     FileVideo,
-    FileAudio,
     Archive,
     FileCode,
     Database,
     File,
     Music,
-    Music2,
-    Music3,
-    Music4
+    MapPin,
+    Globe
   };
 
   const IconComponent = iconComponents[iconName] || File;
@@ -70,6 +78,6 @@ export function FileIcon({ mimeType, className = "h-4 w-4", strokeWidth = 2 }: F
 }
 
 // Helper function that can be used in both client and server components
-export function getFileIcon(mimeType: string, className?: string) {
-  return <FileIcon mimeType={mimeType} className={className} />;
+export function getFileIcon(mimeType: string, fileName?: string, className?: string) {
+  return <FileIcon mimeType={mimeType} fileName={fileName} className={className} />;
 }
