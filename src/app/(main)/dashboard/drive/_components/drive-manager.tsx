@@ -1319,6 +1319,15 @@ export function DriveManager() {
     fetchFiles(currentFolderId || undefined, searchQuery || undefined);
   };
 
+  const handleFileTypeToggle = (type: string) => {
+    setFileTypeFilter(prev => {
+      const newFilter = prev.includes(type) 
+        ? prev.filter(t => t !== type)
+        : [...prev, type];
+      return newFilter;
+    });
+  };
+
   const handleFolderClick = (folderId: string) => {
     setCurrentFolderId(folderId);
     setSearchQuery('');
@@ -1999,8 +2008,8 @@ export function DriveManager() {
 
   return (
     <div className="w-full space-y-3 sm:space-y-4">
-      {/* Simplified Floating Toolbar - Sticky Below Header */}
-      <div className="sticky top-16 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
+      {/* DriveManager Toolbar - Sticky at top */}
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
         <div className="flex items-center justify-between p-4 overflow-x-auto scrollbar-hide scroll-smooth"
              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Main Menu - 5 Items - Horizontal Scrollable */}
@@ -2618,8 +2627,8 @@ export function DriveManager() {
         </div>
       </div>
 
-      {/* Breadcrumb Navigation */}
-      <div className="px-4 py-4 border-b bg-background/95">
+      {/* Breadcrumb Navigation - Between toolbar and data */}
+      <div className="px-4 py-3 bg-background border-b">
         <FileBreadcrumb
           currentFolderId={currentFolderId}
           loading={loading || refreshing}
