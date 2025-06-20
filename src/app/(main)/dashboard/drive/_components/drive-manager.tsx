@@ -539,19 +539,39 @@ export function DriveManager() {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
+    // Filter items that can be trashed based on permissions
+    const itemsWithPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return actions?.canTrash;
+    });
+
+    const itemsWithoutPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return !actions?.canTrash;
+    });
+
+    if (itemsWithPermissions.length === 0) {
+      toast.warning('No items can be moved to trash. All selected items don\'t have permission to be trashed.');
+      setIsBulkDeleteDialogOpen(false);
+      return;
+    }
+
     setBulkOperationProgress({
       isRunning: true,
       current: 0,
-      total: selectedItemsData.length,
+      total: itemsWithPermissions.length,
       operation: 'Moving to trash'
     });
 
     let successCount = 0;
     let failedItems: string[] = [];
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
-      for (let i = 0; i < selectedItemsData.length; i++) {
-        const item = selectedItemsData[i];
+      for (let i = 0; i < itemsWithPermissions.length; i++) {
+        const item = itemsWithPermissions[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
 
         const response = await fetch(`/api/drive/files/${item.id}`, {
@@ -569,7 +589,7 @@ export function DriveManager() {
         }
 
         // Add small delay to prevent rate limiting
-        if (i < selectedItemsData.length - 1) {
+        if (i < itemsWithPermissions.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
@@ -578,11 +598,40 @@ export function DriveManager() {
       deselectAll();
       setIsSelectMode(false);
 
-      // Show result notification
-      if (successCount === selectedItemsData.length) {
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} item${successCount > 1 ? 's' : ''} moved to trash`;
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped (no permission)`;
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} item${failedItems.length > 1 ? 's' : ''} failed`;
+      }
+
+      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
         toast.success(`Successfully moved ${successCount} item${successCount > 1 ? 's' : ''} to trash`);
-      } else if (successCount > 0) {
-        toast.warning(`Moved ${successCount} items to trash. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else if (successCount > 0 || skippedItems.length > 0) {
+        const toastMessage = `Move to trash completed: ${message}`;
+        if (failedItems.length > 0 || skippedItems.length > 0) {
+          toast.warning(toastMessage);
+        } else {
+          toast.success(toastMessage);
+        }
+        
+        // Log details for debugging
+        if (skippedItems.length > 0) {
+          console.log('Skipped items (no permission):', skippedItems);
+        }
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
       } else {
         toast.error(`Failed to move items to trash: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
@@ -599,19 +648,39 @@ export function DriveManager() {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
+    // Filter items that can be moved based on permissions
+    const itemsWithPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return actions?.canMove;
+    });
+
+    const itemsWithoutPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return !actions?.canMove;
+    });
+
+    if (itemsWithPermissions.length === 0) {
+      toast.warning('No items can be moved. All selected items don\'t have permission to be moved.');
+      setIsBulkMoveDialogOpen(false);
+      return;
+    }
+
     setBulkOperationProgress({
       isRunning: true,
       current: 0,
-      total: selectedItemsData.length,
+      total: itemsWithPermissions.length,
       operation: 'Moving items'
     });
 
     let successCount = 0;
     let failedItems: string[] = [];
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
-      for (let i = 0; i < selectedItemsData.length; i++) {
-        const item = selectedItemsData[i];
+      for (let i = 0; i < itemsWithPermissions.length; i++) {
+        const item = itemsWithPermissions[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
 
         const response = await fetch(`/api/drive/files/${item.id}`, {
@@ -633,7 +702,7 @@ export function DriveManager() {
         }
 
         // Add small delay to prevent rate limiting
-        if (i < selectedItemsData.length - 1) {
+        if (i < itemsWithPermissions.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
@@ -642,11 +711,40 @@ export function DriveManager() {
       deselectAll();
       setIsSelectMode(false);
 
-      // Show result notification
-      if (successCount === selectedItemsData.length) {
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} item${successCount > 1 ? 's' : ''} moved`;
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped (no permission)`;
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} item${failedItems.length > 1 ? 's' : ''} failed`;
+      }
+
+      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
         toast.success(`Successfully moved ${successCount} item${successCount > 1 ? 's' : ''}`);
-      } else if (successCount > 0) {
-        toast.warning(`Moved ${successCount} items. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else if (successCount > 0 || skippedItems.length > 0) {
+        const toastMessage = `Move completed: ${message}`;
+        if (failedItems.length > 0 || skippedItems.length > 0) {
+          toast.warning(toastMessage);
+        } else {
+          toast.success(toastMessage);
+        }
+        
+        // Log details for debugging
+        if (skippedItems.length > 0) {
+          console.log('Skipped items (no permission):', skippedItems);
+        }
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
       } else {
         toast.error(`Failed to move items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
@@ -660,9 +758,31 @@ export function DriveManager() {
   };
 
   const handleBulkCopy = async (targetFolderId: string) => {
-    const selectedItemsData = getSelectedItemsData().filter(item => item.type === 'file');
-    if (selectedItemsData.length === 0) {
-      toast.warning('No files selected for copying. Only files can be copied.');
+    const allSelectedItems = getSelectedItemsData();
+    
+    // Filter for files that can be copied based on permissions
+    const itemsWithPermissions = allSelectedItems.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return item.type === 'file' && actions?.canCopy;
+    });
+
+    const foldersSelected = allSelectedItems.filter(item => item.type === 'folder').length;
+    const filesWithoutPermissions = allSelectedItems.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return item.type === 'file' && !actions?.canCopy;
+    });
+
+    if (itemsWithPermissions.length === 0) {
+      let message = 'No files can be copied.';
+      if (foldersSelected > 0) {
+        message += ` Folders cannot be copied (${foldersSelected} selected).`;
+      }
+      if (filesWithoutPermissions.length > 0) {
+        message += ` ${filesWithoutPermissions.length} file${filesWithoutPermissions.length > 1 ? 's' : ''} don't have copy permission.`;
+      }
+      toast.warning(message);
       setIsBulkCopyDialogOpen(false);
       return;
     }
@@ -670,16 +790,26 @@ export function DriveManager() {
     setBulkOperationProgress({
       isRunning: true,
       current: 0,
-      total: selectedItemsData.length,
+      total: itemsWithPermissions.length,
       operation: 'Copying files'
     });
 
     let successCount = 0;
     let failedItems: string[] = [];
+    let skippedItems: string[] = [];
+
+    // Add folders and files without permissions to skipped items
+    if (foldersSelected > 0) {
+      const folderNames = allSelectedItems.filter(item => item.type === 'folder').map(item => item.name);
+      skippedItems.push(...folderNames);
+    }
+    if (filesWithoutPermissions.length > 0) {
+      skippedItems.push(...filesWithoutPermissions.map(item => item.name));
+    }
 
     try {
-      for (let i = 0; i < selectedItemsData.length; i++) {
-        const item = selectedItemsData[i];
+      for (let i = 0; i < itemsWithPermissions.length; i++) {
+        const item = itemsWithPermissions[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
 
         const response = await fetch(`/api/drive/files/${item.id}/copy`, {
@@ -700,7 +830,7 @@ export function DriveManager() {
         }
 
         // Add small delay to prevent rate limiting
-        if (i < selectedItemsData.length - 1) {
+        if (i < itemsWithPermissions.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
@@ -709,11 +839,45 @@ export function DriveManager() {
       deselectAll();
       setIsSelectMode(false);
 
-      // Show result notification
-      if (successCount === selectedItemsData.length) {
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} file${successCount > 1 ? 's' : ''} copied`;
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped`;
+        if (foldersSelected > 0) {
+          message += ` (${foldersSelected} folder${foldersSelected > 1 ? 's' : ''}, ${filesWithoutPermissions.length} no permission)`;
+        } else {
+          message += ` (no permission)`;
+        }
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} file${failedItems.length > 1 ? 's' : ''} failed`;
+      }
+
+      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
         toast.success(`Successfully copied ${successCount} file${successCount > 1 ? 's' : ''}`);
-      } else if (successCount > 0) {
-        toast.warning(`Copied ${successCount} files. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else if (successCount > 0 || skippedItems.length > 0) {
+        const toastMessage = `Copy completed: ${message}`;
+        if (failedItems.length > 0 || skippedItems.length > 0) {
+          toast.warning(toastMessage);
+        } else {
+          toast.success(toastMessage);
+        }
+        
+        // Log details for debugging
+        if (skippedItems.length > 0) {
+          console.log('Skipped items:', { folders: foldersSelected, noPermission: filesWithoutPermissions.length });
+        }
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
       } else {
         toast.error(`Failed to copy files: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
@@ -915,19 +1079,39 @@ export function DriveManager() {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
+    // Filter items that can be renamed based on permissions
+    const itemsWithPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return actions?.canRename;
+    });
+
+    const itemsWithoutPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return !actions?.canRename;
+    });
+
+    if (itemsWithPermissions.length === 0) {
+      toast.warning('No items can be renamed. All selected items don\'t have permission to be renamed.');
+      setIsBulkRenameDialogOpen(false);
+      return;
+    }
+
     setBulkOperationProgress({
       isRunning: true,
       current: 0,
-      total: selectedItemsData.length,
+      total: itemsWithPermissions.length,
       operation: 'Renaming items'
     });
 
     let successCount = 0;
     let failedItems: string[] = [];
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
-      for (let i = 0; i < selectedItemsData.length; i++) {
-        const item = selectedItemsData[i];
+      for (let i = 0; i < itemsWithPermissions.length; i++) {
+        const item = itemsWithPermissions[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
 
         let newName = '';
@@ -997,10 +1181,40 @@ export function DriveManager() {
       deselectAll();
       setIsSelectMode(false);
 
-      if (successCount === selectedItemsData.length) {
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} item${successCount > 1 ? 's' : ''} renamed`;
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped (no permission)`;
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} item${failedItems.length > 1 ? 's' : ''} failed`;
+      }
+
+      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
         toast.success(`Successfully renamed ${successCount} item${successCount > 1 ? 's' : ''}`);
-      } else if (successCount > 0) {
-        toast.warning(`Renamed ${successCount} items. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else if (successCount > 0 || skippedItems.length > 0) {
+        const toastMessage = `Rename completed: ${message}`;
+        if (failedItems.length > 0 || skippedItems.length > 0) {
+          toast.warning(toastMessage);
+        } else {
+          toast.success(toastMessage);
+        }
+        
+        // Log details for debugging
+        if (skippedItems.length > 0) {
+          console.log('Skipped items (no permission):', skippedItems);
+        }
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
       } else {
         toast.error(`Failed to rename items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
@@ -2206,26 +2420,65 @@ export function DriveManager() {
                         <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                           File Operations ({selectedItems.size} selected)
                         </div>
-                        <DropdownMenuItem onClick={handleBulkDownload}>
-                          <Download className="h-4 w-4 mr-2" />
-                          Download Selected
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsBulkRenameDialogOpen(true)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Rename Selected
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsBulkExportDialogOpen(true)}>
-                          <FileText className="h-4 w-4 mr-2" />
-                          Export Selected
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsBulkMoveDialogOpen(true)}>
-                          <Move className="h-4 w-4 mr-2" />
-                          Move Selected
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setIsBulkCopyDialogOpen(true)}>
-                          <Copy className="h-4 w-4 mr-2" />
-                          Copy Selected
-                        </DropdownMenuItem>
+                        
+                        {/* Download Selected - Always available for files */}
+                        {getSelectedItemsData().some(item => item.type === 'file') && (
+                          <DropdownMenuItem onClick={handleBulkDownload}>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download Selected ({getSelectedItemsData().filter(item => item.type === 'file').length} files)
+                          </DropdownMenuItem>
+                        )}
+                        
+                        {/* Rename Selected - Available if any item can be renamed */}
+                        {getSelectedItemsData().some(item => {
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                          return actions?.canRename;
+                        }) && (
+                          <DropdownMenuItem onClick={() => setIsBulkRenameDialogOpen(true)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Rename Selected
+                          </DropdownMenuItem>
+                        )}
+                        
+                        {/* Export Selected - Available if any Google Workspace file can be exported */}
+                        {getSelectedItemsData().some(item => {
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          return item.type === 'file' && 
+                                 item.mimeType && 
+                                 item.mimeType.startsWith('application/vnd.google-apps.') &&
+                                 !item.mimeType.includes('folder') &&
+                                 !item.mimeType.includes('shortcut');
+                        }) && (
+                          <DropdownMenuItem onClick={() => setIsBulkExportDialogOpen(true)}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            Export Selected
+                          </DropdownMenuItem>
+                        )}
+                        
+                        {/* Move Selected - Available if any item can be moved */}
+                        {getSelectedItemsData().some(item => {
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                          return actions?.canMove;
+                        }) && (
+                          <DropdownMenuItem onClick={() => setIsBulkMoveDialogOpen(true)}>
+                            <Move className="h-4 w-4 mr-2" />
+                            Move Selected
+                          </DropdownMenuItem>
+                        )}
+                        
+                        {/* Copy Selected - Available if any item can be copied */}
+                        {getSelectedItemsData().some(item => {
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                          return actions?.canCopy;
+                        }) && (
+                          <DropdownMenuItem onClick={() => setIsBulkCopyDialogOpen(true)}>
+                            <Copy className="h-4 w-4 mr-2" />
+                            Copy Selected
+                          </DropdownMenuItem>
+                        )}
                         
                         <DropdownMenuSeparator />
                         <div className="px-2 py-1.5 text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider">
