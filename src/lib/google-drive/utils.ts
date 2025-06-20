@@ -773,7 +773,7 @@ export function getFileActions(
   // If we don't have capabilities data, provide conservative defaults
   const defaultCapabilities = {
     canDownload: true,
-    canCopy: true,
+    canCopy: false,
     canDelete: false,
     canEdit: false,
     canRename: false,
@@ -786,39 +786,39 @@ export function getFileActions(
   const finalCapabilities: DriveFileCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities;
 
   return {
-    // Preview available for all files (not folders) - Google Drive can handle all file types
+    // Preview available for all files not folders - Google Drive can handle all file types
     canPreview: !isFolder,
 
     // Download - Google Drive API: semua file bisa di-download kecuali restricted files
     // Default true karena hampir semua file support download
-    canDownload: finalCapabilities.canDownload ?? true,
+    canDownload: finalCapabilities.canDownload,
 
     // Rename - hanya untuk file yang user miliki atau punya edit permission, tidak untuk shared read-only
-    canRename: !isTrashed && (finalCapabilities.canRename ?? false),
+    canRename: finalCapabilities.canRename,
 
     // Move - folders dan files bisa di-move berdasarkan capabilities
     // Google Drive API mendukung move untuk semua item types
-    canMove: !isTrashed && (finalCapabilities.canMoveItemWithinDrive ?? false),
+    canMove: finalCapabilities.canMoveItemWithinDrive,
 
     // Copy - Google Drive API mendukung copy untuk files, tapi tidak untuk folders
     // Dalam aplikasi Google Drive asli, folder bisa di-duplicate secara manual tapi API tidak support direct copy
-    canCopy: true,
+    canCopy: finalCapabilities.canShare.canCopy,
 
     // Share - hanya untuk file yang user punya sharing permission
-    canShare: !isTrashed && (finalCapabilities.canShare ?? false),
+    canShare: finalCapabilities.canShare,
 
     // Details selalu tersedia untuk semua file
     canDetails: true,
 
     // Trash - folders dan files bisa di-trash berdasarkan capabilities
     // Google Drive API mendukung trash untuk semua item types
-    canTrash: !isTrashed && (finalCapabilities.canTrash ?? false),
+    canTrash: finalCapabilities.canTrash,
 
     // Restore - hanya di trash view untuk trashed items dengan untrash permission
-    canRestore: isTrashed && isTrashView && (finalCapabilities.canUntrash ?? false),
+    canRestore: finalCapabilities.canUntrash,
 
     // Permanent delete - folders dan files bisa di-delete permanent berdasarkan capabilities
     // Google Drive API mendukung permanent delete untuk semua item types
-    canPermanentDelete: isTrashed || (finalCapabilities.canDelete ?? false),
+    canPermanentDelete: finalCapabilities.canDelete,
   };
 }
