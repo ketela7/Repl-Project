@@ -1564,6 +1564,45 @@ export function DriveManager() {
     }
   };
 
+  const handleShare = async (shareData: { role: string; type: string; emailAddress?: string; message?: string }) => {
+    if (!selectedItemForShare) return;
+
+    try {
+      const response = await fetch(`/api/drive/files/${selectedItemForShare.id}/share`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'get_share_link',
+          role: shareData.role,
+          type: shareData.type,
+          emailAddress: shareData.emailAddress,
+          message: shareData.message,
+          allowFileDiscovery: true
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to share item');
+      }
+
+      toast.success(`${selectedItemForShare.name} shared successfully`);
+      
+      // Refresh the files list to show updated share status
+      fetchFiles();
+      
+      // Close the dialog
+      setIsShareDialogOpen(false);
+      setSelectedItemForShare(null);
+    } catch (error) {
+      console.error('Share error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to share item');
+    }
+  };
+
   const handleBulkPermanentDelete = async () => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
