@@ -108,7 +108,7 @@ import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
 import { EnhancedShareDialog } from './enhanced-share-dialog';
 import { BulkShareDialog } from './bulk-share-dialog';
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
-import { MobileFiltersBottomSheet } from './mobile-filters-bottom-sheet';
+import { FiltersDialog } from './filters-dialog';
 
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { FileCategoryBadges } from '@/components/file-category-badges';
@@ -4396,15 +4396,27 @@ export function DriveManager() {
         onDeselectAll={deselectAll}
       />
 
-      <MobileFiltersBottomSheet
+      <FiltersDialog
         open={isMobileFiltersOpen}
         onOpenChange={setIsMobileFiltersOpen}
-        fileTypeFilter={fileTypeFilter}
-        advancedFilters={advancedFilters}
-        onFileTypeChange={setFileTypeFilter}
-        onAdvancedFiltersChange={setAdvancedFilters}
-        onClearAdvanced={clearAdvancedFilters}
-        onClearAll={clearAllFilters}
+        onFilterChange={(filters: any) => {
+          if (filters.activeView) {
+            setActiveView(filters.activeView);
+          }
+          if (filters.fileTypeFilter) {
+            setFileTypeFilter(filters.fileTypeFilter);
+          }
+          if (filters.advancedFilters) {
+            setAdvancedFilters(filters.advancedFilters);
+          }
+        }}
+        currentFilters={{
+          activeView,
+          fileTypeFilter,
+          advancedFilters
+        }}
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={clearAllFilters}
       />
 
     </div>

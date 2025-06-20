@@ -307,8 +307,8 @@ export function FiltersDialog({
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">From</Label>
                       <SimpleDatePicker
-                        selected={advancedFilters.createdDateRange?.from}
-                        onSelect={(date) => handleAdvancedFiltersChange({
+                        date={advancedFilters.createdDateRange?.from}
+                        onDateChange={(date) => handleAdvancedFiltersChange({
                           ...advancedFilters,
                           createdDateRange: {
                             ...advancedFilters.createdDateRange,
@@ -321,8 +321,8 @@ export function FiltersDialog({
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">To</Label>
                       <SimpleDatePicker
-                        selected={advancedFilters.createdDateRange?.to}
-                        onSelect={(date) => handleAdvancedFiltersChange({
+                        date={advancedFilters.createdDateRange?.to}
+                        onDateChange={(date) => handleAdvancedFiltersChange({
                           ...advancedFilters,
                           createdDateRange: {
                             ...advancedFilters.createdDateRange,
@@ -344,8 +344,8 @@ export function FiltersDialog({
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">From</Label>
                       <SimpleDatePicker
-                        selected={advancedFilters.modifiedDateRange?.from}
-                        onSelect={(date) => handleAdvancedFiltersChange({
+                        date={advancedFilters.modifiedDateRange?.from}
+                        onDateChange={(date) => handleAdvancedFiltersChange({
                           ...advancedFilters,
                           modifiedDateRange: {
                             ...advancedFilters.modifiedDateRange,
@@ -358,8 +358,8 @@ export function FiltersDialog({
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">To</Label>
                       <SimpleDatePicker
-                        selected={advancedFilters.modifiedDateRange?.to}
-                        onSelect={(date) => handleAdvancedFiltersChange({
+                        date={advancedFilters.modifiedDateRange?.to}
+                        onDateChange={(date) => handleAdvancedFiltersChange({
                           ...advancedFilters,
                           modifiedDateRange: {
                             ...advancedFilters.modifiedDateRange,
