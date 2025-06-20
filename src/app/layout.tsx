@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 
 import { Toaster } from "@/components/ui/sonner";
 import { ConfigProvider } from "@/components/providers/config-provider";
+import { TimezoneProvider } from "@/components/timezone-provider";
 import { APP_CONFIG } from "@/config/app-config";
 
 import "./globals.css";
@@ -53,7 +54,7 @@ export const metadata: Metadata = {
     shortcut: "/favicon.png",
     apple: "/favicon.png",
   },
-  
+
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
@@ -73,21 +74,25 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body className={`${inter.className} min-h-screen antialiased overflow-x-hidden`}>
         <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
           <ConfigProvider config={config}>
-            <div className="relative min-h-screen w-full">
-              {children}
-            </div>
+            <TimezoneProvider>
+              <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
+                <div className="relative min-h-screen w-full">
+                  {children}
+                </div>
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    duration: 3000,
+                    style: {
+                      background: 'hsl(var(--background))',
+                      color: 'hsl(var(--foreground))',
+                      border: '1px solid hsl(var(--border))',
+                    },
+                  }}
+                />
+              </ThemeProvider>
+            </TimezoneProvider>
           </ConfigProvider>
-          <Toaster 
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: 'hsl(var(--background))',
-                color: 'hsl(var(--foreground))',
-                border: '1px solid hsl(var(--border))',
-              },
-            }}
-          />
         </ThemeProvider>
       </body>
     </html>

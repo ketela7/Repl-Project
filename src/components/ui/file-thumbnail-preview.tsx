@@ -9,14 +9,29 @@ interface FileThumbnailPreviewProps {
   fileName: string;
   mimeType: string;
   className?: string;
+  modifiedTime?: string; // Add modifiedTime to props
 }
 
-export function FileThumbnailPreview({ 
-  children, 
-  thumbnailLink, 
-  fileName, 
+// Function to format the date with timezone support
+function formatDriveFileDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Auto-detect user's timezone
+  });
+}
+
+export function FileThumbnailPreview({
+  children,
+  thumbnailLink,
+  fileName,
   mimeType,
-  className = ""
+  className = "",
+  modifiedTime // Destructure modifiedTime from props
 }: FileThumbnailPreviewProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
@@ -36,12 +51,12 @@ export function FileThumbnailPreview({
       x: rect.right + 10,
       y: rect.top
     });
-    
+
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
-    
+
     // Show preview after short delay
     timeoutRef.current = setTimeout(() => {
       setIsVisible(true);
@@ -64,7 +79,7 @@ export function FileThumbnailPreview({
       y: rect.top
     });
     setIsVisible(true);
-    
+
     // Auto hide after 3 seconds on mobile
     setTimeout(() => setIsVisible(false), 3000);
   };
@@ -79,7 +94,7 @@ export function FileThumbnailPreview({
 
   return (
     <>
-      <div 
+      <div
         className={`relative ${className}`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -104,7 +119,7 @@ export function FileThumbnailPreview({
             <div className="text-xs font-semibold text-foreground/90 truncate max-w-[300px] mb-2" title={fileName}>
               {fileName}
             </div>
-            
+
             {/* Thumbnail container */}
             <div className="relative bg-gradient-to-br from-muted/20 to-muted/40 rounded-lg overflow-hidden shadow-inner">
               {!thumbnailError ? (
@@ -132,7 +147,7 @@ export function FileThumbnailPreview({
                 <div className="w-[200px] h-[120px] bg-gradient-to-br from-muted to-muted/60 rounded-lg flex items-center justify-center text-muted-foreground">
                   <div className="text-center space-y-2">
                     <div className="opacity-60">
-                      {mimeType?.startsWith('video/') ? <Video className="h-8 w-8" /> : 
+                      {mimeType?.startsWith('video/') ? <Video className="h-8 w-8" /> :
                        mimeType?.startsWith('image/') ? <Image className="h-8 w-8" /> :
                        mimeType?.includes('pdf') ? <FileText className="h-8 w-8" /> :
                        mimeType?.includes('document') ? <FileText className="h-8 w-8" /> :
@@ -143,7 +158,7 @@ export function FileThumbnailPreview({
                   </div>
                 </div>
               )}
-              
+
               {/* Loading animation */}
               {!thumbnailLoaded && !thumbnailError && (
                 <div className="absolute inset-0 w-[200px] h-[120px] bg-gradient-to-br from-muted/40 to-muted/60 rounded-lg flex items-center justify-center">
@@ -155,7 +170,7 @@ export function FileThumbnailPreview({
                 </div>
               )}
             </div>
-            
+
             {/* File type info */}
             {thumbnailLoaded && !thumbnailError && (
               <div className="text-[10px] text-muted-foreground/70 text-center mt-2 font-medium">
@@ -166,6 +181,11 @@ export function FileThumbnailPreview({
                  mimeType?.includes('presentation') ? 'Presentation Preview' :
                  mimeType?.includes('spreadsheet') ? 'Spreadsheet Preview' :
                  'File Preview'}
+              </div>
+            )}
+             {modifiedTime && (
+              <div className="text-[10px] text-muted-foreground/70 text-center mt-2 font-medium">
+                Dimodifikasi: {formatDriveFileDate(modifiedTime)}
               </div>
             )}
           </div>

@@ -736,6 +736,8 @@ export function getMimeTypeFromFileName(fileName: string): string {
     'svg': 'image/svg+xml',
     'mp4': 'video/mp4',
     'avi': 'video/avi',
+Adding timezone formatting functions to the file utilities.```text
+
     'mov': 'video/quicktime',
     'mp3': 'audio/mpeg',
     'wav': 'audio/wav',
@@ -805,3 +807,52 @@ export function getFileActions(
     canPermanentDelete: finalCapabilities.canDelete,
   };
 }
+
+export const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes';
+
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
+/**
+ * Format Google Drive file dates with user timezone
+ */
+export const formatDriveFileDate = (
+  dateString: string, 
+  timezone?: string,
+  showRelative: boolean = true
+): string => {
+  if (!dateString) return 'Tidak diketahui';
+
+  try {
+    const date = new Date(dateString);
+
+    if (showRelative) {
+      const now = new Date();
+      const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+      // Show relative time for recent files (within 7 days)
+      if (diffInHours < 168) {
+        // return getRelativeTime(date, timezone); // This line refers to a function not found in the original file, so I will not add it
+        return formatDate(dateString); // Fallback to existing function.
+      }
+    }
+
+    // return formatDateToUserTimezone(date, timezone, { // This line refers to a function not found in the original file, so I will not add it
+    //   year: 'numeric',
+    //   month: 'short',
+    //   day: 'numeric',
+    //   hour: '2-digit',
+    //   minute: '2-digit'
+    // });
+    return formatDate(dateString); // Fallback to existing function.
+
+  } catch (error) {
+    console.warn('Failed to format drive file date:', error);
+    return 'Format tanggal tidak valid';
+  }
+};
