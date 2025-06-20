@@ -128,8 +128,8 @@ export function MobileFiltersBottomSheet({
 
   return (
     <BottomSheet open={open} onOpenChange={onOpenChange}>
-      <BottomSheetContent className="max-h-[85vh] flex flex-col">
-        <BottomSheetHeader className="pb-2 flex-shrink-0">
+      <BottomSheetContent className="max-h-[90vh] overflow-y-auto">
+        <BottomSheetHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
               <BottomSheetTitle className="flex items-center gap-2">
@@ -154,9 +154,8 @@ export function MobileFiltersBottomSheet({
           </div>
         </BottomSheetHeader>
 
-        <div className="flex-1 overflow-y-auto px-4 pb-4">
-          <div className="space-y-6">
-            {/* Basic Menu */}
+        <div className="px-4 pb-4 space-y-6">
+          {/* Basic Menu */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-medium text-sm">View Status</h3>
@@ -350,7 +349,6 @@ export function MobileFiltersBottomSheet({
                 </div>
               </div>
             )}
-          </div>
           </div>
         </div>
 

@@ -806,31 +806,31 @@ export function getFileActions(
     canPreview: !isFolder,
 
     // Download based on capabilities
-    canDownload: (finalCapabilities as any)?.canDownload ?? true,
+    canDownload: finalCapabilities.canDownload ?? true,
 
     // Rename only if not in trash/shared and has permission
-    canRename: !isTrashView && !isSharedView && !isTrashed && ((finalCapabilities as any)?.canRename ?? false),
+    canRename: !isTrashView && !isSharedView && !isTrashed && (finalCapabilities.canRename ?? false),
 
     // Move only if not in trash/shared and has permission
-    canMove: !isTrashView && !isSharedView && !isTrashed && ((finalCapabilities as any)?.canMoveItemWithinDrive ?? false),
+    canMove: !isTrashView && !isSharedView && !isTrashed && (finalCapabilities.canMoveItemWithinDrive ?? false),
 
     // Copy based on capabilities (can copy even in shared view)
-    canCopy: !isTrashView && !isTrashed && ((finalCapabilities as any)?.canCopy ?? false),
+    canCopy: !isTrashView && !isTrashed && (finalCapabilities.canCopy ?? false),
 
     // Share only if not in trash and has permission
-    canShare: !isTrashView && !isTrashed && ((finalCapabilities as any)?.canShare ?? false),
+    canShare: !isTrashView && !isTrashed && (finalCapabilities.canShare ?? false),
 
     // Details is always available
     canDetails: true,
 
     // Trash only if not already trashed and has permission
-    canTrash: !isTrashView && !isTrashed && ((finalCapabilities as any)?.canTrash ?? false),
+    canTrash: !isTrashView && !isTrashed && (finalCapabilities.canTrash ?? false),
 
     // Restore only if in trash view and has permission
-    canRestore: isTrashView && isTrashed && ((finalCapabilities as any)?.canUntrash ?? false),
+    canRestore: isTrashView && isTrashed && (finalCapabilities.canUntrash ?? false),
 
     // Permanent delete - available in trash view OR for files with delete permission (owner files)
-    canPermanentDelete: (isTrashView && isTrashed && ((finalCapabilities as any)?.canDelete ?? false)) || 
-                       (!isTrashView && !isTrashed && ((finalCapabilities as any)?.canDelete ?? false)),
+    canPermanentDelete: (isTrashView && isTrashed && (finalCapabilities.canDelete ?? false)) || 
+                       (!isTrashView && !isTrashed && (finalCapabilities.canDelete ?? false)),
   };
 }
