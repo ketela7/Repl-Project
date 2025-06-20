@@ -72,6 +72,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { Separator } from "@/components/ui/separator";
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
 import { formatFileSize, formatDate, isPreviewable, getFileActions } from '@/lib/google-drive/utils';
 import { FileIcon } from '@/components/file-icon';
