@@ -141,7 +141,7 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
       'sh': 'FileCode',
       'bat': 'FileCode',
       'ps1': 'FileCode',
-      
+
       // Config files
       'json': 'FileCode',
       'xml': 'FileCode',
@@ -151,12 +151,12 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
       'ini': 'FileCode',
       'conf': 'FileCode',
       'env': 'FileCode',
-      
+
       // Documentation
       'md': 'FileText',
       'readme': 'FileText',
       'txt': 'FileText',
-      
+
       // Design
       'psd': 'Palette',
       'ai': 'Palette',
@@ -294,7 +294,7 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
       'rs': 'text-orange-500 dark:text-orange-400',
       'swift': 'text-orange-500 dark:text-orange-400',
       'kt': 'text-purple-500 dark:text-purple-400',
-      
+
       // Config and markup
       'json': 'text-amber-500 dark:text-amber-400',
       'xml': 'text-emerald-500 dark:text-emerald-400',
@@ -1069,7 +1069,7 @@ export function getFileCategory(mimeType: string): string {
   if (mimeType.includes('javascript') || mimeType.includes('json') || mimeType.includes('html') || mimeType.includes('css')) return 'code';
   if (mimeType.includes('sql') || mimeType.includes('database')) return 'database';
   if (mimeType.includes('photoshop') || mimeType.includes('illustrator')) return 'design';
-  
+
   return 'other';
 }
 
@@ -1184,16 +1184,16 @@ export function renderFileIcon(
   } = {}
 ): { iconName: string; colorClass: string; sizeClass: string } {
   const { iconName, colorClass } = getFileIconProps(mimeType, fileName);
-  
+
   const sizeMap = {
     'sm': 'h-3 w-3',
     'md': 'h-4 w-4', 
     'lg': 'h-5 w-5',
     'xl': 'h-6 w-6'
   };
-  
+
   const sizeClass = options.className || sizeMap[options.size || 'md'];
-  
+
   return {
     iconName,
     colorClass,
