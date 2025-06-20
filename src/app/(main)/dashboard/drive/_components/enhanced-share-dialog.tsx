@@ -13,6 +13,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { 
+  BottomSheet, 
+  BottomSheetContent, 
+  BottomSheetHeader, 
+  BottomSheetTitle, 
+  BottomSheetDescription,
+  BottomSheetFooter 
+} from "@/components/ui/bottom-sheet";
 import {
   Select,
   SelectContent,
@@ -25,6 +33,7 @@ import {
   RadioGroupItem,
 } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { 
   Share2, 
@@ -69,6 +78,7 @@ export function EnhancedShareDialog({
   const [allowDiscovery, setAllowDiscovery] = useState(false);
   const [expirationDays, setExpirationDays] = useState<string>('none');
   const [isLoading, setIsLoading] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleShare = async () => {
     if (!item) return;
@@ -158,18 +168,26 @@ export function EnhancedShareDialog({
 
   if (!item) return null;
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Share2 className="h-5 w-5" />
-            Share "{item.name}"
-          </DialogTitle>
-          <DialogDescription>
-            Configure sharing settings and privacy options for this {item.type}.
-          </DialogDescription>
-        </DialogHeader>
+  const renderContent = () => (
+    <>
+      <div className="space-y-4 pt-2">
+        <div className="text-base">
+          Configure sharing settings and privacy options for this {item.type}.
+        </div>
+
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-900/50">
+          <div className="flex h-8 w-8 items-center justify-center rounded bg-slate-200 dark:bg-slate-700 flex-shrink-0">
+            {item.type === 'folder' ? (
+              <Users className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+            ) : (
+              <Share2 className="h-4 w-4 text-slate-600 dark:text-slate-300" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-medium text-sm truncate">{item.name}</div>
+            <div className="text-xs text-muted-foreground capitalize">{item.type}</div>
+          </div>
+        </div>
 
         <div className="space-y-4">
           {/* Share Type Selection */}
@@ -324,6 +342,86 @@ export function EnhancedShareDialog({
             </>
           )}
         </div>
+
+        <div className="flex items-start gap-2 rounded-lg bg-green-50 dark:bg-green-950/20 p-3 border border-green-200 dark:border-green-800">
+          <div className="h-4 w-4 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <div className="h-1.5 w-1.5 rounded-full bg-white" />
+          </div>
+          <div className="text-sm text-green-800 dark:text-green-200">
+            {shareType === 'link' 
+              ? 'Share link will be generated and copied to clipboard.' 
+              : 'Invitation will be sent to the specified email address.'
+            }
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <BottomSheet open={open} onOpenChange={onOpenChange}>
+        <BottomSheetContent className="max-h-[90vh]">
+          <BottomSheetHeader className="pb-4">
+            <BottomSheetTitle className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+                <Share2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold">Share {item.type}</div>
+                <div className="text-sm font-normal text-muted-foreground">
+                  Configure sharing settings
+                </div>
+              </div>
+            </BottomSheetTitle>
+          </BottomSheetHeader>
+
+          <div className="px-4 pb-4 space-y-4">
+            {renderContent()}
+          </div>
+
+          <BottomSheetFooter className="flex-row gap-2">
+            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="flex-1">
+              Cancel
+            </Button>
+            <Button onClick={handleShare} disabled={isLoading} className="flex-1">
+              {isLoading ? (
+                <>
+                  <Share2 className="h-4 w-4 mr-2 animate-pulse" />
+                  Sharing...
+                </>
+              ) : (
+                <>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  {shareType === 'link' ? 'Copy Link' : 'Send Invitation'}
+                </>
+              )}
+            </Button>
+          </BottomSheetFooter>
+        </BottomSheetContent>
+      </BottomSheet>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+              <Share2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <div className="text-lg font-semibold">Share {item.type}</div>
+              <div className="text-sm font-normal text-muted-foreground">
+                Configure sharing settings
+              </div>
+            </div>
+          </DialogTitle>
+          <DialogDescription className="space-y-4 pt-2">
+            {renderContent()}
+          </DialogDescription>
+        </DialogHeader>
 
         <DialogFooter className="flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
