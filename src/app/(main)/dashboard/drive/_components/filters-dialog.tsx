@@ -84,6 +84,8 @@ export function FiltersDialog({
   onClearFilters
 }: FiltersDialogProps) {
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilters>({});
+  const [showViewStatus, setShowViewStatus] = useState(false);
+  const [showFileTypes, setShowFileTypes] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const isMobile = useIsMobile();
 
@@ -137,62 +139,77 @@ export function FiltersDialog({
   const renderContent = () => (
     <>
       <div className="space-y-6 pt-2">
-        {/* Quick Access Section */}
+        {/* View Status Section */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          <Button
+            variant="ghost"
+            onClick={() => setShowViewStatus(!showViewStatus)}
+            className="w-full justify-between p-0 h-auto"
+          >
             <h3 className="text-sm font-semibold">View Status</h3>
-            <span className="text-xs text-muted-foreground">Quick Access</span>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-2">
-            {basicMenuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = currentFilters?.activeView === item.id;
-              
-              return (
-                <Button
-                  key={item.id}
-                  variant={isActive ? "default" : "outline"}
-                  className={`justify-start h-auto p-3 ${isActive ? 'ring-2 ring-primary/20' : ''}`}
-                  onClick={() => handleBasicFilter(item.id)}
-                >
-                  <div className="flex items-center gap-2 w-full">
-                    <Icon className="h-4 w-4 flex-shrink-0" />
-                    <div className="text-left min-w-0 flex-1">
-                      <div className="text-sm font-medium truncate">{item.label}</div>
-                      <div className="text-xs text-muted-foreground truncate">{item.description}</div>
+            {showViewStatus ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+
+          {showViewStatus && (
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              {basicMenuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentFilters?.activeView === item.id;
+                
+                return (
+                  <Button
+                    key={item.id}
+                    variant={isActive ? "default" : "outline"}
+                    className={`justify-start h-auto p-3 ${isActive ? 'ring-2 ring-primary/20' : ''}`}
+                    onClick={() => handleBasicFilter(item.id)}
+                  >
+                    <div className="flex items-center gap-2 w-full">
+                      <Icon className="h-4 w-4 flex-shrink-0" />
+                      <div className="text-left min-w-0 flex-1">
+                        <div className="text-sm font-medium truncate">{item.label}</div>
+                        <div className="text-xs text-muted-foreground truncate">{item.description}</div>
+                      </div>
                     </div>
-                  </div>
-                </Button>
-              );
-            })}
-          </div>
+                  </Button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <Separator />
 
         {/* File Types Section */}
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold">File Types</h3>
+          <Button
+            variant="ghost"
+            onClick={() => setShowFileTypes(!showFileTypes)}
+            className="w-full justify-between p-0 h-auto"
+          >
+            <h3 className="text-sm font-semibold">File Types</h3>
+            {showFileTypes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
           
-          <div className="grid grid-cols-2 gap-2">
-            {fileTypeFilters.map((filter) => {
-              const Icon = filter.icon;
-              const isActive = currentFilters?.fileTypeFilter === filter.id;
-              
-              return (
-                <Button
-                  key={filter.id}
-                  variant={isActive ? "default" : "outline"}
-                  className={`justify-start h-12 ${isActive ? 'ring-2 ring-primary/20' : ''}`}
-                  onClick={() => handleFileTypeFilter(filter.id)}
-                >
-                  <Icon className={`h-4 w-4 mr-2 ${filter.color}`} />
-                  <span className="text-sm">{filter.label}</span>
-                </Button>
-              );
-            })}
-          </div>
+          {showFileTypes && (
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              {fileTypeFilters.map((filter) => {
+                const Icon = filter.icon;
+                const isActive = currentFilters?.fileTypeFilter === filter.id;
+                
+                return (
+                  <Button
+                    key={filter.id}
+                    variant={isActive ? "default" : "outline"}
+                    className={`justify-start h-12 ${isActive ? 'ring-2 ring-primary/20' : ''}`}
+                    onClick={() => handleFileTypeFilter(filter.id)}
+                  >
+                    <Icon className={`h-4 w-4 mr-2 ${filter.color}`} />
+                    <span className="text-sm">{filter.label}</span>
+                  </Button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <Separator />

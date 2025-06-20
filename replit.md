@@ -104,6 +104,13 @@ Preferred communication style: Simple, everyday language.
 - June 20, 2025: **Complete Cross-Platform Dialog Consistency Implementation**:
   - **Share Dialog Mobile Support**: Enhanced both single-item and bulk share dialogs with full mobile BottomSheet integration
   - **Permanent Delete Dialog**: Added cross-platform support with mobile-optimized confirmation flow and safety checks
+  - **Filter Dialog Enhancement**: Completely redesigned Filter Dialog with cross-platform consistency:
+    - Replaced mobile-only bottom sheet with unified FiltersDialog component
+    - Added collapsible sections for View Status, File Types, and Advanced Filters for cleaner UI
+    - Desktop uses Dialog, mobile uses BottomSheet with automatic useIsMobile detection
+    - Advanced filters include: Size range (min/max + unit), Created date range, Modified date range, Owner search
+    - Visual consistency with color-coded icons and proper touch targets
+    - Fixed hasActiveFilters error and duplicate function implementations
   - **Unified Dialog Pattern**: All dialogs now follow consistent cross-platform architecture:
     - Desktop: Uses Dialog components with proper header icons and structured layout
     - Mobile: Uses BottomSheet with touch-optimized headers and footer buttons

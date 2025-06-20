@@ -722,19 +722,7 @@ export class GoogleDriveService {
     }
   }
 
-  // Get file permissions (for enhanced sharing)
-  async getFilePermissions(fileId: string, accessToken?: string): Promise<any[]> {
-    try {
-      const response = await this.drive.permissions.list({
-        fileId,
-        fields: 'permissions(id, type, role, emailAddress, domain, displayName)'
-      });
-      return response.data.permissions || [];
-    } catch (error) {
-      console.error('Error getting file permissions:', error);
-      throw error;
-    }
-  }
+
 
   // Delete permission (for enhanced sharing)
   async deletePermission(fileId: string, permissionId: string, accessToken?: string): Promise<void> {
@@ -749,19 +737,7 @@ export class GoogleDriveService {
     }
   }
 
-  // Get file details (for enhanced sharing)
-  async getFileDetails(fileId: string, accessToken?: string): Promise<any> {
-    try {
-      const response = await this.drive.files.get({
-        fileId,
-        fields: 'id, name, mimeType, webViewLink, webContentLink, shared'
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error getting file details:', error);
-      throw error;
-    }
-  }
+
 
   // Send notification email (for enhanced sharing)
   async sendNotificationEmail(fileId: string, emailData: any, accessToken?: string): Promise<void> {
