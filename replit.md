@@ -136,13 +136,10 @@ Preferred communication style: Simple, everyday language.
   - **Consistent Implementation**: Both desktop dropdown and mobile bottom sheet now show permanent delete option when appropriate
   - **View Status Filter Fix**: Corrected FiltersDialog to call handleViewChange properly instead of just setting state, ensuring view changes actually refresh data
 
-- June 20, 2025: **Google Drive API Capabilities Logic Optimization**:
-  - **Copy Logic Clarified**: Files dapat di-copy via API, folders tidak support direct copy API
-  - **Folder Operations Support**: Confirmed folders dapat di-trash, move, dan permanent delete sesuai capabilities
-  - **Enhanced Capability Handling**: Logic yang akurat untuk semua item types:
-    - Download: Default true (API handles restrictions)
-    - Rename/Move: Folders dan files support berdasarkan capabilities
-    - Share: Requires share permission dari API
-    - Trash/Restore/Delete: Folders dan files support berdasarkan capabilities
-  - **API Behavior Alignment**: Logic disesuaikan dengan behavior Google Drive API yang sebenarnya
-  - **Better User Experience**: Operasi folders dan files konsisten dengan aplikasi Google Drive resmi
+- June 20, 2025: **Google Drive API Capabilities Logic Simplification**:
+  - **Direct API Capabilities**: Menggunakan capabilities langsung dari Google Drive API tanpa logic tambahan
+  - **Simplified getFileActions**: Hanya canDownload dan canDetails yang perfect, sisanya langsung dari API
+  - **Consistent Bulk Operations**: Bulk actions sekarang menggunakan getFileActions untuk setiap item
+  - **Single Source of Truth**: getFileActions menjadi satu-satunya logic untuk menentukan actions
+  - **API-First Approach**: Logic sederhana yang mengikuti spesifikasi Google Drive API resmi
+  - **Better Maintenance**: Update sekali di getFileActions, otomatis apply ke single dan bulk operations

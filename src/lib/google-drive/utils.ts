@@ -786,39 +786,22 @@ export function getFileActions(
   const finalCapabilities: DriveFileCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities;
 
   return {
-    // Preview available for all files not folders - Google Drive can handle all file types
+    // Preview available for all files (not folders)
     canPreview: !isFolder,
 
-    // Download - Google Drive API: semua file bisa di-download kecuali restricted files
-    // Default true karena hampir semua file support download
-    canDownload: finalCapabilities.canDownload,
+    // Download - always available, API handles restrictions
+    canDownload: finalCapabilities.canDownload ?? true,
 
-    // Rename - hanya untuk file yang user miliki atau punya edit permission, tidak untuk shared read-only
-    canRename: finalCapabilities.canRename,
-
-    // Move - folders dan files bisa di-move berdasarkan capabilities
-    // Google Drive API mendukung move untuk semua item types
-    canMove: finalCapabilities.canMoveItemWithinDrive,
-
-    // Copy - Google Drive API mendukung copy untuk files, tapi tidak untuk folders
-    // Dalam aplikasi Google Drive asli, folder bisa di-duplicate secara manual tapi API tidak support direct copy
-    canCopy: finalCapabilities.canShare.canCopy,
-
-    // Share - hanya untuk file yang user punya sharing permission
-    canShare: finalCapabilities.canShare,
-
-    // Details selalu tersedia untuk semua file
+    // Details - always available  
     canDetails: true,
 
-    // Trash - folders dan files bisa di-trash berdasarkan capabilities
-    // Google Drive API mendukung trash untuk semua item types
-    canTrash: finalCapabilities.canTrash,
-
-    // Restore - hanya di trash view untuk trashed items dengan untrash permission
-    canRestore: finalCapabilities.canUntrash,
-
-    // Permanent delete - folders dan files bisa di-delete permanent berdasarkan capabilities
-    // Google Drive API mendukung permanent delete untuk semua item types
-    canPermanentDelete: finalCapabilities.canDelete,
+    // All other actions: use direct API capabilities without extra logic
+    canRename: finalCapabilities.canRename ?? false,
+    canMove: finalCapabilities.canMoveItemWithinDrive ?? false,
+    canCopy: finalCapabilities.canCopy ?? false,
+    canShare: finalCapabilities.canShare ?? false,
+    canTrash: finalCapabilities.canTrash ?? false,
+    canRestore: finalCapabilities.canUntrash ?? false,
+    canPermanentDelete: finalCapabilities.canDelete ?? false,
   };
 }

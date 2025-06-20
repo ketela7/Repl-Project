@@ -27,6 +27,7 @@ import {
   AlertTriangle
 } from "lucide-react";
 import { bulkOperationsManager, BulkOperationItem } from '@/lib/bulk-operations';
+import { getFileActions } from '@/lib/google-drive/utils';
 
 interface BulkActionsToolbarProps {
   selectedCount: number;
@@ -63,6 +64,8 @@ export function BulkActionsToolbar({
   isSelectMode,
   isAllSelected,
   isInTrash = false,
+  selectedItems,
+  activeView,
   bulkOperationProgress,
   onToggleSelectMode,
   onSelectAll,
@@ -76,6 +79,18 @@ export function BulkActionsToolbar({
   onBulkRestore,
   onBulkPermanentDelete
 }: BulkActionsToolbarProps) {
+  
+  // Check what actions are available for ALL selected items
+  const bulkActions = {
+    canDownload: selectedItems.every(item => getFileActions(item, activeView).canDownload),
+    canRename: selectedItems.every(item => getFileActions(item, activeView).canRename),
+    canMove: selectedItems.every(item => getFileActions(item, activeView).canMove),
+    canCopy: selectedItems.every(item => getFileActions(item, activeView).canCopy),
+    canShare: selectedItems.every(item => getFileActions(item, activeView).canShare),
+    canTrash: selectedItems.every(item => getFileActions(item, activeView).canTrash),
+    canRestore: selectedItems.every(item => getFileActions(item, activeView).canRestore),
+    canPermanentDelete: selectedItems.every(item => getFileActions(item, activeView).canPermanentDelete),
+  };
   if (bulkOperationProgress.isRunning) {
     return (
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
@@ -158,10 +173,12 @@ export function BulkActionsToolbar({
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     File Operations
                   </div>
-                  <DropdownMenuItem onClick={onBulkDownload} className="cursor-pointer">
-                    <Download className="h-4 w-4 mr-2" />
-                    Download Files
-                  </DropdownMenuItem>
+                  {bulkActions.canDownload && (
+                    <DropdownMenuItem onClick={onBulkDownload} className="cursor-pointer">
+                      <Download className="h-4 w-4 mr-2" />
+                      Download Files
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={onBulkExport} className="cursor-pointer">
                     <FileDown className="h-4 w-4 mr-2" />
                     Export As...
@@ -173,18 +190,24 @@ export function BulkActionsToolbar({
                   <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Organization
                   </div>
-                  <DropdownMenuItem onClick={onBulkRename} className="cursor-pointer">
-                    <Edit3 className="h-4 w-4 mr-2" />
-                    Bulk Rename
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onBulkMove} className="cursor-pointer">
-                    <Move className="h-4 w-4 mr-2" />
-                    Move Items
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={onBulkCopy} className="cursor-pointer">
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copy Items
-                  </DropdownMenuItem>
+                  {bulkActions.canRename && (
+                    <DropdownMenuItem onClick={onBulkRename} className="cursor-pointer">
+                      <Edit3 className="h-4 w-4 mr-2" />
+                      Bulk Rename
+                    </DropdownMenuItem>
+                  )}
+                  {bulkActions.canMove && (
+                    <DropdownMenuItem onClick={onBulkMove} className="cursor-pointer">
+                      <Move className="h-4 w-4 mr-2" />
+                      Move Items
+                    </DropdownMenuItem>
+                  )}
+                  {bulkActions.canCopy && (
+                    <DropdownMenuItem onClick={onBulkCopy} className="cursor-pointer">
+                      <Copy className="h-4 w-4 mr-2" />
+                      Copy Items
+                    </DropdownMenuItem>
+                  )}
                   
                   <DropdownMenuSeparator />
                   
@@ -192,11 +215,13 @@ export function BulkActionsToolbar({
                   <div className="px-2 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">
                     Danger Zone
                   </div>
-                  <DropdownMenuItem onClick={onBulkDelete} className="cursor-pointer text-orange-600 dark:text-orange-400">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Move to Trash
-                  </DropdownMenuItem>
-                  {onBulkPermanentDelete && (
+                  {bulkActions.canTrash && (
+                    <DropdownMenuItem onClick={onBulkDelete} className="cursor-pointer text-orange-600 dark:text-orange-400">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Move to Trash
+                    </DropdownMenuItem>
+                  )}
+                  {bulkActions.canPermanentDelete && onBulkPermanentDelete && (
                     <DropdownMenuItem onClick={onBulkPermanentDelete} className="cursor-pointer text-red-600 dark:text-red-400 font-medium">
                       <ShieldX className="h-4 w-4 mr-2" />
                       Permanently Delete
@@ -222,7 +247,7 @@ export function BulkActionsToolbar({
                   <div className="px-2 py-1.5 text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wider">
                     ⚠️ Danger Zone
                   </div>
-                  {onBulkPermanentDelete && (
+                  {bulkActions.canPermanentDelete && onBulkPermanentDelete && (
                     <DropdownMenuItem onClick={onBulkPermanentDelete} className="cursor-pointer text-red-600 dark:text-red-400 font-medium">
                       <ShieldX className="h-4 w-4 mr-2" />
                       Permanently Delete
