@@ -1329,6 +1329,13 @@ export function DriveManager() {
     fetchFiles(folderId);
   };
 
+  const handleFolderNavigation = (folderId: string | null) => {
+    setCurrentFolderId(folderId);
+    setSearchQuery('');
+    setNextPageToken(null); // Reset pagination
+    fetchFiles(folderId || undefined);
+  };
+
   const handleRefresh = async () => {
     setRefreshing(true);
     setNextPageToken(null); // Reset pagination
@@ -2612,14 +2619,11 @@ export function DriveManager() {
       </div>
 
       {/* Breadcrumb Navigation */}
-      <div className="px-4 pb-4">
+      <div className="px-4 py-4 border-b bg-background/95">
         <FileBreadcrumb
           currentFolderId={currentFolderId}
           loading={loading || refreshing}
-          onNavigate={(folderId) => {
-            setCurrentFolderId(folderId);
-            fetchFiles(folderId || undefined);
-          }}
+          onNavigate={handleFolderNavigation}
         />
       </div>
 

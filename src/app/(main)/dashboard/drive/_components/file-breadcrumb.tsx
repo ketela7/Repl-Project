@@ -83,9 +83,9 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
   const isLoading = loading || externalLoading;
 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto py-2">
+    <div className="flex items-center gap-2 overflow-x-auto py-3 px-2 bg-muted/30 rounded-lg border">
       <Breadcrumb>
-        <BreadcrumbList className="flex-nowrap">
+        <BreadcrumbList className="flex-nowrap min-w-0">
           {/* Root Drive Link */}
           <BreadcrumbItem>
             <BreadcrumbLink 
