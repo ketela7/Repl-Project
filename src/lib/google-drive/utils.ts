@@ -51,15 +51,16 @@ export function getFileIconName(mimeType: string): string {
     'video/wmv': 'FileVideo',
     'video/webm': 'FileVideo',
 
-    // Audio
-    'audio/mp3': 'FileAudio',
-    'audio/wav': 'FileAudio',
-    'audio/m4a': 'FileAudio',
-    'audio/flac': 'FileAudio',
-    'audio/aac': 'FileAudio',
-    'audio/ogg': 'FileAudio',
-    'audio/wma': 'FileAudio',
-    'audio/opus': 'FileAudio',
+    // Audio - using Music icon for consistency
+    'audio/mp3': 'Music',
+    'audio/wav': 'Music',
+    'audio/m4a': 'Music',
+    'audio/flac': 'Music',
+    'audio/aac': 'Music',
+    'audio/ogg': 'Music',
+    'audio/wma': 'Music',
+    'audio/opus': 'Music',
+    'audio/mpeg': 'Music',
 
     // Archives
     'application/zip': 'Archive',

@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SimpleDatePicker } from "@/components/ui/simple-date-picker";
 import { 
@@ -30,7 +29,15 @@ import {
   User,
   HardDrive,
   X,
-  Filter
+  Filter,
+  Star,
+  Clock,
+  Trash,
+  Share,
+  Home,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 
 interface AdvancedFilters {
@@ -53,75 +60,83 @@ interface AdvancedFilters {
 interface MobileFiltersBottomSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  fileTypeFilter: string[];
-  advancedFilters: AdvancedFilters;
-  onFileTypeChange: (fileTypes: string[]) => void;
-  onAdvancedFiltersChange: (filters: AdvancedFilters) => void;
-  onClearAdvanced: () => void;
-  onClearAll: () => void;
+  onFilterChange: (filters: any) => void;
+  currentFilters: any;
+  hasActiveFilters: boolean;
+  onClearFilters: () => void;
 }
-
-const fileTypeOptions = [
-  { key: 'folder', label: 'Folders', icon: Folder, color: 'text-blue-600' },
-  { key: 'document', label: 'Documents', icon: FileText, color: 'text-blue-500' },
-  { key: 'spreadsheet', label: 'Spreadsheets', icon: FileText, color: 'text-green-600' },
-  { key: 'presentation', label: 'Presentations', icon: FileText, color: 'text-orange-600' },
-  { key: 'image', label: 'Images', icon: Image, color: 'text-purple-600' },
-  { key: 'video', label: 'Videos', icon: Video, color: 'text-red-600' },
-  { key: 'audio', label: 'Audio', icon: Music, color: 'text-indigo-600' },
-  { key: 'archive', label: 'Archives', icon: Archive, color: 'text-yellow-600' },
-  { key: 'code', label: 'Code Files', icon: Code, color: 'text-yellow-600' },
-];
 
 export function MobileFiltersBottomSheet({
   open,
   onOpenChange,
-  fileTypeFilter,
-  advancedFilters,
-  onFileTypeChange,
-  onAdvancedFiltersChange,
-  onClearAdvanced,
-  onClearAll
+  onFilterChange,
+  currentFilters,
+  hasActiveFilters,
+  onClearFilters
 }: MobileFiltersBottomSheetProps) {
-  const [localAdvancedFilters, setLocalAdvancedFilters] = useState<AdvancedFilters>(advancedFilters);
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilters>({});
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handleFileTypeToggle = (fileType: string) => {
-    const newFileTypes = fileTypeFilter.includes(fileType)
-      ? fileTypeFilter.filter(t => t !== fileType)
-      : [...fileTypeFilter, fileType];
-    onFileTypeChange(newFileTypes);
-  };
+  // Basic Menu Items
+  const basicMenuItems = [
+    { id: 'all', label: 'All Files', icon: Home, description: 'Show all files and folders' },
+    { id: 'my-drive', label: 'My Drive', icon: HardDrive, description: 'Files you own' },
+    { id: 'shared', label: 'Shared with me', icon: Share, description: 'Files shared by others' },
+    { id: 'starred', label: 'Starred', icon: Star, description: 'Files you starred' },
+    { id: 'recent', label: 'Recent', icon: Clock, description: 'Recently viewed files' },
+    { id: 'trash', label: 'Trash', icon: Trash, description: 'Deleted items' },
+  ];
 
-  const handleAdvancedFilterChange = (key: keyof AdvancedFilters, value: any) => {
-    const newFilters = { ...localAdvancedFilters, [key]: value };
-    setLocalAdvancedFilters(newFilters);
-  };
+  // File Type Filters
+  const fileTypes = [
+    { id: 'folders', label: 'Folders', icon: Folder, color: 'text-blue-600' },
+    { id: 'documents', label: 'Documents', icon: FileText, color: 'text-blue-500' },
+    { id: 'spreadsheets', label: 'Spreadsheets', icon: FileText, color: 'text-green-600' },
+    { id: 'presentations', label: 'Presentations', icon: FileText, color: 'text-orange-600' },
+    { id: 'images', label: 'Images', icon: Image, color: 'text-purple-600' },
+    { id: 'videos', label: 'Videos', icon: Video, color: 'text-red-600' },
+    { id: 'audio', label: 'Audio', icon: Music, color: 'text-indigo-600' },
+    { id: 'archives', label: 'Archives', icon: Archive, color: 'text-yellow-600' },
+    { id: 'code', label: 'Code Files', icon: Code, color: 'text-gray-600' },
+  ];
 
-  const applyAdvancedFilters = () => {
-    onAdvancedFiltersChange(localAdvancedFilters);
+  const handleBasicMenuClick = (menuId: string) => {
+    onFilterChange({ viewFilter: menuId });
     onOpenChange(false);
   };
 
-  const hasActiveFilters = fileTypeFilter.length > 0 || 
-                          Object.keys(advancedFilters).some(key => {
-                            const value = advancedFilters[key as keyof AdvancedFilters];
-                            return value !== undefined && value !== null && 
-                                   (typeof value === 'object' ? Object.keys(value).length > 0 : true);
-                          });
+  const handleFileTypeClick = (typeId: string) => {
+    const currentTypes = currentFilters.fileTypes || [];
+    const newTypes = currentTypes.includes(typeId) 
+      ? currentTypes.filter((t: string) => t !== typeId)
+      : [...currentTypes, typeId];
+    
+    onFilterChange({ ...currentFilters, fileTypes: newTypes });
+  };
+
+  const handleAdvancedFilterChange = (key: string, value: any) => {
+    const newFilters = { ...advancedFilters, [key]: value };
+    setAdvancedFilters(newFilters);
+    onFilterChange({ ...currentFilters, advanced: newFilters });
+  };
+
+  const handleClearAll = () => {
+    setAdvancedFilters({});
+    onClearFilters();
+    onOpenChange(false);
+  };
 
   return (
     <BottomSheet open={open} onOpenChange={onOpenChange}>
       <BottomSheetContent className="max-h-[90vh] overflow-y-auto">
-        <BottomSheetHeader>
+        <BottomSheetHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div>
               <BottomSheetTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
+                <Filter className="h-4 w-4" />
                 Filters & Search
                 {hasActiveFilters && (
-                  <Badge variant="secondary" className="ml-2">
-                    Active
-                  </Badge>
+                  <Badge variant="secondary" className="text-xs">Active</Badge>
                 )}
               </BottomSheetTitle>
               <BottomSheetDescription>
@@ -140,23 +155,28 @@ export function MobileFiltersBottomSheet({
         </BottomSheetHeader>
 
         <div className="px-4 pb-4 space-y-6">
-          {/* File Type Filters */}
-          <div>
-            <Label className="text-sm font-medium mb-3 block">File Types</Label>
+          {/* Basic Menu */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-medium text-sm">View Status</h3>
+              <Badge variant="outline" className="text-xs">Quick Access</Badge>
+            </div>
             <div className="grid grid-cols-2 gap-2">
-              {fileTypeOptions.map((option) => {
-                const IconComponent = option.icon;
-                const isSelected = fileTypeFilter.includes(option.key);
-                
+              {basicMenuItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentFilters.viewFilter === item.id;
                 return (
                   <Button
-                    key={option.key}
-                    variant={isSelected ? "default" : "outline"}
-                    className="h-12 justify-start text-left p-3"
-                    onClick={() => handleFileTypeToggle(option.key)}
+                    key={item.id}
+                    variant={isActive ? "default" : "outline"}
+                    className="h-auto p-3 text-left justify-start"
+                    onClick={() => handleBasicMenuClick(item.id)}
                   >
-                    <IconComponent className={`h-4 w-4 mr-2 ${isSelected ? 'text-primary-foreground' : option.color}`} />
-                    <span className="text-sm">{option.label}</span>
+                    <Icon className="h-4 w-4 mr-2 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm truncate">{item.label}</div>
+                      <div className="text-xs text-muted-foreground truncate">{item.description}</div>
+                    </div>
                   </Button>
                 );
               })}
@@ -165,159 +185,189 @@ export function MobileFiltersBottomSheet({
 
           <Separator />
 
-          {/* Size Range Filter */}
-          <div>
-            <Label className="text-sm font-medium mb-3 block">File Size Range</Label>
-            <div className="space-y-3">
-              <div className="flex gap-2">
-                <div className="flex-1">
-                  <Label className="text-xs text-muted-foreground">Min Size</Label>
-                  <Input
-                    type="number"
-                    placeholder="0"
-                    value={localAdvancedFilters.sizeRange?.min || ''}
-                    onChange={(e) => handleAdvancedFilterChange('sizeRange', {
-                      ...localAdvancedFilters.sizeRange,
-                      min: e.target.value ? parseInt(e.target.value) : undefined,
-                      unit: localAdvancedFilters.sizeRange?.unit || 'MB'
-                    })}
-                    className="h-10"
-                  />
-                </div>
-                <div className="flex-1">
-                  <Label className="text-xs text-muted-foreground">Max Size</Label>
-                  <Input
-                    type="number"
-                    placeholder="∞"
-                    value={localAdvancedFilters.sizeRange?.max || ''}
-                    onChange={(e) => handleAdvancedFilterChange('sizeRange', {
-                      ...localAdvancedFilters.sizeRange,
-                      max: e.target.value ? parseInt(e.target.value) : undefined,
-                      unit: localAdvancedFilters.sizeRange?.unit || 'MB'
-                    })}
-                    className="h-10"
-                  />
-                </div>
-                <div className="w-20">
-                  <Label className="text-xs text-muted-foreground">Unit</Label>
-                  <Select
-                    value={localAdvancedFilters.sizeRange?.unit || 'MB'}
-                    onValueChange={(value) => handleAdvancedFilterChange('sizeRange', {
-                      ...localAdvancedFilters.sizeRange,
-                      unit: value as 'B' | 'KB' | 'MB' | 'GB'
-                    })}
+          {/* File Types */}
+          <div className="space-y-3">
+            <h3 className="font-medium text-sm">File Types</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {fileTypes.map((type) => {
+                const Icon = type.icon;
+                const isSelected = currentFilters.fileTypes?.includes(type.id);
+                return (
+                  <Button
+                    key={type.id}
+                    variant={isSelected ? "default" : "outline"}
+                    className="h-12 text-left justify-start"
+                    onClick={() => handleFileTypeClick(type.id)}
                   >
-                    <SelectTrigger className="h-10">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="B">B</SelectItem>
-                      <SelectItem value="KB">KB</SelectItem>
-                      <SelectItem value="MB">MB</SelectItem>
-                      <SelectItem value="GB">GB</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <Icon className={`h-4 w-4 mr-2 ${isSelected ? 'text-white' : type.color}`} />
+                    <span className="text-sm">{type.label}</span>
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Advanced Filters Toggle */}
+          <div className="space-y-3">
+            <Button
+              variant="ghost"
+              className="w-full justify-between p-0 h-auto"
+              onClick={() => setShowAdvanced(!showAdvanced)}
+            >
+              <h3 className="font-medium text-sm">Advanced Filters</h3>
+              {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+
+            {showAdvanced && (
+              <div className="space-y-4 pt-2">
+                {/* File Size Range */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">File Size Range</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Min Size</Label>
+                      <Input
+                        type="number"
+                        placeholder="0"
+                        className="h-9"
+                        value={advancedFilters.sizeRange?.min || ''}
+                        onChange={(e) => handleAdvancedFilterChange('sizeRange', {
+                          ...advancedFilters.sizeRange,
+                          min: Number(e.target.value)
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Max Size</Label>
+                      <Input
+                        type="number"
+                        placeholder="∞"
+                        className="h-9"
+                        value={advancedFilters.sizeRange?.max || ''}
+                        onChange={(e) => handleAdvancedFilterChange('sizeRange', {
+                          ...advancedFilters.sizeRange,
+                          max: Number(e.target.value)
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">Unit</Label>
+                      <Select
+                        value={advancedFilters.sizeRange?.unit || 'MB'}
+                        onValueChange={(value) => handleAdvancedFilterChange('sizeRange', {
+                          ...advancedFilters.sizeRange,
+                          unit: value
+                        })}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="B">B</SelectItem>
+                          <SelectItem value="KB">KB</SelectItem>
+                          <SelectItem value="MB">MB</SelectItem>
+                          <SelectItem value="GB">GB</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Created Date Range */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Created Date Range</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">From</Label>
+                      <SimpleDatePicker
+                        selected={advancedFilters.createdDateRange?.from}
+                        onSelect={(date) => handleAdvancedFilterChange('createdDateRange', {
+                          ...advancedFilters.createdDateRange,
+                          from: date
+                        })}
+                        placeholder="Select date"
+                        className="h-9"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">To</Label>
+                      <SimpleDatePicker
+                        selected={advancedFilters.createdDateRange?.to}
+                        onSelect={(date) => handleAdvancedFilterChange('createdDateRange', {
+                          ...advancedFilters.createdDateRange,
+                          to: date
+                        })}
+                        placeholder="Select date"
+                        className="h-9"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Modified Date Range */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Modified Date Range</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label className="text-xs text-muted-foreground">From</Label>
+                      <SimpleDatePicker
+                        selected={advancedFilters.modifiedDateRange?.from}
+                        onSelect={(date) => handleAdvancedFilterChange('modifiedDateRange', {
+                          ...advancedFilters.modifiedDateRange,
+                          from: date
+                        })}
+                        placeholder="Select date"
+                        className="h-9"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground">To</Label>
+                      <SimpleDatePicker
+                        selected={advancedFilters.modifiedDateRange?.to}
+                        onSelect={(date) => handleAdvancedFilterChange('modifiedDateRange', {
+                          ...advancedFilters.modifiedDateRange,
+                          to: date
+                        })}
+                        placeholder="Select date"
+                        className="h-9"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Owner Filter */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium">Owner (Name or Email)</Label>
+                  <Input
+                    placeholder="Enter owner name or email"
+                    className="h-9"
+                    value={advancedFilters.owner || ''}
+                    onChange={(e) => handleAdvancedFilterChange('owner', e.target.value)}
+                  />
                 </div>
               </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Date Range Filters */}
-          <div>
-            <Label className="text-sm font-medium mb-3 block">Created Date Range</Label>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="text-xs text-muted-foreground">From</Label>
-                <SimpleDatePicker
-                  date={localAdvancedFilters.createdDateRange?.from}
-                  onDateChange={(date) => handleAdvancedFilterChange('createdDateRange', {
-                    ...localAdvancedFilters.createdDateRange,
-                    from: date
-                  })}
-                  placeholder="Select date"
-                  className="w-full h-10"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground">To</Label>
-                <SimpleDatePicker
-                  date={localAdvancedFilters.createdDateRange?.to}
-                  onDateChange={(date) => handleAdvancedFilterChange('createdDateRange', {
-                    ...localAdvancedFilters.createdDateRange,
-                    to: date
-                  })}
-                  placeholder="Select date"
-                  className="w-full h-10"
-                />
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <Label className="text-sm font-medium mb-3 block">Modified Date Range</Label>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label className="text-xs text-muted-foreground">From</Label>
-                <SimpleDatePicker
-                  date={localAdvancedFilters.modifiedDateRange?.from}
-                  onDateChange={(date) => handleAdvancedFilterChange('modifiedDateRange', {
-                    ...localAdvancedFilters.modifiedDateRange,
-                    from: date
-                  })}
-                  placeholder="Select date"
-                  className="w-full h-10"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground">To</Label>
-                <SimpleDatePicker
-                  date={localAdvancedFilters.modifiedDateRange?.to}
-                  onDateChange={(date) => handleAdvancedFilterChange('modifiedDateRange', {
-                    ...localAdvancedFilters.modifiedDateRange,
-                    to: date
-                  })}
-                  placeholder="Select date"
-                  className="w-full h-10"
-                />
-              </div>
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Owner Filter */}
-          <div>
-            <Label className="text-sm font-medium mb-3 block">Owner</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by owner name or email..."
-                value={localAdvancedFilters.owner || ''}
-                onChange={(e) => handleAdvancedFilterChange('owner', e.target.value || undefined)}
-                className="pl-10 h-10"
-              />
-            </div>
+            )}
           </div>
         </div>
 
-        <BottomSheetFooter>
-          <div className="flex gap-2 w-full">
-            <Button
-              variant="outline"
-              onClick={onClearAll}
-              className="flex-1"
-            >
-              Clear All
-            </Button>
-            <Button
-              onClick={applyAdvancedFilters}
-              className="flex-1"
-            >
-              Apply Filters
-            </Button>
-          </div>
+        <BottomSheetFooter className="flex-row gap-2 pt-4">
+          <Button
+            variant="outline"
+            onClick={() => setAdvancedFilters({})}
+            className="flex-1"
+            disabled={!showAdvanced}
+          >
+            Clear Advanced
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleClearAll}
+            className="flex-1"
+          >
+            Clear All
+          </Button>
         </BottomSheetFooter>
       </BottomSheetContent>
     </BottomSheet>

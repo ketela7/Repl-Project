@@ -225,21 +225,19 @@ export function MobileActionsBottomSheet({
                   </Button>
                 )}
 
-                {onBulkPermanentDelete && (
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start h-12 text-left text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
-                    onClick={() => handleAction(onBulkPermanentDelete)}
-                  >
-                    <Trash2 className="h-4 w-4 mr-3" />
-                    <div>
-                      <div className="font-medium">Delete forever</div>
-                      <div className="text-xs text-muted-foreground">
-                        Permanently delete items
-                      </div>
+                <Button
+                  variant="outline"
+                  className="w-full justify-start h-12 text-left text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
+                  onClick={() => handleAction(onBulkPermanentDelete || (() => console.log('Permanent delete')))}
+                >
+                  <Trash2 className="h-4 w-4 mr-3" />
+                  <div>
+                    <div className="font-medium">Delete forever</div>
+                    <div className="text-xs text-muted-foreground">
+                      Permanently delete items
                     </div>
-                  </Button>
-                )}
+                  </div>
+                </Button>
               </>
             )}
           </div>
