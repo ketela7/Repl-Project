@@ -235,3 +235,35 @@ All properly configured in Replit Secrets:
 **Project Status**: Production Ready ✅  
 **Deployment Platform**: Replit Optimized  
 **Next Review**: Quarterly or after major updates
+
+# Update Terbaru Proyek Drive Manager
+
+
+## Menu Batch
+- Menu Batch sekarang mencakup semua opsi yang diperlukan:
+  - **Download Selected**
+  - **Rename Selected**
+  - **Export Selected**
+  - **Move Selected**
+  - **Copy Selected**
+  - **Restore Selected**
+  - **Permanently Delete**
+- Menu Permanently Delete hanya muncul jika file yang dipilih memiliki izin untuk dihapus secara permanen.
+
+## Progress Tracking
+- Indikator progres ditambahkan untuk semua operasi bulk (seperti Rename, Move, Copy, dan Permanently Delete) untuk memberikan umpan balik kepada pengguna tentang status operasi yang sedang berjalan.
+
+## Logika Menu Download
+- Menu Download sekarang akan muncul hanya jika ada file yang dapat diunduh di antara yang dipilih. Jika semua file yang dipilih adalah folder, menu akan dinonaktifkan.
+
+## Dialog Operasi Bulk
+- Setelah men-submit operasi seperti Rename atau Move, dialog tersebut secara otomatis akan ditutup, sehingga pengguna dapat segera melihat indikator progres.
+
+## Konsistensi
+- Penerapan logika yang sama untuk operasi tunggal dan batch memperbaiki pengalaman pengguna.
+
+## Respon terhadap Saran Pengguna
+- Dialog untuk operasi bulk ditutup setelah submit untuk memungkinkan pengguna melihat progres, dan itu sudah diterapkan.
+- Fitur "smart" pada menu Download telah ditingkatkan sesuai dengan saran pengguna.
+
+Silakan periksa pembaruan ini dan sesuaikan dengan file `README.md` Anda!
