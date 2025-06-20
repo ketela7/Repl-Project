@@ -129,10 +129,10 @@ export default [
       "@typescript-eslint/no-unnecessary-type-assertion": "error",
       "@typescript-eslint/no-unnecessary-condition": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }]
+      "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
 
       // React unnecessary import rules
-			"react/jsx-no-useless-fragment": ["warn", { allowExpressions: true }],
+      "react/jsx-no-useless-fragment": ["warn", { allowExpressions: true }],
       // React JSX Pascal Case Rule
       "react/jsx-pascal-case": [
         "error",
