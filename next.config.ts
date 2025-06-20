@@ -21,9 +21,6 @@ const nextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     domains: ['lh3.googleusercontent.com', 'avatars.githubusercontent.com'],
   },
-  experimental: {
-    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-  },
   webpack: (config, { dev, isServer }) => {
     if (!dev && !isServer) {
       config.cache = {
