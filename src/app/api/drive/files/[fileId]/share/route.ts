@@ -4,7 +4,7 @@ import { GoogleDriveService } from '@/lib/google-drive/service';
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -14,7 +14,7 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { fileId } = params;
+    const { fileId } = await params;
     const body = await request.json();
     const { action, role, type, emailAddress, message, allowFileDiscovery, expirationTime } = body;
 
@@ -182,7 +182,7 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { fileId: string } }
+  { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
     const supabase = await createClient();
@@ -192,7 +192,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { fileId } = params;
+    const { fileId } = await params;
     const accessToken = session.provider_token;
     
     if (!accessToken) {

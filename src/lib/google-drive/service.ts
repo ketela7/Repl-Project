@@ -111,7 +111,7 @@ export class GoogleDriveService {
   async getFile(fileId: string): Promise<DriveFile> {
     const response = await this.drive.files.get({
       fileId,
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, owners',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, shared, trashed, starred, capabilities, owners',
     });
 
     return convertGoogleDriveFile(response.data);

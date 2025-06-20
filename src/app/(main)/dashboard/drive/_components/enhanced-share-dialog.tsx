@@ -90,10 +90,26 @@ export function EnhancedShareDialog({
       let shareData: ShareData;
 
       if (shareType === 'link') {
+        // Convert linkAccess to proper Google Drive API type
+        let apiType;
+        switch (linkAccess) {
+          case 'anyoneWithLink':
+            apiType = 'anyone';
+            break;
+          case 'anyone':
+            apiType = 'anyone';
+            break;
+          case 'domain':
+            apiType = 'domain';
+            break;
+          default:
+            apiType = 'anyone';
+        }
+
         shareData = {
           action: 'get_share_link',
           role: accessLevel,
-          type: linkAccess,
+          type: apiType,
           allowFileDiscovery: allowDiscovery,
         };
 
