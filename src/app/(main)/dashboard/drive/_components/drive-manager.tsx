@@ -79,6 +79,7 @@ import { formatFileSize, formatDate, isPreviewable, getFileActions } from '@/lib
 import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
+import { useIsMobile } from '@/hooks/use-mobile';
 // Core drive management imports only
 
 import { FileUploadDialog } from './file-upload-dialog';
@@ -106,6 +107,8 @@ import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
 import { EnhancedShareDialog } from './enhanced-share-dialog';
 import { BulkShareDialog } from './bulk-share-dialog';
+import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
+import { MobileFiltersBottomSheet } from './mobile-filters-bottom-sheet';
 
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { FileCategoryBadges } from '@/components/file-category-badges';
@@ -322,6 +325,7 @@ export function DriveManager() {
   const [files, setFiles] = useState<DriveFile[]>([]);
   const [folders, setFolders] = useState<DriveFolder[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
   const [searchQuery, setSearchQuery] = useState('');
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
@@ -401,6 +405,22 @@ export function DriveManager() {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isBulkShareDialogOpen, setIsBulkShareDialogOpen] = useState(false);
   const [selectedItemForShare, setSelectedItemForShare] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
+
+  // Mobile bottom sheet states
+  const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+
+  // Helper functions for filters
+  const clearAdvancedFilters = () => {
+    setAdvancedFilters({ sizeRange: { unit: 'MB' } });
+  };
+
+  const clearAllFilters = () => {
+    setActiveView('all');
+    setFileTypeFilter([]);
+    setAdvancedFilters({ sizeRange: { unit: 'MB' } });
+    setSearchQuery('');
+  };
 
   // Sorting functionality
   const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
@@ -2644,30 +2664,50 @@ export function DriveManager() {
               </span>
             </Button>
 
-            {/* Batch */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant={isSelectMode ? 'default' : 'ghost'}
-                  size="sm"
-                  disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
-                  className="h-8 px-2 md:px-3"
-                >
-                  <Square className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">Batch</span>
-                  {selectedItems.size > 0 && (
-                    <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                      {selectedItems.size}
-                    </Badge>
-                  )}
-                  {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
-                    <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                      <span className="hidden md:inline">Trash Mode</span>
-                      <span className="md:hidden">T</span>
-                    </Badge>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
+            {/* Batch - Mobile opens bottom sheet when items selected, Desktop uses dropdown */}
+            {isMobile && selectedItems.size > 0 ? (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setIsMobileActionsOpen(true)}
+                className="h-8 px-2 md:px-3"
+              >
+                <Square className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Actions</span>
+                <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                  {selectedItems.size}
+                </Badge>
+                {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
+                  <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                    <span className="hidden md:inline">Trash</span>
+                    <span className="md:hidden">T</span>
+                  </Badge>
+                )}
+              </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant={isSelectMode ? 'default' : 'ghost'}
+                    size="sm"
+                    disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
+                    className="h-8 px-2 md:px-3"
+                  >
+                    <Square className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:inline">Batch</span>
+                    {selectedItems.size > 0 && (
+                      <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                        {selectedItems.size}
+                      </Badge>
+                    )}
+                    {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
+                      <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                        <span className="hidden md:inline">Trash Mode</span>
+                        <span className="md:hidden">T</span>
+                      </Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64">
                 <DropdownMenuItem onClick={toggleSelectMode}>
                   {isSelectMode ? (
@@ -2844,32 +2884,56 @@ export function DriveManager() {
                   </>
                 )}
               </DropdownMenuContent>
-            </DropdownMenu>
+              </DropdownMenu>
+            )}
 
-            {/* Filter */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className={`h-8 px-2 md:px-3 ${(activeView !== 'all' || fileTypeFilter.length > 0 || 
-                    advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
-                    advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
-                    advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
-                >
-                  <Calendar className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">Filter</span>
-                  {(activeView !== 'all' || fileTypeFilter.length > 0 || 
-                    advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
-                    advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
-                    advancedFilters.owner) && (
-                    <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                      <span className="hidden md:inline">Active</span>
-                      <span className="md:hidden">•</span>
-                    </Badge>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
+            {/* Filter - Mobile uses Bottom Sheet, Desktop uses Dropdown */}
+            {isMobile ? (
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setIsMobileFiltersOpen(true)}
+                className={`h-8 px-2 md:px-3 ${(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                  advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                  advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                  advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
+              >
+                <Calendar className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Filter</span>
+                {(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                  advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                  advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                  advancedFilters.owner) && (
+                  <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                    <span className="hidden md:inline">Active</span>
+                    <span className="md:hidden">•</span>
+                  </Badge>
+                )}
+              </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className={`h-8 px-2 md:px-3 ${(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                      advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                      advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                      advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
+                  >
+                    <Calendar className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:inline">Filter</span>
+                    {(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                      advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                      advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                      advancedFilters.owner) && (
+                      <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                        <span className="hidden md:inline">Active</span>
+                        <span className="md:hidden">•</span>
+                      </Badge>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-80 md:w-96">
                 <div className="p-4">
                   <div className="flex items-center gap-2 mb-4">
@@ -3176,7 +3240,8 @@ export function DriveManager() {
                   </Collapsible>
                 </div>
               </DropdownMenuContent>
-            </DropdownMenu>
+              </DropdownMenu>
+            )}
 
             {/* Badge - Floating Panel Toggle */}
             <DropdownMenu>
@@ -4310,6 +4375,36 @@ export function DriveManager() {
         onOpenChange={setIsBulkShareDialogOpen}
         selectedItems={getSelectedItemsData()}
         onShare={handleBulkShare}
+      />
+
+      {/* Mobile Bottom Sheets for Enhanced Touch Experience */}
+      <MobileActionsBottomSheet
+        open={isMobileActionsOpen}
+        onOpenChange={setIsMobileActionsOpen}
+        selectedCount={selectedItems.size}
+        selectedItems={getSelectedItemsData()}
+        isInTrash={activeView === 'trash' || searchQuery.includes('trashed:true')}
+        onBulkDownload={handleBulkDownload}
+        onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
+        onBulkMove={() => setIsBulkMoveDialogOpen(true)}
+        onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
+        onBulkRename={() => setIsBulkRenameDialogOpen(true)}
+        onBulkExport={() => setIsBulkExportDialogOpen(true)}
+        onBulkShare={() => setIsBulkShareDialogOpen(true)}
+        onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
+        onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
+        onDeselectAll={deselectAll}
+      />
+
+      <MobileFiltersBottomSheet
+        open={isMobileFiltersOpen}
+        onOpenChange={setIsMobileFiltersOpen}
+        fileTypeFilter={fileTypeFilter}
+        advancedFilters={advancedFilters}
+        onFileTypeChange={setFileTypeFilter}
+        onAdvancedFiltersChange={setAdvancedFilters}
+        onClearAdvanced={clearAdvancedFilters}
+        onClearAll={clearAllFilters}
       />
 
     </div>
