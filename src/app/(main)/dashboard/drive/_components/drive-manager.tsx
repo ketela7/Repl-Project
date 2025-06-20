@@ -422,6 +422,18 @@ export function DriveManager() {
     setSearchQuery('');
   };
 
+  // Check if any filters are active
+  const hasActiveFilters = activeView !== 'all' || 
+                          fileTypeFilter.length > 0 || 
+                          searchQuery.trim() !== '' ||
+                          (advancedFilters.sizeRange?.min) ||
+                          (advancedFilters.sizeRange?.max) ||
+                          (advancedFilters.createdDateRange?.from) ||
+                          (advancedFilters.createdDateRange?.to) ||
+                          (advancedFilters.modifiedDateRange?.from) ||
+                          (advancedFilters.modifiedDateRange?.to) ||
+                          (advancedFilters.owner?.trim());
+
   // Sorting functionality
   const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
     let direction: 'asc' | 'desc' = 'asc';
