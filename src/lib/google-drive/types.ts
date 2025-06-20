@@ -149,6 +149,14 @@ export interface DriveSearchOptions {
   includeTeamDriveItems?: boolean;
 }
 
+export interface BulkOperationItem {
+  id: string;
+  name: string;
+  type: 'file' | 'folder';
+  mimeType?: string;
+  parentId?: string;
+}
+
 export interface DriveSearchResult {
   files: DriveFile[];
   nextPageToken?: string | null;

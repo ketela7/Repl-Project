@@ -1912,8 +1912,7 @@ export function DriveManager() {
 
   const handleAdvancedFiltersChange = (filters: any) => {
     setAdvancedFilters(filters);
-    // Refresh files with new advanced filters
-    fetchFiles(currentFolderId || undefined, searchQuery || undefined);
+    // Note: No need to call fetchFiles here as client-side filtering handles this
   };
 
   const handleFileTypeToggle = (type: string) => {
@@ -1923,6 +1922,7 @@ export function DriveManager() {
         : [...prev, type];
       return newFilter;
     });
+    // Note: No need to call fetchFiles here as client-side filtering handles this
   };
 
   const handleFolderClick = (folderId: string) => {
@@ -2534,6 +2534,17 @@ export function DriveManager() {
       fetchFiles(currentFolderId);
     }
   }, [debouncedSearchQuery, currentFolderId]);
+
+  // Force re-render when filters change to update the visual display
+  useEffect(() => {
+    // This ensures the component re-renders when filter states change
+    // which will update the filtered data display
+    if (files.length > 0 || folders.length > 0) {
+      // Force a minimal state update to trigger re-render
+      setFiles(prev => [...prev]);
+      setFolders(prev => [...prev]);
+    }
+  }, [fileTypeFilter, advancedFilters, activeView]);
 
   // Handle view mode change for toggle group
   const handleViewModeChange = (value: string) => {
@@ -4461,11 +4472,11 @@ export function DriveManager() {
         onBulkShare={() => {
           // Always use enhanced share dialog for better UI
           const selectedItemsData = getSelectedItemsData();
-          if (selectedItemsData.length === 1) {
+          if (selectedItemsData.length === 1 && selectedItemsData[0]) {
             setSelectedItemForShare({
               id: selectedItemsData[0].id,
               name: selectedItemsData[0].name,
-              type: selectedItemsData[0].type
+              type: selectedItemsData[0].type as 'file' | 'folder'
             });
           } else {
             setSelectedItemForShare({
@@ -4500,7 +4511,7 @@ export function DriveManager() {
           fileTypeFilter,
           advancedFilters
         }}
-        hasActiveFilters={hasActiveFilters}
+        hasActiveFilters={!!hasActiveFilters}
         onClearFilters={clearAllFilters}
       />
 

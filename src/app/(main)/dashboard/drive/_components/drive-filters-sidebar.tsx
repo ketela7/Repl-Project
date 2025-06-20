@@ -183,7 +183,7 @@ export function DriveFiltersSidebar({
   // Apply advanced filters when they change
   React.useEffect(() => {
     updateAdvancedFilters();
-  }, [sizeFilter, createdDateRange, modifiedDateRange, ownerFilter]);
+  }, [sizeFilter, createdDateRange, modifiedDateRange, ownerFilter, onAdvancedFiltersChange]);
 
   return (
     <Card className="border-primary/20 bg-gradient-to-r from-background to-accent/5">

@@ -282,8 +282,8 @@ export function MobileFiltersBottomSheet({
                     <div>
                       <Label className="text-xs text-muted-foreground">From</Label>
                       <SimpleDatePicker
-                        selected={advancedFilters.createdDateRange?.from}
-                        onSelect={(date) => handleAdvancedFilterChange('createdDateRange', {
+                        date={advancedFilters.createdDateRange?.from}
+                        onDateChange={(date) => handleAdvancedFilterChange('createdDateRange', {
                           ...advancedFilters.createdDateRange,
                           from: date
                         })}
@@ -294,8 +294,8 @@ export function MobileFiltersBottomSheet({
                     <div>
                       <Label className="text-xs text-muted-foreground">To</Label>
                       <SimpleDatePicker
-                        selected={advancedFilters.createdDateRange?.to}
-                        onSelect={(date) => handleAdvancedFilterChange('createdDateRange', {
+                        date={advancedFilters.createdDateRange?.to}
+                        onDateChange={(date) => handleAdvancedFilterChange('createdDateRange', {
                           ...advancedFilters.createdDateRange,
                           to: date
                         })}
@@ -313,8 +313,8 @@ export function MobileFiltersBottomSheet({
                     <div>
                       <Label className="text-xs text-muted-foreground">From</Label>
                       <SimpleDatePicker
-                        selected={advancedFilters.modifiedDateRange?.from}
-                        onSelect={(date) => handleAdvancedFilterChange('modifiedDateRange', {
+                        date={advancedFilters.modifiedDateRange?.from}
+                        onDateChange={(date) => handleAdvancedFilterChange('modifiedDateRange', {
                           ...advancedFilters.modifiedDateRange,
                           from: date
                         })}
@@ -325,8 +325,8 @@ export function MobileFiltersBottomSheet({
                     <div>
                       <Label className="text-xs text-muted-foreground">To</Label>
                       <SimpleDatePicker
-                        selected={advancedFilters.modifiedDateRange?.to}
-                        onSelect={(date) => handleAdvancedFilterChange('modifiedDateRange', {
+                        date={advancedFilters.modifiedDateRange?.to}
+                        onDateChange={(date) => handleAdvancedFilterChange('modifiedDateRange', {
                           ...advancedFilters.modifiedDateRange,
                           to: date
                         })}
