@@ -77,9 +77,9 @@ export function BulkShareDialog({
 
   const renderContent = () => (
     <div className="space-y-4">
-          {/* Selected Items Summary */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Selected items</Label>
+      {/* Selected Items Summary */}
+      <div className="space-y-3">
+        <Label className="text-sm font-medium">Selected items</Label>
             <div className="bg-muted/50 rounded-lg p-3 space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Total items:</span>
