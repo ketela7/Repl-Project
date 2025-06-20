@@ -207,6 +207,23 @@ export function MobileActionsBottomSheet({
               </>
             )}
 
+            {/* Permanently Delete - Show for items in trash or owned items */}
+            {onBulkPermanentDelete && (
+              <Button
+                variant="outline"
+                className="w-full justify-start h-12 text-left text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
+                onClick={() => handleAction(onBulkPermanentDelete)}
+              >
+                <AlertTriangle className="h-4 w-4 mr-3" />
+                <div>
+                  <div className="font-medium">Permanently Delete</div>
+                  <div className="text-xs text-muted-foreground">
+                    Cannot be undone
+                  </div>
+                </div>
+              </Button>
+            )}
+
             {isInTrash && (
               <>
                 {onBulkRestore && (

@@ -2976,15 +2976,11 @@ export function DriveManager() {
                           </DropdownMenuItem>
                         )}
                         
-                        {/* Check if any selected item can be permanently deleted - in trash, owner is me, not shared */}
+                        {/* Check if any selected item can be permanently deleted */}
                         {getSelectedItemsData().some(item => {
                           const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
-                          if (!fileOrFolder) return false;
-                          // Can permanently delete if: in trash, owner is me, not shared
-                          const isOwner = fileOrFolder.owners && fileOrFolder.owners.some(owner => owner.me === true);
-                          const isShared = fileOrFolder.shared;
-                          const isTrashed = fileOrFolder.trashed;
-                          return isTrashed && isOwner && !isShared;
+                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                          return actions?.canPermanentDelete;
                         }) && (
                           <DropdownMenuItem 
                             onClick={() => setIsBulkPermanentDeleteDialogOpen(true)}

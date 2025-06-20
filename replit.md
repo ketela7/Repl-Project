@@ -125,3 +125,13 @@ Preferred communication style: Simple, everyday language.
     - Proper content rendering shared between both platforms
   - **Enhanced UX Consistency**: All dialogs maintain visual and functional parity across devices with proper spacing, typography, and interaction patterns
   - **Mobile-First Design**: Touch targets, scrolling areas, and button layouts optimized for mobile interaction
+
+- June 20, 2025: **Permanently Delete Menu Logic Fixed**:
+  - **Enhanced getFileActions Logic**: Updated permanent delete availability criteria to be more user-friendly:
+    - Now available for items in trash (regardless of ownership for safety)
+    - Also available for items with delete capability (owner files)
+    - Simplified logic removes overly restrictive conditions
+  - **Bulk Operations Menu**: Fixed bulk permanent delete visibility to use getFileActions instead of manual ownership checks
+  - **Mobile Actions Integration**: Added permanent delete option to mobile bottom sheet with proper styling and warning indicators
+  - **Consistent Implementation**: Both desktop dropdown and mobile bottom sheet now show permanent delete option when appropriate
+  - **View Status Filter Fix**: Corrected FiltersDialog to call handleViewChange properly instead of just setting state, ensuring view changes actually refresh data

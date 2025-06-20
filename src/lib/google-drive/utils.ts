@@ -798,23 +798,24 @@ export function getFileActions(
     // Move only if not in trash/shared and has permission
     canMove: !isTrashView && !isSharedView && !isTrashed && (finalCapabilities.canMoveItemWithinDrive ?? false),
 
-    // Copy based on capabilities (can copy even in shared view)
-    canCopy: !isTrashView && !isTrashed && (finalCapabilities.canCopy ?? false),
+    // Copy based on capabilities for files only (folders can't be copied in Google Drive)
+    canCopy: (finalCapabilities.canCopy ?? false) && !isFolder && !isTrashed,
 
-    // Share only if not in trash and has permission
-    canShare: !isTrashView && !isTrashed && (finalCapabilities.canShare ?? false),
+    // Share based on capabilities and not in trash
+    canShare: (finalCapabilities.canShare ?? false) && !isTrashed,
 
-    // Details is always available
+    // Details always available
     canDetails: true,
 
-    // Trash only if not already trashed and has permission
-    canTrash: !isTrashView && !isTrashed && (finalCapabilities.canTrash ?? false),
+    // Move to trash based on capabilities, not already trashed, and not shared view
+    canTrash: (finalCapabilities.canTrash ?? false) && !isTrashed && !isSharedView,
 
-    // Restore only if in trash view and has permission
-    canRestore: isTrashView && isTrashed && (finalCapabilities.canUntrash ?? false),
+    // Restore only available in trash view for trashed items
+    canRestore: (finalCapabilities.canUntrash ?? false) && isTrashed && isTrashView,
 
-    // Permanent delete - available in trash view OR for files with delete permission (owner files)
-    canPermanentDelete: (isTrashView && isTrashed && (finalCapabilities.canDelete ?? false)) || 
-                       (!isTrashView && !isTrashed && (finalCapabilities.canDelete ?? false)),
+    // Permanent delete available if:
+    // 1. Item is in trash (safest approach)
+    // 2. OR item has delete capability (for owner files)
+    canPermanentDelete: isTrashed || (finalCapabilities.canDelete ?? false),
   };
 }
