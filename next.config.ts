@@ -5,7 +5,7 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   experimental: {
-    turbo: {
+    turbopack: {
       rules: {
         '*.svg': {
           loaders: ['@svgr/webpack'],
