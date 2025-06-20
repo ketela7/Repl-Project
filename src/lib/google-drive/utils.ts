@@ -1200,3 +1200,4 @@ export function renderFileIcon(
     sizeClass
   };
 }
+The malformed text in the utilities file and the duplicate `formatFileSize` function have been removed.
