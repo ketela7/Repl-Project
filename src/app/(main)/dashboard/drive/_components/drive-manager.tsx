@@ -2364,7 +2364,7 @@ export function DriveManager() {
     }
   };
 
-  // Fix server action issue
+  // Fix server action issue and add sticky toolbar behavior
   useEffect(() => {
     // Clear any stale form data that might cause server action errors
     if (typeof window !== 'undefined') {
@@ -2374,6 +2374,41 @@ export function DriveManager() {
           form.removeAttribute('action');
         }
       });
+
+      // Android-style sticky toolbar behavior
+      let lastScrollY = window.scrollY;
+      let ticking = false;
+
+      const updateToolbar = () => {
+        const toolbar = document.getElementById('drive-toolbar');
+        if (!toolbar) return;
+
+        const currentScrollY = window.scrollY;
+        
+        if (currentScrollY > lastScrollY && currentScrollY > 100) {
+          // Scrolling down - hide toolbar
+          toolbar.style.transform = 'translateY(-100%)';
+        } else {
+          // Scrolling up or at top - show toolbar
+          toolbar.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollY = currentScrollY;
+        ticking = false;
+      };
+
+      const onScroll = () => {
+        if (!ticking) {
+          requestAnimationFrame(updateToolbar);
+          ticking = true;
+        }
+      };
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      
+      return () => {
+        window.removeEventListener('scroll', onScroll);
+      };
     }
   }, []);
 
@@ -2384,39 +2419,74 @@ export function DriveManager() {
 
   if (loading && files.length === 0) {
     return (
-      <div className="space-y-4 sm:space-y-6 px-2 sm:px-0">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 flex-1 sm:max-w-md">
-            <Input
-              placeholder="Search files and folders..."
-              value=""
-              disabled
-              className="text-sm"
-            />
-            <Button size="sm" variant="outline" disabled>
-              <Search className="h-4 w-4" />
-            </Button>
+      <div className="w-full space-y-3 sm:space-y-4">
+        {/* Skeleton Toolbar */}
+        <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
+          <div className="flex items-center justify-between p-3 md:p-4">
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
+              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
+              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
+              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
+              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 bg-muted rounded-md animate-pulse" />
+              <div className="h-8 w-8 bg-muted rounded-md animate-pulse" />
+            </div>
           </div>
         </div>
-        <BreadcrumbLoadingSkeleton />
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle>
-              <LoadingSkeleton count={1} type="list" />
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <LoadingSkeleton count={8} type={viewMode} />
-          </CardContent>
-        </Card>
+
+        {/* Skeleton Search */}
+        <div className="px-2 sm:px-0">
+          <div className="h-10 bg-muted rounded-md animate-pulse" />
+        </div>
+
+        {/* Skeleton Breadcrumb */}
+        <div className="px-2 sm:px-0">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-12 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-4 bg-muted rounded animate-pulse" />
+            <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Skeleton File List */}
+        <div className="px-2 sm:px-0">
+          <Card>
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+                <div className="h-6 w-16 bg-muted rounded animate-pulse" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2">
+                    <div className="h-4 w-4 bg-muted rounded animate-pulse flex-shrink-0" />
+                    <div className="h-4 w-4 bg-muted rounded animate-pulse flex-shrink-0" />
+                    <div className="flex-1 space-y-1">
+                      <div className="h-4 bg-muted rounded animate-pulse" style={{ width: `${60 + Math.random() * 40}%` }} />
+                      <div className="h-3 bg-muted rounded animate-pulse" style={{ width: `${30 + Math.random() * 30}%` }} />
+                    </div>
+                    <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+                    <div className="h-4 w-4 bg-muted rounded animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="w-full space-y-3 sm:space-y-4">
-      {/* DriveManager Toolbar - Sticky at top */}
-      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
+      {/* DriveManager Toolbar - Sticky with Android-style behavior */}
+      <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm transition-transform duration-200 ease-in-out"
+           id="drive-toolbar">
         <div className="flex items-center justify-between p-3 md:p-4 overflow-x-auto scrollbar-hide scroll-smooth"
              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {/* Main Menu - 5 Items - Horizontal Scrollable */}
@@ -2776,16 +2846,47 @@ export function DriveManager() {
                           <Folder className="h-4 w-4" />
                         </Button>
                         {[
-                          { type: 'document', icon: FileText, title: 'Documents' },
-                          { type: 'spreadsheet', icon: Grid3X3, title: 'Spreadsheets' },
-                          { type: 'presentation', icon: Play, title: 'Presentations' },
-                          { type: 'image', icon: Eye, title: 'Images' },
-                          { type: 'video', icon: Play, title: 'Videos' },
-                          { type: 'audio', icon: Play, title: 'Audio' },
-                          { type: 'archive', icon: Download, title: 'Archives' },
-                          { type: 'code', icon: Settings, title: 'Code Files' }
+                          { 
+                            type: 'document', 
+                            mimeType: 'application/vnd.google-apps.document', 
+                            title: 'Documents' 
+                          },
+                          { 
+                            type: 'spreadsheet', 
+                            mimeType: 'application/vnd.google-apps.spreadsheet', 
+                            title: 'Spreadsheets' 
+                          },
+                          { 
+                            type: 'presentation', 
+                            mimeType: 'application/vnd.google-apps.presentation', 
+                            title: 'Presentations' 
+                          },
+                          { 
+                            type: 'image', 
+                            mimeType: 'image/jpeg', 
+                            title: 'Images' 
+                          },
+                          { 
+                            type: 'video', 
+                            mimeType: 'video/mp4', 
+                            title: 'Videos' 
+                          },
+                          { 
+                            type: 'audio', 
+                            mimeType: 'audio/mp3', 
+                            title: 'Audio' 
+                          },
+                          { 
+                            type: 'archive', 
+                            mimeType: 'application/zip', 
+                            title: 'Archives' 
+                          },
+                          { 
+                            type: 'code', 
+                            mimeType: 'text/javascript', 
+                            title: 'Code Files' 
+                          }
                         ].map((filter) => {
-                          const IconComponent = filter.icon;
                           return (
                             <Button
                               key={filter.type}
@@ -2795,7 +2896,7 @@ export function DriveManager() {
                               className="justify-center text-xs p-2"
                               title={filter.title}
                             >
-                              <IconComponent className="h-4 w-4" />
+                              <FileIcon mimeType={filter.mimeType} className="h-4 w-4" />
                             </Button>
                           );
                         })}
