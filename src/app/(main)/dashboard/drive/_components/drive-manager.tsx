@@ -1304,6 +1304,11 @@ export function DriveManager() {
     setActiveView(view);
     setCurrentFolderId(null); // Reset to root when changing views
     setSearchQuery(''); // Clear search
+    
+    // Clear selection when changing views
+    setSelectedItems(new Set());
+    setIsSelectMode(false);
+    
     fetchFiles(undefined, undefined, undefined, false, view);
   };
 
@@ -2051,6 +2056,11 @@ export function DriveManager() {
                       {selectedItems.size}
                     </Badge>
                   )}
+                  {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
+                    <Badge variant="destructive" className="ml-2 text-xs">
+                      Trash Mode
+                    </Badge>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64">
@@ -2112,7 +2122,7 @@ export function DriveManager() {
                           Actions
                         </div>
                         
-                        {searchQuery === 'trashed:true' ? (
+                        {activeView === 'trash' || searchQuery.includes('trashed:true') ? (
                           <>
                             <DropdownMenuItem 
                               onClick={() => setIsBulkRestoreDialogOpen(true)}
@@ -3469,6 +3479,24 @@ export function DriveManager() {
         selectedItems={getSelectedItemsData()}
       />
 
+      {/* Bulk Operations Progress Indicator */}
+      {bulkOperationProgress.isRunning && (
+        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg">
+          <div className="flex items-center gap-3">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            <div className="flex-1">
+              <div className="text-sm font-medium">{bulkOperationProgress.operation}</div>
+              <div className="text-xs text-muted-foreground">
+                {bulkOperationProgress.current} of {bulkOperationProgress.total} items
+              </div>
+            </div>
+          </div>
+          <Progress 
+            value={(bulkOperationProgress.current / bulkOperationProgress.total) * 100} 
+            className="mt-2"
+          />
+        </div>
+      )}
 
     </div>
   );
