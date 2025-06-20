@@ -1511,7 +1511,7 @@ export function DriveManager() {
             body: JSON.stringify({
               action: 'get_share_link',
               role: shareData.role,
-              type: shareData.type
+              type: shareData.type === 'anyoneWithLink' ? 'anyone' : shareData.type
             })
           });
 

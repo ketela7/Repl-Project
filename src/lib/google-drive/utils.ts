@@ -790,18 +790,18 @@ export function getFileActions(
     canPreview: !isFolder,
 
     // Download - always available, API handles restrictions
-    canDownload: finalCapabilities.canDownload ?? true,
+    canDownload: finalCapabilities.canDownload,
 
     // Details - always available  
     canDetails: true,
 
     // All other actions: use direct API capabilities without extra logic
-    canRename: finalCapabilities.canRename ?? false,
-    canMove: finalCapabilities.canMoveItemWithinDrive ?? false,
-    canCopy: finalCapabilities.canCopy ?? false,
-    canShare: finalCapabilities.canShare ?? false,
-    canTrash: finalCapabilities.canTrash ?? false,
-    canRestore: finalCapabilities.canUntrash ?? false,
-    canPermanentDelete: finalCapabilities.canDelete ?? false,
+    canRename: finalCapabilities.canRename,
+    canMove: finalCapabilities.canMoveItemWithinDrive,
+    canCopy: finalCapabilities.canCopy,
+    canShare: finalCapabilities.canShare,
+    canTrash: finalCapabilities.canTrash,
+    canRestore: isTrashed && finalCapabilities.canUntrash,
+    canPermanentDelete: finalCapabilities.canDelete,
   };
 }

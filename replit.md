@@ -143,3 +143,8 @@ Preferred communication style: Simple, everyday language.
   - **Single Source of Truth**: getFileActions menjadi satu-satunya logic untuk menentukan actions
   - **API-First Approach**: Logic sederhana yang mengikuti spesifikasi Google Drive API resmi
   - **Better Maintenance**: Update sekali di getFileActions, otomatis apply ke single dan bulk operations
+
+- June 20, 2025: **Share API Parameter Fix**:
+  - **Fixed Invalid Parameter**: Mengganti 'anyoneWithLink' dengan 'anyone' sesuai Google Drive API v3 spec
+  - **Proper Type Mapping**: Enhanced share dialog menggunakan mapping yang benar untuk permission types
+  - **API Compliance**: Share functionality sekarang mengikuti dokumentasi resmi Google Drive API
