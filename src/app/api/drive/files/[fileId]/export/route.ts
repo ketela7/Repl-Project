@@ -91,13 +91,13 @@ export async function GET(
 
     // Check if the requested format is supported for this file type
     const exportMimeTypes = EXPORT_MIME_TYPES[format as keyof typeof EXPORT_MIME_TYPES];
-    if (!exportMimeTypes || !exportMimeTypes[fileDetails.mimeType]) {
+    if (!exportMimeTypes || !exportMimeTypes[fileDetails.mimeType as keyof typeof exportMimeTypes]) {
       return NextResponse.json({ 
         error: `Format ${format} is not supported for this file type` 
       }, { status: 400 });
     }
 
-    const exportMimeType = exportMimeTypes[fileDetails.mimeType];
+    const exportMimeType = exportMimeTypes[fileDetails.mimeType as keyof typeof exportMimeTypes];
 
     // Export the file using Google Drive API
     const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=${encodeURIComponent(exportMimeType)}`, {

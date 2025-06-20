@@ -7,7 +7,7 @@ export async function POST(
   { params }: { params: { fileId: string } }
 ) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
@@ -18,8 +18,6 @@ export async function POST(
     const body = await request.json();
     const { action, role, type, emailAddress, message, allowFileDiscovery, expirationTime } = body;
 
-    // Initialize Google Drive service
-    const driveService = new GoogleDriveService();
     const accessToken = session.provider_token;
     
     if (!accessToken) {
@@ -29,6 +27,9 @@ export async function POST(
       }, { status: 401 });
     }
 
+    // Initialize Google Drive service
+    const driveService = new GoogleDriveService(accessToken);
+
     let result;
 
     switch (action) {
@@ -36,7 +37,7 @@ export async function POST(
         // Get or create a shareable link
         try {
           // First, try to get existing permissions to see if it's already shared
-          const existingPermissions = await driveService.getFilePermissions(fileId, accessToken);
+          const existingPermissions = await driveService.getFilePermissions(fileId);
           
           // Check if there's already a public link permission
           const publicPermission = existingPermissions?.find(p => 
@@ -45,7 +46,7 @@ export async function POST(
 
           if (publicPermission) {
             // Get file details to return the webViewLink
-            const fileDetails = await driveService.getFileDetails(fileId, accessToken);
+            const fileDetails = await driveService.getFileDetails(fileId);
             result = {
               webViewLink: fileDetails.webViewLink,
               webContentLink: fileDetails.webContentLink,
@@ -61,7 +62,7 @@ export async function POST(
             }, accessToken);
 
             // Get updated file details
-            const fileDetails = await driveService.getFileDetails(fileId, accessToken);
+            const fileDetails = await driveService.getFileDetails(fileId);
             
             result = {
               webViewLink: fileDetails.webViewLink,
@@ -184,7 +185,7 @@ export async function GET(
   { params }: { params: { fileId: string } }
 ) {
   try {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
@@ -192,9 +193,6 @@ export async function GET(
     }
 
     const { fileId } = params;
-
-    // Initialize Google Drive service
-    const driveService = new GoogleDriveService();
     const accessToken = session.provider_token;
     
     if (!accessToken) {
@@ -204,12 +202,15 @@ export async function GET(
       }, { status: 401 });
     }
 
+    // Initialize Google Drive service
+    const driveService = new GoogleDriveService(accessToken);
+
     try {
       // Get current permissions for the file
-      const permissions = await driveService.getFilePermissions(fileId, accessToken);
+      const permissions = await driveService.getFilePermissions(fileId);
       
       // Get file details for additional context
-      const fileDetails = await driveService.getFileDetails(fileId, accessToken);
+      const fileDetails = await driveService.getFileDetails(fileId);
       
       return NextResponse.json({
         permissions,
