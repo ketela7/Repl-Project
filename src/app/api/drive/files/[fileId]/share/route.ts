@@ -7,131 +7,243 @@ export async function POST(
   { params }: { params: { fileId: string } }
 ) {
   try {
-    const supabase = await createClient();
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
     
-    // Get fresh session instead of just user
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-    if (sessionError || !session?.user) {
-      console.log('Session error:', sessionError);
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = session.user;
-    console.log('Share API - User found:', user.email);
-    console.log('Share API - User metadata:', user.user_metadata);
-    console.log('Share API - Session keys:', Object.keys(session));
-
-    // Try multiple possible token locations
-    const accessToken = session.provider_token || 
-                       user.user_metadata?.provider_token ||
-                       session.access_token;
-    
-    console.log('Share API - Access token exists:', !!accessToken);
-    
-    if (!accessToken) {
-      console.log('Share API - No access token found anywhere');
-      return NextResponse.json({ 
-        error: 'Google Drive access not found. Please reconnect your Google account.',
-        needsReauth: true 
-      }, { status: 400 });
     }
 
     const { fileId } = params;
     const body = await request.json();
-    const { action, role = 'reader', type = 'anyone' } = body;
+    const { action, role, type, emailAddress, message, allowFileDiscovery, expirationTime } = body;
 
-    if (!fileId) {
-      return NextResponse.json({ error: 'File ID is required' }, { status: 400 });
+    // Initialize Google Drive service
+    const driveService = new GoogleDriveService();
+    const accessToken = session.provider_token;
+    
+    if (!accessToken) {
+      return NextResponse.json({ 
+        error: 'Google Drive access token not found',
+        needsReauth: true 
+      }, { status: 401 });
     }
 
-    console.log('=== Share File API Called ===');
-    console.log('File ID:', fileId);
-    console.log('Action:', action);
-    console.log('Role:', role);
-    console.log('Type:', type);
-    console.log('Access token exists:', !!accessToken);
-
-    const driveService = new GoogleDriveService(accessToken);
+    let result;
 
     switch (action) {
       case 'get_share_link':
-        // First, make sure the file is shared with anyone with the link
+        // Get or create a shareable link
         try {
-          console.log('Setting file permissions for sharing...');
-          await driveService.shareFile(fileId, {
-            role: role as 'reader' | 'writer' | 'commenter',
-            type: type as 'user' | 'group' | 'domain' | 'anyone'
-          });
-          console.log('File permissions updated successfully');
-        } catch (permissionError) {
-          console.error('Failed to update permissions:', permissionError);
-          // Continue anyway - the file might already be shared
-        }
-
-        // Get the file metadata to retrieve the webViewLink
-        console.log('Fetching file metadata for share link...');
-        const fileMetadata = await driveService.getFile(fileId);
-        
-        if (!fileMetadata) {
-          return NextResponse.json(
-            { error: 'File not found' },
-            { status: 404 }
+          // First, try to get existing permissions to see if it's already shared
+          const existingPermissions = await driveService.getFilePermissions(fileId, accessToken);
+          
+          // Check if there's already a public link permission
+          const publicPermission = existingPermissions?.find(p => 
+            p.type === type && p.role === role
           );
-        }
 
-        const shareLink = fileMetadata.webViewLink;
-        if (!shareLink) {
-          return NextResponse.json(
-            { error: 'Unable to generate share link for this file' },
-            { status: 400 }
-          );
-        }
+          if (publicPermission) {
+            // Get file details to return the webViewLink
+            const fileDetails = await driveService.getFileDetails(fileId, accessToken);
+            result = {
+              webViewLink: fileDetails.webViewLink,
+              webContentLink: fileDetails.webContentLink,
+              permissionId: publicPermission.id,
+              message: 'File is already shared with these settings'
+            };
+          } else {
+            // Create new permission
+            const permission = await driveService.createPermission(fileId, {
+              type,
+              role,
+              allowFileDiscovery
+            }, accessToken);
 
-        console.log('Share link generated successfully:', shareLink);
-        return NextResponse.json({
-          success: true,
-          webViewLink: shareLink,
-          fileId: fileId,
-          fileName: fileMetadata.name
-        });
+            // Get updated file details
+            const fileDetails = await driveService.getFileDetails(fileId, accessToken);
+            
+            result = {
+              webViewLink: fileDetails.webViewLink,
+              webContentLink: fileDetails.webContentLink,
+              permissionId: permission.id,
+              message: 'Share link created successfully'
+            };
+          }
+        } catch (error: any) {
+          console.error('Error creating share link:', error);
+          
+          if (error.code === 403) {
+            return NextResponse.json({ 
+              error: 'Insufficient permissions to share this file',
+              needsReauth: false 
+            }, { status: 403 });
+          }
+          
+          if (error.code === 401) {
+            return NextResponse.json({ 
+              error: 'Google Drive access expired',
+              needsReauth: true 
+            }, { status: 401 });
+          }
+          
+          throw error;
+        }
+        break;
+
+      case 'add_permission':
+        // Add specific user permission
+        try {
+          const permission = await driveService.createPermission(fileId, {
+            type,
+            role,
+            emailAddress,
+            allowFileDiscovery,
+            expirationTime
+          }, accessToken);
+
+          if (message) {
+            await driveService.sendNotificationEmail(fileId, {
+              emailAddress,
+              message
+            }, accessToken);
+          }
+
+          result = {
+            permissionId: permission.id,
+            message: 'Permission added successfully'
+          };
+        } catch (error: any) {
+          console.error('Error adding permission:', error);
+          
+          if (error.code === 403) {
+            return NextResponse.json({ 
+              error: 'Insufficient permissions to share this file',
+              needsReauth: false 
+            }, { status: 403 });
+          }
+          
+          if (error.code === 401) {
+            return NextResponse.json({ 
+              error: 'Google Drive access expired',
+              needsReauth: true 
+            }, { status: 401 });
+          }
+          
+          throw error;
+        }
+        break;
+
+      case 'remove_permission':
+        // Remove specific permission
+        try {
+          await driveService.deletePermission(fileId, body.permissionId, accessToken);
+          
+          result = {
+            message: 'Permission removed successfully'
+          };
+        } catch (error: any) {
+          console.error('Error removing permission:', error);
+          
+          if (error.code === 403) {
+            return NextResponse.json({ 
+              error: 'Insufficient permissions to modify sharing settings',
+              needsReauth: false 
+            }, { status: 403 });
+          }
+          
+          if (error.code === 401) {
+            return NextResponse.json({ 
+              error: 'Google Drive access expired',
+              needsReauth: true 
+            }, { status: 401 });
+          }
+          
+          throw error;
+        }
+        break;
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        );
-    }
-  } catch (error) {
-    console.error('Share API error:', error);
-    
-    // Handle specific Google API errors
-    if (error instanceof Error) {
-      if (error.message.includes('invalid_grant') || error.message.includes('invalid_token')) {
-        return NextResponse.json(
-          { error: 'Google Drive access expired', needsReauth: true },
-          { status: 401 }
-        );
-      }
-      
-      if (error.message.includes('insufficientFilePermissions') || error.message.includes('forbidden')) {
-        return NextResponse.json(
-          { error: 'Insufficient permissions to share this file' },
-          { status: 403 }
-        );
-      }
-      
-      if (error.message.includes('notFound')) {
-        return NextResponse.json(
-          { error: 'File not found' },
-          { status: 404 }
-        );
-      }
+        return NextResponse.json({ 
+          error: 'Invalid action specified' 
+        }, { status: 400 });
     }
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json(result);
+
+  } catch (error) {
+    console.error('Share API error:', error);
+    return NextResponse.json({ 
+      error: 'Internal server error during share operation' 
+    }, { status: 500 });
+  }
+}
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { fileId: string } }
+) {
+  try {
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { fileId } = params;
+
+    // Initialize Google Drive service
+    const driveService = new GoogleDriveService();
+    const accessToken = session.provider_token;
+    
+    if (!accessToken) {
+      return NextResponse.json({ 
+        error: 'Google Drive access token not found',
+        needsReauth: true 
+      }, { status: 401 });
+    }
+
+    try {
+      // Get current permissions for the file
+      const permissions = await driveService.getFilePermissions(fileId, accessToken);
+      
+      // Get file details for additional context
+      const fileDetails = await driveService.getFileDetails(fileId, accessToken);
+      
+      return NextResponse.json({
+        permissions,
+        fileDetails: {
+          webViewLink: fileDetails.webViewLink,
+          webContentLink: fileDetails.webContentLink,
+          shared: fileDetails.shared
+        }
+      });
+
+    } catch (error: any) {
+      console.error('Error fetching share details:', error);
+      
+      if (error.code === 403) {
+        return NextResponse.json({ 
+          error: 'Insufficient permissions to view sharing settings',
+          needsReauth: false 
+        }, { status: 403 });
+      }
+      
+      if (error.code === 401) {
+        return NextResponse.json({ 
+          error: 'Google Drive access expired',
+          needsReauth: true 
+        }, { status: 401 });
+      }
+      
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('Share details API error:', error);
+    return NextResponse.json({ 
+      error: 'Internal server error while fetching share details' 
+    }, { status: 500 });
   }
 }

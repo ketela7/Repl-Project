@@ -701,11 +701,72 @@ export class GoogleDriveService {
         fileId,
         permissionId
       });
-
-      console.log('Permission removed successfully for file:', fileId);
     } catch (error) {
-      console.error('Error removing permission:', error);
+      console.error('Error removing file permission:', error);
       throw error;
     }
+  }
+
+  // Create permission (for enhanced sharing)
+  async createPermission(fileId: string, permissionData: any, accessToken?: string): Promise<any> {
+    try {
+      const response = await this.drive.permissions.create({
+        fileId,
+        requestBody: permissionData,
+        sendNotificationEmail: false
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating permission:', error);
+      throw error;
+    }
+  }
+
+  // Get file permissions (for enhanced sharing)
+  async getFilePermissions(fileId: string, accessToken?: string): Promise<any[]> {
+    try {
+      const response = await this.drive.permissions.list({
+        fileId,
+        fields: 'permissions(id, type, role, emailAddress, domain, displayName)'
+      });
+      return response.data.permissions || [];
+    } catch (error) {
+      console.error('Error getting file permissions:', error);
+      throw error;
+    }
+  }
+
+  // Delete permission (for enhanced sharing)
+  async deletePermission(fileId: string, permissionId: string, accessToken?: string): Promise<void> {
+    try {
+      await this.drive.permissions.delete({
+        fileId,
+        permissionId
+      });
+    } catch (error) {
+      console.error('Error deleting permission:', error);
+      throw error;
+    }
+  }
+
+  // Get file details (for enhanced sharing)
+  async getFileDetails(fileId: string, accessToken?: string): Promise<any> {
+    try {
+      const response = await this.drive.files.get({
+        fileId,
+        fields: 'id, name, mimeType, webViewLink, webContentLink, shared'
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error getting file details:', error);
+      throw error;
+    }
+  }
+
+  // Send notification email (for enhanced sharing)
+  async sendNotificationEmail(fileId: string, emailData: any, accessToken?: string): Promise<void> {
+    // Note: This would typically use the Gmail API or similar service
+    // For now, we'll just log the action
+    console.log('Notification email would be sent for file:', fileId, 'with data:', emailData);
   }
 }

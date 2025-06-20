@@ -103,6 +103,8 @@ import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
+import { EnhancedShareDialog } from './enhanced-share-dialog';
+import { BulkShareDialog } from './bulk-share-dialog';
 
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { FileCategoryBadges } from '@/components/file-category-badges';
@@ -393,6 +395,11 @@ export function DriveManager() {
     isRunning: boolean;
     operation: string;
   }>({ isRunning: false, operation: '' });
+
+  // Additional dialog state for enhanced sharing
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isBulkShareDialogOpen, setIsBulkShareDialogOpen] = useState(false);
+  const [selectedItemForShare, setSelectedItemForShare] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
 
   // Sorting functionality
   const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
@@ -1380,6 +1387,150 @@ export function DriveManager() {
     }
   };
 
+  const handleBulkShare = async (shareData: { role: string; type: string }) => {
+    const selectedItemsData = getSelectedItemsData();
+    if (selectedItemsData.length === 0) return;
+
+    // Close dialog first so user can see progress
+    setIsBulkShareDialogOpen(false);
+
+    // Filter items that can be shared based on permissions
+    const itemsWithPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return actions?.canShare;
+    });
+
+    const itemsWithoutPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return !actions?.canShare;
+    });
+
+    if (itemsWithPermissions.length === 0) {
+      toast.warning('No items can be shared. All selected items either don\'t have permission or are restricted.');
+      return;
+    }
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: itemsWithPermissions.length,
+      operation: 'Generating share links'
+    });
+
+    let successCount = 0;
+    let failedItems: string[] = [];
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
+    const generatedLinks: string[] = [];
+
+    try {
+      for (let i = 0; i < itemsWithPermissions.length; i++) {
+        const item = itemsWithPermissions[i];
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Sharing: ${item.name}`
+        }));
+
+        try {
+          const response = await fetch(`/api/drive/files/${item.id}/share`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'get_share_link',
+              role: shareData.role,
+              type: shareData.type
+            })
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.webViewLink) {
+              generatedLinks.push(`${item.name}: ${result.webViewLink}`);
+              successCount++;
+            } else {
+              failedItems.push(item.name);
+            }
+          } else {
+            const errorData = await response.json();
+            if (errorData.needsReauth) {
+              toast.error('Google Drive access expired. Please reconnect your account.');
+              window.location.reload();
+              return;
+            }
+            failedItems.push(item.name);
+            console.error(`Failed to share ${item.name}:`, response.status, errorData);
+          }
+        } catch (error) {
+          failedItems.push(item.name);
+          console.error(`Error sharing ${item.name}:`, error);
+        }
+
+        if (i < itemsWithPermissions.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+      }
+
+      deselectAll();
+      setIsSelectMode(false);
+
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} share link${successCount > 1 ? 's' : ''} generated`;
+        
+        // Copy all links to clipboard if successful
+        if (generatedLinks.length > 0) {
+          try {
+            const allLinks = generatedLinks.join('\n');
+            await navigator.clipboard.writeText(allLinks);
+            toast.success(`${message} and copied to clipboard!`);
+          } catch (clipboardError) {
+            toast.success(message);
+          }
+        }
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped (no permission)`;
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} item${failedItems.length > 1 ? 's' : ''} failed`;
+      }
+
+      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
+        // Already handled above with clipboard copy
+      } else if (successCount > 0 || skippedItems.length > 0) {
+        const toastMessage = `Bulk share completed: ${message}`;
+        if (failedItems.length > 0 || skippedItems.length > 0) {
+          toast.warning(toastMessage);
+        } else {
+          toast.success(toastMessage);
+        }
+        
+        // Log details for debugging
+        if (skippedItems.length > 0) {
+          console.log('Skipped items (no permission):', skippedItems);
+        }
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
+      } else {
+        toast.error(`Failed to share items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
+    } catch (error) {
+      console.error('Bulk share error:', error);
+      toast.error('An error occurred during bulk share operation');
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+    }
+  };
+
   const handleBulkPermanentDelete = async () => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
@@ -2008,58 +2159,13 @@ export function DriveManager() {
           console.log('Item ID:', fileId);
           console.log('Item Name:', fileName);
 
-          const shareResponse = await fetch(`/api/drive/files/${fileId}/share`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              action: 'get_share_link',
-              role: 'reader',
-              type: 'anyone' 
-            })
-          });
+          // Open enhanced share dialog with customizable privacy settings
+          const shareFile = files.find(f => f.id === fileId);
+          const shareFolder = folders.find(f => f.id === fileId);
+          const shareItemType = shareFile ? 'file' : 'folder';
 
-          console.log('Share response status:', shareResponse.status);
-
-          if (!shareResponse.ok) {
-            const errorData = await shareResponse.json();
-            console.error('Share failed:', errorData);
-
-            if (errorData.needsReauth) {
-              toast.error('Google Drive access expired. Please reconnect your account.');
-              window.location.reload();
-              return;
-            }
-
-            if (shareResponse.status === 403) {
-              toast.error(`You don't have permission to share "${fileName}". This may be a file or folder with restricted sharing access.`);
-              return;
-            }
-
-            if (shareResponse.status === 404) {
-              toast.error(`"${fileName}" was not found. It may have been moved or deleted.`);
-              await handleRefresh();
-              return;
-            }
-
-            throw new Error(errorData.error || 'Failed to get share link');
-          }
-
-          const shareResult = await shareResponse.json();
-          console.log('Share successful:', shareResult);
-
-          if (shareResult.webViewLink) {
-            // Copy to clipboard
-            try {
-              await navigator.clipboard.writeText(shareResult.webViewLink);
-              toast.success(`Share link for "${fileName}" copied to clipboard!`);
-            } catch (clipboardError) {
-              console.error('Failed to copy to clipboard:', clipboardError);
-              // Fallback - show the link in a temporary dialog or toast
-              toast.success(`Share link generated for "${fileName}": ${shareResult.webViewLink}`);
-            }
-          } else {
-            toast.error('Failed to generate share link');
-          }
+          setSelectedItemForShare({ id: fileId, name: fileName, type: shareItemType });
+          setIsShareDialogOpen(true);
           break;
 
         default:
@@ -2660,6 +2766,18 @@ export function DriveManager() {
                           <DropdownMenuItem onClick={() => setIsBulkCopyDialogOpen(true)}>
                             <Copy className="h-4 w-4 mr-2" />
                             Copy Selected
+                          </DropdownMenuItem>
+                        )}
+                        
+                        {/* Share Selected - Available if any item can be shared */}
+                        {getSelectedItemsData().some(item => {
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                          return actions?.canShare;
+                        }) && (
+                          <DropdownMenuItem onClick={() => setIsBulkShareDialogOpen(true)}>
+                            <Share2 className="h-4 w-4 mr-2" />
+                            Share Selected
                           </DropdownMenuItem>
                         )}
                         
@@ -3768,7 +3886,7 @@ export function DriveManager() {
                           >
                             <FileIcon 
                               mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType} 
-                              className="h-5 w-5" 
+                              className="h-4 w-4" 
                             />
                           </FileThumbnailPreview>
                         </div>
@@ -4177,6 +4295,21 @@ export function DriveManager() {
           </div>
         </div>
       )}
+
+      {/* Enhanced Share Dialog */}
+      <EnhancedShareDialog
+        open={isShareDialogOpen}
+        onOpenChange={setIsShareDialogOpen}
+        item={selectedItemForShare}
+      />
+
+      {/* Bulk Share Dialog */}
+      <BulkShareDialog
+        open={isBulkShareDialogOpen}
+        onOpenChange={setIsBulkShareDialogOpen}
+        selectedItems={getSelectedItemsData()}
+        onShare={handleBulkShare}
+      />
 
     </div>
   );
