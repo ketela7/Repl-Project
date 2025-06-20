@@ -1017,36 +1017,61 @@ export function DriveManager() {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
+    // Filter items that can be restored based on permissions
+    const itemsWithPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return actions?.canRestore;
+    });
+
+    const itemsWithoutPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return !actions?.canRestore;
+    });
+
+    if (itemsWithPermissions.length === 0) {
+      toast.warning('No items can be restored. All selected items are either not in trash or don\'t have permission to be restored.');
+      setIsBulkRestoreDialogOpen(false);
+      return;
+    }
+
     setBulkOperationProgress({
       isRunning: true,
       current: 0,
-      total: selectedItemsData.length,
+      total: itemsWithPermissions.length,
       operation: 'Restoring items'
     });
 
     let successCount = 0;
     let failedItems: string[] = [];
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
-      for (let i = 0; i < selectedItemsData.length; i++) {
-        const item = selectedItemsData[i];
+      for (let i = 0; i < itemsWithPermissions.length; i++) {
+        const item = itemsWithPermissions[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
 
-        const response = await fetch(`/api/drive/files/${item.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'restore' })
-        });
+        try {
+          const response = await fetch(`/api/drive/files/${item.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'restore' })
+          });
 
-        if (response.ok) {
-          successCount++;
-        } else {
-          const errorData = await response.text();
+          if (response.ok) {
+            successCount++;
+          } else {
+            const errorData = await response.text();
+            failedItems.push(item.name);
+            console.error(`Failed to restore ${item.name}:`, response.status, errorData);
+          }
+        } catch (error) {
           failedItems.push(item.name);
-          console.error(`Failed to restore ${item.name}:`, response.status, errorData);
+          console.error(`Error restoring ${item.name}:`, error);
         }
 
-        if (i < selectedItemsData.length - 1) {
+        if (i < itemsWithPermissions.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
@@ -1055,12 +1080,42 @@ export function DriveManager() {
       deselectAll();
       setIsSelectMode(false);
 
-      if (successCount === selectedItemsData.length) {
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} item${successCount > 1 ? 's' : ''} restored`;
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped (not in trash or no permission)`;
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} item${failedItems.length > 1 ? 's' : ''} failed`;
+      }
+
+      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
         toast.success(`Successfully restored ${successCount} item${successCount > 1 ? 's' : ''}`);
-      } else if (successCount > 0) {
-        toast.warning(`Restored ${successCount} items. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else if (successCount > 0 || skippedItems.length > 0) {
+        const toastMessage = `Restore completed: ${message}`;
+        if (failedItems.length > 0 || skippedItems.length > 0) {
+          toast.warning(toastMessage);
+        } else {
+          toast.success(toastMessage);
+        }
+        
+        // Log details for debugging
+        if (skippedItems.length > 0) {
+          console.log('Skipped items (not in trash or no permission):', skippedItems);
+        }
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
       } else {
-        toast.error(`Failed torestore items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+        toast.error(`Failed to restore items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
     } catch (error) {
       console.error('Bulk restore error:', error);
@@ -1075,34 +1130,59 @@ export function DriveManager() {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
+    // Filter items that can be permanently deleted based on permissions
+    const itemsWithPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return actions?.canPermanentDelete;
+    });
+
+    const itemsWithoutPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return !actions?.canPermanentDelete;
+    });
+
+    if (itemsWithPermissions.length === 0) {
+      toast.warning('No items can be permanently deleted. All selected items either don\'t have permission or are not in trash.');
+      setIsBulkPermanentDeleteDialogOpen(false);
+      return;
+    }
+
     setBulkOperationProgress({
       isRunning: true,
       current: 0,
-      total: selectedItemsData.length,
+      total: itemsWithPermissions.length,
       operation: 'Permanently deleting items'
     });
 
     let successCount = 0;
     let failedItems: string[] = [];
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
-      for (let i = 0; i < selectedItemsData.length; i++) {
-        const item = selectedItemsData[i];
+      for (let i = 0; i < itemsWithPermissions.length; i++) {
+        const item = itemsWithPermissions[i];
         setBulkOperationProgress(prev => ({ ...prev, current: i + 1 }));
 
-        const response = await fetch(`/api/drive/files/${item.id}`, {
-          method: 'DELETE'
-        });
+        try {
+          const response = await fetch(`/api/drive/files/${item.id}`, {
+            method: 'DELETE'
+          });
 
-        if (response.ok) {
-          successCount++;
-        } else {
-          const errorData = await response.text();
+          if (response.ok) {
+            successCount++;
+          } else {
+            const errorData = await response.text();
+            failedItems.push(item.name);
+            console.error(`Failed to permanently delete ${item.name}:`, response.status, errorData);
+          }
+        } catch (error) {
           failedItems.push(item.name);
-          console.error(`Failed to permanently delete ${item.name}:`, response.status, errorData);
+          console.error(`Error permanently deleting ${item.name}:`, error);
         }
 
-        if (i < selectedItemsData.length - 1) {
+        if (i < itemsWithPermissions.length - 1) {
           await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
@@ -1111,12 +1191,42 @@ export function DriveManager() {
       deselectAll();
       setIsSelectMode(false);
 
-      if (successCount === selectedItemsData.length) {
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} item${successCount > 1 ? 's' : ''} permanently deleted`;
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped (no permission or not in trash)`;
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} item${failedItems.length > 1 ? 's' : ''} failed`;
+      }
+
+      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
         toast.success(`Successfully deleted ${successCount} item${successCount > 1 ? 's' : ''} permanently`);
-      } else if (successCount > 0) {
-        toast.warning(`Deleted ${successCount} items permanently. ${failedItems.length} items failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      } else if (successCount > 0 || skippedItems.length > 0) {
+        const toastMessage = `Permanent delete completed: ${message}`;
+        if (failedItems.length > 0 || skippedItems.length > 0) {
+          toast.warning(toastMessage);
+        } else {
+          toast.success(toastMessage);
+        }
+        
+        // Log details for debugging
+        if (skippedItems.length > 0) {
+          console.log('Skipped items (no permission):', skippedItems);
+        }
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
       } else {
-        toast.error(`Failed to delete items permanently: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+        toast.error(`Failed to permanently delete items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
       }
     } catch (error) {
       console.error('Bulk permanent delete error:', error);
@@ -2122,30 +2232,48 @@ export function DriveManager() {
                           Actions
                         </div>
                         
-                        {activeView === 'trash' || searchQuery.includes('trashed:true') ? (
-                          <>
-                            <DropdownMenuItem 
-                              onClick={() => setIsBulkRestoreDialogOpen(true)}
-                              className="text-green-600 dark:text-green-400"
-                            >
-                              <RefreshCw className="h-4 w-4 mr-2" />
-                              Restore Selected
-                            </DropdownMenuItem>
-                            <DropdownMenuItem 
-                              onClick={() => setIsBulkPermanentDeleteDialogOpen(true)}
-                              className="text-red-600 dark:text-red-400"
-                            >
-                              <AlertTriangle className="h-4 w-4 mr-2" />
-                              Permanently Delete
-                            </DropdownMenuItem>
-                          </>
-                        ) : (
+                        {/* Check if any selected item can be restored (only for trashed items) */}
+                        {getSelectedItemsData().some(item => {
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                          return actions?.canRestore;
+                        }) && (
+                          <DropdownMenuItem 
+                            onClick={() => setIsBulkRestoreDialogOpen(true)}
+                            className="text-green-600 dark:text-green-400"
+                          >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Restore Selected
+                          </DropdownMenuItem>
+                        )}
+                        
+                        {/* Check if any selected item can be moved to trash */}
+                        {getSelectedItemsData().some(item => {
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                          return actions?.canTrash;
+                        }) && (
                           <DropdownMenuItem 
                             onClick={() => setIsBulkDeleteDialogOpen(true)}
                             className="text-orange-600 dark:text-orange-400"
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Move to Trash
+                          </DropdownMenuItem>
+                        )}
+                        
+                        {/* Check if any selected item can be permanently deleted */}
+                        {getSelectedItemsData().some(item => {
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+                          return actions?.canPermanentDelete;
+                        }) && (
+                          <DropdownMenuItem 
+                            onClick={() => setIsBulkPermanentDeleteDialogOpen(true)}
+                            className="text-red-600 dark:text-red-400"
+                          >
+                            <AlertTriangle className="h-4 w-4 mr-2" />
+                            Permanently Delete
                           </DropdownMenuItem>
                         )}
                       </>
