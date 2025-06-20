@@ -201,6 +201,7 @@ export function BulkShareDialog({
             </Select>
           </div>
         </div>
+      </div>
     </div>
   );
 
