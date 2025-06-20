@@ -1,18 +1,11 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Replit optimization
-  port: 5000,
-  hostname: '0.0.0.0',
-  
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
-    // Reduce memory pressure
-    turbo: {
-      memoryLimit: 512,
-    },
   },
   turbopack: {
     rules: {
@@ -47,7 +40,12 @@ const nextConfig = {
       },
     ];
   },
-  allowedDevOrigins: ['*.replit.dev'],
+  allowedDevOrigins: [
+    '*.replit.dev',
+    '127.0.0.1',
+    'localhost',
+    '0.0.0.0'
+  ],
   async redirects() {
     return [
       {
