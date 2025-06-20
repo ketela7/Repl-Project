@@ -135,3 +135,16 @@ Preferred communication style: Simple, everyday language.
   - **Mobile Actions Integration**: Added permanent delete option to mobile bottom sheet with proper styling and warning indicators
   - **Consistent Implementation**: Both desktop dropdown and mobile bottom sheet now show permanent delete option when appropriate
   - **View Status Filter Fix**: Corrected FiltersDialog to call handleViewChange properly instead of just setting state, ensuring view changes actually refresh data
+
+- June 20, 2025: **Google Drive API Capabilities Logic Optimization**:
+  - **Copy Logic Fixed**: Updated canCopy to follow Google Drive API specifications:
+    - All files can be copied (including shared files) - only folders cannot be copied
+    - Removed unnecessary capability checks as copy works for all accessible files
+    - Simplified logic: `!isFolder && !isTrashed`
+  - **Enhanced Capability Handling**: Improved logic for all file actions to better align with Google Drive API behavior:
+    - Download: Default true for all files (API handles restrictions)
+    - Rename/Move: Based on actual capabilities from API
+    - Share: Requires share permission from API
+    - Trash/Restore: Based on ownership and permissions
+  - **Removed Overly Restrictive Checks**: Eliminated view-based restrictions that don't align with API capabilities
+  - **Better User Experience**: More actions available for shared files while respecting actual API permissions

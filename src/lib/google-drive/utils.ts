@@ -789,33 +789,34 @@ export function getFileActions(
     // Preview available for all files (not folders) - Google Drive can handle all file types
     canPreview: !isFolder,
 
-    // Download based on capabilities
+    // Download - Google Drive API: semua file bisa di-download kecuali restricted files
+    // Default true karena hampir semua file support download
     canDownload: finalCapabilities.canDownload ?? true,
 
-    // Rename only if not in trash/shared and has permission
-    canRename: !isTrashView && !isSharedView && !isTrashed && (finalCapabilities.canRename ?? false),
+    // Rename - hanya untuk file yang user miliki atau punya edit permission, tidak untuk shared read-only
+    canRename: !isTrashed && (finalCapabilities.canRename ?? false),
 
-    // Move only if not in trash/shared and has permission
-    canMove: !isTrashView && !isSharedView && !isTrashed && (finalCapabilities.canMoveItemWithinDrive ?? false),
+    // Move - hanya untuk file yang user miliki atau punya edit permission
+    canMove: !isTrashed && (finalCapabilities.canMoveItemWithinDrive ?? false),
 
-    // Copy based on capabilities for files only (folders can't be copied in Google Drive)
-    canCopy: (finalCapabilities.canCopy ?? false) && !isFolder && !isTrashed,
+    // Copy - berdasarkan Google Drive API: semua file bisa di-copy (kecuali folder)
+    // Bahkan shared files bisa di-copy ke Drive user sendiri
+    // Folders memang tidak bisa di-copy via API
+    canCopy: !isFolder && !isTrashed,
 
-    // Share based on capabilities and not in trash
-    canShare: (finalCapabilities.canShare ?? false) && !isTrashed,
+    // Share - hanya untuk file yang user punya sharing permission
+    canShare: !isTrashed && (finalCapabilities.canShare ?? false),
 
-    // Details always available
+    // Details selalu tersedia untuk semua file
     canDetails: true,
 
-    // Move to trash based on capabilities, not already trashed, and not shared view
-    canTrash: (finalCapabilities.canTrash ?? false) && !isTrashed && !isSharedView,
+    // Trash - hanya untuk file yang user miliki atau punya delete permission
+    canTrash: !isTrashed && (finalCapabilities.canTrash ?? false),
 
-    // Restore only available in trash view for trashed items
-    canRestore: (finalCapabilities.canUntrash ?? false) && isTrashed && isTrashView,
+    // Restore - hanya di trash view untuk trashed items dengan untrash permission
+    canRestore: isTrashed && isTrashView && (finalCapabilities.canUntrash ?? false),
 
-    // Permanent delete available if:
-    // 1. Item is in trash (safest approach)
-    // 2. OR item has delete capability (for owner files)
+    // Permanent delete - untuk trashed items dengan delete permission, atau owned files
     canPermanentDelete: isTrashed || (finalCapabilities.canDelete ?? false),
   };
 }
