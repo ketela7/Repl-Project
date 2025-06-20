@@ -796,12 +796,12 @@ export function getFileActions(
     // Rename - hanya untuk file yang user miliki atau punya edit permission, tidak untuk shared read-only
     canRename: !isTrashed && (finalCapabilities.canRename ?? false),
 
-    // Move - hanya untuk file yang user miliki atau punya edit permission
+    // Move - folders dan files bisa di-move berdasarkan capabilities
+    // Google Drive API mendukung move untuk semua item types
     canMove: !isTrashed && (finalCapabilities.canMoveItemWithinDrive ?? false),
 
-    // Copy - berdasarkan Google Drive API: semua file bisa di-copy (kecuali folder)
-    // Bahkan shared files bisa di-copy ke Drive user sendiri
-    // Folders memang tidak bisa di-copy via API
+    // Copy - Google Drive API mendukung copy untuk files, tapi tidak untuk folders
+    // Dalam aplikasi Google Drive asli, folder bisa di-duplicate secara manual tapi API tidak support direct copy
     canCopy: !isFolder && !isTrashed,
 
     // Share - hanya untuk file yang user punya sharing permission
@@ -810,13 +810,15 @@ export function getFileActions(
     // Details selalu tersedia untuk semua file
     canDetails: true,
 
-    // Trash - hanya untuk file yang user miliki atau punya delete permission
+    // Trash - folders dan files bisa di-trash berdasarkan capabilities
+    // Google Drive API mendukung trash untuk semua item types
     canTrash: !isTrashed && (finalCapabilities.canTrash ?? false),
 
     // Restore - hanya di trash view untuk trashed items dengan untrash permission
     canRestore: isTrashed && isTrashView && (finalCapabilities.canUntrash ?? false),
 
-    // Permanent delete - untuk trashed items dengan delete permission, atau owned files
+    // Permanent delete - folders dan files bisa di-delete permanent berdasarkan capabilities
+    // Google Drive API mendukung permanent delete untuk semua item types
     canPermanentDelete: isTrashed || (finalCapabilities.canDelete ?? false),
   };
 }

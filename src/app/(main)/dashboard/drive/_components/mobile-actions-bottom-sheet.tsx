@@ -21,7 +21,8 @@ import {
   RotateCcw,
   Trash,
   FileText,
-  X
+  X,
+  AlertTriangle,
 } from "lucide-react";
 import { BulkOperationItem } from '@/lib/google-drive/types';
 
