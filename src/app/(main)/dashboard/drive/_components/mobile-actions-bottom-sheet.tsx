@@ -21,7 +21,6 @@ import {
   RotateCcw,
   Trash,
   FileText,
-  Settings,
   X
 } from "lucide-react";
 import { BulkOperationItem } from '@/lib/google-drive/types';
@@ -95,9 +94,7 @@ export function MobileActionsBottomSheet({
         </BottomSheetHeader>
 
         <div className="px-4 pb-4">
-          {/* Primary Actions */}
           <div className="space-y-2">
-            {/* Download - Only for files */}
             {hasFiles && (
               <Button
                 variant="outline"
@@ -114,7 +111,6 @@ export function MobileActionsBottomSheet({
               </Button>
             )}
 
-            {/* Export */}
             <Button
               variant="outline"
               className="w-full justify-start h-12 text-left"
@@ -129,7 +125,6 @@ export function MobileActionsBottomSheet({
               </div>
             </Button>
 
-            {/* Share - Only for files */}
             {hasFiles && !isInTrash && (
               <Button
                 variant="outline"
@@ -148,10 +143,8 @@ export function MobileActionsBottomSheet({
 
             <Separator />
 
-            {/* File Management Actions */}
             {!isInTrash && (
               <>
-                {/* Move */}
                 <Button
                   variant="outline"
                   className="w-full justify-start h-12 text-left"
@@ -166,7 +159,6 @@ export function MobileActionsBottomSheet({
                   </div>
                 </Button>
 
-                {/* Copy - Only for files */}
                 {hasFiles && (
                   <Button
                     variant="outline"
@@ -183,7 +175,6 @@ export function MobileActionsBottomSheet({
                   </Button>
                 )}
 
-                {/* Rename */}
                 <Button
                   variant="outline"
                   className="w-full justify-start h-12 text-left"
@@ -200,7 +191,6 @@ export function MobileActionsBottomSheet({
 
                 <Separator />
 
-                {/* Move to Trash */}
                 <Button
                   variant="outline"
                   className="w-full justify-start h-12 text-left text-orange-600 hover:text-orange-700 border-orange-200 hover:bg-orange-50"
@@ -217,10 +207,8 @@ export function MobileActionsBottomSheet({
               </>
             )}
 
-            {/* Trash Actions */}
             {isInTrash && (
               <>
-                {/* Restore */}
                 {onBulkRestore && (
                   <Button
                     variant="outline"
@@ -237,7 +225,6 @@ export function MobileActionsBottomSheet({
                   </Button>
                 )}
 
-                {/* Permanent Delete */}
                 {onBulkPermanentDelete && (
                   <Button
                     variant="outline"
@@ -251,8 +238,7 @@ export function MobileActionsBottomSheet({
                         Permanently delete items
                       </div>
                     </div>
-                  </div>
-                </Button>
+                  </Button>
                 )}
               </>
             )}
