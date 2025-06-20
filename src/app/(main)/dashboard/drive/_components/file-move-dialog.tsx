@@ -12,6 +12,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { 
+  BottomSheet, 
+  BottomSheetContent, 
+  BottomSheetHeader, 
+  BottomSheetTitle, 
+  BottomSheetDescription,
+  BottomSheetFooter 
+} from "@/components/ui/bottom-sheet";
 import {
   Select,
   SelectContent,
@@ -20,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { FolderIcon, Move, ExternalLink } from "lucide-react";
 import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
@@ -46,6 +55,7 @@ export function FileMoveDialog({
   const [activeTab, setActiveTab] = useState<string>('select');
   const [loading, setLoading] = useState(false);
   const [moving, setMoving] = useState(false);
+  const isMobile = useIsMobile();
 
   const fetchFolders = async () => {
     try {
@@ -131,9 +141,121 @@ export function FileMoveDialog({
     }
   }, [isOpen]);
 
+  const renderContent = () => (
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="select">Select Folder</TabsTrigger>
+        <TabsTrigger value="custom">Custom Target</TabsTrigger>
+      </TabsList>
+      
+      <TabsContent value="select" className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="folder-select">Destination Folder</Label>
+          <Select 
+            value={selectedFolderId} 
+            onValueChange={setSelectedFolderId}
+            disabled={loading || moving}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={loading ? "Loading folders..." : "Select a folder"} />
+            </SelectTrigger>
+            <SelectContent>
+              {folders.map((folder) => (
+                <SelectItem 
+                  key={folder.id} 
+                  value={folder.id}
+                  disabled={folder.id === currentParentId}
+                >
+                  <div className="flex items-center gap-2">
+                    <FolderIcon className="h-4 w-4" />
+                    <span>{folder.name}</span>
+                    {folder.id === currentParentId && (
+                      <span className="text-xs text-muted-foreground">(current)</span>
+                    )}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </TabsContent>
+      
+      <TabsContent value="custom" className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="custom-target">Custom Destination</Label>
+          <Input
+            id="custom-target"
+            value={customTargetInput}
+            onChange={(e) => setCustomTargetInput(e.target.value)}
+            placeholder="Enter folder ID or Google Drive URL..."
+            disabled={moving}
+            className="font-mono text-sm"
+          />
+          <div className="text-xs text-muted-foreground space-y-1">
+            <p className="flex items-center gap-1">
+              <ExternalLink className="h-3 w-3" />
+              Supports full URLs like: https://drive.google.com/drive/folders/1h7S-ebE1A5sEREQhawwWLVrqTZe47fez
+            </p>
+            <p>Or direct folder ID: 1h7S-ebE1A5sEREQhawwWLVrqTZe47fez</p>
+            {customTargetInput && (
+              <div className="mt-2 p-2 bg-muted rounded text-xs">
+                <span className="font-medium">Extracted ID: </span>
+                <span className="font-mono">
+                  {extractFolderIdFromUrl(customTargetInput) || 'Invalid ID/URL'}
+                </span>
+              </div>
+            )}
+          </div>
+        </div>
+      </TabsContent>
+    </Tabs>
+  );
+
+  if (isMobile) {
+    return (
+      <BottomSheet open={isOpen} onOpenChange={handleOpenChange}>
+        <BottomSheetContent className="max-h-[90vh]">
+          <BottomSheetHeader className="pb-4">
+            <BottomSheetTitle>Move File</BottomSheetTitle>
+            <BottomSheetDescription>
+              Select a destination folder for "{fileName}".
+            </BottomSheetDescription>
+          </BottomSheetHeader>
+
+          <div className="px-4 pb-4">
+            {renderContent()}
+          </div>
+
+          <BottomSheetFooter className="flex-row gap-2">
+            <Button variant="outline" onClick={handleClose} disabled={moving} className="flex-1">
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleMove} 
+              disabled={!getTargetFolderId() || getTargetFolderId() === currentParentId || moving || loading}
+              className="flex-1"
+            >
+              {moving ? (
+                <>
+                  <Move className="h-4 w-4 mr-2 animate-pulse" />
+                  Moving...
+                </>
+              ) : (
+                <>
+                  <Move className="h-4 w-4 mr-2" />
+                  Move File
+                </>
+              )}
+            </Button>
+          </BottomSheetFooter>
+        </BottomSheetContent>
+      </BottomSheet>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Move File</DialogTitle>
           <DialogDescription>
@@ -141,81 +263,18 @@ export function FileMoveDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="select">Select Folder</TabsTrigger>
-            <TabsTrigger value="custom">Custom Target</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="select" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="folder-select">Destination Folder</Label>
-              <Select 
-                value={selectedFolderId} 
-                onValueChange={setSelectedFolderId}
-                disabled={loading || moving}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={loading ? "Loading folders..." : "Select a folder"} />
-                </SelectTrigger>
-                <SelectContent>
-                  {folders.map((folder) => (
-                    <SelectItem 
-                      key={folder.id} 
-                      value={folder.id}
-                      disabled={folder.id === currentParentId}
-                    >
-                      <div className="flex items-center gap-2">
-                        <FolderIcon className="h-4 w-4" />
-                        <span>{folder.name}</span>
-                        {folder.id === currentParentId && (
-                          <span className="text-xs text-muted-foreground">(current)</span>
-                        )}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="custom" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="custom-target">Custom Destination</Label>
-              <Input
-                id="custom-target"
-                value={customTargetInput}
-                onChange={(e) => setCustomTargetInput(e.target.value)}
-                placeholder="Enter folder ID or Google Drive URL..."
-                disabled={moving}
-                className="font-mono text-sm"
-              />
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p className="flex items-center gap-1">
-                  <ExternalLink className="h-3 w-3" />
-                  Supports full URLs like: https://drive.google.com/drive/folders/1h7S-ebE1A5sEREQhawwWLVrqTZe47fez
-                </p>
-                <p>Or direct folder ID: 1h7S-ebE1A5sEREQhawwWLVrqTZe47fez</p>
-                {customTargetInput && (
-                  <div className="mt-2 p-2 bg-muted rounded text-xs">
-                    <span className="font-medium">Extracted ID: </span>
-                    <span className="font-mono">
-                      {extractFolderIdFromUrl(customTargetInput) || 'Invalid ID/URL'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <div className="px-1">
+          {renderContent()}
+        </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={handleClose} disabled={moving}>
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          <Button variant="outline" onClick={handleClose} disabled={moving} className="w-full sm:w-auto">
             Cancel
           </Button>
           <Button 
             onClick={handleMove} 
             disabled={!getTargetFolderId() || getTargetFolderId() === currentParentId || moving || loading}
+            className="w-full sm:w-auto"
           >
             {moving ? (
               <>

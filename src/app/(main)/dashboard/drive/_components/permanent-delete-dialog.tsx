@@ -10,6 +10,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { 
+  BottomSheet, 
+  BottomSheetContent, 
+  BottomSheetHeader, 
+  BottomSheetTitle, 
+  BottomSheetDescription,
+  BottomSheetFooter 
+} from "@/components/ui/bottom-sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -31,6 +40,7 @@ export function PermanentDeleteDialog({
   onSuccess
 }: PermanentDeleteDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const isMobile = useIsMobile();
 
   const handlePermanentDelete = async () => {
     if (!itemId || !itemName) return;
@@ -78,35 +88,92 @@ export function PermanentDeleteDialog({
     }
   };
 
+  const renderContent = () => (
+    <>
+      <p>
+        Are you sure you want to <strong>permanently delete</strong> "{itemName}"?
+      </p>
+      <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3 text-sm text-destructive">
+        <p className="font-medium mb-1">⚠️ Warning: This action cannot be undone</p>
+        <p>
+          This will permanently remove the {itemType} from Google Drive. 
+          {itemType === 'folder' && ' All contents within this folder will also be permanently deleted.'}
+        </p>
+      </div>
+      <p className="text-muted-foreground text-sm">
+        If you're not sure, consider moving it to trash instead, where it can be restored later.
+      </p>
+    </>
+  );
+
+  if (isMobile) {
+    return (
+      <BottomSheet open={open} onOpenChange={onOpenChange}>
+        <BottomSheetContent className="max-h-[90vh]">
+          <BottomSheetHeader className="pb-4">
+            <BottomSheetTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-5 w-5" />
+              Permanently Delete {itemType === 'folder' ? 'Folder' : 'File'}
+            </BottomSheetTitle>
+          </BottomSheetHeader>
+
+          <div className="px-4 pb-4 space-y-4">
+            {renderContent()}
+          </div>
+
+          <BottomSheetFooter className="flex-row gap-2">
+            <Button
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isDeleting}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handlePermanentDelete}
+              disabled={isDeleting}
+              className="flex-1"
+            >
+              {isDeleting ? (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2 animate-pulse" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Forever
+                </>
+              )}
+            </Button>
+          </BottomSheetFooter>
+        </BottomSheetContent>
+      </BottomSheet>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-destructive">
             <AlertTriangle className="h-5 w-5" />
             Permanently Delete {itemType === 'folder' ? 'Folder' : 'File'}
           </DialogTitle>
-          <DialogDescription className="text-left space-y-2">
-            <p>
-              Are you sure you want to <strong>permanently delete</strong> "{itemName}"?
-            </p>
-            <div className="bg-destructive/10 border border-destructive/20 rounded-md p-3 text-sm text-destructive">
-              <p className="font-medium mb-1">⚠️ Warning: This action cannot be undone</p>
-              <p>
-                This will permanently remove the {itemType} from Google Drive. 
-                {itemType === 'folder' && ' All contents within this folder will also be permanently deleted.'}
-              </p>
-            </div>
-            <p className="text-muted-foreground text-sm">
-              If you're not sure, consider moving it to trash instead, where it can be restored later.
-            </p>
-          </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="gap-2 sm:gap-0">
+
+        <div className="space-y-4 px-1">
+          {renderContent()}
+        </div>
+
+        <DialogFooter className="flex-col sm:flex-row gap-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -114,6 +181,7 @@ export function PermanentDeleteDialog({
             variant="destructive"
             onClick={handlePermanentDelete}
             disabled={isDeleting}
+            className="w-full sm:w-auto"
           >
             {isDeleting ? (
               <>
@@ -123,7 +191,7 @@ export function PermanentDeleteDialog({
             ) : (
               <>
                 <Trash2 className="h-4 w-4 mr-2" />
-                Permanently Delete
+                Delete Forever
               </>
             )}
           </Button>
