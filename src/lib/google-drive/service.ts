@@ -26,19 +26,24 @@ export class GoogleDriveService {
   }
 
   async getUserInfo(): Promise<DriveUserInfo> {
-    const [userResponse, aboutResponse] = await Promise.all([
-      google.oauth2({ version: 'v2', auth: this.drive.context._options.auth }).userinfo.get(),
-      this.drive.about.get({ fields: 'user,storageQuota' })
-    ]);
+    // Use Drive API about endpoint for user info instead of OAuth2 userinfo API
+    // This is the recommended approach according to Google Drive API documentation
+    const aboutResponse = await this.drive.about.get({ 
+      fields: 'user,storageQuota' 
+    });
 
-    const user = userResponse.data;
     const about = aboutResponse.data;
+    const user = about.user;
+
+    if (!user) {
+      throw new Error('Unable to fetch user information from Drive API');
+    }
 
     return {
-      id: user.id!,
-      name: user.name!,
-      email: user.email!,
-      picture: user.picture ?? undefined,
+      id: user.permissionId || 'unknown',
+      name: user.displayName || 'Unknown User',
+      email: user.emailAddress || '',
+      picture: user.photoLink ?? undefined,
       storageQuota: about.storageQuota ? {
         limit: about.storageQuota.limit!,
         usage: about.storageQuota.usage!,
@@ -403,8 +408,10 @@ export class GoogleDriveService {
     const { file, metadata, parentId } = options;
 
     const fileMetadata = {
-      ...metadata,
+      name: metadata.name || file.name,
       parents: parentId ? [parentId] : metadata.parents,
+      description: metadata.description,
+      // Don't include mimeType in metadata as it should be in media object
     };
 
     // Convert File to readable stream for Google Drive API
@@ -417,9 +424,11 @@ export class GoogleDriveService {
       body: stream,
     };
 
+    // Use uploadType=multipart for proper file upload according to Drive API docs
     const response = await this.drive.files.create({
       requestBody: fileMetadata,
       media,
+      uploadType: 'multipart',
       fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     });
 
@@ -522,6 +531,12 @@ export class GoogleDriveService {
   // Unified move operation for both files and folders with error recovery
   async moveFile(fileId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
     try {
+      // According to Drive API docs, we should get current parents if not provided
+      if (!currentParentId) {
+        const fileInfo = await this.getFile(fileId);
+        currentParentId = fileInfo.parents?.[0];
+      }
+
       const response = await this.drive.files.update({
         fileId,
         addParents: newParentId,
@@ -530,30 +545,21 @@ export class GoogleDriveService {
       });
 
       return convertGoogleDriveFile(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error(`Move operation failed for file ${fileId}:`, error);
       
-      // Enhanced error handling - check if it's a recoverable error
-      const errorMessage = error instanceof Error ? error.message.toLowerCase() : String(error).toLowerCase();
-      
-      if (errorMessage.includes('not found') || 
-          errorMessage.includes('permission') || 
-          errorMessage.includes('access')) {
-        
-        // Return current file state instead of throwing
-        console.log(`Keeping file ${fileId} in current location due to move failure`);
-        const currentFile = await this.getFile(fileId);
-        
-        return {
-          ...currentFile,
-          // Add custom properties to indicate the move attempt
-          moveAttempted: true,
-          moveFailureReason: errorMessage,
-          targetFolderId: newParentId
-        } as any;
+      // Handle specific Google API errors according to documentation
+      if (error.code === 403) {
+        throw new Error('Insufficient permissions to move this file');
+      } else if (error.code === 404) {
+        throw new Error('File or destination folder not found');
+      } else if (error.code === 429) {
+        throw new Error('Rate limit exceeded. Please try again later');
+      } else if (error.code === 400) {
+        throw new Error('Invalid move operation parameters');
       }
       
-      // Re-throw for non-recoverable errors
+      // Re-throw with original error for unexpected cases
       throw error;
     }
   }
@@ -654,22 +660,46 @@ export class GoogleDriveService {
     try {
       console.log('Creating permission for file:', fileId, 'with permission:', permission);
       
-      const permissionRequest = {
+      const permissionRequest: any = {
         role: permission.role,
         type: permission.type,
-        ...(permission.emailAddress && { emailAddress: permission.emailAddress }),
-        ...(permission.domain && { domain: permission.domain })
       };
+
+      // Add optional fields only if provided, according to API docs
+      if (permission.emailAddress) {
+        permissionRequest.emailAddress = permission.emailAddress;
+      }
+      
+      if (permission.domain) {
+        permissionRequest.domain = permission.domain;
+      }
+
+      // Set allowFileDiscovery for domain/anyone permissions as per API docs
+      if (permission.type === 'domain' || permission.type === 'anyone') {
+        permissionRequest.allowFileDiscovery = permission.allowFileDiscovery ?? false;
+      }
 
       await this.drive.permissions.create({
         fileId,
         requestBody: permissionRequest,
-        sendNotificationEmail: false // Don't send email notifications for link sharing
+        sendNotificationEmail: permission.sendNotificationEmail ?? false,
+        // Add emailMessage if sending notifications
+        ...(permission.sendNotificationEmail && { emailMessage: 'File shared with you via Drive Manager' })
       });
 
       console.log('Permission created successfully for file:', fileId);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating permission:', error);
+      
+      // Handle specific API errors according to documentation
+      if (error.code === 403) {
+        throw new Error('Insufficient permissions to share this file');
+      } else if (error.code === 404) {
+        throw new Error('File not found');
+      } else if (error.code === 400) {
+        throw new Error('Invalid sharing parameters');
+      }
+      
       throw error;
     }
   }
