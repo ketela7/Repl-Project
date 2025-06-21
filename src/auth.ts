@@ -35,39 +35,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
   callbacks: {
     async jwt({ token, account, user, trigger, session }) {
-      console.log("[JWT Callback] Account:", !!account, "User:", !!user);
       if (account) {
         token.accessToken = account.access_token
         token.refreshToken = account.refresh_token
         token.provider = account.provider
         // Set initial remember me preference - will be updated via session callback
         token.rememberMe = false;
-        console.log("[JWT Callback] Saved tokens to JWT");
       }
       
       // Handle remember me preference updates from client-side session update
       if (trigger === "update" && session?.rememberMe !== undefined) {
         token.rememberMe = session.rememberMe;
-        console.log("[JWT Callback] Updated remember me preference from session update:", session.rememberMe);
         
         // Update token expiration based on remember me preference
         const sessionDuration = session.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60;
         token.exp = Math.floor(Date.now() / 1000) + sessionDuration;
-        console.log("[JWT Callback] Updated token expiration. Remember me:", session.rememberMe, "New exp:", token.exp);
       }
       
       // Set initial remember me state from localStorage during account creation
       if (account && !token.rememberMe) {
         // Default to false if not set; will be updated by client-side session update
         token.rememberMe = false;
-        console.log("[JWT Callback] Set initial remember me preference:", false);
       }
       
       return token
     },
     async session({ session, token }) {
-      console.log("[Session Callback] Token:", !!token.accessToken);
-      
       // Check if session should expire based on remember me preference
       const now = Math.floor(Date.now() / 1000);
       const sessionDuration = token.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 days or 1 day
@@ -75,7 +68,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       
       // If session has expired based on remember me preference, return null to force re-login
       if (now > sessionExpiry) {
-        console.log("[Session Callback] Session expired based on remember me preference");
         return null;
       }
       
@@ -86,7 +78,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session
     },
     async redirect({ url, baseUrl }) {
-      console.log("[Redirect Callback] URL:", url, "BaseURL:", baseUrl);
       // After successful sign in, redirect to dashboard
       if (url.startsWith(baseUrl)) {
         return url
