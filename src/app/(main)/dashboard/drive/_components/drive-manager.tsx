@@ -2011,7 +2011,7 @@ export function DriveManager() {
         case 'preview':
           const previewFile = files.find(f => f.id === fileId);
           
-          // Handle shortcuts differently - open their targets directly
+          // Handle shortcuts differently - navigate/preview their targets internally
           if (previewFile?.mimeType === 'application/vnd.google-apps.shortcut') {
             try {
               // Fetch shortcut details to get target information
@@ -2019,14 +2019,55 @@ export function DriveManager() {
               if (shortcutResponse.ok) {
                 const shortcutData = await shortcutResponse.json();
                 const targetId = shortcutData.shortcutDetails?.targetId;
+                const targetMimeType = shortcutData.shortcutDetails?.targetMimeType;
                 
                 if (targetId) {
-                  // For folder shortcuts, navigate to the folder
-                  if (shortcutData.shortcutDetails?.targetMimeType === 'application/vnd.google-apps.folder') {
+                  // For folder shortcuts, navigate to the folder within the app
+                  if (targetMimeType === 'application/vnd.google-apps.folder') {
                     handleFolderClick(targetId);
                   } else {
-                    // For file shortcuts, open in new tab
-                    window.open(`https://drive.google.com/file/d/${targetId}/view`, '_blank');
+                    // For file shortcuts, try to preview the target file internally
+                    try {
+                      // Fetch the target file details to create a proper file object for preview
+                      const targetFileResponse = await fetch(`/api/drive/files/${targetId}/details`);
+                      if (targetFileResponse.ok) {
+                        const targetFileData = await targetFileResponse.json();
+                        
+                        // Check if the target file is previewable
+                        if (isPreviewable(targetFileData.mimeType)) {
+                          // Create a file object from the target data and preview it
+                          const targetFile = {
+                            id: targetFileData.id,
+                            name: targetFileData.name || `${fileName} (target)`,
+                            mimeType: targetFileData.mimeType,
+                            size: targetFileData.size,
+                            createdTime: targetFileData.createdTime,
+                            modifiedTime: targetFileData.modifiedTime,
+                            webViewLink: targetFileData.webViewLink,
+                            webContentLink: targetFileData.webContentLink,
+                            thumbnailLink: targetFileData.thumbnailLink,
+                            parents: targetFileData.parents,
+                            owners: targetFileData.owners,
+                            shared: targetFileData.shared,
+                            trashed: targetFileData.trashed,
+                            capabilities: targetFileData.capabilities
+                          };
+                          
+                          setSelectedFileForPreview(targetFile);
+                          setIsPreviewDialogOpen(true);
+                        } else {
+                          // If not previewable, show info and offer to download
+                          toast.info(`Shortcut "${fileName}" points to "${targetFileData.name}" which cannot be previewed. Click download to get the file.`);
+                          // Optionally trigger download of the target file
+                          handleFileAction('download', targetId, targetFileData.name);
+                        }
+                      } else {
+                        toast.error(`Shortcut target file not accessible. It may have been moved or deleted.`);
+                      }
+                    } catch (targetError) {
+                      console.error('Error fetching shortcut target:', targetError);
+                      toast.error(`Failed to access shortcut target for "${fileName}".`);
+                    }
                   }
                 } else {
                   toast.error(`"${fileName}" shortcut target not found.`);
