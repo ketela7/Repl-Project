@@ -6,6 +6,7 @@ declare module "next-auth" {
     accessToken?: string
     refreshToken?: string
     provider?: string
+    rememberMe?: boolean
   }
 }
 
@@ -14,6 +15,7 @@ declare module "next-auth/jwt" {
     accessToken?: string
     refreshToken?: string
     provider?: string
+    rememberMe?: boolean
   }
 }
 
@@ -32,7 +34,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, account, user }) {
+    async jwt({ token, account, user, trigger, session }) {
       console.log("[JWT Callback] Account:", !!account, "User:", !!user);
       if (account) {
         token.accessToken = account.access_token
@@ -40,6 +42,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.provider = account.provider
         console.log("[JWT Callback] Saved tokens to JWT");
       }
+      
+      // Handle remember me preference updates
+      if (trigger === "update" && session?.rememberMe !== undefined) {
+        token.rememberMe = session.rememberMe;
+      }
+      
       return token
     },
     async session({ session, token }) {
@@ -47,6 +55,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       session.accessToken = token.accessToken as string
       session.refreshToken = token.refreshToken as string
       session.provider = token.provider as string
+      session.rememberMe = token.rememberMe as boolean
       return session
     },
     async redirect({ url, baseUrl }) {
@@ -63,7 +72,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60, // 30 days (can be overridden per session)
   },
   cookies: {
     sessionToken: {
@@ -72,7 +81,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         httpOnly: true,
         sameSite: 'lax',
         path: '/',
-        secure: process.env.NODE_ENV === 'production'
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60 // 30 days default
       }
     }
   },
