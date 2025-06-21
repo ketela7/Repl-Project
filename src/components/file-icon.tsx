@@ -17,7 +17,8 @@ import {
   FileCode,
   Database,
   MapPin,
-  Globe
+  Globe,
+  ExternalLink
 } from 'lucide-react';
 import { getFileIconProps } from '@/lib/google-drive/utils';
 

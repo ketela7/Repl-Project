@@ -24,6 +24,7 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'application/vnd.google-apps.map': 'MapPin',
     'application/vnd.google-apps.site': 'Globe',
     'application/vnd.google-apps.script': 'FileCode',
+    'application/vnd.google-apps.shortcut': 'ExternalLink',
 
     // PDF and Documents
     'application/pdf': 'BookOpen',
@@ -184,6 +185,7 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'application/vnd.google-apps.map': 'text-emerald-600 dark:text-emerald-400',
     'application/vnd.google-apps.site': 'text-cyan-600 dark:text-cyan-400',
     'application/vnd.google-apps.script': 'text-amber-600 dark:text-amber-400',
+    'application/vnd.google-apps.shortcut': 'text-slate-600 dark:text-slate-400',
 
     // PDF and Documents
     'application/pdf': 'text-red-600 dark:text-red-400',
@@ -387,10 +389,19 @@ export function isDocumentFile(mimeType: string): boolean {
   return documentTypes.includes(mimeType);
 }
 
+export function isShortcutFile(mimeType: string): boolean {
+  return mimeType === 'application/vnd.google-apps.shortcut';
+}
+
 /**
  * Check if a file type supports preview functionality
  */
 export const isPreviewable = (mimeType: string): boolean => {
+  // Shortcuts should not be previewable - they should be opened directly
+  if (isShortcutFile(mimeType)) {
+    return false;
+  }
+  
   // Use proper mimeType category checking instead of specific formats
   return isImageFile(mimeType) ||
          isVideoFile(mimeType) ||
