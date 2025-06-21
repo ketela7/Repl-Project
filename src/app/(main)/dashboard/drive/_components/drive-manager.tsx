@@ -118,10 +118,12 @@ import { EnhancedShareDialog } from './enhanced-share-dialog';
 import { BulkShareDialog } from './bulk-share-dialog';
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
 import { FiltersDialog } from './filters-dialog';
+import { BulkOperationDialog } from './bulk-operation-dialog';
 
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { DrivePermissionRequired } from '@/components/drive-permission-required';
 import { FileCategoryBadges } from '@/components/file-category-badges';
+import { BulkOperationItem, BulkOperationType } from '@/lib/bulk-operations';
 // File size utilities inline
 const normalizeFileSize = (size: any): number => {
   // Handle null, undefined, empty values
@@ -460,6 +462,19 @@ export function DriveManager() {
   const [isBulkShareDialogOpen, setIsBulkShareDialogOpen] = useState(false);
   const [selectedItemForShare, setSelectedItemForShare] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
 
+  // New bulk operation dialog state
+  const [bulkOperationDialog, setBulkOperationDialog] = useState<{
+    open: boolean;
+    operation: BulkOperationType | null;
+    items: BulkOperationItem[];
+    operationParams?: any;
+  }>({
+    open: false,
+    operation: null,
+    items: [],
+    operationParams: undefined
+  });
+
   // Mobile bottom sheet states
   const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -586,6 +601,26 @@ export function DriveManager() {
   const sortedFolders = React.useMemo(() => {
     return sortedAllItems.filter(item => item.itemType === 'folder');
   }, [sortedAllItems]);
+
+  // Convert drive items to bulk operation items
+  const convertToBulkOperationItems = (items: any[]): BulkOperationItem[] => {
+    return items.map(item => ({
+      id: item.id,
+      name: item.name,
+      mimeType: item.mimeType || 'application/vnd.google-apps.folder',
+      size: item.size,
+      webContentLink: item.webContentLink,
+      webViewLink: item.webViewLink,
+      parents: item.parents,
+      capabilities: {
+        canDownload: item.capabilities?.canDownload,
+        canCopy: item.capabilities?.canCopy,
+        canEdit: item.capabilities?.canEdit,
+        canDelete: item.capabilities?.canDelete,
+        canShare: item.capabilities?.canShare
+      }
+    }));
+  };
 
   // Bulk operations utility functions - use filtered results
   const getAllItems = () => [...sortedFolders, ...sortedFiles];
@@ -1005,114 +1040,23 @@ export function DriveManager() {
     }
   };
 
-  const handleBulkDownload = async () => {
-    const allSelectedItems = getSelectedItemsData();
-    // Filter out folders - only allow files to be downloaded
-    const selectedItemsData = allSelectedItems.filter(item => item.type === 'file' && item.mimeType !== 'application/vnd.google-apps.folder');
-    const folderCount = allSelectedItems.filter(item => item.type === 'folder' || item.mimeType === 'application/vnd.google-apps.folder').length;
+  // New parallel processing bulk download handler
+  const handleBulkDownload = () => {
+    const selectedItemsData = getSelectedItemsData();
+    if (selectedItemsData.length === 0) return;
 
-    if (selectedItemsData.length === 0) {
-      if (folderCount > 0) {
-        toast.warning(`Cannot download folders. Only files can be downloaded. ${folderCount} folder${folderCount > 1 ? 's' : ''} selected.`);
-      } else {
-        toast.warning('No files selected for download.');
-      }
-      return;
-    }
+    const allItems = getAllItems();
+    const selectedFullItems = Array.from(selectedItems).map(id => 
+      allItems.find(item => item.id === id)
+    ).filter(Boolean);
 
-    if (folderCount > 0) {
-      toast.info(`Downloading ${selectedItemsData.length} file${selectedItemsData.length > 1 ? 's' : ''}. Skipping ${folderCount} folder${folderCount > 1 ? 's' : ''}.`);
-    }
+    const bulkItems = convertToBulkOperationItems(selectedFullItems);
 
-    setBulkOperationProgress({
-      isRunning: true,
-      current: 0,
-      total: selectedItemsData.length,
-      operation: 'Downloading files'
+    setBulkOperationDialog({
+      open: true,
+      operation: 'download',
+      items: bulkItems
     });
-
-    let successCount = 0;
-    let failedItems: string[] = [];
-    let skippedItems: string[] = [];
-
-    try {
-      for (let i = 0; i < selectedItemsData.length; i++) {
-        const item = selectedItemsData[i];
-        setBulkOperationProgress(prev => ({ 
-          ...prev, 
-          current: i + 1,
-          operation: `Downloading: ${item.name}`
-        }));
-
-        try {
-          // Double check that it's not a folder before downloading
-          if (item.mimeType === 'application/vnd.google-apps.folder') {
-            skippedItems.push(item.name);
-            console.log(`Skipping folder: ${item.name}`);
-            continue;
-          }
-
-          // Direct download for all files (no hybrid strategy)
-          console.log(`Downloading file: ${item.name}`);
-
-          // Create download link directly to API endpoint
-          const link = document.createElement('a');
-          link.href = `/api/drive/download/${item.id}`;
-          link.download = item.name;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-
-          successCount++;
-          console.log(`Direct download initiated for: ${item.name}`);
-
-          // Add delay between downloads to avoid overwhelming the browser
-          if (i < selectedItemsData.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 500));
-          }
-        } catch (downloadError) {
-          failedItems.push(item.name);
-          console.error(`Failed to download ${item.name}:`, downloadError);
-        }
-      }
-
-      deselectAll();
-      setIsSelectMode(false);
-
-      // Show comprehensive result notification
-      let message = '';
-
-      if (successCount > 0) {
-        message += `${successCount} file${successCount > 1 ? 's' : ''} download initiated`;
-      }
-
-      if (skippedItems.length > 0) {
-        if (message) message += ', ';
-        message += `${skippedItems.length} folder${skippedItems.length > 1 ? 's' : ''} skipped`;
-      }
-
-      if (failedItems.length > 0) {
-        if (message) message += ', ';
-        message += `${failedItems.length} failed`;
-      }
-
-      if (successCount === selectedItemsData.length && skippedItems.length === 0) {
-        toast.success(`Download initiated for ${successCount} file${successCount > 1 ? 's' : ''}`);
-      } else if (successCount > 0) {
-        toast.warning(`Download completed: ${message}`);
-        if (failedItems.length > 0) {
-          console.log('Failed items:', failedItems);
-        }
-      } else {
-        toast.error(`Download failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
-      }
-    } catch (error) {
-      console.error('Bulk download error:', error);
-      toast.error('An error occurred during bulk download operation');
-    } finally {
-      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
-    }
   };
 
   const handleBulkExport = async (exportFormat: string) => {
@@ -1474,7 +1418,31 @@ export function DriveManager() {
     }
   };
 
-  const handleBulkShare = async (shareData: { role: string; type: string }) => {
+  // New parallel processing bulk share handler
+  const handleBulkShare = () => {
+    const selectedItemsData = getSelectedItemsData();
+    if (selectedItemsData.length === 0) return;
+
+    const allItems = getAllItems();
+    const selectedFullItems = Array.from(selectedItems).map(id => 
+      allItems.find(item => item.id === id)
+    ).filter(Boolean);
+
+    const bulkItems = convertToBulkOperationItems(selectedFullItems);
+
+    setBulkOperationDialog({
+      open: true,
+      operation: 'share',
+      items: bulkItems,
+      operationParams: {
+        type: 'anyone',
+        role: 'reader'
+      }
+    });
+  };
+
+  // Legacy bulk share handler (commented out)
+  // const handleBulkShareOld = async (shareData: { role: string; type: string }) => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
@@ -4737,24 +4705,7 @@ export function DriveManager() {
         onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
         onBulkRename={() => setIsBulkRenameDialogOpen(true)}
         onBulkExport={() => setIsBulkExportDialogOpen(true)}
-        onBulkShare={() => {
-          // Always use enhanced share dialog for better UI
-          const selectedItemsData = getSelectedItemsData();
-          if (selectedItemsData.length === 1 && selectedItemsData[0]) {
-            setSelectedItemForShare({
-              id: selectedItemsData[0].id,
-              name: selectedItemsData[0].name,
-              type: selectedItemsData[0].type as 'file' | 'folder'
-            });
-          } else {
-            setSelectedItemForShare({
-              id: 'bulk',
-              name: `${selectedItemsData.length} items`,
-              type: 'file'
-            });
-          }
-          setIsShareDialogOpen(true);
-        }}
+        onBulkShare={handleBulkShare}
         onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
         onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         onDeselectAll={deselectAll}
@@ -4781,6 +4732,27 @@ export function DriveManager() {
         }}
         hasActiveFilters={!!hasActiveFilters}
         onClearFilters={clearAllFilters}
+      />
+
+      {/* New Parallel Processing Bulk Operation Dialog */}
+      <BulkOperationDialog
+        open={bulkOperationDialog.open}
+        onClose={() => {
+          setBulkOperationDialog({
+            open: false,
+            operation: null,
+            items: [],
+            operationParams: undefined
+          });
+          // Refresh files after operation completes
+          fetchFiles(currentFolderId, searchQuery);
+          // Clear selection
+          deselectAll();
+          setIsSelectMode(false);
+        }}
+        operation={bulkOperationDialog.operation || 'download'}
+        items={bulkOperationDialog.items}
+        operationParams={bulkOperationDialog.operationParams}
       />
 
     </div>

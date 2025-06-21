@@ -22,12 +22,20 @@ export async function POST(
     auth.setCredentials({ access_token: session.accessToken });
     const drive = google.drive({ version: 'v3', auth });
 
-    // Copy the file
-    const response = await drive.files.copy({
+    // Get current parents
+    const file = await drive.files.get({
       fileId,
-      requestBody: {
-        parents: parentId ? [parentId] : undefined
-      }
+      fields: 'parents'
+    });
+
+    const previousParents = file.data.parents?.join(',') || '';
+
+    // Move the file
+    const response = await drive.files.update({
+      fileId,
+      addParents: parentId,
+      removeParents: previousParents,
+      fields: 'id,parents'
     });
 
     return NextResponse.json({ 
@@ -36,9 +44,9 @@ export async function POST(
     });
 
   } catch (error) {
-    console.error('Copy error:', error);
+    console.error('Move error:', error);
     return NextResponse.json(
-      { error: 'Failed to copy file' },
+      { error: 'Failed to move file' },
       { status: 500 }
     );
   }
