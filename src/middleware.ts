@@ -2,43 +2,65 @@ import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
 
 export async function middleware(req: NextRequest) {
+  const pathname = req.nextUrl.pathname
+  
+  // Skip middleware for static files, API routes, and auth pages
+  if (
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/favicon') ||
+    pathname.startsWith('/icon') ||
+    pathname.startsWith('/auth') ||
+    pathname === '/'
+  ) {
+    return NextResponse.next()
+  }
+  
   try {
-    console.log(`[Middleware] ${req.method} ${req.nextUrl.pathname}`);
+    console.log(`[Middleware] ${req.method} ${pathname}`);
     
-    // Skip middleware for auth API routes
-    if (req.nextUrl.pathname.startsWith('/api/auth')) {
+    // Check for session token in cookies
+    const sessionCookie = req.cookies.get('next-auth.session-token')?.value ||
+                         req.cookies.get('__Secure-next-auth.session-token')?.value
+    
+    if (!sessionCookie) {
+      console.log(`[Middleware] No session cookie found, redirecting to login`);
+      if (pathname.startsWith('/dashboard')) {
+        const url = new URL('/auth/v1/login', req.url)
+        url.searchParams.set('callbackUrl', pathname)
+        return NextResponse.redirect(url)
+      }
       return NextResponse.next()
     }
     
+    // Verify the token
     const token = await getToken({ 
       req, 
-      secret: process.env.NEXTAUTH_SECRET,
-      cookieName: "next-auth.session-token"
+      secret: process.env.NEXTAUTH_SECRET
     })
-    console.log(`[Middleware] Token exists:`, !!token);
-    if (token) {
-      console.log(`[Middleware] Token email:`, token.email);
-    }
+    
+    console.log(`[Middleware] Session cookie exists:`, !!sessionCookie);
+    console.log(`[Middleware] Token verified:`, !!token);
     
     // Protect dashboard routes
-    if (req.nextUrl.pathname.startsWith('/dashboard')) {
+    if (pathname.startsWith('/dashboard')) {
       if (!token) {
-        console.log(`[Middleware] No token, redirecting to login`);
-        const url = req.nextUrl.clone()
-        url.pathname = '/auth/v1/login'
+        console.log(`[Middleware] Invalid token, redirecting to login`);
+        const url = new URL('/auth/v1/login', req.url)
+        url.searchParams.set('callbackUrl', pathname)
         return NextResponse.redirect(url)
       }
-      console.log(`[Middleware] Token found, allowing access to dashboard`);
+      console.log(`[Middleware] Access granted to dashboard`);
     }
     
     return NextResponse.next()
   } catch (error) {
-    console.error(`[Middleware] Critical error:`, {
-      url: req.url,
-      method: req.method,
-      error: error instanceof Error ? error.message : String(error)
-    });
-    
+    console.error(`[Middleware] Error:`, error);
+    // On error, redirect to login for dashboard routes
+    if (pathname.startsWith('/dashboard')) {
+      const url = new URL('/auth/v1/login', req.url)
+      return NextResponse.redirect(url)
+    }
     return NextResponse.next()
   }
 }

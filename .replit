@@ -52,7 +52,7 @@ author = 44095038
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx tsx script/reset.ts"
+args = "npx tsx scripts/reset-db.ts"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
