@@ -15,9 +15,7 @@ import { setRememberMePreference } from "@/lib/session-utils";
 import { Separator } from "@/components/ui/separator";
 
 const FormSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  remember: z.boolean().optional(),
+  remember: z.boolean().default(false),
 });
 
 export function LoginFormV1() {
@@ -26,8 +24,6 @@ export function LoginFormV1() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      email: "",
-      password: "",
       remember: false,
     },
   });
@@ -66,45 +62,14 @@ export function LoginFormV1() {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email Address</FormLabel>
-              <FormControl>
-                <Input id="email" type="email" placeholder="you@example.com" autoComplete="email" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+    <div className="space-y-4">
+      {/* Remember Me Option */}
+      <Form {...form}>
         <FormField
           control={form.control}
           name="remember"
           render={({ field }) => (
-            <FormItem className="flex flex-row items-center">
+            <FormItem className="flex flex-row items-center space-x-2">
               <FormControl>
                 <Checkbox
                   id="login-remember"
@@ -113,34 +78,27 @@ export function LoginFormV1() {
                   className="size-4"
                 />
               </FormControl>
-              <FormLabel htmlFor="login-remember" className="text-muted-foreground ml-1 text-sm font-medium">
+              <FormLabel htmlFor="login-remember" className="text-sm font-medium">
                 Remember me for 30 days
               </FormLabel>
             </FormItem>
           )}
         />
-        <Button className="w-full" type="submit" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Sign in with Google"}
-        </Button>
-      </form>
-      
-      <div className="relative">
-        <div className="absolute inset-0 flex items-center">
-          <Separator className="w-full" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">Or</span>
-        </div>
-      </div>
-      
+      </Form>
+
+      {/* Google Sign In Button */}
       <Button 
-        variant="outline" 
         className="w-full" 
-        onClick={() => handleGoogleSignIn(false)}
+        onClick={() => handleGoogleSignIn(form.getValues('remember') || false)}
         disabled={isLoading}
       >
-        Quick Sign in with Google
+        {isLoading ? "Signing in..." : "Continue with Google"}
       </Button>
+      
+      <p className="text-muted-foreground text-center text-xs">
+        Sign in with your Google account to access the Google Drive management system.
+      </p>
+    </div>
     </Form>
   );
 }
