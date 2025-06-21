@@ -17,7 +17,7 @@ declare module "next-auth/jwt" {
   }
 }
 
-const authConfig = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -33,7 +33,6 @@ const authConfig = {
   ],
   callbacks: {
     async jwt({ token, account }) {
-      // Persist the OAuth access_token to the token right after signin
       if (account) {
         token.accessToken = account.access_token
         token.refreshToken = account.refresh_token
@@ -42,7 +41,6 @@ const authConfig = {
       return token
     },
     async session({ session, token }) {
-      // Send properties to the client
       session.accessToken = token.accessToken as string
       session.refreshToken = token.refreshToken as string
       session.provider = token.provider as string
@@ -52,6 +50,4 @@ const authConfig = {
   pages: {
     signIn: '/auth/v1/login',
   },
-}
-
-export const { handlers, auth, signIn, signOut } = NextAuth(authConfig)
+})
