@@ -218,6 +218,7 @@ export async function GET(request: NextRequest) {
       // When navigating into a specific folder, show its contents regardless of view
       driveQuery = 'trashed=false';  // Reset query for folder contents
       driveQuery += ` and '${folderId}' in parents`;
+	//} else if (!folderId && !filters.search && filters.viewStatus !== 'shared' && filters.viewStatus !== 'starred' && filters.viewStatus !== 'recent' && filters.viewStatus !== 'trash') {
     } else if (!folderId && !filters.search && filters.viewStatus === 'my-drive') {
       // Only restrict to root for "My Drive" view specifically
       driveQuery += " and 'root' in parents";
