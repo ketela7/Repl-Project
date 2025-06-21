@@ -72,13 +72,27 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
   };
 
   const renderPreviewContent = () => {
-    // Universal preview using Google Drive - supports all file types
-    const previewHeight = isFullscreen ? "h-screen" : "h-[50vh] sm:h-[60vh] lg:h-[70vh] min-h-[300px] max-h-[80vh]";
-    const previewClasses = isFullscreen ? "w-full h-full" : "w-full h-full";
+    // Responsive preview dimensions based on screen size
+    const getPreviewHeight = () => {
+      if (isFullscreen) return "h-screen";
+      
+      // Mobile: smaller height to accommodate header
+      if (window.innerWidth < 640) return "h-[45vh] min-h-[250px] max-h-[70vh]";
+      // Tablet
+      if (window.innerWidth < 1024) return "h-[55vh] min-h-[350px] max-h-[75vh]";
+      // Desktop
+      return "h-[65vh] min-h-[400px] max-h-[80vh]";
+    };
+
+    const previewHeight = getPreviewHeight();
+    const previewClasses = isFullscreen ? "w-full h-full" : "w-full h-full border-0";
+    const containerClasses = isFullscreen 
+      ? 'bg-white h-screen w-screen' 
+      : 'bg-white rounded-lg border overflow-hidden';
 
     // Universal Google Drive preview - handles all file types automatically
     return (
-      <div className={`${isFullscreen ? 'bg-white h-screen w-screen' : 'bg-white rounded-lg border'} overflow-hidden ${previewHeight}`}>
+      <div className={`${containerClasses} ${previewHeight}`}>
         <iframe
           src={previewUrl}
           className={previewClasses}
@@ -87,6 +101,10 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
           allowFullScreen
           sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
           loading="lazy"
+          style={{
+            border: 'none',
+            outline: 'none'
+          }}
         />
       </div>
     );
@@ -237,7 +255,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
           </div>
         </DialogHeader>
         
-        <div className="mt-2 sm:mt-3 flex-1 overflow-hidden">
+        <div className="mt-1 sm:mt-2 flex-1 overflow-hidden">
           {renderPreviewContent()}
         </div>
 
