@@ -19,7 +19,19 @@ import {
   MapPin,
   Globe,
   Link,
-  ExternalLink
+  ExternalLink,
+  FileType,
+  FileAudio,
+  Package,
+  Zap,
+  Terminal,
+  Settings,
+  Box,
+  Monitor,
+  Smartphone,
+  Camera,
+  Printer,
+  HardDrive
 } from 'lucide-react';
 import { getFileIconProps } from '@/lib/google-drive/utils';
 
@@ -72,7 +84,19 @@ export function FileIcon({
     Music,
     MapPin,
     Globe,
-    Link
+    Link,
+    FileType,
+    FileAudio,
+    Package,
+    Zap,
+    Terminal,
+    Settings,
+    Box,
+    Monitor,
+    Smartphone,
+    Camera,
+    Printer,
+    HardDrive
   };
 
   const IconComponent = iconComponents[iconName] || File;

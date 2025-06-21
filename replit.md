@@ -73,6 +73,13 @@ Migration preferences: User prefers to discuss project rules and documentation b
 
 ## Recent Changes
 
+### December 2024: **Comprehensive File Icon System Enhancement**
+- **Complete MIME Type Coverage**: Added support for 150+ additional MIME types including `application/rar`, `video/x-matroska`, and specialized formats
+- **Enhanced File Recognition**: Extended support for RAR archives, Matroska videos, mobile app formats (APK/IPA), raw camera files, and system executables
+- **Intelligent Icon Mapping**: Added specialized icons for different file categories including Camera for RAW files, Terminal for shell scripts, Package for archives
+- **Comprehensive Extension Support**: Added fallback recognition for 100+ file extensions when MIME type detection fails
+- **Color-Coded File Types**: Implemented distinct color schemes for programming languages, archive formats, design files, and media types
+
 ### December 2024: **Session Management Enhancement & Remember Me Implementation**
 - **Dynamic Session Duration**: Implemented proper Remember Me functionality with 1-day default and 30-day extended sessions
 - **Enhanced Login UI**: Added clear checkbox with explanatory text for session duration preferences
