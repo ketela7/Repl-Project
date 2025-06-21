@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth, signIn } from '@/auth';
+import { auth, signOut } from '@/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -9,9 +9,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/auth/v1/login', request.url));
     }
 
-    // Force re-authentication with Google to get Drive permissions
-    // This will prompt for additional scopes
-    return NextResponse.redirect(new URL('/api/auth/signin/google?prompt=consent&access_type=offline', request.url));
+    // Simple approach: Sign out current session and redirect to login
+    // This will force a new OAuth flow with consent prompt
+    console.log('[Reauth Drive] Signing out current session to force re-authentication');
+    
+    // Sign out and redirect to login with a special parameter
+    const loginUrl = new URL('/auth/v1/login', request.url);
+    loginUrl.searchParams.set('reauth', 'drive');
+    loginUrl.searchParams.set('callbackUrl', '/dashboard/drive');
+    
+    // We'll handle the signOut in the client side, just redirect to login for now
+    return NextResponse.redirect(loginUrl.toString());
     
   } catch (error) {
     console.error('Drive re-auth error:', error);

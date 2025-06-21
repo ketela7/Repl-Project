@@ -19,10 +19,23 @@ export function DrivePermissionRequired({
 }: DrivePermissionRequiredProps) {
   const [connecting, setConnecting] = useState(false);
 
-  const handleReconnect = () => {
+  const handleReconnect = async () => {
     setConnecting(true);
-    // Redirect to re-auth with consent prompt to request Drive permissions
-    window.location.href = '/api/auth/reauth-drive';
+    
+    try {
+      // Sign out first, then redirect to login
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      // Redirect to login with reauth parameter
+      window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive';
+    } catch (error) {
+      console.error('Signout error:', error);
+      // Fallback: direct redirect to login
+      window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive';
+    }
   };
 
   const handleRetry = () => {
