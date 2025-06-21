@@ -2,7 +2,7 @@
 
 ## Overview
 
-This is a Professional Google Drive Management application built with Next.js 15 and shadcn/ui components, featuring a modern and responsive design with Google OAuth authentication via Supabase. The project includes a sophisticated file management system that provides intelligent, professional-grade tools for file organization, search, and interaction. The application uses TypeScript, ESLint, Tailwind CSS 4.x, and includes comprehensive UI components for building enterprise-grade interfaces with integrated cloud storage capabilities.
+This is a Professional Google Drive Management application built with Next.js 15 and shadcn/ui components, featuring a modern and responsive design with Google OAuth authentication via NextAuth.js. The project includes a sophisticated file management system that provides intelligent, professional-grade tools for file organization, search, and interaction. The application uses TypeScript, ESLint, Tailwind CSS 4.x, and includes comprehensive UI components for building enterprise-grade interfaces with integrated cloud storage capabilities.
 
 ## System Architecture
 
@@ -11,8 +11,8 @@ This is a Professional Google Drive Management application built with Next.js 15
 - **Language**: TypeScript for type safety and better developer experience
 - **Styling**: Tailwind CSS 4.x for utility-first styling approach
 - **UI Components**: Complete shadcn/ui component library
-- **Authentication**: Supabase Auth with Google OAuth integration
-- **Security**: Cloudflare Turnstile CAPTCHA protection
+- **Authentication**: NextAuth.js with Google OAuth integration
+- **Security**: JWT-based session management
 - **State Management**: React hooks and context
 - **Build Tool**: Next.js native bundling for optimal performance
 
@@ -32,9 +32,9 @@ This is a Professional Google Drive Management application built with Next.js 15
 ## Key Features
 
 ### Authentication & Security
-- **Google OAuth**: Complete Google sign-in integration via Supabase
-- **CAPTCHA Protection**: Cloudflare Turnstile verification before authentication
-- **Session Management**: Secure session handling with automatic refresh
+- **Google OAuth**: Complete Google sign-in integration via NextAuth.js
+- **JWT Tokens**: Secure token-based authentication with automatic refresh
+- **Session Management**: Server-side session handling with NextAuth.js
 - **Protected Routes**: Middleware-based route protection for dashboard access
 - **User Profile**: Authenticated user information display with logout functionality
 
@@ -150,7 +150,7 @@ Migration preferences: User prefers to discuss project rules and documentation b
   - **Proper Type Mapping**: Enhanced share dialog menggunakan mapping yang benar untuk permission types
   - **API Compliance**: Share functionality sekarang mengikuti dokumentasi resmi Google Drive API
 
-- June 21, 2025: **NextAuth.js Migration Complete**:
+- June 21, 2025: **Complete Supabase Removal and NextAuth.js Migration**:
   - **Authentication System Migration**: Successfully migrated from Supabase to NextAuth.js for better Next.js 15 compatibility
   - **Google OAuth Configuration**: Set up NextAuth with Google provider for Google Drive API access
   - **Session Management**: Implemented proper JWT token handling with access tokens for Drive API
@@ -158,6 +158,13 @@ Migration preferences: User prefers to discuss project rules and documentation b
   - **Middleware Updates**: Updated authentication middleware to use NextAuth JWT tokens
   - **OAuth Callback Setup**: Configured proper redirect URIs for Google OAuth integration
   - **Environment Variables**: Set up NEXTAUTH_SECRET and NEXTAUTH_URL for secure authentication
+  - **Complete Supabase Removal**: Removed all Supabase dependencies, files, and references:
+    - Deleted src/lib/supabase/ directory entirely
+    - Removed @supabase/ssr, @supabase/supabase-js packages
+    - Updated all configuration files to use NextAuth.js instead
+    - Fixed API routes to use NextAuth session management
+    - Updated documentation (README.md, PROJECT_RULES.md, PROJECT_STATUS.md)
+    - Cleaned up environment variable requirements
 
 - December 2024: **Migration to Replit Environment Complete**:
   - **Environment Setup**: Installed Node.js 20 and all project dependencies successfully

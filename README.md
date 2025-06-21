@@ -164,7 +164,7 @@ src/
 │   │   ├── types.ts                   # TypeScript definitions
 │   │   ├── utils.ts                   # Utility functions
 │   │   └── config.ts                  # API configuration
-│   ├── supabase/                      # Supabase integration
+│   ├── google-drive/                  # Google Drive service integration
 │   ├── cache.ts                       # Smart caching system
 │   └── utils.ts                       # Utility functions
 └── middleware.ts                      # Request middleware
@@ -201,16 +201,16 @@ src/
 - Node.js 18+ (managed by Replit)
 - npm or yarn package manager
 - Google Drive API credentials
-- Supabase project setup
+- NextAuth.js configuration
 
 ### Environment Setup
 Configure these environment variables in Replit Secrets:
 ```bash
 DATABASE_URL=your_postgresql_connection_string
-SUPABASE_URL=your_supabase_project_url
-SUPABASE_ANON_KEY=your_supabase_anonymous_key
-TURNSTILE_SITE_KEY=your_cloudflare_turnstile_site_key
-TURNSTILE_SECRET_KEY=your_cloudflare_turnstile_secret_key
+GOOGLE_CLIENT_ID=your_google_oauth_client_id
+GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
+NEXTAUTH_SECRET=your_nextauth_secret_key
+NEXTAUTH_URL=your_app_url
 ```
 
 ### Development Commands

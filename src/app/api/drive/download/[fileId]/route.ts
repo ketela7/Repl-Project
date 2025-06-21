@@ -7,17 +7,13 @@ export async function GET(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const session = await auth();
 
-    if (authError || !session?.user) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Try multiple token locations
-    const accessToken = session.provider_token || 
-                       session.user.user_metadata?.provider_token ||
-                       session.access_token;
+    const accessToken = session.accessToken;
     
     if (!accessToken) {
       return NextResponse.json({ 

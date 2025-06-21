@@ -3,8 +3,8 @@
 import { createContext, useContext, ReactNode } from "react";
 
 interface Config {
-  supabaseUrl: string;
-  supabaseAnonKey: string;
+  appEnv: string;
+  baseUrl: string;
 }
 
 const ConfigContext = createContext<Config | null>(null);

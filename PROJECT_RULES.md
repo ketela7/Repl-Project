@@ -4,7 +4,7 @@
 
 **Last Updated**: June 20, 2025  
 **Project Type**: Professional Next.js + Google Drive API Integration  
-**Architecture**: Full-stack web application with Supabase authentication
+**Architecture**: Full-stack web application with NextAuth.js authentication
 
 ---
 
@@ -19,15 +19,13 @@
 ### Required Environment Variables
 ```bash
 # Authentication
-SUPABASE_URL
-SUPABASE_ANON_KEY
+GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET
+NEXTAUTH_SECRET
+NEXTAUTH_URL
 
 # Database
 DATABASE_URL
-
-# Turnstile
-TURNSTILE_SITE_KEY
-TURNSTILE_SECRET_KEY
 ```
 
 ---
@@ -126,7 +124,7 @@ TURNSTILE_SECRET_KEY
 
 ### Authentication Flow
 - **Google OAuth**: Primary authentication method
-- **Supabase Integration**: Session management
+- **NextAuth.js Integration**: Session management with JWT tokens
 - **Token Security**: Secure storage and transmission
 - **Scope Management**: Minimal required permissions
 

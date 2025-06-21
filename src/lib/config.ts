@@ -3,18 +3,19 @@
  * Handles both Replit secrets and traditional environment variables
  */
 export const config = {
-  supabase: {
-    url: process.env.SUPABASE_URL!,
-    anonKey: process.env.SUPABASE_ANON_KEY!,
-    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  },
   google: {
     driveScopes: 'https://www.googleapis.com/auth/drive',
+    clientId: process.env.GOOGLE_CLIENT_ID!,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+  },
+  nextAuth: {
+    secret: process.env.NEXTAUTH_SECRET!,
+    url: process.env.NEXTAUTH_URL!,
   },
   app: {
     nodeEnv: process.env.NODE_ENV || 'development',
-    port: process.env.PORT || '3000',
-    baseUrl: process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:3000',
+    port: process.env.PORT || '5000',
+    baseUrl: process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000',
   },
 }
 
@@ -23,8 +24,6 @@ export const config = {
  * These values are safe to expose to the browser
  */
 export const getPublicConfig = () => ({
-  supabaseUrl: process.env.SUPABASE_URL!,
-  supabaseAnonKey: process.env.SUPABASE_ANON_KEY!,
   appEnv: config.app.nodeEnv,
   baseUrl: config.app.baseUrl,
 })
@@ -34,8 +33,10 @@ export const getPublicConfig = () => ({
  */
 export const validateConfig = () => {
   const requiredVars = [
-    'SUPABASE_URL',
-    'SUPABASE_ANON_KEY', 
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET',
+    'NEXTAUTH_SECRET',
+    'NEXTAUTH_URL',
   ];
 
   const missing = requiredVars.filter(varName => !process.env[varName]);
