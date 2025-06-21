@@ -107,4 +107,11 @@ export const validateConfig = () => {
   
   console.log(`✓ BASE_URL detected: ${baseUrl}`);
   console.log(`✓ NEXTAUTH_URL configured: ${config.nextAuth.url}`);
+  
+  // Debug environment variables
+  console.log('Environment check:');
+  console.log('- BASE_URL:', process.env.BASE_URL);
+  console.log('- NEXTAUTH_URL:', process.env.NEXTAUTH_URL);
+  console.log('- NODE_ENV:', process.env.NODE_ENV);
+  console.log('- REPLIT_DOMAINS:', process.env.REPLIT_DOMAINS);
 };

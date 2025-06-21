@@ -12,11 +12,24 @@ import { config } from './config';
 export function getBaseUrl(): string {
   // Server-side: use detected base URL from config
   if (typeof window === 'undefined') {
+    console.log('[Server] Using BASE_URL:', config.app.baseUrl);
     return config.app.baseUrl;
   }
   
-  // Client-side: use current origin
-  return window.location.origin;
+  // Client-side: prefer server-detected BASE_URL over window.location.origin
+  // This ensures client uses the same URL as server in all environments
+  const serverBaseUrl = config.app.baseUrl;
+  const clientOrigin = window.location.origin;
+  
+  // If server detected a different URL (like Replit domain), use that
+  if (serverBaseUrl && serverBaseUrl !== 'http://localhost:5000' && 
+      serverBaseUrl !== clientOrigin) {
+    console.log('[Client] Using server BASE_URL:', serverBaseUrl, 'instead of origin:', clientOrigin);
+    return serverBaseUrl;
+  }
+  
+  console.log('[Client] Using window origin:', clientOrigin);
+  return clientOrigin;
 }
 
 /**
