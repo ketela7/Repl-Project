@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { ReactNode } from "react";
+import { redirectTo } from "@/lib/url-utils";
 
 interface AuthWrapperProps {
   children: ReactNode;
@@ -27,7 +28,7 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
       return <>{fallback}</>;
     }
     // Redirect to login if no fallback provided
-    window.location.href = '/auth/v1/login';
+    redirectTo('/auth/v1/login');
     return null;
   }
 

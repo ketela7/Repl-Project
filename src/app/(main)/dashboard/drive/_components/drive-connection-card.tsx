@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HardDrive, Shield, Upload, Search, Folder } from "lucide-react";
+import { redirectTo } from "@/lib/url-utils";
 
 export function DriveConnectionCard() {
   const [connecting, setConnecting] = useState(false);
@@ -11,7 +12,7 @@ export function DriveConnectionCard() {
   const handleConnect = () => {
     setConnecting(true);
     // Request additional Google Drive permissions
-    window.location.href = '/api/auth/reauth-drive';
+    redirectTo('/api/auth/reauth-drive');
   };
 
   return (
