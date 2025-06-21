@@ -26,6 +26,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -41,7 +47,9 @@ import {
   Copy,
   CheckCircle,
   XCircle,
-  ExternalLink
+  ExternalLink,
+  Download,
+  ChevronDown
 } from "lucide-react";
 import { FileIcon } from '@/components/file-icon';
 import { toast } from 'sonner';
@@ -118,6 +126,86 @@ export function BulkShareDialog({
       document.body.removeChild(textArea);
       toast.success(`Copied ${successfulShares.length} share links to clipboard`);
     }
+  };
+
+  const exportToTxt = () => {
+    if (shareResults.length === 0) return;
+
+    const successfulShares = shareResults.filter(result => result.success);
+    const failedShares = shareResults.filter(result => !result.success);
+
+    const content = [
+      'Bulk Share Results - Generated on ' + new Date().toLocaleString(),
+      '='.repeat(60),
+      '',
+      'SUCCESSFUL SHARES:',
+      '-'.repeat(20),
+      ...successfulShares.map(result => `${result.name} ${result.shareLink}`),
+      '',
+      'FAILED SHARES:',
+      '-'.repeat(15),
+      ...failedShares.map(result => `${result.name} - Error: ${result.error || 'Unknown error'}`),
+      '',
+      'SUMMARY:',
+      '-'.repeat(10),
+      `Total Items: ${shareResults.length}`,
+      `Successful: ${successfulShares.length}`,
+      `Failed: ${failedShares.length}`
+    ].join('\n');
+
+    downloadFile(content, 'bulk-share-results.txt', 'text/plain');
+  };
+
+  const exportToCsv = () => {
+    if (shareResults.length === 0) return;
+
+    const headers = ['Name', 'Share Link', 'Status', 'Error', 'Generated At'];
+    const rows = shareResults.map(result => [
+      `"${result.name.replace(/"/g, '""')}"`,
+      result.shareLink || '',
+      result.success ? 'Success' : 'Failed',
+      result.error ? `"${result.error.replace(/"/g, '""')}"` : '',
+      new Date().toISOString()
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+
+    downloadFile(csvContent, 'bulk-share-results.csv', 'text/csv');
+  };
+
+  const exportToJson = () => {
+    const exportData = {
+      generatedAt: new Date().toISOString(),
+      totalItems: shareResults.length,
+      successfulShares: shareResults.filter(r => r.success).length,
+      failedShares: shareResults.filter(r => !r.success).length,
+      results: shareResults.map(result => ({
+        id: result.id,
+        name: result.name,
+        shareLink: result.shareLink || null,
+        success: result.success,
+        error: result.error || null
+      }))
+    };
+
+    const jsonContent = JSON.stringify(exportData, null, 2);
+    downloadFile(jsonContent, 'bulk-share-results.json', 'application/json');
+  };
+
+  const downloadFile = (content: string, filename: string, mimeType: string) => {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success(`Exported as ${filename}`);
   };
 
   const fileCount = selectedItems.filter(item => item.type === 'file').length;
@@ -475,16 +563,42 @@ export function BulkShareDialog({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold">Share Results</h4>
-                {shareResults.some(r => r.success) && (
-                  <Button 
-                    size="sm" 
-                    variant="outline" 
-                    onClick={copyToClipboard}
-                    className="gap-2"
-                  >
-                    <Copy className="h-4 w-4" />
-                    Copy All Links
-                  </Button>
+                {shareResults.length > 0 && (
+                  <div className="flex gap-2">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={copyToClipboard}
+                      className="gap-2"
+                    >
+                      <Copy className="h-4 w-4" />
+                      Copy
+                    </Button>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="outline" className="gap-2">
+                          <Download className="h-4 w-4" />
+                          Export
+                          <ChevronDown className="h-3 w-3" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={exportToTxt}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Export as TXT
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={exportToCsv}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Export as CSV
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={exportToJson}>
+                          <FileText className="h-4 w-4 mr-2" />
+                          Export as JSON
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 )}
               </div>
               
@@ -533,8 +647,15 @@ export function BulkShareDialog({
                 ))}
               </div>
               
-              <div className="text-sm text-muted-foreground">
-                {shareResults.filter(r => r.success).length} of {shareResults.length} items shared successfully
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>
+                  {shareResults.filter(r => r.success).length} of {shareResults.length} items shared successfully
+                </span>
+                {shareResults.length > 0 && (
+                  <span className="text-xs">
+                    Generated: {new Date().toLocaleString()}
+                  </span>
+                )}
               </div>
             </div>
           </div>
