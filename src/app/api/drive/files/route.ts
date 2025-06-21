@@ -218,10 +218,11 @@ export async function GET(request: NextRequest) {
       // When navigating into a specific folder, show its contents regardless of view
       driveQuery = 'trashed=false';  // Reset query for folder contents
       driveQuery += ` and '${folderId}' in parents`;
-    } else if (!folderId && !filters.search && filters.viewStatus !== 'shared' && filters.viewStatus !== 'starred' && filters.viewStatus !== 'recent' && filters.viewStatus !== 'trash') {
-      // If no parent and no search query, get root files
+    } else if (!folderId && !filters.search && filters.viewStatus === 'my-drive') {
+      // Only restrict to root for "My Drive" view specifically
       driveQuery += " and 'root' in parents";
     }
+    // For "All Files" view (when viewStatus is 'all' or not specified), show everything without parent restriction
     
     console.log('Final Drive query:', driveQuery);
     
