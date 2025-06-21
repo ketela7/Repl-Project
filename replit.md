@@ -72,6 +72,13 @@ Migration preferences: User prefers to discuss project rules and documentation b
 
 ## Recent Changes
 
+### December 2024: **Authentication Bug Fixes & Shortcut Icon Enhancement**
+- **Authentication Redirect Loop Fixed**: Resolved middleware token verification issues causing login redirect loops
+- **NextAuth Configuration Enhanced**: Improved cookie handling and session management for reliable authentication
+- **Shortcut Icon Visibility Fixed**: Added blue "Shortcut" badges with link icons visible on both mobile and desktop
+- **Cross-Platform Consistency**: Implemented shortcut indicators in both grid and table views
+- **Remember Me Functionality**: Streamlined session duration handling for 30-day persistence option
+
 ### December 2024: **Complete Authentication Migration & Performance Enhancement**
 - **NextAuth.js Migration**: Successfully migrated from Supabase to NextAuth.js for better Next.js 15 compatibility
 - **Extended Session Management**: Implemented 30-day login persistence with "Keep me logged in" option
