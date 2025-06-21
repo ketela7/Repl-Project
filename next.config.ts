@@ -4,6 +4,9 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
+  serverRuntimeConfig: {
+    port: process.env.PORT || 5000,
+  },
   images: {
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,

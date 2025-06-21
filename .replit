@@ -1,11 +1,11 @@
-modules = ["web", "postgresql-16", "nodejs-20"]
+modules = ["web", "bash", "nodejs-20"]
 hidden = [".config", "package-lock.json"]
 
 [gitHubImport]
 requiredFiles = [".replit", "replit.nix", "package.json", "package-lock.json"]
 
 [nix]
-channel = "stable-24_11"
+channel = "stable-24_05"
 
 [interpreter]
 command = ["npm", "run", "format"]
@@ -15,6 +15,10 @@ command = ["npm", "run", "format"]
 run = ["npm", "start"]
 deploymentTarget = "autoscale"
 ignorePorts = false
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
 
 [[ports]]
 localPort = 5000
@@ -33,7 +37,7 @@ args = "npm run check"
 
 [[workflows.workflow]]
 name = "Server"
-mode = "sequential"
+mode = "parallel"
 author = "agent"
 
 [[workflows.workflow.tasks]]
@@ -48,15 +52,6 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev -- -p 5000 -H 0.0.0.0"
+args = "PORT=5000 next dev -H 0.0.0.0"
 waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Project"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Server"
 
