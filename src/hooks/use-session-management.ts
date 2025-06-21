@@ -12,7 +12,7 @@ export function useSessionManagement() {
     if (typeof window !== 'undefined' && session) {
       const storedRememberMe = localStorage.getItem('rememberMe') === 'true';
       
-      // Update session if preference differs
+      // Update session if preference differs or if it's undefined
       if (session.rememberMe !== storedRememberMe) {
         console.log("[Session Management] Syncing remember me preference:", storedRememberMe);
         await update({ rememberMe: storedRememberMe });

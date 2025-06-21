@@ -53,7 +53,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           ? 30 * 24 * 60 * 60 // 30 days
           : 24 * 60 * 60; // 1 day
         token.exp = Math.floor(Date.now() / 1000) + maxAge;
-        console.log("[JWT Callback] Updated remember me preference:", session.rememberMe);
+        console.log("[JWT Callback] Updated remember me preference:", session.rememberMe, "expires in", maxAge, "seconds");
       }
       
       return token
@@ -81,6 +81,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days maximum
+    updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
   cookies: {
     sessionToken: {

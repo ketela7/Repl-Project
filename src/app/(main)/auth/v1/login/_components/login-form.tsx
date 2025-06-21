@@ -4,11 +4,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
+import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { setRememberMePreference } from "@/lib/session-utils";
+import { Separator } from "@/components/ui/separator";
 
 const FormSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address." }),
@@ -17,6 +21,8 @@ const FormSchema = z.object({
 });
 
 export function LoginFormV1() {
+  const [isLoading, setIsLoading] = useState(false);
+  
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -26,14 +32,37 @@ export function LoginFormV1() {
     },
   });
 
+  const handleGoogleSignIn = async (rememberMe: boolean = false) => {
+    setIsLoading(true);
+    
+    try {
+      // Store remember me preference in localStorage
+      setRememberMePreference(rememberMe);
+      
+      toast.info("Redirecting to Google Sign-in...", {
+        description: rememberMe ? "You will be remembered for 30 days" : "Session expires in 1 day"
+      });
+      
+      const result = await signIn('google', {
+        callbackUrl: '/dashboard/drive',
+        redirect: true,
+      });
+      
+      if (result?.error) {
+        toast.error("Sign-in failed", {
+          description: "Please try again"
+        });
+      }
+    } catch (error) {
+      console.error("Sign-in error:", error);
+      toast.error("An error occurred during sign-in");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    toast("You submitted the following values", {
-      description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    });
+    await handleGoogleSignIn(data.remember || false);
   };
 
   return (
@@ -90,10 +119,28 @@ export function LoginFormV1() {
             </FormItem>
           )}
         />
-        <Button className="w-full" type="submit">
-          Login
+        <Button className="w-full" type="submit" disabled={isLoading}>
+          {isLoading ? "Signing in..." : "Sign in with Google"}
         </Button>
       </form>
+      
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <Separator className="w-full" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">Or</span>
+        </div>
+      </div>
+      
+      <Button 
+        variant="outline" 
+        className="w-full" 
+        onClick={() => handleGoogleSignIn(false)}
+        disabled={isLoading}
+      >
+        Quick Sign in with Google
+      </Button>
     </Form>
   );
 }
