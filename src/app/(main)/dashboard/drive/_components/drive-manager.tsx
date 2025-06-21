@@ -1775,6 +1775,11 @@ export function DriveManager() {
       if (query) params.append('query', query);
       if (pageToken) params.append('pageToken', pageToken);
 
+      // Add search query from input field
+      if (searchQuery && searchQuery.trim()) {
+        params.append('search', searchQuery.trim());
+      }
+
       // Add view filter parameters
       const currentView = viewFilter || activeView;
       if (currentView !== 'all') {
@@ -1988,7 +1993,7 @@ export function DriveManager() {
   const handleRefresh = async () => {
     setRefreshing(true);
     setNextPageToken(null); // Reset pagination
-    await fetchFiles(currentFolderId || undefined, searchQuery || undefined);
+    await fetchFiles(currentFolderId || undefined, undefined, undefined, false, activeView);
     setRefreshing(false);
   };
 

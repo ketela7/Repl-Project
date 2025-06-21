@@ -44,36 +44,49 @@ function buildDriveQuery(filters: FileFilter): string {
       break;
   }
   
-  // File type filters
+  // File type filters - handle both single and multiple types
   if (filters.fileType && filters.fileType !== 'all') {
-    switch (filters.fileType) {
-      case 'folder':
-        conditions.push('mimeType=\'application/vnd.google-apps.folder\'');
-        break;
-      case 'document':
-        conditions.push('(mimeType contains \'document\' or mimeType=\'application/pdf\' or mimeType contains \'text\')');
-        break;
-      case 'spreadsheet':
-        conditions.push('mimeType contains \'spreadsheet\'');
-        break;
-      case 'presentation':
-        conditions.push('mimeType contains \'presentation\'');
-        break;
-      case 'image':
-        conditions.push('mimeType contains \'image\'');
-        break;
-      case 'video':
-        conditions.push('mimeType contains \'video\'');
-        break;
-      case 'audio':
-        conditions.push('mimeType contains \'audio\'');
-        break;
-      case 'archive':
-        conditions.push('(mimeType=\'application/zip\' or mimeType=\'application/x-rar-compressed\' or mimeType=\'application/x-tar\')');
-        break;
-      case 'code':
-        conditions.push('(mimeType contains \'javascript\' or mimeType contains \'python\' or mimeType contains \'text/x-\')');
-        break;
+    // Handle comma-separated file types from frontend
+    const fileTypes = filters.fileType.split(',').filter(type => type && type !== 'all');
+    
+    if (fileTypes.length > 0) {
+      const typeConditions: string[] = [];
+      
+      fileTypes.forEach(type => {
+        switch (type.trim()) {
+          case 'folder':
+            typeConditions.push('mimeType=\'application/vnd.google-apps.folder\'');
+            break;
+          case 'document':
+            typeConditions.push('(mimeType contains \'document\' or mimeType=\'application/pdf\' or mimeType contains \'text\')');
+            break;
+          case 'spreadsheet':
+            typeConditions.push('mimeType contains \'spreadsheet\'');
+            break;
+          case 'presentation':
+            typeConditions.push('mimeType contains \'presentation\'');
+            break;
+          case 'image':
+            typeConditions.push('mimeType contains \'image\'');
+            break;
+          case 'video':
+            typeConditions.push('mimeType contains \'video\'');
+            break;
+          case 'audio':
+            typeConditions.push('mimeType contains \'audio\'');
+            break;
+          case 'archive':
+            typeConditions.push('(mimeType=\'application/zip\' or mimeType=\'application/x-rar-compressed\' or mimeType=\'application/x-tar\')');
+            break;
+          case 'code':
+            typeConditions.push('(mimeType contains \'javascript\' or mimeType contains \'python\' or mimeType contains \'text/x-\')');
+            break;
+        }
+      });
+      
+      if (typeConditions.length > 0) {
+        conditions.push(`(${typeConditions.join(' or ')})`);
+      }
     }
   }
   
@@ -165,15 +178,15 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     
-    // Parse query parameters
+    // Parse query parameters - match frontend parameter names
     const filters: FileFilter = {
-      fileType: searchParams.get('fileType') || 'all',
-      viewStatus: searchParams.get('viewStatus') || 'my-drive',
+      fileType: searchParams.get('fileTypes') || searchParams.get('fileType') || 'all',
+      viewStatus: searchParams.get('view') || searchParams.get('viewStatus') || 'my-drive',
       sortBy: searchParams.get('sortBy') || 'modified',
       sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
-      search: searchParams.get('search') || undefined,
-      minSize: searchParams.get('minSize') ? parseInt(searchParams.get('minSize')!) : undefined,
-      maxSize: searchParams.get('maxSize') ? parseInt(searchParams.get('maxSize')!) : undefined,
+      search: searchParams.get('search') || searchParams.get('query') || undefined,
+      minSize: searchParams.get('sizeMin') || searchParams.get('minSize') ? parseInt(searchParams.get('sizeMin') || searchParams.get('minSize')!) : undefined,
+      maxSize: searchParams.get('sizeMax') || searchParams.get('maxSize') ? parseInt(searchParams.get('sizeMax') || searchParams.get('maxSize')!) : undefined,
       createdAfter: searchParams.get('createdAfter') || undefined,
       createdBefore: searchParams.get('createdBefore') || undefined,
       modifiedAfter: searchParams.get('modifiedAfter') || undefined,
