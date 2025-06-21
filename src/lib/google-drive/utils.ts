@@ -24,7 +24,7 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'application/vnd.google-apps.map': 'MapPin',
     'application/vnd.google-apps.site': 'Globe',
     'application/vnd.google-apps.script': 'FileCode',
-    'application/vnd.google-apps.shortcut': 'ExternalLink',
+    'application/vnd.google-apps.shortcut': 'Link',
 
     // PDF and Documents
     'application/pdf': 'BookOpen',
@@ -718,6 +718,7 @@ export function getCategoryIcon(category: string): string {
     'text': 'FileText',
     'design': 'Palette',
     'database': 'Database',
+    'shortcut': 'Link',
     'other': 'File'
   };
 

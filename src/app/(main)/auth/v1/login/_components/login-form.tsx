@@ -64,15 +64,14 @@ export function LoginFormV1() {
 
   return (
     <div className="space-y-4">
-      {/* Remember Me Option */}
-      <div className="flex flex-row items-center space-x-2">
+      {/* Remember Me Option - Always Visible */}
+      <div className="flex items-center space-x-2 p-2 border rounded-md bg-muted/30">
         <Checkbox
-          id="login-remember"
+          id="remember-me-checkbox"
           checked={form.watch('remember')}
-          onCheckedChange={(checked) => form.setValue('remember', checked as boolean)}
-          className="size-4"
+          onCheckedChange={(checked) => form.setValue('remember', !!checked)}
         />
-        <label htmlFor="login-remember" className="text-sm font-medium cursor-pointer">
+        <label htmlFor="remember-me-checkbox" className="text-sm font-medium cursor-pointer select-none">
           Remember me for 30 days
         </label>
       </div>
