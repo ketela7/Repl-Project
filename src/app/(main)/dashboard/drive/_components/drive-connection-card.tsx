@@ -10,8 +10,8 @@ export function DriveConnectionCard() {
 
   const handleConnect = () => {
     setConnecting(true);
-    // Request additional Google Drive permissions without logout
-    window.location.href = '/api/auth/google-drive';
+    // Request additional Google Drive permissions
+    window.location.href = '/api/auth/reauth-drive';
   };
 
   return (

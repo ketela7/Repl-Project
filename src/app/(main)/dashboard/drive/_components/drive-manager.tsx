@@ -120,6 +120,7 @@ import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
 import { FiltersDialog } from './filters-dialog';
 
 import { DriveErrorDisplay } from '@/components/drive-error-display';
+import { DrivePermissionRequired } from '@/components/drive-permission-required';
 import { FileCategoryBadges } from '@/components/file-category-badges';
 // File size utilities inline
 const normalizeFileSize = (size: any): number => {
@@ -394,6 +395,7 @@ export function DriveManager() {
   // Get timezone context for consistent date formatting
   const { timezone, isLoading: timezoneLoading } = useTimezoneContext();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const [driveAccessError, setDriveAccessError] = useState<any>(null);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -2630,6 +2632,7 @@ export function DriveManager() {
         if (!accessData.hasAccess) {
           console.log('No Drive access detected');
           setHasAccess(false);
+          setDriveAccessError(accessData.error || 'Insufficient permissions');
           setLoading(false);
           return;
         }
@@ -2641,6 +2644,7 @@ export function DriveManager() {
       } catch (error) {
         console.error('Error checking Drive access:', error);
         setHasAccess(false);
+        setDriveAccessError(error);
         setLoading(false);
       }
     };
@@ -2727,9 +2731,37 @@ export function DriveManager() {
     }
   }, []);
 
-  // Show connection card if no access to Google Drive
+  // Show permission required card if no access to Google Drive
   if (hasAccess === false) {
-    return <DriveConnectionCard />;
+    return (
+      <DrivePermissionRequired 
+        error={driveAccessError}
+        onRetry={async () => {
+          setLoading(true);
+          setHasAccess(null);
+          setDriveAccessError(null);
+          
+          try {
+            const accessResponse = await fetch('/api/auth/check-drive-access');
+            const accessData = await accessResponse.json();
+            
+            if (accessData.hasAccess) {
+              await fetchFiles();
+              setHasAccess(true);
+            } else {
+              setHasAccess(false);
+              setDriveAccessError(accessData.error || 'Insufficient permissions');
+            }
+          } catch (error) {
+            console.error('Retry error:', error);
+            setHasAccess(false);
+            setDriveAccessError(error);
+          } finally {
+            setLoading(false);
+          }
+        }}
+      />
+    );
   }
 
   if (loading && files.length === 0) {
