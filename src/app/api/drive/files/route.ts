@@ -217,8 +217,8 @@ export async function GET(request: NextRequest) {
     console.log('Order by:', orderBy);
 
     // Make the API call
-    const result = await driveService.getFiles({
-      q: driveQuery,
+    const result = await driveService.listFiles({
+      query: driveQuery,
       orderBy,
       pageSize,
       pageToken,
