@@ -47,7 +47,7 @@ import {
   Trash2
 } from "lucide-react";
 
-interface EnhancedShareDialogProps {
+interface FileShareDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item: { id: string; name: string; type: 'file' | 'folder' } | null;
@@ -65,13 +65,13 @@ interface ShareData {
   expirationTime?: string;
 }
 
-export function EnhancedShareDialog({ 
+export function FileShareDialog({ 
   open, 
   onOpenChange, 
   item, 
   items,
   onShare 
-}: EnhancedShareDialogProps) {
+}: FileShareDialogProps) {
   const [shareType, setShareType] = useState<'link' | 'email'>('link');
   const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader');
   const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>('anyoneWithLink');

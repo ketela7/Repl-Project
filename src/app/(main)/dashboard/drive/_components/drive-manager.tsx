@@ -102,8 +102,7 @@ import { PermanentDeleteDialog } from './permanent-delete-dialog';
 import { FileDetailsDialog } from './file-details-dialog';
 import { FilePreviewDialog } from './file-preview-dialog';
 import { DriveGridSkeleton, BreadcrumbSkeleton } from './drive-skeleton';
-import { LoadingSkeleton, BreadcrumbLoadingSkeleton } from '@/components/ui/loading-skeleton';
-import { LazyImage } from '@/components/ui/lazy-image';
+import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
 
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
@@ -114,7 +113,7 @@ import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
 import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
-import { EnhancedShareDialog } from './enhanced-share-dialog';
+import { FileShareDialog } from './file-share-dialog';
 import { BulkShareDialog } from './bulk-share-dialog';
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
 import { FiltersDialog } from './filters-dialog';
@@ -4707,8 +4706,8 @@ export function DriveManager() {
         </div>
       )}
 
-      {/* Enhanced Share Dialog */}
-      <EnhancedShareDialog
+      {/* File Share Dialog */}
+      <FileShareDialog
         open={isShareDialogOpen}
         onOpenChange={setIsShareDialogOpen}
         item={selectedItemForShare}

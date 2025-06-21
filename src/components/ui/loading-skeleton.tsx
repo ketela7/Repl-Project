@@ -67,14 +67,3 @@ export function LoadingSkeleton({ count = 8, type = 'grid' }: LoadingSkeletonPro
   return null;
 }
 
-export function BreadcrumbLoadingSkeleton() {
-  return (
-    <div className="flex items-center space-x-2 mb-4">
-      <Skeleton className="h-4 w-16" />
-      <span className="text-muted-foreground">/</span>
-      <Skeleton className="h-4 w-20" />
-      <span className="text-muted-foreground">/</span>
-      <Skeleton className="h-4 w-24" />
-    </div>
-  );
-}
