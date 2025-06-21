@@ -40,12 +40,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.accessToken = account.access_token
         token.refreshToken = account.refresh_token
         token.provider = account.provider
+        // Set initial remember me preference from localStorage (will be updated via session update)
+        token.rememberMe = false;
         console.log("[JWT Callback] Saved tokens to JWT");
       }
       
       // Handle remember me preference updates
       if (trigger === "update" && session?.rememberMe !== undefined) {
         token.rememberMe = session.rememberMe;
+        // Update token expiration based on remember me preference
+        const maxAge = session.rememberMe 
+          ? 30 * 24 * 60 * 60 // 30 days
+          : 24 * 60 * 60; // 1 day
+        token.exp = Math.floor(Date.now() / 1000) + maxAge;
+        console.log("[JWT Callback] Updated remember me preference:", session.rememberMe);
       }
       
       return token
@@ -72,7 +80,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days (can be overridden per session)
+    maxAge: 30 * 24 * 60 * 60, // 30 days maximum
   },
   cookies: {
     sessionToken: {
@@ -82,7 +90,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60 // 30 days default
+        // Dynamic maxAge will be set based on remember me preference
       }
     }
   },
