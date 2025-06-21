@@ -41,46 +41,43 @@ const nextConfig: NextConfig = {
       '@tanstack/react-query',
       'date-fns'
     ],
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      },
+  },
+  
+  // Turbopack configuration (stable in Next.js 15)
+  turbopack: {
+    resolveAlias: {
+      '@/': './src/',
     },
   },
   
-  // Webpack optimizations
+  // Webpack optimizations (safe configuration)
   webpack: (config, { dev, isServer }) => {
     if (dev) {
       config.watchOptions = {
         poll: 1000,
         aggregateTimeout: 300,
-        ignored: ['node_modules', '.next', 'coverage'],
+        ignored: /node_modules/,
       };
     }
     
-    config.optimization = {
-      ...config.optimization,
-      splitChunks: {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            chunks: 'all',
-            priority: 10,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            chunks: 'all',
-            priority: 5,
+    // Only apply optimizations for client-side builds
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization.splitChunks,
+          cacheGroups: {
+            ...config.optimization.splitChunks?.cacheGroups,
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+              priority: 10,
+            },
           },
         },
-      },
-    };
+      };
+    }
     
     return config;
   },
