@@ -118,15 +118,10 @@ import { EnhancedShareDialog } from './enhanced-share-dialog';
 import { BulkShareDialog } from './bulk-share-dialog';
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
 import { FiltersDialog } from './filters-dialog';
+
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { DrivePermissionRequired } from '@/components/drive-permission-required';
 import { FileCategoryBadges } from '@/components/file-category-badges';
-import { 
-  BulkOperationItem, 
-  BulkOperationType, 
-  executeParallelBulkOperation,
-  getOperationPreview
-} from '@/lib/google-drive/utils';
 // File size utilities inline
 const normalizeFileSize = (size: any): number => {
   // Handle null, undefined, empty values
@@ -465,19 +460,6 @@ export function DriveManager() {
   const [isBulkShareDialogOpen, setIsBulkShareDialogOpen] = useState(false);
   const [selectedItemForShare, setSelectedItemForShare] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
 
-  // New bulk operation dialog state
-  const [bulkOperationDialog, setBulkOperationDialog] = useState<{
-    open: boolean;
-    operation: BulkOperationType | null;
-    items: BulkOperationItem[];
-    operationParams?: any;
-  }>({
-    open: false,
-    operation: null,
-    items: [],
-    operationParams: undefined
-  });
-
   // Mobile bottom sheet states
   const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -604,26 +586,6 @@ export function DriveManager() {
   const sortedFolders = React.useMemo(() => {
     return sortedAllItems.filter(item => item.itemType === 'folder');
   }, [sortedAllItems]);
-
-  // Convert drive items to bulk operation items
-  const convertToBulkOperationItems = (items: any[]): BulkOperationItem[] => {
-    return items.map(item => ({
-      id: item.id,
-      name: item.name,
-      mimeType: item.mimeType || 'application/vnd.google-apps.folder',
-      size: item.size,
-      webContentLink: item.webContentLink,
-      webViewLink: item.webViewLink,
-      parents: item.parents,
-      capabilities: {
-        canDownload: item.capabilities?.canDownload,
-        canCopy: item.capabilities?.canCopy,
-        canEdit: item.capabilities?.canEdit,
-        canDelete: item.capabilities?.canDelete,
-        canShare: item.capabilities?.canShare
-      }
-    }));
-  };
 
   // Bulk operations utility functions - use filtered results
   const getAllItems = () => [...sortedFolders, ...sortedFiles];
@@ -1043,85 +1005,111 @@ export function DriveManager() {
     }
   };
 
-  // Parallel processing bulk download following PROJECT_RULES.md
   const handleBulkDownload = async () => {
-    const selectedItemsData = getSelectedItemsData();
-    if (selectedItemsData.length === 0) return;
+    const allSelectedItems = getSelectedItemsData();
+    // Filter out folders - only allow files to be downloaded
+    const selectedItemsData = allSelectedItems.filter(item => item.type === 'file' && item.mimeType !== 'application/vnd.google-apps.folder');
+    const folderCount = allSelectedItems.filter(item => item.type === 'folder' || item.mimeType === 'application/vnd.google-apps.folder').length;
 
-    const allItems = getAllItems();
-    const selectedFullItems = Array.from(selectedItems).map(id => 
-      allItems.find(item => item.id === id)
-    ).filter(Boolean);
-
-    const bulkItems = convertToBulkOperationItems(selectedFullItems);
-    const preview = getOperationPreview(bulkItems, 'download');
-
-    if (preview.processableItems.length === 0) {
-      toast.warning('No files can be downloaded. Folders and restricted files are not supported for download.');
+    if (selectedItemsData.length === 0) {
+      if (folderCount > 0) {
+        toast.warning(`Cannot download folders. Only files can be downloaded. ${folderCount} folder${folderCount > 1 ? 's' : ''} selected.`);
+      } else {
+        toast.warning('No files selected for download.');
+      }
       return;
     }
 
-    // Show preview info
-    if (preview.skippedItems.length > 0) {
-      const skippedCount = preview.skippedItems.length;
-      const processableCount = preview.processableItems.length;
-      toast.info(`Starting download of ${processableCount} files. ${skippedCount} items will be skipped.`);
+    if (folderCount > 0) {
+      toast.info(`Downloading ${selectedItemsData.length} file${selectedItemsData.length > 1 ? 's' : ''}. Skipping ${folderCount} folder${folderCount > 1 ? 's' : ''}.`);
     }
 
     setBulkOperationProgress({
       isRunning: true,
       current: 0,
-      total: preview.processableItems.length,
-      operation: 'Downloading files in parallel batches'
+      total: selectedItemsData.length,
+      operation: 'Downloading files'
     });
 
+    let successCount = 0;
+    let failedItems: string[] = [];
+    let skippedItems: string[] = [];
+
     try {
-      const result = await executeParallelBulkOperation(
-        preview.processableItems,
-        'download',
-        async (item) => {
-          const response = await fetch(`/api/drive/download/${item.id}`);
-          if (!response.ok) {
-            throw new Error(`Failed to download ${item.name}: ${response.statusText}`);
+      for (let i = 0; i < selectedItemsData.length; i++) {
+        const item = selectedItemsData[i];
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Downloading: ${item.name}`
+        }));
+
+        try {
+          // Double check that it's not a folder before downloading
+          if (item.mimeType === 'application/vnd.google-apps.folder') {
+            skippedItems.push(item.name);
+            console.log(`Skipping folder: ${item.name}`);
+            continue;
           }
-          
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
+
+          // Direct download for all files (no hybrid strategy)
+          console.log(`Downloading file: ${item.name}`);
+
+          // Create download link directly to API endpoint
           const link = document.createElement('a');
-          link.href = url;
+          link.href = `/api/drive/download/${item.id}`;
           link.download = item.name;
           link.style.display = 'none';
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-        },
-        (progress) => {
-          setBulkOperationProgress({
-            isRunning: true,
-            current: progress.current,
-            total: progress.total,
-            operation: `Downloading: ${progress.current}/${progress.total} files`
-          });
+
+          successCount++;
+          console.log(`Direct download initiated for: ${item.name}`);
+
+          // Add delay between downloads to avoid overwhelming the browser
+          if (i < selectedItemsData.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        } catch (downloadError) {
+          failedItems.push(item.name);
+          console.error(`Failed to download ${item.name}:`, downloadError);
         }
-      );
-
-      const duration = (result.timeElapsed / 1000).toFixed(1);
-      const successCount = result.completed.length;
-      const failCount = result.failed.length;
-
-      if (failCount === 0) {
-        toast.success(`Successfully downloaded ${successCount} files in ${duration}s`);
-      } else {
-        toast.warning(`Downloaded ${successCount} files, ${failCount} failed in ${duration}s`);
       }
 
       deselectAll();
       setIsSelectMode(false);
 
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} file${successCount > 1 ? 's' : ''} download initiated`;
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} folder${skippedItems.length > 1 ? 's' : ''} skipped`;
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} failed`;
+      }
+
+      if (successCount === selectedItemsData.length && skippedItems.length === 0) {
+        toast.success(`Download initiated for ${successCount} file${successCount > 1 ? 's' : ''}`);
+      } else if (successCount > 0) {
+        toast.warning(`Download completed: ${message}`);
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
+      } else {
+        toast.error(`Download failed: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
     } catch (error) {
       console.error('Bulk download error:', error);
-      toast.error('Bulk download operation failed');
+      toast.error('An error occurred during bulk download operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
     }
@@ -1486,95 +1474,149 @@ export function DriveManager() {
     }
   };
 
-  // Parallel processing bulk share following PROJECT_RULES.md
-  const handleBulkShare = async () => {
+  const handleBulkShare = async (shareData: { role: string; type: string }) => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
-    const allItems = getAllItems();
-    const selectedFullItems = Array.from(selectedItems).map(id => 
-      allItems.find(item => item.id === id)
-    ).filter(Boolean);
+    // Close dialog first so user can see progress
+    setIsBulkShareDialogOpen(false);
 
-    const bulkItems = convertToBulkOperationItems(selectedFullItems);
-    const preview = getOperationPreview(bulkItems, 'share');
+    // Filter items that can be shared based on permissions
+    const itemsWithPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return actions?.canShare;
+    });
 
-    if (preview.processableItems.length === 0) {
-      toast.warning('No items can be shared. Check permissions for selected items.');
+    const itemsWithoutPermissions = selectedItemsData.filter(item => {
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+      const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
+      return !actions?.canShare;
+    });
+
+    if (itemsWithPermissions.length === 0) {
+      toast.warning('No items can be shared. All selected items either don\'t have permission or are restricted.');
       return;
     }
 
     setBulkOperationProgress({
       isRunning: true,
       current: 0,
-      total: preview.processableItems.length,
-      operation: 'Generating share links in parallel'
+      total: itemsWithPermissions.length,
+      operation: 'Generating share links'
     });
 
+    let successCount = 0;
+    let failedItems: string[] = [];
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
     const generatedLinks: string[] = [];
 
     try {
-      const result = await executeParallelBulkOperation(
-        preview.processableItems,
-        'share',
-        async (item) => {
+      for (let i = 0; i < itemsWithPermissions.length; i++) {
+        const item = itemsWithPermissions[i];
+        setBulkOperationProgress(prev => ({ 
+          ...prev, 
+          current: i + 1,
+          operation: `Sharing: ${item.name}`
+        }));
+
+        try {
           const response = await fetch(`/api/drive/files/${item.id}/share`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              type: 'anyone',
-              role: 'reader'
+              action: 'get_share_link',
+              role: shareData.role,
+              type: shareData.type === 'anyoneWithLink' ? 'anyone' : shareData.type
             })
           });
-          
-          if (!response.ok) {
-            throw new Error(`Failed to share ${item.name}: ${response.statusText}`);
+
+          if (response.ok) {
+            const result = await response.json();
+            if (result.webViewLink) {
+              generatedLinks.push(`${item.name}: ${result.webViewLink}`);
+              successCount++;
+            } else {
+              failedItems.push(item.name);
+            }
+          } else {
+            const errorData = await response.json();
+            if (errorData.needsReauth) {
+              toast.error('Google Drive access expired. Please reconnect your account.');
+              window.location.reload();
+              return;
+            }
+            failedItems.push(item.name);
+            console.error(`Failed to share ${item.name}:`, response.status, errorData);
           }
-          
-          const shareResult = await response.json();
-          if (shareResult.webViewLink) {
-            generatedLinks.push(`${item.name}: ${shareResult.webViewLink}`);
-          }
-        },
-        (progress) => {
-          setBulkOperationProgress({
-            isRunning: true,
-            current: progress.current,
-            total: progress.total,
-            operation: `Sharing: ${progress.current}/${progress.total} items`
-          });
+        } catch (error) {
+          failedItems.push(item.name);
+          console.error(`Error sharing ${item.name}:`, error);
         }
-      );
 
-      const duration = (result.timeElapsed / 1000).toFixed(1);
-      const successCount = result.completed.length;
-      const failCount = result.failed.length;
-
-      if (successCount > 0 && generatedLinks.length > 0) {
-        try {
-          await navigator.clipboard.writeText(generatedLinks.join('\n'));
-          toast.success(`Generated ${successCount} share links in ${duration}s and copied to clipboard`);
-        } catch {
-          toast.success(`Generated ${successCount} share links in ${duration}s`);
+        if (i < itemsWithPermissions.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
         }
-      }
-
-      if (failCount > 0) {
-        toast.warning(`Shared ${successCount} items, ${failCount} failed in ${duration}s`);
       }
 
       deselectAll();
       setIsSelectMode(false);
 
+      // Show comprehensive result notification
+      let message = '';
+
+      if (successCount > 0) {
+        message += `${successCount} share link${successCount > 1 ? 's' : ''} generated`;
+        
+        // Copy all links to clipboard if successful
+        if (generatedLinks.length > 0) {
+          try {
+            const allLinks = generatedLinks.join('\n');
+            await navigator.clipboard.writeText(allLinks);
+            toast.success(`${message} and copied to clipboard!`);
+          } catch (clipboardError) {
+            toast.success(message);
+          }
+        }
+      }
+
+      if (skippedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped (no permission)`;
+      }
+
+      if (failedItems.length > 0) {
+        if (message) message += ', ';
+        message += `${failedItems.length} item${failedItems.length > 1 ? 's' : ''} failed`;
+      }
+
+      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
+        // Already handled above with clipboard copy
+      } else if (successCount > 0 || skippedItems.length > 0) {
+        const toastMessage = `Bulk share completed: ${message}`;
+        if (failedItems.length > 0 || skippedItems.length > 0) {
+          toast.warning(toastMessage);
+        } else {
+          toast.success(toastMessage);
+        }
+        
+        // Log details for debugging
+        if (skippedItems.length > 0) {
+          console.log('Skipped items (no permission):', skippedItems);
+        }
+        if (failedItems.length > 0) {
+          console.log('Failed items:', failedItems);
+        }
+      } else {
+        toast.error(`Failed to share items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
+      }
     } catch (error) {
       console.error('Bulk share error:', error);
-      toast.error('Bulk share operation failed');
+      toast.error('An error occurred during bulk share operation');
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
     }
   };
-
-
 
   const handleShare = async (shareData: { role: string; type: string; emailAddress?: string; message?: string }) => {
     if (!selectedItemForShare) return;
@@ -4695,7 +4737,24 @@ export function DriveManager() {
         onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
         onBulkRename={() => setIsBulkRenameDialogOpen(true)}
         onBulkExport={() => setIsBulkExportDialogOpen(true)}
-        onBulkShare={handleBulkShare}
+        onBulkShare={() => {
+          // Always use enhanced share dialog for better UI
+          const selectedItemsData = getSelectedItemsData();
+          if (selectedItemsData.length === 1 && selectedItemsData[0]) {
+            setSelectedItemForShare({
+              id: selectedItemsData[0].id,
+              name: selectedItemsData[0].name,
+              type: selectedItemsData[0].type as 'file' | 'folder'
+            });
+          } else {
+            setSelectedItemForShare({
+              id: 'bulk',
+              name: `${selectedItemsData.length} items`,
+              type: 'file'
+            });
+          }
+          setIsShareDialogOpen(true);
+        }}
         onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
         onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         onDeselectAll={deselectAll}
@@ -4723,8 +4782,6 @@ export function DriveManager() {
         hasActiveFilters={!!hasActiveFilters}
         onClearFilters={clearAllFilters}
       />
-
-
 
     </div>
   );

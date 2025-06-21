@@ -73,21 +73,6 @@ Migration preferences: User prefers to discuss project rules and documentation b
 
 ## Recent Changes
 
-### December 2024: **PROJECT_RULES.md Compliant Implementation**
-- **Extended Existing Utils**: Added parallel processing to `src/lib/google-drive/utils.ts` instead of creating new files
-- **Performance Standards**: Implemented 5x faster bulk operations following project performance guidelines
-- **Cross-Platform Design**: Enhanced media preview with proper touch targets (44px+) and responsive spacing
-- **Professional UI Standards**: Applied balanced color scheme and consistent icon sizing (Lucide React)
-- **Mobile-First Approach**: Bottom sheets for mobile, dialogs for desktop following project standards
-- **Code Quality**: TypeScript strict mode, comprehensive error handling, and proper JSDoc documentation
-
-### December 2024: **Enhanced Media Preview & Layout Optimization**
-- **Responsive Media Preview**: Fixed layout with proper screen edge spacing (2rem mobile, 4rem tablet, 8rem desktop)
-- **Full Screen Support**: Enhanced fullscreen mode with gradient overlays, proper spacing, and keyboard shortcuts (F11, F, Escape)
-- **Interactive Media Controls**: Added zoom, rotate, and reset controls for images; play/pause/mute for videos and audio
-- **Improved UX**: Better visual hierarchy with enhanced file info display and professional toolbar design
-- **Keyboard Navigation**: Full keyboard support for preview navigation and fullscreen toggle
-
 ### December 2024: **Comprehensive File Icon System Enhancement**
 - **Complete MIME Type Coverage**: Added support for 150+ additional MIME types including `application/rar`, `video/x-matroska`, and specialized formats
 - **Enhanced File Recognition**: Extended support for RAR archives, Matroska videos, mobile app formats (APK/IPA), raw camera files, and system executables
