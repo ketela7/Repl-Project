@@ -150,10 +150,19 @@ Migration preferences: User prefers to discuss project rules and documentation b
   - **Proper Type Mapping**: Enhanced share dialog menggunakan mapping yang benar untuk permission types
   - **API Compliance**: Share functionality sekarang mengikuti dokumentasi resmi Google Drive API
 
+- June 21, 2025: **NextAuth.js Migration Complete**:
+  - **Authentication System Migration**: Successfully migrated from Supabase to NextAuth.js for better Next.js 15 compatibility
+  - **Google OAuth Configuration**: Set up NextAuth with Google provider for Google Drive API access
+  - **Session Management**: Implemented proper JWT token handling with access tokens for Drive API
+  - **Client/Server Architecture**: Fixed React Context issues by properly separating client and server components
+  - **Middleware Updates**: Updated authentication middleware to use NextAuth JWT tokens
+  - **OAuth Callback Setup**: Configured proper redirect URIs for Google OAuth integration
+  - **Environment Variables**: Set up NEXTAUTH_SECRET and NEXTAUTH_URL for secure authentication
+
 - December 2024: **Migration to Replit Environment Complete**:
   - **Environment Setup**: Installed Node.js 20 and all project dependencies successfully
   - **Server Configuration**: Configured Next.js to run on port 5000 with proper host binding for Replit
   - **Database Integration**: Set up PostgreSQL database with connection environment variables
-  - **Authentication Setup**: Configured Supabase integration with proper secret keys management
+  - **Authentication Setup**: Migrated from Supabase to NextAuth.js authentication system
   - **Security Implementation**: Maintained robust security practices with client/server separation
-  - **Production Ready**: Application successfully running with Google Drive API integration and user authentication
+  - **Production Ready**: Application successfully running with Google Drive API integration and NextAuth authentication
