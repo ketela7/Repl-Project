@@ -32,11 +32,64 @@ const nextConfig: NextConfig = {
     ]
   },
   
+  // Performance optimizations
+  experimental: {
+    optimizePackageImports: [
+      '@radix-ui/react-icons', 
+      'lucide-react',
+      '@tanstack/react-table',
+      '@tanstack/react-query',
+      'date-fns'
+    ],
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+  },
+  
+  // Webpack optimizations
+  webpack: (config, { dev, isServer }) => {
+    if (dev) {
+      config.watchOptions = {
+        poll: 1000,
+        aggregateTimeout: 300,
+        ignored: ['node_modules', '.next', 'coverage'],
+      };
+    }
+    
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+            priority: 10,
+          },
+          common: {
+            name: 'common',
+            minChunks: 2,
+            chunks: 'all',
+            priority: 5,
+          },
+        },
+      },
+    };
+    
+    return config;
+  },
+
   // Environment-specific configurations
   ...(process.env.NODE_ENV === 'development' && {
     // Development-only settings
-    experimental: {
-      optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react']
+    typescript: {
+      ignoreBuildErrors: false,
     },
   }),
 
