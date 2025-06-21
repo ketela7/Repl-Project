@@ -85,9 +85,6 @@ function buildDriveQuery(filters: FileFilter): string {
           case 'code':
             typeConditions.push('(mimeType contains \'javascript\' or mimeType contains \'python\' or mimeType contains \'text/x-\')');
             break;
-          case 'shortcut':
-            typeConditions.push('mimeType=\'application/vnd.google-apps.shortcut\'');
-            break;
         }
       });
       
