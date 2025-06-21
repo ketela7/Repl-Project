@@ -17,10 +17,7 @@ import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
 import { NavMain } from "./nav-main";
 import { AuthNavUser } from "./auth-nav-user";
 
-// Placeholder for the TimezoneSelector component
-function TimezoneSelector() {
-  return <div>Timezone Selector (To be implemented)</div>;
-}
+// Timezone is now auto-detected in the background via TimezoneProvider
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -41,9 +38,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={sidebarItems} />
       </SidebarContent>
       <SidebarFooter>
-        <div className="px-3 py-2 border-t">
-          <TimezoneSelector />
-        </div>
         <AuthNavUser />
       </SidebarFooter>
     </Sidebar>

@@ -75,7 +75,9 @@ import {
 } from "@/components/ui/collapsible";
 import { Separator } from "@/components/ui/separator";
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
-import { formatFileSize, formatDate, isPreviewable, getFileActions } from '@/lib/google-drive/utils';
+import { formatFileSize, formatDriveFileDate, isPreviewable, getFileActions } from '@/lib/google-drive/utils';
+import { formatFileTime, getRelativeTime } from '@/lib/timezone-utils';
+import { useTimezoneContext } from '@/components/timezone-provider';
 import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
@@ -379,6 +381,9 @@ export function DriveManager() {
   const [selectedItemForDelete, setSelectedItemForDelete] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // Get timezone context for consistent date formatting
+  const { timezone, isLoading: timezoneLoading } = useTimezoneContext();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);

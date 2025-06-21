@@ -155,3 +155,18 @@ export function getTimezoneDisplayName(timezone?: string): string {
     return tz;
   }
 }
+
+/**
+ * Initialize timezone detection on app load
+ */
+export function initializeTimezone(): string {
+  if (typeof window === 'undefined') return 'UTC';
+  
+  try {
+    const detectedTimezone = getUserTimezone();
+    localStorage.setItem('userTimezone', detectedTimezone);
+    return detectedTimezone;
+  } catch (error) {
+    return 'UTC';
+  }
+}
