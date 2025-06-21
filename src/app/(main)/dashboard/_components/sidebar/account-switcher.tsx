@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
-import { BadgeCheck, Bell, CreditCard, LogOut } from "lucide-react";
+import { BadgeCheck, Bell, CreditCard, LogOut, Clock, Shield } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -35,6 +36,7 @@ export function AccountSwitcher({
   }>;
 }) {
   const [activeUser, setActiveUser] = useState(users[0]);
+  const { data: session } = useSession();
 
   return (
     <DropdownMenu>
@@ -78,6 +80,20 @@ export function AccountSwitcher({
             Notifications
           </DropdownMenuItem>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem disabled className="text-xs text-muted-foreground">
+          {session?.rememberMe ? (
+            <>
+              <Shield className="h-3 w-3" />
+              Session: 30 days (Remember Me)
+            </>
+          ) : (
+            <>
+              <Clock className="h-3 w-3" />
+              Session: 1 day (Standard)
+            </>
+          )}
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut />
