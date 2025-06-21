@@ -25,7 +25,7 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Server"
+runButton = "Project"
 
 [[workflows.workflow]]
 name = "Check"
@@ -57,4 +57,21 @@ args = "npx tsx scripts/reset-db.ts"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx drizzle-kit push"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Test Runner"
+
+[[workflows.workflow]]
+name = "Test Runner"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx jest --watch --coverage --silent"
 
