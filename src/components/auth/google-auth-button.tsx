@@ -7,14 +7,21 @@ import { cn } from "@/lib/utils";
 
 interface GoogleAuthButtonProps {
   className?: string;
+  onClick?: () => void;
 }
 
-export function GoogleAuthButton({ className }: GoogleAuthButtonProps) {
+export function GoogleAuthButton({ className, onClick }: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
+      
+      // Call external onClick handler first (for localStorage storage)
+      if (onClick) {
+        onClick();
+      }
+      
       await signIn('google', { 
         callbackUrl: '/dashboard/drive',
         redirect: true 

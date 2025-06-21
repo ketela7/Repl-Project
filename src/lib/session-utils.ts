@@ -28,8 +28,21 @@ export function getRememberMePreference(): boolean {
  * Set remember me preference in localStorage
  */
 export function setRememberMePreference(rememberMe: boolean): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('rememberMe', rememberMe.toString());
+  if (typeof window === 'undefined') {
+    console.log("[Session Utils] Window undefined, cannot set localStorage");
+    return;
+  }
+  
+  try {
+    localStorage.setItem('rememberMe', rememberMe.toString());
+    console.log("[Session Utils] Successfully set rememberMe to localStorage:", rememberMe);
+    
+    // Verify it was set
+    const stored = localStorage.getItem('rememberMe');
+    console.log("[Session Utils] Verification - localStorage now contains:", stored);
+  } catch (error) {
+    console.error("[Session Utils] Failed to set localStorage:", error);
+  }
 }
 
 /**

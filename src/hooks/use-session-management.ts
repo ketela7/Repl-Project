@@ -12,11 +12,17 @@ export function useSessionManagement() {
     if (typeof window !== 'undefined' && session) {
       const storedRememberMe = localStorage.getItem('rememberMe') === 'true';
       
+      console.log("[Session Management] DEBUG - localStorage 'rememberMe':", localStorage.getItem('rememberMe'));
+      console.log("[Session Management] DEBUG - storedRememberMe (parsed):", storedRememberMe);
+      console.log("[Session Management] DEBUG - session.rememberMe:", session.rememberMe);
+      
       // Update session if preference differs or if it's undefined
       if (session.rememberMe !== storedRememberMe) {
         console.log("[Session Management] Syncing remember me preference from localStorage:", storedRememberMe);
         console.log("[Session Management] Current session rememberMe:", session.rememberMe);
         await update({ rememberMe: storedRememberMe });
+      } else {
+        console.log("[Session Management] Remember me preference already in sync");
       }
     }
   }, [session, update]);

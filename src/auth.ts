@@ -49,6 +49,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (trigger === "update" && session?.rememberMe !== undefined) {
         token.rememberMe = session.rememberMe;
         console.log("[JWT Callback] Updated remember me preference from session update:", session.rememberMe);
+        
+        // Update token expiration based on remember me preference
+        const sessionDuration = session.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60;
+        token.exp = Math.floor(Date.now() / 1000) + sessionDuration;
+        console.log("[JWT Callback] Updated token expiration. Remember me:", session.rememberMe, "New exp:", token.exp);
       }
       
       // Set initial remember me state from localStorage during account creation

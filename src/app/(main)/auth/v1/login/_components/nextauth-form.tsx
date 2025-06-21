@@ -7,6 +7,7 @@ import * as z from "zod";
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { setRememberMePreference } from "@/lib/session-utils";
+import { LocalStorageDebug } from "@/components/debug/localStorage-debug";
 
 const FormSchema = z.object({
   remember: z.boolean().default(false),
@@ -25,6 +26,19 @@ export function NextAuthForm() {
     const rememberMe = form.getValues('remember');
     setRememberMePreference(rememberMe);
     console.log("[NextAuthForm] Remember me preference set:", rememberMe);
+    console.log("[NextAuthForm] localStorage after set:", localStorage.getItem('rememberMe'));
+    
+    // Debug: Check if localStorage is working
+    if (typeof window !== 'undefined') {
+      console.log("[NextAuthForm] Window available, localStorage supported:", !!window.localStorage);
+      try {
+        localStorage.setItem('debug-test', 'working');
+        console.log("[NextAuthForm] localStorage test successful");
+        localStorage.removeItem('debug-test');
+      } catch (e) {
+        console.error("[NextAuthForm] localStorage test failed:", e);
+      }
+    }
   };
 
   return (
@@ -50,6 +64,11 @@ export function NextAuthForm() {
         className="w-full" 
         onClick={handleGoogleSignIn}
       />
+      
+      {/* Debug Component - Remove in production */}
+      <div className="mt-6 pt-4 border-t">
+        <LocalStorageDebug />
+      </div>
     </div>
   );
 }
