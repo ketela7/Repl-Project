@@ -14,7 +14,8 @@ import {
   Presentation,
   File,
   Folder,
-  BookOpen
+  BookOpen,
+  Link
 } from "lucide-react";
 import { getCategoryIcon, getCategoryColor, getFileCategory } from '@/lib/google-drive/utils';
 
@@ -247,6 +248,7 @@ const getCategoryFromMimeType = (mimeType: string): string => {
   if (mime.includes('vnd.google-apps.form')) return 'Documents';
   if (mime.includes('vnd.google-apps.site')) return 'Documents';
   if (mime.includes('vnd.google-apps.script')) return 'Code';
+  if (mime.includes('vnd.google-apps.shortcut')) return 'Shortcuts';
   
   // Microsoft Office mime types
   if (mime.includes('vnd.openxmlformats-officedocument.wordprocessingml')) return 'Documents';
@@ -331,6 +333,13 @@ const getCategoryConfig = (categoryName: string): Omit<FileCategory, 'count' | '
       bgColor: 'bg-cyan-50 dark:bg-cyan-950/50',
       textColor: 'text-cyan-700 dark:text-cyan-300',
       icon: <Folder className="h-4 w-4" />
+    },
+    'Shortcuts': {
+      name: 'Shortcuts',
+      color: 'border-blue-200 dark:border-blue-800',
+      bgColor: 'bg-blue-50 dark:bg-blue-950/50',
+      textColor: 'text-blue-700 dark:text-blue-300',
+      icon: <Link className="h-4 w-4" />
     }
   };
   
