@@ -3,19 +3,20 @@ import { getToken } from "next-auth/jwt"
 
 export async function middleware(req: NextRequest) {
   try {
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[Middleware] ${req.method} ${req.nextUrl.pathname}`);
-    }
+    console.log(`[Middleware] ${req.method} ${req.nextUrl.pathname}`);
     
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+    console.log(`[Middleware] Token exists:`, !!token);
     
     // Protect dashboard routes
     if (req.nextUrl.pathname.startsWith('/dashboard')) {
       if (!token) {
+        console.log(`[Middleware] No token, redirecting to login`);
         const url = req.nextUrl.clone()
         url.pathname = '/auth/v1/login'
         return NextResponse.redirect(url)
       }
+      console.log(`[Middleware] Token found, allowing access to dashboard`);
     }
     
     return NextResponse.next()

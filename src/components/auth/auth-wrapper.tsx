@@ -9,7 +9,9 @@ interface AuthWrapperProps {
 }
 
 export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
-  const { status } = useSession();
+  const { data: session, status } = useSession();
+
+  console.log("[AuthWrapper] Status:", status, "Session:", !!session);
 
   if (status === "loading") {
     return (
@@ -19,9 +21,24 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
     );
   }
 
-  if (status === "unauthenticated" && fallback) {
-    return <>{fallback}</>;
+  if (status === "unauthenticated") {
+    console.log("[AuthWrapper] Unauthenticated, showing fallback");
+    if (fallback) {
+      return <>{fallback}</>;
+    }
+    // Redirect to login if no fallback provided
+    window.location.href = '/auth/v1/login';
+    return null;
   }
 
-  return <>{children}</>;
+  if (status === "authenticated" && session) {
+    console.log("[AuthWrapper] Authenticated, showing children");
+    return <>{children}</>;
+  }
+
+  return (
+    <div className="flex h-screen items-center justify-center">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent"></div>
+    </div>
+  );
 }
