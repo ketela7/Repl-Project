@@ -78,7 +78,7 @@ export function FileCopyDialog({
       
       setFolders(allFolders);
     } catch (error) {
-      // Log error for debugging in development
+      // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
         console.error('Error fetching folders:', error);
       }
@@ -110,11 +110,17 @@ export function FileCopyDialog({
 
     try {
       setCopying(true);
-      console.log(`Copying to folder ID: ${targetFolderId} with name: ${copyName}`);
+      // Log operation for debugging in development only
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Copying to folder ID: ${targetFolderId} with name: ${copyName}`);
+      }
       await onCopy(copyName, targetFolderId);
       handleClose();
     } catch (error) {
-      console.error('Copy operation failed:', error);
+      // Log error for debugging in development only
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Copy operation failed:', error);
+      }
       // Error is handled by parent component
     } finally {
       setCopying(false);

@@ -94,10 +94,15 @@ function buildDriveQuery(filters: FileFilter): string {
     }
   }
   
-  // Search query
+  // Search query with proper sanitization
   if (filters.search) {
-    const searchTerm = filters.search.replace(/'/g, "\\'");
-    conditions.push(`name contains '${searchTerm}'`);
+    const searchTerm = filters.search
+      .replace(/['"\\]/g, '') // Remove quotes and backslashes
+      .trim()
+      .substring(0, 100); // Limit length
+    if (searchTerm) {
+      conditions.push(`name contains '${searchTerm}'`);
+    }
   }
   
   // Date filters
@@ -156,41 +161,59 @@ function getSortKey(sortBy: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('=== Drive Files API Called ===');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('=== Drive Files API Called ===');
+    }
     
     const session = await auth();
     
     if (!session?.user) {
-      console.log('No session found');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('No session found');
+      }
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = session.user;
-    console.log('User found:', user.email);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('User found:', user.email);
+    }
 
     const accessToken = session.accessToken;
     
     if (!accessToken) {
-      console.log('No access token found');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('No access token found');
+      }
       return NextResponse.json({ 
         error: 'No access token found',
         needsReauth: true 
       }, { status: 401 });
     }
 
-    console.log('Access token found, proceeding with Drive API call');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Access token found, proceeding with Drive API call');
+    }
 
     const { searchParams } = new URL(request.url);
     
-    // Parse query parameters with proper mapping
+    // Parse and validate query parameters
+    const pageSize = Math.min(Math.max(parseInt(searchParams.get('pageSize') || '50'), 1), 1000);
+    const sortOrder = searchParams.get('sortOrder');
+    const validateSortOrder = (order: string | null): 'asc' | 'desc' => {
+      return order === 'asc' || order === 'desc' ? order : 'desc';
+    };
+
     const filters: FileFilter = {
       fileType: searchParams.get('fileTypes') || searchParams.get('fileType') || 'all',
       viewStatus: searchParams.get('view') || searchParams.get('viewStatus') || 'all',
       sortBy: searchParams.get('sortBy') || 'modified',
-      sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
+      sortOrder: validateSortOrder(sortOrder),
       search: searchParams.get('search') || searchParams.get('query') || undefined,
-      minSize: searchParams.get('sizeMin') || searchParams.get('minSize') ? parseInt(searchParams.get('sizeMin') || searchParams.get('minSize')!) : undefined,
-      maxSize: searchParams.get('sizeMax') || searchParams.get('maxSize') ? parseInt(searchParams.get('sizeMax') || searchParams.get('maxSize')!) : undefined,
+      minSize: searchParams.get('sizeMin') || searchParams.get('minSize') ? 
+        Math.max(parseInt(searchParams.get('sizeMin') || searchParams.get('minSize')!) || 0, 0) : undefined,
+      maxSize: searchParams.get('sizeMax') || searchParams.get('maxSize') ? 
+        Math.max(parseInt(searchParams.get('sizeMax') || searchParams.get('maxSize')!) || 0, 0) : undefined,
       createdAfter: searchParams.get('createdAfter') || undefined,
       createdBefore: searchParams.get('createdBefore') || undefined,
       modifiedAfter: searchParams.get('modifiedAfter') || undefined,
@@ -198,11 +221,12 @@ export async function GET(request: NextRequest) {
       owner: searchParams.get('owner') || undefined,
     };
 
-    const pageSize = parseInt(searchParams.get('pageSize') || '50');
     const pageToken = searchParams.get('pageToken') || undefined;
     const folderId = searchParams.get('folderId') || searchParams.get('parentId') || undefined;
 
-    console.log('Filters applied:', filters);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Filters applied:', filters);
+    }
 
     // Check cache first
     const cacheKey = driveCache.generateDriveKey({
@@ -228,14 +252,18 @@ export async function GET(request: NextRequest) {
     }
     // For "All Files" view (when viewStatus is 'all' or not specified), show everything without parent restriction
     
-    console.log('Final Drive query:', driveQuery);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Final Drive query:', driveQuery);
+    }
     
     // Get sort configuration
     const sortKey = getSortKey(filters.sortBy || 'modified');
     const orderBy = filters.viewStatus === 'recent' ? 'viewedByMeTime desc' : 
                    `${sortKey} ${filters.sortOrder}`;
 
-    console.log('Order by:', orderBy);
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Order by:', orderBy);
+    }
 
     const driveService = new GoogleDriveService(accessToken);
 
@@ -248,12 +276,16 @@ export async function GET(request: NextRequest) {
       parentId: folderId
     });
 
-    console.log(`Retrieved ${result.files?.length || 0} files from Drive API`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Retrieved ${result.files?.length || 0} files from Drive API`);
+    }
 
     // Apply client-side filters
     const filteredFiles = applyClientSideFilters(result.files || [], filters);
     
-    console.log(`After client-side filtering: ${filteredFiles.length} files`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`After client-side filtering: ${filteredFiles.length} files`);
+    }
 
     const finalResult = {
       ...result,
@@ -266,10 +298,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(finalResult);
     
   } catch (error) {
-    console.error('Drive files API error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Drive files API error:', error);
+    }
     return NextResponse.json({ 
-      error: 'Failed to fetch files',
-      details: error instanceof Error ? error.message : String(error)
+      error: 'Failed to fetch files'
+      // Don't expose error details in production for security
     }, { status: 500 });
   }
 }

@@ -62,7 +62,7 @@ export function FileOrganizationPanel({
     priority: 1
   });
 
-  const handleSettingChange = (key: keyof OrganizationSettings, value: any) => {
+  const handleSettingChange = (key: keyof OrganizationSettings, value: boolean | string) => {
     onSettingsChange({
       ...settings,
       [key]: value

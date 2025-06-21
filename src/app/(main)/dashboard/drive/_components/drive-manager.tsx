@@ -1639,7 +1639,7 @@ export function DriveManager() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to share item');
+        throw new Error('Failed to share item');
       }
 
       toast.success(`${selectedItemForShare.name} shared successfully`);

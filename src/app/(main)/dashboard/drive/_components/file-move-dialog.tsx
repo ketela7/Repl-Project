@@ -77,7 +77,7 @@ export function FileMoveDialog({
       
       setFolders(allFolders);
     } catch (error) {
-      // Log error for debugging in development
+      // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
         console.error('Error fetching folders:', error);
       }
@@ -112,14 +112,14 @@ export function FileMoveDialog({
 
     try {
       setMoving(true);
-      // Log for debugging in development
+      // Log operation for debugging in development only
       if (process.env.NODE_ENV === 'development') {
         console.log(`Moving to folder ID: ${targetFolderId}`);
       }
       await onMove(targetFolderId, currentParentId || undefined);
       handleClose();
     } catch (error) {
-      // Log error for debugging in development
+      // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
         console.error('Move operation failed:', error);
       }

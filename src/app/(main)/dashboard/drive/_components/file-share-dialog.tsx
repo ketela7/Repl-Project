@@ -213,7 +213,9 @@ export function FileShareDialog({
       setExpirationDays('none');
       
     } catch (error) {
-      console.error('Error sharing item:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Error sharing item:', error);
+      }
       toast.error('Failed to share item');
     } finally {
       setIsLoading(false);

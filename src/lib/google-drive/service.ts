@@ -90,7 +90,10 @@ export class GoogleDriveService {
       searchQuery = 'trashed=false';
     }
 
-    console.log('Google Drive Service - Final Query:', searchQuery);
+    // Log query for debugging in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Google Drive Service - Final Query:', searchQuery);
+    }
 
     const response = await this.drive.files.list({
       q: searchQuery,
@@ -104,7 +107,9 @@ export class GoogleDriveService {
 
     const files = response.data.files?.map(convertGoogleDriveFile) || [];
 
-    console.log(`Google Drive Service - Retrieved ${files.length} files`);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`Google Drive Service - Retrieved ${files.length} files`);
+    }
 
     return {
       files,

@@ -246,7 +246,11 @@ export function MobileActionsBottomSheet({
                 <Button
                   variant="outline"
                   className="w-full justify-start h-12 text-left text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
-                  onClick={() => handleAction(onBulkPermanentDelete || (() => console.log('Permanent delete')))}
+                  onClick={() => handleAction(onBulkPermanentDelete || (() => {
+                    if (process.env.NODE_ENV === 'development') {
+                      console.log('Permanent delete action triggered');
+                    }
+                  }))}
                 >
                   <Trash2 className="h-4 w-4 mr-3" />
                   <div>

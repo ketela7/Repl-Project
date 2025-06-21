@@ -7,14 +7,18 @@ export async function GET(request: NextRequest) {
     const session = await auth();
     
     if (!session?.user) {
-      console.log('No session found');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('No session found');
+      }
       return NextResponse.json({ hasAccess: false, error: 'Unauthorized' }, { status: 401 });
     }
 
     const accessToken = session.accessToken;
     
     if (!accessToken) {
-      console.log('No access token found in session');
+      if (process.env.NODE_ENV === 'development') {
+        console.log('No access token found in session');
+      }
       return NextResponse.json({ 
         hasAccess: false, 
         error: 'No access token',
@@ -29,7 +33,9 @@ export async function GET(request: NextRequest) {
       
       return NextResponse.json({ hasAccess: true });
     } catch (error: any) {
-      console.error('Drive access test failed:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Drive access test failed:', error);
+      }
       
       // Check if error is related to insufficient scope
       if (error.message?.includes('insufficient') || error.code === 403) {
@@ -46,7 +52,9 @@ export async function GET(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error('Check drive access error:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Check drive access error:', error);
+    }
     return NextResponse.json({ 
       hasAccess: false, 
       error: 'Server error' 

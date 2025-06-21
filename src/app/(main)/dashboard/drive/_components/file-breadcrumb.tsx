@@ -63,7 +63,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
       setBreadcrumbItems(items);
     } catch (error) {
-      // Log error for debugging in development
+      // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
         console.error('Error fetching folder path:', error);
       }

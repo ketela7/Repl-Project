@@ -172,13 +172,11 @@ export function BulkExportDialog({
 
                 if (!response.ok) {
                   const error = new Error(`Export failed: ${response.statusText}`);
-                  (error as any).status = response.status;
+                  (error as Error & { status?: number }).status = response.status;
                   throw error;
                 }
 
-            if (!response.ok) {
-              throw new Error(`Export failed: ${response.statusText}`);
-            }
+
 
             const blob = await response.blob();
             
@@ -194,7 +192,10 @@ export function BulkExportDialog({
             
             successCount++;
           } catch (error) {
-            console.error(`Export failed for ${file.name}:`, error);
+            // Log error for debugging in development only
+            if (process.env.NODE_ENV === 'development') {
+              console.error(`Export failed for ${file.name}:`, error);
+            }
             errorCount++;
           }
         }

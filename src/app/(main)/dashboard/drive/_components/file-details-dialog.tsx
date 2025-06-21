@@ -192,7 +192,7 @@ export function FileDetailsDialog({
       const details = await response.json();
       setFileDetails(details);
     } catch (error) {
-      // Log error for debugging in development
+      // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
         console.error('Error fetching file details:', error);
       }

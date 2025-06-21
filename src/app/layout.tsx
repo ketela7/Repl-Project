@@ -8,6 +8,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { TimezoneProvider } from "@/components/timezone-provider";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { APP_CONFIG } from "@/config/app-config";
 
 import "./globals.css";
@@ -67,26 +68,28 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={`${inter.className} min-h-screen antialiased overflow-x-hidden`}>
-        <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
-            <TimezoneProvider>
-              <div className="relative min-h-screen w-full">
-                {children}
-              </div>
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  duration: 3000,
-                  style: {
-                    background: 'hsl(var(--background))',
-                    color: 'hsl(var(--foreground))',
-                    border: '1px solid hsl(var(--border))',
-                  },
-                }}
-              />
-            </TimezoneProvider>
-          </ThemeProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
+              <TimezoneProvider>
+                <div className="relative min-h-screen w-full">
+                  {children}
+                </div>
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    duration: 3000,
+                    style: {
+                      background: 'hsl(var(--background))',
+                      color: 'hsl(var(--foreground))',
+                      border: '1px solid hsl(var(--border))',
+                    },
+                  }}
+                />
+              </TimezoneProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

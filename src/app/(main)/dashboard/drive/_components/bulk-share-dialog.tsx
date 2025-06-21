@@ -351,7 +351,7 @@ export function BulkShareDialog({
           {/* Access Level */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Access level</Label>
-            <Select value={accessLevel} onValueChange={(value: any) => setAccessLevel(value)}>
+            <Select value={accessLevel} onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -390,7 +390,7 @@ export function BulkShareDialog({
           {/* Link Access */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Who has access</Label>
-            <Select value={linkAccess} onValueChange={(value: any) => setLinkAccess(value)}>
+            <Select value={linkAccess} onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') => setLinkAccess(value)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
