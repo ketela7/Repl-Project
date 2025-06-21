@@ -56,7 +56,9 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           currentParent = parentFolder.parents?.[0];
           depth++;
         } catch (err) {
-          console.warn('Failed to fetch parent folder:', err);
+          if (process.env.NODE_ENV === 'development') {
+            console.warn('Failed to fetch parent folder:', err);
+          }
           break;
         }
       }

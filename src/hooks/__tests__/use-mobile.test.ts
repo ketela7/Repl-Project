@@ -54,6 +54,6 @@ describe('useIsMobile', () => {
 
     renderHook(() => useIsMobile())
     
-    expect(matchMediaSpy).toHaveBeenCalledWith('(max-width: 768px)')
+    expect(matchMediaSpy).toHaveBeenCalledWith('(max-width: 767px)')
   })
 })

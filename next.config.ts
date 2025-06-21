@@ -34,9 +34,9 @@ const nextConfig: NextConfig = {
   
   // Environment-specific configurations
   ...(process.env.NODE_ENV === 'development' && {
-    // Development-only settings to improve performance
-    devIndicators: {
-      buildActivity: false,
+    // Development-only settings
+    experimental: {
+      optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react']
     },
   }),
 
