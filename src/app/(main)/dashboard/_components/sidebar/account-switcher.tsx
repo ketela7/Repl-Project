@@ -16,9 +16,17 @@ import {
 import { cn, getInitials } from "@/lib/utils";
 
 export function AccountSwitcher({
-  users,
+  users = [
+    {
+      id: "demo-1",
+      email: "demo@example.com",
+      name: "Demo User",
+      avatar: "/placeholder-avatar.jpg",
+      plan: "Free"
+    }
+  ],
 }: {
-  readonly users: ReadonlyArray<{
+  readonly users?: ReadonlyArray<{
     readonly id: string;
     readonly name: string;
     readonly email: string;

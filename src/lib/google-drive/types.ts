@@ -42,51 +42,10 @@ export interface DriveFile {
   // File organization features
   autoTags?: string[];
   manualTags?: string[];
-  smartCategory?: SmartCategory;
-  contentAnalysis?: ContentAnalysis;
+
 }
 
-export interface SmartCategory {
-  primary: string;
-  secondary?: string;
-  confidence: number;
-  reason: string;
-}
 
-export interface ContentAnalysis {
-  fileType: FileTypeCategory;
-  projectType?: ProjectType;
-  language?: string;
-  framework?: string;
-  keywords: string[];
-  estimatedImportance: 'low' | 'medium' | 'high';
-}
-
-export type FileTypeCategory = 
-  | 'document' 
-  | 'spreadsheet' 
-  | 'presentation' 
-  | 'image' 
-  | 'video' 
-  | 'audio' 
-  | 'code' 
-  | 'archive' 
-  | 'design' 
-  | 'data' 
-  | 'configuration' 
-  | 'other';
-
-export type ProjectType = 
-  | 'web-development' 
-  | 'mobile-app' 
-  | 'data-science' 
-  | 'machine-learning' 
-  | 'design' 
-  | 'documentation' 
-  | 'research' 
-  | 'business' 
-  | 'education' 
-  | 'personal';
 
 export interface TaggingRule {
   id: string;
