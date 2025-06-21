@@ -36,7 +36,11 @@ export function AccountSwitcher({
   }>;
 }) {
   const [activeUser, setActiveUser] = useState(users[0]);
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+
+  // Debug logging
+  console.log("[AccountSwitcher] Session:", session);
+  console.log("[AccountSwitcher] Remember Me:", session?.rememberMe);
 
   return (
     <DropdownMenu>
@@ -81,19 +85,21 @@ export function AccountSwitcher({
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled className="text-xs text-muted-foreground">
-          {session?.rememberMe ? (
-            <>
-              <Shield className="h-3 w-3" />
-              Session: 30 days (Remember Me)
-            </>
-          ) : (
-            <>
-              <Clock className="h-3 w-3" />
-              Session: 1 day (Standard)
-            </>
-          )}
-        </DropdownMenuItem>
+        {status === 'authenticated' && (
+          <DropdownMenuItem disabled className="text-xs text-muted-foreground flex items-center gap-2">
+            {session?.rememberMe ? (
+              <>
+                <Shield className="h-3 w-3" />
+                Session: 30 days (Remember Me)
+              </>
+            ) : (
+              <>
+                <Clock className="h-3 w-3" />
+                Session: 1 day (Standard)
+              </>
+            )}
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <LogOut />
