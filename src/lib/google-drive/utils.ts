@@ -516,23 +516,33 @@ export function buildSearchQuery(options: {
 }
 
 export function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - date.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  try {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  if (diffDays === 1) {
-    return 'Yesterday';
-  } else if (diffDays < 7) {
-    return `${diffDays} days ago`;
-  } else if (diffDays < 30) {
-    const weeks = Math.floor(diffDays / 7);
-    return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
-  } else if (diffDays < 365) {
-    const months = Math.floor(diffDays / 30);
-    return `${months} month${months > 1 ? 's' : ''} ago`;
-  } else {
-    return date.toLocaleDateString();
+    if (diffDays === 1) {
+      return 'Yesterday';
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    } else if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+    } else if (diffDays < 365) {
+      const months = Math.floor(diffDays / 30);
+      return `${months} month${months > 1 ? 's' : ''} ago`;
+    } else {
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        timeZone: userTimezone
+      });
+    }
+  } catch (error) {
+    return 'Invalid date';
   }
 }
 
@@ -635,10 +645,11 @@ export const formatDriveFileDate = (
   timezone?: string,
   showRelative: boolean = true
 ): string => {
-  if (!dateString) return 'Tidak diketahui';
+  if (!dateString) return 'Unknown';
 
   try {
     const date = new Date(dateString);
+    const userTimezone = timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     if (showRelative) {
       const now = new Date();
@@ -646,15 +657,22 @@ export const formatDriveFileDate = (
 
       // Show relative time for recent files (within 7 days)
       if (diffInHours < 168) {
-        return formatDate(dateString); // Fallback to existing function.
+        return formatDate(dateString);
       }
     }
 
-    return formatDate(dateString); // Fallback to existing function.
+    // For older files, show formatted date with timezone
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: userTimezone
+    });
 
   } catch (error) {
-    console.warn('Failed to format drive file date:', error);
-    return 'Format tanggal tidak valid';
+    return 'Invalid date format';
   }
 };
 

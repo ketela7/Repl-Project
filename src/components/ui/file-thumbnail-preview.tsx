@@ -14,15 +14,20 @@ interface FileThumbnailPreviewProps {
 
 // Function to format the date with timezone support
 function formatDriveFileDate(dateString: string): string {
-  const date = new Date(dateString);
-  return date.toLocaleDateString('id-ID', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Auto-detect user's timezone
-  });
+  try {
+    const date = new Date(dateString);
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: userTimezone,
+    });
+  } catch (error) {
+    return 'Invalid date';
+  }
 }
 
 export function FileThumbnailPreview({
@@ -185,7 +190,7 @@ export function FileThumbnailPreview({
             )}
              {modifiedTime && (
               <div className="text-[10px] text-muted-foreground/70 text-center mt-2 font-medium">
-                Dimodifikasi: {formatDriveFileDate(modifiedTime)}
+                Modified: {formatDriveFileDate(modifiedTime)}
               </div>
             )}
           </div>

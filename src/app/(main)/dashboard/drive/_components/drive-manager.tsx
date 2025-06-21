@@ -3746,7 +3746,7 @@ export function DriveManager() {
                   <div className="space-y-1">
                     <p className="font-medium truncate text-xs sm:text-sm md:text-base" title={folder.name}>{folder.name}</p>
                     <p className="text-xs text-muted-foreground">
-                      {formatDate(folder.modifiedTime)}
+                      {formatFileTime(folder.modifiedTime, timezone)}
                     </p>
                   </div>
                 </div>
@@ -3925,7 +3925,7 @@ export function DriveManager() {
                     </p>
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-muted-foreground">
                       <span>{file.size ? formatFileSize(file.size) : '-'}</span>
-                      <span>{formatDate(file.modifiedTime)}</span>
+                      <span>{formatFileTime(file.modifiedTime, timezone)}</span>
                     </div>
                   </div>
                 </div>
@@ -4120,12 +4120,12 @@ export function DriveManager() {
                       )}
                       {visibleColumns.createdTime && (
                         <TableCell className="text-muted-foreground">
-                          {formatDate(item.createdTime)}
+                          {formatFileTime(item.createdTime, timezone)}
                         </TableCell>
                       )}
                       {visibleColumns.modifiedTime && (
                         <TableCell className="text-muted-foreground">
-                          {formatDate(item.modifiedTime)}
+                          {formatFileTime(item.modifiedTime, timezone)}
                         </TableCell>
                       )}
                       <TableCell onClick={(e) => e.stopPropagation()}>

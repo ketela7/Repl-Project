@@ -46,7 +46,8 @@ import {
   Archive
 } from "lucide-react";
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
-import { formatFileSize, formatDate } from '@/lib/google-drive/utils';
+import { formatFileSize, formatDriveFileDate } from '@/lib/google-drive/utils';
+import { formatFileTime, formatCreationTime } from '@/lib/timezone-utils';
 import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { getInitials } from '@/lib/utils';
@@ -830,11 +831,11 @@ export function FileDetailsDialog({
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Created:</span>
-                    <span className="text-sm">{formatDate(fileDetails.createdTime)}</span>
+                    <span className="text-sm">{formatCreationTime(fileDetails.createdTime)}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Modified:</span>
-                    <span className="text-sm">{formatDate(fileDetails.modifiedTime)}</span>
+                    <span className="text-sm">{formatFileTime(fileDetails.modifiedTime)}</span>
                   </div>
                 </div>
                 
