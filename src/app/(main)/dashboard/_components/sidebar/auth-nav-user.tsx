@@ -30,20 +30,6 @@ export function AuthNavUser() {
       toast.error("An error occurred while signing out");
     }
   };
-    try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        window.location.href = '/auth/v1/login';
-      } else {
-        toast.error('Failed to log out');
-      }
-    } catch (error) {
-      toast.error('An error occurred during logout');
-    }
-  };
 
   if (loading) {
     return (
@@ -118,13 +104,11 @@ export function AuthNavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
+                  <AvatarImage src={user.image || ""} alt={user.name || ""} />
                   <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                 </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">
-                    {user.user_metadata?.full_name || 'User'}
-                  </span>
+                <div className="grid flex-1 text-left text-sm">
+                  <span className="truncate font-medium">{user.name || 'User'}</span>
                   <span className="text-muted-foreground truncate text-xs">{user.email}</span>
                 </div>
               </div>
