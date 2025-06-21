@@ -62,6 +62,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       console.log("[Session Callback] Token:", !!token.accessToken);
+      
+      // Check if session should expire based on remember me preference
+      const now = Math.floor(Date.now() / 1000);
+      const sessionDuration = token.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 days or 1 day
+      const sessionExpiry = (token.iat || now) + sessionDuration;
+      
+      // If session has expired based on remember me preference, return null to force re-login
+      if (now > sessionExpiry) {
+        console.log("[Session Callback] Session expired based on remember me preference");
+        return null;
+      }
+      
       session.accessToken = token.accessToken as string
       session.refreshToken = token.refreshToken as string
       session.provider = token.provider as string
@@ -82,11 +94,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days maximum for remember me
+    maxAge: 24 * 60 * 60, // Default 1 day (24 hours)
     updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // 30 days maximum for remember me
+    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days (actual duration controlled by session callback)
   },
   cookies: {
     sessionToken: {
@@ -98,7 +110,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60, // 30 days
+        maxAge: 30 * 24 * 60 * 60, // Maximum 30 days (will be limited by JWT maxAge)
       }
     }
   },

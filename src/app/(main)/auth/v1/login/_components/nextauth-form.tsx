@@ -36,9 +36,14 @@ export function NextAuthForm() {
           checked={form.watch('remember')}
           onCheckedChange={(checked) => form.setValue('remember', !!checked)}
         />
-        <label htmlFor="remember-me-nextauth" className="text-sm font-medium cursor-pointer select-none">
-          Remember me for 30 days
-        </label>
+        <div className="space-y-1">
+          <label htmlFor="remember-me-nextauth" className="text-sm font-medium cursor-pointer select-none">
+            Keep me signed in for 30 days
+          </label>
+          <p className="text-xs text-muted-foreground">
+            Default: Sign out after 1 day for security
+          </p>
+        </div>
       </div>
       
       <GoogleAuthButton 

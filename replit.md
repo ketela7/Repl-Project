@@ -34,11 +34,12 @@ This is a Professional Google Drive Management application built with Next.js 15
 
 ### Authentication & Security
 - **NextAuth.js**: Complete Google sign-in integration with OAuth 2.0
-- **Extended Sessions**: 30-day login persistence with "Keep me logged in" option
-- **JWT Tokens**: Secure token-based authentication with automatic refresh
-- **Session Management**: Server-side session handling with NextAuth.js
+- **Dynamic Session Duration**: 1-day default sessions with optional 30-day "Remember Me" extension
+- **JWT Tokens**: Secure token-based authentication with intelligent expiration handling
+- **Session Management**: Server-side session handling with user-controlled duration preferences
 - **Protected Routes**: Middleware-based route protection for dashboard access
 - **User Profile**: Authenticated user information display with logout functionality
+- **Security-First Design**: Short default sessions with explicit long-term opt-in for enhanced security
 
 ### Dashboard Components
 - **Sidebar Navigation**: Collapsible sidebar with route-based navigation including Google Drive section
@@ -72,12 +73,18 @@ Migration preferences: User prefers to discuss project rules and documentation b
 
 ## Recent Changes
 
+### December 2024: **Session Management Enhancement & Remember Me Implementation**
+- **Dynamic Session Duration**: Implemented proper Remember Me functionality with 1-day default and 30-day extended sessions
+- **Enhanced Login UI**: Added clear checkbox with explanatory text for session duration preferences
+- **Badge Counter Fixes**: Added missing "Shortcuts" counter in File Statistics menu with comprehensive category coverage
+- **Filter Consistency**: Ensured shortcut filters work correctly across both mobile and desktop interfaces
+- **Session Security**: Improved session management with appropriate duration based on user preference
+
 ### December 2024: **Authentication Bug Fixes & Shortcut Icon Enhancement**
 - **Authentication Redirect Loop Fixed**: Resolved middleware token verification issues causing login redirect loops
 - **NextAuth Configuration Enhanced**: Improved cookie handling and session management for reliable authentication
 - **Shortcut Icon Visibility Fixed**: Added blue "Shortcut" badges with link icons visible on both mobile and desktop
 - **Cross-Platform Consistency**: Implemented shortcut indicators in both grid and table views
-- **Remember Me Functionality**: Streamlined session duration handling for 30-day persistence option
 
 ### December 2024: **Complete Authentication Migration & Performance Enhancement**
 - **NextAuth.js Migration**: Successfully migrated from Supabase to NextAuth.js for better Next.js 15 compatibility
@@ -138,11 +145,12 @@ Migration preferences: User prefers to discuss project rules and documentation b
 - **Port Configuration**: Running on port 5000 for optimal Replit performance
 
 ### Security Features
-- **JWT Authentication**: Secure token-based authentication with automatic refresh
-- **Session Persistence**: 30-day login with secure token management
+- **JWT Authentication**: Secure token-based authentication with intelligent expiration
+- **Dynamic Session Duration**: 1-day default with optional 30-day Remember Me extension
 - **CSRF Protection**: Built-in Next.js security features
 - **Input Validation**: Comprehensive sanitization and validation
 - **Error Handling**: Limited error details in production for security
+- **Security-First Design**: Short sessions by default with explicit user consent for extended access
 
 ### Database Integration
 - **PostgreSQL**: Robust relational database with connection pooling
