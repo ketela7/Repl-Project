@@ -2010,7 +2010,35 @@ export function DriveManager() {
       switch (action) {
         case 'preview':
           const previewFile = files.find(f => f.id === fileId);
-          if (previewFile && isPreviewable(previewFile.mimeType)) {
+          
+          // Handle shortcuts differently - open their targets directly
+          if (previewFile?.mimeType === 'application/vnd.google-apps.shortcut') {
+            try {
+              // Fetch shortcut details to get target information
+              const shortcutResponse = await fetch(`/api/drive/files/${fileId}/details`);
+              if (shortcutResponse.ok) {
+                const shortcutData = await shortcutResponse.json();
+                const targetId = shortcutData.shortcutDetails?.targetId;
+                
+                if (targetId) {
+                  // For folder shortcuts, navigate to the folder
+                  if (shortcutData.shortcutDetails?.targetMimeType === 'application/vnd.google-apps.folder') {
+                    handleFolderClick(targetId);
+                  } else {
+                    // For file shortcuts, open in new tab
+                    window.open(`https://drive.google.com/file/d/${targetId}/view`, '_blank');
+                  }
+                } else {
+                  toast.error(`"${fileName}" shortcut target not found.`);
+                }
+              } else {
+                toast.error(`Failed to resolve shortcut "${fileName}".`);
+              }
+            } catch (error) {
+              console.error('Error handling shortcut:', error);
+              toast.error(`Failed to open shortcut "${fileName}".`);
+            }
+          } else if (previewFile && isPreviewable(previewFile.mimeType)) {
             setSelectedFileForPreview(previewFile);
             setIsPreviewDialogOpen(true);
           } else {
@@ -3921,10 +3949,12 @@ export function DriveManager() {
                   <div className="space-y-1">
                     <p 
                       className="font-medium truncate text-xs sm:text-sm md:text-base cursor-pointer hover:text-blue-600 hover:underline" 
-                      title={`Click to preview: ${file.name}`}
+                      title={`Click to ${file.mimeType === 'application/vnd.google-apps.shortcut' ? 'open shortcut' : 'preview'}: ${file.name}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (isPreviewable(file.mimeType)) {
+                        if (file.mimeType === 'application/vnd.google-apps.shortcut') {
+                          handleFileAction('preview', file.id, file.name);
+                        } else if (isPreviewable(file.mimeType)) {
                           handleFileAction('preview', file.id, file.name);
                         } else {
                           handleFileAction('download', file.id, file.name);
@@ -4086,10 +4116,12 @@ export function DriveManager() {
                             ) : (
                               <span 
                                 className="truncate hover:text-blue-600 hover:underline"
-                                title={`Click to preview: ${item.name}`}
+                                title={`Click to ${item.mimeType === 'application/vnd.google-apps.shortcut' ? 'open shortcut' : 'preview'}: ${item.name}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (isPreviewable(item.mimeType)) {
+                                  if (item.mimeType === 'application/vnd.google-apps.shortcut') {
+                                    handleFileAction('preview', item.id, item.name);
+                                  } else if (isPreviewable(item.mimeType)) {
                                     handleFileAction('preview', item.id, item.name);
                                   } else {
                                     handleFileAction('download', item.id, item.name);

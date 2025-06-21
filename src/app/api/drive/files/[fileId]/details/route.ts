@@ -40,7 +40,7 @@ export async function GET(
     return NextResponse.json(fileDetails);
   } catch (error) {
     console.error('Drive file details API error:', error);
-    
+
     if (error instanceof Error) {
       // Handle Google API specific errors
       if (error.message.includes('Invalid Credentials') || error.message.includes('unauthorized')) {
@@ -63,7 +63,7 @@ export async function GET(
         }, { status: 404 });
       }
     }
-    
+
     return NextResponse.json(
       { error: 'Failed to retrieve file details' },
       { status: 500 }
