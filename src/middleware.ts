@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getToken } from "next-auth/jwt"
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
   
-  // Skip middleware for static files, API routes, and auth pages
+  // Skip middleware for API routes, static files, and auth pages
   if (
     pathname.startsWith('/api') ||
     pathname.startsWith('/_next') ||
@@ -16,57 +15,33 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
   
-  try {
-    console.log(`[Middleware] ${req.method} ${pathname}`);
+  // For dashboard routes, check for session cookie presence
+  if (pathname.startsWith('/dashboard')) {
+    console.log(`[Middleware] Checking dashboard access for: ${pathname}`);
     
-    // Check for session token in cookies
-    const sessionCookie = req.cookies.get('next-auth.session-token')?.value ||
-                         req.cookies.get('__Secure-next-auth.session-token')?.value
+    // Check if NextAuth session cookie exists
+    const sessionToken = req.cookies.get('next-auth.session-token')?.value ||
+                        req.cookies.get('__Secure-next-auth.session-token')?.value
     
-    if (!sessionCookie) {
-      console.log(`[Middleware] No session cookie found, redirecting to login`);
-      if (pathname.startsWith('/dashboard')) {
-        const url = new URL('/auth/v1/login', req.url)
-        url.searchParams.set('callbackUrl', pathname)
-        return NextResponse.redirect(url)
-      }
-      return NextResponse.next()
-    }
+    console.log(`[Middleware] Session cookie exists:`, !!sessionToken);
+    console.log(`[Middleware] All cookies:`, req.cookies.getAll().map(c => c.name));
     
-    // Verify the token
-    const token = await getToken({ 
-      req, 
-      secret: process.env.NEXTAUTH_SECRET
-    })
-    
-    console.log(`[Middleware] Session cookie exists:`, !!sessionCookie);
-    console.log(`[Middleware] Token verified:`, !!token);
-    
-    // Protect dashboard routes
-    if (pathname.startsWith('/dashboard')) {
-      if (!token) {
-        console.log(`[Middleware] Invalid token, redirecting to login`);
-        const url = new URL('/auth/v1/login', req.url)
-        url.searchParams.set('callbackUrl', pathname)
-        return NextResponse.redirect(url)
-      }
-      console.log(`[Middleware] Access granted to dashboard`);
-    }
-    
-    return NextResponse.next()
-  } catch (error) {
-    console.error(`[Middleware] Error:`, error);
-    // On error, redirect to login for dashboard routes
-    if (pathname.startsWith('/dashboard')) {
+    if (!sessionToken) {
+      console.log(`[Middleware] No session cookie - redirecting to login`);
       const url = new URL('/auth/v1/login', req.url)
+      url.searchParams.set('callbackUrl', pathname)
       return NextResponse.redirect(url)
     }
-    return NextResponse.next()
+    
+    console.log(`[Middleware] Session cookie found - allowing access`);
   }
+  
+  return NextResponse.next()
 }
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    // Disable middleware temporarily to test NextAuth
+    // '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };
