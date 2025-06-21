@@ -46,7 +46,8 @@ import {
   Home,
   RefreshCw,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Link
 } from "lucide-react";
 
 interface AdvancedFilters {
@@ -110,6 +111,7 @@ export function FiltersDialog({
     { id: 'audio', label: 'Audio', icon: Music, color: 'text-blue-600' },
     { id: 'archive', label: 'Archives', icon: Archive, color: 'text-amber-600' },
     { id: 'code', label: 'Code Files', icon: Code, color: 'text-slate-600' },
+    { id: 'shortcut', label: 'Shortcuts', icon: Link, color: 'text-blue-700' },
   ];
 
   const handleBasicFilter = (viewId: string) => {
