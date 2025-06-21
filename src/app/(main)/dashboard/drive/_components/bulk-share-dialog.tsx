@@ -37,20 +37,33 @@ import {
   Eye,
   Edit,
   FileText,
-  Folder
+  Folder,
+  Copy,
+  CheckCircle,
+  XCircle,
+  ExternalLink
 } from "lucide-react";
 import { FileIcon } from '@/components/file-icon';
+import { toast } from 'sonner';
 
 interface BulkShareDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedItems: Array<{ id: string; name: string; type: 'file' | 'folder'; mimeType?: string }>;
-  onShare?: (shareData: BulkShareData) => void;
+  onShare?: (shareData: BulkShareData) => Promise<ShareResult[]>;
 }
 
 interface BulkShareData {
   role: 'reader' | 'writer' | 'commenter';
   type: 'anyone' | 'anyoneWithLink' | 'domain';
+}
+
+interface ShareResult {
+  id: string;
+  name: string;
+  shareLink: string;
+  success: boolean;
+  error?: string;
 }
 
 export function BulkShareDialog({ 
@@ -62,20 +75,48 @@ export function BulkShareDialog({
   const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader');
   const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>('anyoneWithLink');
   const [isLoading, setIsLoading] = useState(false);
+  const [shareResults, setShareResults] = useState<ShareResult[]>([]);
+  const [showResults, setShowResults] = useState(false);
   const isMobile = useIsMobile();
 
   const handleBulkShare = async () => {
     setIsLoading(true);
+    setShowResults(false);
     
     try {
       if (onShare) {
-        await onShare({
+        const results = await onShare({
           role: accessLevel,
           type: linkAccess
         });
+        setShareResults(results);
+        setShowResults(true);
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const copyToClipboard = async () => {
+    const successfulShares = shareResults.filter(result => result.success);
+    if (successfulShares.length === 0) return;
+
+    const clipboardText = successfulShares
+      .map(result => `${result.name} ${result.shareLink}`)
+      .join('\n');
+
+    try {
+      await navigator.clipboard.writeText(clipboardText);
+      toast.success(`Copied ${successfulShares.length} share links to clipboard`);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = clipboardText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast.success(`Copied ${successfulShares.length} share links to clipboard`);
     }
   };
 
@@ -427,13 +468,87 @@ export function BulkShareDialog({
           </div>
         </div>
 
+        {/* Results Section */}
+        {showResults && shareResults.length > 0 && (
+          <div className="space-y-4">
+            <Separator />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold">Share Results</h4>
+                {shareResults.some(r => r.success) && (
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={copyToClipboard}
+                    className="gap-2"
+                  >
+                    <Copy className="h-4 w-4" />
+                    Copy All Links
+                  </Button>
+                )}
+              </div>
+              
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {shareResults.map((result) => (
+                  <div 
+                    key={result.id} 
+                    className={`p-3 rounded-lg border ${
+                      result.success 
+                        ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' 
+                        : 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      {result.success ? (
+                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                      )}
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{result.name}</div>
+                        
+                        {result.success ? (
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="text-xs text-muted-foreground truncate flex-1">
+                              {result.shareLink}
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 w-6 p-0"
+                              onClick={() => window.open(result.shareLink, '_blank')}
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-red-600 dark:text-red-400 mt-1">
+                            {result.error || 'Failed to generate share link'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="text-sm text-muted-foreground">
+                {shareResults.filter(r => r.success).length} of {shareResults.length} items shared successfully
+              </div>
+            </div>
+          </div>
+        )}
+
         <DialogFooter className="flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-            Cancel
+            {showResults ? 'Close' : 'Cancel'}
           </Button>
-          <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0}>
-            {isLoading ? 'Sharing...' : `Generate ${selectedItems.length} Share Links`}
-          </Button>
+          {!showResults && (
+            <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0}>
+              {isLoading ? 'Sharing...' : `Generate ${selectedItems.length} Share Links`}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

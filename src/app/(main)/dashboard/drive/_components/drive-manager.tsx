@@ -1473,12 +1473,9 @@ export function DriveManager() {
     }
   };
 
-  const handleBulkShare = async (shareData: { role: string; type: string }) => {
+  const handleBulkShare = async (shareData: { role: string; type: string }): Promise<Array<{ id: string; name: string; shareLink: string; success: boolean; error?: string }>> => {
     const selectedItemsData = getSelectedItemsData();
-    if (selectedItemsData.length === 0) return;
-
-    // Close dialog first so user can see progress
-    setIsBulkShareDialogOpen(false);
+    if (selectedItemsData.length === 0) return [];
 
     // Filter items that can be shared based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
@@ -1495,7 +1492,7 @@ export function DriveManager() {
 
     if (itemsWithPermissions.length === 0) {
       toast.warning('No items can be shared. All selected items either don\'t have permission or are restricted.');
-      return;
+      return [];
     }
 
     setBulkOperationProgress({
@@ -1505,10 +1502,7 @@ export function DriveManager() {
       operation: 'Generating share links'
     });
 
-    let successCount = 0;
-    let failedItems: string[] = [];
-    let skippedItems = itemsWithoutPermissions.map(item => item.name);
-    const generatedLinks: string[] = [];
+    const results: Array<{ id: string; name: string; shareLink: string; success: boolean; error?: string }> = [];
 
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
@@ -1533,24 +1527,44 @@ export function DriveManager() {
           if (response.ok) {
             const result = await response.json();
             if (result.webViewLink) {
-              generatedLinks.push(`${item.name}: ${result.webViewLink}`);
-              successCount++;
+              results.push({
+                id: item.id,
+                name: item.name,
+                shareLink: result.webViewLink,
+                success: true
+              });
             } else {
-              failedItems.push(item.name);
+              results.push({
+                id: item.id,
+                name: item.name,
+                shareLink: '',
+                success: false,
+                error: 'No share link returned'
+              });
             }
           } else {
             const errorData = await response.json();
             if (errorData.needsReauth) {
               toast.error('Google Drive access expired. Please reconnect your account.');
               window.location.reload();
-              return;
+              return [];
             }
-            failedItems.push(item.name);
-            console.error(`Failed to share ${item.name}:`, response.status, errorData);
+            results.push({
+              id: item.id,
+              name: item.name,
+              shareLink: '',
+              success: false,
+              error: errorData.error || 'Failed to share'
+            });
           }
         } catch (error) {
-          failedItems.push(item.name);
-          console.error(`Error sharing ${item.name}:`, error);
+          results.push({
+            id: item.id,
+            name: item.name,
+            shareLink: '',
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          });
         }
 
         if (i < itemsWithPermissions.length - 1) {
@@ -1558,60 +1572,27 @@ export function DriveManager() {
         }
       }
 
+      // Add skipped items to results
+      itemsWithoutPermissions.forEach(item => {
+        results.push({
+          id: item.id,
+          name: item.name,
+          shareLink: '',
+          success: false,
+          error: 'No permission to share'
+        });
+      });
+
       deselectAll();
       setIsSelectMode(false);
 
-      // Show comprehensive result notification
-      let message = '';
-
-      if (successCount > 0) {
-        message += `${successCount} share link${successCount > 1 ? 's' : ''} generated`;
-        
-        // Copy all links to clipboard if successful
-        if (generatedLinks.length > 0) {
-          try {
-            const allLinks = generatedLinks.join('\n');
-            await navigator.clipboard.writeText(allLinks);
-            toast.success(`${message} and copied to clipboard!`);
-          } catch (clipboardError) {
-            toast.success(message);
-          }
-        }
-      }
-
-      if (skippedItems.length > 0) {
-        if (message) message += ', ';
-        message += `${skippedItems.length} item${skippedItems.length > 1 ? 's' : ''} skipped (no permission)`;
-      }
-
-      if (failedItems.length > 0) {
-        if (message) message += ', ';
-        message += `${failedItems.length} item${failedItems.length > 1 ? 's' : ''} failed`;
-      }
-
-      if (successCount === itemsWithPermissions.length && skippedItems.length === 0) {
-        // Already handled above with clipboard copy
-      } else if (successCount > 0 || skippedItems.length > 0) {
-        const toastMessage = `Bulk share completed: ${message}`;
-        if (failedItems.length > 0 || skippedItems.length > 0) {
-          toast.warning(toastMessage);
-        } else {
-          toast.success(toastMessage);
-        }
-        
-        // Log details for debugging
-        if (skippedItems.length > 0) {
-          console.log('Skipped items (no permission):', skippedItems);
-        }
-        if (failedItems.length > 0) {
-          console.log('Failed items:', failedItems);
-        }
-      } else {
-        toast.error(`Failed to share items: ${failedItems.slice(0, 3).join(', ')}${failedItems.length > 3 ? '...' : ''}`);
-      }
+      return results;
     } catch (error) {
-      console.error('Bulk share error:', error);
+      if (process.env.NODE_ENV === 'development') {
+        console.error('Bulk share error:', error);
+      }
       toast.error('An error occurred during bulk share operation');
+      return results;
     } finally {
       setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
     }
