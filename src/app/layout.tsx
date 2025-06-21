@@ -8,7 +8,6 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { ConfigProvider } from "@/components/providers/config-provider";
 import { TimezoneProvider } from "@/components/timezone-provider";
-import { SessionProvider } from "next-auth/react";
 import { APP_CONFIG } from "@/config/app-config";
 
 import "./globals.css";
@@ -73,10 +72,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={`${inter.className} min-h-screen antialiased overflow-x-hidden`}>
-        <SessionProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
-            <ConfigProvider config={config}>
-              <TimezoneProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
+          <ConfigProvider config={config}>
+            <TimezoneProvider>
+              <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
                 <div className="relative min-h-screen w-full">
                   {children}
                 </div>
@@ -91,10 +90,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                     },
                   }}
                 />
-              </TimezoneProvider>
-            </ConfigProvider>
-          </ThemeProvider>
-        </SessionProvider>
+              </ThemeProvider>
+            </TimezoneProvider>
+          </ConfigProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
