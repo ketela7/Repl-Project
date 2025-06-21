@@ -65,27 +65,17 @@ export function LoginFormV1() {
   return (
     <div className="space-y-4">
       {/* Remember Me Option */}
-      <Form {...form}>
-        <FormField
-          control={form.control}
-          name="remember"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center space-x-2">
-              <FormControl>
-                <Checkbox
-                  id="login-remember"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  className="size-4"
-                />
-              </FormControl>
-              <FormLabel htmlFor="login-remember" className="text-sm font-medium">
-                Remember me for 30 days
-              </FormLabel>
-            </FormItem>
-          )}
+      <div className="flex flex-row items-center space-x-2">
+        <Checkbox
+          id="login-remember"
+          checked={form.watch('remember')}
+          onCheckedChange={(checked) => form.setValue('remember', checked as boolean)}
+          className="size-4"
         />
-      </Form>
+        <label htmlFor="login-remember" className="text-sm font-medium cursor-pointer">
+          Remember me for 30 days
+        </label>
+      </div>
 
       {/* Google Sign In Button */}
       <Button 

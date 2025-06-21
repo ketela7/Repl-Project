@@ -3210,7 +3210,7 @@ export function DriveManager() {
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="space-y-2 ml-2 mt-2">
-                      <div className="grid grid-cols-4 gap-2">
+                      <div className="grid grid-cols-3 gap-2">
                         <Button
                           variant={fileTypeFilter.includes('folder') ? 'default' : 'outline'}
                           size="sm"

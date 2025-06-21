@@ -18,6 +18,7 @@ import {
   Database,
   MapPin,
   Globe,
+  Link,
   ExternalLink
 } from 'lucide-react';
 import { getFileIconProps } from '@/lib/google-drive/utils';
@@ -70,7 +71,8 @@ export function FileIcon({
     File,
     Music,
     MapPin,
-    Globe
+    Globe,
+    Link
   };
 
   const IconComponent = iconComponents[iconName] || File;
