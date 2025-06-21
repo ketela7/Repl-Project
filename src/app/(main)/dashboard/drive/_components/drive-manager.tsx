@@ -102,7 +102,7 @@ import { PermanentDeleteDialog } from './permanent-delete-dialog';
 import { FileDetailsDialog } from './file-details-dialog';
 import { FilePreviewDialog } from './file-preview-dialog';
 import { DriveGridSkeleton, BreadcrumbSkeleton } from './drive-skeleton';
-import { LoadingSkeleton } from '@/components/ui/loading-skeleton';
+import { DriveToolbarSkeleton, DriveSearchSkeleton, DriveBreadcrumbSkeleton } from '@/components/ui/loading-skeleton';
 
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
@@ -2766,78 +2766,11 @@ export function DriveManager() {
   if (loading && files.length === 0) {
     return (
       <div className="w-full space-y-3 sm:space-y-4">
-        {/* Skeleton Toolbar */}
-        <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm">
-          <div className="flex items-center justify-between p-3 md:p-4">
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
-              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
-              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
-              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
-              <div className="h-8 w-16 bg-muted rounded-md animate-pulse" />
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="h-8 w-8 bg-muted rounded-md animate-pulse" />
-              <div className="h-8 w-8 bg-muted rounded-md animate-pulse" />
-            </div>
-          </div>
-        </div>
-
-        {/* Skeleton Search */}
+        <DriveToolbarSkeleton />
+        <DriveSearchSkeleton />
+        <DriveBreadcrumbSkeleton />
         <div className="px-2 sm:px-0">
-          <div className="h-10 bg-muted rounded-md animate-pulse" />
-        </div>
-
-        {/* Skeleton Breadcrumb */}
-        <div className="px-2 sm:px-0">
-          <div className="flex items-center gap-2">
-            <div className="h-4 w-12 bg-muted rounded animate-pulse" />
-            <div className="h-4 w-4 bg-muted rounded animate-pulse" />
-            <div className="h-4 w-20 bg-muted rounded animate-pulse" />
-          </div>
-        </div>
-
-        {/* Skeleton File List */}
-        <div className="px-2 sm:px-0">
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="h-6 w-32 bg-muted rounded animate-pulse" />
-                <div className="h-6 w-16 bg-muted rounded animate-pulse" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {Array.from({ length: 8 }).map((_, i) => {
-                  // Fixed width patterns to avoid hydration mismatch
-                  const widthPatterns = [
-                    { main: '75%', sub: '45%' },
-                    { main: '65%', sub: '35%' },
-                    { main: '85%', sub: '50%' },
-                    { main: '70%', sub: '40%' },
-                    { main: '90%', sub: '55%' },
-                    { main: '80%', sub: '48%' },
-                    { main: '60%', sub: '38%' },
-                    { main: '95%', sub: '42%' }
-                  ];
-                  const pattern = widthPatterns[i % widthPatterns.length];
-                  
-                  return (
-                    <div key={i} className="flex items-center gap-3 p-2">
-                      <div className="h-4 w-4 bg-muted rounded animate-pulse flex-shrink-0" />
-                      <div className="h-4 w-4 bg-muted rounded animate-pulse flex-shrink-0" />
-                      <div className="flex-1 space-y-1">
-                        <div className="h-4 bg-muted rounded animate-pulse" style={{ width: pattern.main }} />
-                        <div className="h-3 bg-muted rounded animate-pulse" style={{ width: pattern.sub }} />
-                      </div>
-                      <div className="h-4 w-16 bg-muted rounded animate-pulse" />
-                      <div className="h-4 w-4 bg-muted rounded animate-pulse" />
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
+          <DriveGridSkeleton />
         </div>
       </div>
     );
