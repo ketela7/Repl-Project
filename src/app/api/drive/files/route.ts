@@ -214,7 +214,9 @@ export async function GET(request: NextRequest) {
     let driveQuery = buildDriveQuery(filters);
     
     // Add parent folder constraint if needed
-    if (folderId && filters.viewStatus !== 'shared' && filters.viewStatus !== 'starred' && filters.viewStatus !== 'recent') {
+    if (folderId) {
+      // When navigating into a specific folder, show its contents regardless of view
+      driveQuery = 'trashed=false';  // Reset query for folder contents
       driveQuery += ` and '${folderId}' in parents`;
     } else if (!folderId && !filters.search && filters.viewStatus !== 'shared' && filters.viewStatus !== 'starred' && filters.viewStatus !== 'recent' && filters.viewStatus !== 'trash') {
       // If no parent and no search query, get root files
