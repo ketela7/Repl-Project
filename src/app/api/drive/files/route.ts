@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
@@ -178,10 +179,10 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     
-    // Parse query parameters - match frontend parameter names
+    // Parse query parameters with proper mapping
     const filters: FileFilter = {
       fileType: searchParams.get('fileTypes') || searchParams.get('fileType') || 'all',
-      viewStatus: searchParams.get('view') || searchParams.get('viewStatus') || 'my-drive',
+      viewStatus: searchParams.get('view') || searchParams.get('viewStatus') || 'all',
       sortBy: searchParams.get('sortBy') || 'modified',
       sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
       search: searchParams.get('search') || searchParams.get('query') || undefined,
@@ -196,7 +197,7 @@ export async function GET(request: NextRequest) {
 
     const pageSize = parseInt(searchParams.get('pageSize') || '50');
     const pageToken = searchParams.get('pageToken') || undefined;
-    const folderId = searchParams.get('folderId') || undefined;
+    const folderId = searchParams.get('folderId') || searchParams.get('parentId') || undefined;
 
     console.log('Filters applied:', filters);
 
@@ -205,21 +206,22 @@ export async function GET(request: NextRequest) {
       pageSize,
       pageToken,
       parentId: folderId,
-      userId: user.email || 'unknown'
+      userId: user.email || 'unknown',
+      filters: JSON.stringify(filters)
     });
 
-    // Temporary disable cache for testing
-    // const cachedResult = driveCache.get(cacheKey);
-    // if (cachedResult) {
-    //   console.log('Returning cached result');
-    //   return NextResponse.json(cachedResult);
-    // }
-
-    const driveService = new GoogleDriveService(accessToken);
+    // Build the Drive API query using the consolidated function
+    let driveQuery = buildDriveQuery(filters);
     
-    // Build the Drive API query
-    const driveQuery = buildDriveQuery(filters);
-    console.log('Drive query:', driveQuery);
+    // Add parent folder constraint if needed
+    if (folderId && filters.viewStatus !== 'shared' && filters.viewStatus !== 'starred' && filters.viewStatus !== 'recent') {
+      driveQuery += ` and '${folderId}' in parents`;
+    } else if (!folderId && !filters.search && filters.viewStatus !== 'shared' && filters.viewStatus !== 'starred' && filters.viewStatus !== 'recent' && filters.viewStatus !== 'trash') {
+      // If no parent and no search query, get root files
+      driveQuery += " and 'root' in parents";
+    }
+    
+    console.log('Final Drive query:', driveQuery);
     
     // Get sort configuration
     const sortKey = getSortKey(filters.sortBy || 'modified');
@@ -227,6 +229,8 @@ export async function GET(request: NextRequest) {
                    `${sortKey} ${filters.sortOrder}`;
 
     console.log('Order by:', orderBy);
+
+    const driveService = new GoogleDriveService(accessToken);
 
     // Make the API call
     const result = await driveService.listFiles({
