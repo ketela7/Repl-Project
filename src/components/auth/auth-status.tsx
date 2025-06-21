@@ -1,40 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-import { useConfig } from "@/components/providers/config-provider";
+import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogIn, User } from "lucide-react";
 import Link from "next/link";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export function AuthStatus() {
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
-  const config = useConfig();
-  const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
-
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-      console.log("Home page - Loading:", loading, "User:", user?.email);
-    };
-
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+  const user = session?.user;
 
   if (loading) {
     return (
@@ -75,7 +51,7 @@ export function AuthStatus() {
     );
   }
 
-  const initials = user.user_metadata?.full_name
+  const initials = user.name
     ?.split(' ')
     .map((n: string) => n[0])
     .join('')

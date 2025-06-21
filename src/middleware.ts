@@ -1,15 +1,24 @@
-import { NextRequest } from "next/server";
-import { updateSession } from "./lib/supabase/middleware";
+import { NextRequest, NextResponse } from "next/server"
+import { getToken } from "next-auth/jwt"
 
 export async function middleware(req: NextRequest) {
   try {
-    // Reduced logging to prevent spam
     if (process.env.NODE_ENV === 'development') {
       console.log(`[Middleware] ${req.method} ${req.nextUrl.pathname}`);
     }
     
-    const response = await updateSession(req);
-    return response;
+    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+    
+    // Protect dashboard routes
+    if (req.nextUrl.pathname.startsWith('/dashboard')) {
+      if (!token) {
+        const url = req.nextUrl.clone()
+        url.pathname = '/auth/v1/login'
+        return NextResponse.redirect(url)
+      }
+    }
+    
+    return NextResponse.next()
   } catch (error) {
     console.error(`[Middleware] Critical error:`, {
       url: req.url,
@@ -17,8 +26,7 @@ export async function middleware(req: NextRequest) {
       error: error instanceof Error ? error.message : String(error)
     });
     
-    // Instead of throwing, return a proper response to prevent crashes
-    return new Response('Internal Server Error', { status: 500 });
+    return NextResponse.next()
   }
 }
 
