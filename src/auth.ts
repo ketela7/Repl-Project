@@ -48,30 +48,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Handle remember me preference updates from client-side session update
       if (trigger === "update" && session?.rememberMe !== undefined) {
         token.rememberMe = session.rememberMe;
-        // Update token expiration based on remember me preference
-        const maxAge = session.rememberMe 
-          ? 30 * 24 * 60 * 60 // 30 days
-          : 24 * 60 * 60; // 1 day
-        token.exp = Math.floor(Date.now() / 1000) + maxAge;
-        console.log("[JWT Callback] Updated remember me preference from session update:", session.rememberMe, "expires in", maxAge, "seconds");
+        console.log("[JWT Callback] Updated remember me preference from session update:", session.rememberMe);
       }
       
-      // Set initial expiration if not set, and check localStorage for remember me
-      if (!token.exp) {
-        let rememberMe = token.rememberMe;
-        
-        // For server-side JWT callback, we can't access localStorage
-        // The remember me preference will be set via session update after login
-        if (account) {
-          // This runs server-side, so we'll rely on session update to set remember me
-          rememberMe = false;
-        }
-        
-        const maxAge = rememberMe 
-          ? 30 * 24 * 60 * 60 // 30 days
-          : 24 * 60 * 60; // 1 day
-        token.exp = Math.floor(Date.now() / 1000) + maxAge;
-        console.log("[JWT Callback] Set initial expiration:", rememberMe ? "30 days" : "1 day");
+      // Set initial remember me state from localStorage during account creation
+      if (account && !token.rememberMe) {
+        // Default to false if not set; will be updated by client-side session update
+        token.rememberMe = false;
+        console.log("[JWT Callback] Set initial remember me preference:", false);
       }
       
       return token
@@ -98,23 +82,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days maximum
+    maxAge: 30 * 24 * 60 * 60, // 30 days maximum for remember me
     updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // 30 days maximum
-  },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60, // 30 days max for remember me
-      }
-    }
+    maxAge: 30 * 24 * 60 * 60, // 30 days maximum for remember me
   },
   trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,

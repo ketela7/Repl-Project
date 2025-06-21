@@ -38,7 +38,8 @@ import {
   SquareCheck,
   Folder,
   FileText,
-  Star
+  Star,
+  Link
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -3995,22 +3996,30 @@ export function DriveManager() {
                     </DropdownMenu>
                   </div>
                   <div className="space-y-1">
-                    <p 
-                      className="font-medium truncate text-xs sm:text-sm md:text-base cursor-pointer hover:text-blue-600 hover:underline" 
-                      title={`Click to ${file.mimeType === 'application/vnd.google-apps.shortcut' ? 'open shortcut' : 'preview'}: ${file.name}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (file.mimeType === 'application/vnd.google-apps.shortcut') {
-                          handleFileAction('preview', file.id, file.name);
-                        } else if (isPreviewable(file.mimeType)) {
-                          handleFileAction('preview', file.id, file.name);
-                        } else {
-                          handleFileAction('download', file.id, file.name);
-                        }
-                      }}
-                    >
-                      {file.name}
-                    </p>
+                    <div className="space-y-1">
+                      <p 
+                        className="font-medium truncate text-xs sm:text-sm md:text-base cursor-pointer hover:text-blue-600 hover:underline" 
+                        title={`Click to ${file.mimeType === 'application/vnd.google-apps.shortcut' ? 'open shortcut' : 'preview'}: ${file.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (file.mimeType === 'application/vnd.google-apps.shortcut') {
+                            handleFileAction('preview', file.id, file.name);
+                          } else if (isPreviewable(file.mimeType)) {
+                            handleFileAction('preview', file.id, file.name);
+                          } else {
+                            handleFileAction('download', file.id, file.name);
+                          }
+                        }}
+                      >
+                        {file.name}
+                      </p>
+                      {file.mimeType === 'application/vnd.google-apps.shortcut' && (
+                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800 w-fit">
+                          <Link className="h-3 w-3 mr-1" />
+                          Shortcut
+                        </Badge>
+                      )}
+                    </div>
                     <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-muted-foreground">
                       <span>{file.size ? formatFileSize(file.size) : '-'}</span>
                       <span>{formatFileTime(file.modifiedTime, timezone)}</span>
@@ -4181,6 +4190,12 @@ export function DriveManager() {
                             )}
                             {item.itemType === 'folder' && <Badge variant="outline" className="text-xs">Folder</Badge>}
                             {item.itemType === 'file' && item.shared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
+                            {item.itemType === 'file' && item.mimeType === 'application/vnd.google-apps.shortcut' && (
+                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">
+                                <Link className="h-3 w-3 mr-1" />
+                                Shortcut
+                              </Badge>
+                            )}
                           </div>
                         </TableCell>
                       )}
