@@ -4,7 +4,6 @@ import { WifiOff, RefreshCw, AlertTriangle, Router } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { redirectTo } from "@/lib/url-utils";
 
 export default function ServerOfflinePage() {
   const handleRefresh = () => {
@@ -12,7 +11,7 @@ export default function ServerOfflinePage() {
   };
 
   const handleRetry = () => {
-    redirectTo('/dashboard/drive');
+    window.location.href = "/dashboard/drive";
   };
 
   return (

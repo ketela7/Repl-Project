@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
-import { createServerRedirectUrl } from "@/lib/url-utils"
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
@@ -25,17 +24,18 @@ export async function middleware(req: NextRequest) {
     
     if (!token) {
       console.log(`[Middleware] No valid session - redirecting to login`);
-      const loginUrl = createServerRedirectUrl(`/auth/v1/login?callbackUrl=${encodeURIComponent(pathname)}`, req.url);
-      return NextResponse.redirect(loginUrl)
+      const url = new URL('/auth/v1/login', req.url)
+      url.searchParams.set('callbackUrl', pathname)
+      return NextResponse.redirect(url)
     }
     
     console.log(`[Middleware] Access granted to: ${token.email}`);
     return NextResponse.next()
   } catch (error) {
     console.error(`[Middleware] Error:`, error);
-    // On error, redirect to login using proper base URL
-    const loginUrl = createServerRedirectUrl('/auth/v1/login', req.url);
-    return NextResponse.redirect(loginUrl)
+    // On error, redirect to login
+    const url = new URL('/auth/v1/login', req.url)
+    return NextResponse.redirect(url)
   }
 }
 

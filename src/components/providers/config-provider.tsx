@@ -5,7 +5,6 @@ import { createContext, useContext, ReactNode } from "react";
 interface Config {
   appEnv: string;
   baseUrl: string;
-  detectedUrl?: string;
 }
 
 const ConfigContext = createContext<Config | null>(null);

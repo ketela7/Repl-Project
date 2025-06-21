@@ -1,25 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
-import { createServerRedirectUrl } from '@/lib/url-utils';
+import { auth, signOut } from '@/auth';
 
 export async function GET(request: NextRequest) {
   try {
     const session = await auth();
     
     if (!session?.user) {
-      const loginUrl = createServerRedirectUrl('/auth/v1/login', request.url);
-      return NextResponse.redirect(loginUrl);
+      return NextResponse.redirect(new URL('/auth/v1/login', request.url));
     }
 
-    // Sign out and redirect to login with reauth parameter
-    const loginUrl = createServerRedirectUrl('/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive', request.url);
+    // Simple approach: Sign out current session and redirect to login
+    // This will force a new OAuth flow with consent prompt
+    console.log('[Reauth Drive] Signing out current session to force re-authentication');
     
-    console.log('[Reauth Drive] Redirecting to login URL:', loginUrl);
-    return NextResponse.redirect(loginUrl);
+    // Sign out and redirect to login with a special parameter
+    const loginUrl = new URL('/auth/v1/login', request.url);
+    loginUrl.searchParams.set('reauth', 'drive');
+    loginUrl.searchParams.set('callbackUrl', '/dashboard/drive');
+    
+    // We'll handle the signOut in the client side, just redirect to login for now
+    return NextResponse.redirect(loginUrl.toString());
     
   } catch (error) {
     console.error('Drive re-auth error:', error);
-    const loginUrl = createServerRedirectUrl('/auth/v1/login', request.url);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL('/auth/v1/login', request.url));
   }
 }

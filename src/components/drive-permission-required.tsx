@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { HardDrive, Shield, AlertTriangle, RefreshCw } from "lucide-react";
-import { redirectTo } from "@/lib/url-utils";
 
 interface DrivePermissionRequiredProps {
   error?: any;
@@ -31,11 +30,11 @@ export function DrivePermissionRequired({
       });
       
       // Redirect to login with reauth parameter
-      redirectTo('/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive');
+      window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive';
     } catch (error) {
       console.error('Signout error:', error);
       // Fallback: direct redirect to login
-      redirectTo('/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive');
+      window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive';
     }
   };
 
