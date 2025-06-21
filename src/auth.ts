@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
+import { config } from "@/lib/config"
 
 declare module "next-auth" {
   interface Session {
@@ -78,13 +79,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session
     },
     async redirect({ url, baseUrl }) {
-      console.log(`[NextAuth] Redirect called with url: ${url}, baseUrl: ${baseUrl}`);
+      // Use detected BASE_URL instead of NextAuth's baseUrl
+      const actualBaseUrl = config.app.baseUrl;
+      console.log(`[NextAuth] Redirect called with url: ${url}, baseUrl: ${baseUrl}, actualBaseUrl: ${actualBaseUrl}`);
+      
       // After successful sign in, redirect to dashboard
-      if (url.startsWith(baseUrl)) {
-        console.log(`[NextAuth] URL starts with baseUrl, returning: ${url}`);
+      if (url.startsWith(actualBaseUrl)) {
+        console.log(`[NextAuth] URL starts with actualBaseUrl, returning: ${url}`);
         return url
       }
-      const redirectUrl = `${baseUrl}/dashboard/drive`;
+      const redirectUrl = `${actualBaseUrl}/dashboard/drive`;
       console.log(`[NextAuth] Redirecting to: ${redirectUrl}`);
       return redirectUrl;
     },
