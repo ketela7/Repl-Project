@@ -118,12 +118,15 @@ import { EnhancedShareDialog } from './enhanced-share-dialog';
 import { BulkShareDialog } from './bulk-share-dialog';
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
 import { FiltersDialog } from './filters-dialog';
-import { BulkOperationDialog } from './bulk-operation-dialog';
-
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { DrivePermissionRequired } from '@/components/drive-permission-required';
 import { FileCategoryBadges } from '@/components/file-category-badges';
-import { BulkOperationItem, BulkOperationType } from '@/lib/bulk-operations';
+import { 
+  BulkOperationItem, 
+  BulkOperationType, 
+  executeParallelBulkOperation,
+  getOperationPreview
+} from '@/lib/google-drive/utils';
 // File size utilities inline
 const normalizeFileSize = (size: any): number => {
   // Handle null, undefined, empty values
@@ -1040,8 +1043,8 @@ export function DriveManager() {
     }
   };
 
-  // New parallel processing bulk download handler
-  const handleBulkDownload = () => {
+  // Parallel processing bulk download following PROJECT_RULES.md
+  const handleBulkDownload = async () => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
@@ -1051,12 +1054,77 @@ export function DriveManager() {
     ).filter(Boolean);
 
     const bulkItems = convertToBulkOperationItems(selectedFullItems);
+    const preview = getOperationPreview(bulkItems, 'download');
 
-    setBulkOperationDialog({
-      open: true,
-      operation: 'download',
-      items: bulkItems
+    if (preview.processableItems.length === 0) {
+      toast.warning('No files can be downloaded. Folders and restricted files are not supported for download.');
+      return;
+    }
+
+    // Show preview info
+    if (preview.skippedItems.length > 0) {
+      const skippedCount = preview.skippedItems.length;
+      const processableCount = preview.processableItems.length;
+      toast.info(`Starting download of ${processableCount} files. ${skippedCount} items will be skipped.`);
+    }
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: preview.processableItems.length,
+      operation: 'Downloading files in parallel batches'
     });
+
+    try {
+      const result = await executeParallelBulkOperation(
+        preview.processableItems,
+        'download',
+        async (item) => {
+          const response = await fetch(`/api/drive/download/${item.id}`);
+          if (!response.ok) {
+            throw new Error(`Failed to download ${item.name}: ${response.statusText}`);
+          }
+          
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = item.name;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+        },
+        (progress) => {
+          setBulkOperationProgress({
+            isRunning: true,
+            current: progress.current,
+            total: progress.total,
+            operation: `Downloading: ${progress.current}/${progress.total} files`
+          });
+        }
+      );
+
+      const duration = (result.timeElapsed / 1000).toFixed(1);
+      const successCount = result.completed.length;
+      const failCount = result.failed.length;
+
+      if (failCount === 0) {
+        toast.success(`Successfully downloaded ${successCount} files in ${duration}s`);
+      } else {
+        toast.warning(`Downloaded ${successCount} files, ${failCount} failed in ${duration}s`);
+      }
+
+      deselectAll();
+      setIsSelectMode(false);
+
+    } catch (error) {
+      console.error('Bulk download error:', error);
+      toast.error('Bulk download operation failed');
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+    }
   };
 
   const handleBulkExport = async (exportFormat: string) => {
@@ -1418,8 +1486,8 @@ export function DriveManager() {
     }
   };
 
-  // New parallel processing bulk share handler
-  const handleBulkShare = () => {
+  // Parallel processing bulk share following PROJECT_RULES.md
+  const handleBulkShare = async () => {
     const selectedItemsData = getSelectedItemsData();
     if (selectedItemsData.length === 0) return;
 
@@ -1429,16 +1497,81 @@ export function DriveManager() {
     ).filter(Boolean);
 
     const bulkItems = convertToBulkOperationItems(selectedFullItems);
+    const preview = getOperationPreview(bulkItems, 'share');
 
-    setBulkOperationDialog({
-      open: true,
-      operation: 'share',
-      items: bulkItems,
-      operationParams: {
-        type: 'anyone',
-        role: 'reader'
-      }
+    if (preview.processableItems.length === 0) {
+      toast.warning('No items can be shared. Check permissions for selected items.');
+      return;
+    }
+
+    setBulkOperationProgress({
+      isRunning: true,
+      current: 0,
+      total: preview.processableItems.length,
+      operation: 'Generating share links in parallel'
     });
+
+    const generatedLinks: string[] = [];
+
+    try {
+      const result = await executeParallelBulkOperation(
+        preview.processableItems,
+        'share',
+        async (item) => {
+          const response = await fetch(`/api/drive/files/${item.id}/share`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'anyone',
+              role: 'reader'
+            })
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Failed to share ${item.name}: ${response.statusText}`);
+          }
+          
+          const shareResult = await response.json();
+          if (shareResult.webViewLink) {
+            generatedLinks.push(`${item.name}: ${shareResult.webViewLink}`);
+          }
+        },
+        (progress) => {
+          setBulkOperationProgress({
+            isRunning: true,
+            current: progress.current,
+            total: progress.total,
+            operation: `Sharing: ${progress.current}/${progress.total} items`
+          });
+        }
+      );
+
+      const duration = (result.timeElapsed / 1000).toFixed(1);
+      const successCount = result.completed.length;
+      const failCount = result.failed.length;
+
+      if (successCount > 0 && generatedLinks.length > 0) {
+        try {
+          await navigator.clipboard.writeText(generatedLinks.join('\n'));
+          toast.success(`Generated ${successCount} share links in ${duration}s and copied to clipboard`);
+        } catch {
+          toast.success(`Generated ${successCount} share links in ${duration}s`);
+        }
+      }
+
+      if (failCount > 0) {
+        toast.warning(`Shared ${successCount} items, ${failCount} failed in ${duration}s`);
+      }
+
+      deselectAll();
+      setIsSelectMode(false);
+
+    } catch (error) {
+      console.error('Bulk share error:', error);
+      toast.error('Bulk share operation failed');
+    } finally {
+      setBulkOperationProgress({ isRunning: false, current: 0, total: 0, operation: '' });
+    }
   };
 
   // Legacy bulk share handler (commented out)
@@ -4734,26 +4867,7 @@ export function DriveManager() {
         onClearFilters={clearAllFilters}
       />
 
-      {/* New Parallel Processing Bulk Operation Dialog */}
-      <BulkOperationDialog
-        open={bulkOperationDialog.open}
-        onClose={() => {
-          setBulkOperationDialog({
-            open: false,
-            operation: null,
-            items: [],
-            operationParams: undefined
-          });
-          // Refresh files after operation completes
-          fetchFiles(currentFolderId, searchQuery);
-          // Clear selection
-          deselectAll();
-          setIsSelectMode(false);
-        }}
-        operation={bulkOperationDialog.operation || 'download'}
-        items={bulkOperationDialog.items}
-        operationParams={bulkOperationDialog.operationParams}
-      />
+
 
     </div>
   );

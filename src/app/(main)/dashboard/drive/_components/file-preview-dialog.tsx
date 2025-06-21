@@ -136,7 +136,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
   if (isFullscreen) {
     return (
       <div className="fixed inset-0 z-[100] bg-black/95">
-        {/* Fullscreen toolbar with gradient background */}
+        {/* Fullscreen toolbar following PROJECT_RULES.md design standards */}
         <div className="absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/90 via-black/70 to-transparent p-4 sm:p-6">
           <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
             <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
@@ -158,7 +158,8 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
                   variant="ghost"
                   size="sm"
                   onClick={handleDownload}
-                  className="text-white hover:bg-white/20 transition-colors h-8 sm:h-9"
+                  className="text-white hover:bg-white/20 transition-colors h-11 min-w-[44px]"
+                  title="Download file"
                 >
                   <Download className="h-4 w-4 sm:mr-2" />
                   <span className="hidden sm:inline">Download</span>
@@ -168,7 +169,8 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
                 variant="ghost"
                 size="sm"
                 onClick={handleOpenInDrive}
-                className="text-white hover:bg-white/20 transition-colors h-8 sm:h-9"
+                className="text-white hover:bg-white/20 transition-colors h-11 min-w-[44px]"
+                title="Open in Google Drive"
               >
                 <ExternalLink className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Open in Drive</span>
@@ -177,7 +179,8 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
                 variant="ghost"
                 size="sm"
                 onClick={() => setIsFullscreen(false)}
-                className="text-white hover:bg-white/20 transition-colors h-8 sm:h-9"
+                className="text-white hover:bg-white/20 transition-colors h-11 min-w-[44px]"
+                title="Exit fullscreen (Esc)"
               >
                 <Minimize2 className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Exit Fullscreen</span>
@@ -186,7 +189,8 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="text-white hover:bg-white/20 transition-colors h-8 w-8"
+                className="text-white hover:bg-white/20 transition-colors h-11 w-11"
+                title="Close preview"
               >
                 <X className="h-4 w-4" />
               </Button>
@@ -194,22 +198,22 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
           </div>
         </div>
         
-        {/* Fullscreen content with proper spacing */}
-        <div className="h-full w-full pt-16 sm:pt-20 pb-4 px-2 sm:px-4 lg:px-8">
+        {/* Fullscreen content with proper spacing following responsive design standards */}
+        <div className="h-full w-full pt-20 sm:pt-24 pb-6 px-4 sm:px-6 lg:px-12">
           <div className="h-full w-full max-w-screen-2xl mx-auto">
             {renderPreviewContent()}
           </div>
         </div>
 
         {/* Bottom gradient for better visual separation */}
-        <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-black/60 to-transparent pointer-events-none" />
       </div>
     );
   }
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] lg:w-[calc(100vw-8rem)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] lg:max-h-[calc(100vh-6rem)] h-auto overflow-hidden p-3 sm:p-4 md:p-6">
+      <DialogContent className="max-w-7xl w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] lg:w-[calc(100vw-8rem)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] lg:max-h-[calc(100vh-6rem)] h-auto overflow-hidden p-3 sm:p-4 md:p-6" showCloseButton={false}
         <DialogHeader className="pb-2 sm:pb-3">
           <div className="flex items-start justify-between gap-2">
             <DialogTitle className="text-sm sm:text-base md:text-lg font-medium truncate flex-1 pr-2">
