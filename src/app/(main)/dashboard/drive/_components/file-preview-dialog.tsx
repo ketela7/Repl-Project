@@ -213,7 +213,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-7xl w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] lg:w-[calc(100vw-8rem)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] lg:max-h-[calc(100vh-6rem)] h-auto overflow-hidden p-3 sm:p-4 md:p-6" showCloseButton={false}
+      <DialogContent className="max-w-7xl w-[calc(100vw-2rem)] sm:w-[calc(100vw-4rem)] lg:w-[calc(100vw-8rem)] max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] lg:max-h-[calc(100vh-6rem)] h-auto overflow-hidden p-3 sm:p-4 md:p-6" showCloseButton={false}>
         <DialogHeader className="pb-2 sm:pb-3">
           <div className="flex items-start justify-between gap-2">
             <DialogTitle className="text-sm sm:text-base md:text-lg font-medium truncate flex-1 pr-2">
