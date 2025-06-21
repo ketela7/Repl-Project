@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { EllipsisVertical, CircleUser, CreditCard, MessageSquareDot, LogOut } from "lucide-react";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,62 +10,50 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { createClient } from "@/lib/supabase/client";
-import { useConfig } from "@/components/providers/config-provider";
-import { toast } from "sonner";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+
+import {
+  BadgeCheck,
+  Bell,
+  ChevronsUpDown,
+  CreditCard,
+  LogOut,
+  Sparkles,
+} from "lucide-react";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { getInitials } from "@/lib/utils";
 
 export function AuthNavUser() {
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
   const { isMobile } = useSidebar();
-  const config = useConfig();
-  const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
+  const { data: session, status } = useSession();
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-    };
-
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
-
-  const handleLogout = async () => {
+  const handleSignOut = async () => {
     try {
-      const response = await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        window.location.href = '/auth/v1/login';
-      } else {
-        toast.error('Failed to log out');
-      }
+      await signOut({ callbackUrl: '/' });
     } catch (error) {
-      toast.error('An error occurred during logout');
+      console.error('Error signing out:', error);
     }
   };
 
-  if (loading) {
+  if (status === "loading") {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg">
-            <div className="h-8 w-8 animate-pulse rounded-lg bg-muted" />
+          <SidebarMenuButton
+            size="lg"
+            className="data-[slot=sidebar-menu-button]:h-12 data-[slot=sidebar-menu-button]:p-1.5"
+          >
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-gray-200 animate-pulse">
+              <div className="size-4 bg-gray-300 rounded-full" />
+            </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
-              <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-              <div className="h-3 w-32 animate-pulse rounded bg-muted mt-1" />
+              <div className="h-4 bg-gray-200 rounded animate-pulse mb-1" />
+              <div className="h-3 bg-gray-200 rounded animate-pulse w-2/3" />
             </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
@@ -76,31 +61,32 @@ export function AuthNavUser() {
     );
   }
 
-  if (!user) {
+  if (!session?.user) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton size="lg" asChild>
-            <a href="/auth/v1/login">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
-                <CircleUser className="h-4 w-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">Sign In</span>
-                <span className="text-muted-foreground truncate text-xs">Access your account</span>
-              </div>
-            </a>
+          <SidebarMenuButton
+            size="lg"
+            className="data-[slot=sidebar-menu-button]:h-12 data-[slot=sidebar-menu-button]:p-1.5"
+            onClick={() => signIn()}
+          >
+            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+              <LogOut className="size-4" />
+            </div>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold">Sign In</span>
+              <span className="truncate text-xs">Click to authenticate</span>
+            </div>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>
     );
   }
 
-  const initials = user.user_metadata?.full_name
-    ?.split(' ')
-    .map((n: string) => n[0])
-    .join('')
-    .toUpperCase() || user.email?.[0]?.toUpperCase() || 'U';
+  const user = session.user;
+  const displayName = user.name || user.email?.split('@')[0] || 'User';
+  const email = user.email || '';
+  const avatarUrl = user.image || '';
 
   return (
     <SidebarMenu>
@@ -109,19 +95,19 @@ export function AuthNavUser() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[slot=sidebar-menu-button]:h-12 data-[slot=sidebar-menu-button]:p-1.5"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
-                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+                <AvatarImage src={avatarUrl} alt={displayName} />
+                <AvatarFallback className="rounded-lg">
+                  {getInitials(displayName)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">
-                  {user.user_metadata?.full_name || 'User'}
-                </span>
-                <span className="text-muted-foreground truncate text-xs">{user.email}</span>
+                <span className="truncate font-semibold">{displayName}</span>
+                <span className="truncate text-xs">{email}</span>
               </div>
-              <EllipsisVertical className="ml-auto size-4" />
+              <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -133,35 +119,42 @@ export function AuthNavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
-                  <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+                  <AvatarImage src={avatarUrl} alt={displayName} />
+                  <AvatarFallback className="rounded-lg">
+                    {getInitials(displayName)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">
-                    {user.user_metadata?.full_name || 'User'}
-                  </span>
-                  <span className="text-muted-foreground truncate text-xs">{user.email}</span>
+                  <span className="truncate font-semibold">{displayName}</span>
+                  <span className="truncate text-xs">{email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <CircleUser />
+                <Sparkles className="mr-2 h-4 w-4" />
+                Upgrade to Pro
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <BadgeCheck className="mr-2 h-4 w-4" />
                 Account
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <CreditCard />
+                <CreditCard className="mr-2 h-4 w-4" />
                 Billing
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <MessageSquareDot />
+                <Bell className="mr-2 h-4 w-4" />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut />
+            <DropdownMenuItem onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
