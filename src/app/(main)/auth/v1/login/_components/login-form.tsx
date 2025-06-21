@@ -99,6 +99,5 @@ export function LoginFormV1() {
         Sign in with your Google account to access the Google Drive management system.
       </p>
     </div>
-    </Form>
   );
 }

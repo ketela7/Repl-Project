@@ -25,22 +25,26 @@ export function useSessionManagement() {
     syncRememberMePreference();
   }, [syncRememberMePreference]);
 
-  // Set up automatic session timeout based on remember me preference
+  // Monitor session expiration based on JWT token expiration
   useEffect(() => {
     if (session) {
       const rememberMe = session.rememberMe || false;
-      const timeoutDuration = rememberMe 
-        ? 30 * 24 * 60 * 60 * 1000 // 30 days in milliseconds
-        : 24 * 60 * 60 * 1000; // 1 day in milliseconds
+      console.log("[Session Management] Session active, remember me:", rememberMe);
+      
+      // Check session validity periodically instead of client-side timeout
+      const checkInterval = setInterval(async () => {
+        try {
+          const response = await fetch('/api/auth/session');
+          if (!response.ok) {
+            console.log("[Session Management] Session check failed, signing out");
+            signOut({ callbackUrl: '/auth/v1/login' });
+          }
+        } catch (error) {
+          console.error("[Session Management] Session check error:", error);
+        }
+      }, 60 * 60 * 1000); // Check every hour
 
-      console.log("[Session Management] Setting session timeout:", rememberMe ? "30 days" : "1 day");
-
-      const timeoutId = setTimeout(() => {
-        console.log("[Session Management] Session expired, signing out");
-        signOut({ callbackUrl: '/auth/v1/login' });
-      }, timeoutDuration);
-
-      return () => clearTimeout(timeoutId);
+      return () => clearInterval(checkInterval);
     }
   }, [session]);
 

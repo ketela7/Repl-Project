@@ -208,6 +208,8 @@ const applyClientSideFilters = (
                    file.mimeType?.includes('json') ||
                    file.mimeType?.includes('xml') ||
                    file.name?.match(/\.(js|ts|jsx|tsx|py|java|cpp|c|cs|php|rb|go|rs|swift|kt)$/i);
+          case 'shortcut':
+            return file.mimeType === 'application/vnd.google-apps.shortcut';
           case 'folder':
             // Handle folders separately
             return false;
@@ -3258,6 +3260,11 @@ export function DriveManager() {
                             type: 'code', 
                             mimeType: 'text/javascript', 
                             title: 'Code Files' 
+                          },
+                          { 
+                            type: 'shortcut', 
+                            mimeType: 'application/vnd.google-apps.shortcut', 
+                            title: 'Shortcuts' 
                           }
                         ].map((filter) => {
                           return (
