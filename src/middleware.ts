@@ -5,8 +5,20 @@ export async function middleware(req: NextRequest) {
   try {
     console.log(`[Middleware] ${req.method} ${req.nextUrl.pathname}`);
     
-    const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
+    // Skip middleware for auth API routes
+    if (req.nextUrl.pathname.startsWith('/api/auth')) {
+      return NextResponse.next()
+    }
+    
+    const token = await getToken({ 
+      req, 
+      secret: process.env.NEXTAUTH_SECRET,
+      cookieName: "next-auth.session-token"
+    })
     console.log(`[Middleware] Token exists:`, !!token);
+    if (token) {
+      console.log(`[Middleware] Token email:`, token.email);
+    }
     
     // Protect dashboard routes
     if (req.nextUrl.pathname.startsWith('/dashboard')) {
@@ -32,5 +44,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/:path*"],
+  matcher: [
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 };

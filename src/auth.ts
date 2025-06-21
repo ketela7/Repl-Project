@@ -32,23 +32,49 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, account }) {
+    async jwt({ token, account, user }) {
+      console.log("[JWT Callback] Account:", !!account, "User:", !!user);
       if (account) {
         token.accessToken = account.access_token
         token.refreshToken = account.refresh_token
         token.provider = account.provider
+        console.log("[JWT Callback] Saved tokens to JWT");
       }
       return token
     },
     async session({ session, token }) {
+      console.log("[Session Callback] Token:", !!token.accessToken);
       session.accessToken = token.accessToken as string
       session.refreshToken = token.refreshToken as string
       session.provider = token.provider as string
       return session
     },
+    async redirect({ url, baseUrl }) {
+      console.log("[Redirect Callback] URL:", url, "BaseURL:", baseUrl);
+      // After successful sign in, redirect to dashboard
+      if (url.startsWith(baseUrl)) {
+        return url
+      }
+      return `${baseUrl}/dashboard/drive`
+    },
   },
   pages: {
     signIn: '/auth/v1/login',
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production'
+      }
+    }
   },
   trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
