@@ -73,6 +73,13 @@ Migration preferences: User prefers to discuss project rules and documentation b
 
 ## Recent Changes
 
+### December 2024: **Enhanced Media Preview & Layout Optimization**
+- **Responsive Media Preview**: Fixed layout with proper screen edge spacing (2rem mobile, 4rem tablet, 8rem desktop)
+- **Full Screen Support**: Enhanced fullscreen mode with gradient overlays, proper spacing, and keyboard shortcuts (F11, F, Escape)
+- **Interactive Media Controls**: Added zoom, rotate, and reset controls for images; play/pause/mute for videos and audio
+- **Improved UX**: Better visual hierarchy with enhanced file info display and professional toolbar design
+- **Keyboard Navigation**: Full keyboard support for preview navigation and fullscreen toggle
+
 ### December 2024: **Comprehensive File Icon System Enhancement**
 - **Complete MIME Type Coverage**: Added support for 150+ additional MIME types including `application/rar`, `video/x-matroska`, and specialized formats
 - **Enhanced File Recognition**: Extended support for RAR archives, Matroska videos, mobile app formats (APK/IPA), raw camera files, and system executables
