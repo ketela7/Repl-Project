@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleDriveService } from '@/lib/google-drive/service';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { auth } from '@/auth';
 import { driveCache } from '@/lib/cache';
 
 export async function GET(
@@ -15,22 +14,8 @@ export async function GET(
       return NextResponse.json({ error: 'File ID is required' }, { status: 400 });
     }
 
-    // Get Supabase session
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          get(name: string) {
-            return cookieStore.get(name)?.value;
-          },
-        },
-      }
-    );
-
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.provider_token || !session?.user) {
+    const session = await auth();
+    if (!session?.accessToken || !session?.user) {
       return NextResponse.json({ 
         error: 'Google Drive access token not found. Please reconnect your account.',
         needsReauth: true 
@@ -38,14 +23,14 @@ export async function GET(
     }
 
     // Check cache first (5 minute TTL for file details)
-    const cacheKey = driveCache.generateFileDetailsKey(fileId, session.user.id);
+    const cacheKey = driveCache.generateFileDetailsKey(fileId, session.user.email || session.user.id);
     const cachedDetails = driveCache.get(cacheKey);
     if (cachedDetails) {
       console.log('File details: Returning cached result');
       return NextResponse.json(cachedDetails);
     }
 
-    const driveService = new GoogleDriveService(session.provider_token);
+    const driveService = new GoogleDriveService(session.accessToken);
     const fileDetails = await driveService.getFileDetails(fileId);
 
     // Cache the result for 5 minutes

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { GoogleDriveService } from '@/lib/google-drive/service';
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@/auth';
 
 export async function GET(
   request: NextRequest,
@@ -10,11 +9,7 @@ export async function GET(
   try {
     console.log('=== Drive File Detail API Called ===');
 
-    const supabase = await createClient();
-
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const session = await auth();
 
     if (!session?.user) {
       console.log('No authenticated user found');
@@ -26,11 +21,11 @@ export async function GET(
 
     console.log('User found:', session.user.email);
 
-    // Get the provider token from session
-    const providerToken = session.provider_token;
+    // Get the access token from session
+    const accessToken = session.accessToken;
 
-    if (!providerToken) {
-      console.log('No provider token found');
+    if (!accessToken) {
+      console.log('No access token found');
       return NextResponse.json(
         { error: 'Google Drive access token not found. Please reconnect your Google account.' },
         { status: 401 }
@@ -40,7 +35,7 @@ export async function GET(
     const { fileId } = await params;
     console.log('Fetching file details for ID:', fileId);
 
-    const driveService = new GoogleDriveService(providerToken);
+    const driveService = new GoogleDriveService(accessToken);
     const file = await driveService.getFile(fileId);
 
     console.log('File details fetched successfully:', file.name);

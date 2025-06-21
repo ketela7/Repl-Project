@@ -8,20 +8,16 @@ export async function POST(
 ) {
   try {
     console.log('=== Copy File API Called ===');
-    const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const session = await auth();
 
-    if (authError || !session?.user) {
-      console.log('Authentication failed:', authError);
+    if (!session?.user) {
+      console.log('Authentication failed');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     console.log('User authenticated for copy:', session.user.email);
 
-    // Try multiple token locations
-    const accessToken = session.provider_token || 
-                       session.user.user_metadata?.provider_token ||
-                       session.access_token;
+    const accessToken = session.accessToken;
     
     if (!accessToken) {
       console.log('No access token found for copy');

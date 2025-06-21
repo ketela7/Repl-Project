@@ -162,9 +162,19 @@ Migration preferences: User prefers to discuss project rules and documentation b
     - Deleted src/lib/supabase/ directory entirely
     - Removed @supabase/ssr, @supabase/supabase-js packages
     - Updated all configuration files to use NextAuth.js instead
-    - Fixed API routes to use NextAuth session management
+    - Fixed all API routes to use NextAuth session management
+    - Updated all authentication imports across the codebase
+    - Fixed TypeScript errors and session variable references
     - Updated documentation (README.md, PROJECT_RULES.md, PROJECT_STATUS.md)
     - Cleaned up environment variable requirements
+    - **Complete Code Cleanup**: Fixed all remaining Supabase imports in API routes:
+      - Updated src/app/api/drive/files/[fileId]/route.ts
+      - Updated src/app/api/drive/files/[fileId]/export/route.ts
+      - Updated src/app/api/drive/files/[fileId]/copy/route.ts
+      - Updated src/app/api/drive/files/[fileId]/details/route.ts
+      - Fixed TypeScript errors in src/app/api/drive/files/route.ts
+      - All API routes now use NextAuth.js `auth()` function
+      - Session tokens correctly reference `session.accessToken`
 
 - December 2024: **Migration to Replit Environment Complete**:
   - **Environment Setup**: Installed Node.js 20 and all project dependencies successfully

@@ -189,10 +189,9 @@ export async function GET(request: NextRequest) {
 
     // Check cache first
     const cacheKey = driveCache.generateDriveKey({
-      filters,
       pageSize,
       pageToken,
-      folderId,
+      parentId: folderId,
       userId: user.email || 'unknown'
     });
 
@@ -210,7 +209,7 @@ export async function GET(request: NextRequest) {
     console.log('Drive query:', driveQuery);
     
     // Get sort configuration
-    const sortKey = getSortKey(filters.sortBy);
+    const sortKey = getSortKey(filters.sortBy || 'modified');
     const orderBy = filters.viewStatus === 'recent' ? 'viewedByMeTime desc' : 
                    `${sortKey} ${filters.sortOrder}`;
 

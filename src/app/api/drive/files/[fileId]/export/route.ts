@@ -1,6 +1,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 
 // MIME type mappings for Google Workspace exports
@@ -54,14 +54,13 @@ export async function GET(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const session = await auth();
 
-    if (authError || !session?.user) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const accessToken = session.provider_token;
+    const accessToken = session.accessToken;
     if (!accessToken) {
       return NextResponse.json({ 
         error: 'Google Drive access not found. Please reconnect your Google account.',

@@ -113,10 +113,10 @@ A streamlined, professional web application for managing Google Drive files and 
 ### Backend Integration
 - **Next.js API Routes**: Server-side endpoint handling
 - **Google APIs 150.0.1**: Official Google Drive API integration
-- **Supabase 2.50.0**: Authentication and session management
+- **NextAuth.js**: Secure authentication and session management
 - **Drizzle ORM 0.44.2**: Type-safe database operations
 - **PostgreSQL**: Robust relational database
-- **Cloudflare Turnstile**: Advanced CAPTCHA protection
+- **JWT Tokens**: Secure token-based authentication
 
 ### Performance & Optimization
 - **Lightweight Architecture**: Streamlined codebase for optimal performance
