@@ -7,10 +7,9 @@ export async function POST(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const session = await auth();
     
-    if (!session) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -18,7 +17,7 @@ export async function POST(
     const body = await request.json();
     const { action, role, type, emailAddress, message, allowFileDiscovery, expirationTime } = body;
 
-    const accessToken = session.provider_token;
+    const accessToken = session.accessToken;
     
     if (!accessToken) {
       return NextResponse.json({ 

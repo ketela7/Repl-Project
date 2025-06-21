@@ -3,423 +3,250 @@ import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 import { driveCache } from '@/lib/cache';
 
-// Client-side filter helper function
-function applyClientSideFilters(
-  result: any, 
-  filters: { 
-    view?: string | null, 
-    fileTypes?: string | null, 
-    query?: string | null,
-    sizeMin?: string | null,
-    sizeMax?: string | null
+interface FileFilter {
+  fileType?: string;
+  viewStatus?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  search?: string;
+  minSize?: number;
+  maxSize?: number;
+  createdAfter?: string;
+  createdBefore?: string;
+  modifiedAfter?: string;
+  modifiedBefore?: string;
+  owner?: string;
+}
+
+function buildDriveQuery(filters: FileFilter): string {
+  const conditions: string[] = [];
+  
+  // Basic file filtering (non-trashed by default unless viewing trash)
+  if (filters.viewStatus === 'trash') {
+    conditions.push('trashed=true');
+  } else {
+    conditions.push('trashed=false');
   }
-) {
-  if (!result || !result.files || !Array.isArray(result.files)) return result;
+  
+  // View status filters
+  switch (filters.viewStatus) {
+    case 'shared':
+      conditions.push('sharedWithMe=true');
+      break;
+    case 'starred':
+      conditions.push('starred=true');
+      break;
+    case 'recent':
+      // Recent files are handled by sorting, not querying
+      break;
+    case 'my-drive':
+      conditions.push('\'me\' in owners');
+      break;
+  }
+  
+  // File type filters
+  if (filters.fileType && filters.fileType !== 'all') {
+    switch (filters.fileType) {
+      case 'folder':
+        conditions.push('mimeType=\'application/vnd.google-apps.folder\'');
+        break;
+      case 'document':
+        conditions.push('(mimeType contains \'document\' or mimeType=\'application/pdf\' or mimeType contains \'text\')');
+        break;
+      case 'spreadsheet':
+        conditions.push('mimeType contains \'spreadsheet\'');
+        break;
+      case 'presentation':
+        conditions.push('mimeType contains \'presentation\'');
+        break;
+      case 'image':
+        conditions.push('mimeType contains \'image\'');
+        break;
+      case 'video':
+        conditions.push('mimeType contains \'video\'');
+        break;
+      case 'audio':
+        conditions.push('mimeType contains \'audio\'');
+        break;
+      case 'archive':
+        conditions.push('(mimeType=\'application/zip\' or mimeType=\'application/x-rar-compressed\' or mimeType=\'application/x-tar\')');
+        break;
+      case 'code':
+        conditions.push('(mimeType contains \'javascript\' or mimeType contains \'python\' or mimeType contains \'text/x-\')');
+        break;
+    }
+  }
+  
+  // Search query
+  if (filters.search) {
+    const searchTerm = filters.search.replace(/'/g, "\\'");
+    conditions.push(`name contains '${searchTerm}'`);
+  }
+  
+  // Date filters
+  if (filters.createdAfter) {
+    conditions.push(`createdTime >= '${filters.createdAfter}'`);
+  }
+  if (filters.createdBefore) {
+    conditions.push(`createdTime <= '${filters.createdBefore}'`);
+  }
+  if (filters.modifiedAfter) {
+    conditions.push(`modifiedTime >= '${filters.modifiedAfter}'`);
+  }
+  if (filters.modifiedBefore) {
+    conditions.push(`modifiedTime <= '${filters.modifiedBefore}'`);
+  }
+  
+  return conditions.join(' and ');
+}
 
-  let filteredFiles = [...result.files];
-
-  // Apply additional client-side filters for complex scenarios
-  if (filters.fileTypes) {
-    const types = filters.fileTypes.split(',').filter(Boolean);
-
+function applyClientSideFilters(files: any[], filters: FileFilter) {
+  let filteredFiles = [...files];
+  
+  // Apply size filters (client-side only as Drive API doesn't support size filtering)
+  if (filters.minSize || filters.maxSize) {
     filteredFiles = filteredFiles.filter(file => {
-      return types.some(type => {
-        switch (type.toLowerCase()) {
-          case 'folder':
-            return file.mimeType === 'application/vnd.google-apps.folder';
-          case 'document':
-            return file.mimeType?.includes('document') || 
-                   file.mimeType?.includes('pdf') || 
-                   file.mimeType?.includes('text') ||
-                   file.mimeType?.includes('word');
-          case 'spreadsheet':
-            return file.mimeType?.includes('spreadsheet') || 
-                   file.mimeType?.includes('excel') ||
-                   file.mimeType?.includes('csv');
-          case 'presentation':
-            return file.mimeType?.includes('presentation') || 
-                   file.mimeType?.includes('powerpoint');
-          case 'image':
-            return file.mimeType?.startsWith('image/');
-          case 'video':
-            return file.mimeType?.startsWith('video/');
-          case 'audio':
-            return file.mimeType?.startsWith('audio/');
-          case 'archive':
-            return file.mimeType?.includes('zip') || 
-                   file.mimeType?.includes('rar') ||
-                   file.mimeType?.includes('tar') ||
-                   file.mimeType?.includes('gzip') ||
-                   file.mimeType?.includes('7z');
-          case 'code':
-            return file.mimeType?.includes('javascript') ||
-                   file.mimeType?.includes('html') ||
-                   file.mimeType?.includes('css') ||
-                   file.mimeType?.includes('json') ||
-                   file.mimeType?.includes('xml') ||
-                   (file.mimeType?.startsWith('text/') && 
-                    !file.mimeType?.includes('plain'));
-          default:
-            return true;
-        }
-      });
+      if (!file.size) return true; // Keep files without size info
+      const sizeInBytes = parseInt(file.size);
+      if (filters.minSize && sizeInBytes < filters.minSize) return false;
+      if (filters.maxSize && sizeInBytes > filters.maxSize) return false;
+      return true;
     });
   }
-
-  // Apply additional query filtering for more complex searches
-  if (filters.query && filters.query.trim()) {
-    const searchTerm = filters.query.toLowerCase();
-    filteredFiles = filteredFiles.filter(file => 
-      file.name?.toLowerCase().includes(searchTerm) ||
-      file.description?.toLowerCase().includes(searchTerm)
-    );
-  }
-
-  // Apply size filtering (client-side since Google Drive API doesn't support it)
-  if (filters.sizeMin || filters.sizeMax) {
+  
+  // Apply owner filter (client-side)
+  if (filters.owner) {
+    const ownerQuery = filters.owner.toLowerCase();
     filteredFiles = filteredFiles.filter(file => {
-      // Skip folders and files without size information
-      if (!file.size || file.mimeType === 'application/vnd.google-apps.folder') {
-        return true;
-      }
-      
-      const fileSize = parseInt(file.size);
-      const sizeMin = filters.sizeMin ? parseInt(filters.sizeMin) : 0;
-      const sizeMax = filters.sizeMax ? parseInt(filters.sizeMax) : Number.MAX_SAFE_INTEGER;
-      
-      return fileSize >= sizeMin && fileSize <= sizeMax;
+      const ownerName = file.owners?.[0]?.displayName?.toLowerCase() || '';
+      const ownerEmail = file.owners?.[0]?.emailAddress?.toLowerCase() || '';
+      return ownerName.includes(ownerQuery) || ownerEmail.includes(ownerQuery);
     });
   }
+  
+  return filteredFiles;
+}
 
-  return {
-    ...result,
-    files: filteredFiles
-  };
+function getSortKey(sortBy: string) {
+  switch (sortBy) {
+    case 'name': return 'name';
+    case 'modified': return 'modifiedTime';
+    case 'created': return 'createdTime';
+    case 'size': return 'quotaBytesUsed';
+    default: return 'modifiedTime';
+  }
 }
 
 export async function GET(request: NextRequest) {
   try {
     console.log('=== Drive Files API Called ===');
-    const supabase = await createClient();
-
-    // Get fresh session instead of just user
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-
-    if (sessionError || !session?.user) {
-      console.log('Session error:', sessionError);
+    
+    const session = await auth();
+    
+    if (!session?.user) {
+      console.log('No session found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = session.user;
     console.log('User found:', user.email);
-    console.log('User metadata:', user.user_metadata);
-    console.log('Session keys:', Object.keys(session));
 
-    // Enhanced token detection with debugging
-    const accessToken = session.provider_token || 
-                       user.user_metadata?.provider_token ||
-                       user.user_metadata?.access_token ||
-                       session.access_token;
-
-    console.log('Token search results:', {
-      session_provider_token: !!session.provider_token,
-      user_metadata_provider_token: !!user.user_metadata?.provider_token,
-      user_metadata_access_token: !!user.user_metadata?.access_token,
-      session_access_token: !!session.access_token,
-      final_token_found: !!accessToken
-    });
-
-    console.log('Access token exists:', !!accessToken);
-
+    const accessToken = session.accessToken;
+    
     if (!accessToken) {
-      console.log('No access token found anywhere');
+      console.log('No access token found');
       return NextResponse.json({ 
-        error: 'Google Drive access not found. Please reconnect your Google account.',
+        error: 'No access token found',
         needsReauth: true 
-      }, { status: 400 });
+      }, { status: 401 });
     }
+
+    console.log('Access token found, proceeding with Drive API call');
 
     const { searchParams } = new URL(request.url);
-    const parentId = searchParams.get('parentId');
-    const query = searchParams.get('query');
-    const mimeType = searchParams.get('mimeType');
-    const pageToken = searchParams.get('pageToken');
-    const pageSize = parseInt(searchParams.get('pageSize') || '20');
-    const view = searchParams.get('view');
-    const fileTypes = searchParams.get('fileTypes');
-    const createdAfter = searchParams.get('createdAfter');
-    const createdBefore = searchParams.get('createdBefore');
-    const modifiedAfter = searchParams.get('modifiedAfter');
-    const modifiedBefore = searchParams.get('modifiedBefore');
-    const owner = searchParams.get('owner');
-    const sizeMin = searchParams.get('sizeMin');
-    const sizeMax = searchParams.get('sizeMax');
-
-    // Build proper Google Drive API query based on official documentation
-    let driveQuery = "";
-    let useCustomParameters = false;
-
-    // Handle different views with proper Google Drive API approach
-    if (view === 'shared') {
-      driveQuery = "sharedWithMe=true and trashed=false";
-    } else if (view === 'starred') {
-      driveQuery = "starred=true and trashed=false";
-    } else if (view === 'recent') {
-      // For recent files, we'll use orderBy and limit results
-      driveQuery = "trashed=false";
-      useCustomParameters = true;
-    } else if (view === 'trash') {
-      driveQuery = "trashed=true";
-    } else if (view === 'my-drive') {
-      // My Drive view - show only root files when no parent specified
-      driveQuery = "trashed=false";
-
-      // Handle folder navigation
-      if (parentId) {
-        driveQuery += ` and '${parentId}' in parents`;
-      } else if (!query) {
-        // Show root files only when no search query and no parent
-        driveQuery += " and 'root' in parents";
-      }
-    } else {
-      // All Files view - show everything without root restriction
-      driveQuery = "trashed=false";
-
-      // Handle folder navigation only
-      if (parentId) {
-        driveQuery += ` and '${parentId}' in parents`;
-      }
-    }
-
-    // Handle search query
-    if (query) {
-      driveQuery += ` and name contains '${query.replace(/'/g, "\\'")}'`;
-    }
-
-    // Handle legacy mimeType parameter
-    if (mimeType) {
-      driveQuery += ` and mimeType='${mimeType}'`;
-    }
-
-    // Handle file type filters
-    if (fileTypes) {
-      const types = fileTypes.split(',').filter(Boolean);
-      const mimeTypeConditions: string[] = [];
-
-      types.forEach(type => {
-        switch (type.toLowerCase()) {
-          case 'folder':
-            mimeTypeConditions.push("mimeType='application/vnd.google-apps.folder'");
-            break;
-          case 'document':
-            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.document' or mimeType='application/pdf' or mimeType='text/plain' or mimeType='application/msword' or mimeType='application/vnd.openxmlformats-officedocument.wordprocessingml.document')");
-            break;
-          case 'spreadsheet':
-            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.spreadsheet' or mimeType='application/vnd.ms-excel' or mimeType='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')");
-            break;
-          case 'presentation':
-            mimeTypeConditions.push("(mimeType='application/vnd.google-apps.presentation' or mimeType='application/vnd.ms-powerpoint' or mimeType='application/vnd.openxmlformats-officedocument.presentationml.presentation')");
-            break;
-          case 'image':
-            mimeTypeConditions.push("(mimeType contains 'image/')");
-            break;
-          case 'video':
-            mimeTypeConditions.push("(mimeType contains 'video/')");
-            break;
-          case 'audio':
-            mimeTypeConditions.push("(mimeType contains 'audio/')");
-            break;
-          case 'archive':
-            mimeTypeConditions.push("(mimeType='application/zip' or mimeType='application/x-rar-compressed' or mimeType='application/x-tar' or mimeType='application/gzip' or mimeType='application/x-7z-compressed')");
-            break;
-        }
-      });
-
-      if (mimeTypeConditions.length > 0) {
-        driveQuery += ` and (${mimeTypeConditions.join(' or ')})`;
-      }
-    }
-
-    // Handle advanced filters with proper Google Drive API syntax
-    if (createdAfter) {
-      driveQuery += ` and createdTime >= '${createdAfter}'`;
-    }
-    if (createdBefore) {
-      driveQuery += ` and createdTime <= '${createdBefore}'`;
-    }
-    if (modifiedAfter) {
-      driveQuery += ` and modifiedTime >= '${modifiedAfter}'`;
-    }
-    if (modifiedBefore) {
-      driveQuery += ` and modifiedTime <= '${modifiedBefore}'`;
-    }
-    if (owner) {
-      driveQuery += ` and '${owner.replace(/'/g, "\\'")}' in owners`;
-    }
     
-    // Note: Google Drive API does not support size filtering directly
-    // Size filtering will be handled client-side after data retrieval
+    // Parse query parameters
+    const filters: FileFilter = {
+      fileType: searchParams.get('fileType') || 'all',
+      viewStatus: searchParams.get('viewStatus') || 'my-drive',
+      sortBy: searchParams.get('sortBy') || 'modified',
+      sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc',
+      search: searchParams.get('search') || undefined,
+      minSize: searchParams.get('minSize') ? parseInt(searchParams.get('minSize')!) : undefined,
+      maxSize: searchParams.get('maxSize') ? parseInt(searchParams.get('maxSize')!) : undefined,
+      createdAfter: searchParams.get('createdAfter') || undefined,
+      createdBefore: searchParams.get('createdBefore') || undefined,
+      modifiedAfter: searchParams.get('modifiedAfter') || undefined,
+      modifiedBefore: searchParams.get('modifiedBefore') || undefined,
+      owner: searchParams.get('owner') || undefined,
+    };
 
-    console.log('Google Drive API Query:', driveQuery);
+    const pageSize = parseInt(searchParams.get('pageSize') || '50');
+    const pageToken = searchParams.get('pageToken') || undefined;
+    const folderId = searchParams.get('folderId') || undefined;
 
-    // Generate cache key including all filter parameters
+    console.log('Filters applied:', filters);
+
+    // Check cache first
     const cacheKey = driveCache.generateDriveKey({
-      parentId: parentId || undefined,
-      query: driveQuery || undefined,
-      mimeType: mimeType || undefined,
-      pageToken: pageToken || undefined,
-      userId: user.id,
-    }) + `_${view || 'all'}_${fileTypes || ''}`;
+      filters,
+      pageSize,
+      pageToken,
+      folderId,
+      userId: user.email || 'unknown'
+    });
 
-    // Temporarily disable cache to test fresh API calls
+    // Temporary disable cache for testing
     // const cachedResult = driveCache.get(cacheKey);
-    // if (cachedResult && !pageToken) {
-    //   console.log('Drive API: Returning cached result, items:', cachedResult.files?.length || 0);
-    //   const filteredResult = applyClientSideFilters(cachedResult, { view, fileTypes, query });
-    //   return NextResponse.json(filteredResult);
+    // if (cachedResult) {
+    //   console.log('Returning cached result');
+    //   return NextResponse.json(cachedResult);
     // }
 
     const driveService = new GoogleDriveService(accessToken);
+    
+    // Build the Drive API query
+    const driveQuery = buildDriveQuery(filters);
+    console.log('Drive query:', driveQuery);
+    
+    // Get sort configuration
+    const sortKey = getSortKey(filters.sortBy);
+    const orderBy = filters.viewStatus === 'recent' ? 'viewedByMeTime desc' : 
+                   `${sortKey} ${filters.sortOrder}`;
 
-    console.log('Drive API: Fetching files with enhanced options:', {
-      parentId: parentId || undefined,
-      query: driveQuery,
-      pageToken: pageToken || undefined,
+    console.log('Order by:', orderBy);
+
+    // Make the API call
+    const result = await driveService.getFiles({
+      q: driveQuery,
+      orderBy,
       pageSize,
-      view,
-      fileTypes
+      pageToken,
+      parentId: folderId
     });
 
-    // Use the constructed query instead of individual parameters with proper ordering
-    const orderBy = view === 'recent' ? 'viewedByMeTime desc' : 'modifiedTime desc';
+    console.log(`Retrieved ${result.files?.length || 0} files from Drive API`);
 
-    const result = await driveService.listFiles({
-      query: driveQuery,
-      pageToken: pageToken || undefined,
-      pageSize,
-      orderBy
-    });
+    // Apply client-side filters
+    const filteredFiles = applyClientSideFilters(result.files || [], filters);
+    
+    console.log(`After client-side filtering: ${filteredFiles.length} files`);
 
-    // Apply client-side filters to enhance API results
-    const filteredResult = applyClientSideFilters(result, { 
-      view, 
-      fileTypes, 
-      query,
-      sizeMin,
-      sizeMax
-    });
+    const finalResult = {
+      ...result,
+      files: filteredFiles
+    };
 
-    // Cache the filtered result with smart TTL based on content type
-    if (!pageToken) {
-      const cacheTTL = query ? 5 : 15; // Search results: 5min, Folder contents: 15min
-      driveCache.set(cacheKey, filteredResult, cacheTTL);
-    }
+    // Cache the result
+    driveCache.set(cacheKey, finalResult, 5); // Cache for 5 minutes
 
-    console.log('Drive API: Files fetched and filtered successfully, count:', filteredResult.files.length);
-
-    return NextResponse.json(filteredResult);
-  } catch (error: any) {
-    console.error('Drive files API error:', error);
-
-    // Handle specific Google API errors
-    if (error.code === 403) {
-      return NextResponse.json(
-        { error: 'Google Drive access denied. Please reconnect your account.' },
-        { status: 403 }
-      );
-    }
-
-    if (error.code === 401) {
-      return NextResponse.json(
-        { error: 'Google Drive access expired. Please reconnect your account.' },
-        { status: 401 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: error.message || 'Failed to fetch files' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    console.log('=== Drive Upload API Called ===');
-    const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
-
-    if (authError || !session?.user) {
-      console.log('Authentication failed:', authError);
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    console.log('User authenticated for upload:', session.user.email);
-
-    // Try multiple token locations
-    const accessToken = session.provider_token || 
-                       session.user.user_metadata?.provider_token ||
-                       session.access_token;
-
-    if (!accessToken) {
-      console.log('No access token found for upload');
-      return NextResponse.json({ 
-        error: 'Google Drive access not found. Please reconnect your Google account.',
-        needsReauth: true 
-      }, { status: 400 });
-    }
-
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
-    const name = formData.get('name') as string;
-    const parentId = formData.get('parentId') as string;
-    const description = formData.get('description') as string;
-
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-    }
-
-    const driveService = new GoogleDriveService(accessToken);
-    const result = await driveService.uploadFile({
-      file,
-      metadata: {
-        name: name || file.name,
-        description,
-      },
-      parentId: parentId || undefined,
-    });
-
-    console.log('File uploaded successfully:', result.name);
-    return NextResponse.json(result);
+    return NextResponse.json(finalResult);
+    
   } catch (error) {
-    console.error('Drive upload API error:', error);
-
-    if (error instanceof Error) {
-      // Handle Google API specific errors
-      if (error.message.includes('Invalid Credentials') || error.message.includes('unauthorized')) {
-        return NextResponse.json({ 
-          error: 'Google Drive access expired. Please reconnect your account.',
-          needsReauth: true 
-        }, { status: 401 });
-      }
-
-      if (error.message.includes('insufficient') || error.message.includes('403')) {
-        return NextResponse.json({ 
-          error: 'Insufficient permissions to upload files. Please check your Google Drive permissions.',
-          needsReauth: true 
-        }, { status: 403 });
-      }
-
-      if (error.message.includes('quota') || error.message.includes('limit')) {
-        return NextResponse.json({ 
-          error: 'Google Drive quota exceeded. Please free up space and try again.' 
-        }, { status: 429 });
-      }
-    }
-
-    return NextResponse.json(
-      { error: 'Failed to upload file' },
-      { status: 500 }
-    );
+    console.error('Drive files API error:', error);
+    return NextResponse.json({ 
+      error: 'Failed to fetch files',
+      details: error instanceof Error ? error.message : String(error)
+    }, { status: 500 });
   }
 }

@@ -4,14 +4,13 @@ import { GoogleDriveService } from '@/lib/google-drive/service';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const session = await auth();
 
-    if (authError || !user) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const accessToken = user.user_metadata?.provider_token;
+    const accessToken = session.accessToken;
     if (!accessToken) {
       return NextResponse.json({ error: 'Google Drive access not found' }, { status: 400 });
     }
