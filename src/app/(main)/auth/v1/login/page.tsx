@@ -1,10 +1,8 @@
+"use client";
+
 import Link from "next/link";
-
 import { Command } from "lucide-react";
-
-import { GoogleAuthButton } from "@/components/auth/google-auth-button";
-
-import { LoginFormV1 } from "./_components/login-form";
+import { NextAuthForm } from "./_components/nextauth-form";
 
 export default function LoginV1() {
   return (
@@ -30,13 +28,9 @@ export default function LoginV1() {
             </div>
           </div>
           <div className="space-y-4">
-            <LoginFormV1 />
-            <GoogleAuthButton className="w-full" />
+            <NextAuthForm />
             <p className="text-muted-foreground text-center text-xs font-medium">
-              Don&apos;t have an account?{" "}
-              <Link href="register" className="text-primary font-semibold">
-                Register
-              </Link>
+              Sign in with your Google account to access the Google Drive management system.
             </p>
           </div>
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { EllipsisVertical, CircleUser, CreditCard, MessageSquareDot, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,37 +13,23 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { createClient } from "@/lib/supabase/client";
-import { useConfig } from "@/components/providers/config-provider";
+import { useSession, signOut } from "next-auth/react";
 import { toast } from "sonner";
-import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 export function AuthNavUser() {
-  const [user, setUser] = useState<SupabaseUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const loading = status === "loading";
+  const user = session?.user;
   const { isMobile } = useSidebar();
-  const config = useConfig();
-  const supabase = createClient(config.supabaseUrl, config.supabaseAnonKey);
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-      setLoading(false);
-    };
-
-    getUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
-
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
-
-  const handleLogout = async () => {
+  const handleSignOut = async () => {
+    try {
+      await signOut({ callbackUrl: '/' });
+      toast.success("Signed out successfully");
+    } catch (error) {
+      toast.error("An error occurred while signing out");
+    }
+  };
     try {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
@@ -96,7 +81,7 @@ export function AuthNavUser() {
     );
   }
 
-  const initials = user.user_metadata?.full_name
+  const initials = user.name
     ?.split(' ')
     .map((n: string) => n[0])
     .join('')
@@ -112,12 +97,12 @@ export function AuthNavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
+                <AvatarImage src={user.image || ""} alt={user.name || ""} />
                 <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">
-                  {user.user_metadata?.full_name || 'User'}
+                  {user.name || 'User'}
                 </span>
                 <span className="text-muted-foreground truncate text-xs">{user.email}</span>
               </div>
@@ -160,7 +145,7 @@ export function AuthNavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
+            <DropdownMenuItem onClick={handleSignOut}>
               <LogOut />
               Log out
             </DropdownMenuItem>

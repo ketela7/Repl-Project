@@ -1,26 +1,19 @@
-import { createClient } from '@/lib/supabase/server'
+import { signOut } from '@/auth'
 import { NextResponse } from 'next/server'
 
 export async function POST() {
-  const supabase = await createClient()
-
-  const { error } = await supabase.auth.signOut()
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 })
+  try {
+    await signOut({ redirect: false })
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    return NextResponse.json({ error: 'Logout failed' }, { status: 400 })
   }
-
-  return NextResponse.json({ success: true })
 }
 
 export async function GET() {
-  const supabase = await createClient()
-
-  const { error } = await supabase.auth.signOut()
-
-  if (error) {
-    return NextResponse.redirect('/dashboard?error=logout_failed')
+  try {
+    await signOut({ redirectTo: '/' })
+  } catch (error) {
+    return NextResponse.redirect('/?error=logout_failed')
   }
-
-  return NextResponse.redirect('/')
 }

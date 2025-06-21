@@ -1,8 +1,23 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
-import type { NextAuthConfig } from "next-auth"
 
-export const config = {
+declare module "next-auth" {
+  interface Session {
+    accessToken?: string
+    refreshToken?: string
+    provider?: string
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    accessToken?: string
+    refreshToken?: string
+    provider?: string
+  }
+}
+
+const authConfig = {
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -37,6 +52,6 @@ export const config = {
   pages: {
     signIn: '/auth/v1/login',
   },
-} satisfies NextAuthConfig
+}
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config)
+export const { handlers, auth, signIn, signOut } = NextAuth(authConfig)

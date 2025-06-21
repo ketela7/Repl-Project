@@ -1,34 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    const session = await auth();
     
-    // Get fresh session to ensure we have the latest tokens
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    
-    if (sessionError || !session?.user) {
-      console.log('Session error:', sessionError);
+    if (!session?.user) {
+      console.log('No session found');
       return NextResponse.json({ hasAccess: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user;
-    console.log('User metadata keys:', Object.keys(user.user_metadata || {}));
-    console.log('Provider token exists:', !!user.user_metadata?.provider_token);
-    console.log('Provider refresh token exists:', !!user.user_metadata?.provider_refresh_token);
-
-    // Try multiple possible token locations
-    const accessToken = user.user_metadata?.provider_token || 
-                       session.provider_token ||
-                       session.access_token;
+    const accessToken = session.accessToken;
     
     if (!accessToken) {
-      console.log('No access token found in:', {
-        user_metadata: user.user_metadata,
-        session_keys: Object.keys(session)
-      });
+      console.log('No access token found in session');
       return NextResponse.json({ 
         hasAccess: false, 
         error: 'No access token',

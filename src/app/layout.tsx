@@ -6,7 +6,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 
 import { Toaster } from "@/components/ui/sonner";
-import { ConfigProvider } from "@/components/providers/config-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
 import { TimezoneProvider } from "@/components/timezone-provider";
 import { APP_CONFIG } from "@/config/app-config";
 
@@ -58,11 +58,6 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const config = {
-    supabaseUrl: process.env.SUPABASE_URL!,
-    supabaseAnonKey: process.env.SUPABASE_ANON_KEY!,
-  };
-
   return (
     <html lang="en" className="light" suppressHydrationWarning>
       <head>
@@ -72,28 +67,26 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={`${inter.className} min-h-screen antialiased overflow-x-hidden`}>
-        <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
-          <ConfigProvider config={config}>
+        <AuthProvider>
+          <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
             <TimezoneProvider>
-              <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
-                <div className="relative min-h-screen w-full">
-                  {children}
-                </div>
-                <Toaster
-                  position="top-right"
-                  toastOptions={{
-                    duration: 3000,
-                    style: {
-                      background: 'hsl(var(--background))',
-                      color: 'hsl(var(--foreground))',
-                      border: '1px solid hsl(var(--border))',
-                    },
-                  }}
-                />
-              </ThemeProvider>
+              <div className="relative min-h-screen w-full">
+                {children}
+              </div>
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  duration: 3000,
+                  style: {
+                    background: 'hsl(var(--background))',
+                    color: 'hsl(var(--foreground))',
+                    border: '1px solid hsl(var(--border))',
+                  },
+                }}
+              />
             </TimezoneProvider>
-          </ConfigProvider>
-        </ThemeProvider>
+          </ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

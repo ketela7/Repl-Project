@@ -62,7 +62,7 @@ export function AuthStatus() {
       <CardHeader className="text-center">
         <div className="mx-auto mb-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={user.user_metadata?.avatar_url} alt={user.user_metadata?.full_name} />
+            <AvatarImage src={user.image || ""} alt={user.name || ""} />
             <AvatarFallback className="text-lg">{initials}</AvatarFallback>
           </Avatar>
         </div>
@@ -71,7 +71,7 @@ export function AuthStatus() {
           Welcome back!
         </CardTitle>
         <CardDescription>
-          {user.user_metadata?.full_name || 'User'}
+          {user.name || 'User'}
           <br />
           <span className="text-xs">{user.email}</span>
         </CardDescription>
