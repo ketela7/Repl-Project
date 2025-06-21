@@ -1,16 +1,18 @@
 /**
  * URL utilities for handling domain-agnostic routing
- * Supports custom domains, Replit domains, and localhost
+ * Uses BASE_URL as the core environment variable with platform auto-detection
  */
+
+import { config } from './config';
 
 /**
  * Get the base URL for the application
- * Priority: NEXTAUTH_URL > current window origin > fallback
+ * Priority: BASE_URL > platform detection > current window origin > fallback
  */
 export function getBaseUrl(): string {
-  // Server-side: use NEXTAUTH_URL
+  // Server-side: use detected base URL from config
   if (typeof window === 'undefined') {
-    return process.env.NEXTAUTH_URL || 'http://localhost:5000';
+    return config.app.baseUrl;
   }
   
   // Client-side: use current origin
@@ -37,19 +39,27 @@ export function redirectTo(path: string): void {
 
 /**
  * Get base URL for server-side redirects
- * Uses NEXTAUTH_URL or extracts from request URL
+ * Uses BASE_URL detection with request URL fallback
  */
 export function getServerBaseUrl(requestUrl?: string): string {
-  if (process.env.NEXTAUTH_URL) {
-    return process.env.NEXTAUTH_URL;
+  // Use detected base URL from config first
+  const detectedBaseUrl = config.app.baseUrl;
+  if (detectedBaseUrl && detectedBaseUrl !== 'http://localhost:5000') {
+    return detectedBaseUrl;
   }
   
+  // Fallback to request URL origin
   if (requestUrl) {
-    const url = new URL(requestUrl);
-    return url.origin;
+    try {
+      const url = new URL(requestUrl);
+      return url.origin;
+    } catch (error) {
+      console.warn('Invalid request URL:', requestUrl);
+    }
   }
   
-  return 'http://localhost:5000';
+  // Final fallback
+  return detectedBaseUrl || 'http://localhost:5000';
 }
 
 /**
