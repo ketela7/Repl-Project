@@ -78,11 +78,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session
     },
     async redirect({ url, baseUrl }) {
+      console.log(`[NextAuth] Redirect called with url: ${url}, baseUrl: ${baseUrl}`);
       // After successful sign in, redirect to dashboard
       if (url.startsWith(baseUrl)) {
+        console.log(`[NextAuth] URL starts with baseUrl, returning: ${url}`);
         return url
       }
-      return `${baseUrl}/dashboard/drive`
+      const redirectUrl = `${baseUrl}/dashboard/drive`;
+      console.log(`[NextAuth] Redirecting to: ${redirectUrl}`);
+      return redirectUrl;
     },
   },
   pages: {
