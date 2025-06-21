@@ -32,8 +32,9 @@ export function LoginFormV1() {
     setIsLoading(true);
     
     try {
-      // Store remember me preference in localStorage
+      // Store remember me preference in localStorage before sign in
       setRememberMePreference(rememberMe);
+      console.log("[Login] Remember me preference stored:", rememberMe);
       
       toast.info("Redirecting to Google Sign-in...", {
         description: rememberMe ? "You will be remembered for 30 days" : "Session expires in 1 day"

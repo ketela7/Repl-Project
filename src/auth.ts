@@ -40,12 +40,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.accessToken = account.access_token
         token.refreshToken = account.refresh_token
         token.provider = account.provider
-        // Set initial remember me preference from localStorage (will be updated via session update)
+        // Set initial remember me preference - will be updated via session callback
         token.rememberMe = false;
         console.log("[JWT Callback] Saved tokens to JWT");
       }
       
-      // Handle remember me preference updates
+      // Handle remember me preference updates from client-side session update
       if (trigger === "update" && session?.rememberMe !== undefined) {
         token.rememberMe = session.rememberMe;
         // Update token expiration based on remember me preference
@@ -53,15 +53,25 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           ? 30 * 24 * 60 * 60 // 30 days
           : 24 * 60 * 60; // 1 day
         token.exp = Math.floor(Date.now() / 1000) + maxAge;
-        console.log("[JWT Callback] Updated remember me preference:", session.rememberMe, "expires in", maxAge, "seconds");
+        console.log("[JWT Callback] Updated remember me preference from session update:", session.rememberMe, "expires in", maxAge, "seconds");
       }
       
-      // Set initial expiration if not set
+      // Set initial expiration if not set, and check localStorage for remember me
       if (!token.exp) {
-        const maxAge = token.rememberMe 
+        let rememberMe = token.rememberMe;
+        
+        // For server-side JWT callback, we can't access localStorage
+        // The remember me preference will be set via session update after login
+        if (account) {
+          // This runs server-side, so we'll rely on session update to set remember me
+          rememberMe = false;
+        }
+        
+        const maxAge = rememberMe 
           ? 30 * 24 * 60 * 60 // 30 days
           : 24 * 60 * 60; // 1 day
         token.exp = Math.floor(Date.now() / 1000) + maxAge;
+        console.log("[JWT Callback] Set initial expiration:", rememberMe ? "30 days" : "1 day");
       }
       
       return token
@@ -102,7 +112,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        // Dynamic maxAge will be set based on remember me preference
+        maxAge: 30 * 24 * 60 * 60, // 30 days max for remember me
       }
     }
   },

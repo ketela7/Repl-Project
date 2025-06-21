@@ -14,7 +14,8 @@ export function useSessionManagement() {
       
       // Update session if preference differs or if it's undefined
       if (session.rememberMe !== storedRememberMe) {
-        console.log("[Session Management] Syncing remember me preference:", storedRememberMe);
+        console.log("[Session Management] Syncing remember me preference from localStorage:", storedRememberMe);
+        console.log("[Session Management] Current session rememberMe:", session.rememberMe);
         await update({ rememberMe: storedRememberMe });
       }
     }
