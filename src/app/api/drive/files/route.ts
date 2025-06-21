@@ -58,6 +58,9 @@ function buildDriveQuery(filters: FileFilter): string {
           case 'folder':
             typeConditions.push('mimeType=\'application/vnd.google-apps.folder\'');
             break;
+          case 'shortcut':
+            typeConditions.push('mimeType=\'application/vnd.google-apps.shortcut\'');
+            break;
           case 'document':
             typeConditions.push('(mimeType contains \'document\' or mimeType=\'application/pdf\' or mimeType contains \'text\')');
             break;

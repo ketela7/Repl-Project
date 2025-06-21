@@ -88,6 +88,7 @@ const fileTypeOptions = [
   { key: 'audio', label: 'Audio', icon: Music, count: 0, description: 'Music, podcasts, recordings' },
   { key: 'archive', label: 'Archives', icon: Archive, count: 0, description: 'ZIP, RAR, compressed files' },
   { key: 'code', label: 'Code Files', icon: FileText, count: 0, description: 'Programming files, scripts' },
+  { key: 'shortcut', label: 'Shortcuts', icon: FileText, count: 0, description: 'Google Drive shortcuts' },
 ];
 
 export function DriveFiltersSidebar({ 

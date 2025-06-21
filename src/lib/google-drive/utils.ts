@@ -829,6 +829,13 @@ export function getFileTypeCategories(): Array<{
       description: 'Music, podcasts, recordings'
     },
     {
+      key: 'shortcut',
+      label: 'Shortcuts',
+      iconName: getCategoryIcon('shortcut'),
+      colorClass: getCategoryColor('shortcut'),
+      description: 'Google Drive shortcuts'
+    },
+    {
       key: 'archive',
       label: 'Archives',
       iconName: getCategoryIcon('archive'),
