@@ -7,10 +7,19 @@ export async function middleware(req: NextRequest) {
   try {
     console.log(`[Middleware] Protecting: ${pathname}`);
     
-    // Get NextAuth token
+    // Skip middleware for auth callback to prevent redirect loops
+    if (pathname.startsWith('/api/auth/')) {
+      console.log(`[Middleware] Skipping auth route: ${pathname}`);
+      return NextResponse.next()
+    }
+    
+    // Get NextAuth token with proper configuration
     const token = await getToken({ 
       req, 
-      secret: process.env.NEXTAUTH_SECRET 
+      secret: process.env.NEXTAUTH_SECRET,
+      cookieName: process.env.NODE_ENV === 'production' 
+        ? '__Secure-next-auth.session-token' 
+        : 'next-auth.session-token'
     })
     
     if (!token) {
