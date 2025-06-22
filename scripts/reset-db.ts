@@ -2,7 +2,7 @@
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { sql } from 'drizzle-orm';
 import postgres from 'postgres';
-import { users, userSessions, activityLogs, bulkOperations } from '../src/lib/schema';
+// import { users, userSessions, activityLogs, bulkOperations } from '../src/lib/schema';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not set');
