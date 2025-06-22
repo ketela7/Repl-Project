@@ -5,6 +5,7 @@ import { GoogleDriveService } from '@/lib/google-drive/service';
 import { driveCache } from '@/lib/cache';
 import { requestDeduplicator } from '@/lib/request-deduplication';
 import { retryDriveApiCall } from '@/lib/api-retry';
+import { searchOptimizer } from '@/lib/search-optimizer';
 
 interface FileFilter {
   fileType?: string;
@@ -280,7 +281,41 @@ export async function GET(request: NextRequest) {
       pageToken: pageToken
     });
 
-    // Use request deduplication for performance optimization
+    // Use search optimization for search queries
+    if (filters.search) {
+      const searchResult = await searchOptimizer.optimizedSearch(
+        filters.search,
+        user.email!,
+        async () => {
+          const driveService = new GoogleDriveService(accessToken);
+          return await retryDriveApiCall(
+            () => driveService.listFiles({
+              query: driveQuery,
+              orderBy,
+              pageSize,
+              pageToken,
+              parentId: folderId
+            }),
+            `Drive API search for "${filters.search}" for user ${user.email}`
+          );
+        }
+      );
+      
+      // Apply client-side filters to search results
+      const filteredFiles = applyClientSideFilters(searchResult.files, filters);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Search "${filters.search}": ${searchResult.files.length} -> ${filteredFiles.length} files after filtering`);
+      }
+
+      return NextResponse.json({
+        files: filteredFiles,
+        nextPageToken: searchResult.nextPageToken,
+        totalCount: filteredFiles.length
+      });
+    }
+
+    // Use request deduplication for non-search requests
     const result = await requestDeduplicator.deduplicate(deduplicationKey, async () => {
       // Check cache first inside deduplicated request
       const cachedData = driveCache.get(cacheKey);
