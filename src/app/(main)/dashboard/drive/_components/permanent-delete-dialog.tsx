@@ -19,6 +19,7 @@ import {
   BottomSheetFooter 
 } from "@/components/ui/bottom-sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses, getMobileInputClasses } from "@/lib/mobile-optimization";
 import { AlertTriangle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -124,12 +125,12 @@ export function PermanentDeleteDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className="flex-row gap-2">
+          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={isDeleting}
-              className="flex-1"
+              className={getTouchButtonClasses('secondary')}
             >
               Cancel
             </Button>
@@ -137,7 +138,7 @@ export function PermanentDeleteDialog({
               variant="destructive"
               onClick={handlePermanentDelete}
               disabled={isDeleting}
-              className="flex-1"
+              className={getTouchButtonClasses('primary')}
             >
               {isDeleting ? (
                 <>

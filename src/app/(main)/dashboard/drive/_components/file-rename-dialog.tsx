@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses, getMobileInputClasses } from "@/lib/mobile-optimization";
 import { 
   BottomSheet, 
   BottomSheetContent, 
@@ -117,7 +118,7 @@ export function FileRenameDialog({
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Enter new file name..."
                 disabled={renaming}
-                className="h-12 text-base"
+                className={`${getMobileInputClasses()} text-base`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleRename();
@@ -137,14 +138,19 @@ export function FileRenameDialog({
             </div>
           </div>
 
-          <BottomSheetFooter className="flex-row gap-2">
-            <Button variant="outline" onClick={handleClose} disabled={renaming} className="flex-1">
+          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+            <Button 
+              variant="outline" 
+              onClick={handleClose} 
+              disabled={renaming} 
+              className={getTouchButtonClasses('secondary')}
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleRename} 
               disabled={!newName?.trim() || newName === file?.name || renaming}
-              className="flex-1"
+              className={getTouchButtonClasses('primary')}
             >
               {renaming ? (
                 <>

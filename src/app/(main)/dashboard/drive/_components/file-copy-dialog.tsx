@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { FolderIcon, Copy, ExternalLink } from "lucide-react";
 import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
@@ -220,7 +221,7 @@ export function FileCopyDialog({
               onChange={(e) => setCustomTargetInput(e.target.value)}
               placeholder="Enter folder ID or Google Drive URL..."
               disabled={copying}
-              className="font-mono text-sm"
+              className={`${getMobileInputClasses()} font-mono text-sm`}
             />
             <div className="text-xs text-muted-foreground space-y-1">
               <p className="flex items-center gap-1">
@@ -258,14 +259,19 @@ export function FileCopyDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className="flex-row gap-2">
-            <Button variant="outline" onClick={handleClose} disabled={copying} className="flex-1">
+          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+            <Button 
+              variant="outline" 
+              onClick={handleClose} 
+              disabled={copying} 
+              className={getTouchButtonClasses('secondary')}
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleCopy} 
               disabled={!getTargetFolderId() || !newFileName.trim() || copying || loading}
-              className="flex-1"
+              className={getTouchButtonClasses('primary')}
             >
               {copying ? (
                 <>

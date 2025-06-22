@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { Trash2 } from "lucide-react";
 
 interface BulkDeleteDialogProps {
@@ -130,13 +131,17 @@ export function BulkDeleteDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className="flex-row gap-2">
-            <Button variant="outline" onClick={onClose} className="flex-1">
+          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+            <Button 
+              variant="outline" 
+              onClick={onClose} 
+              className={getTouchButtonClasses('secondary')}
+            >
               Cancel
             </Button>
             <Button 
               onClick={onConfirm}
-              className="flex-1 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800"
+              className={`${getTouchButtonClasses('primary')} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800`}
             >
               Move to Trash
             </Button>

@@ -25,6 +25,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SimpleDatePicker } from "@/components/ui/simple-date-picker";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses, getMobileInputClasses } from "@/lib/mobile-optimization";
 import { 
   Archive,
   Calendar,
@@ -419,7 +420,7 @@ export function FiltersDialog({
                 </Label>
                 <Input
                   placeholder="Search by owner name or email"
-                  className="text-sm"
+                  className={`${getMobileInputClasses()} text-sm`}
                   value={advancedFilters.owner || ''}
                   onChange={(e) => handleAdvancedFiltersChange({
                     ...advancedFilters,
@@ -494,12 +495,19 @@ export function FiltersDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className="flex-row gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+          <BottomSheetFooter className={getMobileGridClasses({ columns: hasActiveFilters ? 2 : 1, gap: 'normal' })}>
+            <Button 
+              variant="outline" 
+              onClick={() => onOpenChange(false)} 
+              className={getTouchButtonClasses('secondary')}
+            >
               Close
             </Button>
             {hasActiveFilters && (
-              <Button onClick={handleClearAll} className="flex-1">
+              <Button 
+                onClick={handleClearAll} 
+                className={getTouchButtonClasses('primary')}
+              >
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Clear All
               </Button>

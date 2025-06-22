@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { Move } from "lucide-react";
 import { FileMoveDialog } from "./file-move-dialog";
 
@@ -129,13 +130,17 @@ export function BulkMoveDialog({
               {renderContent()}
             </div>
 
-            <BottomSheetFooter className="flex-row gap-2">
-              <Button variant="outline" onClick={onClose} className="flex-1">
+            <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+              <Button 
+                variant="outline" 
+                onClick={onClose} 
+                className={getTouchButtonClasses('secondary')}
+              >
                 Cancel
               </Button>
               <Button 
                 onClick={() => setIsMoveDialogOpen(true)}
-                className="flex-1"
+                className={getTouchButtonClasses('primary')}
               >
                 <Move className="h-4 w-4 mr-2" />
                 Choose Destination

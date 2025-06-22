@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from "@/components/ui/bottom-sheet";
+import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { Copy, AlertTriangle } from "lucide-react";
 import { FileCopyDialog } from "./file-copy-dialog";
 
@@ -144,14 +145,18 @@ export function BulkCopyDialog({
               {renderContent()}
             </div>
 
-            <BottomSheetFooter className="flex-row gap-2">
-              <Button variant="outline" onClick={onClose} className="flex-1">
+            <BottomSheetFooter className={getMobileGridClasses({ columns: files.length > 0 ? 2 : 1, gap: 'normal' })}>
+              <Button 
+                variant="outline" 
+                onClick={onClose} 
+                className={getTouchButtonClasses('secondary')}
+              >
                 Cancel
               </Button>
               {files.length > 0 && (
                 <Button 
                   onClick={() => setIsCopyDialogOpen(true)}
-                  className="flex-1"
+                  className={getTouchButtonClasses('primary')}
                 >
                   <Copy className="h-4 w-4 mr-2" />
                   Choose Destination
@@ -264,7 +269,11 @@ export function BulkCopyDialog({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+            <Button 
+              variant="outline" 
+              onClick={onClose} 
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
             {files.length > 0 && (

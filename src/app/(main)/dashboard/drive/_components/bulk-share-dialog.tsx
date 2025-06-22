@@ -35,6 +35,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { 
   Share2, 
   Globe, 
@@ -487,12 +488,21 @@ export function BulkShareDialog({
             </div>
           )}
 
-          <BottomSheetFooter className="flex-row gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="flex-1">
+          <BottomSheetFooter className={getMobileGridClasses({ columns: !showResults ? 2 : 1, gap: 'normal' })}>
+            <Button 
+              variant="outline" 
+              onClick={() => onOpenChange(false)} 
+              disabled={isLoading} 
+              className={getTouchButtonClasses('secondary')}
+            >
               {showResults ? 'Close' : 'Cancel'}
             </Button>
             {!showResults && (
-              <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="flex-1">
+              <Button 
+                onClick={handleBulkShare} 
+                disabled={isLoading || selectedItems.length === 0} 
+                className={getTouchButtonClasses('primary')}
+              >
                 {isLoading ? (
                   <>
                     <Share2 className="h-4 w-4 mr-2 animate-pulse" />

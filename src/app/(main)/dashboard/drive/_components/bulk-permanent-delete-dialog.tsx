@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { 
   Trash2, 
   AlertTriangle, 
@@ -177,6 +178,7 @@ export function BulkPermanentDeleteDialog({
                 type="text"
                 value={confirmationText}
                 onChange={(e) => setConfirmationText(e.target.value)}
+                className={getMobileInputClasses()}
                 placeholder="Type: permanently delete"
                 className="font-mono"
                 disabled={!acknowledgeWarning}
@@ -226,14 +228,18 @@ export function BulkPermanentDeleteDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className="flex-row gap-2">
-            <Button variant="outline" onClick={handleClose} className="flex-1">
+          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+            <Button 
+              variant="outline" 
+              onClick={handleClose} 
+              className={getTouchButtonClasses('secondary')}
+            >
               Cancel
             </Button>
             <Button 
               onClick={handleConfirm}
               disabled={!isConfirmationValid}
-              className="flex-1 bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`${getTouchButtonClasses('primary')} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {isConfirmationValid ? (
                 <>

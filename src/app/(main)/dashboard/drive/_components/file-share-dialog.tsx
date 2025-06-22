@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getTouchButtonClasses, getMobileGridClasses, getMobileInputClasses } from "@/lib/mobile-optimization";
 import { toast } from "sonner";
 import { successToast, errorToast, loadingToast } from '@/lib/toast';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -415,6 +416,7 @@ export function FileShareDialog({
                   placeholder="Enter email address"
                   value={emailAddress}
                   onChange={(e) => setEmailAddress(e.target.value)}
+                  className={getMobileInputClasses()}
                 />
               </div>
 
@@ -425,6 +427,7 @@ export function FileShareDialog({
                   placeholder="Add a message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
+                  className={getMobileInputClasses()}
                 />
               </div>
             </>
@@ -470,11 +473,20 @@ export function FileShareDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className="flex-row gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="flex-1">
+          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+            <Button 
+              variant="outline" 
+              onClick={() => onOpenChange(false)} 
+              disabled={isLoading} 
+              className={getTouchButtonClasses('secondary')}
+            >
               Cancel
             </Button>
-            <Button onClick={handleShare} disabled={isLoading} className="flex-1">
+            <Button 
+              onClick={handleShare} 
+              disabled={isLoading} 
+              className={getTouchButtonClasses('primary')}
+            >
               {isLoading ? (
                 <>
                   <Share2 className="h-4 w-4 mr-2 animate-pulse" />
