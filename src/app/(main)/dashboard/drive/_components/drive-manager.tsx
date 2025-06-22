@@ -5,16 +5,48 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-// Import only essential icons to reduce bundle size
+// Import essential icons (keeping all used icons to avoid runtime errors)
 import { 
   Upload, 
   FolderPlus, 
   Search, 
   MoreVertical,
+  Download,
+  Trash2,
+  Share,
+  Share2,
+  Edit,
+  Eye,
   RefreshCw,
+  Move,
+  Copy,
+  X,
+  AlertTriangle,
+  Info,
+  Play,
   Grid3X3,
   List,
-  Settings
+  Calendar,
+  HardDrive,
+  Settings,
+  Columns,
+  ChevronUp,
+  ChevronDown,
+  ChevronsUpDown,
+  Square,
+  CheckSquare,
+  MousePointer,
+  SquareCheck,
+  Folder,
+  FileText,
+  Star,
+  Link,
+  FileSpreadsheet,
+  Presentation,
+  Video,
+  Music,
+  Archive,
+  Code
 } from "lucide-react";
 
 import { lazy, Suspense } from "react";
