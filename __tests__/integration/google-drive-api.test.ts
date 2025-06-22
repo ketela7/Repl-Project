@@ -79,8 +79,7 @@ describe('Google Drive API Integration', () => {
     
     expect(response.ok).toBe(true)
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/drive/files'),
-      undefined
+      expect.stringContaining('/api/drive/files?fileType=documents&search=test&sortBy=name&sortOrder=asc')
     )
   })
 
