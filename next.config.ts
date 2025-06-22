@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Cross-origin configuration for Replit environment
+  ...(process.env.NODE_ENV === 'development' && {
+    allowedDevOrigins: [
+      '127.0.0.1:5000',
+      'localhost:5000',
+      '70a2a01c-1a63-4e03-b3ad-142a6ad017fc-00-ni2eddwx0mcm.sisko.replit.dev'
+    ],
+  }),
+  
   // Security headers
   async headers() {
     return [
