@@ -1,11 +1,25 @@
 
+"use client";
+
 import Link from "next/link";
-import { WifiOff, RefreshCw, AlertTriangle, Router } from "lucide-react";
+import { WifiOff, RefreshCw, AlertTriangle, Router, User, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useEffect, useState } from "react";
 
 export default function ServerOfflinePage() {
+  const [hasStoredSession, setHasStoredSession] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const nextAuthSession = localStorage.getItem('next-auth.session-token') || 
+                              localStorage.getItem('__Secure-next-auth.session-token') ||
+                              document.cookie.includes('next-auth.session-token') ||
+                              document.cookie.includes('__Secure-next-auth.session-token');
+      setHasStoredSession(!!nextAuthSession);
+    }
+  }, []);
   const handleRefresh = () => {
     window.location.reload();
   };
@@ -28,10 +42,20 @@ export default function ServerOfflinePage() {
         </CardHeader>
         
         <CardContent className="space-y-6">
+          {hasStoredSession && (
+            <Alert className="border-green-200 bg-green-50">
+              <CheckCircle className="h-4 w-4" />
+              <AlertDescription>
+                <strong>Anda masih login.</strong> Session tersimpan dan akan otomatis tersambung kembali ketika server online.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           <Alert className="border-orange-200 bg-orange-50">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              The server may be temporarily unavailable or undergoing maintenance.
+              Server sementara tidak tersedia atau sedang dalam maintenance.
+              {!hasStoredSession && " Anda perlu login kembali setelah server online."}
             </AlertDescription>
           </Alert>
 
