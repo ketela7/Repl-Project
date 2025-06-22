@@ -62,6 +62,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async session({ session, token }) {
       try {
+        // Validate token structure
+        if (!token || typeof token !== 'object') {
+          console.warn('[NextAuth] Invalid token structure, forcing re-authentication');
+          return null;
+        }
+
         // Check if session should expire based on remember me preference
         const now = Math.floor(Date.now() / 1000);
         const sessionDuration = token.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 days or 1 day
@@ -69,17 +75,27 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         
         // If session has expired based on remember me preference, return null to force re-login
         if (now > sessionExpiry) {
+          console.info('[NextAuth] Session expired, forcing re-authentication');
           return null;
         }
         
-        session.accessToken = token.accessToken as string
-        session.refreshToken = token.refreshToken as string
-        session.provider = token.provider as string
-        session.rememberMe = token.rememberMe as boolean
-        return session
+        // Safely assign token values with fallbacks
+        session.accessToken = token.accessToken as string || undefined;
+        session.refreshToken = token.refreshToken as string || undefined;
+        session.provider = token.provider as string || 'google';
+        session.rememberMe = Boolean(token.rememberMe);
+        
+        return session;
       } catch (error) {
         console.error('[NextAuth] Session callback error:', error);
-        return null; // Force re-authentication on session errors
+        // Return basic session without tokens to maintain user info
+        return {
+          ...session,
+          accessToken: undefined,
+          refreshToken: undefined,
+          provider: 'google',
+          rememberMe: false
+        };
       }
     },
     async redirect({ url, baseUrl }) {
@@ -112,31 +128,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         path: '/',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60, // 30 days for persistent sessions
-        domain: process.env.NODE_ENV === 'production' ? '.replit.app' : undefined, // Share across subdomains
-      }
-    },
-    callbackUrl: {
-      name: process.env.NODE_ENV === 'production'
-        ? '__Secure-next-auth.callback-url'
-        : 'next-auth.callback-url',
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60,
-      }
-    },
-    csrfToken: {
-      name: process.env.NODE_ENV === 'production'
-        ? '__Host-next-auth.csrf-token'
-        : 'next-auth.csrf-token',
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60,
       }
     }
   },
