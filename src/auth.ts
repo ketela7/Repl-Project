@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
+import { sessionCache, generateSessionCacheKey } from "./lib/session-cache"
 
 declare module "next-auth" {
   interface Session {

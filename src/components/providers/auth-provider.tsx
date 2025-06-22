@@ -1,6 +1,6 @@
 "use client";
 
-import { SessionProviderWrapper } from "@/components/optimized-session-provider";
+import { SessionProvider } from "next-auth/react";
 import { ReactNode } from "react";
 
 interface AuthProviderProps {
@@ -8,5 +8,5 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  return <SessionProviderWrapper>{children}</SessionProviderWrapper>;
+  return <SessionProvider>{children}</SessionProvider>;
 }

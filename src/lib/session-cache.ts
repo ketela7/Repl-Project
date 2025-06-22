@@ -1,149 +1,91 @@
 /**
- * Server-side session caching to reduce redundant NextAuth API calls
- * Implements intelligent caching with memory-based storage
+ * Session caching layer to reduce database queries
+ * Implements in-memory session cache with TTL
  */
 
-import type { Session } from 'next-auth';
-
-interface SessionCacheEntry {
-  session: Session | null;
+interface CachedSession {
+  session: any;
   timestamp: number;
   ttl: number;
 }
 
-class SessionCacheManager {
-  private cache = new Map<string, SessionCacheEntry>();
-  private readonly DEFAULT_TTL = 2 * 60 * 1000; // 2 minutes cache
-  private readonly MAX_ENTRIES = 100;
-  
-  /**
-   * Generate cache key from request headers
-   */
-  private generateCacheKey(headers: Headers): string {
-    const authorization = headers.get('authorization') || '';
-    const cookie = headers.get('cookie') || '';
-    
-    // Create a simple hash from auth headers
-    const authString = `${authorization}${cookie}`;
-    
-    // Simple hash function for cache key
-    let hash = 0;
-    for (let i = 0; i < authString.length; i++) {
-      const char = authString.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
-    }
-    
-    return `session_${Math.abs(hash)}`;
-  }
-  
-  /**
-   * Get cached session if valid
-   */
-  getCachedSession(headers: Headers): Session | null | undefined {
-    const key = this.generateCacheKey(headers);
-    const entry = this.cache.get(key);
-    
-    if (!entry) {
-      return undefined; // No cache entry
-    }
-    
-    const age = Date.now() - entry.timestamp;
-    if (age > entry.ttl) {
-      // Cache expired
-      this.cache.delete(key);
-      return undefined;
-    }
-    
-    console.log(`[SessionCache] Cache hit for key: ${key.substring(0, 20)}...`);
-    return entry.session;
-  }
-  
-  /**
-   * Store session in cache
-   */
-  setCachedSession(headers: Headers, session: Session | null): void {
-    const key = this.generateCacheKey(headers);
-    
-    // Prevent cache overflow
-    if (this.cache.size >= this.MAX_ENTRIES) {
+class SessionCache {
+  private cache = new Map<string, CachedSession>();
+  private readonly DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes
+  private readonly MAX_SIZE = 1000;
+
+  set(key: string, session: any, ttlMs: number = this.DEFAULT_TTL): void {
+    // Clean up if cache is getting too large
+    if (this.cache.size >= this.MAX_SIZE) {
       this.cleanup();
     }
-    
+
     this.cache.set(key, {
       session,
       timestamp: Date.now(),
-      ttl: this.DEFAULT_TTL
+      ttl: ttlMs
     });
-    
-    console.log(`[SessionCache] Cached session for key: ${key.substring(0, 20)}...`);
   }
-  
-  /**
-   * Clean up expired entries
-   */
+
+  get(key: string): any | null {
+    const entry = this.cache.get(key);
+    
+    if (!entry) {
+      return null;
+    }
+
+    // Check if expired
+    if (Date.now() - entry.timestamp > entry.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return entry.session;
+  }
+
+  delete(key: string): void {
+    this.cache.delete(key);
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+
   private cleanup(): void {
     const now = Date.now();
-    const expiredKeys: string[] = [];
+    const keysToDelete: string[] = [];
     
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > entry.ttl) {
-        expiredKeys.push(key);
+        keysToDelete.push(key);
       }
     }
     
-    expiredKeys.forEach(key => this.cache.delete(key));
+    keysToDelete.forEach(key => this.cache.delete(key));
     
-    // If still too many entries, remove oldest
-    if (this.cache.size >= this.MAX_ENTRIES) {
-      const entries = Array.from(this.cache.entries());
-      entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+    // If still too large, remove oldest entries
+    if (this.cache.size >= this.MAX_SIZE) {
+      const entries = Array.from(this.cache.entries())
+        .sort((a, b) => a[1].timestamp - b[1].timestamp);
       
-      const toRemove = entries.slice(0, Math.floor(this.MAX_ENTRIES / 2));
+      const toRemove = entries.slice(0, Math.floor(this.MAX_SIZE * 0.2));
       toRemove.forEach(([key]) => this.cache.delete(key));
     }
-    
-    console.log(`[SessionCache] Cleanup completed. Cache size: ${this.cache.size}`);
   }
-  
-  /**
-   * Clear all cached sessions
-   */
-  clearCache(): void {
-    this.cache.clear();
-    console.log('[SessionCache] Cache cleared');
-  }
-  
-  /**
-   * Get cache statistics
-   */
+
   getStats(): { size: number; maxSize: number } {
     return {
       size: this.cache.size,
-      maxSize: this.MAX_ENTRIES
+      maxSize: this.MAX_SIZE
     };
   }
 }
 
-export const sessionCache = new SessionCacheManager();
+export const sessionCache = new SessionCache();
 
 /**
- * Middleware function to check session cache before making NextAuth calls
+ * Generate cache key for session
  */
-export async function getCachedSession(headers: Headers, getSession: () => Promise<Session | null>): Promise<Session | null> {
-  // Check cache first
-  const cached = sessionCache.getCachedSession(headers);
-  
-  if (cached !== undefined) {
-    return cached;
-  }
-  
-  // Cache miss - fetch session and cache it
-  console.log('[SessionCache] Cache miss - fetching fresh session');
-  const session = await getSession();
-  
-  // Cache the result
-  sessionCache.setCachedSession(headers, session);
-  
-  return session;
+export function generateSessionCacheKey(tokenSub: string, tokenEmail: string): string {
+  return `session:${tokenSub}:${tokenEmail}`;
 }

@@ -6,7 +6,6 @@ import { driveCache } from '@/lib/cache';
 import { requestDeduplicator } from '@/lib/request-deduplication';
 import { retryDriveApiCall } from '@/lib/api-retry';
 import { searchOptimizer } from '@/lib/search-optimizer';
-import { getCachedSession } from '@/lib/session-cache';
 
 interface FileFilter {
   fileType?: string;
@@ -169,7 +168,7 @@ export async function GET(request: NextRequest) {
       console.log('=== Drive Files API Called ===');
     }
     
-    const session = await getCachedSession(request.headers, () => auth());
+    const session = await auth();
     
     if (!session?.user) {
       if (process.env.NODE_ENV === 'development') {
