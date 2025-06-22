@@ -408,6 +408,7 @@ export function DriveManager() {
   // Request throttling to prevent multiple identical calls - using refs to avoid React dependency issues
   const lastFetchCallRef = useRef<string>('');
   const fetchThrottleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const activeRequestsRef = useRef<Set<string>>(new Set());
 
   // Manual search state - no debounce, only process on submit
   const [submittedSearchQuery, setSubmittedSearchQuery] = useState('');
@@ -1752,11 +1753,20 @@ export function DriveManager() {
   const fetchFiles = useCallback(async (parentId?: string, query?: string, pageToken?: string, append = false, viewFilter?: string) => {
     const requestId = `fetch-files-${parentId || 'root'}-${query || ''}-${pageToken || ''}`;
     
-    // Throttle identical requests within 100ms to prevent rapid successive calls
-    if (lastFetchCallRef.current === requestId && !append) {
-      console.log('[Throttle] Skipping duplicate fetchFiles call:', requestId);
+    // Check if the same request is already active
+    if (activeRequestsRef.current.has(requestId)) {
+      console.log('[Request Dedup] Skipping duplicate active request:', requestId);
       return;
     }
+    
+    // Check throttle for recent identical requests
+    if (lastFetchCallRef.current === requestId && !append) {
+      console.log('[Throttle] Skipping recent duplicate request:', requestId);
+      return;
+    }
+    
+    // Mark request as active
+    activeRequestsRef.current.add(requestId);
     lastFetchCallRef.current = requestId;
     
     // Clear any existing throttle timeout
@@ -1764,10 +1774,10 @@ export function DriveManager() {
       clearTimeout(fetchThrottleTimeoutRef.current);
     }
     
-    // Set timeout to reset throttle after 200ms
+    // Set timeout to reset throttle after 300ms
     fetchThrottleTimeoutRef.current = setTimeout(() => {
       lastFetchCallRef.current = '';
-    }, 200);
+    }, 300);
     
     const startTime = Date.now();
 
@@ -1926,6 +1936,8 @@ export function DriveManager() {
       }
       // Don't set hasAccess to false here unless it's an auth error
     } finally {
+      // Always cleanup active request tracking
+      activeRequestsRef.current.delete(requestId);
       setLoading(false);
       setLoadingMore(false);
     }
@@ -2726,12 +2738,14 @@ export function DriveManager() {
     }
   }, []);
 
-  // Cleanup throttle timeout on unmount
+  // Cleanup throttle timeout and active requests on unmount
   useEffect(() => {
     return () => {
       if (fetchThrottleTimeoutRef.current) {
         clearTimeout(fetchThrottleTimeoutRef.current);
       }
+      // Clear all active request tracking
+      activeRequestsRef.current.clear();
     };
   }, []);
 
