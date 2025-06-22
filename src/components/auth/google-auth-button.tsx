@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { errorToast, loadingToast } from "@/lib/toast";
+import { toast } from "sonner";
 
 interface GoogleAuthButtonProps {
   className?: string;
@@ -15,11 +15,9 @@ export function GoogleAuthButton({ className, onClick }: GoogleAuthButtonProps) 
   const [loading, setLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
-    const loadingId = "google-signin";
-    
     try {
       setLoading(true);
-      loadingToast.start("Connecting to Google...", loadingId);
+      toast.loading("Connecting to Google...");
       
       // Call external onClick handler first (for localStorage storage)
       if (onClick) {
@@ -31,14 +29,10 @@ export function GoogleAuthButton({ className, onClick }: GoogleAuthButtonProps) 
       });
       
       // Note: Success toast will be shown after redirect in the dashboard
-      loadingToast.dismiss(loadingId);
+      toast.dismiss();
     } catch (error) {
       console.error('Error during Google sign in:', error);
-      loadingToast.error("Failed to sign in with Google", loadingId);
-      errorToast.generic("Sign in failed", {
-        description: "Please try again or check your connection",
-        duration: 5000,
-      });
+      toast.error("Failed to sign in with Google. Please try again or check your connection.");
     } finally {
       setLoading(false);
     }

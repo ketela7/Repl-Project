@@ -141,8 +141,8 @@ export function FileList({
             <TableHead className="w-12">
               <Checkbox
                 checked={allSelected}
-                indeterminate={someSelected}
                 onCheckedChange={onSelectAll}
+                data-indeterminate={someSelected}
               />
             </TableHead>
             <SortableHeader column="name">Name</SortableHeader>
