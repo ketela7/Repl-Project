@@ -4650,24 +4650,7 @@ export function DriveManager() {
         onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
         onBulkRename={() => setIsBulkRenameDialogOpen(true)}
         onBulkExport={() => setIsBulkExportDialogOpen(true)}
-        onBulkShare={() => {
-          // Always use enhanced share dialog for better UI
-          const selectedItemsData = getSelectedItemsData();
-          if (selectedItemsData.length === 1 && selectedItemsData[0]) {
-            setSelectedItemForShare({
-              id: selectedItemsData[0].id,
-              name: selectedItemsData[0].name,
-              type: selectedItemsData[0].type as 'file' | 'folder'
-            });
-          } else {
-            setSelectedItemForShare({
-              id: 'bulk',
-              name: `${selectedItemsData.length} items`,
-              type: 'file'
-            });
-          }
-          setIsShareDialogOpen(true);
-        }}
+        onBulkShare={() => setIsBulkShareDialogOpen(true)}
         onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
         onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
         onDeselectAll={deselectAll}

@@ -387,23 +387,125 @@ export function BulkShareDialog({
             {renderContent()}
           </div>
 
+          {/* Mobile Results Section */}
+          {showResults && shareResults.length > 0 && (
+            <div className="space-y-4 px-4">
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold">Share Results</h4>
+              </div>
+              
+              {/* Mobile Export Actions */}
+              {shareResults.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={copyToClipboard}
+                    className="gap-2"
+                  >
+                    <Copy className="h-4 w-4" />
+                    Copy
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={exportToTxt}
+                    className="gap-2"
+                  >
+                    <FileText className="h-4 w-4" />
+                    TXT
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={exportToCsv}
+                    className="gap-2"
+                  >
+                    <FileText className="h-4 w-4" />
+                    CSV
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={exportToJson}
+                    className="gap-2"
+                  >
+                    <FileText className="h-4 w-4" />
+                    JSON
+                  </Button>
+                </div>
+              )}
+              
+              <div className="max-h-48 overflow-y-auto space-y-2">
+                {shareResults.map((result) => (
+                  <div 
+                    key={result.id} 
+                    className={`p-3 rounded-lg border ${
+                      result.success 
+                        ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' 
+                        : 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      {result.success ? (
+                        <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
+                      )}
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{result.name}</div>
+                        
+                        {result.success ? (
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="text-xs text-muted-foreground truncate flex-1">
+                              {result.shareLink}
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="h-6 w-6 p-0"
+                              onClick={() => window.open(result.shareLink, '_blank')}
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="text-xs text-red-600 dark:text-red-400 mt-1">
+                            {result.error || 'Failed to generate share link'}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="text-sm text-muted-foreground text-center">
+                {shareResults.filter(r => r.success).length} of {shareResults.length} items shared successfully
+              </div>
+            </div>
+          )}
+
           <BottomSheetFooter className="flex-row gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="flex-1">
-              Cancel
+              {showResults ? 'Close' : 'Cancel'}
             </Button>
-            <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="flex-1">
-              {isLoading ? (
-                <>
-                  <Share2 className="h-4 w-4 mr-2 animate-pulse" />
-                  Sharing...
-                </>
-              ) : (
-                <>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  Generate {selectedItems.length} Share Links
-                </>
-              )}
-            </Button>
+            {!showResults && (
+              <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="flex-1">
+                {isLoading ? (
+                  <>
+                    <Share2 className="h-4 w-4 mr-2 animate-pulse" />
+                    Sharing...
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Generate {selectedItems.length} Share Links
+                  </>
+                )}
+              </Button>
+            )}
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
