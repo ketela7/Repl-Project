@@ -183,6 +183,7 @@ const applyClientSideFilters = (
 ) => {
   let filteredFiles = [...files];
   let filteredFolders = [...folders];
+  {/*
 
   // Apply file type filters
   if (filters.fileTypeFilter.length > 0) {
@@ -249,7 +250,7 @@ const applyClientSideFilters = (
     filteredFolders = filteredFolders.filter(folder => 
       folder.name?.toLowerCase().includes(searchTerm)
     );
-  }
+  } 
 
   // Apply advanced filters
   if (filters.advancedFilters) {
@@ -262,9 +263,9 @@ const applyClientSideFilters = (
       });
 
       // Filter folders by size (folders have size = 0)
-      filteredFolders = filteredFolders.filter(folder => {
-        return isFileSizeInRange(0, sizeRange.min, sizeRange.max, sizeRange.unit);
-      });
+      //filteredFolders = filteredFolders.filter(folder => {
+      //  return isFileSizeInRange(0, sizeRange.min, sizeRange.max, sizeRange.unit);
+      //});
     }
 
     // Date range filters
@@ -360,6 +361,8 @@ const applyClientSideFilters = (
         break;
     }
   }
+  */}
+  
 
   return { filteredFiles, filteredFolders };
 };

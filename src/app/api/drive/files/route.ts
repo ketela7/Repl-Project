@@ -1,256 +1,407 @@
-
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
-import { GoogleDriveService } from '@/lib/google-drive/service';
-import { driveCache } from '@/lib/cache';
-import { requestDeduplicator } from '@/lib/request-deduplication';
-import { retryDriveApiCall } from '@/lib/api-retry';
-import { searchOptimizer } from '@/lib/search-optimizer';
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import { GoogleDriveService } from '@/lib/google-drive/service'
+import { driveCache } from '@/lib/cache'
+import { requestDeduplicator } from '@/lib/request-deduplication'
+import { retryDriveApiCall } from '@/lib/api-retry'
+//import { searchOptimizer } from '@/lib/search-optimizer'
 
 interface FileFilter {
-  fileType?: string;
-  viewStatus?: string;
-  sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
-  search?: string;
-  minSize?: number;
-  maxSize?: number;
-  createdAfter?: string;
-  createdBefore?: string;
-  modifiedAfter?: string;
-  modifiedBefore?: string;
-  owner?: string;
+  fileType?: string
+  viewStatus?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
+  search?: string
+  minSize?: number
+  maxSize?: number
+  createdAfter?: string
+  createdBefore?: string
+  modifiedAfter?: string
+  modifiedBefore?: string
+  owner?: string
 }
 
 function buildDriveQuery(filters: FileFilter): string {
-  const conditions: string[] = [];
-  
+  const conditions: string[] = []
+
   // Handle view status filters according to Google Drive API documentation
   switch (filters.viewStatus) {
     case 'trash':
       // Trash view - show only trashed files
-      conditions.push('trashed=true');
-      break;
+      conditions.push('trashed=true')
+      break
     case 'shared':
       // Shared with me view - files shared by others
-      conditions.push('trashed=false');
-      conditions.push('sharedWithMe=true');
-      break;
+      conditions.push('trashed=false')
+      conditions.push('sharedWithMe=true')
+      break
     case 'starred':
       // Starred view - starred files only
-      conditions.push('trashed=false');
-      conditions.push('starred=true');
-      break;
+      conditions.push('trashed=false')
+      conditions.push('starred=true')
+      break
     case 'my-drive':
       // My Drive view - files owned by me
-      conditions.push('trashed=false');
-      conditions.push('\'me\' in owners');
-      break;
-    case 'recent':
-      // Recent files - show files accessed in the last 30 days
-      conditions.push('trashed=false');
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      conditions.push(`viewedByMeTime >= '${thirtyDaysAgo.toISOString()}'`);
-      break;
-    case 'all':
+      conditions.push('trashed=false')
+      conditions.push("'me' in owners")
+      break
+    //case 'recent':
+    // Recent files - show files accessed in the last 30 days
+    //  conditions.push('trashed=false');
+    //  const thirtyDaysAgo = new Date();
+    //  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    //  conditions.push(`viewedByMeTime >= '${thirtyDaysAgo.toISOString()}'`);
+    //  break;
+    //case 'all':
     default:
       // All files view - show non-trashed files by default
-      conditions.push('trashed=false');
-      break;
+      conditions.push('trashed=false')
+      break
   }
-  
+
   // File type filters - handle both single and multiple types
   if (filters.fileType && filters.fileType !== 'all') {
     // Handle comma-separated file types from frontend
-    const fileTypes = filters.fileType.split(',').filter(type => type && type !== 'all');
-    
+    const fileTypes = filters.fileType
+      .split(',')
+      .filter((type) => type && type !== 'all')
+
     if (fileTypes.length > 0) {
-      const typeConditions: string[] = [];
-      
-      fileTypes.forEach(type => {
+      const typeConditions: string[] = []
+
+      fileTypes.forEach((type) => {
         switch (type.trim()) {
           case 'folder':
-            typeConditions.push('mimeType=\'application/vnd.google-apps.folder\'');
-            break;
+            typeConditions.push(
+              "mimeType = 'application/vnd.google-apps.folder'"
+            )
+            break
+
           case 'shortcut':
-            typeConditions.push('mimeType=\'application/vnd.google-apps.shortcut\'');
-            break;
+            typeConditions.push(
+              "mimeType = 'application/vnd.google-apps.shortcut'"
+            )
+            break
+
           case 'document':
-            typeConditions.push('(mimeType contains \'document\' or mimeType=\'application/pdf\' or mimeType contains \'text\')');
-            break;
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'application/vnd.google-apps.document'",
+                  "mimeType = 'application/pdf'",
+                  "mimeType = 'text/plain'",
+                  "mimeType = 'application/msword'",
+                  "mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
           case 'spreadsheet':
-            typeConditions.push('mimeType contains \'spreadsheet\'');
-            break;
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'application/vnd.google-apps.spreadsheet'",
+                  "mimeType = 'application/vnd.ms-excel'",
+                  "mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
           case 'presentation':
-            typeConditions.push('mimeType contains \'presentation\'');
-            break;
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'application/vnd.google-apps.presentation'",
+                  "mimeType = 'application/vnd.ms-powerpoint'",
+                  "mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
           case 'image':
-            typeConditions.push('mimeType contains \'image\'');
-            break;
+            typeConditions.push("mimeType contains 'image/'")
+            break
+
           case 'video':
-            typeConditions.push('mimeType contains \'video\'');
-            break;
+            typeConditions.push("mimeType contains 'video/'")
+            break
+
           case 'audio':
-            typeConditions.push('mimeType contains \'audio\'');
-            break;
+            typeConditions.push("mimeType contains 'audio/'")
+            break
+
           case 'archive':
-            typeConditions.push('(mimeType=\'application/zip\' or mimeType=\'application/x-rar-compressed\' or mimeType=\'application/x-tar\')');
-            break;
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'application/zip'",
+                  "mimeType = 'application/x-zip-compressed'",
+                  "mimeType = 'application/x-rar-compressed'",
+                  "mimeType = 'application/vnd.rar'",
+                  "mimeType = 'application/x-7z-compressed'",
+                  "mimeType = 'application/x-tar'",
+                  "mimeType = 'application/gzip'",
+                  "mimeType = 'application/x-bzip2'",
+                  "mimeType = 'application/x-xz'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
           case 'code':
-            typeConditions.push('(mimeType contains \'javascript\' or mimeType contains \'python\' or mimeType contains \'text/x-\')');
-            break;
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'text/javascript'",
+                  "mimeType = 'application/javascript'",
+                  "mimeType = 'text/x-python'",
+                  "mimeType = 'text/x-c'",
+                  "mimeType = 'text/x-c++'",
+                  "mimeType = 'text/x-java-source'",
+                  "mimeType = 'application/json'",
+                  "mimeType = 'application/xml'",
+                  "mimeType = 'text/html'",
+                  "mimeType = 'text/css'",
+                  "mimeType contains 'text/x-'",
+                  "mimeType contains 'application/x-'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
+          case 'drawing':
+            typeConditions.push(
+              "mimeType = 'application/vnd.google-apps.drawing'"
+            )
+            break
+
+          case 'form':
+            typeConditions.push("mimeType = 'application/vnd.google-apps.form'")
+            break
+
+          case 'jamboard':
+            typeConditions.push("mimeType = 'application/vnd.google-apps.jam'")
+            break
+
+          case 'script':
+            typeConditions.push(
+              "mimeType = 'application/vnd.google-apps.script'"
+            )
+            break
+
+          case 'site':
+            typeConditions.push("mimeType = 'application/vnd.google-apps.site'")
+            break
+
+          case 'map':
+            typeConditions.push("mimeType = 'application/vnd.google-apps.map'")
+            break
+
+          case 'photo':
+            typeConditions.push(
+              "mimeType = 'application/vnd.google-apps.photo'"
+            )
+            break
+
+          case 'google-native':
+            typeConditions.push(
+              "mimeType contains 'application/vnd.google-apps'"
+            )
+            break
+
+          case 'other':
+            typeConditions.push(
+              '(' +
+                [
+                  "not mimeType contains 'application/vnd.google-apps'",
+                  "not mimeType contains 'image/'",
+                  "not mimeType contains 'video/'",
+                  "not mimeType contains 'audio/'",
+                ].join(' and ') +
+                ')'
+            )
+            break
         }
-      });
-      
+      })
+
       if (typeConditions.length > 0) {
-        conditions.push(`(${typeConditions.join(' or ')})`);
+        conditions.push(`(${typeConditions.join(' or ')})`)
       }
     }
   }
-  
+
   // Search query with proper sanitization
   if (filters.search) {
     const searchTerm = filters.search
       .replace(/['"\\]/g, '') // Remove quotes and backslashes
       .trim()
-      .substring(0, 100); // Limit length
+      .substring(0, 100) // Limit length
     if (searchTerm) {
-      conditions.push(`name contains '${searchTerm}'`);
+      conditions.push(`name contains '${searchTerm}'`)
     }
   }
-  
+
   // Date filters
   if (filters.createdAfter) {
-    conditions.push(`createdTime >= '${filters.createdAfter}'`);
+    conditions.push(`createdTime >= '${filters.createdAfter}'`)
   }
   if (filters.createdBefore) {
-    conditions.push(`createdTime <= '${filters.createdBefore}'`);
+    conditions.push(`createdTime <= '${filters.createdBefore}'`)
   }
   if (filters.modifiedAfter) {
-    conditions.push(`modifiedTime >= '${filters.modifiedAfter}'`);
+    conditions.push(`modifiedTime >= '${filters.modifiedAfter}'`)
   }
   if (filters.modifiedBefore) {
-    conditions.push(`modifiedTime <= '${filters.modifiedBefore}'`);
+    conditions.push(`modifiedTime <= '${filters.modifiedBefore}'`)
   }
-  
-  return conditions.join(' and ');
+
+  // Owner filter by email
+  if (filters.owner) {
+    conditions.push(`'${filters.owner}' in owners`)
+  }
+
+  // Size filter
+  if (filters.minSize) {
+    conditions.push(`size >= ${filters.minSize}`)
+  }
+  if (filters.maxSize) {
+    conditions.push(`size <= ${filters.maxSize}`)
+  }
+
+  return conditions.join(' and ')
 }
 
 function applyClientSideFilters(files: any[], filters: FileFilter) {
-  let filteredFiles = [...files];
-  
-  // Apply size filters (client-side only as Drive API doesn't support size filtering)
-  if (filters.minSize || filters.maxSize) {
-    filteredFiles = filteredFiles.filter(file => {
-      if (!file.size) return true; // Keep files without size info
-      const sizeInBytes = parseInt(file.size);
-      if (filters.minSize && sizeInBytes < filters.minSize) return false;
-      if (filters.maxSize && sizeInBytes > filters.maxSize) return false;
-      return true;
-    });
+  let filteredFiles = [...files]
+
+
   }
+
   
-  // Apply owner filter (client-side)
-  if (filters.owner) {
-    const ownerQuery = filters.owner.toLowerCase();
-    filteredFiles = filteredFiles.filter(file => {
-      const ownerName = file.owners?.[0]?.displayName?.toLowerCase() || '';
-      const ownerEmail = file.owners?.[0]?.emailAddress?.toLowerCase() || '';
-      return ownerName.includes(ownerQuery) || ownerEmail.includes(ownerQuery);
-    });
-  }
   
-  return filteredFiles;
+
+  return filteredFiles
 }
 
 function getSortKey(sortBy: string) {
   switch (sortBy) {
-    case 'name': return 'name';
-    case 'modified': return 'modifiedTime';
-    case 'created': return 'createdTime';
-    case 'size': return 'quotaBytesUsed';
-    default: return 'modifiedTime';
+    case 'name':
+      return 'name'
+    case 'modified':
+      return 'modifiedTime'
+    case 'created':
+      return 'createdTime'
+    case 'size':
+      return 'quotaBytesUsed'
+    default:
+      return 'modifiedTime'
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
     if (process.env.NODE_ENV === 'development') {
-      console.log('=== Drive Files API Called ===');
+      console.log('=== Drive Files API Called ===')
     }
-    
-    const session = await auth();
-    
+
+    const session = await auth()
+
     if (!session?.user) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('No session found');
+        console.log('No session found')
       }
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const user = session.user;
+    const user = session.user
     if (process.env.NODE_ENV === 'development') {
-      console.log('User found:', user.email);
+      console.log('User found:', user.email)
     }
 
-    const accessToken = session.accessToken;
-    
+    const accessToken = session.accessToken
+
     if (!accessToken) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('No access token found');
+        console.log('No access token found')
       }
-      return NextResponse.json({ 
-        error: 'No access token found',
-        needsReauth: true 
-      }, { status: 401 });
+      return NextResponse.json(
+        {
+          error: 'No access token found',
+          needsReauth: true,
+        },
+        { status: 401 }
+      )
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Access token found, proceeding with Drive API call');
+      console.log('Access token found, proceeding with Drive API call')
     }
 
-    const { searchParams } = new URL(request.url);
-    
+    const { searchParams } = new URL(request.url)
+
     // Parse and validate query parameters
-    const pageSize = Math.min(Math.max(parseInt(searchParams.get('pageSize') || '50'), 1), 1000);
-    const sortOrder = searchParams.get('sortOrder');
+    const pageSize = Math.min(
+      Math.max(parseInt(searchParams.get('pageSize') || '50'), 1),
+      1000
+    )
+    const sortOrder = searchParams.get('sortOrder')
     const validateSortOrder = (order: string | null): 'asc' | 'desc' => {
-      return order === 'asc' || order === 'desc' ? order : 'desc';
-    };
+      return order === 'asc' || order === 'desc' ? order : 'desc'
+    }
 
     const filters: FileFilter = {
-      fileType: searchParams.get('fileTypes') || searchParams.get('fileType') || 'all',
-      viewStatus: searchParams.get('viewStatus') || searchParams.get('view') || 'all',
+      fileType:
+        searchParams.get('fileTypes') || searchParams.get('fileType') || 'all',
+      viewStatus:
+        searchParams.get('viewStatus') || searchParams.get('view') || 'all',
       sortBy: searchParams.get('sortBy') || 'modified',
       sortOrder: validateSortOrder(sortOrder),
-      search: searchParams.get('search') || searchParams.get('query') || undefined,
-      minSize: searchParams.get('sizeMin') || searchParams.get('minSize') ? 
-        Math.max(parseInt(searchParams.get('sizeMin') || searchParams.get('minSize')!) || 0, 0) : undefined,
-      maxSize: searchParams.get('sizeMax') || searchParams.get('maxSize') ? 
-        Math.max(parseInt(searchParams.get('sizeMax') || searchParams.get('maxSize')!) || 0, 0) : undefined,
+      search:
+        searchParams.get('search') || searchParams.get('query') || undefined,
+      minSize:
+        searchParams.get('sizeMin') || searchParams.get('minSize')
+          ? Math.max(
+              parseInt(
+                searchParams.get('sizeMin') || searchParams.get('minSize')!
+              ) || 0,
+              0
+            )
+          : undefined,
+      maxSize:
+        searchParams.get('sizeMax') || searchParams.get('maxSize')
+          ? Math.max(
+              parseInt(
+                searchParams.get('sizeMax') || searchParams.get('maxSize')!
+              ) || 0,
+              0
+            )
+          : undefined,
       createdAfter: searchParams.get('createdAfter') || undefined,
       createdBefore: searchParams.get('createdBefore') || undefined,
       modifiedAfter: searchParams.get('modifiedAfter') || undefined,
       modifiedBefore: searchParams.get('modifiedBefore') || undefined,
       owner: searchParams.get('owner') || undefined,
-    };
+    }
 
     // Properly decode pageToken to handle URL encoding issues
-    let pageToken = searchParams.get('pageToken') || undefined;
+    let pageToken = searchParams.get('pageToken') || undefined
     if (pageToken) {
       try {
         // Decode URL-encoded pageToken that may have been double-encoded
-        pageToken = decodeURIComponent(pageToken);
+        pageToken = decodeURIComponent(pageToken)
       } catch (error) {
-        console.warn('Failed to decode pageToken, using original:', pageToken);
+        console.warn('Failed to decode pageToken, using original:', pageToken)
       }
     }
-    
-    const folderId = searchParams.get('folderId') || searchParams.get('parentId') || undefined;
+
+    const folderId =
+      searchParams.get('folderId') || searchParams.get('parentId') || undefined
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Filters applied:', filters);
+      console.log('Filters applied:', filters)
     }
 
     // Check cache first - include viewStatus in cache key for proper filtering
@@ -260,38 +411,40 @@ export async function GET(request: NextRequest) {
       userId: user.email || 'unknown',
       viewStatus: filters.viewStatus,
       fileType: filters.fileType,
-      search: filters.search
-    });
+      search: filters.search,
+    })
 
     // Build the Drive API query using the consolidated function
-    let driveQuery = buildDriveQuery(filters);
-    
+    let driveQuery = buildDriveQuery(filters)
+
     // Add parent folder constraint if needed
     if (folderId) {
       // When navigating into a specific folder, show its contents regardless of view
-      driveQuery = 'trashed=false';  // Reset query for folder contents
-      driveQuery += ` and '${folderId}' in parents`;
-    } else if (!folderId && !filters.search) {
-      // For special views (starred, shared, trash), don't add parent restrictions
-      if (filters.viewStatus === 'my-drive') {
-        driveQuery += " and 'root' in parents";
-      }
-      // For starred, shared, trash views - no parent restriction needed
-    }
+      driveQuery = 'trashed=false' // Reset query for folder contents
+      driveQuery += ` and '${folderId}' in parents`
+    } // else if (!folderId && !filters.search) {
+    // For special views (starred, shared, trash), don't add parent restrictions
+    //  if (filters.viewStatus === 'my-drive') {
+    //    driveQuery += " and 'root' in parents";
+    //  }
+    // For starred, shared, trash views - no parent restriction needed
+    //   }
     // For "All Files" view (when viewStatus is 'all' or not specified), show everything without parent restriction
-    
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Final Drive query:', driveQuery);
-      console.log('View Status:', filters.viewStatus);
-    }
-    
-    // Get sort configuration
-    const sortKey = getSortKey(filters.sortBy || 'modified');
-    const orderBy = filters.viewStatus === 'recent' ? 'viewedByMeTime desc, modifiedTime desc' : 
-                   `${sortKey} ${filters.sortOrder}`;
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Order by:', orderBy);
+      console.log('Final Drive query:', driveQuery)
+      console.log('View Status:', filters.viewStatus)
+    }
+
+    // Get sort configuration
+    const sortKey = getSortKey(filters.sortBy || 'modified')
+    const orderBy =
+      filters.viewStatus === 'recent'
+        ? 'viewedByMeTime desc, modifiedTime desc'
+        : `${sortKey} ${filters.sortOrder}`
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Order by:', orderBy)
     }
 
     // Generate deduplication key to prevent multiple identical requests
@@ -304,113 +457,129 @@ export async function GET(request: NextRequest) {
       sortOrder: filters.sortOrder,
       search: filters.search,
       folderId: folderId,
-      pageToken: pageToken
-    });
+      pageToken: pageToken,
+    })
 
-    // Use search optimization for search queries
-    if (filters.search) {
+    {/*// Use search optimization for search queries
+ 		if (filters.search) {
       const searchResult = await searchOptimizer.optimizedSearch(
         filters.search,
         user.email!,
         async () => {
-          const driveService = new GoogleDriveService(accessToken);
+          const driveService = new GoogleDriveService(accessToken)
           return await retryDriveApiCall(
-            () => driveService.listFiles({
-              query: driveQuery,
-              orderBy,
-              pageSize,
-              pageToken,
-              parentId: folderId
-            }),
+            () =>
+              driveService.listFiles({
+                query: driveQuery,
+                orderBy,
+                pageSize,
+                pageToken,
+                parentId: folderId,
+              }),
             `Drive API search for "${filters.search}" for user ${user.email}${folderId ? ` in folder ${folderId}` : ''}`
-          );
+          )
         },
         folderId
-      );
-      
+      )
+
       // Apply client-side filters to search results
-      const filteredFiles = applyClientSideFilters(searchResult.files, filters);
-      
+      const filteredFiles = applyClientSideFilters(searchResult.files, filters)
+
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Search "${filters.search}": ${searchResult.files.length} -> ${filteredFiles.length} files after filtering`);
+        console.log(
+          `Search "${filters.search}": ${searchResult.files.length} -> ${filteredFiles.length} files after filtering`
+        )
       }
 
       return NextResponse.json({
         files: filteredFiles,
         nextPageToken: searchResult.nextPageToken,
-        totalCount: filteredFiles.length
-      });
+        totalCount: filteredFiles.length,
+      })
     }
-
+		*/}
     // Check cache first - before deduplication
-    const cachedData = driveCache.get(cacheKey);
+    const cachedData = driveCache.get(cacheKey)
     if (cachedData) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('Cache hit for:', cacheKey);
+        console.log('Cache hit for:', cacheKey)
       }
-      
+
       // Apply client-side filters to cached results
-      const filteredFiles = applyClientSideFilters((cachedData as any)?.files || [], filters);
-      
+      const filteredFiles = applyClientSideFilters(
+        (cachedData as any)?.files || [],
+        filters
+      )
+
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Retrieved ${(cachedData as any)?.files?.length || 0} files from Drive API`);
-        console.log(`After client-side filtering: ${filteredFiles.length} files`);
+        console.log(
+          `Retrieved ${(cachedData as any)?.files?.length || 0} files from Drive API`
+        )
+        console.log(
+          `After client-side filtering: ${filteredFiles.length} files`
+        )
       }
 
       return NextResponse.json({
         files: filteredFiles,
         nextPageToken: (cachedData as any)?.nextPageToken,
-        totalCount: filteredFiles.length
-      });
+        totalCount: filteredFiles.length,
+      })
     }
 
     // Use request deduplication only for uncached requests
-    const result = await requestDeduplicator.deduplicate(deduplicationKey, async () => {
-      const driveService = new GoogleDriveService(accessToken);
+    const result = await requestDeduplicator.deduplicate(
+      deduplicationKey,
+      async () => {
+        const driveService = new GoogleDriveService(accessToken)
 
-      // Make the actual API call with retry mechanism
-      const apiResult = await retryDriveApiCall(
-        () => driveService.listFiles({
-          query: driveQuery,
-          orderBy,
-          pageSize,
-          pageToken,
-          parentId: folderId
-        }),
-        `Drive API listFiles for user ${user.email}`
-      );
+        // Make the actual API call with retry mechanism
+        const apiResult = await retryDriveApiCall(
+          () =>
+            driveService.listFiles({
+              query: driveQuery,
+              orderBy,
+              pageSize,
+              pageToken,
+              parentId: folderId,
+            }),
+          `Drive API listFiles for user ${user.email}`
+        )
 
-      // Cache the result
-      driveCache.set(cacheKey, apiResult, 5); // Cache for 5 minutes
-      
-      return apiResult;
-    });
+        // Cache the result
+        driveCache.set(cacheKey, apiResult, 5) // Cache for 5 minutes
+
+        return apiResult
+      }
+    )
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Retrieved ${result.files?.length || 0} files from Drive API`);
+      console.log(`Retrieved ${result.files?.length || 0} files from Drive API`)
     }
 
     // Apply client-side filters
-    const filteredFiles = applyClientSideFilters(result.files || [], filters);
-    
+    const filteredFiles = applyClientSideFilters(result.files || [], filters)
+
     if (process.env.NODE_ENV === 'development') {
-      console.log(`After client-side filtering: ${filteredFiles.length} files`);
+      console.log(`After client-side filtering: ${filteredFiles.length} files`)
     }
 
     const finalResult = {
       ...result,
-      files: filteredFiles
-    };
+      files: filteredFiles,
+    }
 
-    return NextResponse.json(finalResult);
-    
+    return NextResponse.json(finalResult)
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('Drive files API error:', error);
+      console.error('Drive files API error:', error)
     }
-    return NextResponse.json({ 
-      error: 'Failed to fetch files'
-      // Don't expose error details in production for security
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch files',
+        // Don't expose error details in production for security
+      },
+      { status: 500 }
+    )
   }
 }
