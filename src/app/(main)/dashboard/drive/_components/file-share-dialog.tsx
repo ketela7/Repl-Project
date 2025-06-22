@@ -35,8 +35,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
-import { successToast, errorToast, loadingToast } from '@/lib/toast-utils';
-import { copyToClipboard } from '@/lib/clipboard-utils';
+import { successToast, errorToast, loadingToast } from '@/lib/toast';
+import { copyToClipboard } from '@/lib/clipboard';
 import { 
   Share2, 
   Copy, 

@@ -33,6 +33,12 @@ DATABASE_URL
 
 ## 📁 Code Optimization & File Structure
 
+### File Naming Conventions
+- **Simplified naming**: Use clear, descriptive names without prefixes like "enhanced-" or "utils-"
+- **Core utilities**: Direct functional names (e.g., `toast.ts`, `clipboard.ts`, `timezone.ts`, `session.ts`)
+- **Component naming**: Descriptive component names without redundant prefixes
+- **Import consistency**: Update all imports when renaming files to maintain consistency
+
 ### Extension Priorities
 
 #### ✅ **High Priority (Always Extend)**
@@ -40,11 +46,14 @@ DATABASE_URL
 - `src/lib/google-drive/service.ts` - API service methods
 - `src/components/ui/` - Shadcn components
 - `src/app/(main)/dashboard/drive/_components/drive-manager.tsx` - Main component
+- `src/lib/toast.ts` - Toast notification utilities
+- `src/lib/clipboard.ts` - Clipboard functionality
 
 #### ⚠️ **Medium Priority (Consider Extension)**
 - Custom hooks in `src/hooks/`
 - Type definitions in `src/lib/google-drive/types.ts`
 - Configuration files
+- Utility libraries (`src/lib/timezone.ts`, `src/lib/session.ts`)
 
 #### 🔄 **Low Priority (OK to Create New)**
 - Page components (`page.tsx`)
@@ -99,6 +108,14 @@ DATABASE_URL
 - **Cross-Platform Dialogs**: Bottom sheets for mobile, dialogs for desktop
 - **Theme Support**: Dark/light mode compatibility
 - **Accessibility**: WCAG 2.1 AA compliance
+
+### Toast Notification System
+- **Library**: Sonner toast notifications with mobile-first design
+- **Positioning**: Bottom-center for mobile devices, top-right for desktop
+- **Types**: Success, error, warning, info, loading, and promise-based toasts
+- **Integration**: Automatic feedback for file operations (copy, download, share, delete)
+- **Mobile Optimization**: Android-style "Copied to clipboard" notifications
+- **Utilities**: Centralized toast functions in `src/lib/toast.ts`
 
 ---
 

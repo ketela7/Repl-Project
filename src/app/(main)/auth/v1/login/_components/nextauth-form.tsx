@@ -8,7 +8,7 @@ import { GoogleAuthButton } from "@/components/auth/google-auth-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield } from "lucide-react";
-import { setRememberMePreference } from "@/lib/session-utils";
+import { setRememberMePreference } from "@/lib/session";
 
 const FormSchema = z.object({
   remember: z.boolean().default(false),

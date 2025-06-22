@@ -47,7 +47,7 @@ import {
 } from "lucide-react";
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
 import { formatFileSize, formatDriveFileDate } from '@/lib/google-drive/utils';
-import { formatFileTime, formatCreationTime } from '@/lib/timezone-utils';
+import { formatFileTime, formatCreationTime } from '@/lib/timezone';
 import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { getInitials } from '@/lib/utils';

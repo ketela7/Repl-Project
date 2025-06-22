@@ -33,7 +33,7 @@ import { FolderIcon, Copy, ExternalLink } from "lucide-react";
 import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
 import { toast } from "sonner";
-import { successToast, errorToast, loadingToast } from '@/lib/toast-utils';
+import { successToast, errorToast, loadingToast } from '@/lib/toast';
 
 interface FileCopyDialogProps {
   isOpen: boolean;
