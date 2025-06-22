@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
+import { sessionCache, generateSessionCacheKey } from "./lib/session-cache"
 
 declare module "next-auth" {
   interface Session {
@@ -31,6 +32,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           prompt: "consent",
         },
       },
+      checks: ["pkce", "state"],
     }),
   ],
   callbacks: {
@@ -68,6 +70,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
+        // Generate cache key
+        const cacheKey = generateSessionCacheKey(token.sub || '', token.email || '');
+        
+        // Check cache first
+        const cachedSession = sessionCache.get(cacheKey);
+        if (cachedSession) {
+          return cachedSession;
+        }
+
         // Check if session should expire based on remember me preference
         const now = Math.floor(Date.now() / 1000);
         const sessionDuration = token.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 days or 1 day
@@ -79,13 +90,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
         
-        // Safely assign token values with fallbacks
-        session.accessToken = token.accessToken as string || undefined;
-        session.refreshToken = token.refreshToken as string || undefined;
-        session.provider = token.provider as string || 'google';
-        session.rememberMe = Boolean(token.rememberMe);
+        // Build session object
+        const sessionData = {
+          ...session,
+          accessToken: token.accessToken as string || undefined,
+          refreshToken: token.refreshToken as string || undefined,
+          provider: token.provider as string || 'google',
+          rememberMe: Boolean(token.rememberMe)
+        };
         
-        return session;
+        // Cache the session for 5 minutes
+        sessionCache.set(cacheKey, sessionData, 5 * 60 * 1000);
+        
+        return sessionData;
       } catch (error) {
         console.error('[NextAuth] Session callback error:', error);
         // Return basic session without tokens to maintain user info
@@ -112,7 +129,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // Maximum 30 days
-    updateAge: 0, // Always update session to maintain persistence
+    updateAge: 24 * 60 * 60, // Update session only once per day to reduce database calls
   },
   jwt: {
     maxAge: 30 * 24 * 60 * 60, // Maximum 30 days JWT token lifetime
@@ -133,4 +150,5 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 })
