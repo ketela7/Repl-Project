@@ -18,7 +18,7 @@ export const mockSession = {
   expires: '2025-12-31',
 }
 
-// Test wrapper with all providers
+// Test wrapper with essential providers only
 const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -31,9 +31,9 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider session={mockSession}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <div className="light">
           {children}
-        </ThemeProvider>
+        </div>
       </SessionProvider>
     </QueryClientProvider>
   )

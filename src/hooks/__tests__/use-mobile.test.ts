@@ -21,6 +21,12 @@ const mockMatchMedia = (matches: boolean) => {
 describe('useIsMobile', () => {
   it('returns true for mobile screens', () => {
     mockMatchMedia(true)
+    // Mock window.innerWidth for mobile
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 600,
+    })
     
     const { result } = renderHook(() => useIsMobile())
     
@@ -29,6 +35,12 @@ describe('useIsMobile', () => {
 
   it('returns false for desktop screens', () => {
     mockMatchMedia(false)
+    // Mock window.innerWidth for desktop
+    Object.defineProperty(window, 'innerWidth', {
+      writable: true,
+      configurable: true,
+      value: 1024,
+    })
     
     const { result } = renderHook(() => useIsMobile())
     

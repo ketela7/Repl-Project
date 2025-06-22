@@ -45,8 +45,17 @@ describe('Timezone Utils', () => {
 
   describe('getUserTimezone', () => {
     it('returns browser timezone', () => {
+      // Mock Intl.DateTimeFormat to return a specific timezone
+      const originalDateTimeFormat = Intl.DateTimeFormat
+      Intl.DateTimeFormat = jest.fn().mockImplementation(() => ({
+        resolvedOptions: () => ({ timeZone: 'America/New_York' })
+      })) as any
+
       const timezone = getUserTimezone()
       expect(timezone).toBe('America/New_York')
+
+      // Restore original
+      Intl.DateTimeFormat = originalDateTimeFormat
     })
   })
 
