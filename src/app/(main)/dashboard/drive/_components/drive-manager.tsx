@@ -332,37 +332,32 @@ const applyClientSideFilters = (
   }
 
   // Apply view-specific filters based on activeView
-  // Note: These filters should be handled at the API level for proper Google Drive queries
+  // These filters are primarily handled at the API level, but we add client-side filtering as backup
   if (filters.activeView && filters.activeView !== 'all') {
     switch (filters.activeView) {
       case 'my-drive':
-        // Show only files/folders owned by me (handled by API query 'me' in owners)
-        filteredFiles = filteredFiles.filter(file => file.ownedByMe === true);
-        filteredFolders = filteredFolders.filter(folder => folder.ownedByMe === true);
+        // Show only files/folders owned by me
+        filteredFiles = filteredFiles.filter(file => file.ownedByMe === true || file.ownedByMe === undefined);
+        filteredFolders = filteredFolders.filter(folder => folder.ownedByMe === true || folder.ownedByMe === undefined);
         break;
       case 'shared':
-        // Show only files/folders shared with me (handled by API query sharedWithMe=true)
+        // Show only files/folders shared with me
         filteredFiles = filteredFiles.filter(file => file.shared === true);
         filteredFolders = filteredFolders.filter(folder => folder.shared === true);
         break;
       case 'starred':
-        // Show only starred files/folders (handled by API query starred=true)
+        // Show only starred files/folders
         filteredFiles = filteredFiles.filter(file => file.starred === true);
         filteredFolders = filteredFolders.filter(folder => folder.starred === true);
         break;
       case 'trash':
-        // Show only trashed files/folders (handled by API query trashed=true)
+        // Show only trashed files/folders
         filteredFiles = filteredFiles.filter(file => file.trashed === true);
         filteredFolders = filteredFolders.filter(folder => folder.trashed === true);
         break;
       case 'recent':
         // Recent files are handled by sorting (modifiedTime desc)
         break;
-        filteredFolders = filteredFolders.filter(folder => folder.capabilities?.canShare);
-        break;
-      case 'recent':
-        // Show recently modified files/folders (last 7 days)
-        const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         filteredFiles = filteredFiles.filter(file => 
           new Date(file.modifiedTime) > sevenDaysAgo

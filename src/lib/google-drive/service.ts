@@ -114,11 +114,13 @@ export class GoogleDriveService {
     // Log query for debugging in development only
     if (process.env.NODE_ENV === 'development') {
       console.log('Google Drive Service - Final Query:', searchQuery);
+      console.log('Google Drive Service - Order By:', orderBy);
     }
 
     // Prepare API request parameters with proper validation
     const requestParams: any = {
       q: searchQuery,
+      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, ownedByMe, viewedByMeTime, capabilities, owners)',
       pageSize: validPageSize,
       orderBy,
       includeItemsFromAllDrives: includeTeamDriveItems,

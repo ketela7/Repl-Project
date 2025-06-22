@@ -218,7 +218,7 @@ export async function GET(request: NextRequest) {
 
     const filters: FileFilter = {
       fileType: searchParams.get('fileTypes') || searchParams.get('fileType') || 'all',
-      viewStatus: searchParams.get('view') || searchParams.get('viewStatus') || 'all',
+      viewStatus: searchParams.get('viewStatus') || searchParams.get('view') || 'all',
       sortBy: searchParams.get('sortBy') || 'modified',
       sortOrder: validateSortOrder(sortOrder),
       search: searchParams.get('search') || searchParams.get('query') || undefined,
@@ -265,15 +265,18 @@ export async function GET(request: NextRequest) {
       // When navigating into a specific folder, show its contents regardless of view
       driveQuery = 'trashed=false';  // Reset query for folder contents
       driveQuery += ` and '${folderId}' in parents`;
-        //} else if (!folderId && !filters.search && filters.viewStatus !== 'shared' && filters.viewStatus !== 'starred' && filters.viewStatus !== 'recent' && filters.viewStatus !== 'trash') {
-    } else if (!folderId && !filters.search && filters.viewStatus === 'my-drive') {
-      // Only restrict to root for "My Drive" view specifically
-      driveQuery += " and 'root' in parents";
+    } else if (!folderId && !filters.search) {
+      // For special views (starred, shared, trash), don't add parent restrictions
+      if (filters.viewStatus === 'my-drive') {
+        driveQuery += " and 'root' in parents";
+      }
+      // For starred, shared, trash views - no parent restriction needed
     }
     // For "All Files" view (when viewStatus is 'all' or not specified), show everything without parent restriction
     
     if (process.env.NODE_ENV === 'development') {
       console.log('Final Drive query:', driveQuery);
+      console.log('View Status:', filters.viewStatus);
     }
     
     // Get sort configuration
