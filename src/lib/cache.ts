@@ -96,9 +96,25 @@ class MemoryCache {
     mimeType?: string;
     pageToken?: string;
     userId: string;
+    viewStatus?: string;
+    fileType?: string;
+    search?: string;
+    pageSize?: number;
+    orderBy?: string;
   }): string {
-    const { parentId = 'root', query = '', mimeType = '', pageToken = '', userId } = params;
-    return `drive:${userId}:${parentId}:${query}:${mimeType}:${pageToken}`;
+    const { 
+      parentId = 'root', 
+      query = '', 
+      mimeType = '', 
+      pageToken = '', 
+      userId,
+      viewStatus = 'all',
+      fileType = 'all',
+      search = '',
+      pageSize = 50,
+      orderBy = 'modified'
+    } = params;
+    return `drive:${userId}:${parentId}:${query}:${mimeType}:${pageToken}:${viewStatus}:${fileType}:${search}:${pageSize}:${orderBy}`;
   }
 
   // Generate cache key for file details

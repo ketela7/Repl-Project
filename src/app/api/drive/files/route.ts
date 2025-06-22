@@ -250,11 +250,14 @@ export async function GET(request: NextRequest) {
       console.log('Filters applied:', filters);
     }
 
-    // Check cache first
+    // Check cache first - include viewStatus in cache key for proper filtering
     const cacheKey = driveCache.generateDriveKey({
       pageToken,
       parentId: folderId,
-      userId: user.email || 'unknown'
+      userId: user.email || 'unknown',
+      viewStatus: filters.viewStatus,
+      fileType: filters.fileType,
+      search: filters.search
     });
 
     // Build the Drive API query using the consolidated function
