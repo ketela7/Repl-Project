@@ -224,7 +224,17 @@ export async function GET(request: NextRequest) {
       owner: searchParams.get('owner') || undefined,
     };
 
-    const pageToken = searchParams.get('pageToken') || undefined;
+    // Properly decode pageToken to handle URL encoding issues
+    let pageToken = searchParams.get('pageToken') || undefined;
+    if (pageToken) {
+      try {
+        // Decode URL-encoded pageToken that may have been double-encoded
+        pageToken = decodeURIComponent(pageToken);
+      } catch (error) {
+        console.warn('Failed to decode pageToken, using original:', pageToken);
+      }
+    }
+    
     const folderId = searchParams.get('folderId') || searchParams.get('parentId') || undefined;
 
     if (process.env.NODE_ENV === 'development') {

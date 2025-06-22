@@ -64,6 +64,26 @@ export class GoogleDriveService {
       includeTeamDriveItems = false,
     } = options;
 
+    // Validate and sanitize pageSize
+    const validPageSize = Math.min(Math.max(pageSize, 1), 1000);
+    
+    // Validate pageToken - ensure it's properly formatted
+    let validPageToken: string | undefined = pageToken;
+    if (pageToken) {
+      // Basic validation for pageToken format
+      if (typeof pageToken !== 'string' || pageToken.length > 2048) {
+        console.warn('Invalid pageToken format, ignoring:', pageToken);
+        validPageToken = undefined;
+      } else {
+        // Additional validation: pageToken should not contain certain invalid characters
+        const invalidChars = /[<>"'&\x00-\x1f\x7f-\x9f]/;
+        if (invalidChars.test(pageToken)) {
+          console.warn('PageToken contains invalid characters, ignoring:', pageToken);
+          validPageToken = undefined;
+        }
+      }
+    }
+
     // Use the query parameter directly if provided, otherwise build one
     let searchQuery = '';
     
@@ -95,27 +115,60 @@ export class GoogleDriveService {
       console.log('Google Drive Service - Final Query:', searchQuery);
     }
 
-    const response = await this.drive.files.list({
+    // Prepare API request parameters with proper validation
+    const requestParams: any = {
       q: searchQuery,
-      pageSize,
-      pageToken,
+      pageSize: validPageSize,
       orderBy,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
       fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, viewedByMeTime, capabilities, owners)',
-    });
+    };
 
-    const files = response.data.files?.map(convertGoogleDriveFile) || [];
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`Google Drive Service - Retrieved ${files.length} files`);
+    // Only add pageToken if it's valid
+    if (validPageToken) {
+      requestParams.pageToken = validPageToken;
     }
 
-    return {
-      files,
-      nextPageToken: response.data.nextPageToken,
-      incompleteSearch: response.data.incompleteSearch || false,
-    };
+    try {
+      const response = await this.drive.files.list(requestParams);
+
+      const files = response.data.files?.map(convertGoogleDriveFile) || [];
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Google Drive Service - Retrieved ${files.length} files`);
+      }
+
+      return {
+        files,
+        nextPageToken: response.data.nextPageToken,
+        incompleteSearch: response.data.incompleteSearch || false,
+      };
+    } catch (error: any) {
+      // Handle specific Google Drive API errors
+      if (error.code === 400 && error.message?.includes('Invalid Value')) {
+        console.warn('Google Drive API Invalid Value error, likely due to malformed pageToken');
+        
+        // If pageToken was the issue, retry without it
+        if (validPageToken) {
+          console.log('Retrying request without pageToken');
+          const retryParams = { ...requestParams };
+          delete retryParams.pageToken;
+          
+          const retryResponse = await this.drive.files.list(retryParams);
+          const retryFiles = retryResponse.data.files?.map(convertGoogleDriveFile) || [];
+          
+          return {
+            files: retryFiles,
+            nextPageToken: retryResponse.data.nextPageToken,
+            incompleteSearch: retryResponse.data.incompleteSearch || false,
+          };
+        }
+      }
+      
+      // Re-throw other errors
+      throw error;
+    }
   }
 
   async getFile(fileId: string): Promise<DriveFile> {
