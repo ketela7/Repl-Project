@@ -125,6 +125,16 @@ export function MobileFiltersBottomSheet({
     onOpenChange(false);
   };
 
+  const handleApplyFilters = () => {
+    // Apply all current filters
+    onFilterChange({ 
+      viewFilter: currentFilters?.viewFilter || 'all',
+      fileTypes: currentFilters?.fileTypes || [],
+      advanced: advancedFilters 
+    });
+    onOpenChange(false);
+  };
+
   return (
     <BottomSheet open={open} onOpenChange={onOpenChange}>
       <BottomSheetContent className="max-h-[90vh] overflow-y-auto">
@@ -360,6 +370,13 @@ export function MobileFiltersBottomSheet({
             disabled={!showAdvanced}
           >
             Clear Advanced
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={handleClearAll}
+            className="flex-1"
+          >
+            Clear All
           </Button>
           <Button
             onClick={handleApplyFilters}

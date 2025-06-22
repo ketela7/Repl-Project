@@ -3365,7 +3365,7 @@ export function DriveManager() {
                   {sortedFiles.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length > 0 && (
                     <div className="flex items-center justify-between p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-md">
                       <div className="flex items-center gap-2">
-                        <Code className="h-4 w-4 text-emerald-500" />
+                        <FileCode className="h-4 w-4 text-emerald-500" />
                         <span className="text-sm">Code Files</span>
                       </div>
                       <Badge variant="outline" className="border-emerald-500 text-emerald-700 dark:text-emerald-300">
