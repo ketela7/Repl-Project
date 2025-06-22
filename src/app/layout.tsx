@@ -1,10 +1,8 @@
 import { ReactNode } from "react";
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
-import { ThemeProvider } from "next-themes";
-
+import { OptimizedThemeProvider } from "@/components/providers/optimized-theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { TimezoneProvider } from "@/components/timezone-provider";
@@ -70,14 +68,14 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <body className={`${inter.className} min-h-screen antialiased overflow-x-hidden`}>
         <ErrorBoundary>
           <AuthProvider>
-            <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange enableSystem={false}>
+            <OptimizedThemeProvider>
               <TimezoneProvider>
                 <div className="relative min-h-screen w-full">
                   {children}
                 </div>
                 <Toaster />
               </TimezoneProvider>
-            </ThemeProvider>
+            </OptimizedThemeProvider>
           </AuthProvider>
         </ErrorBoundary>
       </body>
