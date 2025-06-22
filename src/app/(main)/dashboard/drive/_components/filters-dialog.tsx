@@ -510,7 +510,7 @@ export function FiltersDialog({
               onClick={() => onOpenChange(false)} 
               className={getTouchButtonClasses('secondary')}
             >
-              Close
+              Apply Filter
             </Button>
             {hasActiveFilters && (
               <Button 
@@ -552,7 +552,7 @@ export function FiltersDialog({
 
         <DialogFooter className="flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Close
+            Apply Filter
           </Button>
           {hasActiveFilters && (
             <Button onClick={handleClearAll}>

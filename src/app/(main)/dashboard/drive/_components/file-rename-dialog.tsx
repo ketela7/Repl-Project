@@ -240,7 +240,7 @@ export function FileRenameDialog({
 
         <DialogFooter>
           <Button variant="outline" onClick={handleClose} disabled={renaming}>
-            Cancel
+            Apply Filter
           </Button>
           <Button 
             onClick={handleRename} 

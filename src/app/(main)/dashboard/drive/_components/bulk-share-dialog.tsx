@@ -778,7 +778,7 @@ export function BulkShareDialog({
 
         <DialogFooter className="flex justify-between">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
-            {showResults ? 'Close' : 'Cancel'}
+            {showResults ? 'Apply Filter' : 'Apply Filter'}
           </Button>
           {!showResults && (
             <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0}>

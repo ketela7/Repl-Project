@@ -307,7 +307,7 @@ export function AdvancedFilters({
               onClick={onClose}
               className={getTouchButtonClasses('default')}
             >
-              Cancel
+              Apply Filter
             </Button>
             <Button
               onClick={handleApply}
@@ -335,7 +335,7 @@ export function AdvancedFilters({
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            Apply Filter
           </Button>
           <Button onClick={handleApply}>
             Submit
