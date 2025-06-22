@@ -25,26 +25,35 @@ interface FileFilter {
 function buildDriveQuery(filters: FileFilter): string {
   const conditions: string[] = [];
   
-  // Basic file filtering (non-trashed by default unless viewing trash)
-  if (filters.viewStatus === 'trash') {
-    conditions.push('trashed=true');
-  } else {
-    conditions.push('trashed=false');
-  }
-  
-  // View status filters
+  // Handle view status filters according to Google Drive API documentation
   switch (filters.viewStatus) {
+    case 'trash':
+      // Trash view - show only trashed files
+      conditions.push('trashed=true');
+      break;
     case 'shared':
+      // Shared with me view - files shared by others
+      conditions.push('trashed=false');
       conditions.push('sharedWithMe=true');
       break;
     case 'starred':
+      // Starred view - starred files only
+      conditions.push('trashed=false');
       conditions.push('starred=true');
       break;
-    case 'recent':
-      // Recent files are handled by sorting, not querying
-      break;
     case 'my-drive':
+      // My Drive view - files owned by me
+      conditions.push('trashed=false');
       conditions.push('\'me\' in owners');
+      break;
+    case 'recent':
+      // Recent files - handled by sorting, show non-trashed files
+      conditions.push('trashed=false');
+      break;
+    case 'all':
+    default:
+      // All files view - show non-trashed files by default
+      conditions.push('trashed=false');
       break;
   }
   

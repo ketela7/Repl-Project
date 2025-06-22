@@ -89,10 +89,10 @@ export class GoogleDriveService {
     
     if (query) {
       // If query is already formatted (contains operators), use it directly
-      if (query.includes('=') || query.includes('and') || query.includes('or')) {
+      if (query.includes('=') || query.includes('and') || query.includes('or') || query.includes('in')) {
         searchQuery = query;
       } else {
-        // Otherwise treat it as a search term
+        // Otherwise treat it as a search term and build proper query
         searchQuery = buildSearchQuery({
           name: query,
           parentId,
@@ -107,6 +107,7 @@ export class GoogleDriveService {
         trashed: false,
       });
     } else {
+      // Default to non-trashed files only
       searchQuery = 'trashed=false';
     }
 

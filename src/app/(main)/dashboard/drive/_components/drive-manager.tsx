@@ -332,22 +332,32 @@ const applyClientSideFilters = (
   }
 
   // Apply view-specific filters based on activeView
+  // Note: These filters should be handled at the API level for proper Google Drive queries
   if (filters.activeView && filters.activeView !== 'all') {
     switch (filters.activeView) {
       case 'my-drive':
-        // Show only files/folders in the user's Drive (not shared)
-        filteredFiles = filteredFiles.filter(file => !file.shared);
-        filteredFolders = filteredFolders.filter(folder => !folder.shared);
+        // Show only files/folders owned by me (handled by API query 'me' in owners)
+        filteredFiles = filteredFiles.filter(file => file.ownedByMe === true);
+        filteredFolders = filteredFolders.filter(folder => folder.ownedByMe === true);
         break;
       case 'shared':
-        // Show only shared files/folders
-        filteredFiles = filteredFiles.filter(file => file.shared);
-        filteredFolders = filteredFolders.filter(folder => folder.shared);
+        // Show only files/folders shared with me (handled by API query sharedWithMe=true)
+        filteredFiles = filteredFiles.filter(file => file.shared === true);
+        filteredFolders = filteredFolders.filter(folder => folder.shared === true);
         break;
       case 'starred':
-        // Show only starred files/folders (would need starred property)
-        // For now, filter based on capabilities or permissions
-        filteredFiles = filteredFiles.filter(file => file.capabilities?.canShare);
+        // Show only starred files/folders (handled by API query starred=true)
+        filteredFiles = filteredFiles.filter(file => file.starred === true);
+        filteredFolders = filteredFolders.filter(folder => folder.starred === true);
+        break;
+      case 'trash':
+        // Show only trashed files/folders (handled by API query trashed=true)
+        filteredFiles = filteredFiles.filter(file => file.trashed === true);
+        filteredFolders = filteredFolders.filter(folder => folder.trashed === true);
+        break;
+      case 'recent':
+        // Recent files are handled by sorting (modifiedTime desc)
+        break;
         filteredFolders = filteredFolders.filter(folder => folder.capabilities?.canShare);
         break;
       case 'recent':
@@ -1793,10 +1803,11 @@ export function DriveManager() {
         params.append('search', searchQuery.trim());
       }
 
-      // Add view filter parameters
+      // Add view filter parameters for proper Google Drive API querying
       const currentView = viewFilter || activeView;
       if (currentView !== 'all') {
         params.append('view', currentView);
+        params.append('viewStatus', currentView); // Add viewStatus for backend API compatibility
       }
 
       // Add file type filters
