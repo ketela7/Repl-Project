@@ -452,7 +452,7 @@ export function FileShareDialog({
   if (isMobile) {
     return (
       <BottomSheet open={open} onOpenChange={onOpenChange}>
-        <BottomSheetContent className="max-h-[95vh] flex flex-col">
+        <BottomSheetContent className="max-h-[90vh] flex flex-col">
           <BottomSheetHeader className="pb-4 flex-shrink-0">
             <BottomSheetTitle className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
@@ -473,20 +473,20 @@ export function FileShareDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className="flex-shrink-0 border-t bg-background p-4">
+          <BottomSheetFooter className="flex-shrink-0 border-t bg-background p-4 safe-area-bottom">
             <div className="grid grid-cols-2 gap-3 w-full">
               <Button 
                 variant="outline" 
                 onClick={() => onOpenChange(false)} 
                 disabled={isLoading} 
-                className="min-h-[48px] text-base font-medium"
+                className="min-h-[48px] text-base font-medium touch-manipulation"
               >
                 Cancel
               </Button>
               <Button 
                 onClick={handleShare} 
                 disabled={isLoading} 
-                className="min-h-[48px] text-base font-medium"
+                className="min-h-[48px] text-base font-medium touch-manipulation"
               >
                 {isLoading ? (
                   <>
@@ -501,7 +501,6 @@ export function FileShareDialog({
                 )}
               </Button>
             </div>
-            <div className="pb-safe-area-inset-bottom"></div>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
