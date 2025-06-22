@@ -95,6 +95,13 @@ const nextConfig = {
       }
     }
 
+    // Additional optimizations for bundle size
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      // Replace heavy libraries with lighter alternatives in development
+      'recharts': dev ? 'recharts/lib' : 'recharts',
+    }
+
     return config
   }
 }

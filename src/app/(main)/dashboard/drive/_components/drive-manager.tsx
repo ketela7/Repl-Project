@@ -5,55 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+// Import only essential icons to reduce bundle size
 import { 
   Upload, 
   FolderPlus, 
   Search, 
   MoreVertical,
-  Download,
-  Trash2,
-  Share,
-  Share2,
-  Edit,
-  Eye,
   RefreshCw,
-  Move,
-  Copy,
-  X,
-  AlertTriangle,
-  Info,
-  Play,
   Grid3X3,
   List,
-  Calendar,
-  HardDrive,
-  Settings,
-  Columns,
-  ChevronUp,
-  ChevronDown,
-  ChevronsUpDown,
-  Square,
-  CheckSquare,
-  MousePointer,
-  SquareCheck,
-  Folder,
-  FileText,
-  Star,
-  Link,
-  FileSpreadsheet,
-  Presentation,
-  Video,
-  Music,
-  Archive,
-  Code
+  Settings
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
+import { lazy, Suspense } from "react";
 import {
   Table,
   TableBody,
@@ -62,6 +26,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { 
   ToggleGroup, 
   ToggleGroupItem 

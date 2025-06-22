@@ -25,6 +25,20 @@ export const FileBulkOperationsDialog = lazy(() =>
   import("@/app/(main)/dashboard/drive/_components/file-bulk-operations-dialog").then(mod => ({ default: mod.FileBulkOperationsDialog }))
 );
 
+// Lazy load heavy table components
+export const FileList = lazy(() => 
+  import("@/app/(main)/dashboard/drive/_components/file-list").then(mod => ({ default: mod.FileList }))
+);
+
+export const DriveToolbar = lazy(() => 
+  import("@/app/(main)/dashboard/drive/_components/drive-toolbar").then(mod => ({ default: mod.DriveToolbar }))
+);
+
+// Lazy load UI components that are not immediately visible
+export const AdvancedFilters = lazy(() => 
+  import("@/app/(main)/dashboard/drive/_components/advanced-filters").then(mod => ({ default: mod.AdvancedFilters }))
+);
+
 // Lazy load chart components (heavy recharts dependency)
 export const ChartComponents = lazy(() => 
   import("recharts").then(mod => ({ 
