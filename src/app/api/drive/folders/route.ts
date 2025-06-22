@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -38,20 +39,18 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     console.log('=== Create Folder API Called ===');
-    const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    // Use NextAuth session instead of Supabase
+    const session = await getServerSession(authOptions);
 
-    if (authError || !session?.user) {
-      console.log('Authentication failed:', authError);
+    if (!session?.user) {
+      console.log('Authentication failed: No session');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     console.log('User authenticated:', session.user.email);
 
-    // Try multiple token locations
-    const accessToken = session.provider_token || 
-                       session.user.user_metadata?.provider_token ||
-                       session.access_token;
+    // Get access token from NextAuth session
+    const accessToken = session.accessToken;
     
     console.log('Access token found:', !!accessToken);
     
