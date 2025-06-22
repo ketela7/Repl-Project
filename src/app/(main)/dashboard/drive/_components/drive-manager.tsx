@@ -599,12 +599,12 @@ export function DriveManager() {
   const getSelectedItemsData = () => {
     const allItems = getAllItems();
     return Array.from(selectedItems).map(id => {
-      const item = allItems.find(item => item?.id === id);
+      const item = allItems.find(item => item.id === id);
       return item ? { 
-        id: item?.id, 
-        name: item?.name, 
+        id: item.id, 
+        name: item.name, 
         type: 'mimeType' in item ? 'file' : 'folder',
-        mimeType: 'mimeType' in item ? item?.mimeType : 'application/vnd.google-apps.folder'
+        mimeType: 'mimeType' in item ? item.mimeType : 'application/vnd.google-apps.folder'
       } : null;
     }).filter(Boolean);
   };
@@ -623,7 +623,7 @@ export function DriveManager() {
 
   const selectAll = () => {
     const allItems = getAllItems();
-    setSelectedItems(new Set(allItems.map(item => item?.id)));
+    setSelectedItems(new Set(allItems.map(item => item.id)));
   };
 
   const deselectAll = () => {
@@ -650,13 +650,13 @@ export function DriveManager() {
 
     // Filter items that can be trashed based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return actions?.canTrash;
     });
 
     const itemsWithoutPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return !actions?.canTrash;
     });
@@ -675,7 +675,7 @@ export function DriveManager() {
 
     let successCount = 0;
     let failedItems: string[] = [];
-    let skippedItems = itemsWithoutPermissions.map(item => item?.name);
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
@@ -683,10 +683,10 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Moving to trash: ${item?.name}`
+          operation: `Moving to trash: ${item.name}`
         }));
 
-        const response = await fetch(`/api/drive/files/${item?.id}`, {
+        const response = await fetch(`/api/drive/files/${item.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'trash' })
@@ -696,8 +696,8 @@ export function DriveManager() {
           successCount++;
         } else {
           const errorData = await response.text();
-          failedItems.push(item?.name);
-          console.error(`Failed to delete ${item?.name}:`, response.status, errorData);
+          failedItems.push(item.name);
+          console.error(`Failed to delete ${item.name}:`, response.status, errorData);
         }
 
         if (i < itemsWithPermissions.length - 1) {
@@ -762,13 +762,13 @@ export function DriveManager() {
 
     // Filter items that can be moved based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return actions?.canMove;
     });
 
     const itemsWithoutPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return !actions?.canMove;
     });
@@ -787,7 +787,7 @@ export function DriveManager() {
 
     let successCount = 0;
     let failedItems: string[] = [];
-    let skippedItems = itemsWithoutPermissions.map(item => item?.name);
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
@@ -795,10 +795,10 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Moving: ${item?.name}`
+          operation: `Moving: ${item.name}`
         }));
 
-        const response = await fetch(`/api/drive/files/${item?.id}`, {
+        const response = await fetch(`/api/drive/files/${item.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
@@ -812,8 +812,8 @@ export function DriveManager() {
           successCount++;
         } else {
           const errorData = await response.text();
-          failedItems.push(item?.name);
-          console.error(`Failed to move ${item?.name}:`, response.status, errorData);
+          failedItems.push(item.name);
+          console.error(`Failed to move ${item.name}:`, response.status, errorData);
         }
 
         if (i < itemsWithPermissions.length - 1) {
@@ -877,16 +877,16 @@ export function DriveManager() {
     
     // Filter for files that can be copied based on permissions
     const itemsWithPermissions = allSelectedItems.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
-      return item?.type === 'file' && actions?.canCopy;
+      return item.type === 'file' && actions?.canCopy;
     });
 
-    const foldersSelected = allSelectedItems.filter(item => item?.type === 'folder').length;
+    const foldersSelected = allSelectedItems.filter(item => item.type === 'folder').length;
     const filesWithoutPermissions = allSelectedItems.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
-      return item?.type === 'file' && !actions?.canCopy;
+      return item.type === 'file' && !actions?.canCopy;
     });
 
     if (itemsWithPermissions.length === 0) {
@@ -914,11 +914,11 @@ export function DriveManager() {
 
     // Add folders and files without permissions to skipped items
     if (foldersSelected > 0) {
-      const folderNames = allSelectedItems.filter(item => item?.type === 'folder').map(item => item?.name);
+      const folderNames = allSelectedItems.filter(item => item.type === 'folder').map(item => item.name);
       skippedItems.push(...folderNames);
     }
     if (filesWithoutPermissions.length > 0) {
-      skippedItems.push(...filesWithoutPermissions.map(item => item?.name));
+      skippedItems.push(...filesWithoutPermissions.map(item => item.name));
     }
 
     try {
@@ -927,14 +927,14 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Copying: ${item?.name}`
+          operation: `Copying: ${item.name}`
         }));
 
-        const response = await fetch(`/api/drive/files/${item?.id}/copy`, {
+        const response = await fetch(`/api/drive/files/${item.id}/copy`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            name: `Copy of ${item?.name}`,
+            name: `Copy of ${item.name}`,
             parentId: targetFolderId 
           })
         });
@@ -943,8 +943,8 @@ export function DriveManager() {
           successCount++;
         } else {
           const errorData = await response.text();
-          failedItems.push(item?.name);
-          console.error(`Failed to copy ${item?.name}:`, response.status, errorData);
+          failedItems.push(item.name);
+          console.error(`Failed to copy ${item.name}:`, response.status, errorData);
         }
 
         if (i < itemsWithPermissions.length - 1) {
@@ -1008,8 +1008,8 @@ export function DriveManager() {
   const handleBulkDownload = async () => {
     const allSelectedItems = getSelectedItemsData();
     // Filter out folders - only allow files to be downloaded
-    const selectedItemsData = allSelectedItems.filter(item => item?.type === 'file' && item?.mimeType !== 'application/vnd.google-apps.folder');
-    const folderCount = allSelectedItems.filter(item => item?.type === 'folder' || item?.mimeType === 'application/vnd.google-apps.folder').length;
+    const selectedItemsData = allSelectedItems.filter(item => item.type === 'file' && item.mimeType !== 'application/vnd.google-apps.folder');
+    const folderCount = allSelectedItems.filter(item => item.type === 'folder' || item.mimeType === 'application/vnd.google-apps.folder').length;
 
     if (selectedItemsData.length === 0) {
       if (folderCount > 0) {
@@ -1041,38 +1041,38 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Downloading: ${item?.name}`
+          operation: `Downloading: ${item.name}`
         }));
 
         try {
           // Double check that it's not a folder before downloading
-          if (item?.mimeType === 'application/vnd.google-apps.folder') {
-            skippedItems.push(item?.name);
-            console.log(`Skipping folder: ${item?.name}`);
+          if (item.mimeType === 'application/vnd.google-apps.folder') {
+            skippedItems.push(item.name);
+            console.log(`Skipping folder: ${item.name}`);
             continue;
           }
 
           // Direct download for all files (no hybrid strategy)
-          console.log(`Downloading file: ${item?.name}`);
+          console.log(`Downloading file: ${item.name}`);
 
           // Create download link directly to API endpoint
           const link = document.createElement('a');
-          link.href = `/api/drive/download/${item?.id}`;
-          link.download = item?.name;
+          link.href = `/api/drive/download/${item.id}`;
+          link.download = item.name;
           link.style.display = 'none';
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
 
           successCount++;
-          console.log(`Direct download initiated for: ${item?.name}`);
+          console.log(`Direct download initiated for: ${item.name}`);
 
           // Add delay between downloads to avoid overwhelming the browser
           if (i < selectedItemsData.length - 1) {
           }
         } catch (downloadError) {
-          failedItems.push(item?.name);
-          console.error(`Failed to download ${item?.name}:`, downloadError);
+          failedItems.push(item.name);
+          console.error(`Failed to download ${item.name}:`, downloadError);
         }
       }
 
@@ -1116,11 +1116,11 @@ export function DriveManager() {
 
   const handleBulkExport = async (exportFormat: string) => {
     const exportableFiles = getSelectedItemsData().filter(item => 
-      item?.type === 'file' && 
-      item?.mimeType && 
-      item?.mimeType.startsWith('application/vnd.google-apps.') &&
-      !item?.mimeType.includes('folder') &&
-      !item?.mimeType.includes('shortcut')
+      item.type === 'file' && 
+      item.mimeType && 
+      item.mimeType.startsWith('application/vnd.google-apps.') &&
+      !item.mimeType.includes('folder') &&
+      !item.mimeType.includes('shortcut')
     );
 
     // Close dialog first so user can see progress
@@ -1147,11 +1147,11 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Exporting: ${item?.name} (${exportFormat.toUpperCase()})`
+          operation: `Exporting: ${item.name} (${exportFormat.toUpperCase()})`
         }));
 
         try {
-          const response = await fetch(`/api/drive/files/${item?.id}/export?format=${exportFormat}`);
+          const response = await fetch(`/api/drive/files/${item.id}/export?format=${exportFormat}`);
 
           if (response.ok) {
             const blob = await response.blob();
@@ -1159,7 +1159,7 @@ export function DriveManager() {
 
             const link = document.createElement('a');
             link.href = url;
-            link.download = `${item?.name}.${exportFormat}`;
+            link.download = `${item.name}.${exportFormat}`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1167,12 +1167,12 @@ export function DriveManager() {
 
             successCount++;
           } else {
-            failedItems.push(item?.name);
-            console.error(`Failed to export ${item?.name}:`, response.status);
+            failedItems.push(item.name);
+            console.error(`Failed to export ${item.name}:`, response.status);
           }
         } catch (error) {
-          failedItems.push(item?.name);
-          console.error(`Export error for ${item?.name}:`, error);
+          failedItems.push(item.name);
+          console.error(`Export error for ${item.name}:`, error);
         }
 
         if (i < exportableFiles.length - 1) {
@@ -1206,13 +1206,13 @@ export function DriveManager() {
 
     // Filter items that can be renamed based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return actions?.canRename;
     });
 
     const itemsWithoutPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return !actions?.canRename;
     });
@@ -1231,7 +1231,7 @@ export function DriveManager() {
 
     let successCount = 0;
     let failedItems: string[] = [];
-    let skippedItems = itemsWithoutPermissions.map(item => item?.name);
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
@@ -1239,7 +1239,7 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Renaming: ${item?.name}`
+          operation: `Renaming: ${item.name}`
         }));
 
         let newName = '';
@@ -1248,25 +1248,25 @@ export function DriveManager() {
           try {
             const regexData = JSON.parse(renamePattern);
             const regex = new RegExp(regexData.pattern, regexData.flags);
-            newName = item?.name.replace(regex, regexData.replacement);
+            newName = item.name.replace(regex, regexData.replacement);
           } catch (error) {
-            console.error(`Failed to apply regex to ${item?.name}:`, error);
-            newName = item?.name; // Keep original name if regex fails
+            console.error(`Failed to apply regex to ${item.name}:`, error);
+            newName = item.name; // Keep original name if regex fails
           }
         } else {
-          const fileExtension = item?.name.includes('.') ? 
-            item?.name.substring(item?.name.lastIndexOf('.')) : '';
+          const fileExtension = item.name.includes('.') ? 
+            item.name.substring(item.name.lastIndexOf('.')) : '';
           const baseName = fileExtension ? 
-            item?.name.substring(0, item?.name.lastIndexOf('.')) : item?.name;
+            item.name.substring(0, item.name.lastIndexOf('.')) : item.name;
 
           switch (renameType) {
             case 'prefix':
-              newName = `${renamePattern}_${item?.name}`;
+              newName = `${renamePattern}_${item.name}`;
               break;
             case 'suffix':
               newName = fileExtension ? 
                 `${baseName}_${renamePattern}${fileExtension}` : 
-                `${item?.name}_${renamePattern}`;
+                `${item.name}_${renamePattern}`;
               break;
             case 'numbering':
               const number = String(i + 1).padStart(3, '0');
@@ -1279,14 +1279,14 @@ export function DriveManager() {
               const timestamp = now.toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
               newName = fileExtension ? 
                 `${baseName}_${timestamp}${fileExtension}` : 
-                `${item?.name}_${timestamp}`;
+                `${item.name}_${timestamp}`;
               break;
             default:
-              newName = item?.name;
+              newName = item.name;
           }
         }
 
-        const response = await fetch(`/api/drive/files/${item?.id}`, {
+        const response = await fetch(`/api/drive/files/${item.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'rename', name: newName })
@@ -1296,8 +1296,8 @@ export function DriveManager() {
           successCount++;
         } else {
           const errorData = await response.text();
-          failedItems.push(item?.name);
-          console.error(`Failed to rename ${item?.name}:`, response.status, errorData);
+          failedItems.push(item.name);
+          console.error(`Failed to rename ${item.name}:`, response.status, errorData);
         }
 
         if (i < selectedItemsData.length - 1) {
@@ -1362,13 +1362,13 @@ export function DriveManager() {
 
     // Filter items that can be restored based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return actions?.canRestore;
     });
 
     const itemsWithoutPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return !actions?.canRestore;
     });
@@ -1387,7 +1387,7 @@ export function DriveManager() {
 
     let successCount = 0;
     let failedItems: string[] = [];
-    let skippedItems = itemsWithoutPermissions.map(item => item?.name);
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
@@ -1395,11 +1395,11 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Restoring: ${item?.name}`
+          operation: `Restoring: ${item.name}`
         }));
 
         try {
-          const response = await fetch(`/api/drive/files/${item?.id}`, {
+          const response = await fetch(`/api/drive/files/${item.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: 'restore' })
@@ -1409,12 +1409,12 @@ export function DriveManager() {
             successCount++;
           } else {
             const errorData = await response.text();
-            failedItems.push(item?.name);
-            console.error(`Failed to restore ${item?.name}:`, response.status, errorData);
+            failedItems.push(item.name);
+            console.error(`Failed to restore ${item.name}:`, response.status, errorData);
           }
         } catch (error) {
-          failedItems.push(item?.name);
-          console.error(`Error restoring ${item?.name}:`, error);
+          failedItems.push(item.name);
+          console.error(`Error restoring ${item.name}:`, error);
         }
 
         if (i < itemsWithPermissions.length - 1) {
@@ -1476,13 +1476,13 @@ export function DriveManager() {
 
     // Filter items that can be shared based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return actions?.canShare;
     });
 
     const itemsWithoutPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return !actions?.canShare;
     });
@@ -1507,11 +1507,11 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Sharing: ${item?.name}`
+          operation: `Sharing: ${item.name}`
         }));
 
         try {
-          const response = await fetch(`/api/drive/files/${item?.id}/share`, {
+          const response = await fetch(`/api/drive/files/${item.id}/share`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1525,15 +1525,15 @@ export function DriveManager() {
             const result = await response.json();
             if (result.webViewLink) {
               results.push({
-                id: item?.id,
-                name: item?.name,
+                id: item.id,
+                name: item.name,
                 shareLink: result.webViewLink,
                 success: true
               });
             } else {
               results.push({
-                id: item?.id,
-                name: item?.name,
+                id: item.id,
+                name: item.name,
                 shareLink: '',
                 success: false,
                 error: 'No share link returned'
@@ -1547,8 +1547,8 @@ export function DriveManager() {
               return [];
             }
             results.push({
-              id: item?.id,
-              name: item?.name,
+              id: item.id,
+              name: item.name,
               shareLink: '',
               success: false,
               error: errorData.error || 'Failed to share'
@@ -1556,8 +1556,8 @@ export function DriveManager() {
           }
         } catch (error) {
           results.push({
-            id: item?.id,
-            name: item?.name,
+            id: item.id,
+            name: item.name,
             shareLink: '',
             success: false,
             error: error instanceof Error ? error.message : 'Unknown error'
@@ -1571,8 +1571,8 @@ export function DriveManager() {
       // Add skipped items to results
       itemsWithoutPermissions.forEach(item => {
         results.push({
-          id: item?.id,
-          name: item?.name,
+          id: item.id,
+          name: item.name,
           shareLink: '',
           success: false,
           error: 'No permission to share'
@@ -1642,13 +1642,13 @@ export function DriveManager() {
 
     // Filter items that can be permanently deleted based on permissions
     const itemsWithPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return actions?.canPermanentDelete;
     });
 
     const itemsWithoutPermissions = selectedItemsData.filter(item => {
-      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+      const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
       const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
       return !actions?.canPermanentDelete;
     });
@@ -1667,7 +1667,7 @@ export function DriveManager() {
 
     let successCount = 0;
     let failedItems: string[] = [];
-    let skippedItems = itemsWithoutPermissions.map(item => item?.name);
+    let skippedItems = itemsWithoutPermissions.map(item => item.name);
 
     try {
       for (let i = 0; i < itemsWithPermissions.length; i++) {
@@ -1675,11 +1675,11 @@ export function DriveManager() {
         setBulkOperationProgress(prev => ({ 
           ...prev, 
           current: i + 1,
-          operation: `Permanently deleting: ${item?.name}`
+          operation: `Permanently deleting: ${item.name}`
         }));
 
         try {
-          const response = await fetch(`/api/drive/files/${item?.id}`, {
+          const response = await fetch(`/api/drive/files/${item.id}`, {
             method: 'DELETE'
           });
 
@@ -1687,12 +1687,12 @@ export function DriveManager() {
             successCount++;
           } else {
             const errorData = await response.text();
-            failedItems.push(item?.name);
-            console.error(`Failed to permanently delete ${item?.name}:`, response.status, errorData);
+            failedItems.push(item.name);
+            console.error(`Failed to permanently delete ${item.name}:`, response.status, errorData);
           }
         } catch (error) {
-          failedItems.push(item?.name);
-          console.error(`Error permanently deleting ${item?.name}:`, error);
+          failedItems.push(item.name);
+          console.error(`Error permanently deleting ${item.name}:`, error);
         }
 
         if (i < itemsWithPermissions.length - 1) {
@@ -1889,10 +1889,10 @@ export function DriveManager() {
 
       // Separate files and folders
       const fileList = data.files.filter((item: DriveFile) => 
-        item?.mimeType !== 'application/vnd.google-apps.folder'
+        item.mimeType !== 'application/vnd.google-apps.folder'
       );
       const folderList = data.files.filter((item: DriveFile) => 
-        item?.mimeType === 'application/vnd.google-apps.folder'
+        item.mimeType === 'application/vnd.google-apps.folder'
       );
 
       console.log('Processed - Files:', fileList.length, 'Folders:', folderList.length);
@@ -2592,25 +2592,25 @@ export function DriveManager() {
   const processFileOrganization = (item: DriveFile | DriveFolder) => {
     // Example: Auto-tagging based on file type
     let tags: string[] = [];
-    if (item?.mimeType?.includes('document')) {
+    if (item.mimeType?.includes('document')) {
       tags.push('document');
-    } else if (item?.mimeType?.includes('spreadsheet')) {
+    } else if (item.mimeType?.includes('spreadsheet')) {
       tags.push('spreadsheet');
-    } else if (item?.mimeType?.startsWith('image/')) {
+    } else if (item.mimeType?.startsWith('image/')) {
       tags.push('image');
     }
 
     // Example: Smart categorization based on file name
-    if (item?.name?.toLowerCase().includes('report')) {
+    if (item.name?.toLowerCase().includes('report')) {
       tags.push('report');
     }
 
     // Add tags to the file's description or metadata
     if (tags.length > 0) {
-      console.log(`Auto-tagging ${item?.name}:`, tags);
+      console.log(`Auto-tagging ${item.name}:`, tags);
       // You can implement a function to update the file's description
       // or metadata with these tags using the Google Drive API.
-      // Example: updateFileMetadata(item?.id, { tags: tags });
+      // Example: updateFileMetadata(item.id, { tags: tags });
     }
   };
 
@@ -2931,8 +2931,8 @@ export function DriveManager() {
                           const selectedItems = getSelectedItemsData();
                           const downloadableFiles = selectedItems.filter(item => {
                             // Only files can be downloaded, not folders
-                            return item?.type === 'file' && 
-                                   item?.mimeType !== 'application/vnd.google-apps.folder';
+                            return item.type === 'file' && 
+                                   item.mimeType !== 'application/vnd.google-apps.folder';
                           });
                           
                           return downloadableFiles.length > 0 && (
@@ -2945,7 +2945,7 @@ export function DriveManager() {
                         
                         {/* Rename Selected - Available if any item can be renamed */}
                         {getSelectedItemsData().some(item => {
-                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                           return actions?.canRename;
                         }) && (
@@ -2957,12 +2957,12 @@ export function DriveManager() {
                         
                         {/* Export Selected - Available if any Google Workspace file can be exported */}
                         {getSelectedItemsData().some(item => {
-                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
-                          return item?.type === 'file' && 
-                                 item?.mimeType && 
-                                 item?.mimeType.startsWith('application/vnd.google-apps.') &&
-                                 !item?.mimeType.includes('folder') &&
-                                 !item?.mimeType.includes('shortcut');
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                          return item.type === 'file' && 
+                                 item.mimeType && 
+                                 item.mimeType.startsWith('application/vnd.google-apps.') &&
+                                 !item.mimeType.includes('folder') &&
+                                 !item.mimeType.includes('shortcut');
                         }) && (
                           <DropdownMenuItem onClick={() => setIsBulkExportDialogOpen(true)}>
                             <FileText className="h-4 w-4 mr-2" />
@@ -2972,7 +2972,7 @@ export function DriveManager() {
                         
                         {/* Move Selected - Available if any item can be moved */}
                         {getSelectedItemsData().some(item => {
-                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                           return actions?.canMove;
                         }) && (
@@ -2984,7 +2984,7 @@ export function DriveManager() {
                         
                         {/* Copy Selected - Available if any item can be copied */}
                         {getSelectedItemsData().some(item => {
-                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                           return actions?.canCopy;
                         }) && (
@@ -2996,7 +2996,7 @@ export function DriveManager() {
                         
                         {/* Share Selected - Available if any item can be shared */}
                         {getSelectedItemsData().some(item => {
-                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                           return actions?.canShare;
                         }) && (
@@ -3013,7 +3013,7 @@ export function DriveManager() {
                         
                         {/* Check if any selected item can be restored (only for trashed items) */}
                         {getSelectedItemsData().some(item => {
-                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                           return actions?.canRestore;
                         }) && (
@@ -3028,7 +3028,7 @@ export function DriveManager() {
                         
                         {/* Check if any selected item can be moved to trash - owner is me, not shared */}
                         {getSelectedItemsData().some(item => {
-                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           if (!fileOrFolder) return false;
                           // Can trash if: owner is me, not shared, not already in trash
                           const isOwner = fileOrFolder.owners && fileOrFolder.owners.some(owner => owner.me === true);
@@ -3047,7 +3047,7 @@ export function DriveManager() {
                         
                         {/* Check if any selected item can be permanently deleted */}
                         {getSelectedItemsData().some(item => {
-                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item?.id);
+                          const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                           return actions?.canPermanentDelete;
                         }) && (
@@ -4218,30 +4218,30 @@ export function DriveManager() {
                   {/* All items (folders and files) sorted together */}
                   {sortedAllItems.map((item) => (
                     <TableRow 
-                      key={item?.id}
+                      key={item.id}
                       className={`cursor-pointer hover:bg-accent transition-colors ${
-                        selectedItems.has(item?.id) ? 'bg-primary/5 border-primary/20' : ''
+                        selectedItems.has(item.id) ? 'bg-primary/5 border-primary/20' : ''
                       }`}
-                      onClick={() => isSelectMode ? toggleItemSelection(item?.id) : (item.itemType === 'folder' ? handleFolderClick(item?.id) : undefined)}
+                      onClick={() => isSelectMode ? toggleItemSelection(item.id) : (item.itemType === 'folder' ? handleFolderClick(item.id) : undefined)}
                     >
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {isSelectMode && (
                             <Checkbox
-                              checked={selectedItems.has(item?.id)}
-                              onCheckedChange={() => toggleItemSelection(item?.id)}
+                              checked={selectedItems.has(item.id)}
+                              onCheckedChange={() => toggleItemSelection(item.id)}
                               onClick={(e) => e.stopPropagation()}
                               className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                             />
                           )}
                           <FileThumbnailPreview
                             thumbnailLink={item.itemType === 'file' ? item.thumbnailLink : undefined}
-                            fileName={item?.name}
-                            mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item?.mimeType}
+                            fileName={item.name}
+                            mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType}
                             className="transition-all duration-200"
                           >
                             <FileIcon 
-                              mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item?.mimeType} 
+                              mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType} 
                               className="h-4 w-4" 
                             />
                           </FileThumbnailPreview>
@@ -4251,28 +4251,28 @@ export function DriveManager() {
                         <TableCell className="font-medium">
                           <div className="flex items-center space-x-2">
                             {item.itemType === 'folder' ? (
-                              <span className="truncate">{item?.name}</span>
+                              <span className="truncate">{item.name}</span>
                             ) : (
                               <span 
                                 className="truncate hover:text-blue-600 hover:underline"
-                                title={`Click to ${item?.mimeType === 'application/vnd.google-apps.shortcut' ? 'open shortcut' : 'preview'}: ${item?.name}`}
+                                title={`Click to ${item.mimeType === 'application/vnd.google-apps.shortcut' ? 'open shortcut' : 'preview'}: ${item.name}`}
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (item?.mimeType === 'application/vnd.google-apps.shortcut') {
-                                    handleFileAction('preview', item?.id, item?.name);
-                                  } else if (isPreviewable(item?.mimeType)) {
-                                    handleFileAction('preview', item?.id, item?.name);
+                                  if (item.mimeType === 'application/vnd.google-apps.shortcut') {
+                                    handleFileAction('preview', item.id, item.name);
+                                  } else if (isPreviewable(item.mimeType)) {
+                                    handleFileAction('preview', item.id, item.name);
                                   } else {
-                                    handleFileAction('download', item?.id, item?.name);
+                                    handleFileAction('download', item.id, item.name);
                                   }
                                 }}
                               >
-                                {item?.name}
+                                {item.name}
                               </span>
                             )}
                             {item.itemType === 'folder' && <Badge variant="outline" className="text-xs">Folder</Badge>}
                             {item.itemType === 'file' && item.shared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
-                            {item.itemType === 'file' && item?.mimeType === 'application/vnd.google-apps.shortcut' && (
+                            {item.itemType === 'file' && item.mimeType === 'application/vnd.google-apps.shortcut' && (
                               <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">
                                 <Link className="h-3 w-3 mr-1" />
                                 Shortcut
@@ -4283,7 +4283,7 @@ export function DriveManager() {
                       )}
                       {visibleColumns.id && (
                         <TableCell className="text-muted-foreground">
-                          <code className="text-xs bg-muted px-1 rounded">{item?.id}</code>
+                          <code className="text-xs bg-muted px-1 rounded">{item.id}</code>
                         </TableCell>
                       )}
                       {visibleColumns.size && (
@@ -4301,7 +4301,7 @@ export function DriveManager() {
                           {item.itemType === 'folder' ? (
                             <Badge variant="secondary" className="text-xs">Folder</Badge>
                           ) : (
-                            <code className="text-xs bg-muted px-1 rounded">{item?.mimeType}</code>
+                            <code className="text-xs bg-muted px-1 rounded">{item.mimeType}</code>
                           )}
                         </TableCell>
                       )}
@@ -4327,10 +4327,10 @@ export function DriveManager() {
                               const actions = getFileActions(item, activeView);
                               return (
                                 <>
-                                  {item.itemType === 'file' && actions.canPreview && isPreviewable(item?.mimeType) && (
+                                  {item.itemType === 'file' && actions.canPreview && isPreviewable(item.mimeType) && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('preview', item?.id, item?.name);
+                                      handleFileAction('preview', item.id, item.name);
                                     }}>
                                       <Eye className="h-4 w-4 mr-2" />
                                       Preview
@@ -4340,7 +4340,7 @@ export function DriveManager() {
                                   {item.itemType === 'file' && actions.canDownload && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('download', item?.id, item?.name);
+                                      handleFileAction('download', item.id, item.name);
                                     }}>
                                       <Download className="h-4 w-4 mr-2" />
                                       Download
@@ -4350,7 +4350,7 @@ export function DriveManager() {
                                   {actions.canRename && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('rename', item?.id, item?.name);
+                                      handleFileAction('rename', item.id, item.name);
                                     }}>
                                       <Edit className="h-4 w-4 mr-2" />
                                       Rename
@@ -4360,7 +4360,7 @@ export function DriveManager() {
                                   {actions.canMove && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('move', item?.id, item?.name);
+                                      handleFileAction('move', item.id, item.name);
                                     }}>
                                       <Move className="h-4 w-4 mr-2" />
                                       Move
@@ -4370,7 +4370,7 @@ export function DriveManager() {
                                   {actions.canCopy && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('copy', item?.id, item?.name);
+                                      handleFileAction('copy', item.id, item.name);
                                     }}>
                                       <Copy className="h-4 w-4 mr-2" />
                                       Copy
@@ -4380,7 +4380,7 @@ export function DriveManager() {
                                   {actions.canShare && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('share', item?.id, item?.name);
+                                      handleFileAction('share', item.id, item.name);
                                     }}>
                                       <Share className="h-4 w-4 mr-2" />
                                       Share
@@ -4390,7 +4390,7 @@ export function DriveManager() {
                                   {actions.canDetails && (
                                     <DropdownMenuItem onClick={(e) => {
                                       e.stopPropagation();
-                                      handleFileAction('details', item?.id, item?.name);
+                                      handleFileAction('details', item.id, item.name);
                                     }}>
                                       <Info className="h-4 w-4 mr-2" />
                                       Details
@@ -4404,7 +4404,7 @@ export function DriveManager() {
                                       className="text-green-600"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleFileAction('restore', item?.id, item?.name);
+                                        handleFileAction('restore', item.id, item.name);
                                       }}
                                     >
                                       <RefreshCw className="h-4 w-4 mr-2" />
@@ -4417,7 +4417,7 @@ export function DriveManager() {
                                       className="text-orange-600"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleFileAction('trash', item?.id, item?.name);
+                                        handleFileAction('trash', item.id, item.name);
                                       }}
                                     >
                                       <Trash2 className="h-4 w-4 mr-2" />
@@ -4430,7 +4430,7 @@ export function DriveManager() {
                                       className="text-destructive"
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleFileAction('permanentDelete', item?.id, item?.name);
+                                        handleFileAction('permanentDelete', item.id, item.name);
                                       }}
                                     >
                                       <AlertTriangle className="h-4 w-4 mr-2" />
@@ -4565,42 +4565,42 @@ export function DriveManager() {
         isOpen={isBulkDeleteDialogOpen}
         onClose={() => setIsBulkDeleteDialogOpen(false)}
         onConfirm={handleBulkDelete}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as "file" | "folder" }))}
+        selectedItems={getSelectedItemsData()}
       />
 
       <BulkMoveDialog
         isOpen={isBulkMoveDialogOpen}
         onClose={() => setIsBulkMoveDialogOpen(false)}
         onConfirm={handleBulkMove}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as "file" | "folder" }))}
+        selectedItems={getSelectedItemsData()}
       />
 
       <BulkCopyDialog
         isOpen={isBulkCopyDialogOpen}
         onClose={() => setIsBulkCopyDialogOpen(false)}
         onConfirm={handleBulkCopy}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as "file" | "folder" }))}
+        selectedItems={getSelectedItemsData()}
       />
 
       <BulkExportDialog
         isOpen={isBulkExportDialogOpen}
         onClose={() => setIsBulkExportDialogOpen(false)}
         onConfirm={handleBulkExport}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as "file" | "folder" }))}
+        selectedItems={getSelectedItemsData()}
       />
 
       <BulkRenameDialog
         isOpen={isBulkRenameDialogOpen}
         onClose={() => setIsBulkRenameDialogOpen(false)}
         onConfirm={handleBulkRename}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as "file" | "folder" }))}
+        selectedItems={getSelectedItemsData()}
       />
 
       <BulkRestoreDialog
         isOpen={isBulkRestoreDialogOpen}
         onClose={() => setIsBulkRestoreDialogOpen(false)}
         onConfirm={handleBulkRestore}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as "file" | "folder" }))}
+        selectedItems={getSelectedItemsData()}
       />
 
       {/* Enhanced Bulk Permanent Delete Dialog with Security Features */}
@@ -4608,7 +4608,7 @@ export function DriveManager() {
         isOpen={isBulkPermanentDeleteDialogOpen}
         onClose={() => setIsBulkPermanentDeleteDialogOpen(false)}
         onConfirm={handleBulkPermanentDelete}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as "file" | "folder" }))}
+        selectedItems={getSelectedItemsData()}
       />
 
       {/* Enhanced Bulk Operations Progress Indicator */}
@@ -4667,7 +4667,7 @@ export function DriveManager() {
         open={isShareDialogOpen}
         onOpenChange={setIsShareDialogOpen}
         item={selectedItemForShare}
-        items={selectedItemForShare?.id === 'bulk' ? getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as 'file' | 'folder' })) : undefined}
+        items={selectedItemForShare?.id === 'bulk' ? getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item.type as 'file' | 'folder' })) : undefined}
         onShare={handleShare}
       />
 
@@ -4684,7 +4684,7 @@ export function DriveManager() {
         open={isMobileActionsOpen}
         onOpenChange={setIsMobileActionsOpen}
         selectedCount={selectedItems.size}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item?.type as 'file' | 'folder' }))}
+        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item.type as 'file' | 'folder' }))}
         isInTrash={activeView === 'trash' || searchQuery.includes('trashed:true')}
         onBulkDownload={handleBulkDownload}
         onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
