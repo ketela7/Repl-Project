@@ -4457,13 +4457,15 @@ export function DriveManager() {
       />
 
       <FileRenameDialog
-        isOpen={isRenameDialogOpen}
-        onClose={() => {
-          setIsRenameDialogOpen(false);
-          setSelectedFileForAction(null);
+        open={isRenameDialogOpen}
+        onOpenChange={(open) => {
+          setIsRenameDialogOpen(open);
+          if (!open) {
+            setSelectedFileForAction(null);
+          }
         }}
-        fileName={selectedFileForAction?.name || ''}
-        onRename={handleRenameFile}
+        file={selectedFileForAction}
+        onFileRenamed={handleRenameFile}
       />
 
       <FileMoveDialog
