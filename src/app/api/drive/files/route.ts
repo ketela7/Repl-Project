@@ -274,24 +274,7 @@ function buildDriveQuery(filters: FileFilter): string {
   return conditions.join(' and ')
 }
 
-function applyClientSideFilters(files: any[], filters: FileFilter) {
-  let filteredFiles = [...files]
-
-  // Apply client-side filters that can't be handled by Google API
-  if (filters.minSize) {
-    filteredFiles = filteredFiles.filter(file => 
-      file.size && parseInt(file.size) >= filters.minSize!
-    )
-  }
-
-  if (filters.maxSize) {
-    filteredFiles = filteredFiles.filter(file => 
-      file.size && parseInt(file.size) <= filters.maxSize!
-    )
-  }
-
-  return filteredFiles
-}
+// Removed applyClientSideFilters - now using Google Drive API directly with proper query parameters
 
 function getSortKey(sortBy: string) {
   switch (sortBy) {
@@ -512,25 +495,17 @@ export async function GET(request: NextRequest) {
         console.log('Cache hit for:', cacheKey)
       }
 
-      // Apply client-side filters to cached results
-      const filteredFiles = applyClientSideFilters(
-        (cachedData as any)?.files || [],
-        filters
-      )
-
+      // Direct API filtering from cache
       if (process.env.NODE_ENV === 'development') {
         console.log(
           `Retrieved ${(cachedData as any)?.files?.length || 0} files from Drive API`
         )
-        console.log(
-          `After client-side filtering: ${filteredFiles.length} files`
-        )
       }
 
       return NextResponse.json({
-        files: filteredFiles,
+        files: (cachedData as any)?.files || [],
         nextPageToken: (cachedData as any)?.nextPageToken,
-        totalCount: filteredFiles.length,
+        totalCount: (cachedData as any)?.files?.length || 0,
       })
     }
 
@@ -564,16 +539,10 @@ export async function GET(request: NextRequest) {
       console.log(`Retrieved ${result.files?.length || 0} files from Drive API`)
     }
 
-    // Apply client-side filters
-    const filteredFiles = applyClientSideFilters(result.files || [], filters)
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`After client-side filtering: ${filteredFiles.length} files`)
-    }
-
+    // Direct API filtering - no client-side processing needed
     const finalResult = {
       ...result,
-      files: filteredFiles,
+      files: result.files || [],
     }
 
     return NextResponse.json(finalResult)

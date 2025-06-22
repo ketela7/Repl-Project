@@ -44,10 +44,11 @@ import {
   Link,
   FileSpreadsheet,
   Presentation,
-  Video,
-  Music,
+  FileVideo,
+  FileAudio,
   Archive,
-  Code
+  FileCode,
+  FileImage
 } from "lucide-react";
 
 import { lazy, Suspense } from "react";
@@ -166,206 +167,7 @@ const isFileSizeInRange = (
 };
 
 // Enhanced client-side filtering utilities
-const applyClientSideFilters = (
-  files: DriveFile[], 
-  folders: DriveFolder[], 
-  filters: {
-    fileTypeFilter: string[];
-    searchQuery: string;
-    activeView: string;
-    advancedFilters?: {
-      sizeRange?: { min?: number; max?: number; unit: 'B' | 'KB' | 'MB' | 'GB' };
-      createdDateRange?: { from?: Date; to?: Date };
-      modifiedDateRange?: { from?: Date; to?: Date };
-      owner?: string;
-    };
-  }
-) => {
-  let filteredFiles = [...files];
-  let filteredFolders = [...folders];
-  {/*
-
-  // Apply file type filters
-  if (filters.fileTypeFilter.length > 0) {
-    filteredFiles = filteredFiles.filter(file => {
-      return filters.fileTypeFilter.some(type => {
-        switch (type.toLowerCase()) {
-          case 'document':
-            return file.mimeType?.includes('document') || 
-                   file.mimeType?.includes('pdf') || 
-                   file.mimeType?.includes('text') ||
-                   file.mimeType?.includes('word') ||
-                   file.mimeType?.includes('rtf');
-          case 'spreadsheet':
-            return file.mimeType?.includes('spreadsheet') || 
-                   file.mimeType?.includes('excel') ||
-                   file.mimeType?.includes('csv');
-          case 'presentation':
-            return file.mimeType?.includes('presentation') || 
-                   file.mimeType?.includes('powerpoint');
-          case 'image':
-            return file.mimeType?.startsWith('image/');
-          case 'video':
-            return file.mimeType?.startsWith('video/');
-          case 'audio':
-            return file.mimeType?.startsWith('audio/');
-          case 'archive':
-            return file.mimeType?.includes('zip') || 
-                   file.mimeType?.includes('rar') ||
-                   file.mimeType?.includes('tar') ||
-                   file.mimeType?.includes('gzip') ||
-                   file.mimeType?.includes('7z');
-          case 'code':
-            return file.mimeType?.includes('javascript') ||
-                   file.mimeType?.includes('html') ||
-                   file.mimeType?.includes('css') ||
-                   file.mimeType?.includes('json') ||
-                   file.mimeType?.includes('xml') ||
-                   file.name?.match(/\.(js|ts|jsx|tsx|py|java|cpp|c|cs|php|rb|go|rs|swift|kt)$/i);
-          case 'shortcut':
-            return file.mimeType === 'application/vnd.google-apps.shortcut';
-          case 'folder':
-            // Handle folders separately
-            return false;
-          default:
-            return true;
-        }
-      });
-    });
-
-    // Filter folders if 'folder' type is selected
-    if (!filters.fileTypeFilter.includes('folder')) {
-      filteredFolders = [];
-    }
-  }
-
-  // Apply additional search filtering for better results
-  if (filters.searchQuery && filters.searchQuery.trim()) {
-    const searchTerm = filters.searchQuery.toLowerCase();
-
-    filteredFiles = filteredFiles.filter(file => 
-      file.name?.toLowerCase().includes(searchTerm)
-    );
-
-    filteredFolders = filteredFolders.filter(folder => 
-      folder.name?.toLowerCase().includes(searchTerm)
-    );
-  } 
-
-  // Apply advanced filters
-  if (filters.advancedFilters) {
-    const { sizeRange, createdDateRange, modifiedDateRange, owner } = filters.advancedFilters;
-
-    // Size range filter (client-side only since Google Drive API doesn't support it)
-    if (sizeRange && (sizeRange.min || sizeRange.max)) {
-      filteredFiles = filteredFiles.filter(file => {
-        return isFileSizeInRange(file.size, sizeRange.min, sizeRange.max, sizeRange.unit);
-      });
-
-      // Filter folders by size (folders have size = 0)
-      //filteredFolders = filteredFolders.filter(folder => {
-      //  return isFileSizeInRange(0, sizeRange.min, sizeRange.max, sizeRange.unit);
-      //});
-    }
-
-    // Date range filters
-    if (createdDateRange && (createdDateRange.from || createdDateRange.to)) {
-      filteredFiles = filteredFiles.filter(file => {
-        const fileDate = new Date(file.createdTime);
-        const fromDate = createdDateRange.from;
-        const toDate = createdDateRange.to;
-
-        if (fromDate && fileDate < fromDate) return false;
-        if (toDate && fileDate > toDate) return false;
-        return true;
-      });
-
-      filteredFolders = filteredFolders.filter(folder => {
-        const folderDate = new Date(folder.createdTime);
-        const fromDate = createdDateRange.from;
-        const toDate = createdDateRange.to;
-
-        if (fromDate && folderDate < fromDate) return false;
-        if (toDate && folderDate > toDate) return false;
-        return true;
-      });
-    }
-
-    if (modifiedDateRange && (modifiedDateRange.from || modifiedDateRange.to)) {
-      filteredFiles = filteredFiles.filter(file => {
-        const fileDate = new Date(file.modifiedTime);
-        const fromDate = modifiedDateRange.from;
-        const toDate = modifiedDateRange.to;
-
-        if (fromDate && fileDate < fromDate) return false;
-        if (toDate && fileDate > toDate) return false;
-        return true;
-      });
-
-      filteredFolders = filteredFolders.filter(folder => {
-        const folderDate = new Date(folder.modifiedTime);
-        const fromDate = modifiedDateRange.from;
-        const toDate = modifiedDateRange.to;
-
-        if (fromDate && folderDate < fromDate) return false;
-        if (toDate && folderDate > toDate) return false;
-        return true;
-      });
-    }
-
-    // Owner filter
-    if (owner && owner.trim()) {
-      const ownerTerm = owner.toLowerCase();
-      filteredFiles = filteredFiles.filter(file => 
-        file.owners?.some(ownerInfo => 
-          ownerInfo.displayName?.toLowerCase().includes(ownerTerm) ||
-          ownerInfo.emailAddress?.toLowerCase().includes(ownerTerm)
-        )
-      );
-
-      filteredFolders = filteredFolders.filter(folder => 
-        folder.owners?.some(ownerInfo => 
-          ownerInfo.displayName?.toLowerCase().includes(ownerTerm) ||
-          ownerInfo.emailAddress?.toLowerCase().includes(ownerTerm)
-        )
-      );
-    }
-  }
-
-  // Apply view-specific filters based on activeView
-  // These filters are primarily handled at the API level, but we add client-side filtering as backup
-  if (filters.activeView && filters.activeView !== 'all') {
-    switch (filters.activeView) {
-      case 'my-drive':
-        // Show only files/folders owned by me
-        filteredFiles = filteredFiles.filter(file => file.ownedByMe === true || file.ownedByMe === undefined);
-        filteredFolders = filteredFolders.filter(folder => folder.ownedByMe === true || folder.ownedByMe === undefined);
-        break;
-      case 'shared':
-        // Show only files/folders shared with me
-        filteredFiles = filteredFiles.filter(file => file.shared === true);
-        filteredFolders = filteredFolders.filter(folder => folder.shared === true);
-        break;
-      case 'starred':
-        // Show only starred files/folders
-        filteredFiles = filteredFiles.filter(file => file.starred === true);
-        filteredFolders = filteredFolders.filter(folder => folder.starred === true);
-        break;
-      case 'trash':
-        // Show only trashed files/folders
-        filteredFiles = filteredFiles.filter(file => file.trashed === true);
-        filteredFolders = filteredFolders.filter(folder => folder.trashed === true);
-        break;
-      case 'recent':
-        // Recent files are handled by sorting (modifiedTime desc)
-        break;
-    }
-  }
-  */}
-  
-
-  return { filteredFiles, filteredFolders };
-};
+// Removed applyClientSideFilters - now using Google Drive API directly with proper query parameters;
 
 // This function is deprecated - now using getFileActions from utils
 
@@ -508,21 +310,16 @@ export function DriveManager() {
       : <ChevronDown className="h-4 w-4" />;
   };
 
-  // Manual search: Only process submitted search queries
+  // Direct API filtering - no client-side processing needed
   const { filteredFiles: clientFilteredFiles, filteredFolders: clientFilteredFolders } = React.useMemo(() => {
-    return applyClientSideFilters(files, folders, {
-      fileTypeFilter,
-      searchQuery: submittedSearchQuery,
-      activeView,
-      advancedFilters
-    });
-  }, [files, folders, fileTypeFilter, submittedSearchQuery, activeView, advancedFilters]);
+    return { filteredFiles: files, filteredFolders: folders };
+  }, [files, folders]);
 
   // Sort items based on current sort configuration
   const sortedAllItems = React.useMemo(() => {
     const allItems = [
-      ...clientFilteredFolders.map(folder => ({ ...folder, itemType: 'folder' as const })),
-      ...clientFilteredFiles.map(file => ({ ...file, itemType: 'file' as const }))
+      ...clientFilteredFolders.map((folder: any) => ({ ...folder, itemType: 'folder' as const })),
+      ...clientFilteredFiles.map((file: any) => ({ ...file, itemType: 'file' as const }))
     ];
 
     if (!sortConfig) {
@@ -3380,10 +3177,10 @@ export function DriveManager() {
 
                       {/* Owner */}
                       <div className="space-y-2">
-                        <label className="text-xs font-medium text-muted-foreground">Owner (Name or Email)</label>
+                        <label className="text-xs font-medium text-muted-foreground">Owner Email</label>
                         <Input
-                          type="text"
-                          placeholder="Enter owner name or email"
+                          type="email"
+                          placeholder="Enter owner email"
                           value={advancedFilters.owner || ''}
                           onChange={(e) => setAdvancedFilters(prev => ({
                             ...prev,
@@ -3464,7 +3261,7 @@ export function DriveManager() {
                   {sortedFiles.filter(f => f.mimeType?.includes('image')).length > 0 && (
                     <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
                       <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-green-500" />
+                        <FileImage className="h-4 w-4 text-green-500" />
                         <span className="text-sm">Images</span>
                       </div>
                       <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
@@ -3529,7 +3326,7 @@ export function DriveManager() {
                   {sortedFiles.filter(f => f.mimeType?.startsWith('video/')).length > 0 && (
                     <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
                       <div className="flex items-center gap-2">
-                        <Video className="h-4 w-4 text-red-500" />
+                        <FileVideo className="h-4 w-4 text-red-500" />
                         <span className="text-sm">Videos</span>
                       </div>
                       <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
@@ -3542,7 +3339,7 @@ export function DriveManager() {
                   {sortedFiles.filter(f => f.mimeType?.startsWith('audio/')).length > 0 && (
                     <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-md">
                       <div className="flex items-center gap-2">
-                        <Music className="h-4 w-4 text-indigo-500" />
+                        <FileAudio className="h-4 w-4 text-indigo-500" />
                         <span className="text-sm">Audio</span>
                       </div>
                       <Badge variant="outline" className="border-indigo-500 text-indigo-700 dark:text-indigo-300">
@@ -4289,7 +4086,7 @@ export function DriveManager() {
                       )}
                       {visibleColumns.owners && (
                         <TableCell className="text-muted-foreground">
-                          {item.owners?.map(owner => owner.displayName || owner.emailAddress).join(', ') || '-'}
+                          {item.owners?.map((owner: any) => owner.displayName || owner.emailAddress).join(', ') || '-'}
                         </TableCell>
                       )}
                       {visibleColumns.mimeType && (

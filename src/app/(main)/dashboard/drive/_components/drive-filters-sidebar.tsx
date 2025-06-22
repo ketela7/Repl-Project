@@ -468,8 +468,8 @@ export function DriveFiltersSidebar({
                         <Label className="text-sm font-medium">Owner</Label>
                       </div>
                       <Input
-                        type="text"
-                        placeholder="Enter owner name or email"
+                        type="email"
+                        placeholder="Enter owner email"
                         value={ownerFilter}
                         onChange={(e) => setOwnerFilter(e.target.value)}
                         className="h-8 text-xs"

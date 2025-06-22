@@ -7,7 +7,7 @@ import {
   FileVideo, 
   FileText, 
   FileImage, 
-  Music, 
+  FileAudio, 
   Archive, 
   FileCode, 
   FileSpreadsheet,
@@ -15,10 +15,7 @@ import {
   File,
   Folder,
   BookOpen,
-  Link,
-  Video,
-  ImageIcon,
-  Code2
+  Link
 } from "lucide-react";
 import { getCategoryIcon, getCategoryColor, getFileCategory } from '@/lib/google-drive/utils';
 
@@ -286,14 +283,14 @@ const getCategoryConfig = (categoryName: string): Omit<FileCategory, 'count' | '
       color: 'border-purple-200 dark:border-purple-800', 
       bgColor: 'bg-purple-50 dark:bg-purple-950/50',
       textColor: 'text-purple-700 dark:text-purple-300',
-      icon: <ImageIcon className="h-4 w-4" />
+      icon: <FileImage className="h-4 w-4" />
     },
     'Audio': {
       name: 'Audio',
       color: 'border-orange-200 dark:border-orange-800',
       bgColor: 'bg-orange-50 dark:bg-orange-950/50', 
       textColor: 'text-orange-700 dark:text-orange-300',
-      icon: <Music className="h-4 w-4" />
+      icon: <FileAudio className="h-4 w-4" />
     },
     'Spreadsheets': {
       name: 'Spreadsheets',
@@ -321,7 +318,7 @@ const getCategoryConfig = (categoryName: string): Omit<FileCategory, 'count' | '
       color: 'border-indigo-200 dark:border-indigo-800',
       bgColor: 'bg-indigo-50 dark:bg-indigo-950/50',
       textColor: 'text-indigo-700 dark:text-indigo-300',
-      icon: <Code2 className="h-4 w-4" />
+      icon: <FileCode className="h-4 w-4" />
     },
     'Others': {
       name: 'Others',

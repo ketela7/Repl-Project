@@ -419,7 +419,8 @@ export function FiltersDialog({
                   Owner
                 </Label>
                 <Input
-                  placeholder="Search by owner name or email"
+                  type="email"
+                  placeholder="Search by owner email"
                   className={`${getMobileInputClasses()} text-sm`}
                   value={advancedFilters.owner || ''}
                   onChange={(e) => handleAdvancedFiltersChange({

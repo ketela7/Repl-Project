@@ -3,7 +3,7 @@
 
 ## Overview
 
-This is a Professional Google Drive Management application built with Next.js 15 and shadcn/ui components, featuring a modern and responsive design with Google OAuth authentication via NextAuth.js. The project includes a sophisticated file management system that provides intelligent, professional-grade tools for file organization, search, and interaction. The application uses TypeScript, ESLint, Tailwind CSS 4.x, and includes comprehensive UI components for building enterprise-grade interfaces with integrated cloud storage capabilities.
+This is a Professional Google Drive Management application built with Next.js 15 and shadcn/ui components, featuring a modern and responsive design with Google OAuth authentication via NextAuth.js. The project includes a sophisticated file management system that provides intelligent, professional-grade tools for file organization, search, and interaction using direct Google Drive API queries for optimal performance. The application uses TypeScript, ESLint, Tailwind CSS 4.x, and includes comprehensive UI components for building enterprise-grade interfaces with integrated cloud storage capabilities.
 
 ## System Architecture
 
@@ -72,6 +72,15 @@ Preferred communication style: Simple, everyday language.
 Migration preferences: User prefers to discuss project rules and documentation before development work.
 
 ## Recent Changes
+
+### June 2025: **Complete Migration from clientSideFilter to liveFilter**
+- **Google Drive API Direct Filtering**: Removed `applyClientSideFilters` completely and implemented direct Google Drive API queries
+- **Backend API Optimization**: Updated `/api/drive/files/route.ts` to use official Google Drive API query parameters exclusively
+- **Owner Filter Enhancement**: Changed owner filtering from "name or email" to "email only" as per Google Drive API capabilities
+- **Filter Dialog UX**: Updated all filter dialogs to use "Submit" instead of "Close" buttons for better user experience
+- **FileIcon Synchronization**: Synchronized FileIcon components across all UI elements (badges, menus, file types) for consistency
+- **Code Cleanup**: Removed all unused client-side filtering modules and functions for cleaner project structure
+- **Performance Improvement**: Direct API filtering provides faster response times and reduced client-side processing
 
 ### June 2025: **Project Structure Cleanup & Critical Stability Fixes**
 - **Documentation Overhaul**: Created comprehensive README.md and PROJECT_RULES.md with complete project guidelines

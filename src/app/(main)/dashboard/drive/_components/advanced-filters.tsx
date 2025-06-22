@@ -278,10 +278,12 @@ export function AdvancedFilters({
           Owner
         </Label>
         <Input
+          type="email"
           placeholder="Enter owner email..."
           value={filters.owner || ''}
           onChange={(e) => handleFilterChange('owner', e.target.value)}
         />
+        <p className="text-xs text-muted-foreground">Filter by owner email address only</p>
       </div>
     </div>
   );
@@ -311,7 +313,7 @@ export function AdvancedFilters({
               onClick={handleApply}
               className={getTouchButtonClasses('default')}
             >
-              Apply Filters
+              Submit
             </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
@@ -336,7 +338,7 @@ export function AdvancedFilters({
             Cancel
           </Button>
           <Button onClick={handleApply}>
-            Apply Filters
+            Submit
           </Button>
         </DialogFooter>
       </DialogContent>

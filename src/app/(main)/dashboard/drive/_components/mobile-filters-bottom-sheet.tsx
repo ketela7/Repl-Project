@@ -338,9 +338,10 @@ export function MobileFiltersBottomSheet({
 
                 {/* Owner Filter */}
                 <div className="space-y-2">
-                  <Label className="text-sm font-medium">Owner (Name or Email)</Label>
+                  <Label className="text-sm font-medium">Owner Email</Label>
                   <Input
-                    placeholder="Enter owner name or email"
+                    type="email"
+                    placeholder="Enter owner email"
                     className="h-9"
                     value={advancedFilters.owner || ''}
                     onChange={(e) => handleAdvancedFilterChange('owner', e.target.value)}
