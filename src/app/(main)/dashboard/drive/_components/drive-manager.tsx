@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -404,6 +404,10 @@ export function DriveManager() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [needsReauth, setNeedsReauth] = useState(false);
+  
+  // Request throttling to prevent multiple identical calls - using refs to avoid React dependency issues
+  const lastFetchCallRef = useRef<string>('');
+  const fetchThrottleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Manual search state - no debounce, only process on submit
   const [submittedSearchQuery, setSubmittedSearchQuery] = useState('');
@@ -1745,8 +1749,26 @@ export function DriveManager() {
     }
   };
 
-  const fetchFiles = async (parentId?: string, query?: string, pageToken?: string, append = false, viewFilter?: string) => {
+  const fetchFiles = useCallback(async (parentId?: string, query?: string, pageToken?: string, append = false, viewFilter?: string) => {
     const requestId = `fetch-files-${parentId || 'root'}-${query || ''}-${pageToken || ''}`;
+    
+    // Throttle identical requests within 100ms to prevent rapid successive calls
+    if (lastFetchCallRef.current === requestId && !append) {
+      console.log('[Throttle] Skipping duplicate fetchFiles call:', requestId);
+      return;
+    }
+    lastFetchCallRef.current = requestId;
+    
+    // Clear any existing throttle timeout
+    if (fetchThrottleTimeoutRef.current) {
+      clearTimeout(fetchThrottleTimeoutRef.current);
+    }
+    
+    // Set timeout to reset throttle after 200ms
+    fetchThrottleTimeoutRef.current = setTimeout(() => {
+      lastFetchCallRef.current = '';
+    }, 200);
+    
     const startTime = Date.now();
 
     try {
@@ -1907,7 +1929,7 @@ export function DriveManager() {
       setLoading(false);
       setLoadingMore(false);
     }
-  };
+  }, [searchQuery, fileTypeFilter, advancedFilters, activeView]);
 
   // Instant search input handler - no processing while typing
   const handleSearchInput = (value: string) => {
@@ -1915,7 +1937,7 @@ export function DriveManager() {
   };
 
   // Manual search submission - only process when user submits
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     const query = searchQuery.trim();
     setSubmittedSearchQuery(query);
     if (query) {
@@ -1923,9 +1945,9 @@ export function DriveManager() {
     } else {
       fetchFiles(currentFolderId);
     }
-  };
+  }, [searchQuery, currentFolderId, fetchFiles]);
 
-  const handleViewChange = (view: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash') => {
+  const handleViewChange = useCallback((view: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash') => {
     setActiveView(view);
     setCurrentFolderId(null); // Reset to root when changing views
     setSearchQuery(''); // Clear search
@@ -1935,7 +1957,7 @@ export function DriveManager() {
     setIsSelectMode(false);
     
     fetchFiles(undefined, undefined, undefined, false, view);
-  };
+  }, [fetchFiles]);
 
   const handleFileTypeFilterChange = (newFileTypes: string[]) => {
     setFileTypeFilter(newFileTypes);
@@ -1958,7 +1980,7 @@ export function DriveManager() {
     // Note: No need to call fetchFiles here as client-side filtering handles this
   };
 
-  const handleFolderClick = (folderId: string) => {
+  const handleFolderClick = useCallback((folderId: string) => {
     setCurrentFolderId(folderId);
     setSearchQuery('');
     setNextPageToken(null); // Reset pagination
@@ -1966,21 +1988,21 @@ export function DriveManager() {
     // Track folder access for navigation
 
     fetchFiles(folderId);
-  };
+  }, [fetchFiles]);
 
-  const handleFolderNavigation = (folderId: string | null) => {
+  const handleFolderNavigation = useCallback((folderId: string | null) => {
     setCurrentFolderId(folderId);
     setSearchQuery('');
     setNextPageToken(null); // Reset pagination
     fetchFiles(folderId || undefined);
-  };
+  }, [fetchFiles]);
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     setNextPageToken(null); // Reset pagination
     await fetchFiles(currentFolderId || undefined, undefined, undefined, false, activeView);
     setRefreshing(false);
-  };
+  }, [fetchFiles, currentFolderId, activeView]);
 
   const handleLoadMore = () => {
     if (nextPageToken && !loadingMore) {
@@ -2702,6 +2724,15 @@ export function DriveManager() {
         window.removeEventListener('scroll', onScroll);
       };
     }
+  }, []);
+
+  // Cleanup throttle timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (fetchThrottleTimeoutRef.current) {
+        clearTimeout(fetchThrottleTimeoutRef.current);
+      }
+    };
   }, []);
 
   // Show permission required card if no access to Google Drive
