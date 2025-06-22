@@ -69,6 +69,13 @@ export function FileOrganizationPanel({
     });
   };
 
+  const handleCustomRulesChange = (newRules: TaggingRule[]) => {
+    onSettingsChange({
+      ...settings,
+      customRules: newRules
+    });
+  };
+
   const handleAddRule = () => {
     if (!newRule.name || newRule.tags?.length === 0) {
       toast.error('Please provide a name and at least one tag for the rule');
@@ -84,19 +91,19 @@ export function FileOrganizationPanel({
       priority: newRule.priority || 1
     };
 
-    handleSettingChange('customRules' as any, [...settings.customRules, rule]);
+    handleCustomRulesChange([...settings.customRules, rule]);
     setIsAddingRule(false);
     setNewRule({ name: '', condition: {}, tags: [], enabled: true, priority: 1 });
     toast.success('Tagging rule added successfully');
   };
 
   const handleDeleteRule = (ruleId: string) => {
-    handleSettingChange('customRules' as any, settings.customRules.filter(rule => rule.id !== ruleId));
+    handleCustomRulesChange(settings.customRules.filter(rule => rule.id !== ruleId));
     toast.success('Tagging rule deleted');
   };
 
   const handleToggleRule = (ruleId: string) => {
-    handleSettingChange('customRules' as any, settings.customRules.map(rule =>
+    handleCustomRulesChange(settings.customRules.map(rule =>
       rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
     ));
   };

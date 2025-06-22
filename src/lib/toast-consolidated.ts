@@ -207,6 +207,31 @@ export const QuickToast = {
   }),
 };
 
+// Legacy API compatibility - these are the missing functions causing TypeScript errors
+export const successToast = {
+  copied: (count?: number) => FileToast.copied(count),
+  generic: (message: string) => Toast.success(message),
+};
+
+export const errorToast = {
+  generic: (message: string, options?: { description?: string }) => 
+    Toast.error(message, { description: options?.description }),
+  downloadFailed: (fileName: string) => 
+    Toast.error(`Failed to download "${fileName}"`),
+};
+
+export const loadingToast = {
+  start: (message: string, id: string) => Toast.loading(message, id),
+  dismiss: (id: string) => Toast.dismiss(id),
+  error: (message: string, id: string) => Toast.updateError(message, id),
+};
+
+export const toastUtils = {
+  download: async (operationFn: () => Promise<void>) => {
+    return OperationToast.execute("Download", operationFn);
+  },
+};
+
 // Export consolidated API
 export { toast };
 export default Toast;

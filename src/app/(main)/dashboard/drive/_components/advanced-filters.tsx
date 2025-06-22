@@ -303,13 +303,13 @@ export function AdvancedFilters({
             <Button
               variant="outline"
               onClick={onClose}
-              className={getTouchButtonClasses('default')}
+              className={getTouchButtonClasses()}
             >
               Cancel
             </Button>
             <Button
               onClick={handleApply}
-              className={getTouchButtonClasses('default')}
+              className={getTouchButtonClasses()}
             >
               Apply Filters
             </Button>
