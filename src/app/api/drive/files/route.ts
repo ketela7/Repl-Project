@@ -235,8 +235,7 @@ export async function GET(request: NextRequest) {
     const cacheKey = driveCache.generateDriveKey({
       pageToken,
       parentId: folderId,
-      userId: user.email || 'unknown',
-      filters: JSON.stringify(filters)
+      userId: user.email || 'unknown'
     });
 
     // Build the Drive API query using the consolidated function

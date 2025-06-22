@@ -91,8 +91,7 @@ import { formatFileSize, formatDriveFileDate, isPreviewable, getFileActions } fr
 import { formatFileTime, getRelativeTime } from '@/lib/timezone';
 import { useTimezoneContext } from '@/components/timezone-provider';
 import { FileIcon } from '@/components/file-icon';
-import { toast } from "sonner";
-import { successToast, errorToast, warningToast, infoToast, loadingToast, toastUtils } from '@/lib/toast';
+import { Toast, FileToast, QuickToast } from "@/lib/toast-consolidated";
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useIsMobile } from '@/hooks/use-mobile';
 // Core drive management imports only

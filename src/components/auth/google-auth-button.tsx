@@ -4,7 +4,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { errorToast, loadingToast } from "@/lib/toast";
+import { Toast, QuickToast } from "@/lib/toast-consolidated";
 
 interface GoogleAuthButtonProps {
   className?: string;

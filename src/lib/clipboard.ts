@@ -1,7 +1,7 @@
 /**
  * Enhanced clipboard utilities with toast notifications
  */
-import { successToast, errorToast } from './toast';
+import { Toast } from './toast-consolidated';
 
 /**
  * Copy text to clipboard with automatic toast feedback

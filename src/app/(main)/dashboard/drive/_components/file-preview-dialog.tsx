@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { X, Download, ExternalLink, Maximize2, Minimize2, FileText, Image, Video, Music, AlertCircle } from "lucide-react";
 import { DriveFile } from '@/lib/google-drive/types';
 import { getPreviewUrl, isImageFile, isVideoFile, isAudioFile, isDocumentFile, formatFileSize } from '@/lib/google-drive/utils';
-import { successToast, errorToast, toastUtils } from '@/lib/toast';
+import { Toast } from "@/lib/toast-consolidated";
 
 interface FilePreviewDialogProps {
   open: boolean;

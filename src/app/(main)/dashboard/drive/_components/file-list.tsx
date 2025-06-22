@@ -140,8 +140,7 @@ export function FileList({
           <TableRow>
             <TableHead className="w-12">
               <Checkbox
-                checked={allSelected}
-                indeterminate={someSelected}
+                checked={allSelected ? true : someSelected ? 'indeterminate' : false}
                 onCheckedChange={onSelectAll}
               />
             </TableHead>
