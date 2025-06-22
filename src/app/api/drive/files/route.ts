@@ -296,9 +296,10 @@ export async function GET(request: NextRequest) {
               pageToken,
               parentId: folderId
             }),
-            `Drive API search for "${filters.search}" for user ${user.email}`
+            `Drive API search for "${filters.search}" for user ${user.email}${folderId ? ` in folder ${folderId}` : ''}`
           );
-        }
+        },
+        folderId
       );
       
       // Apply client-side filters to search results

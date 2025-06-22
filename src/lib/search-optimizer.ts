@@ -28,7 +28,8 @@ class SearchOptimizer {
   async optimizedSearch(
     searchQuery: string,
     userId: string,
-    apiCall: () => Promise<any>
+    apiCall: () => Promise<any>,
+    folderId?: string
   ): Promise<SearchResult> {
     // Clean search query
     const cleanQuery = searchQuery.trim().toLowerCase();
@@ -37,13 +38,13 @@ class SearchOptimizer {
     }
 
     // Check for incremental search optimization
-    const incrementalResult = this.checkIncrementalSearch(cleanQuery, userId);
+    const incrementalResult = this.checkIncrementalSearch(cleanQuery, userId, folderId);
     if (incrementalResult) {
       return incrementalResult;
     }
 
     // Generate cache key
-    const cacheKey = this.generateSearchKey(cleanQuery, userId);
+    const cacheKey = this.generateSearchKey(cleanQuery, userId, folderId);
     
     // Check cache first
     const cached = this.getFromCache(cacheKey);
@@ -73,10 +74,15 @@ class SearchOptimizer {
   /**
    * Check if we can use incremental search (extending previous results)
    */
-  private checkIncrementalSearch(query: string, userId: string): SearchResult | null {
-    // Find cached results that this query extends
+  private checkIncrementalSearch(query: string, userId: string, folderId?: string): SearchResult | null {
+    // Find cached results that this query extends (same folder context)
+    const folderSuffix = folderId ? `:folder:${folderId}` : '';
+    
     for (const [cachedKey, result] of Object.entries(this.cache)) {
       if (!this.isCacheValid(result)) continue;
+      
+      // Only match within same folder context
+      if (!cachedKey.endsWith(folderSuffix)) continue;
       
       const cachedQuery = result.searchQuery.toLowerCase();
       
@@ -87,7 +93,7 @@ class SearchOptimizer {
           file.mimeType?.toLowerCase().includes(query)
         );
 
-        console.log(`[SearchOptimizer] Incremental search: "${cachedQuery}" -> "${query}" (${result.files.length} -> ${filteredFiles.length} files)`);
+        console.log(`[SearchOptimizer] Incremental search (folder: ${folderId || 'root'}): "${cachedQuery}" -> "${query}" (${result.files.length} -> ${filteredFiles.length} files)`);
 
         return {
           files: filteredFiles,
@@ -166,8 +172,9 @@ class SearchOptimizer {
   /**
    * Generate cache key for search
    */
-  private generateSearchKey(query: string, userId: string): string {
-    return `search:${userId}:${query}`;
+  private generateSearchKey(query: string, userId: string, folderId?: string): string {
+    const folderPart = folderId ? `:folder:${folderId}` : '';
+    return `search:${userId}:${query}${folderPart}`;
   }
 
   /**

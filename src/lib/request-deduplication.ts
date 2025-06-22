@@ -64,17 +64,22 @@ class RequestDeduplicator {
     folderId?: string;
     pageToken?: string;
   }): string {
+    // Create more specific keys for folder navigation
+    const contextKey = params.folderId ? `folder:${params.folderId}` : 'root';
+    const searchKey = params.search ? `search:${params.search}` : 'browse';
+    const paginationKey = params.pageToken ? `page:${params.pageToken.substring(0, 10)}` : 'p1';
+    
     const keyParts = [
       'drive-files',
       params.userId,
-      params.pageSize || 50,
+      contextKey,
+      searchKey,
       params.fileType || 'all',
       params.viewStatus || 'all',
       params.sortBy || 'modified',
       params.sortOrder || 'desc',
-      params.search || '',
-      params.folderId || 'root',
-      params.pageToken || '',
+      paginationKey,
+      params.pageSize || 50
     ];
     return keyParts.join('|');
   }
