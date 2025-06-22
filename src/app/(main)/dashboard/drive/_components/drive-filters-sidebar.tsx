@@ -332,7 +332,10 @@ export function DriveFiltersSidebar({
                           className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                         />
                         <div className="flex items-center space-x-2 flex-1 min-w-0">
-                          <Icon className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />
+                          {(() => {
+                            const IconComponent = Icon as React.ComponentType<any>;
+                            return <IconComponent className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-primary' : 'text-muted-foreground'}`} />;
+                          })()}
                           <label 
                             htmlFor={key} 
                             className={`text-xs font-medium cursor-pointer truncate ${

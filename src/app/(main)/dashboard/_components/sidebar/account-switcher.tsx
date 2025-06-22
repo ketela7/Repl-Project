@@ -23,7 +23,7 @@ export function AccountSwitcher({
       email: "demo@example.com",
       name: "Demo User",
       avatar: "/placeholder-avatar.jpg",
-      plan: "Free"
+      role: "Free"
     }
   ],
 }: {

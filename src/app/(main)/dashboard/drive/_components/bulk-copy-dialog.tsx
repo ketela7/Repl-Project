@@ -171,7 +171,7 @@ export function BulkCopyDialog({
           onClose={() => setIsCopyDialogOpen(false)}
           fileName={`${files.length} files`}
           currentParentId={null}
-          onCopy={handleCopyConfirm}
+          onCopy={async (newName: string, parentId: string) => { handleCopyConfirm(parentId); }}
         />
       </>
     );
@@ -291,12 +291,9 @@ export function BulkCopyDialog({
       <FileCopyDialog
         isOpen={isCopyDialogOpen}
         onClose={() => setIsCopyDialogOpen(false)}
-        onConfirm={handleCopyConfirm}
-        selectedFile={files.length > 0 ? { 
-          id: files[0].id, 
-          name: `${files.length} files`,
-          parentId: undefined
-        } : null}
+        onCopy={async (newName: string, parentId: string) => { handleCopyConfirm(parentId); }}
+        fileName={`${files.length} files`}
+        currentParentId={null}
       />
     </>
   );

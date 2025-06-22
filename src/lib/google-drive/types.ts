@@ -48,6 +48,14 @@ export interface DriveFile {
 
 
 
+export interface TaggingCondition {
+  fileName?: RegExp | string;
+  mimeType?: string[];
+  fileSize?: { min?: number; max?: number };
+  parentFolder?: string[];
+  keywords?: string[];
+}
+
 export interface TaggingRule {
   id: string;
   name: string;
@@ -56,14 +64,6 @@ export interface TaggingRule {
   category?: string;
   enabled: boolean;
   priority: number;
-}
-
-export interface TaggingCondition {
-  fileName?: RegExp | string;
-  mimeType?: string[];
-  fileSize?: { min?: number; max?: number };
-  parentFolder?: string[];
-  keywords?: string[];
 }
 
 export interface OrganizationSettings {
@@ -151,4 +151,30 @@ export interface DriveUserInfo {
     usageInDrive: string;
     usageInDriveTrash: string;
   };
+}
+
+export interface TaggingCondition {
+  fileName?: RegExp | string;
+  mimeType?: string[];
+  fileSize?: { min?: number; max?: number };
+  parentFolder?: string[];
+  keywords?: string[];
+}
+
+export interface TaggingRule {
+  id: string;
+  name: string;
+  condition: TaggingCondition;
+  tags: string[];
+  category?: string;
+  enabled: boolean;
+  priority: number;
+}
+
+export interface OrganizationSettings {
+  autoTagging: boolean;
+  smartCategorization: boolean;
+  customRules: TaggingRule[];
+  tagSuggestions: boolean;
+  duplicateDetection: boolean;
 }

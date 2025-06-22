@@ -154,7 +154,7 @@ export function BulkMoveDialog({
           onClose={() => setIsMoveDialogOpen(false)}
           fileName={`${selectedItems.length} items`}
           currentParentId={null}
-          onMove={handleMoveConfirm}
+          onMove={async (newParentId: string) => { handleMoveConfirm(newParentId); }}
         />
       </>
     );
@@ -255,12 +255,9 @@ export function BulkMoveDialog({
       <FileMoveDialog
         isOpen={isMoveDialogOpen}
         onClose={() => setIsMoveDialogOpen(false)}
-        onConfirm={handleMoveConfirm}
-        selectedFile={selectedItems.length > 0 ? { 
-          id: selectedItems[0].id, 
-          name: `${selectedItems.length} items`,
-          parentId: undefined
-        } : null}
+        onMove={async (newParentId: string) => { handleMoveConfirm(newParentId); }}
+        fileName={`${selectedItems.length} items`}
+        currentParentId={null}
       />
     </>
   );

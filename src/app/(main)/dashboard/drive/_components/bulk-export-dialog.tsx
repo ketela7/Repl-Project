@@ -159,11 +159,11 @@ export function BulkExportDialog({
         for (let i = 0; i < compatibleFiles.length; i++) {
           const file = compatibleFiles[i];
           try {
-            setProgress(prev => ({ 
-              ...prev, 
+            setProgress({
               current: i + 1,
+              total: compatibleFiles.length,
               currentFile: file.name
-            }));
+            });
             
             // Attempt to export the file
                 const response = await fetch(

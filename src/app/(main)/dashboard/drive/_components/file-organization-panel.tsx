@@ -62,7 +62,7 @@ export function FileOrganizationPanel({
     priority: 1
   });
 
-  const handleSettingChange = (key: keyof OrganizationSettings, value: boolean | string) => {
+  const handleSettingChange = (key: keyof OrganizationSettings, value: boolean | string | TaggingRule[]) => {
     onSettingsChange({
       ...settings,
       [key]: value
@@ -84,19 +84,19 @@ export function FileOrganizationPanel({
       priority: newRule.priority || 1
     };
 
-    handleSettingChange('customRules' as any, [...settings.customRules, rule]);
+    handleSettingChange('customRules', [...settings.customRules, rule]);
     setIsAddingRule(false);
     setNewRule({ name: '', condition: {}, tags: [], enabled: true, priority: 1 });
     toast.success('Tagging rule added successfully');
   };
 
   const handleDeleteRule = (ruleId: string) => {
-    handleSettingChange('customRules' as any, settings.customRules.filter(rule => rule.id !== ruleId));
+    handleSettingChange('customRules', settings.customRules.filter(rule => rule.id !== ruleId));
     toast.success('Tagging rule deleted');
   };
 
   const handleToggleRule = (ruleId: string) => {
-    handleSettingChange('customRules' as any, settings.customRules.map(rule =>
+    handleSettingChange('customRules', settings.customRules.map(rule =>
       rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
     ));
   };

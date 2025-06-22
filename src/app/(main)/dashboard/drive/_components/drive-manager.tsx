@@ -603,10 +603,10 @@ export function DriveManager() {
       return item ? { 
         id: item.id, 
         name: item.name, 
-        type: 'mimeType' in item ? 'file' : 'folder',
+        type: ('mimeType' in item ? 'file' : 'folder') as 'file' | 'folder',
         mimeType: 'mimeType' in item ? item.mimeType : 'application/vnd.google-apps.folder'
       } : null;
-    }).filter(Boolean);
+    }).filter((item): item is { id: string; name: string; type: 'file' | 'folder'; mimeType: string } => item !== null);
   };
 
   const toggleItemSelection = (itemId: string) => {
@@ -2664,7 +2664,7 @@ export function DriveManager() {
     if (hasAccess === null) return;
     
     if (submittedSearchQuery.trim()) {
-      fetchFiles(currentFolderId, submittedSearchQuery.trim());
+      fetchFiles(currentFolderId || undefined, submittedSearchQuery.trim());
     } else {
       fetchFiles(currentFolderId || undefined);
     }
@@ -3031,7 +3031,7 @@ export function DriveManager() {
                           const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           if (!fileOrFolder) return false;
                           // Can trash if: owner is me, not shared, not already in trash
-                          const isOwner = fileOrFolder.owners && fileOrFolder.owners.some(owner => owner.me === true);
+                          const isOwner = fileOrFolder.ownedByMe === true;
                           const isShared = fileOrFolder.shared;
                           const isTrashed = fileOrFolder.trashed;
                           return isOwner && !isShared && !isTrashed;

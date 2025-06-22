@@ -41,6 +41,7 @@ interface BulkPermanentDeleteDialogProps {
     id: string;
     name: string;
     type: 'file' | 'folder';
+    mimeType?: string;
   }>;
 }
 
@@ -157,7 +158,7 @@ export function BulkPermanentDeleteDialog({
               <Checkbox
                 id="acknowledge-warning"
                 checked={acknowledgeWarning}
-                onCheckedChange={setAcknowledgeWarning}
+                onCheckedChange={(checked) => setAcknowledgeWarning(checked === true)}
                 className="mt-1"
               />
               <Label
@@ -178,9 +179,8 @@ export function BulkPermanentDeleteDialog({
                 type="text"
                 value={confirmationText}
                 onChange={(e) => setConfirmationText(e.target.value)}
-                className={getMobileInputClasses()}
+                className={`${getMobileInputClasses()} font-mono`}
                 placeholder="Type: permanently delete"
-                className="font-mono"
                 disabled={!acknowledgeWarning}
               />
               {confirmationText && confirmationText.toLowerCase() !== 'permanently delete' && (

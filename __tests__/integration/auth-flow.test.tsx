@@ -42,7 +42,7 @@ describe('Authentication Flow Integration', () => {
     )
 
     // Click sign in button
-    mockSignIn.mockResolvedValue(undefined)
+    mockSignIn.mockResolvedValue({ ok: true, error: null, status: 200, url: null })
     const signInButton = screen.getByRole('button')
     fireEvent.click(signInButton)
 
