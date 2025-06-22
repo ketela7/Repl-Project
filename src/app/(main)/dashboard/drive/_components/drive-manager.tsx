@@ -2628,23 +2628,26 @@ export function DriveManager() {
 
   // Manual search effect - only run when submitted search changes
   useEffect(() => {
+    // Skip if this is the initial load (handled by main useEffect)
+    if (hasAccess === null) return;
+    
     if (submittedSearchQuery.trim()) {
       fetchFiles(currentFolderId, submittedSearchQuery.trim());
     } else {
       fetchFiles(currentFolderId);
     }
-  }, [submittedSearchQuery, currentFolderId]);
+  }, [submittedSearchQuery, currentFolderId, hasAccess]);
 
   // Force re-render when filters change to update the visual display
   useEffect(() => {
-    // This ensures the component re-renders when filter states change
-    // which will update the filtered data display
-    if (files.length > 0 || folders.length > 0) {
-      // Force a minimal state update to trigger re-render
+    // Only trigger re-render if we have data and access is confirmed
+    // This prevents unnecessary API calls during initial load
+    if ((files.length > 0 || folders.length > 0) && hasAccess === true) {
+      // Force a minimal state update to trigger re-render without API calls
       setFiles(prev => [...prev]);
       setFolders(prev => [...prev]);
     }
-  }, [fileTypeFilter, advancedFilters, activeView]);
+  }, [fileTypeFilter, advancedFilters, activeView, files.length, folders.length, hasAccess]);
 
   // Handle view mode change for toggle group
   const handleViewModeChange = (value: string) => {

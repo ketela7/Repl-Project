@@ -316,17 +316,30 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Use request deduplication for non-search requests
-    const result = await requestDeduplicator.deduplicate(deduplicationKey, async () => {
-      // Check cache first inside deduplicated request
-      const cachedData = driveCache.get(cacheKey);
-      if (cachedData) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('Cache hit for:', cacheKey);
-        }
-        return cachedData;
+    // Check cache first - before deduplication
+    const cachedData = driveCache.get(cacheKey);
+    if (cachedData) {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Cache hit for:', cacheKey);
+      }
+      
+      // Apply client-side filters to cached results
+      const filteredFiles = applyClientSideFilters(cachedData.files, filters);
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`Retrieved ${cachedData.files.length} files from Drive API`);
+        console.log(`After client-side filtering: ${filteredFiles.length} files`);
       }
 
+      return NextResponse.json({
+        files: filteredFiles,
+        nextPageToken: cachedData.nextPageToken,
+        totalCount: filteredFiles.length
+      });
+    }
+
+    // Use request deduplication only for uncached requests
+    const result = await requestDeduplicator.deduplicate(deduplicationKey, async () => {
       const driveService = new GoogleDriveService(accessToken);
 
       // Make the actual API call with retry mechanism
