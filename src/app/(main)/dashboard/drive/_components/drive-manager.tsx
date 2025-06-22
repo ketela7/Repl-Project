@@ -401,8 +401,8 @@ export function DriveManager() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [needsReauth, setNeedsReauth] = useState(false);
 
-  // Debounced search query for performance
-  const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
+  // Debounced search query for performance - optimized delay for better UX
+  const debouncedSearchQuery = useDebouncedValue(searchQuery, 800);
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   // Table column visibility state
