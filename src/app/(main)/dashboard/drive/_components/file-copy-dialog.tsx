@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
+import { getTouchButtonClasses, getMobileGridClasses, getMobileInputClasses } from "@/lib/mobile-optimization";
 import { FolderIcon, Copy, ExternalLink } from "lucide-react";
 import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
