@@ -449,8 +449,7 @@ export function FileShareDialog({
     </>
   );
 
-  // Force mobile UI for debugging
-  if (true || isMobile) {
+  if (isMobile) {
     return (
       <BottomSheet open={open} onOpenChange={onOpenChange}>
         <BottomSheetContent className="max-h-[90vh] flex flex-col">
