@@ -24,20 +24,23 @@ export function useSessionManagement() {
     syncRememberMePreference();
   }, [syncRememberMePreference]);
 
-  // Monitor session expiration based on JWT token expiration
+  // Monitor session expiration with optimized frequency
   useEffect(() => {
     if (session) {
-      // Check session validity periodically instead of client-side timeout
+      // Reduce frequency to every 4 hours for less API overhead
       const checkInterval = setInterval(async () => {
         try {
-          const response = await fetch('/api/auth/session');
-          if (!response.ok) {
-            signOut({ callbackUrl: '/auth/v1/login' });
+          // Only check if tab is visible to reduce unnecessary calls
+          if (!document.hidden) {
+            const response = await fetch('/api/auth/session');
+            if (!response.ok) {
+              signOut({ callbackUrl: '/auth/v1/login' });
+            }
           }
         } catch (error) {
           console.error("[Session Management] Session check error:", error);
         }
-      }, 60 * 60 * 1000); // Check every hour
+      }, 4 * 60 * 60 * 1000); // Check every 4 hours
 
       return () => clearInterval(checkInterval);
     }

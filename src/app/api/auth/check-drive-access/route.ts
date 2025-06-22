@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
+import { driveCache } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,9 +28,22 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-      // Test Drive access by making a simple API call
+      // Check cache first for faster response
+      const cacheKey = `drive-access:${session.user.email}`;
+      const cachedResult = driveCache.get(cacheKey);
+      
+      if (cachedResult) {
+        return NextResponse.json({ hasAccess: true });
+      }
+
+      // Test Drive access with a lightweight API call
       const driveService = new GoogleDriveService(accessToken);
-      await driveService.getUserInfo();
+      
+      // Use a minimal files.list call instead of getUserInfo for faster response
+      await driveService.listFiles({ pageSize: 1 });
+      
+      // Cache successful result for 5 minutes
+      driveCache.set(cacheKey, { hasAccess: true }, 5);
       
       return NextResponse.json({ hasAccess: true });
     } catch (error: any) {

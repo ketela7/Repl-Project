@@ -15,7 +15,8 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
   const [isServerOnline, setIsServerOnline] = useState(true);
   const [hasStoredSession, setHasStoredSession] = useState(false);
 
-  console.log("[AuthWrapper] Status:", status, "Session:", !!session);
+  // Remove console.log for production performance
+  // console.log("[AuthWrapper] Status:", status, "Session:", !!session);
 
   // Check if user has stored session data (indicating they were previously logged in)
   useEffect(() => {
