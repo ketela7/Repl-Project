@@ -173,40 +173,6 @@ export function getMobileInputClasses(): string {
 }
 
 /**
- * Audit component for touch target compliance
- */
-export function auditTouchTargets(element: HTMLElement): {
-  compliant: boolean;
-  issues: string[];
-  suggestions: string[];
-} {
-  const issues: string[] = [];
-  const suggestions: string[] = [];
-  
-  // Check interactive elements
-  const interactiveElements = element.querySelectorAll('button, a, input, [role="button"], [tabindex]');
-  
-  interactiveElements.forEach((el, index) => {
-    const rect = el.getBoundingClientRect();
-    const isClickable = el.tagName.toLowerCase() === 'button' || 
-                       el.tagName.toLowerCase() === 'a' ||
-                       el.hasAttribute('onclick') ||
-                       el.getAttribute('role') === 'button';
-    
-    if (isClickable && (rect.height < TOUCH_TARGETS.MINIMUM || rect.width < TOUCH_TARGETS.MINIMUM)) {
-      issues.push(`Element ${index + 1} (${el.tagName.toLowerCase()}) is too small: ${rect.width}x${rect.height}px`);
-      suggestions.push(`Increase size to at least ${TOUCH_TARGETS.MINIMUM}x${TOUCH_TARGETS.MINIMUM}px`);
-    }
-  });
-  
-  return {
-    compliant: issues.length === 0,
-    issues,
-    suggestions,
-  };
-}
-
-/**
  * Mobile-specific animation classes
  */
 export const mobileAnimations = {
