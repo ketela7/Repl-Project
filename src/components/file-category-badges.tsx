@@ -340,6 +340,55 @@ const getCategoryConfig = (categoryName: string): Omit<FileCategory, 'count' | '
       bgColor: 'bg-blue-50 dark:bg-blue-950/50',
       textColor: 'text-blue-700 dark:text-blue-300',
       icon: <Link className="h-4 w-4" />
+    },
+    'PDF': {
+      name: 'PDF',
+      color: 'border-rose-200 dark:border-rose-800',
+      bgColor: 'bg-rose-50 dark:bg-rose-950/50',
+      textColor: 'text-rose-700 dark:text-rose-300',
+      icon: <FileText className="h-4 w-4" />
+    },
+    'Design': {
+      name: 'Design',
+      color: 'border-pink-200 dark:border-pink-800',
+      bgColor: 'bg-pink-50 dark:bg-pink-950/50',
+      textColor: 'text-pink-700 dark:text-pink-300',
+      icon: <FileImage className="h-4 w-4" />
+    },
+    'E-books': {
+      name: 'E-books',
+      color: 'border-teal-200 dark:border-teal-800',
+      bgColor: 'bg-teal-50 dark:bg-teal-950/50',
+      textColor: 'text-teal-700 dark:text-teal-300',
+      icon: <BookOpen className="h-4 w-4" />
+    },
+    'Fonts': {
+      name: 'Fonts',
+      color: 'border-gray-200 dark:border-gray-700',
+      bgColor: 'bg-gray-50 dark:bg-gray-950/50',
+      textColor: 'text-gray-700 dark:text-gray-300',
+      icon: <FileText className="h-4 w-4" />
+    },
+    'Calendar': {
+      name: 'Calendar',
+      color: 'border-emerald-200 dark:border-emerald-800',
+      bgColor: 'bg-emerald-50 dark:bg-emerald-950/50',
+      textColor: 'text-emerald-700 dark:text-emerald-300',
+      icon: <FileText className="h-4 w-4" />
+    },
+    'Contacts': {
+      name: 'Contacts',
+      color: 'border-cyan-200 dark:border-cyan-800',
+      bgColor: 'bg-cyan-50 dark:bg-cyan-950/50',
+      textColor: 'text-cyan-700 dark:text-cyan-300',
+      icon: <FileText className="h-4 w-4" />
+    },
+    'Database': {
+      name: 'Database',
+      color: 'border-indigo-200 dark:border-indigo-800',
+      bgColor: 'bg-indigo-50 dark:bg-indigo-950/50',
+      textColor: 'text-indigo-700 dark:text-indigo-300',
+      icon: <FileText className="h-4 w-4" />
     }
   };
   

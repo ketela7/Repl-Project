@@ -212,6 +212,98 @@ function buildDriveQuery(filters: FileFilter): string {
             )
             break
 
+          case 'pdf':
+            typeConditions.push("mimeType = 'application/pdf'")
+            break
+
+          case 'text':
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'text/plain'",
+                  "mimeType = 'text/markdown'",
+                  "mimeType = 'text/csv'",
+                  "mimeType = 'text/tab-separated-values'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
+          case 'design':
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'application/vnd.google-apps.drawing'",
+                  "mimeType = 'image/svg+xml'",
+                  "mimeType = 'application/postscript'",
+                  "mimeType = 'application/illustrator'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
+          case 'database':
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'application/x-sqlite3'",
+                  "mimeType = 'application/vnd.ms-access'",
+                  "mimeType = 'application/x-dbf'",
+                  "mimeType contains 'database'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
+          case 'ebook':
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'application/epub+zip'",
+                  "mimeType = 'application/x-mobipocket-ebook'",
+                  "mimeType = 'application/vnd.amazon.ebook'",
+                  "mimeType = 'application/x-fictionbook+xml'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
+          case 'font':
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'font/ttf'",
+                  "mimeType = 'font/otf'",
+                  "mimeType = 'font/woff'",
+                  "mimeType = 'font/woff2'",
+                  "mimeType = 'application/font-woff'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
+          case 'calendar':
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'text/calendar'",
+                  "mimeType = 'application/ics'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
+          case 'contact':
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'text/vcard'",
+                  "mimeType = 'text/x-vcard'",
+                ].join(' or ') +
+                ')'
+            )
+            break
+
           case 'other':
             typeConditions.push(
               '(' +
@@ -220,6 +312,10 @@ function buildDriveQuery(filters: FileFilter): string {
                   "not mimeType contains 'image/'",
                   "not mimeType contains 'video/'",
                   "not mimeType contains 'audio/'",
+                  "not mimeType contains 'text/'",
+                  "not mimeType contains 'application/pdf'",
+                  "not mimeType contains 'zip'",
+                  "not mimeType contains 'archive'",
                 ].join(' and ') +
                 ')'
             )

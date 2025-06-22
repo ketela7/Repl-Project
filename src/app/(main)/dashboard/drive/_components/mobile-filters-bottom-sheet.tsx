@@ -362,11 +362,10 @@ export function MobileFiltersBottomSheet({
             Clear Advanced
           </Button>
           <Button
-            variant="ghost"
-            onClick={handleClearAll}
+            onClick={handleApplyFilters}
             className="flex-1"
           >
-            Clear All
+            Apply Filter
           </Button>
         </BottomSheetFooter>
       </BottomSheetContent>

@@ -76,6 +76,8 @@ Migration preferences: User prefers to discuss project rules and documentation b
 ### June 2025: **Complete Migration from clientSideFilter to liveFilter**
 - **Google Drive API Direct Filtering**: Removed `applyClientSideFilters` completely and implemented direct Google Drive API queries
 - **Backend API Optimization**: Updated `/api/drive/files/route.ts` to use official Google Drive API query parameters exclusively
+- **Expanded File Type Support**: Added 8 new file type filters (PDF, Text, Design, Database, E-books, Fonts, Calendar, Contacts)
+- **Mobile UI Enhancement**: Fixed mobile bottom-sheet filter dialogs to use "Apply Filter" button for consistency
 - **Owner Filter Enhancement**: Changed owner filtering from "name or email" to "email only" as per Google Drive API capabilities
 - **Filter Dialog UX**: Updated all filter dialogs to use "Submit" instead of "Close" buttons for better user experience
 - **FileIcon Synchronization**: Synchronized FileIcon components across all UI elements (badges, menus, file types) for consistency

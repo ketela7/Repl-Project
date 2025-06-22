@@ -112,6 +112,14 @@ export function FiltersDialog({
     { id: 'archive', label: 'Archives', icon: Archive, color: 'text-amber-600' },
     { id: 'code', label: 'Code Files', icon: Code, color: 'text-slate-600' },
     { id: 'shortcut', label: 'Shortcuts', icon: Link, color: 'text-blue-700' },
+    { id: 'pdf', label: 'PDF Files', icon: FileText, color: 'text-rose-600' },
+    { id: 'text', label: 'Text Files', icon: FileText, color: 'text-slate-600' },
+    { id: 'design', label: 'Design Files', icon: Image, color: 'text-pink-600' },
+    { id: 'database', label: 'Database Files', icon: FileText, color: 'text-indigo-600' },
+    { id: 'ebook', label: 'E-books', icon: FileText, color: 'text-teal-600' },
+    { id: 'font', label: 'Font Files', icon: FileText, color: 'text-gray-600' },
+    { id: 'calendar', label: 'Calendar Files', icon: Calendar, color: 'text-emerald-600' },
+    { id: 'contact', label: 'Contact Files', icon: User, color: 'text-cyan-600' },
   ];
 
   const handleBasicFilter = (viewId: string) => {

@@ -84,14 +84,22 @@ const viewOptions = [
 const fileTypeOptions = [
   { key: 'folder', label: 'Folders', icon: Folder, count: 0, description: 'Google Drive folders' },
   { key: 'document', label: 'Documents', icon: FileText, count: 0, description: 'Text documents, PDFs, Word files' },
-  { key: 'spreadsheet', label: 'Spreadsheets', icon: FileText, count: 0, description: 'Excel files, Google Sheets, CSV' },
-  { key: 'presentation', label: 'Presentations', icon: FileText, count: 0, description: 'PowerPoint, Google Slides' },
-  { key: 'image', label: 'Images', icon: Image, count: 0, description: 'Photos, graphics, icons' },
-  { key: 'video', label: 'Videos', icon: Video, count: 0, description: 'Movies, clips, recordings' },
+  { key: 'spreadsheet', label: 'Spreadsheets', icon: FileSpreadsheet, count: 0, description: 'Excel files, Google Sheets, CSV' },
+  { key: 'presentation', label: 'Presentations', icon: Presentation, count: 0, description: 'PowerPoint, Google Slides' },
+  { key: 'image', label: 'Images', icon: FileImage, count: 0, description: 'Photos, graphics, icons' },
+  { key: 'video', label: 'Videos', icon: FileVideo, count: 0, description: 'Movies, clips, recordings' },
   { key: 'audio', label: 'Audio', icon: Music, count: 0, description: 'Music, podcasts, recordings' },
   { key: 'archive', label: 'Archives', icon: Archive, count: 0, description: 'ZIP, RAR, compressed files' },
-  { key: 'code', label: 'Code Files', icon: FileText, count: 0, description: 'Programming files, scripts' },
+  { key: 'code', label: 'Code Files', icon: FileCode, count: 0, description: 'Programming files, scripts' },
   { key: 'shortcut', label: 'Shortcuts', icon: FileText, count: 0, description: 'Google Drive shortcuts' },
+  { key: 'pdf', label: 'PDF Files', icon: FileText, count: 0, description: 'PDF documents' },
+  { key: 'text', label: 'Text Files', icon: FileText, count: 0, description: 'Plain text, markdown, CSV files' },
+  { key: 'design', label: 'Design Files', icon: FileImage, count: 0, description: 'SVG, illustrations, drawings' },
+  { key: 'database', label: 'Database Files', icon: FileText, count: 0, description: 'SQLite, Access, database files' },
+  { key: 'ebook', label: 'E-books', icon: FileText, count: 0, description: 'EPUB, Kindle, e-book formats' },
+  { key: 'font', label: 'Font Files', icon: FileText, count: 0, description: 'TTF, OTF, WOFF font files' },
+  { key: 'calendar', label: 'Calendar Files', icon: Calendar, count: 0, description: 'ICS calendar files' },
+  { key: 'contact', label: 'Contact Files', icon: User, count: 0, description: 'VCard contact files' },
 ];
 
 export function DriveFiltersSidebar({ 
