@@ -452,8 +452,8 @@ export function FileShareDialog({
   if (isMobile) {
     return (
       <BottomSheet open={open} onOpenChange={onOpenChange}>
-        <BottomSheetContent className="max-h-[90vh]">
-          <BottomSheetHeader className="pb-4">
+        <BottomSheetContent className="max-h-[95vh] flex flex-col">
+          <BottomSheetHeader className="pb-4 flex-shrink-0">
             <BottomSheetTitle className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
                 <Share2 className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -469,11 +469,11 @@ export function FileShareDialog({
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="px-4 pb-4 space-y-4">
+          <div className="px-4 pb-4 space-y-4 flex-1 overflow-y-auto">
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+          <BottomSheetFooter className={`${getMobileGridClasses({ columns: 2, gap: 'normal' })} flex-shrink-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-bottom`}>
             <Button 
               variant="outline" 
               onClick={() => onOpenChange(false)} 
