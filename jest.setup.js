@@ -83,50 +83,7 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }))
 
-// Extended Jest DOM matchers
-expect.extend({
-  toBeVisible(received) {
-    const pass = received && received.style.display !== 'none';
-    return {
-      message: () => `expected element ${pass ? 'not ' : ''}to be visible`,
-      pass,
-    };
-  },
-  toHaveAttribute(received, attribute, value) {
-    const hasAttr = received && received.hasAttribute && received.hasAttribute(attribute);
-    const attrValue = hasAttr ? received.getAttribute(attribute) : null;
-    const pass = value !== undefined ? attrValue === value : hasAttr;
-    return {
-      message: () => `expected element ${pass ? 'not ' : ''}to have attribute ${attribute}${value !== undefined ? ` with value ${value}` : ''}`,
-      pass,
-    };
-  },
-  toBeInTheDocument(received) {
-    const pass = received && document.body.contains(received);
-    return {
-      message: () => `expected element ${pass ? 'not ' : ''}to be in the document`,
-      pass,
-    };
-  },
-  toHaveTextContent(received, expected) {
-    const pass = received && received.textContent && (
-      typeof expected === 'string' 
-        ? received.textContent.includes(expected)
-        : expected.test(received.textContent)
-    );
-    return {
-      message: () => `expected element ${pass ? 'not ' : ''}to have text content matching ${expected}`,
-      pass,
-    };
-  },
-  toHaveClass(received, className) {
-    const pass = received && received.classList && received.classList.contains(className);
-    return {
-      message: () => `expected element ${pass ? 'not ' : ''}to have class ${className}`,
-      pass,
-    };
-  },
-});
+// Note: Using @testing-library/jest-dom matchers instead of custom ones
 
 // Suppress console errors during tests
 const originalError = console.error

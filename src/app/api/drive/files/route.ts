@@ -277,11 +277,18 @@ function buildDriveQuery(filters: FileFilter): string {
 function applyClientSideFilters(files: any[], filters: FileFilter) {
   let filteredFiles = [...files]
 
-
+  // Apply client-side filters that can't be handled by Google API
+  if (filters.minSize) {
+    filteredFiles = filteredFiles.filter(file => 
+      file.size && parseInt(file.size) >= filters.minSize!
+    )
   }
 
-  
-  
+  if (filters.maxSize) {
+    filteredFiles = filteredFiles.filter(file => 
+      file.size && parseInt(file.size) <= filters.maxSize!
+    )
+  }
 
   return filteredFiles
 }
@@ -461,7 +468,7 @@ export async function GET(request: NextRequest) {
     })
 
     {/*// Use search optimization for search queries
- 		if (filters.search) {
+                if (filters.search) {
       const searchResult = await searchOptimizer.optimizedSearch(
         filters.search,
         user.email!,
@@ -497,7 +504,7 @@ export async function GET(request: NextRequest) {
         totalCount: filteredFiles.length,
       })
     }
-		*/}
+                */}
     // Check cache first - before deduplication
     const cachedData = driveCache.get(cacheKey)
     if (cachedData) {
