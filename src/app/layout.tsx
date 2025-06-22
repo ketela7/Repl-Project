@@ -75,17 +75,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
                 <div className="relative min-h-screen w-full">
                   {children}
                 </div>
-                <Toaster
-                  position="top-right"
-                  toastOptions={{
-                    duration: 3000,
-                    style: {
-                      background: 'hsl(var(--background))',
-                      color: 'hsl(var(--foreground))',
-                      border: '1px solid hsl(var(--border))',
-                    },
-                  }}
-                />
+                <Toaster />
               </TimezoneProvider>
             </ThemeProvider>
           </AuthProvider>

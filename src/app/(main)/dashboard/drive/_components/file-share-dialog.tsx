@@ -35,6 +35,8 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
+import { successToast, errorToast, loadingToast } from '@/lib/toast-utils';
+import { copyToClipboard } from '@/lib/clipboard-utils';
 import { 
   Share2, 
   Copy, 
@@ -85,8 +87,11 @@ export function FileShareDialog({
   const handleShare = async () => {
     if (!item && !items) return;
 
-    setIsLoading(true);
+    const loadingId = "share-operation";
+    
     try {
+      setIsLoading(true);
+      
       let shareData: ShareData;
 
       if (shareType === 'link') {
@@ -120,7 +125,7 @@ export function FileShareDialog({
         }
       } else {
         if (!emailAddress.trim()) {
-          toast.error('Please enter an email address');
+          errorToast.generic('Please enter an email address');
           return;
         }
 
@@ -135,6 +140,8 @@ export function FileShareDialog({
 
       // Handle bulk operations
       if (items && items.length > 1) {
+        loadingToast.start(`Sharing ${items.length} items...`, loadingId);
+        
         const results = [];
         for (const currentItem of items) {
           try {
@@ -158,10 +165,12 @@ export function FileShareDialog({
         const successCount = results.filter(r => r.success).length;
         const failCount = results.filter(r => !r.success).length;
 
-        if (successCount > 0) {
-          toast.success(`Successfully shared ${successCount} item(s)${failCount > 0 ? `, ${failCount} failed` : ''}`);
+        if (successCount === items.length) {
+          loadingToast.success(`Successfully shared all ${successCount} items`, loadingId);
+        } else if (successCount > 0) {
+          warningToast.partialSuccess(successCount, items.length, "Share operation");
         } else {
-          toast.error(`Failed to share all ${failCount} item(s)`);
+          loadingToast.error(`Failed to share all ${failCount} items`, loadingId);
         }
 
         onOpenChange(false);
@@ -169,6 +178,12 @@ export function FileShareDialog({
       }
 
       // Handle single item
+      if (shareType === 'link') {
+        loadingToast.start(`Generating share link for "${item.name}"...`, loadingId);
+      } else {
+        loadingToast.start(`Sharing "${item.name}" with ${emailAddress}...`, loadingId);
+      }
+      
       const response = await fetch(`/api/drive/files/${item?.id}/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,13 +194,15 @@ export function FileShareDialog({
         const errorData = await response.json();
         
         if (errorData.needsReauth) {
-          toast.error('Google Drive access expired. Please reconnect your account.');
+          loadingToast.error('Google Drive access expired', loadingId);
+          errorToast.driveAccessDenied();
           window.location.reload();
           return;
         }
 
         if (response.status === 403) {
-          toast.error(`You don't have permission to share "${item.name}".`);
+          loadingToast.error(`Permission denied for "${item.name}"`, loadingId);
+          errorToast.permissionDenied();
           return;
         }
 
@@ -195,14 +212,19 @@ export function FileShareDialog({
       const result = await response.json();
 
       if (shareType === 'link' && result.webViewLink) {
-        try {
-          await navigator.clipboard.writeText(result.webViewLink);
-          toast.success(`Share link for "${item.name}" copied to clipboard!`);
-        } catch (clipboardError) {
-          toast.success(`Share link generated for "${item.name}": ${result.webViewLink}`);
+        const success = await copyToClipboard(result.webViewLink);
+        if (success) {
+          loadingToast.success(`Share link for "${item.name}" copied to clipboard`, loadingId);
+        } else {
+          loadingToast.success(`Share link generated for "${item.name}"`, loadingId);
+          successToast.generic(`Link: ${result.webViewLink}`, {
+            description: "Click to copy manually",
+            duration: 8000,
+          });
         }
       } else if (shareType === 'email') {
-        toast.success(`"${item.name}" shared with ${emailAddress}`);
+        loadingToast.success(`"${item.name}" shared with ${emailAddress}`, loadingId);
+        successToast.shared(1);
       }
 
       onOpenChange(false);
@@ -216,7 +238,8 @@ export function FileShareDialog({
       if (process.env.NODE_ENV === 'development') {
         console.error('Error sharing item:', error);
       }
-      toast.error('Failed to share item');
+      loadingToast.error('Failed to share item', loadingId);
+      errorToast.apiError(error instanceof Error ? error.message : 'Unknown error occurred');
     } finally {
       setIsLoading(false);
     }

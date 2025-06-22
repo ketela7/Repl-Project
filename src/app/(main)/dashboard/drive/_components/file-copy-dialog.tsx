@@ -33,6 +33,7 @@ import { FolderIcon, Copy, ExternalLink } from "lucide-react";
 import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
 import { toast } from "sonner";
+import { successToast, errorToast, loadingToast } from '@/lib/toast-utils';
 
 interface FileCopyDialogProps {
   isOpen: boolean;
@@ -102,26 +103,29 @@ export function FileCopyDialog({
     const targetFolderId = getTargetFolderId();
     
     if (!targetFolderId) {
-      toast.error('Please select a valid destination folder');
+      errorToast.generic('Please select a valid destination folder');
       return;
     }
 
     const copyName = newFileName.trim() || `Copy of ${fileName}`;
+    const loadingId = "file-copy";
 
     try {
       setCopying(true);
-      // Log operation for debugging in development only
+      loadingToast.start(`Copying "${fileName}"...`, loadingId);
+      
       if (process.env.NODE_ENV === 'development') {
         console.log(`Copying to folder ID: ${targetFolderId} with name: ${copyName}`);
       }
+      
       await onCopy(copyName, targetFolderId);
+      loadingToast.success(`Successfully copied "${fileName}"`, loadingId);
       handleClose();
     } catch (error) {
-      // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
         console.error('Copy operation failed:', error);
       }
-      // Error is handled by parent component
+      loadingToast.error(`Failed to copy "${fileName}"`, loadingId);
     } finally {
       setCopying(false);
     }

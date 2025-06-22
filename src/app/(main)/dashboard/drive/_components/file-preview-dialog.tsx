@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { X, Download, ExternalLink, Maximize2, Minimize2, FileText, Image, Video, Music, AlertCircle } from "lucide-react";
 import { DriveFile } from '@/lib/google-drive/types';
 import { getPreviewUrl, isImageFile, isVideoFile, isAudioFile, isDocumentFile, formatFileSize } from '@/lib/google-drive/utils';
+import { successToast, errorToast, toastUtils } from '@/lib/toast-utils';
 
 interface FilePreviewDialogProps {
   open: boolean;
@@ -54,15 +55,20 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
 
   const previewUrl = getPreviewUrl(file.id, file.mimeType, file.webContentLink);
 
-  const handleDownload = () => {
-    // Use direct download API endpoint instead of export link
-    const link = document.createElement('a');
-    link.href = `/api/drive/download/${file.id}`;
-    link.download = file.name;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const handleDownload = async () => {
+    try {
+      await toastUtils.download(async () => {
+        const link = document.createElement('a');
+        link.href = `/api/drive/download/${file.id}`;
+        link.download = file.name;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, file.name);
+    } catch (error) {
+      errorToast.downloadFailed(file.name);
+    }
   };
 
   const handleOpenInDrive = () => {
