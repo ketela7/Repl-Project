@@ -81,7 +81,7 @@ export function getRelativeTime(date: string | Date, _timezone?: string): string
     const days = Math.floor(diffInSeconds / 86400);
     return `${days} day${days > 1 ? 's' : ''} ago`;
   } else {
-    return formatDateToUserTimezone(dateObj, timezone, {
+    return formatDateToUserTimezone(dateObj, _timezone, {
       year: 'numeric',
       month: 'short',
       day: 'numeric'

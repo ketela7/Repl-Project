@@ -606,14 +606,14 @@ export class GoogleDriveService {
     // Note: For full folder copying with contents, we would need recursive copying
     // This creates an empty copy of the folder structure
     return convertGoogleDriveFile({
-      id: newFolder.id,
-      name: newFolder.name,
+      id: newFolder.id!,
+      name: newFolder.name!,
       mimeType: 'application/vnd.google-apps.folder',
-      createdTime: newFolder.createdTime,
-      modifiedTime: newFolder.modifiedTime,
-      parents: newFolder.parents,
-      shared: newFolder.shared,
-      trashed: newFolder.trashed,
+      createdTime: newFolder.createdTime!,
+      modifiedTime: newFolder.modifiedTime!,
+      parents: newFolder.parents ?? undefined,
+      shared: newFolder.shared ?? undefined,
+      trashed: newFolder.trashed ?? undefined,
     });
   }
 
@@ -743,7 +743,7 @@ export class GoogleDriveService {
   }
 
   // Create permission (for enhanced sharing)
-  async createPermission(fileId: string, permissionData: any, accessToken?: string): Promise<any> {
+  async createPermission(fileId: string, permissionData: any, _accessToken?: string): Promise<any> {
     try {
       const response = await this.drive.permissions.create({
         fileId,
@@ -760,7 +760,7 @@ export class GoogleDriveService {
 
 
   // Delete permission (for enhanced sharing)
-  async deletePermission(fileId: string, permissionId: string, accessToken?: string): Promise<void> {
+  async deletePermission(fileId: string, permissionId: string, _accessToken?: string): Promise<void> {
     try {
       await this.drive.permissions.delete({
         fileId,
@@ -775,7 +775,7 @@ export class GoogleDriveService {
 
 
   // Send notification email (for enhanced sharing)
-  async sendNotificationEmail(fileId: string, emailData: any, accessToken?: string): Promise<void> {
+  async sendNotificationEmail(fileId: string, emailData: any, _accessToken?: string): Promise<void> {
     // Note: This would typically use the Gmail API or similar service
     // For now, we'll just log the action
     console.log('Notification email would be sent for file:', fileId, 'with data:', emailData);

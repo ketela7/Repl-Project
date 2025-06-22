@@ -120,7 +120,7 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'application/x-cab': 'Archive',
     'application/x-iso9660-image': 'Archive',
     'application/x-stuffit': 'Archive',
-    'application/x-apple-diskimage': 'Archive',
+    'application/x-apple-diskimage-old': 'Archive',
 
     // Code files
     'text/javascript': 'FileCode',
@@ -227,7 +227,7 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'application/x-deb': 'Archive',
     'application/x-rpm': 'Archive',
     'application/vnd.microsoft.portable-executable': 'File',
-    'application/x-apple-diskimage': 'Archive',
+    'application/x-apple-diskimage-dmg': 'Archive',
 
     // Office formats (additional)
     'application/vnd.oasis.opendocument.text': 'FileText',
@@ -577,7 +577,7 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'application/x-cab': 'text-yellow-600 dark:text-yellow-400',
     'application/x-iso9660-image': 'text-yellow-600 dark:text-yellow-400',
     'application/x-stuffit': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-apple-diskimage': 'text-yellow-600 dark:text-yellow-400',
+    'application/x-apple-diskimage-old': 'text-yellow-600 dark:text-yellow-400',
 
     // Code files - More specific colors
     'text/javascript': 'text-yellow-500 dark:text-yellow-400',
@@ -977,7 +977,7 @@ export const isPreviewable = (mimeType: string): boolean => {
 /**
  * Generate preview URL for different media types
  */
-export function getPreviewUrl(fileId: string, mimeType: string, webContentLink?: string): string {
+export function getPreviewUrl(fileId: string, _mimeType: string, _webContentLink?: string): string {
   // Universal Google Drive preview - supports all file types
   // If Google Drive can't preview the file, it will show appropriate message
   return `https://drive.google.com/file/d/${fileId}/preview`;
@@ -999,7 +999,7 @@ export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
       displayName: owner.displayName!,
       emailAddress: owner.emailAddress!,
       photoLink: owner.photoLink ?? undefined,
-    })),
+    })) ?? undefined,
     shared: file.shared ?? undefined,
     trashed: file.trashed ?? undefined,
     capabilities: file.capabilities ? {
@@ -1157,8 +1157,8 @@ export function getFileActions(
   canRestore: boolean;
   canPermanentDelete: boolean;
 } {
-  const isTrashView = activeView === 'trash';
-  const isSharedView = activeView === 'shared';
+  const _isTrashView = activeView === 'trash';
+  const _isSharedView = activeView === 'shared';
   const isTrashed = file.trashed === true;
   const isFolder = file.itemType === 'folder' || file.mimeType === 'application/vnd.google-apps.folder';
   const capabilities = file.capabilities || {} as DriveFileCapabilities;
