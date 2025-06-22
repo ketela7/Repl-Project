@@ -305,7 +305,7 @@ export function DriveFiltersSidebar({
               <Separator />
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <File className="h-4 w-4 text-primary" />
+                  <FileText className="h-4 w-4 text-primary" />
                   <span className="font-medium text-sm">File Types</span>
                 </div>
 
@@ -418,7 +418,7 @@ export function DriveFiltersSidebar({
                     {/* Created Date Range Filter */}
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
                         <Label className="text-sm font-medium">Created Date Range</Label>
                       </div>
                       <div className="grid grid-cols-2 gap-2">

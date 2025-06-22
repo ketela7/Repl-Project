@@ -26,28 +26,27 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { SimpleDatePicker } from "@/components/ui/simple-date-picker";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { 
-  FileText,
-  Image,
-  Video,
-  Music,
   Archive,
-  File,
-  Folder,
-  Code,
   Calendar,
-  User,
-  HardDrive,
-  X,
-  Filter,
-  Star,
-  Clock,
-  Trash,
-  Share,
-  Home,
-  RefreshCw,
   ChevronDown,
   ChevronUp,
-  Link
+  Clock,
+  Code,
+  FileText,
+  Filter,
+  Folder,
+  HardDrive,
+  Home,
+  Image,
+  Link,
+  Music,
+  RefreshCw,
+  Share,
+  Star,
+  Trash,
+  User,
+  Video,
+  X
 } from "lucide-react";
 
 interface AdvancedFilters {

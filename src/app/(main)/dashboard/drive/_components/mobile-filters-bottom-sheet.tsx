@@ -22,7 +22,6 @@ import {
   Video,
   Music,
   Archive,
-  File,
   Folder,
   Code,
   Calendar,
