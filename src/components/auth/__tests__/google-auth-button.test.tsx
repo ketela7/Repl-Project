@@ -21,7 +21,7 @@ describe('GoogleAuthButton', () => {
   })
 
   it('triggers Google sign in when clicked', async () => {
-    mockSignIn.mockResolvedValue(undefined)
+    mockSignIn.mockResolvedValue({ error: null, ok: true, status: 200, url: null })
     
     render(<GoogleAuthButton />)
     

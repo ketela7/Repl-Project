@@ -37,12 +37,13 @@ export interface DriveFile {
     emailAddress?: string;
   }>;
   shared?: boolean;
+  starred?: boolean;
   trashed?: boolean;
+  ownedByMe?: boolean;
   capabilities?: DriveFileCapabilities;
   // File organization features
   autoTags?: string[];
   manualTags?: string[];
-
 }
 
 
@@ -76,12 +77,20 @@ export interface OrganizationSettings {
 export interface DriveFolder {
   id: string;
   name: string;
+  mimeType: string;
   createdTime: string;
   modifiedTime: string;
   parents?: string[];
   shared?: boolean;
   trashed?: boolean;
+  starred?: boolean;
   capabilities?: DriveFileCapabilities;
+  owners?: Array<{
+    displayName: string;
+    emailAddress: string;
+    photoLink?: string;
+  }>;
+  ownedByMe?: boolean;
 }
 
 export interface DriveFileMetadata {

@@ -1024,11 +1024,19 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
   return {
     id: folder.id!,
     name: folder.name!,
+    mimeType: 'application/vnd.google-apps.folder',
     createdTime: folder.createdTime!,
     modifiedTime: folder.modifiedTime!,
     parents: folder.parents ?? undefined,
     shared: folder.shared ?? undefined,
     trashed: folder.trashed ?? undefined,
+    starred: folder.starred ?? undefined,
+    ownedByMe: folder.ownedByMe ?? true,
+    owners: folder.owners?.map(owner => ({
+      displayName: owner.displayName || '',
+      emailAddress: owner.emailAddress || '',
+      photoLink: owner.photoLink || undefined
+    })),
     capabilities: folder.capabilities ? {
       canCopy: folder.capabilities.canCopy ?? false,
       canDelete: folder.capabilities.canDelete ?? false,

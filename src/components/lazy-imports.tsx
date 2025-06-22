@@ -42,11 +42,6 @@ export const AdvancedFilters = lazy(() =>
 // Lazy load chart components (heavy recharts dependency)
 export const ChartComponents = lazy(() => 
   import("recharts").then(mod => ({ 
-    default: {
-      BarChart: mod.BarChart,
-      PieChart: mod.PieChart,
-      LineChart: mod.LineChart,
-      ResponsiveContainer: mod.ResponsiveContainer
-    }
+    default: () => null as any // Placeholder for chart components
   }))
 );

@@ -96,7 +96,7 @@ export async function retryOperation<T>(
       lastError = error;
       
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Retry] Attempt ${attempt + 1} failed for ${context}:`, error.message || error);
+        console.log(`[Retry] Attempt ${attempt + 1} failed for ${context}:`, error instanceof Error ? error.message : String(error));
       }
       
       // Don't retry if not retryable or on last attempt
