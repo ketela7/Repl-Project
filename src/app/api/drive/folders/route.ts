@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
+import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -39,8 +38,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     console.log('=== Create Folder API Called ===');
-    // Use NextAuth session instead of Supabase
-    const session = await getServerSession(authOptions);
+    const session = await auth();
 
     if (!session?.user) {
       console.log('Authentication failed: No session');

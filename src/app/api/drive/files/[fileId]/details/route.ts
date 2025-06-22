@@ -23,7 +23,7 @@ export async function GET(
     }
 
     // Check cache first (5 minute TTL for file details)
-    const cacheKey = driveCache.generateFileDetailsKey(fileId, session.user.email || session.user.id);
+    const cacheKey = driveCache.generateFileDetailsKey(fileId, session.user.email || session.user.id || '');
     const cachedDetails = driveCache.get(cacheKey);
     if (cachedDetails) {
       console.log('File details: Returning cached result');

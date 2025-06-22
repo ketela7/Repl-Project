@@ -184,15 +184,14 @@ export async function GET(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { session } } = await supabase.auth.getSession();
+    const session = await auth();
     
-    if (!session) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const { fileId } = await params;
-    const accessToken = session.provider_token;
+    const accessToken = session.accessToken;
     
     if (!accessToken) {
       return NextResponse.json({ 

@@ -233,7 +233,6 @@ export async function GET(request: NextRequest) {
 
     // Check cache first
     const cacheKey = driveCache.generateDriveKey({
-      pageSize,
       pageToken,
       parentId: folderId,
       userId: user.email || 'unknown',
@@ -324,16 +323,16 @@ export async function GET(request: NextRequest) {
       }
       
       // Apply client-side filters to cached results
-      const filteredFiles = applyClientSideFilters(cachedData.files, filters);
+      const filteredFiles = applyClientSideFilters((cachedData as any)?.files || [], filters);
       
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Retrieved ${cachedData.files.length} files from Drive API`);
+        console.log(`Retrieved ${(cachedData as any)?.files?.length || 0} files from Drive API`);
         console.log(`After client-side filtering: ${filteredFiles.length} files`);
       }
 
       return NextResponse.json({
         files: filteredFiles,
-        nextPageToken: cachedData.nextPageToken,
+        nextPageToken: (cachedData as any)?.nextPageToken,
         totalCount: filteredFiles.length
       });
     }

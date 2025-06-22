@@ -46,11 +46,13 @@ export const mobileSpacing = {
  * Generate touch-friendly button classes
  */
 export function getTouchButtonClasses(
-  size: keyof typeof touchButtonSizes = "md",
+  size: keyof typeof touchButtonSizes | "primary" | "secondary" = "md",
   variant: "default" | "ghost" | "outline" = "default"
 ): string {
+  // Map legacy size names to actual sizes
+  const normalizedSize = size === "primary" || size === "secondary" ? "md" : size;
   const baseClasses = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50";
-  const sizeClasses = touchButtonSizes[size];
+  const sizeClasses = touchButtonSizes[normalizedSize];
   
   const variantClasses = {
     default: "bg-primary text-primary-foreground hover:bg-primary/90",
@@ -65,9 +67,20 @@ export function getTouchButtonClasses(
  * Generate mobile-optimized grid layout classes
  */
 export function getMobileGridClasses(
-  columns: { mobile: number; tablet?: number; desktop?: number }
+  options: { mobile?: number; tablet?: number; desktop?: number; columns?: number; gap?: string } | { columns: number; gap?: string }
 ): string {
-  const { mobile, tablet = mobile * 2, desktop = tablet + 1 } = columns;
+  // Handle legacy usage with just columns/gap
+  if ('columns' in options && !('mobile' in options)) {
+    const { columns = 1, gap = 'normal' } = options;
+    return cn(
+      `grid grid-cols-${columns}`,
+      `md:grid-cols-${columns * 2}`,
+      `lg:grid-cols-${columns * 2 + 1}`,
+      mobileSpacing.gridGap
+    );
+  }
+  
+  const { mobile = 1, tablet = mobile * 2, desktop = tablet + 1 } = options as { mobile?: number; tablet?: number; desktop?: number };
   
   return cn(
     `grid grid-cols-${mobile}`,

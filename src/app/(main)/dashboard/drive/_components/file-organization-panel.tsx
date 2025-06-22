@@ -84,19 +84,19 @@ export function FileOrganizationPanel({
       priority: newRule.priority || 1
     };
 
-    handleSettingChange('customRules', [...settings.customRules, rule]);
+    handleSettingChange('customRules' as any, [...settings.customRules, rule]);
     setIsAddingRule(false);
     setNewRule({ name: '', condition: {}, tags: [], enabled: true, priority: 1 });
     toast.success('Tagging rule added successfully');
   };
 
   const handleDeleteRule = (ruleId: string) => {
-    handleSettingChange('customRules', settings.customRules.filter(rule => rule.id !== ruleId));
+    handleSettingChange('customRules' as any, settings.customRules.filter(rule => rule.id !== ruleId));
     toast.success('Tagging rule deleted');
   };
 
   const handleToggleRule = (ruleId: string) => {
-    handleSettingChange('customRules', settings.customRules.map(rule =>
+    handleSettingChange('customRules' as any, settings.customRules.map(rule =>
       rule.id === ruleId ? { ...rule, enabled: !rule.enabled } : rule
     ));
   };
@@ -202,7 +202,7 @@ export function FileOrganizationPanel({
                         <Switch
                           checked={rule.enabled}
                           onCheckedChange={() => handleToggleRule(rule.id)}
-                          size="sm"
+
                         />
                         <span className="text-sm font-medium">{rule.name}</span>
                       </div>

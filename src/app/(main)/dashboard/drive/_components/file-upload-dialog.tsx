@@ -70,7 +70,7 @@ export function FileUploadDialog({
         body: formData,
       });
 
-      clearInterval(progressInterval);
+      // Progress interval would be cleared here if implemented
       setUploadProgress(100);
 
       if (!response.ok) {

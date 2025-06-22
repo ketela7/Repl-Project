@@ -199,7 +199,7 @@ export function FileList({
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {'size' in item && item.size ? formatFileSize(item.size) : '—'}
+                  {'size' in item && item.size ? formatFileSize(Number(item.size)) : '—'}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {formatFileTime(item.modifiedTime, timezone)}

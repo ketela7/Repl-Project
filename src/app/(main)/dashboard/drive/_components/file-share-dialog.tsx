@@ -115,7 +115,7 @@ export function FileShareDialog({
         shareData = {
           action: 'get_share_link',
           role: accessLevel,
-          type: apiType,
+          type: apiType as 'anyone' | 'anyoneWithLink' | 'domain' | 'user',
           allowFileDiscovery: allowDiscovery,
         };
 
@@ -169,7 +169,9 @@ export function FileShareDialog({
         if (successCount === items.length) {
           loadingToast.success(`Successfully shared all ${successCount} items`, loadingId);
         } else if (successCount > 0) {
-          warningToast.partialSuccess(successCount, items.length, "Share operation");
+          toast(`Shared ${successCount} of ${items.length} items`, { 
+            description: "Some items could not be shared" 
+          });
         } else {
           loadingToast.error(`Failed to share all ${failCount} items`, loadingId);
         }
@@ -180,9 +182,9 @@ export function FileShareDialog({
 
       // Handle single item
       if (shareType === 'link') {
-        loadingToast.start(`Generating share link for "${item.name}"...`, loadingId);
+        loadingToast.start(`Generating share link for "${item?.name || 'file'}"...`, loadingId);
       } else {
-        loadingToast.start(`Sharing "${item.name}" with ${emailAddress}...`, loadingId);
+        loadingToast.start(`Sharing "${item?.name || 'file'}" with ${emailAddress}...`, loadingId);
       }
       
       const response = await fetch(`/api/drive/files/${item?.id}/share`, {
@@ -202,7 +204,7 @@ export function FileShareDialog({
         }
 
         if (response.status === 403) {
-          loadingToast.error(`Permission denied for "${item.name}"`, loadingId);
+          loadingToast.error(`Permission denied for "${item?.name || 'file'}"`, loadingId);
           errorToast.permissionDenied();
           return;
         }
@@ -215,16 +217,16 @@ export function FileShareDialog({
       if (shareType === 'link' && result.webViewLink) {
         const success = await copyToClipboard(result.webViewLink);
         if (success) {
-          loadingToast.success(`Share link for "${item.name}" copied to clipboard`, loadingId);
+          loadingToast.success(`Share link for "${item?.name || 'file'}" copied to clipboard`, loadingId);
         } else {
-          loadingToast.success(`Share link generated for "${item.name}"`, loadingId);
+          loadingToast.success(`Share link generated for "${item?.name || 'file'}"`, loadingId);
           successToast.generic(`Link: ${result.webViewLink}`, {
             description: "Click to copy manually",
             duration: 8000,
           });
         }
       } else if (shareType === 'email') {
-        loadingToast.success(`"${item.name}" shared with ${emailAddress}`, loadingId);
+        loadingToast.success(`"${item?.name || 'file'}" shared with ${emailAddress}`, loadingId);
         successToast.shared(1);
       }
 

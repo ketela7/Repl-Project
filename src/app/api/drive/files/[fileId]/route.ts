@@ -73,14 +73,13 @@ export async function PUT(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const session = await auth();
 
-    if (authError || !session?.user) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const accessToken = session.provider_token;
+    const accessToken = session.accessToken;
     if (!accessToken) {
       return NextResponse.json({ error: 'Google Drive access not found' }, { status: 400 });
     }
@@ -154,14 +153,13 @@ export async function DELETE(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const supabase = await createClient();
-    const { data: { session }, error: authError } = await supabase.auth.getSession();
+    const session = await auth();
 
-    if (authError || !session?.user) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const accessToken = session.provider_token;
+    const accessToken = session.accessToken;
     if (!accessToken) {
       return NextResponse.json({ error: 'Google Drive access not found' }, { status: 400 });
     }
