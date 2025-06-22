@@ -401,8 +401,8 @@ export function DriveManager() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [needsReauth, setNeedsReauth] = useState(false);
 
-  // Debounced search query for performance - optimized delay for better UX
-  const debouncedSearchQuery = useDebouncedValue(searchQuery, 5000);
+  // Manual search state - no debounce, only process on submit
+  const [submittedSearchQuery, setSubmittedSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   // Table column visibility state
@@ -506,33 +506,18 @@ export function DriveManager() {
       : <ChevronDown className="h-4 w-4" />;
   };
 
-  // Lazy search: Only process when debounce completes or no search active
+  // Manual search: Only process submitted search queries
   const { filteredFiles: clientFilteredFiles, filteredFolders: clientFilteredFolders } = React.useMemo(() => {
-    // Show original data while user is actively typing
-    if (searchQuery !== debouncedSearchQuery && searchQuery.trim() !== '') {
-      return { filteredFiles: files, filteredFolders: folders };
-    }
-    
-    // Only process when search is stable (debounced) or cleared
     return applyClientSideFilters(files, folders, {
       fileTypeFilter,
-      searchQuery: debouncedSearchQuery,
+      searchQuery: submittedSearchQuery,
       activeView,
       advancedFilters
     });
-  }, [files, folders, fileTypeFilter, debouncedSearchQuery, activeView, advancedFilters]);
+  }, [files, folders, fileTypeFilter, submittedSearchQuery, activeView, advancedFilters]);
 
-  // Lazy sorting: Only sort when search is stable
+  // Sort items based on current sort configuration
   const sortedAllItems = React.useMemo(() => {
-    // Simple folder-first ordering while typing (no heavy sorting)
-    if (searchQuery !== debouncedSearchQuery && searchQuery.trim() !== '') {
-      return [
-        ...clientFilteredFolders.map(folder => ({ ...folder, itemType: 'folder' as const })),
-        ...clientFilteredFiles.map(file => ({ ...file, itemType: 'file' as const }))
-      ];
-    }
-
-    // Full sorting only when search is stable
     const allItems = [
       ...clientFilteredFolders.map(folder => ({ ...folder, itemType: 'folder' as const })),
       ...clientFilteredFiles.map(file => ({ ...file, itemType: 'file' as const }))
@@ -1932,17 +1917,19 @@ export function DriveManager() {
     }
   };
 
-  // Optimized search input handler
+  // Instant search input handler - no processing while typing
   const handleSearchInput = (value: string) => {
     setSearchQuery(value);
-    // No timeout needed - using debounced value hook instead
   };
 
+  // Manual search submission - only process when user submits
   const handleSearch = () => {
-    if (searchQuery.trim()) {
-      fetchFiles(undefined, searchQuery);
+    const query = searchQuery.trim();
+    setSubmittedSearchQuery(query);
+    if (query) {
+      fetchFiles(currentFolderId, query);
     } else {
-      fetchFiles(currentFolderId || undefined);
+      fetchFiles(currentFolderId);
     }
   };
 
@@ -3682,7 +3669,11 @@ export function DriveManager() {
                     variant="ghost"
                     size="sm"
                     className="h-8 w-8 p-0 hover:bg-muted"
-                    onClick={() => setSearchQuery('')}
+                    onClick={() => {
+                      setSearchQuery('');
+                      setSubmittedSearchQuery('');
+                      fetchFiles(currentFolderId);
+                    }}
                     title="Clear search"
                   >
                     <X className="h-4 w-4" />
