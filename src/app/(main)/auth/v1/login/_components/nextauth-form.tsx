@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { useSearchParams } from "next/navigation";
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -15,9 +14,11 @@ const FormSchema = z.object({
   remember: z.boolean().default(false),
 });
 
-export function NextAuthForm() {
-  const searchParams = useSearchParams();
-  const isReauth = searchParams.get('reauth') === 'drive';
+interface NextAuthFormProps {
+  isReauth?: boolean;
+}
+
+export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
   
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),

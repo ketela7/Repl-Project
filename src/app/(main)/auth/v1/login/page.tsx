@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { Command } from "lucide-react";
+import { Suspense } from "react";
 import { NextAuthForm } from "./_components/nextauth-form";
+import { SearchParamsHandler } from "./_components/search-params-handler";
 
 export default function LoginV1() {
   return (
@@ -28,7 +30,11 @@ export default function LoginV1() {
             </div>
           </div>
           <div className="space-y-4">
-            <NextAuthForm />
+            <Suspense fallback={<div className="text-center">Loading...</div>}>
+              <SearchParamsHandler>
+                {(isReauth) => <NextAuthForm isReauth={isReauth} />}
+              </SearchParamsHandler>
+            </Suspense>
             <p className="text-muted-foreground text-center text-xs font-medium">
               Sign in with your Google account to access the Google Drive management system.
             </p>
