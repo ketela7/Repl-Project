@@ -74,7 +74,7 @@ class SearchOptimizer {
   /**
    * Check if we can use incremental search (extending previous results)
    */
-  private checkIncrementalSearch(query: string, userId: string, folderId?: string): SearchResult | null {
+  private checkIncrementalSearch(query: string, _userId: string, folderId?: string): SearchResult | null {
     // Find cached results that this query extends (same folder context)
     const folderSuffix = folderId ? `:folder:${folderId}` : '';
     
@@ -113,7 +113,7 @@ class SearchOptimizer {
    */
   private async executeSearch(
     query: string,
-    userId: string,
+    _userId: string,
     apiCall: () => Promise<any>
   ): Promise<SearchResult> {
     const startTime = Date.now();

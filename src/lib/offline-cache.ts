@@ -157,7 +157,7 @@ class OfflineCache {
       console.error('[OfflineCache] Failed to get cache stats:', error);
     }
     
-    return { size: totalSize, entries, lastSync: lastSync || undefined };
+    return { size: totalSize, entries, lastSync };
   }
 
   /**

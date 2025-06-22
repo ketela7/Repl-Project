@@ -316,7 +316,7 @@ export const toastUtils = {
   /**
    * Show clipboard copy feedback
    */
-  clipboard: (text: string, label?: string) => {
+  clipboard: (text: string, _label?: string) => {
     navigator.clipboard.writeText(text).then(() => {
       successToast.copied();
     }).catch(() => {
@@ -346,7 +346,7 @@ export const toastUtils = {
   bulkOperation: async (
     operation: string,
     operationFn: () => Promise<{ success: number; total: number; failed?: string[] }>,
-    onProgress?: (current: number, total: number) => void
+    _onProgress?: (current: number, total: number) => void
   ) => {
     const loadingId = "bulk-operation";
     loadingToast.start(`Starting ${operation}...`, loadingId);

@@ -175,7 +175,7 @@ class SessionManager {
   /**
    * Add event listener
    */
-  on(event: SessionEventType, listener: (data?: any) => void): void {
+  on(_event: SessionEventType, listener: (data?: any) => void): void {
     this.listeners.add(listener);
   }
 

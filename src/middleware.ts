@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
-import { sessionCache, generateSessionCacheKey } from "./lib/session-cache"
+import { sessionCache } from "./lib/session-cache"
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
@@ -40,7 +40,7 @@ export async function middleware(req: NextRequest) {
     // Get NextAuth token with proper configuration
     const token = await getToken({ 
       req, 
-      secret: process.env.NEXTAUTH_SECRET,
+      secret: process.env.NEXTAUTH_SECRET || '',
       cookieName: process.env.NODE_ENV === 'production' 
         ? '__Secure-next-auth.session-token' 
         : 'next-auth.session-token'

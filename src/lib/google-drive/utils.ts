@@ -1193,7 +1193,7 @@ export function getFileActions(
     canMove: finalCapabilities.canMoveItemWithinDrive,
     canCopy: finalCapabilities.canCopy,
     canShare: finalCapabilities.canShare,
-    canTrash: finalCapabilities.canTrash,
+    canTrash: Boolean(finalCapabilities.canTrash),
     canRestore: Boolean(isTrashed && finalCapabilities.canUntrash),
     canPermanentDelete: Boolean(finalCapabilities.canDelete),
   };
