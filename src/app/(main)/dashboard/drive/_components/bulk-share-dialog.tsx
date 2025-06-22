@@ -369,7 +369,7 @@ export function BulkShareDialog({
   if (isMobile) {
     return (
       <BottomSheet open={open} onOpenChange={onOpenChange}>
-        <BottomSheetContent className="max-h-[90vh]">
+        <BottomSheetContent className="max-h-[90vh] flex flex-col">
           <BottomSheetHeader className="pb-4">
             <BottomSheetTitle className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
@@ -384,7 +384,7 @@ export function BulkShareDialog({
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="px-4 pb-4 space-y-4">
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
             {renderContent()}
           </div>
 
@@ -488,34 +488,37 @@ export function BulkShareDialog({
             </div>
           )}
 
-          <BottomSheetFooter className={getMobileGridClasses({ columns: !showResults ? 2 : 1, gap: 'normal' })}>
-            <Button 
-              variant="outline" 
-              onClick={() => onOpenChange(false)} 
-              disabled={isLoading} 
-              className={getTouchButtonClasses('secondary')}
-            >
-              {showResults ? 'Close' : 'Cancel'}
-            </Button>
-            {!showResults && (
+          <BottomSheetFooter className="flex-shrink-0 border-t bg-background p-4">
+            <div className={`grid ${!showResults ? 'grid-cols-2' : 'grid-cols-1'} gap-3 w-full`}>
               <Button 
-                onClick={handleBulkShare} 
-                disabled={isLoading || selectedItems.length === 0} 
-                className={getTouchButtonClasses('primary')}
+                variant="outline" 
+                onClick={() => onOpenChange(false)} 
+                disabled={isLoading} 
+                className="min-h-[48px] text-base font-medium"
               >
-                {isLoading ? (
-                  <>
-                    <Share2 className="h-4 w-4 mr-2 animate-pulse" />
-                    Sharing...
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Generate {selectedItems.length} Share Links
-                  </>
-                )}
+                {showResults ? 'Close' : 'Cancel'}
               </Button>
-            )}
+              {!showResults && (
+                <Button 
+                  onClick={handleBulkShare} 
+                  disabled={isLoading || selectedItems.length === 0} 
+                  className="min-h-[48px] text-base font-medium"
+                >
+                  {isLoading ? (
+                    <>
+                      <Share2 className="h-4 w-4 mr-2 animate-pulse" />
+                      Sharing...
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Generate {selectedItems.length} Share Links
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+            <div className="pb-safe-area-inset-bottom"></div>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
