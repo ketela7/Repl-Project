@@ -1183,16 +1183,16 @@ export function getFileActions(
     canPreview: !isFolder,
 
     // Download - always available, API handles restrictions
-    canDownload: finalCapabilities.canDownload,
+    canDownload: Boolean(finalCapabilities.canDownload),
 
     // Details - always available  
     canDetails: true,
 
     // All other actions: use direct API capabilities without extra logic
-    canRename: finalCapabilities.canRename,
-    canMove: finalCapabilities.canMoveItemWithinDrive,
-    canCopy: finalCapabilities.canCopy,
-    canShare: finalCapabilities.canShare,
+    canRename: Boolean(finalCapabilities.canRename),
+    canMove: Boolean(finalCapabilities.canMoveItemWithinDrive),
+    canCopy: Boolean(finalCapabilities.canCopy),
+    canShare: Boolean(finalCapabilities.canShare),
     canTrash: Boolean(finalCapabilities.canTrash),
     canRestore: Boolean(isTrashed && finalCapabilities.canUntrash),
     canPermanentDelete: Boolean(finalCapabilities.canDelete),

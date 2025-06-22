@@ -50,8 +50,7 @@ export function formatDateToUserTimezone(
 /**
  * Convert UTC date to user's timezone
  */
-export function convertUTCToUserTimezone(utcDate: string | Date, timezone?: string): Date {
-  const _userTimezone = timezone || getUserTimezone();
+export function convertUTCToUserTimezone(utcDate: string | Date, _timezone?: string): Date {
   const dateObj = typeof utcDate === 'string' ? new Date(utcDate) : utcDate;
   
   // Create a new date adjusted for user's timezone
@@ -64,8 +63,7 @@ export function convertUTCToUserTimezone(utcDate: string | Date, timezone?: stri
 /**
  * Get relative time (e.g., "2 hours ago") in user's timezone
  */
-export function getRelativeTime(date: string | Date, timezone?: string): string {
-  const _userTimezone = timezone || getUserTimezone();
+export function getRelativeTime(date: string | Date, _timezone?: string): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
   
