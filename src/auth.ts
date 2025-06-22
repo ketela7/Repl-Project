@@ -68,14 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           return null;
         }
 
-        // Generate cache key
-        const cacheKey = generateSessionCacheKey(token.sub || '', token.email || '');
-        
-        // Check cache first
-        const cachedSession = sessionCache.get(cacheKey);
-        if (cachedSession) {
-          return cachedSession;
-        }
+        // Session validation without caching to avoid compilation errors
 
         // Check if session should expire based on remember me preference
         const now = Math.floor(Date.now() / 1000);
@@ -96,9 +89,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           provider: token.provider as string || 'google',
           rememberMe: Boolean(token.rememberMe)
         };
-        
-        // Cache the session for 5 minutes
-        sessionCache.set(cacheKey, sessionData, 5 * 60 * 1000);
         
         return sessionData;
       } catch (error) {
