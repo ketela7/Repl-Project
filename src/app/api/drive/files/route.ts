@@ -47,8 +47,11 @@ function buildDriveQuery(filters: FileFilter): string {
       conditions.push('\'me\' in owners');
       break;
     case 'recent':
-      // Recent files - handled by sorting, show non-trashed files
+      // Recent files - show files accessed in the last 30 days
       conditions.push('trashed=false');
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      conditions.push(`viewedByMeTime >= '${thirtyDaysAgo.toISOString()}'`);
       break;
     case 'all':
     default:
@@ -284,7 +287,7 @@ export async function GET(request: NextRequest) {
     
     // Get sort configuration
     const sortKey = getSortKey(filters.sortBy || 'modified');
-    const orderBy = filters.viewStatus === 'recent' ? 'viewedByMeTime desc' : 
+    const orderBy = filters.viewStatus === 'recent' ? 'viewedByMeTime desc, modifiedTime desc' : 
                    `${sortKey} ${filters.sortOrder}`;
 
     if (process.env.NODE_ENV === 'development') {

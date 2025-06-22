@@ -1004,6 +1004,8 @@ export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
     starred: file.starred ?? false,
     trashed: file.trashed ?? false,
     ownedByMe: file.ownedByMe ?? true,
+    viewedByMeTime: file.viewedByMeTime ?? undefined,
+    viewedByMe: file.viewedByMe ?? false,
     capabilities: file.capabilities ? {
       canCopy: file.capabilities.canCopy ?? false,
       canDelete: file.capabilities.canDelete ?? false,

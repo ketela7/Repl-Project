@@ -40,6 +40,8 @@ export interface DriveFile {
   starred?: boolean;
   trashed?: boolean;
   ownedByMe?: boolean;
+  viewedByMeTime?: string;
+  viewedByMe?: boolean;
   capabilities?: DriveFileCapabilities;
   // File organization features
   autoTags?: string[];
