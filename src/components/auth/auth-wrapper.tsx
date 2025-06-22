@@ -66,10 +66,19 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
 
   if (status === "loading") {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-2"></div>
-          <p>Loading...</p>
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="text-center space-y-4 max-w-sm mx-auto px-6">
+          <div className="relative">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-muted border-t-primary mx-auto"></div>
+            <div className="absolute inset-0 h-12 w-12 animate-pulse rounded-full border-4 border-primary/20 mx-auto"></div>
+          </div>
+          <div className="space-y-2">
+            <p className="text-lg font-medium text-foreground">Authenticating</p>
+            <p className="text-sm text-muted-foreground">Verifying your Google Drive access...</p>
+          </div>
+          <div className="w-48 h-1 bg-muted rounded-full mx-auto overflow-hidden">
+            <div className="h-full bg-primary rounded-full animate-pulse" style={{width: '60%'}}></div>
+          </div>
         </div>
       </div>
     );

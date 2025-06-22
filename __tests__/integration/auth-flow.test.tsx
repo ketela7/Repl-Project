@@ -90,7 +90,7 @@ describe('Authentication Flow Integration', () => {
       </AuthWrapper>
     )
 
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
+    expect(screen.getByText('Authenticating')).toBeInTheDocument()
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument()
   })
 
