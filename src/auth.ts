@@ -32,7 +32,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           prompt: "consent",
         },
       },
-      checks: ["pkce", "state"],
     }),
   ],
   callbacks: {
@@ -146,9 +145,34 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         secure: process.env.NODE_ENV === 'production',
         maxAge: 30 * 24 * 60 * 60, // 30 days for persistent sessions
       }
+    },
+    state: {
+      name: process.env.NODE_ENV === 'production' 
+        ? '__Secure-authjs.state' 
+        : 'authjs.state',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 15 * 60, // 15 minutes
+      }
+    },
+    pkceCodeVerifier: {
+      name: process.env.NODE_ENV === 'production' 
+        ? '__Secure-authjs.pkce.code_verifier' 
+        : 'authjs.pkce.code_verifier',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 15 * 60, // 15 minutes
+      }
     }
   },
   trustHost: true,
   secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development',
+  debug: false, // Disable debug to reduce noise
+  useSecureCookies: process.env.NODE_ENV === 'production',
 })
