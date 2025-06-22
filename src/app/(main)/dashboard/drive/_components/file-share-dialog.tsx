@@ -469,36 +469,39 @@ export function FileShareDialog({
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="px-4 pb-4 space-y-4 flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className={`${getMobileGridClasses({ columns: 2, gap: 'normal' })} flex-shrink-0 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 safe-area-bottom`}>
-            <Button 
-              variant="outline" 
-              onClick={() => onOpenChange(false)} 
-              disabled={isLoading} 
-              className={getTouchButtonClasses('secondary')}
-            >
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleShare} 
-              disabled={isLoading} 
-              className={getTouchButtonClasses('primary')}
-            >
-              {isLoading ? (
-                <>
-                  <Share2 className="h-4 w-4 mr-2 animate-pulse" />
-                  Sharing...
-                </>
-              ) : (
-                <>
-                  <Share2 className="h-4 w-4 mr-2" />
-                  {shareType === 'link' ? 'Copy Link' : 'Send Invitation'}
-                </>
-              )}
-            </Button>
+          <BottomSheetFooter className="flex-shrink-0 border-t bg-background p-4">
+            <div className="grid grid-cols-2 gap-3 w-full">
+              <Button 
+                variant="outline" 
+                onClick={() => onOpenChange(false)} 
+                disabled={isLoading} 
+                className="min-h-[48px] text-base font-medium"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleShare} 
+                disabled={isLoading} 
+                className="min-h-[48px] text-base font-medium"
+              >
+                {isLoading ? (
+                  <>
+                    <Share2 className="h-4 w-4 mr-2 animate-pulse" />
+                    Sharing...
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    {shareType === 'link' ? 'Copy Link' : 'Send Invitation'}
+                  </>
+                )}
+              </Button>
+            </div>
+            <div className="pb-safe-area-inset-bottom"></div>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>

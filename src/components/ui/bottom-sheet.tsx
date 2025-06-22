@@ -106,9 +106,8 @@ BottomSheetDescription.displayName = "BottomSheetDescription";
 
 const BottomSheetFooter = ({ className, children, ...props }: BottomSheetFooterProps) => (
   <div
-    className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 px-4 pt-4 pb-6", className)}
+    className={cn("flex flex-col sm:flex-row sm:justify-end sm:space-x-2", className)}
     {...props}
-    style={{ paddingBottom: 'max(1.5rem, calc(1rem + env(safe-area-inset-bottom)))' }}
   >
     {children}
   </div>
