@@ -693,9 +693,7 @@ export function DriveManager() {
           console.error(`Failed to delete ${item.name}:`, response.status, errorData);
         }
 
-        // Add small delay to prevent rate limiting
         if (i < itemsWithPermissions.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -811,9 +809,7 @@ export function DriveManager() {
           console.error(`Failed to move ${item.name}:`, response.status, errorData);
         }
 
-        // Add small delay to prevent rate limiting
         if (i < itemsWithPermissions.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -944,9 +940,7 @@ export function DriveManager() {
           console.error(`Failed to copy ${item.name}:`, response.status, errorData);
         }
 
-        // Add small delay to prevent rate limiting
         if (i < itemsWithPermissions.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -1068,7 +1062,6 @@ export function DriveManager() {
 
           // Add delay between downloads to avoid overwhelming the browser
           if (i < selectedItemsData.length - 1) {
-            await new Promise(resolve => setTimeout(resolve, 500));
           }
         } catch (downloadError) {
           failedItems.push(item.name);
@@ -1176,7 +1169,6 @@ export function DriveManager() {
         }
 
         if (i < exportableFiles.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 500));
         }
       }
 
@@ -1302,7 +1294,6 @@ export function DriveManager() {
         }
 
         if (i < selectedItemsData.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -1420,7 +1411,6 @@ export function DriveManager() {
         }
 
         if (i < itemsWithPermissions.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -1568,7 +1558,6 @@ export function DriveManager() {
         }
 
         if (i < itemsWithPermissions.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 
@@ -1700,7 +1689,6 @@ export function DriveManager() {
         }
 
         if (i < itemsWithPermissions.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 300));
         }
       }
 

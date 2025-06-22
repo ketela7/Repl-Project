@@ -62,16 +62,8 @@ export function FileUploadDialog({
       if (description) formData.append('description', description);
       if (currentFolderId) formData.append('parentId', currentFolderId);
 
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return prev;
-          }
-          return prev + 10;
-        });
-      }, 200);
+      // Upload progress will be handled by the actual upload stream
+      setUploadProgress(50);
 
       const response = await fetch('/api/drive/files', {
         method: 'POST',
