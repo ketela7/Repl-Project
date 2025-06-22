@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -51,6 +51,11 @@ import { formatFileTime, formatCreationTime } from '@/lib/timezone';
 import { FileIcon } from '@/components/file-icon';
 import { toast } from "sonner";
 import { getInitials } from '@/lib/utils';
+
+// Global cache and request tracking for file details
+const fileDetailsCache = new Map<string, DetailedFileInfo>();
+const activeFileDetailRequests = new Set<string>();
+const pendingFileDetailPromises = new Map<string, Promise<DetailedFileInfo>>();
 
 interface FileDetailsDialogProps {
   isOpen: boolean;
@@ -170,35 +175,96 @@ export function FileDetailsDialog({
   const [fileDetails, setFileDetails] = useState<DetailedFileInfo | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const currentFileIdRef = useRef<string>('');
 
   useEffect(() => {
     if (isOpen && fileId) {
+      currentFileIdRef.current = fileId;
       fetchFileDetails();
     }
+    
+    // Cleanup on close or fileId change
+    return () => {
+      if (currentFileIdRef.current && currentFileIdRef.current !== fileId) {
+        // Clean up any pending requests for the previous file
+        activeFileDetailRequests.delete(currentFileIdRef.current);
+        pendingFileDetailPromises.delete(currentFileIdRef.current);
+      }
+    };
   }, [isOpen, fileId]);
 
   const fetchFileDetails = async () => {
+    if (!fileId) return;
+    
     setLoading(true);
     setError(null);
     
     try {
-      const response = await fetch(`/api/drive/files/${fileId}/details`);
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch file details');
+      // Check cache first
+      const cachedDetails = fileDetailsCache.get(fileId);
+      if (cachedDetails) {
+        console.log('[File Details Cache] Cache hit for:', fileId);
+        setFileDetails(cachedDetails);
+        setLoading(false);
+        return;
       }
+
+      // Check if request is already pending
+      const pendingPromise = pendingFileDetailPromises.get(fileId);
+      if (pendingPromise) {
+        console.log('[File Details Dedup] Using pending request for:', fileId);
+        const details = await pendingPromise;
+        setFileDetails(details);
+        setLoading(false);
+        return;
+      }
+
+      // Check if request is already active
+      if (activeFileDetailRequests.has(fileId)) {
+        console.log('[File Details Dedup] Skipping duplicate active request for:', fileId);
+        setLoading(false);
+        return;
+      }
+
+      console.log('[File Details API] Making new request for:', fileId);
+      // Mark request as active and create promise
+      activeFileDetailRequests.add(fileId);
       
-      const details = await response.json();
+      const fetchPromise = (async (): Promise<DetailedFileInfo> => {
+        const response = await fetch(`/api/drive/files/${fileId}/details`);
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch file details');
+        }
+        
+        const details = await response.json();
+        
+        // Cache the result with 5-minute TTL
+        fileDetailsCache.set(fileId, details);
+        setTimeout(() => {
+          fileDetailsCache.delete(fileId);
+        }, 5 * 60 * 1000);
+        
+        return details;
+      })();
+
+      // Store pending promise for deduplication
+      pendingFileDetailPromises.set(fileId, fetchPromise);
+      
+      const details = await fetchPromise;
       setFileDetails(details);
+      
     } catch (error) {
-      // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
         console.error('Error fetching file details:', error);
       }
       setError(error instanceof Error ? error.message : 'Failed to fetch file details');
       toast.error('Failed to load file details');
     } finally {
+      // Cleanup request tracking
+      activeFileDetailRequests.delete(fileId);
+      pendingFileDetailPromises.delete(fileId);
       setLoading(false);
     }
   };
