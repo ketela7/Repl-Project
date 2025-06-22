@@ -61,6 +61,8 @@ class RequestDeduplicator {
     sortBy?: string;
     sortOrder?: string;
     search?: string;
+    folderId?: string;
+    pageToken?: string;
   }): string {
     const keyParts = [
       'drive-files',
@@ -71,6 +73,8 @@ class RequestDeduplicator {
       params.sortBy || 'modified',
       params.sortOrder || 'desc',
       params.search || '',
+      params.folderId || 'root',
+      params.pageToken || '',
     ];
     return keyParts.join('|');
   }

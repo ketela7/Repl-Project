@@ -4,6 +4,7 @@ import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 import { driveCache } from '@/lib/cache';
 import { requestDeduplicator } from '@/lib/request-deduplication';
+import { retryDriveApiCall } from '@/lib/api-retry';
 
 interface FileFilter {
   fileType?: string;
@@ -274,7 +275,9 @@ export async function GET(request: NextRequest) {
       viewStatus: filters.viewStatus,
       sortBy: filters.sortBy,
       sortOrder: filters.sortOrder,
-      search: filters.search
+      search: filters.search,
+      folderId: folderId,
+      pageToken: pageToken
     });
 
     // Use request deduplication for performance optimization
@@ -290,14 +293,17 @@ export async function GET(request: NextRequest) {
 
       const driveService = new GoogleDriveService(accessToken);
 
-      // Make the actual API call
-      const apiResult = await driveService.listFiles({
-        query: driveQuery,
-        orderBy,
-        pageSize,
-        pageToken,
-        parentId: folderId
-      });
+      // Make the actual API call with retry mechanism
+      const apiResult = await retryDriveApiCall(
+        () => driveService.listFiles({
+          query: driveQuery,
+          orderBy,
+          pageSize,
+          pageToken,
+          parentId: folderId
+        }),
+        `Drive API listFiles for user ${user.email}`
+      );
 
       // Cache the result
       driveCache.set(cacheKey, apiResult, 5); // Cache for 5 minutes
