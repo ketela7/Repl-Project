@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 import { driveCache } from '@/lib/cache';
+import { requestDeduplicator } from '@/lib/request-deduplication';
 
 interface FileFilter {
   fileType?: string;
@@ -265,15 +266,43 @@ export async function GET(request: NextRequest) {
       console.log('Order by:', orderBy);
     }
 
-    const driveService = new GoogleDriveService(accessToken);
-
-    // Make the API call
-    const result = await driveService.listFiles({
-      query: driveQuery,
-      orderBy,
+    // Generate deduplication key to prevent multiple identical requests
+    const deduplicationKey = requestDeduplicator.generateDriveFilesKey({
+      userId: user.email!,
       pageSize,
-      pageToken,
-      parentId: folderId
+      fileType: filters.fileType,
+      viewStatus: filters.viewStatus,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      search: filters.search
+    });
+
+    // Use request deduplication for performance optimization
+    const result = await requestDeduplicator.deduplicate(deduplicationKey, async () => {
+      // Check cache first inside deduplicated request
+      const cachedData = driveCache.get(cacheKey);
+      if (cachedData) {
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Cache hit for:', cacheKey);
+        }
+        return cachedData;
+      }
+
+      const driveService = new GoogleDriveService(accessToken);
+
+      // Make the actual API call
+      const apiResult = await driveService.listFiles({
+        query: driveQuery,
+        orderBy,
+        pageSize,
+        pageToken,
+        parentId: folderId
+      });
+
+      // Cache the result
+      driveCache.set(cacheKey, apiResult, 5); // Cache for 5 minutes
+      
+      return apiResult;
     });
 
     if (process.env.NODE_ENV === 'development') {
@@ -291,9 +320,6 @@ export async function GET(request: NextRequest) {
       ...result,
       files: filteredFiles
     };
-
-    // Cache the result
-    driveCache.set(cacheKey, finalResult, 5); // Cache for 5 minutes
 
     return NextResponse.json(finalResult);
     
