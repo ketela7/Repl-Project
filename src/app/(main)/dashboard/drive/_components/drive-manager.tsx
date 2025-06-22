@@ -506,34 +506,33 @@ export function DriveManager() {
       : <ChevronDown className="h-4 w-4" />;
   };
 
-  // Apply client-side filters first, then sort - optimized to only run when debounced search is ready
+  // Lazy search: Only process when debounce completes or no search active
   const { filteredFiles: clientFilteredFiles, filteredFolders: clientFilteredFolders } = React.useMemo(() => {
-    // Only run heavy filtering when search is stabilized or no search
+    // Show original data while user is actively typing
     if (searchQuery !== debouncedSearchQuery && searchQuery.trim() !== '') {
-      // Return unfiltered data while user is still typing
       return { filteredFiles: files, filteredFolders: folders };
     }
     
+    // Only process when search is stable (debounced) or cleared
     return applyClientSideFilters(files, folders, {
       fileTypeFilter,
       searchQuery: debouncedSearchQuery,
       activeView,
       advancedFilters
     });
-  }, [files, folders, fileTypeFilter, debouncedSearchQuery, activeView, advancedFilters, searchQuery]);
+  }, [files, folders, fileTypeFilter, debouncedSearchQuery, activeView, advancedFilters]);
 
-  // Sort ALL items (files and folders together) based on current sort configuration - optimized
+  // Lazy sorting: Only sort when search is stable
   const sortedAllItems = React.useMemo(() => {
-    // Skip heavy sorting during active typing to improve performance
+    // Simple folder-first ordering while typing (no heavy sorting)
     if (searchQuery !== debouncedSearchQuery && searchQuery.trim() !== '') {
-      // Return simple folder-first ordering while typing
       return [
         ...clientFilteredFolders.map(folder => ({ ...folder, itemType: 'folder' as const })),
         ...clientFilteredFiles.map(file => ({ ...file, itemType: 'file' as const }))
       ];
     }
 
-    // Combine files and folders into single array with type information
+    // Full sorting only when search is stable
     const allItems = [
       ...clientFilteredFolders.map(folder => ({ ...folder, itemType: 'folder' as const })),
       ...clientFilteredFiles.map(file => ({ ...file, itemType: 'file' as const }))
@@ -591,7 +590,7 @@ export function DriveManager() {
       if (aValue > bValue) return direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [clientFilteredFiles, clientFilteredFolders, sortConfig, searchQuery, debouncedSearchQuery]);
+  }, [clientFilteredFiles, clientFilteredFolders, sortConfig]);
 
   // Separate sorted items back into files and folders for backward compatibility
   const sortedFiles = React.useMemo(() => {

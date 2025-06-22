@@ -90,6 +90,7 @@ Migration preferences: User prefers to discuss project rules and documentation b
 - **Folder Navigation Consistency**: Enhanced deduplication keys for consistent folder-specific caching and search
 - **Search Typing Performance**: Fixed heavy computation on every keystroke by optimizing useMemo dependencies
 - **Debounce Optimization**: Improved search debounce from 500ms to 800ms for natural typing experience
+- **Lazy Search Implementation**: Implemented true lazy search - no processing until debounce completes or manual submit
 
 ### December 2024: **Comprehensive File Icon System Enhancement**
 - **Complete MIME Type Coverage**: Added support for 150+ additional MIME types including `application/rar`, `video/x-matroska`, and specialized formats
