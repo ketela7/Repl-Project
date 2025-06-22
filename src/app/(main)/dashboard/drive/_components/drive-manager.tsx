@@ -406,7 +406,6 @@ export function DriveManager() {
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [needsReauth, setNeedsReauth] = useState(false);
   
-  // Request throttling to prevent multiple identical calls - using refs to avoid React dependency issues
   const lastFetchCallRef = useRef<string>('');
   const fetchThrottleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const activeRequestsRef = useRef<Set<string>>(new Set());
