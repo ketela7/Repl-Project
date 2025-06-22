@@ -29,8 +29,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           scope: "openid email profile https://www.googleapis.com/auth/drive",
           access_type: "offline",
           prompt: "consent",
+          response_type: "code",
         },
       },
+      checks: ["state"],
     }),
   ],
   callbacks: {
@@ -61,21 +63,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token
     },
     async session({ session, token }) {
-      // Check if session should expire based on remember me preference
-      const now = Math.floor(Date.now() / 1000);
-      const sessionDuration = token.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 days or 1 day
-      const sessionExpiry = (token.iat || now) + sessionDuration;
-      
-      // If session has expired based on remember me preference, return null to force re-login
-      if (now > sessionExpiry) {
-        return null;
+      try {
+        // Check if session should expire based on remember me preference
+        const now = Math.floor(Date.now() / 1000);
+        const sessionDuration = token.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60; // 30 days or 1 day
+        const sessionExpiry = (token.iat || now) + sessionDuration;
+        
+        // If session has expired based on remember me preference, return null to force re-login
+        if (now > sessionExpiry) {
+          return null;
+        }
+        
+        session.accessToken = token.accessToken as string
+        session.refreshToken = token.refreshToken as string
+        session.provider = token.provider as string
+        session.rememberMe = token.rememberMe as boolean
+        return session
+      } catch (error) {
+        console.error('[NextAuth] Session callback error:', error);
+        return null; // Force re-authentication on session errors
       }
-      
-      session.accessToken = token.accessToken as string
-      session.refreshToken = token.refreshToken as string
-      session.provider = token.provider as string
-      session.rememberMe = token.rememberMe as boolean
-      return session
     },
     async redirect({ url, baseUrl }) {
       // After successful sign in, redirect to dashboard
