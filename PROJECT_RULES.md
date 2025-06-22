@@ -31,33 +31,46 @@ DATABASE_URL
 
 ---
 
-## 📁 Code Optimization & File Structure
+## 📁 Clean Architecture & Project Structure
+
+### Directory Organization (Next.js App Router)
+- **API Routes**: Only in `src/app/api/` (Next.js 13+ standard)
+- **Pages**: Route components in `src/app/(main)/`
+- **Components**: Reusable UI in `src/components/`
+- **Utilities**: Core logic in `src/lib/`
+- **Configuration**: Settings in `src/config/`
+- **Hooks**: Custom React hooks in `src/hooks/`
 
 ### File Naming Conventions
-- **Simplified naming**: Use clear, descriptive names without prefixes like "enhanced-" or "utils-"
-- **Core utilities**: Direct functional names (e.g., `toast.ts`, `clipboard.ts`, `timezone.ts`, `session.ts`)
-- **Component naming**: Descriptive component names without redundant prefixes
-- **Import consistency**: Update all imports when renaming files to maintain consistency
+- **kebab-case**: For all files and directories
+- **Descriptive names**: Clear, purpose-driven naming without prefixes
+- **No redundant prefixes**: Avoid "enhanced-", "utils-", "component-"
+- **Consistent patterns**: Follow established project conventions
+
+### API Structure Rules
+- **Single API Location**: Only `src/app/api/` contains API routes
+- **REST Conventions**: Proper HTTP methods and status codes
+- **Route Grouping**: Organize by feature domain
+- **Type Safety**: All API routes use TypeScript
 
 ### Extension Priorities
 
 #### ✅ **High Priority (Always Extend)**
-- `src/lib/google-drive/utils.ts` - Core utilities
-- `src/lib/google-drive/service.ts` - API service methods
-- `src/components/ui/` - Shadcn components
-- `src/app/(main)/dashboard/drive/_components/drive-manager.tsx` - Main component
-- `src/lib/toast.ts` - Toast notification utilities
+- `src/lib/google-drive/` - Core Google Drive integration
+- `src/components/ui/` - Shadcn component library
+- `src/lib/toast.ts` - Toast notification system
 - `src/lib/clipboard.ts` - Clipboard functionality
+- `src/app/(main)/dashboard/drive/_components/drive-manager.tsx` - Main component
 
 #### ⚠️ **Medium Priority (Consider Extension)**
-- Custom hooks in `src/hooks/`
-- Type definitions in `src/lib/google-drive/types.ts`
-- Configuration files
-- Utility libraries (`src/lib/timezone.ts`, `src/lib/session.ts`)
+- `src/hooks/` - Custom React hooks
+- `src/lib/` utilities (timezone, session, cache)
+- `src/config/` - Configuration files
+- `src/components/navigation/` - Navigation components
 
 #### 🔄 **Low Priority (OK to Create New)**
-- Page components (`page.tsx`)
-- Route handlers (`/api/`)
+- `src/app/(main)/` - New page routes
+- `src/app/api/` - New API endpoints
 - Completely different feature domains
 
 ### Anti-Patterns to Avoid

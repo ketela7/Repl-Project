@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import type { SidebarVariant, SidebarCollapsible, ContentLayout } from "@/lib/layout-preferences";
-import { setValueToCookie } from "@/server/server-actions";
+import { setValueToCookie } from "@/lib/actions";
 
 type LayoutControlsProps = {
   readonly variant: SidebarVariant;

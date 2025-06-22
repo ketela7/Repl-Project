@@ -1,5 +1,9 @@
 import packageJson from "../../package.json";
 
+/**
+ * Application configuration constants
+ * Centralized configuration for the Google Drive Management Application
+ */
 export const APP_CONFIG = {
   name: "Professional Google Drive Management",
   version: packageJson.version,
