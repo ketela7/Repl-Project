@@ -88,6 +88,8 @@ Migration preferences: User prefers to discuss project rules and documentation b
 - **Offline Cache Strategy**: Implemented 50MB persistent storage system for offline file access with intelligent cleanup
 - **Search Query Performance Fix**: Optimized search performance from 2+ seconds to 500ms with folder-aware caching
 - **Folder Navigation Consistency**: Enhanced deduplication keys for consistent folder-specific caching and search
+- **Search Typing Performance**: Fixed heavy computation on every keystroke by optimizing useMemo dependencies
+- **Debounce Optimization**: Improved search debounce from 500ms to 800ms for natural typing experience
 
 ### December 2024: **Comprehensive File Icon System Enhancement**
 - **Complete MIME Type Coverage**: Added support for 150+ additional MIME types including `application/rar`, `video/x-matroska`, and specialized formats
