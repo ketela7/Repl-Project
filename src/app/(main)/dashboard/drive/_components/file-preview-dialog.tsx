@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { X, Download, ExternalLink, Maximize2, Minimize2, FileText, Image, Video, Music, AlertCircle } from "lucide-react";
 import { DriveFile } from '@/lib/google-drive/types';
 import { getPreviewUrl, isImageFile, isVideoFile, isAudioFile, isDocumentFile, formatFileSize } from '@/lib/google-drive/utils';
-import { toastUtils, errorToast } from "@/lib/toast-consolidated";
+import { successToast, errorToast, toastUtils } from '@/lib/toast';
 
 interface FilePreviewDialogProps {
   open: boolean;
@@ -65,7 +65,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-      });
+      }, file.name);
     } catch (error) {
       errorToast.downloadFailed(file.name);
     }

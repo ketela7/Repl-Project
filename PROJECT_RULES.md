@@ -1,334 +1,186 @@
+# Project Development Rules
 
-# Project Rules & Guidelines
+## 🎯 Code Quality Standards
 
-## Professional Google Drive Management Application
+### TypeScript Requirements
+- **Strict Mode**: Always use TypeScript strict mode
+- **Type Safety**: No `any` types except for legacy API compatibility
+- **Interface Definitions**: Define interfaces for all data structures
+- **JSDoc Comments**: Document all public functions and complex logic
 
-**Last Updated**: December 2024  
-**Project Type**: Professional Next.js + Google Drive API Integration  
-**Architecture**: Full-stack web application with NextAuth.js authentication
+### Code Style
+- **ESLint + Prettier**: Mandatory code formatting
+- **Naming Convention**: Use kebab-case for files, camelCase for variables
+- **Component Structure**: Follow React functional component patterns
+- **Error Handling**: Comprehensive try-catch blocks for async operations
 
----
-
-## 🏗️ Environment & Configuration
-
-### Environment Variables
-- **Handle without NEXT_PUBLIC_ prefixes** - All environment variables are stored in Replit secrets
-- **Direct access pattern**: Use `process.env.VARIABLE_NAME` for server-side components
-- **Configuration centralization**: Utilize `src/lib/config.ts` for environment management
-- **Validation required**: All environment variables must be validated on startup
-
-### Required Environment Variables
-```bash
-# Authentication (NextAuth.js)
-GOOGLE_CLIENT_ID
-GOOGLE_CLIENT_SECRET
-NEXTAUTH_SECRET
-NEXTAUTH_URL
-
-# Database
-DATABASE_URL
+### File Organization
+```
+- Use kebab-case for file names (user-profile.tsx)
+- Group related components in feature folders
+- Keep components under 300 lines when possible
+- Separate logic into custom hooks when appropriate
 ```
 
----
+## 🏗 Architecture Guidelines
 
-## 📁 Clean Architecture & Project Structure
+### Component Design
+- **Extend Over Create**: Always extend existing components rather than creating new ones
+- **Single Responsibility**: Each component should have one clear purpose
+- **Props Interface**: Define clear TypeScript interfaces for all props
+- **Composition**: Prefer composition over inheritance
 
-### Directory Organization (Next.js App Router)
-- **API Routes**: Only in `src/app/api/` (Next.js 13+ standard)
-- **Pages**: Route components in `src/app/(main)/`
-- **Components**: Reusable UI in `src/components/`
-- **Utilities**: Core logic in `src/lib/`
-- **Configuration**: Settings in `src/config/`
-- **Hooks**: Custom React hooks in `src/hooks/`
+### API Structure
+- **Route Organization**: API routes only in `src/app/api/`
+- **Error Handling**: Consistent error response format
+- **Authentication**: All protected routes must use NextAuth middleware
+- **Validation**: Input validation on all API endpoints
 
-### File Naming Conventions
-- **kebab-case**: For all files and directories
-- **Descriptive names**: Clear, purpose-driven naming without prefixes
-- **No redundant prefixes**: Avoid "enhanced-", "utils-", "component-"
-- **Consistent patterns**: Follow established project conventions
+### Database Operations
+- **Drizzle ORM**: Use Drizzle for all database operations
+- **Migrations**: Use `npm run db:push` for schema changes
+- **No Raw SQL**: Avoid direct SQL queries except for complex operations
+- **Type Safety**: Use generated types from Drizzle schema
 
-### API Structure Rules
-- **Single API Location**: Only `src/app/api/` contains API routes
-- **REST Conventions**: Proper HTTP methods and status codes
-- **Route Grouping**: Organize by feature domain
-- **Type Safety**: All API routes use TypeScript
+## 📱 Design Requirements
 
-### Extension Priorities
+### Mobile-First Approach
+- **Touch Targets**: Minimum 44px touch targets for interactive elements
+- **Responsive Design**: Test on mobile, tablet, and desktop
+- **Bottom Sheets**: Use bottom sheets for mobile actions, dialogs for desktop
+- **Gesture Support**: Implement appropriate touch gestures
 
-#### ✅ **High Priority (Always Extend)**
-- `src/lib/google-drive/` - Core Google Drive integration
-- `src/components/ui/` - Shadcn component library
-- `src/lib/toast.ts` - Toast notification system
-- `src/lib/clipboard.ts` - Clipboard functionality
-- `src/app/(main)/dashboard/drive/_components/drive-manager.tsx` - Main component
-
-#### ⚠️ **Medium Priority (Consider Extension)**
-- `src/hooks/` - Custom React hooks
-- `src/lib/` utilities (timezone, session, cache)
-- `src/config/` - Configuration files
-- `src/components/navigation/` - Navigation components
-
-#### 🔄 **Low Priority (OK to Create New)**
-- `src/app/(main)/` - New page routes
-- `src/app/api/` - New API endpoints
-- Completely different feature domains
-
-### Anti-Patterns to Avoid
-
-#### ❌ **Don't Create**
-- New utility files for similar logic
-- Duplicate components with slight variations
-- Separate service classes for related functionality
-- Multiple files for single feature
-
-#### ✅ **Do Instead**
-- Extend existing utilities with options
-- Compose existing components
-- Add methods to existing services
-- Consolidate related functionality
-
----
-
-## 🎨 UI/UX Design Standards
-
-### Color Scheme: "Balanced Professional"
-- **Primary Colors**: Professional blue palette
-- **Secondary Colors**: Neutral grays with accent colors
-- **Contextual Coloring**: 
-  - Success: Green variants
-  - Warning: Amber variants
-  - Error: Red variants
-  - Info: Blue variants
+### Accessibility Standards
+- **WCAG 2.1 AA**: Maintain AA compliance
+- **Keyboard Navigation**: Full keyboard accessibility
+- **Screen Readers**: Proper ARIA labels and descriptions
+- **Color Contrast**: Minimum 4.5:1 contrast ratio
 
 ### Cross-Platform Compatibility
-- **Responsive Design**: Mobile-first approach with touch optimization
-- **Browser Support**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
-- **Mobile Support**: iOS Safari 14+, Android Chrome 90+
-- **Progressive Web App**: PWA capabilities enabled
-- **Touch Targets**: Minimum 44px for mobile interactions
+- **Device Testing**: Test on multiple devices and browsers
+- **Progressive Enhancement**: Core functionality works without JavaScript
+- **Performance**: Optimize for various network conditions
+- **Offline Support**: Implement offline capabilities where applicable
 
-### Icon Strategy
-- **Icon Library**: Lucide React exclusively
-- **Size Strategy**: Consistent sizing for cross-platform compatibility
-  - Small: 16px (w-4 h-4)
-  - Medium: 20px (w-5 h-5)
-  - Large: 24px (w-6 h-6)
-  - Extra Large: 32px (w-8 h-8)
+## 🧪 Testing Standards
 
-### Component Standards
-- **Shadcn/ui**: Primary component library
-- **Tailwind CSS**: Utility-first styling
-- **Cross-Platform Dialogs**: Bottom sheets for mobile, dialogs for desktop
-- **Theme Support**: Dark/light mode compatibility
-- **Accessibility**: WCAG 2.1 AA compliance
+### Coverage Requirements
+- **Minimum Coverage**: 70% code coverage for all new features
+- **Unit Tests**: Test all utility functions and hooks
+- **Integration Tests**: Test critical user flows
+- **Component Tests**: Test component rendering and interactions
 
-### Toast Notification System
-- **Library**: Sonner toast notifications with mobile-first design
-- **Positioning**: Bottom-center for mobile devices, top-right for desktop
-- **Types**: Success, error, warning, info, loading, and promise-based toasts
-- **Integration**: Automatic feedback for file operations (copy, download, share, delete)
-- **Mobile Optimization**: Android-style "Copied to clipboard" notifications
-- **Utilities**: Centralized toast functions in `src/lib/toast.ts`
+### Testing Guidelines
+- **Test File Location**: Co-locate tests with source files or in `__tests__` folders
+- **Naming Convention**: Use `.test.ts` or `.test.tsx` extensions
+- **Mock Strategy**: Mock external dependencies and API calls
+- **Test Data**: Use realistic test data, avoid placeholder content
 
----
+### Quality Checks
+```bash
+# Before committing, ensure:
+npm run lint          # No ESLint errors
+npm run type-check    # No TypeScript errors
+npm test             # All tests pass
+npm run build        # Production build succeeds
+```
 
-## 🔧 Development Standards
+## 🔒 Security Requirements
 
-### Writing Style: Professional Coder
-- **TypeScript**: Strict type checking enabled
-- **Code Quality**: ESLint + Prettier configuration
-- **Documentation**: Comprehensive JSDoc comments
-- **Error Handling**: Graceful error boundaries and user feedback
-
-### Testing Requirements
-- **Always test results**: Ensure everything works correctly before completion
-- **End-to-end validation**: Test complete user workflows
-- **Cross-browser testing**: Verify functionality across supported browsers
-- **Mobile testing**: Validate responsive behavior and touch interactions
-
-### File Naming Conventions
-- **kebab-case**: For all files except configuration
-- **Descriptive names**: Clear, purpose-driven naming
-- **Consistent patterns**: Follow established project structure
-
----
-
-## 🔐 Security & Authentication
-
-### Authentication Flow (NextAuth.js)
-- **NextAuth.js Integration**: Primary authentication method with Google OAuth
-- **Session Management**: JWT-based sessions with 30-day persistence
-- **Token Security**: Secure storage and automatic refresh
-- **Scope Management**: Minimal required Google Drive permissions
-
-### Session Management Features
-- **Extended Sessions**: 30-day login persistence with "Keep me logged in" option
-- **Automatic Renewal**: Token refresh without user intervention
-- **Secure Storage**: JWT tokens with proper encryption
-- **Cross-Device**: Session persistence across devices
+### Authentication
+- **NextAuth.js**: Use only NextAuth.js for authentication
+- **Session Management**: Implement secure session handling
+- **JWT Tokens**: Proper token validation and refresh
+- **Protected Routes**: Middleware-based route protection
 
 ### Data Protection
-- **HTTPS Enforcement**: All communications encrypted
-- **Input Validation**: Comprehensive sanitization
-- **CSRF Protection**: Built-in Next.js protection
-- **Error Information**: Limited details in production
+- **Input Validation**: Validate all user inputs
+- **SQL Injection**: Use parameterized queries only
+- **XSS Prevention**: Sanitize all user-generated content
+- **CSRF Protection**: Enable Next.js built-in CSRF protection
 
-### File Handling Implementation
-- **No Archive Libraries**: Direct download links for memory-efficient file transfer
-- **Size Filtering**: Client-side implementation since Google Drive API lacks server-side size filtering support
-- **Bulk Operations**: Parallel processing with comprehensive error handling and progress tracking
-- **Folder Size**: Folders treated as 0 bytes in size range filtering
-- **Smart Menu Logic**: Download operations only available for files, not folders
-- **Permission-Based Actions**: Trash/Delete operations based on ownership and sharing status
-- **Cross-Platform Toolbar**: Responsive design with mobile-first approach and consistent icon sizing
-- **Shortcut Support**: Internal navigation and preview for Google Drive shortcuts
+### Environment Security
+- **Secret Management**: Use Replit Secrets for sensitive data
+- **Environment Variables**: Never commit secrets to version control
+- **API Keys**: Validate API key presence and permissions
+- **Error Handling**: Limit error details in production
 
----
+## 🚀 Performance Standards
 
-## 🚀 Performance & Optimization
+### Loading Performance
+- **Initial Load**: Target <2s for initial page load
+- **Code Splitting**: Implement lazy loading for heavy components
+- **Bundle Size**: Monitor and optimize bundle size
+- **Image Optimization**: Use Next.js Image component
 
-### Frontend Optimizations
-- **Code Splitting**: Automatic route-based splitting
-- **Image Optimization**: Next.js built-in optimization
-- **Caching Strategy**: Strategic API response caching
-- **Lazy Loading**: Component and route lazy loading
-- **Parallel Processing**: Up to 5x faster bulk operations
+### Runtime Performance
+- **Memory Usage**: Monitor memory consumption
+- **API Response**: Target <1s for API responses
+- **Caching Strategy**: Implement intelligent caching
+- **Database Queries**: Optimize database operations
 
-### Backend Optimizations
-- **API Efficiency**: Optimized Google Drive API usage with batching
-- **Database Queries**: Efficient Drizzle ORM operations
-- **Response Compression**: Automatic compression
-- **Error Boundaries**: Prevent cascading failures
-- **Session Optimization**: Efficient JWT token management
+### Mobile Performance
+- **Touch Response**: Immediate visual feedback for touch events
+- **Animation Performance**: Use CSS transforms for animations
+- **Network Optimization**: Minimize API calls on mobile
+- **Battery Efficiency**: Avoid excessive background processing
 
-### Caching Strategy
-- **Memory Cache**: In-memory caching for API responses
-- **TTL Management**: Configurable time-to-live settings
-- **Cache Keys**: Structured key generation for Drive API
-- **Cleanup Processes**: Automatic cache maintenance
+## 📚 Documentation Standards
 
----
+### Code Documentation
+- **README**: Comprehensive project setup and usage
+- **API Documentation**: Document all API endpoints
+- **Component Props**: Document all component interfaces
+- **Architecture**: Maintain architecture decision records
 
-## 📊 Data Management
-
-### Database Schema
-- **Drizzle ORM**: Type-safe database operations
-- **PostgreSQL**: Primary database system
-- **Migration Strategy**: Use `npm run db:push` for schema changes
-- **Data Integrity**: Comprehensive validation and constraints
-
-### API Integration
-- **Google Drive API**: Core file management functionality
-- **Rate Limiting**: Respect API quotas and limits
-- **Error Handling**: Robust error recovery mechanisms
-- **Token Refresh**: Automatic token management with NextAuth.js
-
----
+### User Documentation
+- **Feature Guides**: Step-by-step user guides
+- **Troubleshooting**: Common issues and solutions
+- **Changelog**: Document all feature changes
+- **Deployment**: Clear deployment instructions
 
 ## 🔄 Development Workflow
 
 ### Git Workflow
-- **Feature Branches**: Isolated feature development
-- **Code Review**: Mandatory peer review process
-- **Commit Messages**: Conventional commit format
-- **Branch Protection**: Main branch protection enabled
+- **Branch Strategy**: Feature branches from main
+- **Commit Messages**: Clear, descriptive commit messages
+- **Pull Requests**: Required for all changes
+- **Code Review**: Mandatory peer review
 
-### Build Process
-- **Next.js Build**: Optimized production builds
-- **Type Checking**: Pre-build TypeScript validation
-- **Linting**: Automated code quality checks
-- **Testing**: Automated test execution
+### Continuous Integration
+- **Automated Testing**: All tests must pass
+- **Type Checking**: TypeScript compilation required
+- **Linting**: ESLint checks must pass
+- **Build Verification**: Production build must succeed
 
-### Deployment
-- **Replit Hosting**: Primary deployment platform (port 5000)
-- **Environment Variables**: Secure secret management
-- **Health Checks**: Automated deployment validation
-- **Rollback Strategy**: Quick rollback capabilities
+### Deployment Process
+- **Environment Parity**: Test in production-like environment
+- **Database Migrations**: Safe migration strategies
+- **Rollback Plan**: Always have rollback capability
+- **Monitoring**: Monitor application health post-deployment
 
----
+## 🎯 User Experience Requirements
 
-## 📋 Quality Assurance
+### Loading States
+- **Skeleton Loaders**: Use skeleton loaders for content loading
+- **Progress Indicators**: Show progress for long operations
+- **Error States**: Clear error messages with recovery options
+- **Empty States**: Meaningful empty state messaging
 
-### Code Quality
-- **ESLint Configuration**: Comprehensive linting rules
-- **Prettier Integration**: Consistent code formatting
-- **Type Safety**: Strict TypeScript enforcement
-- **Security Scanning**: Automated vulnerability detection
+### Interaction Design
+- **Feedback**: Immediate feedback for user actions
+- **Consistency**: Consistent interaction patterns
+- **Accessibility**: Keyboard and screen reader support
+- **Mobile Touch**: Optimized touch interactions
 
-### Testing Strategy
-- **Unit Tests**: Component and utility testing
-- **Integration Tests**: API endpoint validation
-- **E2E Tests**: Complete user workflow testing
-- **Performance Tests**: Load and stress testing
-- **Mobile Testing**: Cross-platform validation
-
-### Documentation Requirements
-- **README Updates**: Always update project documentation
-- **API Documentation**: Comprehensive endpoint documentation
-- **Component Documentation**: JSDoc comments for all components
-- **Change Logs**: Detailed change tracking
+### Data Integrity
+- **Authentic Data**: Only use real data from authorized sources
+- **Error Handling**: Graceful error handling with recovery options
+- **Validation**: Client and server-side validation
+- **Backup Strategy**: Data backup and recovery procedures
 
 ---
 
-## 🛠️ Maintenance & Updates
-
-### Regular Tasks
-- **Dependency Updates**: Monthly security updates
-- **Performance Monitoring**: Ongoing performance tracking
-- **Error Monitoring**: Proactive error detection
-- **User Feedback**: Regular user experience assessment
-
-### Code Review Checklist
-- [ ] TypeScript strict mode compliance
-- [ ] Proper error handling implementation
-- [ ] Security best practices followed
-- [ ] Performance optimization applied
-- [ ] Cross-platform compatibility verified
-- [ ] Mobile responsiveness tested
-- [ ] Documentation updated
-- [ ] Tests passing
-- [ ] Accessibility requirements met
-
----
-
-## 📚 Resources & References
-
-### Documentation
-- [Next.js Documentation](https://nextjs.org/docs)
-- [NextAuth.js Documentation](https://next-auth.js.org/)
-- [Google Drive API](https://developers.google.com/drive/api)
-- [Drizzle ORM Documentation](https://orm.drizzle.team/)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-
-### Tools & Libraries
-- **Framework**: Next.js 15 with App Router
-- **Authentication**: NextAuth.js + Google OAuth
-- **Database**: PostgreSQL with Drizzle ORM
-- **UI Components**: Shadcn/ui + Radix UI
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **Notifications**: Sonner
-
----
-
-**Note**: This document serves as the definitive guide for project development. All team members must adhere to these guidelines to ensure consistency, quality, and maintainability of the codebase.
-
-## 🔄 Recent Updates (December 2024)
-
-### Authentication Migration
-- Complete migration from Supabase to NextAuth.js
-- Extended session management with 30-day persistence
-- Enhanced security with JWT token management
-- Streamlined Google OAuth integration
-
-### Performance Enhancements
-- Parallel bulk operations implementation (up to 5x faster)
-- Smart caching improvements
-- Resource optimization for Replit deployment
-- Server health monitoring system
-
-### Mobile & Cross-Platform
-- Touch-optimized interface design
-- Cross-platform dialog system (bottom sheets for mobile)
-- Responsive design improvements
-- Native UI patterns for each platform
+**Last Updated**: June 2025  
+**Version**: 2.0  
+**Enforcement**: Mandatory for all contributors

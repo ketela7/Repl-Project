@@ -92,7 +92,7 @@ export function DriveToolbar({
         <div className="flex items-center gap-2">
           <Button
             onClick={onUpload}
-            className={getTouchButtonClasses()}
+            className={getTouchButtonClasses('default')}
             disabled={isLoading}
           >
             <Upload className="h-4 w-4 mr-2" />
@@ -102,7 +102,7 @@ export function DriveToolbar({
           <Button
             variant="outline"
             onClick={onCreateFolder}
-            className={getTouchButtonClasses()}
+            className={getTouchButtonClasses('default')}
             disabled={isLoading}
           >
             <FolderPlus className="h-4 w-4 mr-2" />

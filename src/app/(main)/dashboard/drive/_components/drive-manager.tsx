@@ -91,7 +91,8 @@ import { formatFileSize, formatDriveFileDate, isPreviewable, getFileActions } fr
 import { formatFileTime, getRelativeTime } from '@/lib/timezone';
 import { useTimezoneContext } from '@/components/timezone-provider';
 import { FileIcon } from '@/components/file-icon';
-import { Toast, FileToast, QuickToast, toast } from "@/lib/toast-consolidated";
+import { toast } from "sonner";
+import { successToast, errorToast, warningToast, infoToast, loadingToast, toastUtils } from '@/lib/toast';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useIsMobile } from '@/hooks/use-mobile';
 // Core drive management imports only
@@ -242,13 +243,11 @@ const applyClientSideFilters = (
     const searchTerm = filters.searchQuery.toLowerCase();
 
     filteredFiles = filteredFiles.filter(file => 
-      file.name?.toLowerCase().includes(searchTerm) ||
-      file.description?.toLowerCase().includes(searchTerm)
+      file.name?.toLowerCase().includes(searchTerm)
     );
 
     filteredFolders = filteredFolders.filter(folder => 
-      folder.name?.toLowerCase().includes(searchTerm) ||
-      folder.description?.toLowerCase().includes(searchTerm)
+      folder.name?.toLowerCase().includes(searchTerm)
     );
   }
 
@@ -604,10 +603,10 @@ export function DriveManager() {
       return item ? { 
         id: item.id, 
         name: item.name, 
-        type: ('mimeType' in item ? 'file' : 'folder') as 'file' | 'folder',
+        type: 'mimeType' in item ? 'file' : 'folder',
         mimeType: 'mimeType' in item ? item.mimeType : 'application/vnd.google-apps.folder'
       } : null;
-    }).filter((item): item is { id: string; name: string; type: 'file' | 'folder'; mimeType: string } => item !== null);
+    }).filter(Boolean);
   };
 
   const toggleItemSelection = (itemId: string) => {
@@ -705,7 +704,7 @@ export function DriveManager() {
         }
       }
 
-      await fetchFiles(currentFolderId, searchQuery);
+      await fetchFiles(currentFolderId || undefined, searchQuery || undefined);
       deselectAll();
       setIsSelectMode(false);
 
@@ -821,7 +820,7 @@ export function DriveManager() {
         }
       }
 
-      await fetchFiles(currentFolderId, searchQuery);
+      await fetchFiles(currentFolderId || undefined, searchQuery || undefined);
       deselectAll();
       setIsSelectMode(false);
 
@@ -952,7 +951,7 @@ export function DriveManager() {
         }
       }
 
-      await fetchFiles(currentFolderId, searchQuery);
+      await fetchFiles(currentFolderId || undefined, searchQuery || undefined);
       deselectAll();
       setIsSelectMode(false);
 
@@ -1305,7 +1304,7 @@ export function DriveManager() {
         }
       }
 
-      await fetchFiles(currentFolderId, searchQuery);
+      await fetchFiles(currentFolderId || undefined, searchQuery || undefined);
       deselectAll();
       setIsSelectMode(false);
 
@@ -1422,7 +1421,7 @@ export function DriveManager() {
         }
       }
 
-      await fetchFiles(currentFolderId, searchQuery);
+      await fetchFiles(currentFolderId || undefined, searchQuery || undefined);
       deselectAll();
       setIsSelectMode(false);
 
@@ -1472,7 +1471,7 @@ export function DriveManager() {
   };
 
   const handleBulkShare = async (shareData: { role: string; type: string }): Promise<Array<{ id: string; name: string; shareLink: string; success: boolean; error?: string }>> => {
-    const selectedItemsData = getSelectedItemsData();
+    const selectedItemsData = getSelectedItemsData().filter(item => item !== null);
     if (selectedItemsData.length === 0) return [];
 
     // Filter items that can be shared based on permissions
@@ -1700,7 +1699,7 @@ export function DriveManager() {
         }
       }
 
-      await fetchFiles(currentFolderId, searchQuery);
+      await fetchFiles(currentFolderId || undefined, searchQuery || undefined);
       deselectAll();
       setIsSelectMode(false);
 
@@ -1952,7 +1951,7 @@ export function DriveManager() {
     const query = searchQuery.trim();
     setSubmittedSearchQuery(query);
     if (query) {
-      fetchFiles(currentFolderId, query);
+      fetchFiles(currentFolderId || undefined, query);
     } else {
       fetchFiles(currentFolderId || undefined);
     }
@@ -2665,9 +2664,9 @@ export function DriveManager() {
     if (hasAccess === null) return;
     
     if (submittedSearchQuery.trim()) {
-      fetchFiles(currentFolderId || undefined, submittedSearchQuery.trim());
+      fetchFiles(currentFolderId, submittedSearchQuery.trim());
     } else {
-      fetchFiles(currentFolderId);
+      fetchFiles(currentFolderId || undefined);
     }
   }, [submittedSearchQuery, currentFolderId, hasAccess]);
 
@@ -3032,7 +3031,7 @@ export function DriveManager() {
                           const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
                           if (!fileOrFolder) return false;
                           // Can trash if: owner is me, not shared, not already in trash
-                          const isOwner = fileOrFolder.owners && fileOrFolder.owners.some(owner => (owner as any).me === true);
+                          const isOwner = fileOrFolder.owners && fileOrFolder.owners.some(owner => owner.me === true);
                           const isShared = fileOrFolder.shared;
                           const isTrashed = fileOrFolder.trashed;
                           return isOwner && !isShared && !isTrashed;
@@ -4668,7 +4667,7 @@ export function DriveManager() {
         open={isShareDialogOpen}
         onOpenChange={setIsShareDialogOpen}
         item={selectedItemForShare}
-        items={selectedItemForShare?.id === 'bulk' ? getSelectedItemsData() : undefined}
+        items={selectedItemForShare?.id === 'bulk' ? getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item.type as 'file' | 'folder' })) : undefined}
         onShare={handleShare}
       />
 
@@ -4676,7 +4675,7 @@ export function DriveManager() {
       <BulkShareDialog
         open={isBulkShareDialogOpen}
         onOpenChange={setIsBulkShareDialogOpen}
-        selectedItems={getSelectedItemsData()}
+        selectedItems={getSelectedItemsData().filter(item => item !== null) as Array<{ id: string; name: string; type: 'file' | 'folder'; mimeType?: string }>}
         onShare={handleBulkShare}
       />
 
@@ -4685,7 +4684,7 @@ export function DriveManager() {
         open={isMobileActionsOpen}
         onOpenChange={setIsMobileActionsOpen}
         selectedCount={selectedItems.size}
-        selectedItems={getSelectedItemsData()}
+        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item.type as 'file' | 'folder' }))}
         isInTrash={activeView === 'trash' || searchQuery.includes('trashed:true')}
         onBulkDownload={handleBulkDownload}
         onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}

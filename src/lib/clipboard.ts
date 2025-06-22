@@ -1,7 +1,7 @@
 /**
  * Enhanced clipboard utilities with toast notifications
  */
-import { successToast, errorToast } from './toast-consolidated';
+import { successToast, errorToast } from './toast';
 
 /**
  * Copy text to clipboard with automatic toast feedback
@@ -38,7 +38,8 @@ export async function copyToClipboard(text: string, label?: string): Promise<boo
     errorToast.generic(
       'Failed to copy to clipboard',
       {
-        description: 'Please try copying manually'
+        description: 'Please try copying manually',
+        duration: 4000,
       }
     );
     return false;

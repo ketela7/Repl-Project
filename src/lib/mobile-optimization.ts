@@ -46,11 +46,11 @@ export const mobileSpacing = {
  * Generate touch-friendly button classes
  */
 export function getTouchButtonClasses(
-  size: keyof typeof touchButtonSizes | "primary" | "secondary" = "md",
+  size: keyof typeof touchButtonSizes | "primary" | "secondary" | "default" = "md",
   variant: "default" | "ghost" | "outline" = "default"
 ): string {
   // Map legacy size names to actual sizes
-  const normalizedSize = size === "primary" || size === "secondary" ? "md" : size;
+  const normalizedSize = size === "primary" || size === "secondary" || size === "default" ? "md" : size;
   const baseClasses = "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50";
   const sizeClasses = touchButtonSizes[normalizedSize];
   

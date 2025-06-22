@@ -34,7 +34,7 @@ import { FolderIcon, Copy, ExternalLink } from "lucide-react";
 import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
 import { toast } from "sonner";
-import { errorToast, loadingToast } from "@/lib/toast-consolidated";
+import { successToast, errorToast, loadingToast } from '@/lib/toast';
 
 interface FileCopyDialogProps {
   isOpen: boolean;
@@ -120,8 +120,7 @@ export function FileCopyDialog({
       }
       
       await onCopy(copyName, targetFolderId);
-      loadingToast.dismiss(loadingId);
-      toast.success(`Successfully copied "${fileName}"`);
+      loadingToast.success(`Successfully copied "${fileName}"`, loadingId);
       handleClose();
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {

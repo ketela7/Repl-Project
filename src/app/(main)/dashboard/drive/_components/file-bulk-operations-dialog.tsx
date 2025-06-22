@@ -132,7 +132,7 @@ export function FileBulkOperationsDialog({
             <Button
               key={operation.label}
               variant={operation.variant}
-              className={`${getTouchButtonClasses()} justify-start h-auto p-3`}
+              className={`${getTouchButtonClasses('default')} justify-start h-auto p-3`}
               onClick={() => {
                 operation.action();
                 onClose();

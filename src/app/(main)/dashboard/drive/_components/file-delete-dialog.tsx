@@ -73,14 +73,14 @@ export function FileDeleteDialog({
             <Button
               variant="outline"
               onClick={onClose}
-              className={getTouchButtonClasses()}
+              className={getTouchButtonClasses('default')}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={onConfirm}
-              className={getTouchButtonClasses()}
+              className={getTouchButtonClasses('default')}
             >
               Move to Trash
             </Button>
