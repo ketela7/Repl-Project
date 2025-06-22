@@ -2,10 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { GoogleDriveService } from '@/lib/google-drive/service';
 import { driveCache } from '@/lib/cache';
+import { getCachedSession } from '@/lib/session-cache';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getCachedSession(request.headers, () => auth());
     
     if (!session?.user) {
       if (process.env.NODE_ENV === 'development') {

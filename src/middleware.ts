@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
-import { sessionCache, generateSessionCacheKey } from "./lib/session-cache"
 
 export async function middleware(req: NextRequest) {
   const pathname = req.nextUrl.pathname
@@ -19,23 +18,12 @@ export async function middleware(req: NextRequest) {
       return NextResponse.next()
     }
     
-    // Check session cache first for faster middleware
+    // Get session cookie for NextAuth token validation
     const sessionCookie = req.cookies.get(
       process.env.NODE_ENV === 'production' 
         ? '__Secure-next-auth.session-token' 
         : 'next-auth.session-token'
     );
-    
-    if (sessionCookie) {
-      // Try to extract email from cached session for quick auth
-      const cachedAuth = sessionCache.get(`middleware:${sessionCookie.value}`);
-      if (cachedAuth && cachedAuth.email) {
-        if (process.env.NODE_ENV === 'development') {
-          console.log(`[Middleware] Cached auth for: ${cachedAuth.email}`);
-        }
-        return NextResponse.next();
-      }
-    }
 
     // Get NextAuth token with proper configuration
     const token = await getToken({ 
@@ -55,10 +43,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(url)
     }
     
-    // Cache the middleware auth check for 2 minutes
-    if (sessionCookie && token.email) {
-      sessionCache.set(`middleware:${sessionCookie.value}`, { email: token.email }, 2 * 60 * 1000);
-    }
+    // Token validation successful
     
     if (process.env.NODE_ENV === 'development') {
       console.log(`[Middleware] Access granted to: ${token.email}`);
