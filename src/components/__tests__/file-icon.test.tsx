@@ -57,7 +57,8 @@ describe('FileIcon', () => {
       <FileIcon mimeType="text/plain" className="custom-class" />
     )
     
-    expect(container.firstChild).toHaveClass('custom-class')
+    const icon = container.querySelector('svg[data-testid="file-icon"]')
+    expect(icon).toHaveClass('custom-class')
   })
 
   it('handles different sizes', () => {
@@ -65,7 +66,8 @@ describe('FileIcon', () => {
       <FileIcon mimeType="text/plain" size="lg" />
     )
     
-    expect(container.firstChild).toHaveClass('h-8', 'w-8')
+    const icon = container.querySelector('svg[data-testid="file-icon"]')
+    expect(icon).toHaveClass('h-8', 'w-8')
   })
 
   it('uses fileName for additional context when provided', () => {

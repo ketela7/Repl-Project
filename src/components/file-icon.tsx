@@ -56,15 +56,20 @@ export function FileIcon({
   const sizeMap = {
     'sm': 'h-3 w-3',
     'md': 'h-4 w-4', 
-    'lg': 'h-5 w-5',
+    'lg': 'h-8 w-8',
     'xl': 'h-6 w-6'
   };
   
-  const sizeClass = className || sizeMap[size];
+  const sizeClass = sizeMap[size];
+  const baseClasses = 'drop-shadow-sm transition-colors duration-200';
+  const finalClassName = className ? 
+    `${className} ${colorClass} ${baseClasses}` : 
+    `${sizeClass} ${colorClass} ${baseClasses}`;
   
   const iconProps = {
-    className: `${sizeClass} ${colorClass} drop-shadow-sm transition-colors duration-200`,
-    strokeWidth
+    className: finalClassName,
+    strokeWidth,
+    'data-testid': 'file-icon'
   };
 
   const iconComponents: Record<string, React.ComponentType<any>> = {
