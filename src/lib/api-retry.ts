@@ -13,8 +13,8 @@ interface RetryConfig {
 
 const DEFAULT_CONFIG: RetryConfig = {
   maxRetries: 3,
-  baseDelay: 1000, // 1 second
-  maxDelay: 10000, // 10 seconds
+  baseDelay: 500, // 500ms - faster initial retry
+  maxDelay: 8000, // 8 seconds max - prevent excessive delays
   backoffMultiplier: 2,
   jitterFactor: 0.1
 };

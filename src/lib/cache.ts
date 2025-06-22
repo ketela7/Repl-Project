@@ -13,7 +13,7 @@ class MemoryCache {
   private cache = new Map<string, CacheEntry<any>>();
   private maxSize = 500; // Maximum number of entries
 
-  set<T>(key: string, data: T, ttlMinutes: number = 15): void {
+  set<T>(key: string, data: T, ttlMinutes: number = 5): void {
     // Clean up old entries if cache is getting too large
     if (this.cache.size >= this.maxSize) {
       this.cleanup();
