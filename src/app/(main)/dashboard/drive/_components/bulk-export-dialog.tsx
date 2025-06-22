@@ -110,8 +110,11 @@ export function BulkExportDialog({
   selectedItems
 }: BulkExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState('pdf');
-  const [progress, setProgress] = useState(0);
-  const [currentFile, setCurrentFile] = useState('');
+  const [progress, setProgress] = useState<{
+    current: number;
+    total: number;
+    currentFile?: string;
+  }>({ current: 0, total: 0 });
 
   // Filter exportable files (Google Workspace files only)
   const exportableFiles = selectedItems.filter(item => 

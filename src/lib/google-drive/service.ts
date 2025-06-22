@@ -120,12 +120,11 @@ export class GoogleDriveService {
     // Prepare API request parameters with proper validation
     const requestParams: any = {
       q: searchQuery,
-      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, ownedByMe, viewedByMeTime, capabilities, owners)',
       pageSize: validPageSize,
       orderBy,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
-      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, viewedByMeTime, capabilities, owners)',
+      fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, ownedByMe, viewedByMeTime, capabilities, owners)',
     };
 
     // Only add pageToken if it's valid

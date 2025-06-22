@@ -358,19 +358,6 @@ const applyClientSideFilters = (
       case 'recent':
         // Recent files are handled by sorting (modifiedTime desc)
         break;
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        filteredFiles = filteredFiles.filter(file => 
-          new Date(file.modifiedTime) > sevenDaysAgo
-        );
-        filteredFolders = filteredFolders.filter(folder => 
-          new Date(folder.modifiedTime) > sevenDaysAgo
-        );
-        break;
-      case 'trash':
-        // Show only trashed files/folders
-        filteredFiles = filteredFiles.filter(file => file.trashed);
-        filteredFolders = filteredFolders.filter(folder => folder.trashed);
-        break;
     }
   }
 
