@@ -93,6 +93,8 @@ Migration preferences: User prefers to discuss project rules and documentation b
 - **Chat-Like Search Experience**: Implemented instant typing with zero delays, processing only on manual submission
 - **Session Management Fix**: Fixed PKCE OAuth callback errors and improved authentication stability
 - **Authentication Error Handling**: Added robust error handling to prevent session parsing failures
+- **Session Persistence Enhancement**: Fixed session retention across server restarts and device switches
+- **Cross-Device Session Support**: Improved cookie configuration for seamless mobile-to-desktop transitions
 
 ### December 2024: **Comprehensive File Icon System Enhancement**
 - **Complete MIME Type Coverage**: Added support for 150+ additional MIME types including `application/rar`, `video/x-matroska`, and specialized formats

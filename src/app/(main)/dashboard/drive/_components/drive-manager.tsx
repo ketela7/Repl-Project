@@ -2634,18 +2634,14 @@ export function DriveManager() {
     checkAccessAndFetch();
   }, []);
 
-  // Handle debounced search with optimized API calls
+  // Manual search effect - only run when submitted search changes
   useEffect(() => {
-    if (debouncedSearchQuery.trim() !== searchQuery.trim()) {
-      return; // Only trigger when debounced value matches current input
-    }
-
-    if (debouncedSearchQuery.trim()) {
-      fetchFiles(currentFolderId, debouncedSearchQuery.trim());
-    } else if (debouncedSearchQuery === '' && searchQuery === '') {
+    if (submittedSearchQuery.trim()) {
+      fetchFiles(currentFolderId, submittedSearchQuery.trim());
+    } else {
       fetchFiles(currentFolderId);
     }
-  }, [debouncedSearchQuery, currentFolderId]);
+  }, [submittedSearchQuery, currentFolderId]);
 
   // Force re-render when filters change to update the visual display
   useEffect(() => {

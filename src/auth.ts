@@ -29,10 +29,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           scope: "openid email profile https://www.googleapis.com/auth/drive",
           access_type: "offline",
           prompt: "consent",
-          response_type: "code",
         },
       },
-      checks: ["state"],
     }),
   ],
   callbacks: {
@@ -97,11 +95,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // Default 1 day (24 hours)
-    updateAge: 24 * 60 * 60, // Update session every 24 hours
+    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days
+    updateAge: 0, // Always update session to maintain persistence
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days (actual duration controlled by session callback)
+    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days JWT token lifetime
   },
   cookies: {
     sessionToken: {
@@ -113,7 +111,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60, // Maximum 30 days (will be limited by JWT maxAge)
+        maxAge: 30 * 24 * 60 * 60, // 30 days for persistent sessions
+        domain: process.env.NODE_ENV === 'production' ? '.replit.app' : undefined, // Share across subdomains
+      }
+    },
+    callbackUrl: {
+      name: process.env.NODE_ENV === 'production'
+        ? '__Secure-next-auth.callback-url'
+        : 'next-auth.callback-url',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60,
+      }
+    },
+    csrfToken: {
+      name: process.env.NODE_ENV === 'production'
+        ? '__Host-next-auth.csrf-token'
+        : 'next-auth.csrf-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 30 * 24 * 60 * 60,
       }
     }
   },
