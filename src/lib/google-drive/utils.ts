@@ -1194,8 +1194,8 @@ export function getFileActions(
     canCopy: finalCapabilities.canCopy,
     canShare: finalCapabilities.canShare,
     canTrash: finalCapabilities.canTrash,
-    canRestore: isTrashed && finalCapabilities.canUntrash,
-    canPermanentDelete: finalCapabilities.canDelete,
+    canRestore: Boolean(isTrashed && finalCapabilities.canUntrash),
+    canPermanentDelete: Boolean(finalCapabilities.canDelete),
   };
 }
 

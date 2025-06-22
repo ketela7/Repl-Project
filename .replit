@@ -71,6 +71,14 @@ args = "Server"
 task = "workflow.run"
 args = "Test Runner"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Development Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Type Checker"
+
 [[workflows.workflow]]
 name = "Test Runner"
 author = "agent"
@@ -78,4 +86,21 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx jest --coverage --watchAll=false"
+
+[[workflows.workflow]]
+name = "Development Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev -- -p 5000 -H 0.0.0.0"
+waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Type Checker"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsc --noEmit --watch --preserveWatchOutput"
 
