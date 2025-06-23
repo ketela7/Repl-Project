@@ -104,7 +104,6 @@ import { BulkRenameDialog } from './bulk-rename-dialog';
 import { BulkRestoreDialog } from './bulk-restore-dialog';
 import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
-import { DriveFiltersSidebar } from './drive-filters-sidebar';
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
 import { FileShareDialog } from './file-share-dialog';
 import { BulkShareDialog } from './bulk-share-dialog';
@@ -559,19 +558,6 @@ export function DriveManager() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 flex overflow-hidden">
-        {!isMobile && (
-          <DriveFiltersSidebar
-            activeView={filters.activeView}
-            fileTypeFilter={filters.fileTypeFilter}
-            advancedFilters={filters.advancedFilters}
-            onViewChange={(view) => handleFilter({ activeView: view })}
-            onFileTypeFilterChange={(types) => handleFilter({ fileTypeFilter: types })}
-            onAdvancedFiltersChange={(advanced) => handleFilter({ advancedFilters: advanced as any })}
-            onClearFilters={clearAllFilters}
-            onApplyFilters={applyFilters}
-            hasActiveFilters={hasActiveFilters}
-          />
-        )}
         
         <div className="flex-1 flex flex-col overflow-hidden">
           <DriveToolbar
@@ -616,7 +602,7 @@ export function DriveManager() {
             />
           )}
 
-          <FileCategoryBadges
+          {/*<FileCategoryBadges
             files={files}
             folders={folders}
             onCategoryClick={(category) => {
@@ -624,7 +610,7 @@ export function DriveManager() {
               applyFilters();
             }}
             className="mb-4 px-4"
-          />
+          />*/}
 
           <DriveDataView
             items={sortedItems}
