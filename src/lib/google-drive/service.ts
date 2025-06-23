@@ -67,20 +67,30 @@ export class GoogleDriveService {
     // Validate and sanitize pageSize
     const validPageSize = Math.min(Math.max(pageSize, 1), 1000);
     
-    // Validate pageToken - ensure it's properly formatted
+    // Validate and sanitize pageToken
     let validPageToken: string | undefined = pageToken;
     if (pageToken) {
-      // Basic validation for pageToken format
-      if (typeof pageToken !== 'string' || pageToken.length > 2048) {
-        console.warn('Invalid pageToken format, ignoring:', pageToken);
-        validPageToken = undefined;
-      } else {
-        // Additional validation: pageToken should not contain certain invalid characters
-        const invalidChars = /[<>"'&\x00-\x1f\x7f-\x9f]/;
-        if (invalidChars.test(pageToken)) {
-          console.warn('PageToken contains invalid characters, ignoring:', pageToken);
-          validPageToken = undefined;
+      try {
+        // Try to decode if it appears to be URL encoded
+        if (pageToken.includes('%')) {
+          validPageToken = decodeURIComponent(pageToken);
         }
+        
+        // Basic validation for pageToken format
+        if (typeof validPageToken !== 'string' || validPageToken.length === 0 || validPageToken.length > 2048) {
+          console.warn('Invalid pageToken format, ignoring:', validPageToken);
+          validPageToken = undefined;
+        } else {
+          // Additional validation: pageToken should not contain certain invalid characters
+          const invalidChars = /[<>"'&\x00-\x1f\x7f-\x9f\s]/;
+          if (invalidChars.test(validPageToken)) {
+            console.warn('PageToken contains invalid characters, ignoring:', validPageToken);
+            validPageToken = undefined;
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to process pageToken, ignoring:', pageToken);
+        validPageToken = undefined;
       }
     }
 

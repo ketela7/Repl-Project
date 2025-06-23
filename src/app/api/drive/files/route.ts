@@ -376,7 +376,7 @@ function buildDriveQuery(filters: FileFilter): string {
     if (fileSizeConditions.length > 0) {
       if (includesFolders) {
         // If folders are requested, create OR condition: (size filters for files) OR (folders)
-        conditions.push(`((${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder') or mimeType = 'application/vnd.google-apps.folder'`);
+        conditions.push(`(((${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder') or mimeType = 'application/vnd.google-apps.folder')`);
       } else {
         // If no folders requested, just apply size filters normally
         conditions.push(fileSizeConditions.join(' and '));
@@ -493,10 +493,32 @@ export async function GET(request: NextRequest) {
     let pageToken = searchParams.get('pageToken') || undefined
     if (pageToken) {
       try {
-        // Decode URL-encoded pageToken that may have been double-encoded
-        pageToken = decodeURIComponent(pageToken)
+        // Handle double-encoded pageTokens
+        let decodedToken = pageToken;
+        
+        // Keep decoding until we get a stable result or hit limit
+        let attempts = 0;
+        while (decodedToken.includes('%') && attempts < 3) {
+          const previousToken = decodedToken;
+          decodedToken = decodeURIComponent(decodedToken);
+          attempts++;
+          
+          // If decoding doesn't change the token, we're done
+          if (previousToken === decodedToken) {
+            break;
+          }
+        }
+        
+        pageToken = decodedToken;
+        
+        // Validate the final pageToken
+        if (pageToken.length > 1000 || /[<>{}\\|\s]/.test(pageToken)) {
+          console.warn('PageToken appears invalid after decoding, ignoring');
+          pageToken = undefined;
+        }
       } catch (error) {
-        console.warn('Failed to decode pageToken, using original:', pageToken)
+        console.warn('Failed to decode pageToken, ignoring:', error);
+        pageToken = undefined;
       }
     }
 
