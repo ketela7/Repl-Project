@@ -31,9 +31,6 @@ export const bulkOperations = pgTable('bulk_operations', {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
-export type UserSession = typeof userSessions.$inferSelect;
-export type NewUserSession = typeof userSessions.$inferInsert;
-export type ActivityLog = typeof activityLogs.$inferSelect;
-export type NewActivityLog = typeof activityLogs.$inferInsert;
+// Note: UserSession and ActivityLog types removed as tables were unused
 export type BulkOperation = typeof bulkOperations.$inferSelect;
 export type NewBulkOperation = typeof bulkOperations.$inferInsert;
