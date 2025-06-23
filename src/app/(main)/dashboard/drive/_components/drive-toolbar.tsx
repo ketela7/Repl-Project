@@ -85,6 +85,8 @@ interface AdvancedFilters {
     to?: Date;
   };
   owner?: string;
+  sortBy?: 'name' | 'modified' | 'created' | 'size';
+  sortOrder?: 'asc' | 'desc';
 }
 
 interface VisibleColumns {
@@ -887,9 +889,7 @@ export function DriveToolbar({
                         variant="default"
                         size="sm"
                         onClick={() => {
-                          console.log('🔍 [FILTER DEBUG] Desktop Apply Filter clicked');
-                          // Trigger immediate filter application
-                          fetchFiles(currentFolderId || undefined, searchQuery || undefined);
+                          handleRefresh();
                         }}
                         className="flex-1 text-xs"
                       >
@@ -899,7 +899,6 @@ export function DriveToolbar({
                         variant="outline"
                         size="sm"
                         onClick={() => {
-                          console.log('🔍 [FILTER DEBUG] Desktop Clear All clicked');
                           handleViewChange('all');
                           fileTypeFilter.forEach(type => handleFileTypeToggle(type));
                           setAdvancedFilters({ 
@@ -908,8 +907,7 @@ export function DriveToolbar({
                             sortOrder: 'desc'
                           });
                           setSearchQuery('');
-                          // Apply cleared filters immediately
-                          setTimeout(() => fetchFiles(currentFolderId || undefined, searchQuery || undefined), 100);
+                          setTimeout(() => handleRefresh(), 100);
                         }}
                         className="flex-1 text-xs"
                       >

@@ -526,16 +526,7 @@ export async function GET(request: NextRequest) {
       searchParams.get('folderId') || searchParams.get('parentId') || undefined
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('🔍 [FILTER DEBUG] Backend API received filters:', filters);
-      console.log('🔍 [FILTER DEBUG] Backend API searchParams:', {
-        fileType: searchParams.get('fileType'),
-        fileTypes: searchParams.get('fileTypes'),
-        viewStatus: searchParams.get('viewStatus'),
-        view: searchParams.get('view'),
-        sizeMin: searchParams.get('sizeMin'),
-        sizeMax: searchParams.get('sizeMax'),
-        owner: searchParams.get('owner')
-      });
+      console.log('Drive API filters:', filters);
     }
 
     // Check cache first - include viewStatus in cache key for proper filtering
