@@ -2898,6 +2898,24 @@ export function DriveManager() {
         selectedItems={getSelectedItemsData()}
       />
 
+      <BulkExportDialog
+        isOpen={isBulkExportDialogOpen}
+        onClose={() => setIsBulkExportDialogOpen(false)}
+        onConfirm={async (exportFormat: string) => {
+          await handleBulkExport(exportFormat);
+        }}
+        selectedItems={getSelectedItemsData()}
+      />
+
+      <BulkPermanentDeleteDialog
+        isOpen={isBulkPermanentDeleteDialogOpen}
+        onClose={() => setIsBulkPermanentDeleteDialogOpen(false)}
+        onConfirm={async () => {
+          await handleBulkPermanentDelete();
+        }}
+        selectedItems={getSelectedItemsData()}
+      />
+
       <BulkShareDialog
         open={isBulkShareDialogOpen}
         onOpenChange={setIsBulkShareDialogOpen}
