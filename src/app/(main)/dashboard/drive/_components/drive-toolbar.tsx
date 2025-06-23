@@ -52,6 +52,7 @@ import {
   Upload,
   FolderPlus,
   ChevronUp,
+  MoreVertical,
 } from "lucide-react";
 import { FileIcon } from "@/components/file-icon";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -118,6 +119,7 @@ interface DriveToolbarProps {
   onBulkCopy: () => void;
   onBulkShare: () => void;
   onFiltersOpen: () => void;
+  onMobileActionsOpen?: () => void;
   filters: {
     activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash';
     fileTypeFilter: string[];
@@ -164,6 +166,7 @@ export function DriveToolbar({
   onBulkCopy,
   onBulkShare,
   onFiltersOpen,
+  onMobileActionsOpen,
   filters,
   onFilterChange,
   onApplyFilters,
@@ -228,29 +231,43 @@ export function DriveToolbar({
             )}
           </Button>
 
-          {/* Batch - Mobile-style interface for all platforms */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant={isSelectMode ? 'default' : 'ghost'}
-                size="sm"
-                disabled={files.length === 0 && folders.length === 0}
-                className="h-8 px-2"
-              >
-                <Square className="h-4 w-4" />
-                {selectedCount > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
-                    {selectedCount}
-                  </Badge>
-                )}
-                {(filters.activeView === 'trash' || searchQuery.includes('trashed:true')) && (
-                  <Badge variant="destructive" className="ml-1 h-4 px-1 text-xs">
-                    T
-                  </Badge>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64">
+          {/* Mobile Bulk Actions Button - Show when items are selected on mobile */}
+          {isMobile && selectedCount > 0 && onMobileActionsOpen && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onMobileActionsOpen}
+              className="h-8 px-3 bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              <MoreVertical className="h-4 w-4 mr-1" />
+              Actions ({selectedCount})
+            </Button>
+          )}
+
+          {/* Batch - Desktop dropdown interface */}
+          {!isMobile && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant={isSelectMode ? 'default' : 'ghost'}
+                  size="sm"
+                  disabled={files.length === 0 && folders.length === 0}
+                  className="h-8 px-2"
+                >
+                  <Square className="h-4 w-4" />
+                  {selectedCount > 0 && (
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                      {selectedCount}
+                    </Badge>
+                  )}
+                  {(filters.activeView === 'trash' || searchQuery.includes('trashed:true')) && (
+                    <Badge variant="destructive" className="ml-1 h-4 px-1 text-xs">
+                      T
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-64">
               <DropdownMenuItem onClick={() => onSelectModeChange(!isSelectMode)}>
                 {isSelectMode ? (
                   <>
@@ -327,8 +344,9 @@ export function DriveToolbar({
                   )}
                 </>
               )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
 
           {/* Filter - Mobile uses Bottom Sheet, Desktop uses Dropdown */}
           {isMobile ? (

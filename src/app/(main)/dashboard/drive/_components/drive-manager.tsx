@@ -580,6 +580,7 @@ export function DriveManager() {
             onBulkCopy={() => openDialog('bulkCopy')}
             onBulkShare={() => openDialog('bulkShare')}
             onFiltersOpen={() => openDialog('mobileFilters')}
+            onMobileActionsOpen={() => openDialog('mobileActions')}
             filters={filters}
             onFilterChange={handleFilter as any}
             onApplyFilters={applyFilters}
