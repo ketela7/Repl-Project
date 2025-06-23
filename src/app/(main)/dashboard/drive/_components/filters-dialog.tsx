@@ -106,6 +106,8 @@ export function FiltersDialog({
   // Calculate if there are active temp filters to show Clear All button
   const hasTempActiveFilters = tempActiveView !== 'all' || 
                               tempFileTypeFilter.length > 0 || 
+                              (tempAdvancedFilters.sortBy && tempAdvancedFilters.sortBy !== 'modified') ||
+                              (tempAdvancedFilters.orderBy && tempAdvancedFilters.orderBy !== 'desc') ||
                               (tempAdvancedFilters.sizeRange?.min || tempAdvancedFilters.sizeRange?.max) ||
                               (tempAdvancedFilters.createdDateRange?.from || tempAdvancedFilters.createdDateRange?.to) ||
                               (tempAdvancedFilters.modifiedDateRange?.from || tempAdvancedFilters.modifiedDateRange?.to) ||
