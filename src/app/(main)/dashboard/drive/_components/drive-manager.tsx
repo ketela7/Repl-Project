@@ -151,11 +151,11 @@ export function DriveManager() {
     activeView: 'all' as 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash',
     fileTypeFilter: [] as string[],
     advancedFilters: {
-      sizeRange: { unit: 'MB' as 'B' | 'KB' | 'MB' | 'GB' },
+      sizeRange: { unit: 'MB' as 'B' | 'KB' | 'MB' | 'GB', min: undefined, max: undefined },
       sortBy: 'modified' as 'name' | 'modified' | 'created' | 'size',
       sortOrder: 'desc' as 'asc' | 'desc',
-      createdDateRange: {},
-      modifiedDateRange: {},
+      createdDateRange: { from: undefined, to: undefined },
+      modifiedDateRange: { from: undefined, to: undefined },
       owner: undefined
     }
   });
@@ -277,12 +277,12 @@ export function DriveManager() {
   const hasActiveFilters = filters.activeView !== 'all' || 
                           filters.fileTypeFilter.length > 0 || 
                           searchQuery.trim() !== '' ||
-                          (filters.advancedFilters.sizeRange?.min) ||
-                          (filters.advancedFilters.sizeRange?.max) ||
-                          (filters.advancedFilters.createdDateRange?.from) ||
-                          (filters.advancedFilters.createdDateRange?.to) ||
-                          (filters.advancedFilters.modifiedDateRange?.from) ||
-                          (filters.advancedFilters.modifiedDateRange?.to) ||
+                          (filters.advancedFilters.sizeRange.min) ||
+                          (filters.advancedFilters.sizeRange.max) ||
+                          (filters.advancedFilters.createdDateRange.from) ||
+                          (filters.advancedFilters.createdDateRange.to) ||
+                          (filters.advancedFilters.modifiedDateRange.from) ||
+                          (filters.advancedFilters.modifiedDateRange.to) ||
                           (filters.advancedFilters.owner?.trim());
 
   // Sorting functionality
@@ -575,9 +575,6 @@ export function DriveManager() {
             folders={folders}
             visibleColumns={visibleColumns}
             setVisibleColumns={setVisibleColumns}
-            setIsUploadDialogOpen={setIsUploadDialogOpen}
-            setIsCreateFolderDialogOpen={setIsCreateFolderDialogOpen}
-            loading={loading}
             setIsUploadDialogOpen={setIsUploadDialogOpen}
             setIsCreateFolderDialogOpen={setIsCreateFolderDialogOpen}
             loading={loading}

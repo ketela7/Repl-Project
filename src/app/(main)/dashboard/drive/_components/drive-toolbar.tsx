@@ -71,22 +71,22 @@ interface DriveFile {
 }
 
 interface AdvancedFilters {
-  sizeRange?: {
+  sizeRange: {
     min?: number;
     max?: number;
     unit: 'B' | 'KB' | 'MB' | 'GB';
   };
-  createdDateRange?: {
+  createdDateRange: {
     from?: Date;
     to?: Date;
   };
-  modifiedDateRange?: {
+  modifiedDateRange: {
     from?: Date;
     to?: Date;
   };
   owner?: string;
-  sortBy?: 'name' | 'modified' | 'created' | 'size';
-  sortOrder?: 'asc' | 'desc';
+  sortBy: 'name' | 'modified' | 'created' | 'size';
+  sortOrder: 'asc' | 'desc';
 }
 
 interface VisibleColumns {
