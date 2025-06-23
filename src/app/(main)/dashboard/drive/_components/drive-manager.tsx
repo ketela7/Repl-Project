@@ -2718,7 +2718,7 @@ export function DriveManager() {
         activeView={activeView}
         visibleColumns={visibleColumns}
         sortConfig={sortConfig}
-        onSort={handleSort}
+        onSort={(field: string) => handleSort(field as "name" | "id" | "size" | "modifiedTime" | "createdTime" | "mimeType" | "owners")}
         selectAll={selectAll}
         deselectAll={deselectAll}
         toggleItemSelection={toggleItemSelection}
@@ -2772,7 +2772,7 @@ export function DriveManager() {
       <FileRenameDialog
         open={isRenameDialogOpen}
         onOpenChange={(open) => setIsRenameDialogOpen(open)}
-        onRename={async (newName: string) => {
+        onConfirm={async (newName: string) => {
           if (selectedFileForAction) {
             await handleRenameFile(newName);
           }

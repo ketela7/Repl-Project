@@ -28,66 +28,31 @@ import { cn } from "@/lib/utils";
 interface FileRenameDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  file: { id: string; name: string; parentId?: string } | null;
-  onFileRenamed: (renamedFile: any) => void;
+  onConfirm: (newName: string) => Promise<void>;
+  fileName: string;
+  fileId: string;
 }
 
 export function FileRenameDialog({ 
   open, 
   onOpenChange, 
-  file,
-  onFileRenamed
+  onConfirm,
+  fileName,
+  fileId
 }: FileRenameDialogProps) {
-  const [newName, setNewName] = useState(file?.name || '');
+  const [newName, setNewName] = useState(fileName || '');
   const [renaming, setRenaming] = useState(false);
   const isMobile = useIsMobile();
 
   const handleRename = async () => {
-    if (!newName?.trim() || !file || newName === file.name) {
+    if (!newName?.trim() || !fileId || newName === fileName) {
       handleClose();
       return;
     }
 
     try {
       setRenaming(true);
-
-      // Call the actual Google Drive API
-      const response = await fetch(`/api/drive/files/${file.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'rename',
-          name: newName.trim()
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-
-        if (errorData.needsReauth) {
-          toast.error('Google Drive access expired. Please reconnect your account.');
-          window.location.reload();
-          return;
-        }
-
-        if (response.status === 403) {
-          toast.error(`You don't have permission to rename "${file.name}". This may be a shared file with restricted access.`);
-          return;
-        }
-
-        if (response.status === 404) {
-          toast.error(`"${file.name}" was not found. It may have already been moved or deleted.`);
-          handleClose();
-          return;
-        }
-
-        throw new Error(errorData.error || 'Failed to rename file');
-      }
-
-      const renamedFile = await response.json();
-
-      toast.success(`Successfully renamed to "${newName.trim()}"`);
-      onFileRenamed(renamedFile);
+      await onConfirm(newName.trim());
       handleClose();
     } catch (error) {
       console.error('Error renaming file:', error);
@@ -99,7 +64,7 @@ export function FileRenameDialog({
 
   const handleClose = () => {
     if (!renaming) {
-      setNewName(file?.name || '');
+      setNewName(fileName || '');
       onOpenChange(false);
     }
   };
@@ -110,12 +75,12 @@ export function FileRenameDialog({
     }
   };
 
-  // Update newName when file prop changes
+  // Update newName when fileName prop changes
   React.useEffect(() => {
-    if (file?.name) {
-      setNewName(file.name);
+    if (fileName) {
+      setNewName(fileName);
     }
-  }, [file?.name]);
+  }, [fileName]);
 
   // Add React import
   if (!file) {
