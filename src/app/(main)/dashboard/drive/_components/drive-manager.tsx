@@ -635,7 +635,13 @@ export function DriveManager() {
             sortConfig={sortConfig}
             onSelectItem={handleSelectItem}
             onFolderClick={handleFolderClick}
-            onColumnsChange={setVisibleColumns}
+            onColumnsChange={(changes: any) => {
+              if (changes.sortBy) {
+                handleSort(changes.sortBy);
+              } else {
+                setVisibleColumns(prev => ({ ...prev, ...changes }));
+              }
+            }}
             onItemAction={(action: string, item: DriveItem) => {
               switch (action) {
                 case 'preview':

@@ -192,22 +192,107 @@ export function DriveDataView({
                     <Checkbox
                       checked={items.length > 0 && items.every(item => selectedItems.has(item.id))}
                       onCheckedChange={(checked) => {
-                        if (checked) {
-                          items.forEach(item => selectedItems.add(item.id));
-                        } else {
-                          items.forEach(item => selectedItems.delete(item.id));
-                        }
-                        onSelectItem(''); // Trigger re-render
+                        items.forEach(item => {
+                          if (checked) {
+                            onSelectItem(item.id);
+                          } else if (selectedItems.has(item.id)) {
+                            onSelectItem(item.id);
+                          }
+                        });
                       }}
                     />
                   </TableHead>
                 )}
-                {visibleColumns.name && <TableHead>Name</TableHead>}
-                {visibleColumns.size && <TableHead>Size</TableHead>}
-                {visibleColumns.owners && <TableHead>Owner</TableHead>}
-                {visibleColumns.mimeType && <TableHead>Type</TableHead>}
-                {visibleColumns.modifiedTime && <TableHead>Modified</TableHead>}
-                {visibleColumns.createdTime && <TableHead>Created</TableHead>}
+                {visibleColumns.name && (
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => onColumnsChange({ sortBy: 'name' })}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Name</span>
+                      {sortConfig?.key === 'name' && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.size && (
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => onColumnsChange({ sortBy: 'size' })}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Size</span>
+                      {sortConfig?.key === 'size' && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.owners && (
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => onColumnsChange({ sortBy: 'owners' })}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Owner</span>
+                      {sortConfig?.key === 'owners' && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.mimeType && (
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => onColumnsChange({ sortBy: 'mimeType' })}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Type</span>
+                      {sortConfig?.key === 'mimeType' && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.modifiedTime && (
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => onColumnsChange({ sortBy: 'modifiedTime' })}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Modified</span>
+                      {sortConfig?.key === 'modifiedTime' && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </TableHead>
+                )}
+                {visibleColumns.createdTime && (
+                  <TableHead 
+                    className="cursor-pointer hover:bg-muted/50"
+                    onClick={() => onColumnsChange({ sortBy: 'createdTime' })}
+                  >
+                    <div className="flex items-center space-x-1">
+                      <span>Created</span>
+                      {sortConfig?.key === 'createdTime' && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </TableHead>
+                )}
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
