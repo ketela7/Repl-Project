@@ -34,6 +34,7 @@ import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
 import { toast } from "sonner";
 import { successToast, errorToast, loadingToast } from '@/lib/toast';
+import { cn } from "@/lib/utils";
 
 interface FileCopyDialogProps {
   isOpen: boolean;
