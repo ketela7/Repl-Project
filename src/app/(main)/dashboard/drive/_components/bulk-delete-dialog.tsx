@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface BulkDeleteDialogProps {
   isOpen: boolean;

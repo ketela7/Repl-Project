@@ -25,6 +25,7 @@ import {
   Info
 } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 // Simple error handling without complex recovery
 
 interface BulkExportDialogProps {

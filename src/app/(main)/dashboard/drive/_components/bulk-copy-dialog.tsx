@@ -15,6 +15,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from "@/components/ui/bottom-sheet";
 import { Copy, AlertTriangle } from "lucide-react";
 import { FileCopyDialog } from "./file-copy-dialog";
+import { cn } from "@/lib/utils";
 
 interface BulkCopyDialogProps {
   isOpen: boolean;
