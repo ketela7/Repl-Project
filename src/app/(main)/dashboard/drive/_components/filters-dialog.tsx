@@ -103,6 +103,14 @@ export function FiltersDialog({
     }
   }, [open, currentFilters]);
 
+  // Calculate if there are active temp filters to show Clear All button
+  const hasTempActiveFilters = tempActiveView !== 'all' || 
+                              tempFileTypeFilter.length > 0 || 
+                              (tempAdvancedFilters.sizeRange?.min || tempAdvancedFilters.sizeRange?.max) ||
+                              (tempAdvancedFilters.createdDateRange?.from || tempAdvancedFilters.createdDateRange?.to) ||
+                              (tempAdvancedFilters.modifiedDateRange?.from || tempAdvancedFilters.modifiedDateRange?.to) ||
+                              tempAdvancedFilters.owner?.trim();
+
   // Basic Menu Items
   const basicMenuItems = [
     { id: 'all', label: 'All Files', icon: Home, description: 'Show all files and folders' },
@@ -170,6 +178,12 @@ export function FiltersDialog({
     setTempActiveView('all');
     setTempFileTypeFilter([]);
     setTempAdvancedFilters({});
+    // Apply the clear immediately to reset the data view
+    onFilterChange({
+      activeView: 'all',
+      fileTypeFilter: [],
+      advancedFilters: {}
+    });
     onClearFilters();
     onOpenChange(false);
   };
@@ -531,7 +545,7 @@ export function FiltersDialog({
             >
               Apply Filter
             </Button>
-            {hasActiveFilters && (
+            {hasTempActiveFilters && (
               <Button 
                 onClick={handleClearAll} 
                 className={cn("touch-target min-h-[44px] active:scale-95")}
@@ -557,7 +571,7 @@ export function FiltersDialog({
             <div>
               <div className="text-lg font-semibold">Filters & Search</div>
               <div className="text-sm font-normal text-muted-foreground">
-                {hasActiveFilters && (
+                {hasTempActiveFilters && (
                   <Badge variant="secondary" className="text-xs mr-1">Active</Badge>
                 )}
                 Filter files by type, size, date, and owner
@@ -581,7 +595,7 @@ export function FiltersDialog({
           }}>
             Apply Filter
           </Button>
-          {hasActiveFilters && (
+          {hasTempActiveFilters && (
             <Button onClick={handleClearAll} variant="destructive">
               <RefreshCw className="h-4 w-4 mr-2" />
               Clear All

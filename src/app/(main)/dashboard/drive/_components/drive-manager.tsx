@@ -280,6 +280,10 @@ export function DriveManager() {
     setFileTypeFilter([]);
     setAdvancedFilters({ sizeRange: { unit: 'MB' } });
     setSearchQuery('');
+    // Fetch files with cleared filters to reset the data view
+    setTimeout(() => {
+      fetchFiles(currentFolderId || undefined, undefined);
+    }, 0);
   };
 
   // Check if any filters are active
