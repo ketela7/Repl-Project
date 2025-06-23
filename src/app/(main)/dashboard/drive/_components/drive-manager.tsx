@@ -128,6 +128,7 @@ const isFolder = (item: DriveItem): boolean => {
 export function DriveManager() {
   // Core state - unified items
   const [items, setItems] = useState<DriveItem[]>([]);
+  const [filteredItems, setFilteredItems] = useState<DriveItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -523,17 +524,26 @@ export function DriveManager() {
   }, []);
 
   const handleSelectAll = useCallback(() => {
-    if (selectedItems.size === items.length) {
+    if (selectedItems.size === displayItems.length) {
       setSelectedItems(new Set());
     } else {
-      setSelectedItems(new Set(items.map(item => item.id)));
+      setSelectedItems(new Set(displayItems.map(item => item.id)));
     }
-  }, [items, selectedItems.size]);
+  }, [displayItems, selectedItems.size]);
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
     fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined);
   }, [fetchFiles, currentFolderId, searchQuery]);
+
+  // Client-side filtering handler
+  const handleClientSideFilter = useCallback((filteredFiles: any[], filteredFolders: any[]) => {
+    const combined = [...filteredFiles, ...filteredFolders];
+    setFilteredItems(combined);
+  }, []);
+
+  // Use filtered items when available, otherwise use all items
+  const displayItems = filteredItems.length > 0 ? filteredItems : items;
 
   if (loading && items.length === 0) {
     return <DriveGridSkeleton />;
@@ -569,7 +579,7 @@ export function DriveManager() {
             isSelectMode={isSelectMode}
             onSelectModeChange={setIsSelectMode}
             selectedCount={selectedItems.size}
-            totalCount={items.length}
+            totalCount={displayItems.length}
             onSelectAll={handleSelectAll}
             onRefresh={handleRefresh}
             refreshing={refreshing}
@@ -593,6 +603,7 @@ export function DriveManager() {
             setIsUploadDialogOpen={setIsUploadDialogOpen}
             setIsCreateFolderDialogOpen={setIsCreateFolderDialogOpen}
             loading={loading}
+            onClientSideFilter={handleClientSideFilter}
           />
 
           {currentFolderId && (

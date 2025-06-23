@@ -56,6 +56,7 @@ import {
 } from "lucide-react";
 import { FileIcon } from "@/components/file-icon";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { FileCategoryBadges } from "@/components/file-category-badges";
 
 // Types
 interface DriveFile {
@@ -144,7 +145,56 @@ interface DriveToolbarProps {
   
   // Loading states
   loading: boolean;
+  
+  // Client-side filtering
+  onClientSideFilter?: (filteredFiles: DriveFile[], filteredFolders: DriveFile[]) => void;
 }
+
+// Client-side filtering function using mimeType
+const filterByMimeType = (files: DriveFile[], folders: DriveFile[], category: string) => {
+  const getCategoryFromMimeType = (mimeType: string): string => {
+    const mime = mimeType.toLowerCase();
+    
+    // Video files
+    if (mime.startsWith('video/') || mime.includes('mp4') || mime.includes('mov') || mime.includes('avi') || mime.includes('mkv') || mime.includes('webm')) return 'Videos';
+    
+    // Audio files
+    if (mime.startsWith('audio/') || mime.includes('mp3') || mime.includes('wav') || mime.includes('flac') || mime.includes('aac') || mime.includes('ogg')) return 'Audio';
+    
+    // Image files
+    if (mime.startsWith('image/') || mime.includes('jpeg') || mime.includes('jpg') || mime.includes('png') || mime.includes('gif') || mime.includes('bmp') || mime.includes('svg') || mime.includes('webp')) return 'Images';
+    
+    // Document files
+    if (mime.includes('document') || mime.includes('pdf') || mime.includes('msword') || mime.includes('wordprocessingml') || mime.includes('rtf') || mime.includes('odt') || mime.includes('txt')) return 'Documents';
+    
+    // Spreadsheet files
+    if (mime.includes('spreadsheet') || mime.includes('excel') || mime.includes('sheet') || mime.includes('csv') || mime.includes('ods') || mime.includes('xlsx') || mime.includes('xls')) return 'Spreadsheets';
+    
+    // Presentation files
+    if (mime.includes('presentation') || mime.includes('powerpoint') || mime.includes('ppt') || mime.includes('odp') || mime.includes('keynote') || mime.includes('pptx')) return 'Presentations';
+    
+    // Archive files
+    if (mime.includes('zip') || mime.includes('rar') || mime.includes('tar') || mime.includes('gz') || mime.includes('7z') || mime.includes('archive')) return 'Archives';
+    
+    // Code files
+    if (mime.includes('javascript') || mime.includes('typescript') || mime.includes('json') || mime.includes('html') || mime.includes('css') || mime.includes('xml') || mime.includes('yaml') || mime.includes('python') || mime.includes('java')) return 'Code';
+    
+    // Google Drive specific
+    if (mime.includes('vnd.google-apps.document')) return 'Documents';
+    if (mime.includes('vnd.google-apps.spreadsheet')) return 'Spreadsheets';
+    if (mime.includes('vnd.google-apps.presentation')) return 'Presentations';
+    if (mime.includes('vnd.google-apps.shortcut')) return 'Shortcuts';
+    
+    return 'Others';
+  };
+
+  if (category === 'Folders') {
+    return { filteredFiles: [], filteredFolders: folders };
+  }
+
+  const filteredFiles = files.filter(f => getCategoryFromMimeType(f.mimeType) === category);
+  return { filteredFiles, filteredFolders: category === 'Folders' ? folders : [] };
+};
 
 export function DriveToolbar({
   searchQuery,
@@ -175,12 +225,21 @@ export function DriveToolbar({
   files,
   folders,
   visibleColumns,
-  setVisibleColumns
+  setVisibleColumns,
+  onClientSideFilter
 }: DriveToolbarProps) {
   const isMobile = useIsMobile();
   
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters;
+
+  // Handle badge click for client-side filtering
+  const handleCategoryClick = (category: string) => {
+    if (onClientSideFilter) {
+      const { filteredFiles, filteredFolders } = filterByMimeType(files, folders, category);
+      onClientSideFilter(filteredFiles, filteredFolders);
+    }
+  };
 
   return (
     <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm transition-transform duration-200 ease-in-out"
@@ -795,246 +854,42 @@ export function DriveToolbar({
             </DropdownMenu>
           )}
 
-          {/* Badge - Floating Panel Toggle */}
+          {/* File Category Badges - Client-side filtering support */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="h-8 px-2 md:px-3">
                 <HardDrive className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Badge</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-80 p-4">
-              <div className="space-y-4">
-                <div className="text-sm font-semibold border-b pb-2">File Statistics</div>
-                
-                {/* Total Files */}
-                <div className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
-                  <div className="flex items-center gap-2">
-                    <HardDrive className="h-4 w-4 text-gray-600" />
-                    <span className="text-sm">Total Items</span>
-                  </div>
-                  <Badge variant="outline" className="font-medium">
+                {(files.length + folders.length) > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
                     {files.length + folders.length}
                   </Badge>
-                </div>
-
-                {/* Folders */}
-                {folders.length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <Folder className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm">Folders</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-blue-500 text-blue-700 dark:text-blue-300 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['folder'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {folders.length}
-                    </Badge>
-                  </div>
                 )}
-
-                {/* Images */}
-                {files.filter(f => f.mimeType?.includes('image')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <FileImage className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Images</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-green-500 text-green-700 dark:text-green-300 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['image'] });
-                        onApplyFilters();
-                      }}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="center" className="w-96 p-4">
+              <div className="space-y-4">
+                <div className="text-sm font-semibold border-b pb-2">File Categories (Click to Filter)</div>
+                
+                {/* File Category Badges Component */}
+                <FileCategoryBadges
+                  files={files}
+                  folders={folders}
+                  onCategoryClick={handleCategoryClick}
+                  className="w-full"
+                />
+                
+                {/* Reset Filter Button */}
+                {onClientSideFilter && (
+                  <div className="pt-2 border-t">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => onClientSideFilter(files, folders)}
+                      className="w-full text-xs"
                     >
-                      {files.filter(f => f.mimeType?.includes('image')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Videos */}
-                {files.filter(f => f.mimeType?.includes('video')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <Play className="h-4 w-4 text-red-500" />
-                      <span className="text-sm">Videos</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-red-500 text-red-700 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['video'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType?.includes('video')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Documents */}
-                {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm">Documents</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-orange-500 text-orange-700 dark:text-orange-300 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['document'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Spreadsheets */}
-                {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <FileSpreadsheet className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Spreadsheets</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-green-500 text-green-700 dark:text-green-300 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['spreadsheet'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Presentations */}
-                {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <Presentation className="h-4 w-4 text-amber-500" />
-                      <span className="text-sm">Presentations</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-amber-500 text-amber-700 dark:text-amber-300 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['presentation'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Videos */}
-                {files.filter(f => f.mimeType?.startsWith('video/')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <FileVideo className="h-4 w-4 text-red-500" />
-                      <span className="text-sm">Videos</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-red-500 text-red-700 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['video'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType?.startsWith('video/')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Audio */}
-                {files.filter(f => f.mimeType?.startsWith('audio/')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <FileAudio className="h-4 w-4 text-indigo-500" />
-                      <span className="text-sm">Audio</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-indigo-500 text-indigo-700 dark:text-indigo-300 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['audio'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType?.startsWith('audio/')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Archives */}
-                {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <Archive className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Archives</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-gray-500 text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['archive'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Code Files */}
-                {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <FileCode className="h-4 w-4 text-emerald-500" />
-                      <span className="text-sm">Code Files</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-emerald-500 text-emerald-700 dark:text-emerald-300 cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['code'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Shortcuts */}
-                {files.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
-                    <div className="flex items-center gap-2">
-                      <Link className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm">Shortcuts</span>
-                    </div>
-                    <Badge 
-                      variant="outline" 
-                      className="border-blue-500 text-blue-700 dark:text-blue-300 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
-                      onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['shortcut'] });
-                        onApplyFilters();
-                      }}
-                    >
-                      {files.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length}
-                    </Badge>
+                      Show All Files ({files.length + folders.length})
+                    </Button>
                   </div>
                 )}
               </div>
