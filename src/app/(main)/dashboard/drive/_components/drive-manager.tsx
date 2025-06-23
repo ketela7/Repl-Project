@@ -192,6 +192,8 @@ export function DriveManager() {
   const [selectedFileForPreview, setSelectedFileForPreview] = useState<DriveFile | null>(null);
   const [selectedItemForDelete, setSelectedItemForDelete] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
+  const [selectedItemForShare, setSelectedItemForShare] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   
   // Get timezone context for consistent date formatting
@@ -263,7 +265,6 @@ export function DriveManager() {
   // Additional dialog state for enhanced sharing
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isBulkShareDialogOpen, setIsBulkShareDialogOpen] = useState(false);
-  const [selectedItemForShare, setSelectedItemForShare] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
 
   // Mobile bottom sheet states
   const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false);
@@ -2360,6 +2361,62 @@ export function DriveManager() {
     }
   };
 
+  const handleDeleteFile = async (fileId: string) => {
+    try {
+      const response = await fetch(`/api/drive/files/${fileId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'trash' })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.needsReauth) {
+          toast.error('Google Drive access expired. Please reconnect your account.');
+          window.location.reload();
+          return;
+        }
+        throw new Error(errorData.error || 'Failed to delete file');
+      }
+
+      const fileName = selectedItemForDelete?.name || 'File';
+      toast.success(`${fileName} moved to trash`);
+      setIsDeleteDialogOpen(false);
+      setSelectedItemForDelete(null);
+      await handleRefresh();
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      handleError(error, 'Failed to delete file');
+    }
+  };
+
+  const handlePermanentDeleteFile = async (fileId: string) => {
+    try {
+      const response = await fetch(`/api/drive/files/${fileId}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.needsReauth) {
+          toast.error('Google Drive access expired. Please reconnect your account.');
+          window.location.reload();
+          return;
+        }
+        throw new Error(errorData.error || 'Failed to permanently delete file');
+      }
+
+      const fileName = selectedItemForDelete?.name || 'File';
+      toast.success(`${fileName} permanently deleted`);
+      setIsDeleteDialogOpen(false);
+      setSelectedItemForDelete(null);
+      await handleRefresh();
+    } catch (error) {
+      console.error('Error permanently deleting file:', error);
+      handleError(error, 'Failed to permanently delete file');
+    }
+  };
+
   const handleError = async (error: any, context: string) => {
     console.error(`${context}:`, error);
 
@@ -2709,73 +2766,76 @@ export function DriveManager() {
       />
 
       <FileRenameDialog
-        isOpen={isRenameDialogOpen}
-        onClose={() => setIsRenameDialogOpen(false)}
-        onRename={async (newName) => {
-          if (selectedFileForRename) {
-            await handleRenameFile(selectedFileForRename.id, newName);
+        open={isRenameDialogOpen}
+        onOpenChange={(open) => setIsRenameDialogOpen(open)}
+        onRename={async (newName: string) => {
+          if (selectedFileForAction) {
+            await handleRenameFile(newName);
           }
         }}
-        fileName={selectedFileForRename?.name || ''}
-        fileId={selectedFileForRename?.id || ''}
+        fileName={selectedFileForAction?.name || ''}
+        fileId={selectedFileForAction?.id || ''}
       />
 
       <FileMoveDialog
         isOpen={isMoveDialogOpen}
         onClose={() => setIsMoveDialogOpen(false)}
         onMove={async (targetFolderId) => {
-          if (selectedFileForMove) {
-            await handleMoveFile(selectedFileForMove.id, targetFolderId);
+          if (selectedFileForAction) {
+            await handleMoveFile(targetFolderId, selectedFileForAction.parentId);
           }
         }}
-        fileName={selectedFileForMove?.name || ''}
-        fileId={selectedFileForMove?.id || ''}
+        fileName={selectedFileForAction?.name || ''}
+        currentParentId={selectedFileForAction?.parentId || null}
       />
 
       <FileCopyDialog
         isOpen={isCopyDialogOpen}
         onClose={() => setIsCopyDialogOpen(false)}
         onCopy={async (targetFolderId, newName) => {
-          if (selectedFileForCopy) {
-            await handleCopyFile(selectedFileForCopy.id, targetFolderId, newName);
+          if (selectedFileForAction) {
+            await handleCopyFile(newName, targetFolderId);
           }
         }}
-        fileName={selectedFileForCopy?.name || ''}
-        fileId={selectedFileForCopy?.id || ''}
+        fileName={selectedFileForAction?.name || ''}
+        currentParentId={selectedFileForAction?.parentId || null}
       />
 
-      <FileDeleteDialog
+      <BulkDeleteDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
-        onDelete={async () => {
-          if (selectedFileForDelete) {
+        onConfirm={async () => {
+          if (selectedItemForDelete) {
             if (activeView === 'trash') {
-              await handlePermanentDeleteFile(selectedFileForDelete.id);
+              await handlePermanentDeleteFile(selectedItemForDelete.id);
             } else {
-              await handleDeleteFile(selectedFileForDelete.id);
+              await handleDeleteFile(selectedItemForDelete.id);
             }
           }
         }}
-        fileName={selectedFileForDelete?.name || ''}
-        fileId={selectedFileForDelete?.id || ''}
-        isPermanent={activeView === 'trash'}
+        selectedItems={selectedItemForDelete ? [selectedItemForDelete] : []}
       />
 
       <FileDetailsDialog
         isOpen={isDetailsDialogOpen}
         onClose={() => setIsDetailsDialogOpen(false)}
-        fileId={selectedFileForDetails?.id || ''}
+        fileId={selectedItemForDetails?.id || ''}
+        fileName={selectedItemForDetails?.name || ''}
+        fileType={selectedItemForDetails?.type || 'file'}
       />
 
       <FileShareDialog
-        isOpen={isShareDialogOpen}
-        onClose={() => setIsShareDialogOpen(false)}
-        fileId={selectedFileForShare?.id || ''}
-        fileName={selectedFileForShare?.name || ''}
+        open={isShareDialogOpen}
+        onOpenChange={(open) => setIsShareDialogOpen(open)}
+        file={selectedItemForShare ? {
+          id: selectedItemForShare.id,
+          name: selectedItemForShare.name,
+          mimeType: selectedItemForShare.type === 'folder' ? 'application/vnd.google-apps.folder' : 'application/octet-stream'
+        } : null}
       />
 
       <FilePreviewDialog
-        isOpen={isPreviewDialogOpen}
+        open={isPreviewDialogOpen}
         onClose={() => setIsPreviewDialogOpen(false)}
         file={selectedFileForPreview}
       />
@@ -2784,24 +2844,23 @@ export function DriveManager() {
       <BulkDeleteDialog
         isOpen={isBulkDeleteDialogOpen}
         onClose={() => setIsBulkDeleteDialogOpen(false)}
-        onDelete={async () => {
+        onConfirm={async () => {
           const items = getSelectedItemsData();
           if (activeView === 'trash') {
-            await handleBulkPermanentDelete(items.map(item => item.id));
+            await handleBulkPermanentDelete();
           } else {
-            await handleBulkDelete(items.map(item => item.id));
+            await handleBulkDelete();
           }
         }}
         selectedItems={getSelectedItemsData()}
-        isPermanent={activeView === 'trash'}
       />
 
       <BulkMoveDialog
         isOpen={isBulkMoveDialogOpen}
         onClose={() => setIsBulkMoveDialogOpen(false)}
-        onMove={async (targetFolderId) => {
+        onConfirm={async (targetFolderId) => {
           const items = getSelectedItemsData();
-          await handleBulkMove(items.map(item => item.id), targetFolderId);
+          await handleBulkMove(targetFolderId);
         }}
         selectedItems={getSelectedItemsData()}
       />
@@ -2809,9 +2868,9 @@ export function DriveManager() {
       <BulkCopyDialog
         isOpen={isBulkCopyDialogOpen}
         onClose={() => setIsBulkCopyDialogOpen(false)}
-        onCopy={async (targetFolderId) => {
+        onConfirm={async (targetFolderId) => {
           const items = getSelectedItemsData();
-          await handleBulkCopy(items.map(item => item.id), targetFolderId);
+          await handleBulkCopy(targetFolderId);
         }}
         selectedItems={getSelectedItemsData()}
       />
@@ -2819,8 +2878,8 @@ export function DriveManager() {
       <BulkRenameDialog
         isOpen={isBulkRenameDialogOpen}
         onClose={() => setIsBulkRenameDialogOpen(false)}
-        onRename={async (renameData) => {
-          await handleBulkRename(renameData);
+        onConfirm={async (renamePattern: string, renameType: string) => {
+          await handleBulkRename(renamePattern, renameType);
         }}
         selectedItems={getSelectedItemsData()}
       />
@@ -2828,16 +2887,16 @@ export function DriveManager() {
       <BulkRestoreDialog
         isOpen={isBulkRestoreDialogOpen}
         onClose={() => setIsBulkRestoreDialogOpen(false)}
-        onRestore={async () => {
+        onConfirm={async () => {
           const items = getSelectedItemsData();
-          await handleBulkRestore(items.map(item => item.id));
+          await handleBulkRestore();
         }}
         selectedItems={getSelectedItemsData()}
       />
 
       <BulkShareDialog
-        isOpen={isBulkShareDialogOpen}
-        onClose={() => setIsBulkShareDialogOpen(false)}
+        open={isBulkShareDialogOpen}
+        onOpenChange={setIsBulkShareDialogOpen}
         selectedItems={getSelectedItemsData()}
       />
 
@@ -2845,26 +2904,42 @@ export function DriveManager() {
       <MobileActionsBottomSheet
         open={isMobileActionsOpen}
         onOpenChange={setIsMobileActionsOpen}
-        selectedItems={getSelectedItemsData()}
-        isSelectMode={isSelectMode}
-        onAction={(action) => {
-          setIsMobileActionsOpen(false);
-          handleBulkAction(action);
-        }}
-        onRefresh={handleRefresh}
-        onCreateFolder={() => setIsCreateFolderDialogOpen(true)}
-        onUpload={() => setIsUploadDialogOpen(true)}
+        selectedCount={selectedItems.size}
+        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item.type as 'file' | 'folder' }))}
+        isInTrash={activeView === 'trash' || searchQuery.includes('trashed:true')}
+        onBulkDownload={handleBulkDownload}
+        onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
+        onBulkMove={() => setIsBulkMoveDialogOpen(true)}
+        onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
+        onBulkRename={() => setIsBulkRenameDialogOpen(true)}
+        onBulkExport={() => setIsBulkExportDialogOpen(true)}
+        onBulkShare={() => setIsBulkShareDialogOpen(true)}
+        onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
+        onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
+        onDeselectAll={deselectAll}
+
       />
 
       <FiltersDialog
         open={isMobileFiltersOpen}
         onOpenChange={setIsMobileFiltersOpen}
-        fileTypeFilter={fileTypeFilter}
-        onFileTypeToggle={handleFileTypeToggle}
-        advancedFilters={advancedFilters}
-        onAdvancedFiltersChange={setAdvancedFilters}
-        sortedFiles={sortedFiles}
-        sortedFolders={sortedFolders}
+        onFilterChange={(filters: any) => {
+          if (filters.activeView) {
+            handleViewChange(filters.activeView);
+          }
+          if (filters.fileTypeFilter) {
+            setFileTypeFilter(filters.fileTypeFilter);
+          }
+          if (filters.advancedFilters) {
+            setAdvancedFilters(filters.advancedFilters);
+          }
+        }}
+        currentFilters={{
+          activeView,
+          fileTypeFilter,
+          advancedFilters
+        }}
+        hasActiveFilters={!!hasActiveFilters}
         onClearFilters={clearAllFilters}
       />
     </div>

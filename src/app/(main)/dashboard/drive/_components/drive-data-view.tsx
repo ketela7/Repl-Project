@@ -11,9 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FileIcon } from "@/components/file-icon";
-import { FileThumbnailPreview } from "./file-thumbnail-preview";
-import { DriveGridSkeleton } from "./drive-grid-skeleton";
-import { DriveTable } from "./drive-table";
+import { FileThumbnailPreview } from "@/components/ui/file-thumbnail-preview";
+import { DriveManagerSkeleton } from "./drive-manager-skeleton";
+import { FileList } from "./file-list";
 import { useTimezone } from "@/hooks/use-timezone";
 import { formatFileTime } from "@/lib/timezone";
 import { isPreviewable } from "@/lib/google-drive/utils";
@@ -82,7 +82,7 @@ export function DriveDataView({
     <Card>
       <CardContent className="p-0">
         {loading ? (
-          <DriveGridSkeleton />
+          <DriveManagerSkeleton />
         ) : folders.length === 0 && files.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">
             <div className="flex justify-center mb-4">
@@ -408,10 +408,10 @@ export function DriveDataView({
             ))}
           </div>
         ) : (
-          <DriveTable
+          <FileList
             files={sortedFiles}
             folders={sortedFolders}
-            selectedItems={selectedItems}
+            selectedItems={Array.from(selectedItems)}
             isSelectMode={isSelectMode}
             visibleColumns={visibleColumns}
             activeView={activeView}
