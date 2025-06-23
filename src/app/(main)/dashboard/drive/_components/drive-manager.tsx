@@ -164,10 +164,10 @@ export function DriveManager() {
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
     size: true,
-    owners: false,
-    mimeType: false,
+    owners: true,
+    mimeType: true,
     createdTime: false,
-    modifiedTime: false,
+    modifiedTime: true,
   });
 
   // Dialog state

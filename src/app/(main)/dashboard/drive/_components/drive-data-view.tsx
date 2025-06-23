@@ -25,6 +25,15 @@ import {
   RefreshCw,
   Trash2,
 } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { formatFileSize } from '@/lib/google-drive/utils';
 import type { DriveFile, DriveFolder } from "@/lib/google-drive/types";
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' };
@@ -189,65 +198,130 @@ export function DriveDataView({
             )}
           </div>
         ) : (
-          <div className="space-y-4">
-            {items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  {isSelectMode && (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {isSelectMode && (
+                  <TableHead className="w-12">
                     <Checkbox
-                      checked={selectedItems.has(item.id)}
-                      onCheckedChange={() => onSelectItem(item.id)}
+                      checked={items.length > 0 && items.every(item => selectedItems.has(item.id))}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          items.forEach(item => selectedItems.add(item.id));
+                        } else {
+                          items.forEach(item => selectedItems.delete(item.id));
+                        }
+                        onSelectItem(''); // Trigger re-render
+                      }}
                     />
+                  </TableHead>
+                )}
+                {visibleColumns.name && <TableHead>Name</TableHead>}
+                {visibleColumns.size && <TableHead>Size</TableHead>}
+                {visibleColumns.owners && <TableHead>Owner</TableHead>}
+                {visibleColumns.mimeType && <TableHead>Type</TableHead>}
+                {visibleColumns.modifiedTime && <TableHead>Modified</TableHead>}
+                {visibleColumns.createdTime && <TableHead>Created</TableHead>}
+                <TableHead className="w-12"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {items.map((item) => (
+                <TableRow 
+                  key={item.id}
+                  className={`cursor-pointer ${selectedItems.has(item.id) ? 'bg-primary/5' : ''}`}
+                  onClick={() => isSelectMode ? onSelectItem(item.id) : isFolder(item) ? onFolderClick(item.id) : onItemAction('preview', item)}
+                >
+                  {isSelectMode && (
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedItems.has(item.id)}
+                        onCheckedChange={() => onSelectItem(item.id)}
+                      />
+                    </TableCell>
                   )}
-                  <FileIcon mimeType={item.mimeType} className="h-8 w-8" />
-                  <div>
-                    <p className="font-medium">{item.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {formatFileTime(item.modifiedTime, effectiveTimezone)}
-                    </p>
-                  </div>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onItemAction('preview', item)}>
-                      <Eye className="h-4 w-4 mr-2" />
-                      Preview
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onItemAction('download', item)}>
-                      <Download className="h-4 w-4 mr-2" />
-                      Download
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onItemAction('rename', item)}>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Rename
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onItemAction('move', item)}>
-                      <Move className="h-4 w-4 mr-2" />
-                      Move
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onItemAction('copy', item)}>
-                      <Copy className="h-4 w-4 mr-2" />
-                      Copy
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onItemAction('share', item)}>
-                      <Share className="h-4 w-4 mr-2" />
-                      Share
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onItemAction('delete', item)} className="text-destructive">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ))}
+                  {visibleColumns.name && (
+                    <TableCell>
+                      <div className="flex items-center space-x-3">
+                        <FileIcon mimeType={item.mimeType} className="h-6 w-6" />
+                        <span className="font-medium">{item.name}</span>
+                      </div>
+                    </TableCell>
+                  )}
+                  {visibleColumns.size && (
+                    <TableCell>
+                      {item.size ? formatFileSize(parseInt(item.size)) : isFolder(item) ? '—' : 'Unknown'}
+                    </TableCell>
+                  )}
+                  {visibleColumns.owners && (
+                    <TableCell>
+                      {item.owners?.[0]?.displayName || 'Unknown'}
+                    </TableCell>
+                  )}
+                  {visibleColumns.mimeType && (
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {isFolder(item) ? 'Folder' : item.mimeType.split('/').pop()?.toUpperCase() || 'File'}
+                      </span>
+                    </TableCell>
+                  )}
+                  {visibleColumns.modifiedTime && (
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {formatFileTime(item.modifiedTime, effectiveTimezone)}
+                      </span>
+                    </TableCell>
+                  )}
+                  {visibleColumns.createdTime && (
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}
+                      </span>
+                    </TableCell>
+                  )}
+                  <TableCell onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => onItemAction('preview', item)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          Preview
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onItemAction('download', item)}>
+                          <Download className="h-4 w-4 mr-2" />
+                          Download
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => onItemAction('rename', item)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Rename
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onItemAction('move', item)}>
+                          <Move className="h-4 w-4 mr-2" />
+                          Move
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onItemAction('copy', item)}>
+                          <Copy className="h-4 w-4 mr-2" />
+                          Copy
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => onItemAction('share', item)}>
+                          <Share className="h-4 w-4 mr-2" />
+                          Share
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => onItemAction('delete', item)} className="text-destructive">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
             
             {loadingMore && (
               <div className="flex justify-center py-4">
