@@ -32,6 +32,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true
   },
+  allowedDevOrigins : ['*.pike.replit.dev', '*.sisko.replit.dev'],
   // Performance optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production'

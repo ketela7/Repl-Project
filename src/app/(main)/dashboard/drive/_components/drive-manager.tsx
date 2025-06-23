@@ -672,16 +672,6 @@ export function DriveManager() {
             />
           )}
 
-          {/*<FileCategoryBadges
-            files={files}
-            folders={folders}
-            onCategoryClick={(category) => {
-              handleFilter({ fileTypeFilter: [category] });
-              applyFilters();
-            }}
-            className="mb-4 px-4"
-          />*/}
-
           <DriveDataView
             items={sortedDisplayItems}
             viewMode={viewMode}
