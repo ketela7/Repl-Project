@@ -336,7 +336,7 @@ export function DriveToolbar({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onSelectAll}>
                     <CheckSquare className="h-4 w-4 mr-2" />
-                    Select All ({files.length + folders.length})
+                    Select All ({items.length})
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={onSelectAll}>
                     <Square className="h-4 w-4 mr-2" />
