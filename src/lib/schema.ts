@@ -12,30 +12,7 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// User sessions table
-export const userSessions = pgTable('user_sessions', {
-  id: serial('id').primaryKey(),
-  userId: serial('user_id').references(() => users.id),
-  sessionToken: text('session_token').notNull().unique(),
-  expiresAt: timestamp('expires_at').notNull(),
-  createdAt: timestamp('created_at').defaultNow(),
-});
-
-// Activity logging tables
-export const activityLogs = pgTable('activity_logs', {
-  id: serial('id').primaryKey(),
-  userId: text('user_id').notNull(),
-  operation: text('operation').notNull(), // 'bulk_download', 'bulk_delete', 'bulk_move', etc.
-  itemType: text('item_type').notNull(), // 'file' or 'folder'
-  itemId: text('item_id').notNull(),
-  itemName: text('item_name').notNull(),
-  status: text('status').notNull(), // 'success', 'failed', 'skipped'
-  errorMessage: text('error_message'),
-  metadata: jsonb('metadata'), // Additional operation-specific data
-  batchId: text('batch_id'), // Group related operations together
-  processedAt: timestamp('processed_at').defaultNow(),
-  createdAt: timestamp('created_at').defaultNow(),
-});
+// Unused schema definitions removed
 
 export const bulkOperations = pgTable('bulk_operations', {
   id: serial('id').primaryKey(),

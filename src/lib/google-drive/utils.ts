@@ -954,7 +954,7 @@ export const isPreviewable = (mimeType: string): boolean => {
   if (isShortcutFile(mimeType)) {
     return false;
   }
-  
+
   // Use proper mimeType category checking instead of specific formats
   return isImageFile(mimeType) ||
          isVideoFile(mimeType) ||
@@ -966,13 +966,7 @@ export const isPreviewable = (mimeType: string): boolean => {
          mimeType.includes('google-apps');
 };
 
-
-
-
-
-
-
-
+// Unused utility functions removed
 
 /**
  * Generate preview URL for different media types
@@ -1211,8 +1205,6 @@ export function getFileActions(
   };
 }
 
-
-
 /**
  * Format Google Drive file dates with user timezone
  */
@@ -1337,107 +1329,6 @@ export function getFileCategory(mimeType: string): string {
 /**
  * Get all available file type categories with their icon and color info
  */
-export function getFileTypeCategories(): Array<{
-  key: string;
-  label: string;
-  iconName: string;
-  colorClass: string;
-  description: string;
-}> {
-  return [
-    {
-      key: 'folder',
-      label: 'Folders',
-      iconName: getCategoryIcon('folder'),
-      colorClass: getCategoryColor('folder'),
-      description: 'Google Drive folders'
-    },
-    {
-      key: 'document',
-      label: 'Documents',
-      iconName: getCategoryIcon('document'),
-      colorClass: getCategoryColor('document'),
-      description: 'Text documents, PDFs, Word files'
-    },
-    {
-      key: 'spreadsheet',
-      label: 'Spreadsheets',
-      iconName: getCategoryIcon('spreadsheet'),
-      colorClass: getCategoryColor('spreadsheet'),
-      description: 'Excel files, Google Sheets, CSV'
-    },
-    {
-      key: 'presentation',
-      label: 'Presentations',
-      iconName: getCategoryIcon('presentation'),
-      colorClass: getCategoryColor('presentation'),
-      description: 'PowerPoint, Google Slides'
-    },
-    {
-      key: 'image',
-      label: 'Images',
-      iconName: getCategoryIcon('image'),
-      colorClass: getCategoryColor('image'),
-      description: 'Photos, graphics, icons'
-    },
-    {
-      key: 'video',
-      label: 'Videos',
-      iconName: getCategoryIcon('video'),
-      colorClass: getCategoryColor('video'),
-      description: 'Movies, clips, recordings'
-    },
-    {
-      key: 'audio',
-      label: 'Audio',
-      iconName: getCategoryIcon('audio'),
-      colorClass: getCategoryColor('audio'),
-      description: 'Music, podcasts, recordings'
-    },
-    {
-      key: 'shortcut',
-      label: 'Shortcuts',
-      iconName: getCategoryIcon('shortcut'),
-      colorClass: getCategoryColor('shortcut'),
-      description: 'Google Drive shortcuts'
-    },
-    {
-      key: 'archive',
-      label: 'Archives',
-      iconName: getCategoryIcon('archive'),
-      colorClass: getCategoryColor('archive'),
-      description: 'ZIP, RAR, compressed files'
-    },
-    {
-      key: 'code',
-      label: 'Code Files',
-      iconName: getCategoryIcon('code'),
-      colorClass: getCategoryColor('code'),
-      description: 'Programming files, scripts'
-    },
-    {
-      key: 'pdf',
-      label: 'PDF Files',
-      iconName: getCategoryIcon('pdf'),
-      colorClass: getCategoryColor('pdf'),
-      description: 'PDF documents'
-    },
-    {
-      key: 'design',
-      label: 'Design Files',
-      iconName: getCategoryIcon('design'),
-      colorClass: getCategoryColor('design'),
-      description: 'Photoshop, Illustrator, design files'
-    },
-    {
-      key: 'database',
-      label: 'Database Files',
-      iconName: getCategoryIcon('database'),
-      colorClass: getCategoryColor('database'),
-      description: 'SQL, database files'
-    }
-  ];
-}
 
 /**
  * Enhanced file icon rendering with consistent props

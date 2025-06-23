@@ -22,7 +22,7 @@ export function DriveErrorDisplay({
   compact = false,
   className = '' 
 }: DriveErrorDisplayProps) {
-  
+
   const getErrorDetails = (error: any) => {
     const message = error?.message || error?.toString() || 'Unknown error';
     const code = error?.code || error?.status;
@@ -159,7 +159,7 @@ export function DriveErrorDisplay({
                 {errorDetails.retryable ? 'Retryable' : 'Manual Fix Required'}
               </Badge>
             </div>
-            
+
             <AlertDescription className="text-sm">
               {errorDetails.description}
             </AlertDescription>
@@ -197,17 +197,4 @@ export function DriveErrorDisplay({
   );
 }
 
-// Hook for consistent error handling across the app
-export function useDriveErrorHandler() {
-  const showError = React.useCallback((error: any, options?: {
-    onRetry?: () => void;
-    onReconnect?: () => void;
-    compact?: boolean;
-  }) => {
-    // This can be expanded to show toast notifications or modal dialogs
-    console.error('Drive error:', error);
-    return <DriveErrorDisplay error={error} {...options} />;
-  }, []);
-
-  return { showError };
-}
+// Unused useDriveErrorHandler hook removed

@@ -18,10 +18,10 @@ export async function copyToClipboard(text: string, label?: string): Promise<boo
       document.body.appendChild(textArea);
       textArea.focus();
       textArea.select();
-      
+
       const result = document.execCommand('copy');
       document.body.removeChild(textArea);
-      
+
       if (result) {
         successToast.copied();
         return true;
@@ -55,7 +55,7 @@ export async function copyFileLink(fileId: string, fileName: string, linkType: '
     const link = linkType === 'download' 
       ? `${baseUrl}/api/drive/download/${fileId}`
       : `https://drive.google.com/file/d/${fileId}/view`;
-    
+
     const success = await copyToClipboard(link, `${fileName} link`);
     if (success) {
       successToast.generic(`${fileName} link copied to clipboard`);
@@ -108,9 +108,4 @@ export async function readFromClipboard(): Promise<string | null> {
   }
 }
 
-/**
- * Check if clipboard API is supported
- */
-export function isClipboardSupported(): boolean {
-  return !!(navigator.clipboard || document.execCommand);
-}
+// Unused clipboard function removed

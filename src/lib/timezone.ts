@@ -1,4 +1,3 @@
-
 /**
  * Timezone utilities for handling client-server time synchronization
  */
@@ -25,7 +24,7 @@ export function formatDateToUserTimezone(
 ): string {
   const userTimezone = timezone || getUserTimezone();
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
+
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: '2-digit',
@@ -52,11 +51,11 @@ export function formatDateToUserTimezone(
  */
 export function convertUTCToUserTimezone(utcDate: string | Date, _timezone?: string): Date {
   const dateObj = typeof utcDate === 'string' ? new Date(utcDate) : utcDate;
-  
+
   // Create a new date adjusted for user's timezone
   const utcTime = dateObj.getTime();
   const userTime = new Date(utcTime);
-  
+
   return userTime;
 }
 
@@ -66,9 +65,9 @@ export function convertUTCToUserTimezone(utcDate: string | Date, _timezone?: str
 export function getRelativeTime(date: string | Date, _timezone?: string): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();
-  
+
   const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
-  
+
   if (diffInSeconds < 60) {
     return 'just now';
   } else if (diffInSeconds < 3600) {
@@ -89,25 +88,7 @@ export function getRelativeTime(date: string | Date, _timezone?: string): string
   }
 }
 
-/**
- * Store user's timezone in localStorage
- */
-export function storeUserTimezone(): void {
-  if (typeof window !== 'undefined') {
-    const timezone = getUserTimezone();
-    localStorage.setItem('userTimezone', timezone);
-  }
-}
-
-/**
- * Get stored user timezone from localStorage
- */
-export function getStoredUserTimezone(): string | null {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('userTimezone');
-  }
-  return null;
-}
+// Unused timezone functions removed
 
 /**
  * Format file modification time for display
@@ -147,7 +128,7 @@ export function getTimezoneDisplayName(timezone?: string): string {
       timeZone: tz,
       timeZoneName: 'long'
     }).formatToParts(now).find(part => part.type === 'timeZoneName')?.value;
-    
+
     return timeZoneName || tz;
   } catch (error) {
     return tz;
@@ -159,7 +140,7 @@ export function getTimezoneDisplayName(timezone?: string): string {
  */
 export function initializeTimezone(): string {
   if (typeof window === 'undefined') return 'UTC';
-  
+
   try {
     const detectedTimezone = getUserTimezone();
     localStorage.setItem('userTimezone', detectedTimezone);
