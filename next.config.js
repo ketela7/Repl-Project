@@ -10,8 +10,8 @@ const nextConfig = {
       '@radix-ui/react-tabs',
       '@tanstack/react-query',
       '@tanstack/react-table',
-      'recharts',
-    ],
+      'recharts'
+    ]
   },
   serverExternalPackages: ['postgres'],
   turbopack: {
@@ -20,19 +20,18 @@ const nextConfig = {
         loaders: ['@svgr/webpack'],
         as: '*.js',
       },
-    },
+    }
   },
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: true
   },
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   },
   // Performance optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
+    removeConsole: process.env.NODE_ENV === 'production'
   },
-  allowedDevOrigins: ['*.sisko.replit.dev'],
   async headers() {
     return [
       {
@@ -84,7 +83,7 @@ const nextConfig = {
       config.watchOptions = {
         poll: 1000,
         aggregateTimeout: 300,
-        ignored: ['**/node_modules', '**/.git', '**/coverage', '**/drizzle'],
+        ignored: ['**/node_modules', '**/.git', '**/coverage', '**/drizzle']
       }
     }
 
@@ -92,11 +91,11 @@ const nextConfig = {
     config.resolve.alias = {
       ...config.resolve.alias,
       // Replace heavy libraries with lighter alternatives in development
-      recharts: dev ? 'recharts/lib' : 'recharts',
+      'recharts': dev ? 'recharts/lib' : 'recharts',
     }
 
     return config
-  },
+  }
 }
 
 module.exports = nextConfig

@@ -73,15 +73,6 @@ Migration preferences: User prefers to discuss project rules and documentation b
 
 ## Recent Changes
 
-### June 2025: **Mobile-Style Toolbar Implementation & FileCategoryBadges Floating Panel**
-- **Unified Mobile-Style Interface**: Applied consistent mobile-style toolbar appearance across all platforms (mobile and desktop)
-- **FileCategoryBadges as Floating Panel Toggle**: Implemented comprehensive file category overview with real-time counts and color-coded badges
-- **Table Columns Functionality**: Fixed interactive column visibility controls in More menu with proper state management
-- **Responsive Design Consolidation**: Removed responsive breakpoints for consistent icon-only button design across all devices
-- **Enhanced File Organization**: Added floating panel showing categorized file counts (Documents, Images, Videos, Audio, Spreadsheets, Presentations, Archives, Code Files, Shortcuts)
-- **Visual Consistency**: Maintained desktop functionality while applying mobile visual design patterns throughout the interface
-- **Interactive Category Display**: Real-time file counting with visual indicators for each category type using appropriate icons and color schemes
-
 ### June 2025: **Complete Migration from clientSideFilter to liveFilter**
 - **Google Drive API Direct Filtering**: Removed `applyClientSideFilters` completely and implemented direct Google Drive API queries
 - **Backend API Optimization**: Updated `/api/drive/files/route.ts` to use official Google Drive API query parameters exclusively

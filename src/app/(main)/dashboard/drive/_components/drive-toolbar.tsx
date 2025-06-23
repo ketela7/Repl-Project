@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React from 'react';
+import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -34,12 +34,16 @@ import {
   Share2,
   RefreshCw,
   Trash2,
+  AlertTriangle,
   Calendar,
   Settings,
   ChevronDown,
   HardDrive,
   Folder,
   FileImage,
+  Play,
+  FileSpreadsheet,
+  Presentation,
   FileVideo,
   FileAudio,
   Archive,
@@ -48,8 +52,6 @@ import {
   Upload,
   FolderPlus,
   ChevronUp,
-  FileSpreadsheet,
-  Presentation,
 } from "lucide-react";
 import { FileIcon } from "@/components/file-icon";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -61,25 +63,17 @@ interface DriveFile {
   mimeType: string;
   size?: string;
   modifiedTime: string;
-  parents?: string[];
-  owners?: Array<{ displayName: string; emailAddress: string }>;
   createdTime?: string;
-}
-
-interface DriveFolder {
-  id: string;
-  name: string;
-  mimeType: string;
-  modifiedTime: string;
-  parents?: string[];
-  owners?: Array<{ displayName: string; emailAddress: string }>;
-  createdTime?: string;
+  ownedByMe?: boolean;
+  shared?: boolean;
+  trashed?: boolean;
+  type: 'file' | 'folder';
 }
 
 interface AdvancedFilters {
   sizeRange: {
-    min?: string;
-    max?: string;
+    min?: number;
+    max?: number;
     unit: 'B' | 'KB' | 'MB' | 'GB';
   };
   createdDateRange: {
@@ -190,7 +184,7 @@ export function DriveToolbar({
          id="drive-toolbar">
       <div className="flex items-center justify-between p-3 overflow-x-auto scrollbar-hide scroll-smooth"
            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-        {/* Main Menu - Mobile-style buttons */}
+        {/* Main Menu - 5 Items - Horizontal Scrollable */}
         <div className="flex items-center gap-2 flex-shrink-0 min-w-0">
           
           {/* Search */}
@@ -219,7 +213,7 @@ export function DriveToolbar({
             )}
           </Button>
 
-          {/* View Toggle */}
+          {/* View Toggle - More prominent */}
           <Button
             variant="ghost"
             size="sm"
@@ -234,7 +228,7 @@ export function DriveToolbar({
             )}
           </Button>
 
-          {/* Batch Operations */}
+          {/* Batch - Mobile-style interface for all platforms */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -290,6 +284,7 @@ export function DriveToolbar({
                         File Operations ({selectedCount} selected)
                       </div>
                       
+                      {/* Download Selected - Smart visibility: only show if there are actual downloadable files (not folders) */}
                       <DropdownMenuItem onClick={onBulkDelete}>
                         <Download className="h-4 w-4 mr-2" />
                         Download Selected
@@ -333,30 +328,54 @@ export function DriveToolbar({
                 </>
               )}
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
+          )}
 
-          {/* Filter */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className={`h-8 px-2 ${(filters.activeView !== 'all' || filters.fileTypeFilter.length > 0 || 
-                  filters.advancedFilters.sizeRange?.min || filters.advancedFilters.sizeRange?.max ||
-                  filters.advancedFilters.createdDateRange?.from || filters.advancedFilters.modifiedDateRange?.from ||
-                  filters.advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
-              >
-                <Calendar className="h-4 w-4" />
-                {(activeView !== 'all' || fileTypeFilter.length > 0 || 
-                  advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
-                  advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
-                  advancedFilters.owner) && (
-                  <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
-                    •
-                  </Badge>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
+          {/* Filter - Mobile uses Bottom Sheet, Desktop uses Dropdown */}
+          {isMobile ? (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={onFiltersOpen}
+              className={`h-8 px-2 md:px-3 ${(filters.activeView !== 'all' || filters.fileTypeFilter.length > 0 || 
+                filters.advancedFilters.sizeRange?.min || filters.advancedFilters.sizeRange?.max ||
+                filters.advancedFilters.createdDateRange?.from || filters.advancedFilters.modifiedDateRange?.from ||
+                filters.advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
+            >
+              <Calendar className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">Filter</span>
+              {(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                advancedFilters.owner) && (
+                <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+                  <span className="hidden md:inline">Active</span>
+                  <span className="md:hidden">•</span>
+                </Badge>
+              )}
+            </Button>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className={`h-8 px-2 ${(filters.activeView !== 'all' || filters.fileTypeFilter.length > 0 || 
+                    filters.advancedFilters.sizeRange?.min || filters.advancedFilters.sizeRange?.max ||
+                    filters.advancedFilters.createdDateRange?.from || filters.advancedFilters.modifiedDateRange?.from ||
+                    filters.advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
+                >
+                  <Calendar className="h-4 w-4" />
+                  {(activeView !== 'all' || fileTypeFilter.length > 0 || 
+                    advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
+                    advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
+                    advancedFilters.owner) && (
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                      •
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-80">
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-4">
@@ -372,6 +391,7 @@ export function DriveToolbar({
                   )}
                 </div>
                 
+                {/* Basic Filter */}
                 <Collapsible defaultOpen>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
                     <span className="text-sm font-semibold">View Status</span>
@@ -395,43 +415,395 @@ export function DriveToolbar({
                       >
                         My Drive
                       </Button>
+                      <Button
+                        variant={filters.activeView === 'recent' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => onFilterChange({ activeView: 'recent' })}
+                        className="justify-start text-xs"
+                      >
+                        Recent
+                      </Button>
+                      <Button
+                        variant={filters.activeView === 'trash' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => onFilterChange({ activeView: 'trash' })}
+                        className="justify-start text-xs"
+                      >
+                        Trash
+                      </Button>
+                      <Button
+                        variant={filters.activeView === 'starred' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => onFilterChange({ activeView: 'starred' })}
+                        className="justify-start text-xs"
+                      >
+                        Starred
+                      </Button>
+                      <Button
+                        variant={filters.activeView === 'shared' ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => onFilterChange({ activeView: 'shared' })}
+                        className="justify-start text-xs"
+                      >
+                        Shared
+                      </Button>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Separator className="my-3" />
+
+                {/* File Types */}
+                <Collapsible defaultOpen>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
+                    <span className="text-sm font-semibold">File Types</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-2 ml-2 mt-2">
+                    <div className="grid grid-cols-3 gap-2">
+                      <Button
+                        variant={filters.fileTypeFilter.includes('folder') ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => {
+                          const newTypes = filters.fileTypeFilter.includes('folder') 
+                            ? filters.fileTypeFilter.filter(t => t !== 'folder')
+                            : [...filters.fileTypeFilter, 'folder'];
+                          onFilterChange({ fileTypeFilter: newTypes });
+                        }}
+                        className="justify-center text-xs p-2"
+                        title="Folders"
+                      >
+                        <Folder className="h-4 w-4" />
+                      </Button>
+                      {[
+                        { 
+                          type: 'document', 
+                          mimeType: 'application/vnd.google-apps.document', 
+                          title: 'Documents' 
+                        },
+                        { 
+                          type: 'spreadsheet', 
+                          mimeType: 'application/vnd.google-apps.spreadsheet', 
+                          title: 'Spreadsheets' 
+                        },
+                        { 
+                          type: 'presentation', 
+                          mimeType: 'application/vnd.google-apps.presentation', 
+                          title: 'Presentations' 
+                        },
+                        { 
+                          type: 'image', 
+                          mimeType: 'image/jpeg', 
+                          title: 'Images' 
+                        },
+                        { 
+                          type: 'video', 
+                          mimeType: 'video/mp4', 
+                          title: 'Videos' 
+                        },
+                        { 
+                          type: 'audio', 
+                          mimeType: 'audio/mp3', 
+                          title: 'Audio' 
+                        },
+                        { 
+                          type: 'archive', 
+                          mimeType: 'application/zip', 
+                          title: 'Archives' 
+                        },
+                        { 
+                          type: 'code', 
+                          mimeType: 'text/javascript', 
+                          title: 'Code Files' 
+                        },
+                        { 
+                          type: 'shortcut', 
+                          mimeType: 'application/vnd.google-apps.shortcut', 
+                          title: 'Shortcuts' 
+                        }
+                      ].map((filter) => {
+                        return (
+                          <Button
+                            key={filter.type}
+                            variant={filters.fileTypeFilter.includes(filter.type) ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => {
+                              const newTypes = filters.fileTypeFilter.includes(filter.type) 
+                                ? filters.fileTypeFilter.filter(t => t !== filter.type)
+                                : [...filters.fileTypeFilter, filter.type];
+                              onFilterChange({ fileTypeFilter: newTypes });
+                            }}
+                            className="justify-center text-xs p-2"
+                            title={filter.title}
+                          >
+                            <FileIcon mimeType={filter.mimeType} className="h-4 w-4" />
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Separator className="my-3" />
+
+                {/* Sort Options */}
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
+                    <span className="text-sm font-semibold">Sort Options</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-2 ml-2 mt-2">
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Sort By</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          variant={filters.advancedFilters.sortBy === 'name' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            onFilterChange({ advancedFilters: { ...filters.advancedFilters, sortBy: 'name' } });
+                          }}
+                          className="justify-start text-xs"
+                        >
+                          Name
+                        </Button>
+                        <Button
+                          variant={filters.advancedFilters.sortBy === 'modified' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            onFilterChange({ advancedFilters: { ...filters.advancedFilters, sortBy: 'modified' } });
+                          }}
+                          className="justify-start text-xs"
+                        >
+                          Modified
+                        </Button>
+                        <Button
+                          variant={filters.advancedFilters.sortBy === 'created' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            onFilterChange({ advancedFilters: { ...filters.advancedFilters, sortBy: 'created' } });
+                          }}
+                          className="justify-start text-xs"
+                        >
+                          Created
+                        </Button>
+                        <Button
+                          variant={filters.advancedFilters.sortBy === 'size' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            onFilterChange({ advancedFilters: { ...filters.advancedFilters, sortBy: 'size' } });
+                          }}
+                          className="justify-start text-xs"
+                        >
+                          Size
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Sort Order</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          variant={filters.advancedFilters.sortOrder === 'asc' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            onFilterChange({ advancedFilters: { ...filters.advancedFilters, sortOrder: 'asc' } });
+                          }}
+                          className="justify-start text-xs"
+                        >
+                          Ascending
+                        </Button>
+                        <Button
+                          variant={filters.advancedFilters.sortOrder === 'desc' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => {
+                            onFilterChange({ advancedFilters: { ...filters.advancedFilters, sortOrder: 'desc' } });
+                          }}
+                          className="justify-start text-xs"
+                        >
+                          Descending
+                        </Button>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Separator className="my-3" />
+
+                {/* Advanced Filters */}
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
+                    <span className="text-sm font-semibold">Advanced Filters</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-4 ml-2 mt-3">
+                    {/* Size Range */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">File Size Range</label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <Input
+                          type="number"
+                          placeholder="Min"
+                          value={filters.advancedFilters.sizeRange?.min || ''}
+                          onChange={(e) => onFilterChange({ advancedFilters: {
+                            ...filters.advancedFilters,
+                            sizeRange: { ...filters.advancedFilters.sizeRange, min: parseInt(e.target.value) || undefined, unit: filters.advancedFilters.sizeRange?.unit || 'MB' }
+                          }})}
+                          className="text-xs h-8"
+                        />
+                        <Input
+                          type="number"
+                          placeholder="Max"
+                          value={filters.advancedFilters.sizeRange?.max || ''}
+                          onChange={(e) => onFilterChange({ advancedFilters: {
+                            ...filters.advancedFilters,
+                            sizeRange: { ...filters.advancedFilters.sizeRange, max: parseInt(e.target.value) || undefined, unit: filters.advancedFilters.sizeRange?.unit || 'MB' }
+                          }})}
+                          className="text-xs h-8"
+                        />
+                        <select
+                          value={filters.advancedFilters.sizeRange?.unit || 'MB'}
+                          onChange={(e) => onFilterChange({ advancedFilters: {
+                            ...filters.advancedFilters,
+                            sizeRange: { ...filters.advancedFilters.sizeRange, unit: e.target.value as 'B' | 'KB' | 'MB' | 'GB' }
+                          }})}
+                          className="text-xs h-8 px-2 border rounded-md bg-background"
+                        >
+                          <option value="B">B</option>
+                          <option value="KB">KB</option>
+                          <option value="MB">MB</option>
+                          <option value="GB">GB</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Date Ranges */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Created Date Range</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          type="date"
+                          value={filters.advancedFilters.createdDateRange?.from?.toISOString().split('T')[0] || ''}
+                          onChange={(e) => onFilterChange({ advancedFilters: {
+                            ...filters.advancedFilters,
+                            createdDateRange: { 
+                              ...filters.advancedFilters.createdDateRange, 
+                              from: e.target.value ? new Date(e.target.value) : undefined 
+                            }
+                          }})}
+                          className="text-xs h-8"
+                        />
+                        <Input
+                          type="date"
+                          value={filters.advancedFilters.createdDateRange?.to?.toISOString().split('T')[0] || ''}
+                          onChange={(e) => onFilterChange({ advancedFilters: {
+                            ...filters.advancedFilters,
+                            createdDateRange: { 
+                              ...filters.advancedFilters.createdDateRange, 
+                              to: e.target.value ? new Date(e.target.value) : undefined 
+                            }
+                          }})}
+                          className="text-xs h-8"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Modified Date Range</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input
+                          type="date"
+                          value={filters.advancedFilters.modifiedDateRange?.from?.toISOString().split('T')[0] || ''}
+                          onChange={(e) => onFilterChange({ advancedFilters: {
+                            ...filters.advancedFilters,
+                            modifiedDateRange: { 
+                              ...filters.advancedFilters.modifiedDateRange, 
+                              from: e.target.value ? new Date(e.target.value) : undefined 
+                            }
+                          }})}
+                          className="text-xs h-8"
+                        />
+                        <Input
+                          type="date"
+                          value={filters.advancedFilters.modifiedDateRange?.to?.toISOString().split('T')[0] || ''}
+                          onChange={(e) => onFilterChange({ advancedFilters: {
+                            ...filters.advancedFilters,
+                            modifiedDateRange: { 
+                              ...filters.advancedFilters.modifiedDateRange, 
+                              to: e.target.value ? new Date(e.target.value) : undefined 
+                            }
+                          }})}
+                          className="text-xs h-8"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Owner */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Owner Email</label>
+                      <Input
+                        type="email"
+                        placeholder="Enter owner email"
+                        value={filters.advancedFilters.owner || ''}
+                        onChange={(e) => onFilterChange({ advancedFilters: {
+                          ...filters.advancedFilters,
+                          owner: e.target.value || undefined
+                        }})}
+                        className="text-xs h-8"
+                      />
+                    </div>
+
+                    {/* Apply and Clear Filters */}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={onApplyFilters}
+                        className="flex-1 text-xs"
+                      >
+                        Apply Filters
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={onClearFilters}
+                        className="flex-1 text-xs"
+                      >
+                        Clear All
+                      </Button>
                     </div>
                   </CollapsibleContent>
                 </Collapsible>
               </div>
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
+          )}
 
-          {/* FileCategoryBadges - Floating Panel Toggle */}
+          {/* Badge - Floating Panel Toggle */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="h-8 px-2"
-                title="File Categories"
-              >
-                <HardDrive className="h-4 w-4" />
-                {(files.length > 0 || folders.length > 0) && (
-                  <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
-                    {files.length + folders.length}
-                  </Badge>
-                )}
+              <Button variant="ghost" size="sm" className="h-8 px-2 md:px-3">
+                <HardDrive className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Badge</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-80">
-              <div className="p-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <HardDrive className="h-4 w-4 text-primary" />
-                  <h4 className="font-semibold text-sm text-foreground">File Categories</h4>
-                  <Badge variant="secondary" className="ml-2 text-xs">
-                    {files.length + folders.length} items
+            <DropdownMenuContent align="center" className="w-80 p-4">
+              <div className="space-y-4">
+                <div className="text-sm font-semibold border-b pb-2">File Statistics</div>
+                
+                {/* Total Files */}
+                <div className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <HardDrive className="h-4 w-4 text-gray-600" />
+                    <span className="text-sm">Total Items</span>
+                  </div>
+                  <Badge variant="outline" className="font-medium">
+                    {files.length + folders.length}
                   </Badge>
                 </div>
-                
+
                 {/* Folders */}
                 {folders.length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md mb-2">
+                  <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Folder className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">Folders</span>
@@ -442,35 +814,126 @@ export function DriveToolbar({
                   </div>
                 )}
 
-                {/* Documents */}
-                {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('pdf') || f.mimeType?.includes('text')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md mb-2">
+                {/* Images */}
+                {files.filter(f => f.mimeType?.includes('image')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Documents</span>
+                      <FileImage className="h-4 w-4 text-green-500" />
+                      <span className="text-sm">Images</span>
                     </div>
                     <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
-                      {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('pdf') || f.mimeType?.includes('text')).length}
+                      {files.filter(f => f.mimeType?.includes('image')).length}
                     </Badge>
                   </div>
                 )}
 
-                {/* Images */}
-                {files.filter(f => f.mimeType?.startsWith('image/')).length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-purple-50 dark:bg-purple-950/30 rounded-md mb-2">
+                {/* Videos */}
+                {files.filter(f => f.mimeType?.includes('video')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
                     <div className="flex items-center gap-2">
-                      <FileImage className="h-4 w-4 text-purple-500" />
-                      <span className="text-sm">Images</span>
+                      <Play className="h-4 w-4 text-red-500" />
+                      <span className="text-sm">Videos</span>
                     </div>
-                    <Badge variant="outline" className="border-purple-500 text-purple-700 dark:text-purple-300">
-                      {files.filter(f => f.mimeType?.startsWith('image/')).length}
+                    <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
+                      {files.filter(f => f.mimeType?.includes('video')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Documents */}
+                {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-orange-500" />
+                      <span className="text-sm">Documents</span>
+                    </div>
+                    <Badge variant="outline" className="border-orange-500 text-orange-700 dark:text-orange-300">
+                      {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Spreadsheets */}
+                {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileSpreadsheet className="h-4 w-4 text-green-500" />
+                      <span className="text-sm">Spreadsheets</span>
+                    </div>
+                    <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
+                      {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Presentations */}
+                {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Presentation className="h-4 w-4 text-amber-500" />
+                      <span className="text-sm">Presentations</span>
+                    </div>
+                    <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-300">
+                      {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Videos */}
+                {files.filter(f => f.mimeType?.startsWith('video/')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileVideo className="h-4 w-4 text-red-500" />
+                      <span className="text-sm">Videos</span>
+                    </div>
+                    <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
+                      {files.filter(f => f.mimeType?.startsWith('video/')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Audio */}
+                {files.filter(f => f.mimeType?.startsWith('audio/')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileAudio className="h-4 w-4 text-indigo-500" />
+                      <span className="text-sm">Audio</span>
+                    </div>
+                    <Badge variant="outline" className="border-indigo-500 text-indigo-700 dark:text-indigo-300">
+                      {files.filter(f => f.mimeType?.startsWith('audio/')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Archives */}
+                {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Archive className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm">Archives</span>
+                    </div>
+                    <Badge variant="outline" className="border-gray-500 text-gray-700 dark:text-gray-300">
+                      {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Code Files */}
+                {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileCode className="h-4 w-4 text-emerald-500" />
+                      <span className="text-sm">Code Files</span>
+                    </div>
+                    <Badge variant="outline" className="border-emerald-500 text-emerald-700 dark:text-emerald-300">
+                      {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Shortcuts */}
                 {files.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length > 0 && (
-                  <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md mb-2">
+                  <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Link className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">Shortcuts</span>
@@ -611,6 +1074,7 @@ export function DriveToolbar({
                       />
                       <span className="text-xs">Modified</span>
                     </DropdownMenuItem>
+
                   </CollapsibleContent>
                 </Collapsible>
               </>
@@ -628,9 +1092,9 @@ export function DriveToolbar({
       </div>
 
       {/* Enhanced Search Bar - Expandable with better UX */}
-      <div id="search-expanded" style={{ display: 'none' }} className="border-t bg-muted/30 p-3">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
+      <div id="search-expanded" style={{ display: 'none' }} className="border-t bg-muted/30 p-3 md:p-4">
+        <div className="flex items-center gap-2 md:gap-4">
+          <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
