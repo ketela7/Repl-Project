@@ -170,7 +170,9 @@ export function DriveToolbar({
   onClearFilters,
   hasActiveFilters,
   files,
-  folders
+  folders,
+  visibleColumns,
+  setVisibleColumns
 }: DriveToolbarProps) {
   const isMobile = useIsMobile();
   
@@ -180,10 +182,10 @@ export function DriveToolbar({
   return (
     <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm transition-transform duration-200 ease-in-out"
          id="drive-toolbar">
-      <div className="flex items-center justify-between p-3 md:p-4 overflow-x-auto scrollbar-hide scroll-smooth"
+      <div className="flex items-center justify-between p-3 overflow-x-auto scrollbar-hide scroll-smooth"
            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {/* Main Menu - 5 Items - Horizontal Scrollable */}
-        <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 min-w-0">
+        <div className="flex items-center gap-2 flex-shrink-0 min-w-0">
           
           {/* Search */}
           <Button
@@ -201,12 +203,11 @@ export function DriveToolbar({
                 }
               }
             }}
-            className="h-8 px-2 md:px-3"
+            className="h-8 px-2"
           >
-            <Search className="h-4 w-4 md:mr-2" />
-            <span className="hidden md:inline">Search</span>
+            <Search className="h-4 w-4" />
             {searchQuery && (
-              <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
+              <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
                 •
               </Badge>
             )}
@@ -217,63 +218,38 @@ export function DriveToolbar({
             variant="ghost"
             size="sm"
             onClick={() => onViewModeChange(viewMode === 'grid' ? 'table' : 'grid')}
-            className="h-8 px-2 md:px-3"
+            className="h-8 px-2"
             title={`Switch to ${viewMode === 'grid' ? 'table' : 'grid'} view`}
           >
             {viewMode === 'grid' ? (
-              <List className="h-4 w-4 md:mr-2" />
+              <List className="h-4 w-4" />
             ) : (
-              <Grid3X3 className="h-4 w-4 md:mr-2" />
+              <Grid3X3 className="h-4 w-4" />
             )}
-            <span className="hidden md:inline">
-              {viewMode === 'grid' ? 'Table' : 'Grid'}
-            </span>
           </Button>
 
-          {/* Batch - Mobile opens bottom sheet when items selected, Desktop uses dropdown */}
-          {isMobile && selectedCount > 0 ? (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={onFiltersOpen}
-              className="h-8 px-2 md:px-3"
-            >
-              <Square className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">Actions</span>
-              <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                {selectedCount}
-              </Badge>
-              {(filters.activeView === 'trash' || searchQuery.includes('trashed:true')) && (
-                <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                  <span className="hidden md:inline">Trash</span>
-                  <span className="md:hidden">T</span>
-                </Badge>
-              )}
-            </Button>
-          ) : (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant={isSelectMode ? 'default' : 'ghost'}
-                  size="sm"
-                  disabled={files.length === 0 && folders.length === 0}
-                  className="h-8 px-2 md:px-3"
-                >
-                  <Square className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">Batch</span>
-                  {selectedCount > 0 && (
-                    <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                      {selectedCount}
-                    </Badge>
-                  )}
-                  {(filters.activeView === 'trash' || searchQuery.includes('trashed:true')) && (
-                    <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                      <span className="hidden md:inline">Trash Mode</span>
-                      <span className="md:hidden">T</span>
-                    </Badge>
-                  )}
-                </Button>
-              </DropdownMenuTrigger>
+          {/* Batch - Mobile-style interface for all platforms */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant={isSelectMode ? 'default' : 'ghost'}
+                size="sm"
+                disabled={files.length === 0 && folders.length === 0}
+                className="h-8 px-2"
+              >
+                <Square className="h-4 w-4" />
+                {selectedCount > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                    {selectedCount}
+                  </Badge>
+                )}
+                {(filters.activeView === 'trash' || searchQuery.includes('trashed:true')) && (
+                  <Badge variant="destructive" className="ml-1 h-4 px-1 text-xs">
+                    T
+                  </Badge>
+                )}
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-64">
               <DropdownMenuItem onClick={() => onSelectModeChange(!isSelectMode)}>
                 {isSelectMode ? (
@@ -384,25 +360,23 @@ export function DriveToolbar({
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className={`h-8 px-2 md:px-3 ${(filters.activeView !== 'all' || filters.fileTypeFilter.length > 0 || 
+                  className={`h-8 px-2 ${(filters.activeView !== 'all' || filters.fileTypeFilter.length > 0 || 
                     filters.advancedFilters.sizeRange?.min || filters.advancedFilters.sizeRange?.max ||
                     filters.advancedFilters.createdDateRange?.from || filters.advancedFilters.modifiedDateRange?.from ||
                     filters.advancedFilters.owner) ? 'bg-primary/10 text-primary' : ''}`}
                 >
-                  <Calendar className="h-4 w-4 md:mr-2" />
-                  <span className="hidden md:inline">Filter</span>
+                  <Calendar className="h-4 w-4" />
                   {(activeView !== 'all' || fileTypeFilter.length > 0 || 
                     advancedFilters.sizeRange?.min || advancedFilters.sizeRange?.max ||
                     advancedFilters.createdDateRange?.from || advancedFilters.modifiedDateRange?.from ||
                     advancedFilters.owner) && (
-                    <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                      <span className="hidden md:inline">Active</span>
-                      <span className="md:hidden">•</span>
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
+                      •
                     </Badge>
                   )}
                 </Button>
               </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-80 md:w-96">
+            <DropdownMenuContent align="start" className="w-80">
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-4">
                   <Settings className="h-4 w-4 text-primary" />
@@ -977,9 +951,8 @@ export function DriveToolbar({
         {/* More (Settings) - Fixed position on the right */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="flex-shrink-0 h-8 px-2 md:px-3">
-              <Settings className="h-4 w-4 md:mr-2" />
-              <span className="hidden md:inline">More</span>
+            <Button variant="ghost" size="sm" className="flex-shrink-0 h-8 px-2">
+              <Settings className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-64">
@@ -1174,8 +1147,7 @@ export function DriveToolbar({
               <RefreshCw className="h-4 w-4 animate-spin" />
             ) : (
               <>
-                <Search className="h-4 w-4 md:mr-2" />
-                <span className="hidden md:inline">Search</span>
+                <Search className="h-4 w-4" />
               </>
             )}
           </Button>
