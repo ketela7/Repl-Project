@@ -20,6 +20,7 @@ interface CreateFolderDialogProps {
   onClose: () => void;
   onFolderCreated: () => void;
   parentFolderId?: string | null;
+  currentFolderId?: string | null;
 }
 
 export function CreateFolderDialog({ 

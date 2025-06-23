@@ -195,7 +195,7 @@ export function DriveManager() {
   const [selectedItemForShare, setSelectedItemForShare] = useState<{ id: string; name: string; type: 'file' | 'folder' } | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // Get timezone context for consistent date formatting
   const { timezone, isLoading: timezoneLoading } = useTimezoneContext();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
@@ -204,7 +204,7 @@ export function DriveManager() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [needsReauth, setNeedsReauth] = useState(false);
-  
+
   const lastFetchCallRef = useRef<string>('');
   const fetchThrottleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const activeRequestsRef = useRef<Set<string>>(new Set());
@@ -528,7 +528,7 @@ export function DriveManager() {
         } else {
           toast.success(toastMessage);
         }
-        
+
         // Log details for debugging
         if (skippedItems.length > 0) {
           console.log('Skipped items (no permission):', skippedItems);
@@ -644,7 +644,7 @@ export function DriveManager() {
         } else {
           toast.success(toastMessage);
         }
-        
+
         // Log details for debugging
         if (skippedItems.length > 0) {
           console.log('Skipped items (no permission):', skippedItems);
@@ -665,10 +665,10 @@ export function DriveManager() {
 
   const handleBulkCopy = async (targetFolderId: string) => {
     const allSelectedItems = getSelectedItemsData();
-    
+
     // Close dialog first so user can see progress
     setIsBulkCopyDialogOpen(false);
-    
+
     // Filter for files that can be copied based on permissions
     const itemsWithPermissions = allSelectedItems.filter(item => {
       const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
@@ -780,7 +780,7 @@ export function DriveManager() {
         } else {
           toast.success(toastMessage);
         }
-        
+
         // Log details for debugging
         if (skippedItems.length > 0) {
           console.log('Skipped items:', { folders: foldersSelected, noPermission: filesWithoutPermissions.length });
@@ -1128,7 +1128,7 @@ export function DriveManager() {
         } else {
           toast.success(toastMessage);
         }
-        
+
         // Log details for debugging
         if (skippedItems.length > 0) {
           console.log('Skipped items (no permission):', skippedItems);
@@ -1245,7 +1245,7 @@ export function DriveManager() {
         } else {
           toast.success(toastMessage);
         }
-        
+
         // Log details for debugging
         if (skippedItems.length > 0) {
           console.log('Skipped items (not in trash or no permission):', skippedItems);
@@ -1414,10 +1414,10 @@ export function DriveManager() {
       }
 
       toast.success(`${selectedItemForShare.name} shared successfully`);
-      
+
       // Refresh the files list to show updated share status
       fetchFiles();
-      
+
       // Close the dialog
       setIsShareDialogOpen(false);
       setSelectedItemForShare(null);
@@ -1523,7 +1523,7 @@ export function DriveManager() {
         } else {
           toast.success(toastMessage);
         }
-        
+
         // Log details for debugging
         if (skippedItems.length > 0) {
           console.log('Skipped items (no permission):', skippedItems);
@@ -1544,33 +1544,33 @@ export function DriveManager() {
 
   const fetchFiles = useCallback(async (parentId?: string, query?: string, pageToken?: string, append = false, viewFilter?: string) => {
     const requestId = `fetch-files-${parentId || 'root'}-${query || ''}-${pageToken || ''}`;
-    
+
     // Check if the same request is already active
     if (activeRequestsRef.current.has(requestId)) {
       console.log('[Request Dedup] Skipping duplicate active request:', requestId);
       return;
     }
-    
+
     // Check throttle for recent identical requests
     if (lastFetchCallRef.current === requestId && !append) {
       console.log('[Throttle] Skipping recent duplicate request:', requestId);
       return;
     }
-    
+
     // Mark request as active
     activeRequestsRef.current.add(requestId);
     lastFetchCallRef.current = requestId;
-    
+
     // Clear any existing throttle timeout
     if (fetchThrottleTimeoutRef.current) {
       clearTimeout(fetchThrottleTimeoutRef.current);
     }
-    
+
     // Set timeout to reset throttle after 300ms
     fetchThrottleTimeoutRef.current = setTimeout(() => {
       lastFetchCallRef.current = '';
     }, 300);
-    
+
     const startTime = Date.now();
 
     try {
@@ -1656,9 +1656,7 @@ export function DriveManager() {
             setFolders([]);
           }
           return;
-        }
-
-        if (response.status === 401 || response.status === 403 || errorData.needsReauth) {
+        }        if (response.status === 401 || response.status === 403 || errorData.needsReauth) {
           setHasAccess(false);
           toast.error(errorData.error || 'Google Drive access expired. Please reconnect your account.');
           if (!append) {
@@ -1756,11 +1754,11 @@ export function DriveManager() {
     setActiveView(view);
     setCurrentFolderId(null); // Reset to root when changing views
     setSearchQuery(''); // Clear search
-    
+
     // Clear selection when changing views
     setSelectedItems(new Set());
     setIsSelectMode(false);
-    
+
     fetchFiles(undefined, undefined, undefined, false, view);
   }, [fetchFiles]);
 
@@ -1822,7 +1820,7 @@ export function DriveManager() {
       switch (action) {
         case 'preview':
           const previewFile = files.find(f => f.id === fileId);
-          
+
           // Handle shortcuts differently - navigate/preview their targets internally
           if (previewFile?.mimeType === 'application/vnd.google-apps.shortcut') {
             try {
@@ -1832,7 +1830,7 @@ export function DriveManager() {
                 const shortcutData = await shortcutResponse.json();
                 const targetId = shortcutData.shortcutDetails?.targetId;
                 const targetMimeType = shortcutData.shortcutDetails?.targetMimeType;
-                
+
                 if (targetId) {
                   // For folder shortcuts, navigate to the folder within the app
                   if (targetMimeType === 'application/vnd.google-apps.folder') {
@@ -1844,7 +1842,7 @@ export function DriveManager() {
                       const targetFileResponse = await fetch(`/api/drive/files/${targetId}/details`);
                       if (targetFileResponse.ok) {
                         const targetFileData = await targetFileResponse.json();
-                        
+
                         // Check if the target file is previewable
                         if (isPreviewable(targetFileData.mimeType)) {
                           // Create a file object from the target data and preview it
@@ -1864,7 +1862,7 @@ export function DriveManager() {
                             trashed: targetFileData.trashed,
                             capabilities: targetFileData.capabilities
                           };
-                          
+
                           setSelectedFileForPreview(targetFile);
                           setIsPreviewDialogOpen(true);
                         } else {
@@ -2425,7 +2423,7 @@ export function DriveManager() {
         error.message?.includes('unauthorized') || 
         error.message?.includes('invalid_credentials') ||
         error.message?.includes('authentication')) {
-      
+
       toast.error('Google Drive access expired. Please reconnect your account.');
       setNeedsReauth(true);
       return;
@@ -2513,7 +2511,7 @@ export function DriveManager() {
   useEffect(() => {
     // Skip if this is the initial load (handled by main useEffect)
     if (hasAccess === null) return;
-    
+
     if (submittedSearchQuery.trim()) {
       fetchFiles(currentFolderId || undefined, submittedSearchQuery.trim());
     } else {
@@ -2563,7 +2561,7 @@ export function DriveManager() {
         if (!toolbar) return;
 
         const currentScrollY = window.scrollY;
-        
+
         if (currentScrollY > lastScrollY && currentScrollY > 100) {
           // Scrolling down - hide toolbar
           toolbar.style.transform = 'translateY(-100%)';
@@ -2571,7 +2569,7 @@ export function DriveManager() {
           // Scrolling up or at top - show toolbar
           toolbar.style.transform = 'translateY(0)';
         }
-        
+
         lastScrollY = currentScrollY;
         ticking = false;
       };
@@ -2584,7 +2582,7 @@ export function DriveManager() {
       };
 
       window.addEventListener('scroll', onScroll, { passive: true });
-      
+
       return () => {
         window.removeEventListener('scroll', onScroll);
       };
@@ -2600,9 +2598,7 @@ export function DriveManager() {
       // Clear all active request tracking
       activeRequestsRef.current.clear();
     };
-  }, []);
-
-  // Show permission required card if no access to Google Drive
+  }, []);  // Show permission required card if no access to Google Drive
   if (hasAccess === false) {
     return (
       <DrivePermissionRequired 
@@ -2611,11 +2607,11 @@ export function DriveManager() {
           setLoading(true);
           setHasAccess(null);
           setDriveAccessError(null);
-          
+
           try {
             const accessResponse = await fetch('/api/auth/check-drive-access');
             const accessData = await accessResponse.json();
-            
+
             if (accessData.hasAccess) {
               await fetchFiles();
               setHasAccess(true);
@@ -2830,11 +2826,11 @@ export function DriveManager() {
 
       <FileShareDialog
         open={isShareDialogOpen}
-        onOpenChange={(open) => setIsShareDialogOpen(open)}
-        file={selectedItemForShare ? {
-          id: selectedItemForShare.id,
-          name: selectedItemForShare.name,
-          mimeType: selectedItemForShare.type === 'folder' ? 'application/vnd.google-apps.folder' : 'application/octet-stream'
+        onOpenChange={setIsShareDialogOpen}
+        item={selectedItemForShare ? { 
+          id: selectedItemForShare.id, 
+          name: selectedItemForShare.name, 
+          type: selectedItemForShare.type === 'folder' ? 'folder' : 'file' 
         } : null}
       />
 

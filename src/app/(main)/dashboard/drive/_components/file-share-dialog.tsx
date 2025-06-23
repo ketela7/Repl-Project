@@ -53,12 +53,8 @@ import { cn } from "@/lib/utils";
 interface FileShareDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  file?: {
-    id: string;
-    name: string;
-    mimeType: string;
-  } | null;
-  item: { id: string; name: string; type: 'file' | 'folder' } | null;
+  item?: { id: string; name: string; type: 'file' | 'folder' } | null;
+  file?: { id: string; name: string; mimeType: string } | null;
   items?: { id: string; name: string; type: 'file' | 'folder' }[];
   onShare?: (shareData: ShareData) => void;
 }

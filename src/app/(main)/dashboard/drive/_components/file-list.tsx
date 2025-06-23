@@ -39,13 +39,20 @@ interface FileListProps {
   files: DriveFile[];
   folders: DriveFolder[];
   selectedItems: string[];
-  onItemSelect: (id: string, checked: boolean) => void;
-  onSelectAll: (checked: boolean) => void;
-  onFileAction: (action: string, item: DriveFile | DriveFolder) => void;
-  viewMode: 'list' | 'grid';
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-  onSort: (column: string) => void;
+  isSelectMode: boolean;
+  visibleColumns: {
+    name: boolean;
+    size: boolean;
+    owners: boolean;
+    mimeType: boolean;
+    createdTime: boolean;
+    modifiedTime: boolean;
+  };
+  sortConfig: SortConfig;
+  onSort: (field: string) => void;
+  onFileSelect: (fileId: string) => void;
+  onFolderDoubleClick: (folderId: string) => void;
+  getFileActions: (file: DriveFile | DriveFolder, view: string) => any;
 }
 
 export function FileList({

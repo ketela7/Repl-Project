@@ -34,7 +34,17 @@ const nextConfig = {
   },
   // Allow all domains for development (fixes cross-origin warnings)
   experimental: {
-    ...nextConfig.experimental,
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-icons',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-tabs',
+      '@tanstack/react-query',
+      '@tanstack/react-table',
+      'recharts'
+    ],
     allowedDevOrigins: ['*']
   },
   async headers() {
