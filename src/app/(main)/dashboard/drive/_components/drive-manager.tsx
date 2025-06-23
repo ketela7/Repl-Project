@@ -247,7 +247,7 @@ export function DriveManager() {
       activeView: 'all',
       fileTypeFilter: [],
       advancedFilters: {
-        sizeRange: { unit: 'MB' },
+        sizeRange: { unit: 'MB', min: undefined, max: undefined },
         sortBy: 'modified',
         sortOrder: 'desc'
       }
@@ -283,7 +283,7 @@ export function DriveManager() {
                           (filters.advancedFilters.createdDateRange.to) ||
                           (filters.advancedFilters.modifiedDateRange.from) ||
                           (filters.advancedFilters.modifiedDateRange.to) ||
-                          (filters.advancedFilters.owner?.trim());
+                          (filters.advancedFilters.owner && filters.advancedFilters.owner.trim());
 
   // Sorting functionality
   const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
@@ -432,11 +432,27 @@ export function DriveManager() {
         throw new Error(data.error);
       }
 
-      // Unify files and folders into items array
+      console.log('API Response data:', data);
+      console.log('Retrieved', data.files?.length || 0, 'files from Drive API');
+
+      // The API returns an array of files directly, not separated files and folders
+      const allFiles = data.files || data || [];
+      
+      // Separate files and folders based on mimeType
+      const folders = allFiles.filter((item: any) => 
+        item.mimeType === 'application/vnd.google-apps.folder'
+      );
+      const files = allFiles.filter((item: any) => 
+        item.mimeType !== 'application/vnd.google-apps.folder'
+      );
+
+      // Transform and combine data
       const newItems: DriveItem[] = [
-        ...(data.folders || []).map((folder: DriveFolder) => ({ ...folder, itemType: 'folder' as const })),
-        ...(data.files || []).map((file: DriveFile) => ({ ...file, itemType: 'file' as const }))
+        ...folders.map((folder: DriveFolder) => ({ ...folder, itemType: 'folder' as const })),
+        ...files.map((file: DriveFile) => ({ ...file, itemType: 'file' as const }))
       ];
+
+      console.log('Processed items:', newItems.length, 'folders:', folders.length, 'files:', files.length);
 
       if (pageToken) {
         setItems(prev => [...prev, ...newItems]);
@@ -520,6 +536,15 @@ export function DriveManager() {
   if (loading && items.length === 0) {
     return <DriveGridSkeleton />;
   }
+
+  // Debug: Log current state
+  console.log('DriveManager render state:', {
+    loading,
+    itemsLength: items.length,
+    hasAccess,
+    driveAccessError: !!driveAccessError,
+    needsReauth
+  });
 
   if (hasAccess === false && driveAccessError) {
     if (needsReauth) {

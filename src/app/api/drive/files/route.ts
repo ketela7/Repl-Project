@@ -680,6 +680,19 @@ export async function GET(request: NextRequest) {
       files: result.files || [],
     }
 
+    // Log the final result structure for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.log('API returning:', {
+        filesCount: finalResult.files?.length || 0,
+        hasNextPageToken: !!finalResult.nextPageToken,
+        sampleFile: finalResult.files?.[0] ? {
+          id: finalResult.files[0].id,
+          name: finalResult.files[0].name,
+          mimeType: finalResult.files[0].mimeType
+        } : null
+      });
+    }
+
     return NextResponse.json(finalResult)
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {

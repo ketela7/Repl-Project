@@ -193,7 +193,7 @@ export function DriveFiltersSidebar({
 
   const clearAllFilters = () => {
     onViewChange('all');
-    onFileTypeChange([]);
+    onFileTypeFilterChange([]);
     setSizeFilter({ min: '', max: '', unit: 'MB' });
     setCreatedDateRange({});
     setModifiedDateRange({});
@@ -203,7 +203,7 @@ export function DriveFiltersSidebar({
 
   const removeFileTypeFilter = (fileTypeKey: string) => {
     const newFilter = fileTypeFilter.filter(type => type !== fileTypeKey);
-    onFileTypeChange(newFilter);
+    onFileTypeFilterChange(newFilter);
   };
 
   const hasAdvancedFilters = sizeFilter.min || sizeFilter.max || 
