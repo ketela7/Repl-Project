@@ -12,6 +12,41 @@ export function formatFileSize(bytes: string | number): string {
   return `${(size / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
 }
 
+// File size utilities
+export function normalizeFileSize(size: any): number {
+  if (size === null || size === undefined || size === '' || size === '-') return 0;
+  if (!size && size !== 0) return 0;
+
+  const sizeStr = size.toString().trim();
+  if (sizeStr === '-' || sizeStr === '' || sizeStr === 'undefined' || sizeStr === 'null') return 0;
+
+  const parsedSize = parseInt(sizeStr);
+  return isNaN(parsedSize) || parsedSize < 0 ? 0 : parsedSize;
+}
+
+export function getSizeMultiplier(unit: 'B' | 'KB' | 'MB' | 'GB'): number {
+  switch (unit) {
+    case 'B': return 1;
+    case 'KB': return 1024;
+    case 'MB': return 1024 * 1024;
+    case 'GB': return 1024 * 1024 * 1024;
+    default: return 1;
+  }
+}
+
+export function isFileSizeInRange(
+  fileSize: any,
+  minSize?: number,
+  maxSize?: number,
+  unit: 'B' | 'KB' | 'MB' | 'GB' = 'MB'
+): boolean {
+  const normalizedFileSize = normalizeFileSize(fileSize);
+  const multiplier = getSizeMultiplier(unit);
+  const minBytes = minSize ? minSize * multiplier : 0;
+  const maxBytes = maxSize ? maxSize * multiplier : Number.MAX_SAFE_INTEGER;
+  return normalizedFileSize >= minBytes && normalizedFileSize <= maxBytes;
+}
+
 export function getFileIconName(mimeType: string, fileName?: string): string {
   const iconMap: Record<string, string> = {
     // Google Workspace Files
