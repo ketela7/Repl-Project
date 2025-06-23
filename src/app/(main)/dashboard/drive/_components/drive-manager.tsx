@@ -1647,6 +1647,16 @@ export function DriveManager() {
       // Optimized page size for better performance
       params.append('pageSize', '50');
 
+      console.log('🔍 [FILTER DEBUG] fetchFiles params built:', {
+        parentId,
+        query,
+        pageToken,
+        searchQuery,
+        currentView,
+        fileTypeFilter,
+        advancedFilters,
+        paramsString: params.toString()
+      });
       console.log('=== Fetching files with params:', params.toString(), '===');
 
       // Simple fetch without request queue
@@ -3005,10 +3015,14 @@ export function DriveManager() {
         open={isMobileFiltersOpen}
         onOpenChange={setIsMobileFiltersOpen}
         onFilterChange={(filters: any) => {
+          console.log('🔍 [FILTER DEBUG] onFilterChange received:', filters);
+          console.log('🔍 [FILTER DEBUG] Current state:', { activeView, fileTypeFilter, advancedFilters });
+          
           // Apply all filters synchronously
           let shouldRefetch = false;
           
           if (filters.activeView && filters.activeView !== activeView) {
+            console.log('🔍 [FILTER DEBUG] Changing activeView from', activeView, 'to', filters.activeView);
             setActiveView(filters.activeView);
             setCurrentFolderId(null); // Reset to root when changing views
             setSearchQuery(''); // Clear search
@@ -3018,19 +3032,23 @@ export function DriveManager() {
           }
           
           if (filters.fileTypeFilter !== undefined && JSON.stringify(filters.fileTypeFilter) !== JSON.stringify(fileTypeFilter)) {
+            console.log('🔍 [FILTER DEBUG] Changing fileTypeFilter from', fileTypeFilter, 'to', filters.fileTypeFilter);
             setFileTypeFilter(filters.fileTypeFilter);
             shouldRefetch = true;
           }
           
           if (filters.advancedFilters && JSON.stringify(filters.advancedFilters) !== JSON.stringify(advancedFilters)) {
+            console.log('🔍 [FILTER DEBUG] Changing advancedFilters from', advancedFilters, 'to', filters.advancedFilters);
             setAdvancedFilters(filters.advancedFilters);
             shouldRefetch = true;
           }
           
           // Trigger single fetch with all new filter states
           if (shouldRefetch) {
+            console.log('🔍 [FILTER DEBUG] Triggering fetchFiles with shouldRefetch=true');
             // Use a small delay to ensure state updates are applied
             requestAnimationFrame(() => {
+              console.log('🔍 [FILTER DEBUG] Executing fetchFiles...');
               fetchFiles(
                 filters.activeView === activeView ? (currentFolderId || undefined) : undefined,
                 searchQuery || undefined,
@@ -3039,6 +3057,8 @@ export function DriveManager() {
                 filters.activeView || activeView
               );
             });
+          } else {
+            console.log('🔍 [FILTER DEBUG] No changes detected, skipping refetch');
           }
         }}
         currentFilters={{

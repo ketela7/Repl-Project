@@ -586,6 +586,11 @@ export function FiltersDialog({
               variant="outline" 
               onClick={() => {
                 // Apply all temporary filter changes
+                console.log('🔍 [FILTER DEBUG] Mobile Apply Filter clicked with:', {
+                  activeView: tempActiveView,
+                  fileTypeFilter: tempFileTypeFilter,
+                  advancedFilters: tempAdvancedFilters
+                });
                 onFilterChange({
                   activeView: tempActiveView,
                   fileTypeFilter: tempFileTypeFilter,
@@ -638,6 +643,11 @@ export function FiltersDialog({
         <DialogFooter className="flex justify-between">
           <Button variant="outline" onClick={() => {
             // Apply all temporary filter changes
+            console.log('🔍 [FILTER DEBUG] Apply Filter clicked with:', {
+              activeView: tempActiveView,
+              fileTypeFilter: tempFileTypeFilter,
+              advancedFilters: tempAdvancedFilters
+            });
             onFilterChange({
               activeView: tempActiveView,
               fileTypeFilter: tempFileTypeFilter,
