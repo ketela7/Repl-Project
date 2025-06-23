@@ -182,20 +182,6 @@ export function DriveDataView({
                 </div>
               </div>
             ))}
-            
-            {loadingMore && (
-              <div className="flex justify-center py-4">
-                <RefreshCw className="h-6 w-6 animate-spin" />
-              </div>
-            )}
-            
-            {hasMore && !loadingMore && onLoadMore && (
-              <div className="flex justify-center py-4">
-                <Button onClick={onLoadMore} variant="outline">
-                  Load More
-                </Button>
-              </div>
-            )}
           </div>
         ) : (
           <Table>
@@ -250,7 +236,7 @@ export function DriveDataView({
                   )}
                   {visibleColumns.size && (
                     <TableCell>
-                      {item.size ? formatFileSize(parseInt(item.size)) : isFolder(item) ? '—' : 'Unknown'}
+                      {'size' in item && item.size ? formatFileSize(parseInt(item.size)) : isFolder(item) ? '—' : 'Unknown'}
                     </TableCell>
                   )}
                   {visibleColumns.owners && (
@@ -322,20 +308,21 @@ export function DriveDataView({
                   </TableCell>
                 </TableRow>
               ))}
-            
-            {loadingMore && (
-              <div className="flex justify-center py-4">
-                <RefreshCw className="h-6 w-6 animate-spin" />
-              </div>
-            )}
-            
-            {hasMore && !loadingMore && onLoadMore && (
-              <div className="flex justify-center py-4">
-                <Button onClick={onLoadMore} variant="outline">
-                  Load More
-                </Button>
-              </div>
-            )}
+            </TableBody>
+          </Table>
+        )}
+        
+        {loadingMore && (
+          <div className="flex justify-center py-4">
+            <RefreshCw className="h-6 w-6 animate-spin" />
+          </div>
+        )}
+        
+        {hasMore && !loadingMore && onLoadMore && (
+          <div className="flex justify-center py-4">
+            <Button onClick={onLoadMore} variant="outline">
+              Load More
+            </Button>
           </div>
         )}
       </CardContent>

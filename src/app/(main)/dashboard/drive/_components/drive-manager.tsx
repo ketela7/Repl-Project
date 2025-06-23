@@ -249,7 +249,10 @@ export function DriveManager() {
       advancedFilters: {
         sizeRange: { unit: 'MB', min: undefined, max: undefined },
         sortBy: 'modified',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
+        createdDateRange: { from: undefined, to: undefined },
+        modifiedDateRange: { from: undefined, to: undefined },
+        owner: undefined
       }
     });
     setSearchQuery('');
@@ -274,16 +277,16 @@ export function DriveManager() {
   }, []);
 
   // Check if any filters are active
-  const hasActiveFilters = filters.activeView !== 'all' || 
+  const hasActiveFilters: boolean = filters.activeView !== 'all' || 
                           filters.fileTypeFilter.length > 0 || 
                           searchQuery.trim() !== '' ||
-                          (filters.advancedFilters.sizeRange.min) ||
-                          (filters.advancedFilters.sizeRange.max) ||
-                          (filters.advancedFilters.createdDateRange.from) ||
-                          (filters.advancedFilters.createdDateRange.to) ||
-                          (filters.advancedFilters.modifiedDateRange.from) ||
-                          (filters.advancedFilters.modifiedDateRange.to) ||
-                          (filters.advancedFilters.owner && filters.advancedFilters.owner.trim());
+                          !!filters.advancedFilters.sizeRange.min ||
+                          !!filters.advancedFilters.sizeRange.max ||
+                          !!filters.advancedFilters.createdDateRange.from ||
+                          !!filters.advancedFilters.createdDateRange.to ||
+                          !!filters.advancedFilters.modifiedDateRange.from ||
+                          !!filters.advancedFilters.modifiedDateRange.to ||
+                          !!(filters.advancedFilters.owner && String(filters.advancedFilters.owner).trim());
 
   // Sorting functionality
   const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
@@ -592,7 +595,7 @@ export function DriveManager() {
             onBulkShare={() => openDialog('bulkShare')}
             onFiltersOpen={() => openDialog('mobileFilters')}
             filters={filters}
-            onFilterChange={handleFilter}
+            onFilterChange={handleFilter as any}
             onApplyFilters={applyFilters}
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
