@@ -34,11 +34,6 @@ export const DriveToolbar = lazy(() =>
   import("@/app/(main)/dashboard/drive/_components/drive-toolbar").then(mod => ({ default: mod.DriveToolbar }))
 );
 
-// Lazy load UI components that are not immediately visible
-export const AdvancedFilters = lazy(() => 
-  import("@/app/(main)/dashboard/drive/_components/advanced-filters").then(mod => ({ default: mod.AdvancedFilters }))
-);
-
 // Lazy load chart components (heavy recharts dependency)
 export const ChartComponents = lazy(() => 
   import("recharts").then(mod => ({ 
