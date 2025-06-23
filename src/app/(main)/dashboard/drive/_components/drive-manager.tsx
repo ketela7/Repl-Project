@@ -239,7 +239,11 @@ export function DriveManager() {
     owner?: string;
     sortBy?: 'name' | 'modified' | 'created' | 'size';
     sortOrder?: 'asc' | 'desc';
-  }>({});
+  }>({
+    sizeRange: { unit: 'MB' },
+    sortBy: 'modified',
+    sortOrder: 'desc'
+  });
 
   // Bulk operations state
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
@@ -274,13 +278,21 @@ export function DriveManager() {
 
   // Helper functions for filters
   const clearAdvancedFilters = () => {
-    setAdvancedFilters({ sizeRange: { unit: 'MB' } });
+    setAdvancedFilters({ 
+      sizeRange: { unit: 'MB' },
+      sortBy: 'modified',
+      sortOrder: 'desc'
+    });
   };
 
   const clearAllFilters = () => {
     setActiveView('all');
     setFileTypeFilter([]);
-    setAdvancedFilters({ sizeRange: { unit: 'MB' } });
+    setAdvancedFilters({ 
+      sizeRange: { unit: 'MB' },
+      sortBy: 'modified',
+      sortOrder: 'desc'
+    });
     setSearchQuery('');
     // Fetch files with cleared filters to reset the data view
     setTimeout(() => {
@@ -1632,6 +1644,14 @@ export function DriveManager() {
 
       if (advancedFilters.owner) {
         params.append('owner', advancedFilters.owner);
+      }
+
+      // Add sort parameters
+      if (advancedFilters.sortBy) {
+        params.append('sortBy', advancedFilters.sortBy);
+      }
+      if (advancedFilters.sortOrder) {
+        params.append('sortOrder', advancedFilters.sortOrder);
       }
 
       // Add sort options from advanced filters

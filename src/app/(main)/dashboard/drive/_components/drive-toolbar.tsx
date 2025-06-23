@@ -889,7 +889,7 @@ export function DriveToolbar({
                         onClick={() => {
                           console.log('🔍 [FILTER DEBUG] Desktop Apply Filter clicked');
                           // Trigger immediate filter application
-                          applyFilters();
+                          fetchFiles(currentFolderId || undefined, searchQuery || undefined);
                         }}
                         className="flex-1 text-xs"
                       >
@@ -909,7 +909,7 @@ export function DriveToolbar({
                           });
                           setSearchQuery('');
                           // Apply cleared filters immediately
-                          setTimeout(() => applyFilters(), 100);
+                          setTimeout(() => fetchFiles(currentFolderId || undefined, searchQuery || undefined), 100);
                         }}
                         className="flex-1 text-xs"
                       >
