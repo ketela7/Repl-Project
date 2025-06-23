@@ -523,14 +523,6 @@ export function DriveManager() {
     });
   }, []);
 
-  const handleSelectAll = useCallback(() => {
-    if (selectedItems.size === displayItems.length) {
-      setSelectedItems(new Set());
-    } else {
-      setSelectedItems(new Set(displayItems.map(item => item.id)));
-    }
-  }, [displayItems, selectedItems.size]);
-
   const handleRefresh = useCallback(() => {
     setRefreshing(true);
     fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined);
@@ -544,6 +536,14 @@ export function DriveManager() {
 
   // Use filtered items when available, otherwise use all items
   const displayItems = filteredItems.length > 0 ? filteredItems : items;
+
+  const handleSelectAll = useCallback(() => {
+    if (selectedItems.size === displayItems.length) {
+      setSelectedItems(new Set());
+    } else {
+      setSelectedItems(new Set(displayItems.map(item => item.id)));
+    }
+  }, [displayItems, selectedItems.size]);
 
   if (loading && items.length === 0) {
     return <DriveGridSkeleton />;
@@ -579,7 +579,7 @@ export function DriveManager() {
             isSelectMode={isSelectMode}
             onSelectModeChange={setIsSelectMode}
             selectedCount={selectedItems.size}
-            totalCount={displayItems.length}
+            totalCount={items.length}
             onSelectAll={handleSelectAll}
             onRefresh={handleRefresh}
             refreshing={refreshing}
@@ -598,6 +598,7 @@ export function DriveManager() {
             hasActiveFilters={hasActiveFilters}
             files={files}
             folders={folders}
+            items={items}
             visibleColumns={visibleColumns}
             setVisibleColumns={setVisibleColumns}
             setIsUploadDialogOpen={setIsUploadDialogOpen}

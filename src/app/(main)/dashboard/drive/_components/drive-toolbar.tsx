@@ -136,6 +136,7 @@ interface DriveToolbarProps {
   hasActiveFilters: boolean;
   files: import("@/lib/google-drive/types").DriveFile[];
   folders: import("@/lib/google-drive/types").DriveFolder[];
+  items: any[];
   setIsUploadDialogOpen: (open: boolean) => void;
   setIsCreateFolderDialogOpen: (open: boolean) => void;
   
@@ -860,9 +861,9 @@ export function DriveToolbar({
               <Button variant="ghost" size="sm" className="h-8 px-2 md:px-3">
                 <HardDrive className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Badge</span>
-                {(files.length + folders.length) > 0 && (
+                {items.length > 0 && (
                   <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
-                    {files.length + folders.length}
+                    {items.length}
                   </Badge>
                 )}
               </Button>
@@ -888,7 +889,7 @@ export function DriveToolbar({
                       onClick={() => onClientSideFilter(files, folders)}
                       className="w-full text-xs"
                     >
-                      Show All Files ({files.length + folders.length})
+                      Show All Files ({items.length})
                     </Button>
                   </div>
                 )}
