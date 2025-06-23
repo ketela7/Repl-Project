@@ -195,7 +195,7 @@ export function FileList({
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <Checkbox
                     checked={selectedItems.includes(item.id)}
-                    onCheckedChange={(checked) => onItemSelect(item.id)}
+                    onCheckedChange={(checked) => toggleItemSelection(item.id)}
                   />
                 </TableCell>
                 <TableCell className="font-medium">

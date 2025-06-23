@@ -446,14 +446,19 @@ export function DriveDataView({
             onSort={onSort || (() => {})}
             onItemSelect={(id) => toggleItemSelection(id)}
             onSelectAll={() => {
-              // Toggle select all functionality
+              // Toggle select all functionality - this needs to be handled by the parent component
               const allIds = [...sortedFolders.map(f => f.id), ...sortedFiles.map(f => f.id)];
               const isAllSelected = allIds.every(id => selectedItems.has(id));
+              
+              // Call toggleItemSelection for each item to trigger the proper state update
               allIds.forEach(id => {
-                if (isAllSelected) {
-                  selectedItems.delete(id);
-                } else {
-                  selectedItems.add(id);
+                const isCurrentlySelected = selectedItems.has(id);
+                if (isAllSelected && isCurrentlySelected) {
+                  // Deselect if all are selected
+                  toggleItemSelection(id);
+                } else if (!isAllSelected && !isCurrentlySelected) {
+                  // Select if not all are selected
+                  toggleItemSelection(id);
                 }
               });
             }}
