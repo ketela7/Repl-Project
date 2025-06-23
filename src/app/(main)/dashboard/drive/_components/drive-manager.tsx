@@ -2949,11 +2949,19 @@ export function DriveManager() {
           if (filters.activeView) {
             handleViewChange(filters.activeView);
           }
-          if (filters.fileTypeFilter) {
+          if (filters.fileTypeFilter !== undefined) {
             setFileTypeFilter(filters.fileTypeFilter);
+            // Trigger re-fetch when file type filter changes
+            setTimeout(() => {
+              fetchFiles(currentFolderId || undefined, searchQuery || undefined, undefined, false, activeView);
+            }, 100);
           }
           if (filters.advancedFilters) {
             setAdvancedFilters(filters.advancedFilters);
+            // Trigger re-fetch when advanced filters change
+            setTimeout(() => {
+              fetchFiles(currentFolderId || undefined, searchQuery || undefined, undefined, false, activeView);
+            }, 100);
           }
         }}
         currentFilters={{

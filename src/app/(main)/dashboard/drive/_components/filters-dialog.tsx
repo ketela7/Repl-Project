@@ -129,21 +129,18 @@ export function FiltersDialog({
   };
 
   const handleFileTypeFilter = (typeId: string) => {
-    // Check if this filter is already active
-    const currentFilter = currentFilters?.fileTypeFilter;
+    // Always handle as array for consistency
+    const currentFilter = currentFilters?.fileTypeFilter || [];
     const isArray = Array.isArray(currentFilter);
     
-    if (isArray) {
-      // Handle array-based filter (toggle behavior)
-      const newFilter = currentFilter.includes(typeId)
-        ? currentFilter.filter((type: string) => type !== typeId)
-        : [...currentFilter, typeId];
-      onFilterChange({ fileTypeFilter: newFilter });
-    } else {
-      // Handle single value filter (replacement behavior)
-      const newFilter = currentFilter === typeId ? '' : typeId;
-      onFilterChange({ fileTypeFilter: newFilter });
-    }
+    const currentArray = isArray ? currentFilter : (currentFilter ? [currentFilter] : []);
+    
+    // Toggle behavior - add if not present, remove if present
+    const newFilter = currentArray.includes(typeId)
+      ? currentArray.filter((type: string) => type !== typeId)
+      : [...currentArray, typeId];
+    
+    onFilterChange({ fileTypeFilter: newFilter });
   };
 
   const handleAdvancedFiltersChange = (newFilters: AdvancedFilters) => {
@@ -220,11 +217,10 @@ export function FiltersDialog({
             <div className="grid grid-cols-2 gap-2 pt-2">
               {fileTypeFilters.map((filter) => {
                 const Icon = filter.icon;
-                const currentFilter = currentFilters?.fileTypeFilter;
+                const currentFilter = currentFilters?.fileTypeFilter || [];
                 const isArray = Array.isArray(currentFilter);
-                const isActive = isArray 
-                  ? currentFilter.includes(filter.id)
-                  : currentFilter === filter.id;
+                const currentArray = isArray ? currentFilter : (currentFilter ? [currentFilter] : []);
+                const isActive = currentArray.includes(filter.id);
                 
                 return (
                   <Button
@@ -555,7 +551,7 @@ export function FiltersDialog({
             Apply Filter
           </Button>
           {hasActiveFilters && (
-            <Button onClick={handleClearAll}>
+            <Button onClick={handleClearAll} variant="destructive">
               <RefreshCw className="h-4 w-4 mr-2" />
               Clear All
             </Button>
