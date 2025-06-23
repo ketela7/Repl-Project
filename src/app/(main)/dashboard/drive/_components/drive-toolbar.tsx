@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -33,9 +33,7 @@ import {
   Share,
   MoreVertical,
   SlidersHorizontal,
-  ChevronDown,
-  X,
-  ChevronUp
+  ChevronDown
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -57,7 +55,6 @@ interface DriveToolbarProps {
   sortOrder: 'asc' | 'desc';
   onSortChange: (sortBy: string, sortOrder: 'asc' | 'desc') => void;
   isLoading?: boolean;
-  className?: string;
 }
 
 export function DriveToolbar({
@@ -76,65 +73,9 @@ export function DriveToolbar({
   sortBy,
   sortOrder,
   onSortChange,
-  isLoading = false,
-  className
+  isLoading = false
 }: DriveToolbarProps) {
   const isMobile = useIsMobile();
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [isScrollingUp, setIsScrollingUp] = useState(true);
-  const toolbarRef = useRef<HTMLDivElement>(null);
-
-  // Android-style scroll behavior - hide on scroll down, show on scroll up
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const scrollingUp = currentScrollY < lastScrollY;
-      const scrollDelta = Math.abs(currentScrollY - lastScrollY);
-      
-      // Only trigger changes on significant scroll movements (5px+)
-      if (scrollDelta > 5) {
-        setIsScrollingUp(scrollingUp);
-        
-        // Auto-minimize when scrolling down past 100px
-        if (currentScrollY > 100 && !scrollingUp) {
-          setIsMinimized(true);
-        }
-        // Auto-expand when scrolling up
-        else if (scrollingUp) {
-          setIsMinimized(false);
-        }
-      }
-      
-      setLastScrollY(currentScrollY);
-    };
-
-    const throttledScroll = throttle(handleScroll, 16); // 60fps
-    window.addEventListener('scroll', throttledScroll, { passive: true });
-    
-    return () => window.removeEventListener('scroll', throttledScroll);
-  }, [lastScrollY]);
-
-  // Throttle function for smooth scrolling performance
-  function throttle(func: Function, delay: number) {
-    let timeoutId: NodeJS.Timeout;
-    let lastExecTime = 0;
-    return function (...args: any[]) {
-      const currentTime = Date.now();
-      
-      if (currentTime - lastExecTime > delay) {
-        func(...args);
-        lastExecTime = currentTime;
-      } else {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          func(...args);
-          lastExecTime = Date.now();
-        }, delay - (currentTime - lastExecTime));
-      }
-    };
-  }
 
   const sortOptions = [
     { value: 'name', label: 'Name' },
@@ -144,99 +85,7 @@ export function DriveToolbar({
   ];
 
   return (
-    <div 
-      ref={toolbarRef}
-      className={cn(
-        "sticky top-0 z-50 transition-all duration-300 ease-in-out",
-        "bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80",
-        "border-b shadow-sm",
-        // Android-style behavior
-        isScrollingUp ? "translate-y-0" : "-translate-y-2",
-        isMinimized ? "shadow-lg" : "shadow-sm",
-        className
-      )}
-    >
-      {/* Minimized state - compact toolbar */}
-      {isMinimized && (
-        <div className="flex items-center justify-between p-2 border-b bg-background/98">
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setIsMinimized(false)}
-              className="h-8 w-8 p-0 touch-target active:scale-95"
-            >
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-            
-            {selectedCount > 0 && (
-              <Badge variant="secondary" className="text-xs">
-                {selectedCount}
-              </Badge>
-            )}
-            
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setIsSearchExpanded(!isSearchExpanded)}
-              className="h-8 w-8 p-0 touch-target active:scale-95"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <div className="flex items-center gap-1">
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={onRefresh}
-              disabled={isLoading}
-              className="h-8 w-8 p-0 touch-target active:scale-95"
-            >
-              <RefreshCw className={cn("h-4 w-4", isLoading && "animate-spin")} />
-            </Button>
-            
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={onUpload}
-              disabled={isLoading}
-              className="h-8 w-8 p-0 touch-target active:scale-95"
-            >
-              <Upload className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Expanded search bar in minimized mode */}
-      {isMinimized && isSearchExpanded && (
-        <div className="p-2 border-b bg-background/98">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search files and folders..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 h-8"
-              disabled={isLoading}
-              autoFocus
-            />
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => setIsSearchExpanded(false)}
-              className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-            >
-              <X className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* Full toolbar - only show when not minimized */}
-      {!isMinimized && (
-        <div className="flex flex-col gap-3 p-4">
+    <div className="flex flex-col gap-3 p-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Main toolbar row */}
       <div className="flex items-center justify-between gap-3">
         {/* Left: Primary actions */}
@@ -396,30 +245,16 @@ export function DriveToolbar({
         </div>
       </div>
 
-          {/* Search bar */}
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search files and folders..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10"
-              disabled={isLoading}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Minimize/Expand button - always visible */}
-      <div className="absolute top-2 right-2">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => setIsMinimized(!isMinimized)}
-          className="h-6 w-6 p-0 touch-target active:scale-95 bg-background/80 hover:bg-background"
-        >
-          {isMinimized ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
-        </Button>
+      {/* Search bar */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search files and folders..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-10"
+          disabled={isLoading}
+        />
       </div>
     </div>
   );
