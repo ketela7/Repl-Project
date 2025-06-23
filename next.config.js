@@ -32,10 +32,11 @@ const nextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production'
   },
-  // Fix cross-origin warnings for Replit environment
-  allowedDevOrigins: [
-    '*'
-  ],
+  // Allow all domains for development (fixes cross-origin warnings)
+  experimental: {
+    ...nextConfig.experimental,
+    allowedDevOrigins: ['*']
+  },
   async headers() {
     return [
       {
