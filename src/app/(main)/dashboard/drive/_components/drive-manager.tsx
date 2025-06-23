@@ -564,12 +564,14 @@ export function DriveManager() {
             onApplyFilters={applyFilters}
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
+            files={files}
+            folders={folders}
           />
 
           {currentFolderId && (
             <FileBreadcrumb
               currentFolderId={currentFolderId}
-              onNavigate={handleFolderClick}
+              onNavigate={(folderId) => folderId ? handleFolderClick(folderId) : handleBackToParent()}
               onBackToRoot={handleBackToParent}
             />
           )}
@@ -593,10 +595,8 @@ export function DriveManager() {
             sortConfig={sortConfig}
             onSelectItem={handleSelectItem}
             onFolderClick={handleFolderClick}
-            onSort={handleSort}
-            getSortIcon={getSortIcon}
             onColumnsChange={setVisibleColumns}
-            onItemAction={(action, item) => {
+            onItemAction={(action: string, item: DriveItem) => {
               switch (action) {
                 case 'preview':
                   setSelectedFileForPreview(item as DriveFile);
@@ -664,14 +664,16 @@ export function DriveManager() {
       {selectedFileForAction && (
         <>
           <FileRenameDialog
-            isOpen={dialogs.rename}
-            onClose={() => {
-              closeDialog('rename');
-              setSelectedFileForAction(null);
+            open={dialogs.rename}
+            onOpenChange={(open) => {
+              if (!open) {
+                closeDialog('rename');
+                setSelectedFileForAction(null);
+              }
             }}
             fileId={selectedFileForAction.id}
-            currentName={selectedFileForAction.name}
-            onRenamed={() => {
+            fileName={selectedFileForAction.name}
+            onConfirm={async (newName: string) => {
               closeDialog('rename');
               setSelectedFileForAction(null);
               handleRefresh();
@@ -684,9 +686,9 @@ export function DriveManager() {
               closeDialog('move');
               setSelectedFileForAction(null);
             }}
-            itemId={selectedFileForAction.id}
-            itemName={selectedFileForAction.name}
-            onMoved={() => {
+            fileName={selectedFileForAction.name}
+            currentParentId={selectedFileForAction.parentId || null}
+            onMove={async (newParentId: string) => {
               closeDialog('move');
               setSelectedFileForAction(null);
               handleRefresh();
@@ -699,9 +701,9 @@ export function DriveManager() {
               closeDialog('copy');
               setSelectedFileForAction(null);
             }}
-            itemId={selectedFileForAction.id}
-            itemName={selectedFileForAction.name}
-            onCopied={() => {
+            fileName={selectedFileForAction.name}
+            currentParentId={selectedFileForAction.parentId || null}
+            onCopy={async (newName: string, parentId: string) => {
               closeDialog('copy');
               setSelectedFileForAction(null);
               handleRefresh();
@@ -765,9 +767,11 @@ export function DriveManager() {
               setSelectedItemForShare(null);
             }
           }}
-          fileId={selectedItemForShare.id}
-          fileName={selectedItemForShare.name}
-          fileType={selectedItemForShare.type}
+          file={{
+            id: selectedItemForShare.id,
+            name: selectedItemForShare.name,
+            mimeType: selectedItemForShare.type === 'folder' ? 'application/vnd.google-apps.folder' : 'application/octet-stream'
+          }}
         />
       )}
 
@@ -903,6 +907,7 @@ export function DriveManager() {
         }}
         currentFilters={filters}
         onFilterChange={handleFilter}
+        onClearFilters={clearAllFilters}
         hasActiveFilters={hasActiveFilters}
       />
 
