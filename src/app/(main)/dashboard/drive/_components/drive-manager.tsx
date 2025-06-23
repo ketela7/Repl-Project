@@ -2539,6 +2539,10 @@ export function DriveManager() {
     }
   };
 
+  // Pagination state
+  const hasNextPage = !!nextPageToken;
+  const loadMore = handleLoadMore;
+
   // Fix server action issue and add sticky toolbar behavior
   useEffect(() => {
     // Clear any stale form data that might cause server action errors

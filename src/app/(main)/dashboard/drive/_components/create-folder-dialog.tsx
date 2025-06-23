@@ -30,6 +30,8 @@ export function CreateFolderDialog({
 }: CreateFolderDialogProps) {
   const [folderName, setFolderName] = useState('');
   const [creating, setCreating] = useState(false);
+  // Rename parentFolderId to actualParentId to be used in the API call
+  const actualParentId = parentFolderId;
 
   const handleCreate = async () => {
     if (!folderName.trim()) {
@@ -47,13 +49,13 @@ export function CreateFolderDialog({
         },
         body: JSON.stringify({
           name: folderName.trim(),
-          parentId: parentFolderId,
+          parentId: actualParentId
         }),
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         // Handle reauthentication needed
         if (errorData.needsReauth || response.status === 401 || response.status === 403) {
           toast.error(errorData.error || 'Google Drive access expired. Please reconnect your account.');
@@ -61,12 +63,12 @@ export function CreateFolderDialog({
           window.location.reload();
           return;
         }
-        
+
         throw new Error(errorData.error || 'Failed to create folder');
       }
 
       const result = await response.json();
-      
+
       toast.success(`Folder "${result.name}" created successfully`);
       onFolderCreated();
       handleClose();

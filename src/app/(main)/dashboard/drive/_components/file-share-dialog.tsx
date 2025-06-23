@@ -53,6 +53,11 @@ import { cn } from "@/lib/utils";
 interface FileShareDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  file?: {
+    id: string;
+    name: string;
+    mimeType: string;
+  } | null;
   item: { id: string; name: string; type: 'file' | 'folder' } | null;
   items?: { id: string; name: string; type: 'file' | 'folder' }[];
   onShare?: (shareData: ShareData) => void;
@@ -70,7 +75,8 @@ interface ShareData {
 
 export function FileShareDialog({ 
   open, 
-  onOpenChange, 
+  onOpenChange,
+  file,
   item, 
   items,
   onShare 
@@ -89,10 +95,10 @@ export function FileShareDialog({
     if (!item && !items) return;
 
     const loadingId = "share-operation";
-    
+
     try {
       setIsLoading(true);
-      
+
       let shareData: ShareData;
 
       if (shareType === 'link') {
@@ -142,7 +148,7 @@ export function FileShareDialog({
       // Handle bulk operations
       if (items && items.length > 1) {
         loadingToast.start(`Sharing ${items.length} items...`, loadingId);
-        
+
         const results = [];
         for (const currentItem of items) {
           try {
@@ -186,7 +192,7 @@ export function FileShareDialog({
       } else {
         loadingToast.start(`Sharing "${item?.name || 'file'}" with ${emailAddress}...`, loadingId);
       }
-      
+
       const response = await fetch(`/api/drive/files/${item?.id}/share`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -195,7 +201,7 @@ export function FileShareDialog({
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         if (errorData.needsReauth) {
           loadingToast.error('Google Drive access expired', loadingId);
           errorToast.driveAccessDenied();
@@ -231,12 +237,12 @@ export function FileShareDialog({
       }
 
       onOpenChange(false);
-      
+
       // Reset form
       setEmailAddress('');
       setMessage('');
       setExpirationDays('none');
-      
+
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
         console.error('Error sharing item:', error);

@@ -58,6 +58,25 @@ interface DriveDataViewProps {
   getFileActions: (file: DriveFile | DriveFolder, view: string) => any;
 }
 
+interface FileListProps {
+  files: DriveFile[];
+  folders: DriveFolder[];
+  selectedItems: string[];
+  isSelectMode: boolean;
+  visibleColumns: {
+    name: boolean;
+    size: boolean;
+    owners: boolean;
+    mimeType: boolean;
+    createdTime: boolean;
+    modifiedTime: boolean;
+  };
+  onToggleItemSelection: (itemId: string) => void;
+  onFolderClick: (folderId: string) => void;
+  onFileAction: (action: string, fileId: string, fileName: string) => void;
+  getFileActions: (file: DriveFile | DriveFolder, view: string) => any;
+}
+
 export function DriveDataView({
   loading,
   files,
@@ -210,7 +229,7 @@ export function DriveDataView({
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 Move to Trash
-                              </DropdownMenuItem>
+                              DropdownMenuItem>
                             )}
 
                             {actions.canPermanentDelete && (

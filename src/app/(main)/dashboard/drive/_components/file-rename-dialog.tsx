@@ -50,7 +50,7 @@ export function FileRenameDialog({
 
     try {
       setRenaming(true);
-      
+
       // Call the actual Google Drive API
       const response = await fetch(`/api/drive/files/${file.id}`, {
         method: 'PUT',
@@ -63,7 +63,7 @@ export function FileRenameDialog({
 
       if (!response.ok) {
         const errorData = await response.json();
-        
+
         if (errorData.needsReauth) {
           toast.error('Google Drive access expired. Please reconnect your account.');
           window.location.reload();
@@ -85,7 +85,7 @@ export function FileRenameDialog({
       }
 
       const renamedFile = await response.json();
-      
+
       toast.success(`Successfully renamed to "${newName.trim()}"`);
       onFileRenamed(renamedFile);
       handleClose();

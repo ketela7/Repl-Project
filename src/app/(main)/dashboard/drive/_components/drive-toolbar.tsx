@@ -108,7 +108,7 @@ interface DriveToolbarProps {
   viewMode: 'grid' | 'table';
   setViewMode: (mode: 'grid' | 'table') => void;
   activeView: string;
-  handleViewChange: (view: string) => void;
+  handleViewChange: (view: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash') => void;
   
   // Selection state
   selectedItems: Set<string>;
