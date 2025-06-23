@@ -1005,28 +1005,100 @@ export function DriveToolbar({
                     <ChevronDown className="h-4 w-4" />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="space-y-1 ml-4">
-                    <DropdownMenuItem>
-                      <Checkbox checked={true} className="mr-2 h-3 w-3" />
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setVisibleColumns(prev => ({ ...prev, name: !prev.name }));
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Checkbox 
+                        checked={visibleColumns.name} 
+                        className="mr-2 h-3 w-3"
+                        onCheckedChange={(checked) => {
+                          setVisibleColumns(prev => ({ ...prev, name: !!checked }));
+                        }}
+                      />
                       <span className="text-xs">Name</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Checkbox checked={true} className="mr-2 h-3 w-3" />
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setVisibleColumns(prev => ({ ...prev, size: !prev.size }));
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Checkbox 
+                        checked={visibleColumns.size} 
+                        className="mr-2 h-3 w-3"
+                        onCheckedChange={(checked) => {
+                          setVisibleColumns(prev => ({ ...prev, size: !!checked }));
+                        }}
+                      />
                       <span className="text-xs">Size</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Checkbox checked={false} className="mr-2 h-3 w-3" />
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setVisibleColumns(prev => ({ ...prev, mimeType: !prev.mimeType }));
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Checkbox 
+                        checked={visibleColumns.mimeType} 
+                        className="mr-2 h-3 w-3"
+                        onCheckedChange={(checked) => {
+                          setVisibleColumns(prev => ({ ...prev, mimeType: !!checked }));
+                        }}
+                      />
                       <span className="text-xs">MIME Type</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Checkbox checked={false} className="mr-2 h-3 w-3" />
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setVisibleColumns(prev => ({ ...prev, owners: !prev.owners }));
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Checkbox 
+                        checked={visibleColumns.owners} 
+                        className="mr-2 h-3 w-3"
+                        onCheckedChange={(checked) => {
+                          setVisibleColumns(prev => ({ ...prev, owners: !!checked }));
+                        }}
+                      />
                       <span className="text-xs">Owner</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Checkbox checked={false} className="mr-2 h-3 w-3" />
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setVisibleColumns(prev => ({ ...prev, createdTime: !prev.createdTime }));
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Checkbox 
+                        checked={visibleColumns.createdTime} 
+                        className="mr-2 h-3 w-3"
+                        onCheckedChange={(checked) => {
+                          setVisibleColumns(prev => ({ ...prev, createdTime: !!checked }));
+                        }}
+                      />
                       <span className="text-xs">Created</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Checkbox checked={false} className="mr-2 h-3 w-3" />
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setVisibleColumns(prev => ({ ...prev, modifiedTime: !prev.modifiedTime }));
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Checkbox 
+                        checked={visibleColumns.modifiedTime} 
+                        className="mr-2 h-3 w-3"
+                        onCheckedChange={(checked) => {
+                          setVisibleColumns(prev => ({ ...prev, modifiedTime: !!checked }));
+                        }}
+                      />
                       <span className="text-xs">Modified</span>
                     </DropdownMenuItem>
 
