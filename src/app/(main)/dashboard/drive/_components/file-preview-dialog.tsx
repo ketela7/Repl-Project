@@ -15,11 +15,11 @@ import { successToast, errorToast, toastUtils } from '@/lib/toast';
 
 interface FilePreviewDialogProps {
   open: boolean;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
   file: DriveFile | null;
 }
 
-export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProps) {
+export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialogProps) {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Handle escape key to exit fullscreen
@@ -164,7 +164,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
+                onClick={() => onOpenChange(false)}
                 className="text-white hover:bg-white/10"
               >
                 <X className="h-4 w-4" />
@@ -182,7 +182,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
   }
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-6xl w-[95vw] max-h-[95vh] h-auto overflow-hidden p-3 sm:p-4 md:p-6">
         <DialogHeader className="pb-2 sm:pb-3">
           <div className="flex items-start justify-between gap-2">
@@ -252,7 +252,7 @@ export function FilePreviewDialog({ open, onClose, file }: FilePreviewDialogProp
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
+                onClick={() => onOpenChange(false)}
                 className="h-8 w-8 p-0"
               >
                 <X className="h-4 w-4" />

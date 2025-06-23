@@ -29,7 +29,7 @@ interface PermanentDeleteDialogProps {
   itemId: string | null;
   itemName: string | null;
   itemType: 'file' | 'folder';
-  onSuccess: () => void;
+  onDeleted: () => void;
 }
 
 export function PermanentDeleteDialog({
@@ -38,7 +38,7 @@ export function PermanentDeleteDialog({
   itemId,
   itemName,
   itemType,
-  onSuccess
+  onDeleted
 }: PermanentDeleteDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const isMobile = useIsMobile();
@@ -70,7 +70,7 @@ export function PermanentDeleteDialog({
         
         if (response.status === 404) {
           toast.error(`"${itemName}" was not found. It may have already been deleted.`);
-          onSuccess(); // Refresh the list
+          onDeleted(); // Refresh the list
           onOpenChange(false);
           return;
         }
@@ -79,7 +79,7 @@ export function PermanentDeleteDialog({
       }
 
       toast.success(`${itemName} permanently deleted`);
-      onSuccess();
+      onDeleted();
       onOpenChange(false);
     } catch (error) {
       // Log error for debugging in development only

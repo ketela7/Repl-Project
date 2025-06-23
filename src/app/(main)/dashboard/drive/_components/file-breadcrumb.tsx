@@ -20,6 +20,7 @@ interface BreadcrumbItemData {
 interface FileBreadcrumbProps {
   currentFolderId: string | null;
   onNavigate: (folderId: string | null) => void;
+  onBackToRoot?: () => void;
   loading?: boolean;
 }
 

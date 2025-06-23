@@ -49,9 +49,17 @@ import { format } from "date-fns";
 interface DriveFiltersSidebarProps {
   activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash';
   fileTypeFilter: string[];
+  advancedFilters: {
+    sizeRange: { unit: 'B' | 'KB' | 'MB' | 'GB' };
+    sortBy: 'name' | 'modified' | 'created' | 'size';
+    sortOrder: 'asc' | 'desc';
+  };
   onViewChange: (view: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash') => void;
-  onFileTypeChange: (fileTypes: string[]) => void;
-  onAdvancedFiltersChange?: (filters: AdvancedFilters) => void;
+  onFileTypeFilterChange: (fileTypes: string[]) => void;
+  onAdvancedFiltersChange: (filters: AdvancedFilters) => void;
+  onClearFilters: () => void;
+  onApplyFilters: () => void;
+  hasActiveFilters: boolean;
   isCollapsed?: boolean;
 }
 
@@ -70,6 +78,8 @@ interface AdvancedFilters {
     to?: Date;
   };
   owner?: string;
+  sortBy?: 'name' | 'modified' | 'created' | 'size';
+  sortOrder?: 'asc' | 'desc';
 }
 
 const viewOptions = [
@@ -105,9 +115,13 @@ const fileTypeOptions = [
 export function DriveFiltersSidebar({ 
   activeView, 
   fileTypeFilter, 
+  advancedFilters,
   onViewChange, 
-  onFileTypeChange,
+  onFileTypeFilterChange,
   onAdvancedFiltersChange,
+  onClearFilters,
+  onApplyFilters,
+  hasActiveFilters,
   isCollapsed = false 
 }: DriveFiltersSidebarProps) {
 
@@ -141,7 +155,11 @@ export function DriveFiltersSidebar({
     const newFilter = fileTypeFilter.includes(fileTypeKey)
       ? fileTypeFilter.filter(type => type !== fileTypeKey)
       : [...fileTypeFilter, fileTypeKey];
-    onFileTypeChange(newFilter);
+    onFileTypeFilterChange(newFilter);
+  };
+
+  const handleAdvancedFilterChange = (updates: Partial<AdvancedFilters>) => {
+    onAdvancedFiltersChange({ ...advancedFilters, ...updates });
   };
 
   // Utility functions for advanced filters
@@ -193,7 +211,7 @@ export function DriveFiltersSidebar({
                            modifiedDateRange.from || modifiedDateRange.to ||
                            ownerFilter.trim();
 
-  const hasActiveFilters = activeView !== 'all' || fileTypeFilter.length > 0 || hasAdvancedFilters;
+  const computedHasActiveFilters = activeView !== 'all' || fileTypeFilter.length > 0 || hasAdvancedFilters;
 
   // Apply advanced filters when they change
   React.useEffect(() => {
