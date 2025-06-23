@@ -48,10 +48,15 @@ interface FileListProps {
     createdTime: boolean;
     modifiedTime: boolean;
   };
-  sortConfig: SortConfig;
+  activeView: string;
+  sortBy: string;
+  sortOrder: 'asc' | 'desc';
   onSort: (field: string) => void;
-  onFileSelect: (fileId: string) => void;
-  onFolderDoubleClick: (folderId: string) => void;
+  onItemSelect: (id: string) => void;
+  onSelectAll: () => void;
+  onFileAction: (action: string, item: DriveFile | DriveFolder) => void;
+  toggleItemSelection: (id: string) => void;
+  handleFolderClick: (id: string) => void;
   getFileActions: (file: DriveFile | DriveFolder, view: string) => any;
 }
 
@@ -59,12 +64,18 @@ export function FileList({
   files,
   folders,
   selectedItems,
+  isSelectMode,
+  visibleColumns,
+  activeView,
+  sortBy,
+  sortOrder,
+  onSort,
   onItemSelect,
   onSelectAll,
   onFileAction,
-  sortBy,
-  sortOrder,
-  onSort
+  toggleItemSelection,
+  handleFolderClick,
+  getFileActions
 }: FileListProps) {
   const { timezone } = useTimezoneContext();
   const allItems = [...folders, ...files];
@@ -175,7 +186,7 @@ export function FileList({
                 className="hover:bg-muted/50 cursor-pointer"
                 onClick={() => {
                   if ('mimeType' in item && item.mimeType === 'application/vnd.google-apps.folder') {
-                    onFileAction('open', item);
+                    handleFolderClick(item.id);
                   } else {
                     onFileAction('preview', item);
                   }
@@ -184,7 +195,7 @@ export function FileList({
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <Checkbox
                     checked={selectedItems.includes(item.id)}
-                    onCheckedChange={(checked) => onItemSelect(item.id, !!checked)}
+                    onCheckedChange={(checked) => onItemSelect(item.id)}
                   />
                 </TableCell>
                 <TableCell className="font-medium">

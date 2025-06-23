@@ -52,6 +52,11 @@ interface DriveDataViewProps {
     createdTime: boolean;
     modifiedTime: boolean;
   };
+  sortConfig?: {
+    key: string;
+    direction: 'asc' | 'desc';
+  };
+  onSort?: (field: string) => void;
   toggleItemSelection: (id: string) => void;
   handleFolderClick: (id: string) => void;
   handleFileAction: (action: string, fileId: string, fileName: string) => void;
@@ -90,6 +95,8 @@ export function DriveDataView({
   selectedItems,
   activeView,
   visibleColumns,
+  sortConfig,
+  onSort,
   toggleItemSelection,
   handleFolderClick,
   handleFileAction,
@@ -434,9 +441,29 @@ export function DriveDataView({
             isSelectMode={isSelectMode}
             visibleColumns={visibleColumns}
             activeView={activeView}
+            sortBy={sortConfig?.key || 'name'}
+            sortOrder={sortConfig?.direction || 'asc'}
+            onSort={onSort || (() => {})}
+            onItemSelect={(id) => toggleItemSelection(id)}
+            onSelectAll={() => {
+              // Toggle select all functionality
+              const allIds = [...sortedFolders.map(f => f.id), ...sortedFiles.map(f => f.id)];
+              const isAllSelected = allIds.every(id => selectedItems.has(id));
+              allIds.forEach(id => {
+                if (isAllSelected) {
+                  selectedItems.delete(id);
+                } else {
+                  selectedItems.add(id);
+                }
+              });
+            }}
+            onFileAction={(action, item) => {
+              if (typeof item === 'object' && item !== null && 'id' in item && 'name' in item) {
+                handleFileAction(action, item.id, item.name);
+              }
+            }}
             toggleItemSelection={toggleItemSelection}
             handleFolderClick={handleFolderClick}
-            handleFileAction={handleFileAction}
             getFileActions={getFileActions}
           />
         )}
