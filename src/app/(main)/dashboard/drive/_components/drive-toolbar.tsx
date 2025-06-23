@@ -161,7 +161,7 @@ interface DriveToolbarProps {
 }
 
 export function DriveToolbar({
-  searchQuery,
+  searchQuery = '',
   setSearchQuery,
   handleSearchInput,
   handleSearch,
@@ -272,7 +272,7 @@ export function DriveToolbar({
               <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
                 {selectedItems?.size ?? 0}
               </Badge>
-              {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
+              {(activeView === 'trash' || (searchQuery && searchQuery.includes('trashed:true'))) && (
                 <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
                   <span className="hidden md:inline">Trash</span>
                   <span className="md:hidden">T</span>
@@ -295,7 +295,7 @@ export function DriveToolbar({
                       {selectedItems?.size ?? 0}
                     </Badge>
                   )}
-                  {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
+                  {(activeView === 'trash' || (searchQuery && searchQuery.includes('trashed:true'))) && (
                     <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
                       <span className="hidden md:inline">Trash Mode</span>
                       <span className="md:hidden">T</span>
