@@ -13,17 +13,17 @@ const nextConfig = {
       '@tanstack/react-table',
       'recharts'
     ],
-    // Enable faster compilation
-    turbo: {
-      rules: {
-        '*.svg': {
-          loaders: ['@svgr/webpack'],
-          as: '*.js',
-        },
-      }
-    },
     // Faster builds
     optimisticClientCache: true
+  },
+  // Turbopack configuration (replaces experimental.turbo)
+  turbo: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    }
   },
   serverExternalPackages: ['postgres'],
   typescript: {
@@ -53,65 +53,7 @@ const nextConfig = {
       },
     ]
   },
-  // Webpack optimizations for faster compilation
-  webpack: (config, { dev, isServer }) => {
-    // Speed up compilation
-    config.cache = {
-      type: 'filesystem',
-      buildDependencies: {
-        config: [__filename]
-      }
-    };
-
-    // Optimize bundle splitting
-    if (!dev && !isServer) {
-      config.optimization.splitChunks = {
-        chunks: 'all',
-        cacheGroups: {
-          vendor: {
-            test: /[\\/]node_modules[\\/]/,
-            name: 'vendors',
-            priority: 10,
-            enforce: true,
-          },
-          radix: {
-            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
-            name: 'radix-ui',
-            priority: 20,
-            enforce: true,
-          },
-          common: {
-            name: 'common',
-            minChunks: 2,
-            priority: 5,
-            reuseExistingChunk: true,
-          },
-        },
-      }
-    }
-
-    // Development optimizations
-    if (dev) {
-      config.watchOptions = {
-        poll: false, // Disable polling for better performance
-        aggregateTimeout: 200, // Reduced from 300
-        ignored: ['**/node_modules', '**/.git', '**/coverage', '**/drizzle', '**/.next']
-      }
-      
-      // Faster module resolution in development
-      config.resolve.symlinks = false;
-      config.resolve.cacheWithContext = false;
-    }
-
-    // Additional optimizations for bundle size
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      // Replace heavy libraries with lighter alternatives in development
-      'recharts': dev ? 'recharts/lib' : 'recharts',
-    }
-
-    return config
-  }
+  
 }
 
 module.exports = nextConfig
