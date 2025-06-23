@@ -951,8 +951,12 @@ export function DriveToolbar({
                       variant="outline" 
                       className="border-amber-500 text-amber-700 dark:text-amber-300 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50"
                       onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['presentation'] });
-                        onApplyFilters();
+                        if (onClientSideFilter) {
+                          onClientSideFilter(['application/vnd.google-apps.presentation', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation']);
+                        } else {
+                          onFilterChange({ fileTypeFilter: ['presentation'] });
+                          onApplyFilters();
+                        }
                       }}
                     >
                       {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
@@ -971,8 +975,12 @@ export function DriveToolbar({
                       variant="outline" 
                       className="border-red-500 text-red-700 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/50"
                       onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['video'] });
-                        onApplyFilters();
+                        if (onClientSideFilter) {
+                          onClientSideFilter(['video/']);
+                        } else {
+                          onFilterChange({ fileTypeFilter: ['video'] });
+                          onApplyFilters();
+                        }
                       }}
                     >
                       {files.filter(f => f.mimeType?.startsWith('video/')).length}
@@ -991,8 +999,12 @@ export function DriveToolbar({
                       variant="outline" 
                       className="border-indigo-500 text-indigo-700 dark:text-indigo-300 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
                       onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['audio'] });
-                        onApplyFilters();
+                        if (onClientSideFilter) {
+                          onClientSideFilter(['audio/']);
+                        } else {
+                          onFilterChange({ fileTypeFilter: ['audio'] });
+                          onApplyFilters();
+                        }
                       }}
                     >
                       {files.filter(f => f.mimeType?.startsWith('audio/')).length}

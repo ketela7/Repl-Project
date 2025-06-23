@@ -159,6 +159,10 @@ export function DriveManager() {
     }
   });
 
+  // Client-side filtering state
+  const [clientSideFilter, setClientSideFilter] = useState<string[]>([]);
+  const [filteredItems, setFilteredItems] = useState<DriveItem[]>([]);
+
   // Table state
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
