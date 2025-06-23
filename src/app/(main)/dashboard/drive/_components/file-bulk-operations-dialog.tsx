@@ -28,6 +28,7 @@ import {
   Edit,
   FolderOpen 
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FileBulkOperationsDialogProps {
   isOpen: boolean;

@@ -48,6 +48,7 @@ import {
   Video,
   X
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface AdvancedFilters {
   sizeRange?: {

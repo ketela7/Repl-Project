@@ -31,6 +31,7 @@ import {
   Shield,
   Clock
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface BulkPermanentDeleteDialogProps {
   isOpen: boolean;

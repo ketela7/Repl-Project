@@ -33,6 +33,7 @@ import { FolderIcon, Move, ExternalLink } from "lucide-react";
 import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface FileMoveDialogProps {
   isOpen: boolean;

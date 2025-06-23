@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Move } from "lucide-react";
 import { FileMoveDialog } from "./file-move-dialog";
+import { cn } from "@/lib/utils";
 
 interface BulkMoveDialogProps {
   isOpen: boolean;

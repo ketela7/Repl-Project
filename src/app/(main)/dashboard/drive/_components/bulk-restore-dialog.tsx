@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from "@/components/ui/bottom-sheet";
 import { RotateCcw, Info } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface BulkRestoreDialogProps {
   isOpen: boolean;

@@ -33,6 +33,7 @@ import {
   Code2,
   HelpCircle
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface BulkRenameDialogProps {
   isOpen: boolean;

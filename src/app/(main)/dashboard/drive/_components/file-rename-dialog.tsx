@@ -23,6 +23,7 @@ import {
   BottomSheetFooter 
 } from "@/components/ui/bottom-sheet";
 import { Edit } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FileRenameDialogProps {
   open: boolean;
