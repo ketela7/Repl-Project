@@ -530,12 +530,15 @@ export function DriveManager() {
 
   // Client-side filtering handler
   const handleClientSideFilter = useCallback((filteredItems: any[]) => {
+    console.log('DriveManager: Setting filtered items:', filteredItems.length);
     setFilteredItems(filteredItems);
   }, []);
 
   // Use filtered items when available, otherwise use all items
   const displayItems = useMemo(() => {
-    return filteredItems.length > 0 ? filteredItems : items;
+    const result = filteredItems.length > 0 ? filteredItems : items;
+    console.log('DriveManager displayItems:', result.length, 'Filtered:', filteredItems.length, 'Original:', items.length);
+    return result;
   }, [filteredItems, items]);
 
   const handleSelectAll = useCallback(() => {

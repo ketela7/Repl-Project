@@ -92,12 +92,3 @@ author = "agent"
 task = "shell.exec"
 args = "npx tsc --noEmit --watch --preserveWatchOutput --skipLibCheck"
 
-[[workflows.workflow]]
-name = "Development Server"
-author = 44152367
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- --turbo -p 5000 -H 0.0.0.0"
-

@@ -53,6 +53,11 @@ import {
   FolderPlus,
   ChevronUp,
   MoreVertical,
+  Music,
+  Palette,
+  Database,
+  BookOpen,
+  FileType,
 } from "lucide-react";
 import { FileIcon } from "@/components/file-icon";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -225,9 +230,13 @@ export function DriveToolbar({
 
   // Handle badge click for client-side filtering
   const handleCategoryClick = useCallback((category: string) => {
+    console.log('Badge clicked:', category, 'Items:', items.length);
     if (onClientSideFilter) {
       const filteredItems = filterByMimeType(items, category);
+      console.log('Filtered items:', filteredItems.length, 'Category:', category);
       onClientSideFilter(filteredItems);
+    } else {
+      console.log('onClientSideFilter callback not available');
     }
   }, [items, onClientSideFilter]);
 
