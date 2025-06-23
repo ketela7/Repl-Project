@@ -1595,8 +1595,9 @@ export function DriveManager() {
       }
 
       // Add file type filters
-      if (fileTypeFilter.length > 0) {
-        params.append('fileTypes', fileTypeFilter.join(','));
+      // Add file type filters
+      if (fileTypeFilter && fileTypeFilter.length > 0) {
+        params.append('fileType', fileTypeFilter.join(','));
       }
 
       // Add advanced filters
