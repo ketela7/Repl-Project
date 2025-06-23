@@ -292,7 +292,7 @@ export function DriveToolbar({
                 <Button
                   variant={isSelectMode ? 'default' : 'ghost'}
                   size="sm"
-                  disabled={files.length === 0 && folders.length === 0}
+                  disabled={items.length === 0}
                   className="h-8 px-2"
                 >
                   <Square className="h-4 w-4" />
@@ -328,7 +328,7 @@ export function DriveToolbar({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onSelectAll}>
                     <CheckSquare className="h-4 w-4 mr-2" />
-                    Select All ({files.length + folders.length})
+                    Select All ({items.length})
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={onSelectAll}>
                     <Square className="h-4 w-4 mr-2" />
