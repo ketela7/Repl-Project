@@ -1,3 +1,4 @@
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -11,17 +12,20 @@ const nextConfig = {
       '@tanstack/react-query',
       '@tanstack/react-table',
       'recharts'
-    ]
+    ],
+    // Enable faster compilation
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      }
+    },
+    // Faster builds
+    optimisticClientCache: true
   },
   serverExternalPackages: ['postgres'],
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    }
-  },
   typescript: {
     ignoreBuildErrors: true
   },
@@ -51,6 +55,14 @@ const nextConfig = {
   },
   // Webpack optimizations for faster compilation
   webpack: (config, { dev, isServer }) => {
+    // Speed up compilation
+    config.cache = {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [__filename]
+      }
+    };
+
     // Optimize bundle splitting
     if (!dev && !isServer) {
       config.optimization.splitChunks = {
@@ -81,10 +93,14 @@ const nextConfig = {
     // Development optimizations
     if (dev) {
       config.watchOptions = {
-        poll: 1000,
-        aggregateTimeout: 300,
-        ignored: ['**/node_modules', '**/.git', '**/coverage', '**/drizzle']
+        poll: false, // Disable polling for better performance
+        aggregateTimeout: 200, // Reduced from 300
+        ignored: ['**/node_modules', '**/.git', '**/coverage', '**/drizzle', '**/.next']
       }
+      
+      // Faster module resolution in development
+      config.resolve.symlinks = false;
+      config.resolve.cacheWithContext = false;
     }
 
     // Additional optimizations for bundle size
