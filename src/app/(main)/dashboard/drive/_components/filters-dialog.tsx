@@ -88,7 +88,7 @@ export function FiltersDialog({
   const [tempActiveView, setTempActiveView] = useState(currentFilters?.activeView || 'all');
   const [tempFileTypeFilter, setTempFileTypeFilter] = useState(currentFilters?.fileTypeFilter || []);
   const [tempAdvancedFilters, setTempAdvancedFilters] = useState<AdvancedFilters>(currentFilters?.advancedFilters || {});
-  
+
   const [showViewStatus, setShowViewStatus] = useState(false);
   const [showFileTypes, setShowFileTypes] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -106,8 +106,6 @@ export function FiltersDialog({
   // Calculate if there are active temp filters to show Clear All button
   const hasTempActiveFilters = tempActiveView !== 'all' || 
                               tempFileTypeFilter.length > 0 || 
-                              (tempAdvancedFilters.sortBy && tempAdvancedFilters.sortBy !== 'modified') ||
-                              (tempAdvancedFilters.orderBy && tempAdvancedFilters.orderBy !== 'desc') ||
                               (tempAdvancedFilters.sizeRange?.min || tempAdvancedFilters.sizeRange?.max) ||
                               (tempAdvancedFilters.createdDateRange?.from || tempAdvancedFilters.createdDateRange?.to) ||
                               (tempAdvancedFilters.modifiedDateRange?.from || tempAdvancedFilters.modifiedDateRange?.to) ||
@@ -154,14 +152,14 @@ export function FiltersDialog({
     // Always handle as array for consistency
     const currentFilter = tempFileTypeFilter || [];
     const isArray = Array.isArray(currentFilter);
-    
+
     const currentArray = isArray ? currentFilter : (currentFilter ? [currentFilter] : []);
-    
+
     // Toggle behavior - add if not present, remove if present
     const newFilter = currentArray.includes(typeId)
       ? currentArray.filter((type: string) => type !== typeId)
       : [...currentArray, typeId];
-    
+
     setTempFileTypeFilter(newFilter);
     // Don't apply immediately - wait for Apply Filter button
   };
@@ -209,7 +207,7 @@ export function FiltersDialog({
               {basicMenuItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = tempActiveView === item.id;
-                
+
                 return (
                   <Button
                     key={item.id}
@@ -243,7 +241,7 @@ export function FiltersDialog({
             <h3 className="text-sm font-semibold">File Types</h3>
             {showFileTypes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
-          
+
           {showFileTypes && (
             <div className="grid grid-cols-2 gap-2 pt-2">
               {fileTypeFilters.map((filter) => {
@@ -252,7 +250,7 @@ export function FiltersDialog({
                 const isArray = Array.isArray(currentFilter);
                 const currentArray = isArray ? currentFilter : (currentFilter ? [currentFilter] : []);
                 const isActive = currentArray.includes(filter.id);
-                
+
                 return (
                   <Button
                     key={filter.id}
@@ -306,11 +304,11 @@ export function FiltersDialog({
                         })}
                       />
                       <Select
-                        value={advancedFilters.sizeRange?.unit || 'MB'}
+                        value={tempAdvancedFilters.sizeRange?.unit || 'MB'}
                         onValueChange={(unit: 'B' | 'KB' | 'MB' | 'GB') => handleAdvancedFiltersChange({
-                          ...advancedFilters,
+                          ...tempAdvancedFilters,
                           sizeRange: {
-                            ...advancedFilters.sizeRange,
+                            ...tempAdvancedFilters.sizeRange,
                             unit
                           }
                         })}
@@ -327,7 +325,7 @@ export function FiltersDialog({
                       </Select>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-1">
                     <Label className="text-xs text-muted-foreground">Max Size</Label>
                     <div className="flex gap-1">
@@ -346,11 +344,11 @@ export function FiltersDialog({
                         })}
                       />
                       <Select
-                        value={advancedFilters.sizeRange?.unit || 'MB'}
+                        value={tempAdvancedFilters.sizeRange?.unit || 'MB'}
                         onValueChange={(unit: 'B' | 'KB' | 'MB' | 'GB') => handleAdvancedFiltersChange({
-                          ...advancedFilters,
+                          ...tempAdvancedFilters,
                           sizeRange: {
-                            ...advancedFilters.sizeRange,
+                            ...tempAdvancedFilters.sizeRange,
                             unit
                           }
                         })}
