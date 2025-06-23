@@ -304,16 +304,16 @@ export function AdvancedFilters({
           <BottomSheetFooter className="flex flex-row gap-3">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={handleClearAll}
               className={getTouchButtonClasses('default')}
             >
-              Apply Filter
+              Clear All
             </Button>
             <Button
               onClick={handleApply}
               className={getTouchButtonClasses('default')}
             >
-              Submit
+              Apply Filter
             </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
@@ -334,11 +334,17 @@ export function AdvancedFilters({
           {renderContent()}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Apply Filter
+          <Button
+            variant="outline"
+            onClick={handleClearAll}
+          >
+            Clear All
           </Button>
-          <Button onClick={handleApply}>
-            Submit
+          <Button
+            onClick={handleApply}
+            className={getTouchButtonClasses('default')}
+          >
+            Apply Filter
           </Button>
         </DialogFooter>
       </DialogContent>
