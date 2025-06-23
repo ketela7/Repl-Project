@@ -359,7 +359,7 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  // Size filter - exclude folders since they don't have size property
+  // Size filter - only apply to files, not folders
   if (filters.minSize || filters.maxSize) {
     const fileSizeConditions = [];
     if (filters.minSize) {
@@ -368,9 +368,19 @@ function buildDriveQuery(filters: FileFilter): string {
     if (filters.maxSize) {
       fileSizeConditions.push(`size <= ${filters.maxSize}`);
     }
-    // Only apply size filters to non-folder items
+    
+    // Check if folders are included in file type filter
+    const includesFolders = filters.fileType && filters.fileType !== 'all' && 
+      (filters.fileType.includes('folder') || filters.fileType === 'folder');
+    
     if (fileSizeConditions.length > 0) {
-      conditions.push(`(${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder'`);
+      if (includesFolders) {
+        // If folders are requested, create OR condition: (size filters for files) OR (folders)
+        conditions.push(`((${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder') or mimeType = 'application/vnd.google-apps.folder'`);
+      } else {
+        // If no folders requested, just apply size filters normally
+        conditions.push(fileSizeConditions.join(' and '));
+      }
     }
   }
 
