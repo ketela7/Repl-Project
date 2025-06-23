@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useCallback } from "react";
+import { Suspense, useMemo, useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -62,6 +62,7 @@ import {
 import { FileIcon } from "@/components/file-icon";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FileCategoryBadges } from "@/components/file-category-badges";
+import { successToast, infoToast } from "@/lib/toast";
 
 // Types
 interface DriveFile {
@@ -155,40 +156,124 @@ interface DriveToolbarProps {
   onClearClientSideFilter?: () => void;
 }
 
-// Client-side filtering function using mimeType
+// Enhanced client-side filtering function using comprehensive mimeType matching
 const filterByMimeType = (items: any[], category: string) => {
-  switch (category) {
-    case 'Images':
-      return items.filter(f => f.mimeType?.includes('image'));
-    case 'Videos':
-      return items.filter(f => f.mimeType?.includes('video'));
-    case 'Documents':
-      return items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf'));
-    case 'Spreadsheets':
-      return items.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv'));
-    case 'Presentations':
-      return items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint'));
-    case 'Audio':
-      return items.filter(f => f.mimeType?.startsWith('audio/'));
-    case 'Archives':
-      return items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z'));
-    case 'Code':
-      return items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml'));
-    case 'Design':
-      return items.filter(f => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma'));
-    case 'Database':
-      return items.filter(f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite'));
-    case 'Ebooks':
-      return items.filter(f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle'));
-    case 'Fonts':
-      return items.filter(f => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff'));
-    case 'Shortcuts':
-      return items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut');
-    case 'Folders':
-      return items.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
-    default:
-      return items;
-  }
+  return items.filter(item => {
+    const mime = item.mimeType?.toLowerCase() || '';
+    const name = item.name?.toLowerCase() || '';
+    
+    switch (category) {
+      case 'Images':
+        return mime.startsWith('image/') || 
+               mime.includes('jpeg') || mime.includes('jpg') || mime.includes('png') ||
+               mime.includes('gif') || mime.includes('bmp') || mime.includes('svg') ||
+               mime.includes('webp') || mime.includes('tiff') || mime.includes('ico') ||
+               mime.includes('heic') || mime.includes('heif') || mime.includes('avif') ||
+               name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') ||
+               name.endsWith('.gif') || name.endsWith('.bmp') || name.endsWith('.svg') ||
+               name.endsWith('.webp') || name.endsWith('.tiff') || name.endsWith('.ico');
+
+      case 'Videos':
+        return mime.startsWith('video/') || 
+               mime.includes('mp4') || mime.includes('avi') || mime.includes('mov') ||
+               mime.includes('wmv') || mime.includes('webm') || mime.includes('mkv') ||
+               mime.includes('flv') || mime.includes('m4v') || mime.includes('3gp') ||
+               mime.includes('quicktime') || mime.includes('x-matroska') ||
+               name.endsWith('.mp4') || name.endsWith('.avi') || name.endsWith('.mov') ||
+               name.endsWith('.wmv') || name.endsWith('.webm') || name.endsWith('.mkv') ||
+               name.endsWith('.flv') || name.endsWith('.m4v') || name.endsWith('.3gp');
+
+      case 'Documents':
+        return mime.includes('document') || mime.includes('text') || mime.includes('pdf') ||
+               mime.includes('vnd.google-apps.document') || mime.includes('msword') ||
+               mime.includes('wordprocessingml') || mime.includes('rtf') ||
+               mime.includes('opendocument.text') || mime.includes('plain') ||
+               name.endsWith('.pdf') || name.endsWith('.doc') || name.endsWith('.docx') ||
+               name.endsWith('.txt') || name.endsWith('.rtf') || name.endsWith('.odt');
+
+      case 'Spreadsheets':
+        return mime.includes('spreadsheet') || mime.includes('excel') || mime.includes('csv') ||
+               mime.includes('vnd.google-apps.spreadsheet') || mime.includes('ms-excel') ||
+               mime.includes('spreadsheetml') || mime.includes('opendocument.spreadsheet') ||
+               name.endsWith('.xls') || name.endsWith('.xlsx') || name.endsWith('.csv') ||
+               name.endsWith('.ods') || name.endsWith('.tsv');
+
+      case 'Presentations':
+        return mime.includes('presentation') || mime.includes('powerpoint') || 
+               mime.includes('vnd.google-apps.presentation') || mime.includes('ms-powerpoint') ||
+               mime.includes('presentationml') || mime.includes('opendocument.presentation') ||
+               name.endsWith('.ppt') || name.endsWith('.pptx') || name.endsWith('.odp') ||
+               name.endsWith('.key');
+
+      case 'Audio':
+        return mime.startsWith('audio/') || 
+               mime.includes('mp3') || mime.includes('wav') || mime.includes('flac') ||
+               mime.includes('aac') || mime.includes('ogg') || mime.includes('wma') ||
+               mime.includes('m4a') || mime.includes('opus') || mime.includes('aiff') ||
+               name.endsWith('.mp3') || name.endsWith('.wav') || name.endsWith('.flac') ||
+               name.endsWith('.aac') || name.endsWith('.ogg') || name.endsWith('.wma') ||
+               name.endsWith('.m4a') || name.endsWith('.opus') || name.endsWith('.aiff');
+
+      case 'Archives':
+        return mime.includes('zip') || mime.includes('rar') || mime.includes('tar') ||
+               mime.includes('gz') || mime.includes('7z') || mime.includes('archive') ||
+               mime.includes('bz2') || mime.includes('xz') || mime.includes('cab') ||
+               mime.includes('deb') || mime.includes('rpm') || mime.includes('dmg') ||
+               mime.includes('iso') || mime.includes('apk') || mime.includes('ipa') ||
+               name.endsWith('.zip') || name.endsWith('.rar') || name.endsWith('.tar') ||
+               name.endsWith('.gz') || name.endsWith('.7z') || name.endsWith('.bz2') ||
+               name.endsWith('.xz') || name.endsWith('.cab') || name.endsWith('.deb') ||
+               name.endsWith('.rpm') || name.endsWith('.dmg') || name.endsWith('.iso');
+
+      case 'Code':
+        return mime.includes('javascript') || mime.includes('typescript') || mime.includes('json') ||
+               mime.includes('html') || mime.includes('css') || mime.includes('xml') ||
+               mime.includes('python') || mime.includes('java') || mime.includes('php') ||
+               mime.includes('ruby') || mime.includes('perl') || mime.includes('shell') ||
+               name.endsWith('.js') || name.endsWith('.ts') || name.endsWith('.json') ||
+               name.endsWith('.html') || name.endsWith('.css') || name.endsWith('.xml') ||
+               name.endsWith('.py') || name.endsWith('.java') || name.endsWith('.php') ||
+               name.endsWith('.rb') || name.endsWith('.pl') || name.endsWith('.sh') ||
+               name.endsWith('.jsx') || name.endsWith('.tsx') || name.endsWith('.vue') ||
+               name.endsWith('.scss') || name.endsWith('.sass') || name.endsWith('.less');
+
+      case 'Design':
+        return mime.includes('photoshop') || mime.includes('illustrator') || 
+               mime.includes('sketch') || mime.includes('figma') || mime.includes('adobe') ||
+               mime.includes('x-xcf') || mime.includes('postscript') || mime.includes('indesign') ||
+               name.endsWith('.psd') || name.endsWith('.ai') || name.endsWith('.sketch') ||
+               name.endsWith('.fig') || name.endsWith('.xcf') || name.endsWith('.eps') ||
+               name.endsWith('.indd') || name.endsWith('.cr2') || name.endsWith('.nef') ||
+               name.endsWith('.dng') || name.endsWith('.arw');
+
+      case 'Database':
+        return mime.includes('database') || mime.includes('sql') || mime.includes('sqlite') ||
+               mime.includes('x-sqlite3') || mime.includes('x-sql') ||
+               name.endsWith('.db') || name.endsWith('.sql') || name.endsWith('.sqlite') ||
+               name.endsWith('.sqlite3') || name.endsWith('.mdb') || name.endsWith('.accdb');
+
+      case 'Ebooks':
+        return mime.includes('epub') || mime.includes('mobi') || mime.includes('kindle') ||
+               mime.includes('x-mobipocket') || mime.includes('amazon.ebook') ||
+               name.endsWith('.epub') || name.endsWith('.mobi') || name.endsWith('.azw') ||
+               name.endsWith('.azw3') || name.endsWith('.fb2') || name.endsWith('.lit');
+
+      case 'Fonts':
+        return mime.includes('font') || mime.includes('ttf') || mime.includes('otf') || 
+               mime.includes('woff') || mime.includes('eot') || mime.includes('x-font') ||
+               name.endsWith('.ttf') || name.endsWith('.otf') || name.endsWith('.woff') ||
+               name.endsWith('.woff2') || name.endsWith('.eot') || name.endsWith('.fon');
+
+      case 'Shortcuts':
+        return mime === 'application/vnd.google-apps.shortcut';
+
+      case 'Folders':
+        return mime === 'application/vnd.google-apps.folder';
+
+      default:
+        return true;
+    }
+  });
 };
 
 export function DriveToolbar({
@@ -230,6 +315,9 @@ export function DriveToolbar({
 
 
 
+  // Track active filter state
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
   // Handle badge click for client-side filtering
   const handleCategoryClick = useCallback((category: string) => {
     console.log('Badge clicked:', category, 'Items:', items.length);
@@ -237,10 +325,26 @@ export function DriveToolbar({
       const filteredItems = filterByMimeType(items, category);
       console.log('Filtered items:', filteredItems.length, 'Category:', category);
       onClientSideFilter(filteredItems);
+      setActiveFilter(category);
+      // Show success toast
+      successToast.generic(`Filtered to ${filteredItems.length} ${category.toLowerCase()}`, {
+        description: `Showing only ${category.toLowerCase()} from ${items.length} total items`
+      });
     } else {
       console.log('onClientSideFilter callback not available');
     }
   }, [items, onClientSideFilter]);
+
+  // Handle clear filter
+  const handleClearFilter = useCallback(() => {
+    if (onClearClientSideFilter) {
+      onClearClientSideFilter();
+      setActiveFilter(null);
+      infoToast.generic('Filter cleared', {
+        description: `Showing all ${items.length} items`
+      });
+    }
+  }, [onClearClientSideFilter, items.length]);
 
   return (
     <div 
@@ -867,7 +971,20 @@ export function DriveToolbar({
             </DropdownMenuTrigger>
             <DropdownMenuContent align="center" className="w-80 p-4">
               <div className="space-y-4">
-                <div className="text-sm font-semibold border-b pb-2">File Statistics</div>
+                <div className="flex items-center justify-between border-b pb-2">
+                  <div className="text-sm font-semibold">File Statistics</div>
+                  {activeFilter && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearFilter}
+                      className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="h-3 w-3 mr-1" />
+                      Clear Filter
+                    </Button>
+                  )}
+                </div>
                 
                 {/* Total Files */}
                 <div className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
@@ -888,8 +1005,12 @@ export function DriveToolbar({
                       <span className="text-sm">Images</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-green-500 text-green-700 dark:text-green-300 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
+                      variant={activeFilter === 'Images' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Images' 
+                          ? 'bg-green-500 text-white border-green-500' 
+                          : 'border-green-500 text-green-700 dark:text-green-300 hover:bg-green-100 dark:hover:bg-green-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Images')}
                     >
                       {items.filter(f => f.mimeType?.includes('image')).length}
@@ -905,8 +1026,12 @@ export function DriveToolbar({
                       <span className="text-sm">Videos</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-red-500 text-red-700 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/50"
+                      variant={activeFilter === 'Videos' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Videos' 
+                          ? 'bg-red-500 text-white border-red-500' 
+                          : 'border-red-500 text-red-700 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Videos')}
                     >
                       {items.filter(f => f.mimeType?.includes('video')).length}
@@ -922,8 +1047,12 @@ export function DriveToolbar({
                       <span className="text-sm">Documents</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-orange-500 text-orange-700 dark:text-orange-300 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/50"
+                      variant={activeFilter === 'Documents' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Documents' 
+                          ? 'bg-orange-500 text-white border-orange-500' 
+                          : 'border-orange-500 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Documents')}
                     >
                       {items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
@@ -939,8 +1068,12 @@ export function DriveToolbar({
                       <span className="text-sm">Spreadsheets</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-emerald-500 text-emerald-700 dark:text-emerald-300 cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
+                      variant={activeFilter === 'Spreadsheets' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Spreadsheets' 
+                          ? 'bg-emerald-500 text-white border-emerald-500' 
+                          : 'border-emerald-500 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Spreadsheets')}
                     >
                       {items.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
@@ -956,8 +1089,12 @@ export function DriveToolbar({
                       <span className="text-sm">Presentations</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-amber-500 text-amber-700 dark:text-amber-300 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50"
+                      variant={activeFilter === 'Presentations' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Presentations' 
+                          ? 'bg-amber-500 text-white border-amber-500' 
+                          : 'border-amber-500 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Presentations')}
                     >
                       {items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
@@ -973,8 +1110,12 @@ export function DriveToolbar({
                       <span className="text-sm">Audio</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-indigo-500 text-indigo-700 dark:text-indigo-300 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
+                      variant={activeFilter === 'Audio' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Audio' 
+                          ? 'bg-indigo-500 text-white border-indigo-500' 
+                          : 'border-indigo-500 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Audio')}
                     >
                       {items.filter(f => f.mimeType?.startsWith('audio/')).length}
@@ -990,8 +1131,12 @@ export function DriveToolbar({
                       <span className="text-sm">Archives</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-gray-500 text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900/50"
+                      variant={activeFilter === 'Archives' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Archives' 
+                          ? 'bg-gray-500 text-white border-gray-500' 
+                          : 'border-gray-500 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Archives')}
                     >
                       {items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
@@ -1007,8 +1152,12 @@ export function DriveToolbar({
                       <span className="text-sm">Code Files</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-cyan-500 text-cyan-700 dark:text-cyan-300 cursor-pointer hover:bg-cyan-100 dark:hover:bg-cyan-900/50"
+                      variant={activeFilter === 'Code' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Code' 
+                          ? 'bg-cyan-500 text-white border-cyan-500' 
+                          : 'border-cyan-500 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 dark:hover:bg-cyan-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Code')}
                     >
                       {items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
@@ -1024,8 +1173,12 @@ export function DriveToolbar({
                       <span className="text-sm">Design Files</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-purple-500 text-purple-700 dark:text-purple-300 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/50"
+                      variant={activeFilter === 'Design' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Design' 
+                          ? 'bg-purple-500 text-white border-purple-500' 
+                          : 'border-purple-500 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Design')}
                     >
                       {items.filter(f => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')).length}
@@ -1041,8 +1194,12 @@ export function DriveToolbar({
                       <span className="text-sm">Database Files</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-teal-500 text-teal-700 dark:text-teal-300 cursor-pointer hover:bg-teal-100 dark:hover:bg-teal-900/50"
+                      variant={activeFilter === 'Database' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Database' 
+                          ? 'bg-teal-500 text-white border-teal-500' 
+                          : 'border-teal-500 text-teal-700 dark:text-teal-300 hover:bg-teal-100 dark:hover:bg-teal-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Database')}
                     >
                       {items.filter(f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length}
@@ -1058,8 +1215,12 @@ export function DriveToolbar({
                       <span className="text-sm">E-books</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-rose-500 text-rose-700 dark:text-rose-300 cursor-pointer hover:bg-rose-100 dark:hover:bg-rose-900/50"
+                      variant={activeFilter === 'Ebooks' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Ebooks' 
+                          ? 'bg-rose-500 text-white border-rose-500' 
+                          : 'border-rose-500 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Ebooks')}
                     >
                       {items.filter(f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length}
@@ -1075,8 +1236,12 @@ export function DriveToolbar({
                       <span className="text-sm">Fonts</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-stone-500 text-stone-700 dark:text-stone-300 cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-900/50"
+                      variant={activeFilter === 'Fonts' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Fonts' 
+                          ? 'bg-stone-500 text-white border-stone-500' 
+                          : 'border-stone-500 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Fonts')}
                     >
                       {items.filter(f => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')).length}
@@ -1092,8 +1257,12 @@ export function DriveToolbar({
                       <span className="text-sm">Shortcuts</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-sky-500 text-sky-700 dark:text-sky-300 cursor-pointer hover:bg-sky-100 dark:hover:bg-sky-900/50"
+                      variant={activeFilter === 'Shortcuts' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Shortcuts' 
+                          ? 'bg-sky-500 text-white border-sky-500' 
+                          : 'border-sky-500 text-sky-700 dark:text-sky-300 hover:bg-sky-100 dark:hover:bg-sky-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Shortcuts')}
                     >
                       {items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length}
@@ -1109,8 +1278,12 @@ export function DriveToolbar({
                       <span className="text-sm">Folders</span>
                     </div>
                     <Badge 
-                      variant="outline" 
-                      className="border-blue-500 text-blue-700 dark:text-blue-300 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                      variant={activeFilter === 'Folders' ? 'default' : 'outline'}
+                      className={`cursor-pointer transition-all ${
+                        activeFilter === 'Folders' 
+                          ? 'bg-blue-500 text-white border-blue-500' 
+                          : 'border-blue-500 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50'
+                      }`}
                       onClick={() => handleCategoryClick('Folders')}
                     >
                       {items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').length}
