@@ -264,7 +264,7 @@ export function FiltersDialog({
                       onFilterChange({
                         activeView: tempActiveView,
                         fileTypeFilter: tempFileTypeFilter.includes(filter.id) 
-                          ? tempFileTypeFilter.filter(t => t !== filter.id)
+                          ? tempFileTypeFilter.filter((t: string) => t !== filter.id)
                           : [...tempFileTypeFilter, filter.id],
                         advancedFilters: tempAdvancedFilters
                       });
