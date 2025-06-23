@@ -29,7 +29,7 @@ class SessionCache {
 
   get(key: string): any | null {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       return null;
     }
@@ -54,20 +54,20 @@ class SessionCache {
   private cleanup(): void {
     const now = Date.now();
     const keysToDelete: string[] = [];
-    
+
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > entry.ttl) {
         keysToDelete.push(key);
       }
     }
-    
+
     keysToDelete.forEach(key => this.cache.delete(key));
-    
+
     // If still too large, remove oldest entries
     if (this.cache.size >= this.MAX_SIZE) {
       const entries = Array.from(this.cache.entries())
         .sort((a, b) => a[1].timestamp - b[1].timestamp);
-      
+
       const toRemove = entries.slice(0, Math.floor(this.MAX_SIZE * 0.2));
       toRemove.forEach(([key]) => this.cache.delete(key));
     }
@@ -78,6 +78,20 @@ class SessionCache {
       size: this.cache.size,
       maxSize: this.MAX_SIZE
     };
+  }
+
+  // Clear all session cache entries for a specific user
+  clearUserSessions(userId: string): void {
+    const keysToDelete: string[] = [];
+
+    for (const key of this.cache.keys()) {
+      if (key.includes(userId)) {
+        keysToDelete.push(key);
+      }
+    }
+
+    keysToDelete.forEach(key => this.cache.delete(key));
+    console.log(`[SessionCache] Cleared ${keysToDelete.length} session entries for user: ${userId}`);
   }
 }
 

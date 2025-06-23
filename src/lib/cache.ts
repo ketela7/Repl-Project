@@ -147,6 +147,20 @@ class MemoryCache {
       this.cleanup();
     }
   }
+
+  // Clear all cache entries for a specific user
+  clearUserCache(userId: string): void {
+    const keysToDelete: string[] = [];
+    
+    for (const key of this.cache.keys()) {
+      if (key.includes(userId)) {
+        keysToDelete.push(key);
+      }
+    }
+    
+    keysToDelete.forEach(key => this.cache.delete(key));
+    console.log(`[Cache] Cleared ${keysToDelete.length} cache entries for user: ${userId}`);
+  }
 }
 
 // Export singleton instance
