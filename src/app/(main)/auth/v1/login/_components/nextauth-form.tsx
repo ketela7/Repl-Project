@@ -4,11 +4,11 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useSession } from "next-auth/react";
 import { GoogleAuthButton } from "@/components/auth/google-auth-button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Shield } from "lucide-react";
-// Note: Session preference handling simplified
 
 const FormSchema = z.object({
   remember: z.boolean().default(false),
@@ -19,6 +19,7 @@ interface NextAuthFormProps {
 }
 
 export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
+  const { update } = useSession();
   
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -27,10 +28,25 @@ export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
     },
   });
 
-  const handleGoogleSignIn = () => {
+  // Store remember me preference in localStorage for use during authentication
+  const setRememberMePreference = (rememberMe: boolean) => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('nextauth-remember-me', JSON.stringify(rememberMe));
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
     // Store remember me preference before sign in
     const rememberMe = form.getValues('remember');
     setRememberMePreference(rememberMe);
+    
+    // Update session with remember me preference if already authenticated
+    try {
+      await update({ rememberMe });
+    } catch (error) {
+      // Session update will happen after authentication completes
+      console.debug('Session update will occur after authentication');
+    }
   };
 
   return (
