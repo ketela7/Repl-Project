@@ -83,7 +83,7 @@ export function FileRenameDialog({
   }, [fileName]);
 
   // Add React import
-  if (!file) {
+  if (!fileId || !fileName) {
     return null;
   }
 
@@ -97,7 +97,7 @@ export function FileRenameDialog({
               Rename File
             </BottomSheetTitle>
             <BottomSheetDescription>
-              Enter a new name for "{file?.name}"
+              Enter a new name for "{fileName}"
             </BottomSheetDescription>
           </BottomSheetHeader>
 
@@ -141,7 +141,7 @@ export function FileRenameDialog({
             </Button>
             <Button 
               onClick={handleRename} 
-              disabled={!newName?.trim() || newName === file?.name || renaming}
+              disabled={!newName?.trim() || newName === fileName || renaming}
               className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               {renaming ? (
@@ -171,7 +171,7 @@ export function FileRenameDialog({
             Rename File
           </DialogTitle>
           <DialogDescription>
-            Enter a new name for "{file?.name}"
+            Enter a new name for "{fileName}"
           </DialogDescription>
         </DialogHeader>
 
@@ -209,7 +209,7 @@ export function FileRenameDialog({
           </Button>
           <Button 
             onClick={handleRename} 
-            disabled={!newName?.trim() || newName === file?.name || renaming}
+            disabled={!newName?.trim() || newName === fileName || renaming}
           >
             {renaming ? (
               <>
