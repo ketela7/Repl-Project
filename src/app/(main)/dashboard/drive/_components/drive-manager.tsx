@@ -528,10 +528,16 @@ export function DriveManager() {
     fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined);
   }, [fetchFiles, currentFolderId, searchQuery]);
 
-  // Client-side filtering handler
+  // Client-side filtering handler with reset option
   const handleClientSideFilter = useCallback((filteredItems: any[]) => {
     console.log('DriveManager: Setting filtered items:', filteredItems.length);
     setFilteredItems(filteredItems);
+  }, []);
+
+  // Clear filter function
+  const clearClientSideFilter = useCallback(() => {
+    console.log('DriveManager: Clearing client-side filter');
+    setFilteredItems([]);
   }, []);
 
   // Use filtered items when available, otherwise use all items
@@ -541,13 +547,61 @@ export function DriveManager() {
     return result;
   }, [filteredItems, items]);
 
+  // Apply sorting to display items (includes filtering)
+  const sortedDisplayItems = useMemo(() => {
+    const itemsToSort = [...displayItems];
+    
+    if (sortConfig && sortConfig.key) {
+      itemsToSort.sort((a, b) => {
+        let aValue: any;
+        let bValue: any;
+        
+        // Handle sorting by different keys
+        switch (sortConfig.key) {
+          case 'name':
+            aValue = a.name?.toLowerCase() || '';
+            bValue = b.name?.toLowerCase() || '';
+            break;
+          case 'size':
+            aValue = normalizeFileSize((a as any).size || '0 B');
+            bValue = normalizeFileSize((b as any).size || '0 B');
+            break;
+          case 'modifiedTime':
+            aValue = new Date(a.modifiedTime || 0).getTime();
+            bValue = new Date(b.modifiedTime || 0).getTime();
+            break;
+          case 'createdTime':
+            aValue = new Date((a as any).createdTime || 0).getTime();
+            bValue = new Date((b as any).createdTime || 0).getTime();
+            break;
+          case 'mimeType':
+            aValue = isFolder(a) ? 'folder' : (a.mimeType || '').toLowerCase();
+            bValue = isFolder(b) ? 'folder' : (b.mimeType || '').toLowerCase();
+            break;
+          case 'owners':
+            aValue = ((a as any).owners?.[0]?.displayName || (a as any).owners?.[0]?.emailAddress || '').toLowerCase();
+            bValue = ((b as any).owners?.[0]?.displayName || (b as any).owners?.[0]?.emailAddress || '').toLowerCase();
+            break;
+          default:
+            return 0;
+        }
+        
+        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+    
+    return itemsToSort;
+  }, [displayItems, sortConfig]);
+
   const handleSelectAll = useCallback(() => {
-    if (selectedItems.size === displayItems.length) {
+    if (selectedItems.size === sortedDisplayItems.length) {
       setSelectedItems(new Set());
     } else {
-      setSelectedItems(new Set(displayItems.map(item => item.id)));
+      setSelectedItems(new Set(sortedDisplayItems.map(item => item.id)));
     }
-  }, [displayItems, selectedItems.size]);
+  }, [sortedDisplayItems, selectedItems.size]);
 
   if (loading && items.length === 0) {
     return <DriveGridSkeleton />;
@@ -607,6 +661,7 @@ export function DriveManager() {
             setIsCreateFolderDialogOpen={setIsCreateFolderDialogOpen}
             loading={loading}
             onClientSideFilter={handleClientSideFilter}
+            onClearClientSideFilter={clearClientSideFilter}
           />
 
           {currentFolderId && (
@@ -628,7 +683,7 @@ export function DriveManager() {
           />*/}
 
           <DriveDataView
-            items={sortedItems}
+            items={sortedDisplayItems}
             viewMode={viewMode}
             isSelectMode={isSelectMode}
             selectedItems={selectedItems}

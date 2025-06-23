@@ -152,6 +152,7 @@ interface DriveToolbarProps {
   
   // Client-side filtering
   onClientSideFilter?: (filteredItems: any[]) => void;
+  onClearClientSideFilter?: () => void;
 }
 
 // Client-side filtering function using mimeType
@@ -219,7 +220,8 @@ export function DriveToolbar({
   items,
   visibleColumns,
   setVisibleColumns,
-  onClientSideFilter
+  onClientSideFilter,
+  onClearClientSideFilter
 }: DriveToolbarProps) {
   const isMobile = useIsMobile();
   
