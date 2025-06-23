@@ -258,7 +258,17 @@ export function FiltersDialog({
                     key={filter.id}
                     variant={isActive ? "default" : "outline"}
                     className={`justify-start h-12 ${isActive ? 'ring-2 ring-primary/20' : ''}`}
-                    onClick={() => handleFileTypeFilter(filter.id)}
+                    onClick={() => {
+                      handleFileTypeFilter(filter.id);
+                      // Apply immediately like View Status
+                      onFilterChange({
+                        activeView: tempActiveView,
+                        fileTypeFilter: tempFileTypeFilter.includes(filter.id) 
+                          ? tempFileTypeFilter.filter(t => t !== filter.id)
+                          : [...tempFileTypeFilter, filter.id],
+                        advancedFilters: tempAdvancedFilters
+                      });
+                    }}
                   >
                     <Icon className={`h-4 w-4 mr-2 ${filter.color}`} />
                     <span className="text-sm">{filter.label}</span>

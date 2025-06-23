@@ -617,7 +617,10 @@ export function DriveToolbar({
                       <Button
                         variant={fileTypeFilter.includes('folder') ? 'default' : 'outline'}
                         size="sm"
-                        onClick={() => handleFileTypeToggle('folder')}
+                        onClick={() => {
+                          handleFileTypeToggle('folder');
+                          setTimeout(() => handleRefresh(), 0);
+                        }}
                         className="justify-center text-xs p-2"
                         title="Folders"
                       >
@@ -675,7 +678,10 @@ export function DriveToolbar({
                             key={filter.type}
                             variant={fileTypeFilter.includes(filter.type) ? 'default' : 'outline'}
                             size="sm"
-                            onClick={() => handleFileTypeToggle(filter.type)}
+                            onClick={() => {
+                              handleFileTypeToggle(filter.type);
+                              setTimeout(() => handleRefresh(), 0);
+                            }}
                             className="justify-center text-xs p-2"
                             title={filter.title}
                           >
@@ -702,7 +708,10 @@ export function DriveToolbar({
                         <Button
                           variant={advancedFilters.sortBy === 'name' ? 'default' : 'outline'}
                           size="sm"
-                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortBy: 'name' }))}
+                          onClick={() => {
+                            setAdvancedFilters(prev => ({ ...prev, sortBy: 'name' }));
+                            setTimeout(() => handleRefresh(), 0);
+                          }}
                           className="justify-start text-xs"
                         >
                           Name
@@ -710,7 +719,10 @@ export function DriveToolbar({
                         <Button
                           variant={advancedFilters.sortBy === 'modified' ? 'default' : 'outline'}
                           size="sm"
-                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortBy: 'modified' }))}
+                          onClick={() => {
+                            setAdvancedFilters(prev => ({ ...prev, sortBy: 'modified' }));
+                            setTimeout(() => handleRefresh(), 0);
+                          }}
                           className="justify-start text-xs"
                         >
                           Modified
@@ -718,7 +730,10 @@ export function DriveToolbar({
                         <Button
                           variant={advancedFilters.sortBy === 'created' ? 'default' : 'outline'}
                           size="sm"
-                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortBy: 'created' }))}
+                          onClick={() => {
+                            setAdvancedFilters(prev => ({ ...prev, sortBy: 'created' }));
+                            setTimeout(() => handleRefresh(), 0);
+                          }}
                           className="justify-start text-xs"
                         >
                           Created
@@ -726,7 +741,10 @@ export function DriveToolbar({
                         <Button
                           variant={advancedFilters.sortBy === 'size' ? 'default' : 'outline'}
                           size="sm"
-                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortBy: 'size' }))}
+                          onClick={() => {
+                            setAdvancedFilters(prev => ({ ...prev, sortBy: 'size' }));
+                            setTimeout(() => handleRefresh(), 0);
+                          }}
                           className="justify-start text-xs"
                         >
                           Size
@@ -740,7 +758,10 @@ export function DriveToolbar({
                         <Button
                           variant={advancedFilters.sortOrder === 'asc' ? 'default' : 'outline'}
                           size="sm"
-                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortOrder: 'asc' }))}
+                          onClick={() => {
+                            setAdvancedFilters(prev => ({ ...prev, sortOrder: 'asc' }));
+                            setTimeout(() => handleRefresh(), 0);
+                          }}
                           className="justify-start text-xs"
                         >
                           Ascending
@@ -748,7 +769,10 @@ export function DriveToolbar({
                         <Button
                           variant={advancedFilters.sortOrder === 'desc' ? 'default' : 'outline'}
                           size="sm"
-                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortOrder: 'desc' }))}
+                          onClick={() => {
+                            setAdvancedFilters(prev => ({ ...prev, sortOrder: 'desc' }));
+                            setTimeout(() => handleRefresh(), 0);
+                          }}
                           className="justify-start text-xs"
                         >
                           Descending
