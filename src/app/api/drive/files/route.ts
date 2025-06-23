@@ -359,12 +359,19 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  // Size filter
-  if (filters.minSize) {
-    conditions.push(`size >= ${filters.minSize}`)
-  }
-  if (filters.maxSize) {
-    conditions.push(`size <= ${filters.maxSize}`)
+  // Size filter - exclude folders since they don't have size property
+  if (filters.minSize || filters.maxSize) {
+    const fileSizeConditions = [];
+    if (filters.minSize) {
+      fileSizeConditions.push(`size >= ${filters.minSize}`);
+    }
+    if (filters.maxSize) {
+      fileSizeConditions.push(`size <= ${filters.maxSize}`);
+    }
+    // Only apply size filters to non-folder items
+    if (fileSizeConditions.length > 0) {
+      conditions.push(`(${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder'`);
+    }
   }
 
   return conditions.join(' and ')
@@ -381,7 +388,7 @@ function getSortKey(sortBy: string) {
     case 'created':
       return 'createdTime'
     case 'size':
-      return 'quotaBytesUsed'
+      return 'size'
     default:
       return 'modifiedTime'
   }

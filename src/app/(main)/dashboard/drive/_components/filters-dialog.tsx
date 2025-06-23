@@ -65,6 +65,8 @@ interface AdvancedFilters {
     to?: Date;
   };
   owner?: string;
+  sortBy?: 'name' | 'modified' | 'created' | 'size';
+  sortOrder?: 'asc' | 'desc';
 }
 
 interface FiltersDialogProps {
@@ -441,6 +443,56 @@ export function FiltersDialog({
                         placeholder="End date"
                       />
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sort Options */}
+              <div className="space-y-3">
+                <Label className="text-xs font-medium flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  Sort Options
+                </Label>
+                
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Sort By</Label>
+                    <Select
+                      value={tempAdvancedFilters.sortBy || 'modified'}
+                      onValueChange={(value: 'name' | 'modified' | 'created' | 'size') => handleAdvancedFiltersChange({
+                        ...tempAdvancedFilters,
+                        sortBy: value
+                      })}
+                    >
+                      <SelectTrigger className="text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="modified">Last Modified</SelectItem>
+                        <SelectItem value="created">Date Created</SelectItem>
+                        <SelectItem value="name">Name</SelectItem>
+                        <SelectItem value="size">File Size</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Order</Label>
+                    <Select
+                      value={tempAdvancedFilters.sortOrder || 'desc'}
+                      onValueChange={(value: 'asc' | 'desc') => handleAdvancedFiltersChange({
+                        ...tempAdvancedFilters,
+                        sortOrder: value
+                      })}
+                    >
+                      <SelectTrigger className="text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="desc">Newest First</SelectItem>
+                        <SelectItem value="asc">Oldest First</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>

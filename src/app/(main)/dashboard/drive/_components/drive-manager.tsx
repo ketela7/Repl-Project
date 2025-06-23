@@ -237,6 +237,8 @@ export function DriveManager() {
     createdDateRange?: { from?: Date; to?: Date };
     modifiedDateRange?: { from?: Date; to?: Date };
     owner?: string;
+    sortBy?: 'name' | 'modified' | 'created' | 'size';
+    sortOrder?: 'asc' | 'desc';
   }>({});
 
   // Bulk operations state
@@ -1630,6 +1632,14 @@ export function DriveManager() {
 
       if (advancedFilters.owner) {
         params.append('owner', advancedFilters.owner);
+      }
+
+      // Add sort options from advanced filters
+      if (advancedFilters.sortBy) {
+        params.append('sortBy', advancedFilters.sortBy);
+      }
+      if (advancedFilters.sortOrder) {
+        params.append('sortOrder', advancedFilters.sortOrder);
       }
       
       console.log('Frontend sending all params:', Object.fromEntries(params.entries()));
