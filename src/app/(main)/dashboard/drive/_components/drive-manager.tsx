@@ -529,13 +529,14 @@ export function DriveManager() {
   }, [fetchFiles, currentFolderId, searchQuery]);
 
   // Client-side filtering handler
-  const handleClientSideFilter = useCallback((filteredFiles: any[], filteredFolders: any[]) => {
-    const combined = [...filteredFiles, ...filteredFolders];
-    setFilteredItems(combined);
+  const handleClientSideFilter = useCallback((filteredItems: any[]) => {
+    setFilteredItems(filteredItems);
   }, []);
 
   // Use filtered items when available, otherwise use all items
-  const displayItems = filteredItems.length > 0 ? filteredItems : items;
+  const displayItems = useMemo(() => {
+    return filteredItems.length > 0 ? filteredItems : items;
+  }, [filteredItems, items]);
 
   const handleSelectAll = useCallback(() => {
     if (selectedItems.size === displayItems.length) {
@@ -596,8 +597,6 @@ export function DriveManager() {
             onApplyFilters={applyFilters}
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
-            files={files}
-            folders={folders}
             items={items}
             visibleColumns={visibleColumns}
             setVisibleColumns={setVisibleColumns}

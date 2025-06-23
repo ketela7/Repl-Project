@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useMemo, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -134,8 +134,6 @@ interface DriveToolbarProps {
   onApplyFilters: () => void;
   onClearFilters: () => void;
   hasActiveFilters: boolean;
-  files: import("@/lib/google-drive/types").DriveFile[];
-  folders: import("@/lib/google-drive/types").DriveFolder[];
   items: any[];
   setIsUploadDialogOpen: (open: boolean) => void;
   setIsCreateFolderDialogOpen: (open: boolean) => void;
@@ -148,53 +146,35 @@ interface DriveToolbarProps {
   loading: boolean;
   
   // Client-side filtering
-  onClientSideFilter?: (filteredFiles: DriveFile[], filteredFolders: DriveFile[]) => void;
+  onClientSideFilter?: (filteredItems: any[]) => void;
 }
 
 // Client-side filtering function using mimeType
-const filterByMimeType = (files: DriveFile[], folders: DriveFile[], category: string) => {
-  const getCategoryFromMimeType = (mimeType: string): string => {
-    const mime = mimeType.toLowerCase();
-    
-    // Video files
-    if (mime.startsWith('video/') || mime.includes('mp4') || mime.includes('mov') || mime.includes('avi') || mime.includes('mkv') || mime.includes('webm')) return 'Videos';
-    
-    // Audio files
-    if (mime.startsWith('audio/') || mime.includes('mp3') || mime.includes('wav') || mime.includes('flac') || mime.includes('aac') || mime.includes('ogg')) return 'Audio';
-    
-    // Image files
-    if (mime.startsWith('image/') || mime.includes('jpeg') || mime.includes('jpg') || mime.includes('png') || mime.includes('gif') || mime.includes('bmp') || mime.includes('svg') || mime.includes('webp')) return 'Images';
-    
-    // Document files
-    if (mime.includes('document') || mime.includes('pdf') || mime.includes('msword') || mime.includes('wordprocessingml') || mime.includes('rtf') || mime.includes('odt') || mime.includes('txt')) return 'Documents';
-    
-    // Spreadsheet files
-    if (mime.includes('spreadsheet') || mime.includes('excel') || mime.includes('sheet') || mime.includes('csv') || mime.includes('ods') || mime.includes('xlsx') || mime.includes('xls')) return 'Spreadsheets';
-    
-    // Presentation files
-    if (mime.includes('presentation') || mime.includes('powerpoint') || mime.includes('ppt') || mime.includes('odp') || mime.includes('keynote') || mime.includes('pptx')) return 'Presentations';
-    
-    // Archive files
-    if (mime.includes('zip') || mime.includes('rar') || mime.includes('tar') || mime.includes('gz') || mime.includes('7z') || mime.includes('archive')) return 'Archives';
-    
-    // Code files
-    if (mime.includes('javascript') || mime.includes('typescript') || mime.includes('json') || mime.includes('html') || mime.includes('css') || mime.includes('xml') || mime.includes('yaml') || mime.includes('python') || mime.includes('java')) return 'Code';
-    
-    // Google Drive specific
-    if (mime.includes('vnd.google-apps.document')) return 'Documents';
-    if (mime.includes('vnd.google-apps.spreadsheet')) return 'Spreadsheets';
-    if (mime.includes('vnd.google-apps.presentation')) return 'Presentations';
-    if (mime.includes('vnd.google-apps.shortcut')) return 'Shortcuts';
-    
-    return 'Others';
-  };
-
-  if (category === 'Folders') {
-    return { filteredFiles: [], filteredFolders: folders };
+const filterByMimeType = (items: any[], category: string) => {
+  switch (category) {
+    case 'Images':
+      return items.filter(f => f.mimeType?.includes('image'));
+    case 'Videos':
+      return items.filter(f => f.mimeType?.includes('video'));
+    case 'Documents':
+      return items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf'));
+    case 'Spreadsheets':
+      return items.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv'));
+    case 'Presentations':
+      return items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint'));
+    case 'Audio':
+      return items.filter(f => f.mimeType?.startsWith('audio/'));
+    case 'Archives':
+      return items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z'));
+    case 'Code':
+      return items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml'));
+    case 'Shortcuts':
+      return items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut');
+    case 'Folders':
+      return items.filter(f => f.mimeType === 'application/vnd.google-apps.folder');
+    default:
+      return items;
   }
-
-  const filteredFiles = files.filter(f => getCategoryFromMimeType(f.mimeType) === category);
-  return { filteredFiles, filteredFolders: category === 'Folders' ? folders : [] };
 };
 
 export function DriveToolbar({
@@ -223,8 +203,7 @@ export function DriveToolbar({
   onApplyFilters,
   onClearFilters,
   hasActiveFilters,
-  files,
-  folders,
+  items,
   visibleColumns,
   setVisibleColumns,
   onClientSideFilter
@@ -234,11 +213,20 @@ export function DriveToolbar({
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters;
 
+  // Separate files and folders from items
+  const files = useMemo(() => {
+    return items.filter(item => item.mimeType !== 'application/vnd.google-apps.folder');
+  }, [items]);
+
+  const folders = useMemo(() => {
+    return items.filter(item => item.mimeType === 'application/vnd.google-apps.folder');
+  }, [items]);
+
   // Handle badge click for client-side filtering
   const handleCategoryClick = (category: string) => {
     if (onClientSideFilter) {
-      const { filteredFiles, filteredFolders } = filterByMimeType(files, folders, category);
-      onClientSideFilter(filteredFiles, filteredFolders);
+      const filteredItems = filterByMimeType(items, category);
+      onClientSideFilter(filteredItems);
     }
   };
 
@@ -886,10 +874,10 @@ export function DriveToolbar({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => onClientSideFilter(files, folders)}
+                      onClick={() => onClientSideFilter(items)}
                       className="w-full text-xs"
                     >
-                      Show All Files ({items.length})
+                      Total ({items.length})
                     </Button>
                   </div>
                 )}
