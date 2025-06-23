@@ -1794,6 +1794,43 @@ export function DriveManager() {
     // Don't fetch files immediately - wait for Apply Filter button
   };
 
+  // Enhanced filter change handler for immediate application
+  const handleFilterChangeAndApply = (filters: any) => {
+    let shouldRefetch = false;
+    
+    if (filters.activeView && filters.activeView !== activeView) {
+      setActiveView(filters.activeView);
+      setCurrentFolderId(null);
+      setSearchQuery('');
+      setSelectedItems(new Set());
+      setIsSelectMode(false);
+      shouldRefetch = true;
+    }
+    
+    if (filters.fileTypeFilter !== undefined && JSON.stringify(filters.fileTypeFilter) !== JSON.stringify(fileTypeFilter)) {
+      setFileTypeFilter(filters.fileTypeFilter);
+      shouldRefetch = true;
+    }
+    
+    if (filters.advancedFilters && JSON.stringify(filters.advancedFilters) !== JSON.stringify(advancedFilters)) {
+      setAdvancedFilters(filters.advancedFilters);
+      shouldRefetch = true;
+    }
+    
+    // Apply filters immediately with proper state synchronization
+    if (shouldRefetch) {
+      requestAnimationFrame(() => {
+        fetchFiles(
+          filters.activeView === activeView ? (currentFolderId || undefined) : undefined,
+          searchQuery || undefined,
+          undefined,
+          false,
+          filters.activeView || activeView
+        );
+      });
+    }
+  };
+
   const handleFileTypeToggle = (type: string) => {
     setFileTypeFilter(prev => {
       const newFilter = prev.includes(type) 
@@ -2968,22 +3005,40 @@ export function DriveManager() {
         open={isMobileFiltersOpen}
         onOpenChange={setIsMobileFiltersOpen}
         onFilterChange={(filters: any) => {
-          if (filters.activeView) {
-            handleViewChange(filters.activeView);
+          // Apply all filters synchronously
+          let shouldRefetch = false;
+          
+          if (filters.activeView && filters.activeView !== activeView) {
+            setActiveView(filters.activeView);
+            setCurrentFolderId(null); // Reset to root when changing views
+            setSearchQuery(''); // Clear search
+            setSelectedItems(new Set());
+            setIsSelectMode(false);
+            shouldRefetch = true;
           }
-          if (filters.fileTypeFilter !== undefined) {
+          
+          if (filters.fileTypeFilter !== undefined && JSON.stringify(filters.fileTypeFilter) !== JSON.stringify(fileTypeFilter)) {
             setFileTypeFilter(filters.fileTypeFilter);
-            // Trigger re-fetch when file type filter changes
-            setTimeout(() => {
-              fetchFiles(currentFolderId || undefined, searchQuery || undefined, undefined, false, activeView);
-            }, 100);
+            shouldRefetch = true;
           }
-          if (filters.advancedFilters) {
+          
+          if (filters.advancedFilters && JSON.stringify(filters.advancedFilters) !== JSON.stringify(advancedFilters)) {
             setAdvancedFilters(filters.advancedFilters);
-            // Trigger re-fetch when advanced filters change
-            setTimeout(() => {
-              fetchFiles(currentFolderId || undefined, searchQuery || undefined, undefined, false, activeView);
-            }, 100);
+            shouldRefetch = true;
+          }
+          
+          // Trigger single fetch with all new filter states
+          if (shouldRefetch) {
+            // Use a small delay to ensure state updates are applied
+            requestAnimationFrame(() => {
+              fetchFiles(
+                filters.activeView === activeView ? (currentFolderId || undefined) : undefined,
+                searchQuery || undefined,
+                undefined,
+                false,
+                filters.activeView || activeView
+              );
+            });
           }
         }}
         currentFilters={{
