@@ -14,15 +14,15 @@ const nextConfig = {
       'recharts'
     ],
     // Faster builds
-    optimisticClientCache: true
-  },
-  // Turbopack configuration (replaces experimental.turbo)
-  turbo: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
+    optimisticClientCache: true,
+    // Turbopack configuration
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      }
     }
   },
   serverExternalPackages: ['postgres'],
