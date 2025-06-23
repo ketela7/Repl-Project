@@ -125,6 +125,7 @@ import { BulkShareDialog } from './bulk-share-dialog';
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
 import { FiltersDialog } from './filters-dialog';
 import { DriveToolbar } from './drive-toolbar';
+import { DriveDataView } from './drive-data-view';
 
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { DrivePermissionRequired } from '@/components/drive-permission-required';
@@ -213,7 +214,6 @@ export function DriveManager() {
   // Table column visibility state
   const [visibleColumns, setVisibleColumns] = useState({
     name: true,
-    id: true,
     size: true,
     owners: false,
     mimeType: false,
@@ -2646,720 +2646,46 @@ export function DriveManager() {
         />
       </div>
 
-      {/* Clean Data Container */}
-      <Card>
-        <CardContent className="p-0">
+      {/* Data Container - Refactored into separate component */}
+      <DriveDataView
+        loading={loading}
+        files={files}
+        folders={folders}
+        sortedFiles={sortedFiles}
+        sortedFolders={sortedFolders}
+        viewMode={viewMode}
+        searchQuery={searchQuery}
+        currentFolderId={currentFolderId}
+        isSelectMode={isSelectMode}
+        selectedItems={selectedItems}
+        activeView={activeView}
+        visibleColumns={visibleColumns}
+        toggleItemSelection={toggleItemSelection}
+        handleFolderClick={handleFolderClick}
+        handleFileAction={handleFileAction}
+        getFileActions={getFileActions}
+      />
 
-          {loading ? (
-            <DriveGridSkeleton />
-          ) : folders.length === 0 && files.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <div className="flex justify-center mb-4">
-                <FileIcon mimeType="application/vnd.google-apps.folder" className="h-16 w-16" />
-              </div>
-              <h3 className="text-lg font-medium mb-2">
-                {searchQuery ? 'No files found' : currentFolderId ? 'This folder is empty' : 'Your Google Drive is ready!'}
-              </h3>
-              <p className="text-sm">
-                {searchQuery 
-                  ? 'Try adjusting your search terms' 
-                  : currentFolderId 
-                    ? 'Upload files or create folders to get started'
-                    : 'Upload files or create folders to get started, or check if your files are in subfolders'
-                }
-              </p>
-            </div>
-          ) : viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
-              {/* Folders - using filtered/sorted data */}
-              {sortedFolders.map((folder) => (
-                <div
-                  key={folder.id}
-                  className={`border rounded-lg p-2 sm:p-3 md:p-4 hover:bg-accent cursor-pointer transition-colors relative ${
-                    selectedItems.has(folder.id) ? 'ring-2 ring-primary bg-primary/5' : ''
-                  }`}
-                  onClick={() => isSelectMode ? toggleItemSelection(folder.id) : handleFolderClick(folder.id)}
-                >
-                  {isSelectMode && (
-                    <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedItems.has(folder.id)}
-                        onCheckedChange={() => toggleItemSelection(folder.id)}
-                        className="bg-background !h-4 !w-4 !size-4"
-                      />
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
-                      <FileIcon mimeType="application/vnd.google-apps.folder" className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {(() => {
-                          const actions = getFileActions(folder, activeView);
-                          return (
-                            <>
-                              {actions.canRename && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('rename', folder.id, folder.name);
-                                }}>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Rename
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canMove && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('move', folder.id, folder.name);
-                                }}>
-                                  <Move className="h-4 w-4 mr-2" />
-                                  Move
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canCopy && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('copy', folder.id, folder.name);
-                                }}>
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  Copy
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canShare && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('share', folder.id, folder.name);
-                                }}>
-                                  <Share className="h-4 w-4 mr-2" />
-                                  Share
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canDetails && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('details', folder.id, folder.name);
-                                }}>
-                                  <Info className="h-4 w-4 mr-2" />
-                                  Details
-                                </DropdownMenuItem>
-                              )}
-
-                              {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
-
-                              {actions.canRestore && (
-                                <DropdownMenuItem 
-                                  className="text-green-600"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleFileAction('restore', folder.id, folder.name);
-                                  }}
-                                >
-                                  <RefreshCw className="h-4 w-4 mr-2" />
-                                  Restore
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canTrash && (
-                                <DropdownMenuItem 
-                                  className="text-orange-600"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleFileAction('trash', folder.id, folder.name);
-                                  }}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Move to Trash
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canPermanentDelete && (
-                                <DropdownMenuItem 
-                                  className="text-destructive"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleFileAction('permanentDelete', folder.id, folder.name);
-                                  }}
-                                >
-                                  <AlertTriangle className="h-4 w-4 mr-2" />
-                                  Permanently Delete
-                                </DropdownMenuItem>
-                              )}
-                            </>
-                          );
-                        })()}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="font-medium truncate text-xs sm:text-sm md:text-base" title={folder.name}>{folder.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatFileTime(folder.modifiedTime, timezone)}
-                    </p>
-                  </div>
-                </div>
-              ))}
-
-              {/* Files - using filtered/sorted data */}
-              {sortedFiles.map((file) => (
-                <div
-                  key={file.id}
-                  className={`border rounded-lg p-2 sm:p-3 md:p-4 hover:bg-accent transition-colors relative cursor-pointer ${
-                    selectedItems.has(file.id) ? 'ring-2 ring-primary bg-primary/5' : ''
-                  }`}
-                  onClick={() => isSelectMode ? toggleItemSelection(file.id) : undefined}
-                >
-                  {isSelectMode && (
-                    <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedItems.has(file.id)}
-                        onCheckedChange={() => toggleItemSelection(file.id)}
-                        className="bg-background !h-4 !w-4 !size-4"
-                      />
-                    </div>
-                  )}
-                  <div className="flex items-start justify-between mb-2">
-                    <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
-                      <FileThumbnailPreview
-                        thumbnailLink={file.thumbnailLink}
-                        fileName={file.name}
-                        mimeType={file.mimeType}
-                        className="transition-all duration-200"
-                      >
-                        <FileIcon mimeType={file.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
-                      </FileThumbnailPreview>
-                    </div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {(() => {
-                          const actions = getFileActions(file, activeView);
-                          return (
-                            <>
-                              {actions.canPreview && isPreviewable(file.mimeType) && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('preview', file.id, file.name);
-                                }}>
-                                  <Eye className="h-4 w-4 mr-2" />
-                                  Preview
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canDownload && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('download', file.id, file.name);
-                                }}>
-                                  <Download className="h-4 w-4 mr-2" />
-                                  Download
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canRename && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('rename', file.id, file.name);
-                                }}>
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Rename
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canMove && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('move', file.id, file.name);
-                                }}>
-                                  <Move className="h-4 w-4 mr-2" />
-                                  Move
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canCopy && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('copy', file.id, file.name);
-                                }}>
-                                  <Copy className="h-4 w-4 mr-2" />
-                                  Copy
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canShare && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('share', file.id, file.name);
-                                }}>
-                                  <Share className="h-4 w-4 mr-2" />
-                                  Share
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canDetails && (
-                                <DropdownMenuItem onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleFileAction('details', file.id, file.name);
-                                }}>
-                                  <Info className="h-4 w-4 mr-2" />
-                                  Details
-                                </DropdownMenuItem>
-                              )}
-
-                              {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
-
-                              {actions.canRestore && (
-                                <DropdownMenuItem 
-                                  className="text-green-600"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleFileAction('restore', file.id, file.name);
-                                  }}
-                                >
-                                  <RefreshCw className="h-4 w-4 mr-2" />
-                                  Restore
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canTrash && (
-                                <DropdownMenuItem 
-                                  className="text-orange-600"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleFileAction('trash', file.id, file.name);
-                                  }}
-                                >
-                                  <Trash2 className="h-4 w-4 mr-2" />
-                                  Move to Trash
-                                </DropdownMenuItem>
-                              )}
-
-                              {actions.canPermanentDelete && (
-                                <DropdownMenuItem 
-                                  className="text-destructive"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleFileAction('permanentDelete', file.id, file.name);
-                                  }}
-                                >
-                                  <AlertTriangle className="h-4 w-4 mr-2" />
-                                  Permanently Delete
-                                </DropdownMenuItem>
-                              )}
-                            </>
-                          );
-                        })()}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                  <div className="space-y-1">
-                    <div className="space-y-1">
-                      <p 
-                        className="font-medium truncate text-xs sm:text-sm md:text-base cursor-pointer hover:text-blue-600 hover:underline" 
-                        title={`Click to ${file.mimeType === 'application/vnd.google-apps.shortcut' ? 'open shortcut' : 'preview'}: ${file.name}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (file.mimeType === 'application/vnd.google-apps.shortcut') {
-                            handleFileAction('preview', file.id, file.name);
-                          } else if (isPreviewable(file.mimeType)) {
-                            handleFileAction('preview', file.id, file.name);
-                          } else {
-                            handleFileAction('download', file.id, file.name);
-                          }
-                        }}
-                      >
-                        {file.name}
-                      </p>
-                      {file.mimeType === 'application/vnd.google-apps.shortcut' && (
-                        <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800 w-fit">
-                          <Link className="h-3 w-3 mr-1" />
-                          Shortcut
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex flex-col sm:flex-row sm:justify-between gap-1 text-xs text-muted-foreground">
-                      <span>{file.size ? formatFileSize(file.size) : '-'}</span>
-                      <span>{formatFileTime(file.modifiedTime, timezone)}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            /* Table View */
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[50px]">
-                      {isSelectMode && (
-                        <div className="flex items-center justify-center">
-                          <Checkbox
-                            checked={selectedItems.size === folders.length + files.length && folders.length + files.length > 0}
-                            onCheckedChange={selectedItems.size === folders.length + files.length ? deselectAll : selectAll}
-                            className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                          />
-                        </div>
-                      )}
-                    </TableHead>
-                    {visibleColumns.name && (
-                      <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('name')}
-                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
-                        >
-                          Name
-                          <span className="ml-1 opacity-60">{getSortIcon('name')}</span>
-                        </Button>
-                      </TableHead>
-                    )}
-                    {visibleColumns.id && (
-                      <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('id')}
-                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
-                        >
-                          ID
-                          <span className="ml-1 opacity-60">{getSortIcon('id')}</span>
-                        </Button>
-                      </TableHead>
-                    )}
-                    {visibleColumns.size && (
-                      <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('size')}
-                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
-                        >
-                          Size
-                          <span className="ml-1 opacity-60">{getSortIcon('size')}</span>
-                        </Button>
-                      </TableHead>
-                    )}
-                    {visibleColumns.owners && (
-                      <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('owners')}
-                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
-                        >
-                          Owners
-                          <span className="ml-1 opacity-60">{getSortIcon('owners')}</span>
-                        </Button>
-                      </TableHead>
-                    )}
-                    {visibleColumns.mimeType && (
-                      <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('mimeType')}
-                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
-                        >
-                          Type
-                          <span className="ml-1 opacity-60">{getSortIcon('mimeType')}</span>
-                        </Button>
-                      </TableHead>
-                    )}
-                    {visibleColumns.createdTime && (
-                      <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('createdTime')}
-                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
-                        >
-                          Created
-                          <span className="ml-1 opacity-60">{getSortIcon('createdTime')}</span>
-                        </Button>
-                      </TableHead>
-                    )}
-                    {visibleColumns.modifiedTime && (
-                      <TableHead>
-                        <Button
-                          variant="ghost"
-                          onClick={() => handleSort('modifiedTime')}
-                          className="h-auto p-0 font-medium hover:bg-transparent text-left justify-start w-full"
-                        >
-                          Modified
-                          <span className="ml-1 opacity-60">{getSortIcon('modifiedTime')}</span>
-                        </Button>
-                      </TableHead>
-                    )}
-                    <TableHead className="w-[100px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {/* All items (folders and files) sorted together */}
-                  {sortedAllItems.map((item) => (
-                    <TableRow 
-                      key={item.id}
-                      className={`cursor-pointer hover:bg-accent transition-colors ${
-                        selectedItems.has(item.id) ? 'bg-primary/5 border-primary/20' : ''
-                      }`}
-                      onClick={() => isSelectMode ? toggleItemSelection(item.id) : (item.itemType === 'folder' ? handleFolderClick(item.id) : undefined)}
-                    >
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {isSelectMode && (
-                            <Checkbox
-                              checked={selectedItems.has(item.id)}
-                              onCheckedChange={() => toggleItemSelection(item.id)}
-                              onClick={(e) => e.stopPropagation()}
-                              className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                            />
-                          )}
-                          <FileThumbnailPreview
-                            thumbnailLink={item.itemType === 'file' ? item.thumbnailLink : undefined}
-                            fileName={item.name}
-                            mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType}
-                            className="transition-all duration-200"
-                          >
-                            <FileIcon 
-                              mimeType={item.itemType === 'folder' ? 'application/vnd.google-apps.folder' : item.mimeType} 
-                              className="h-4 w-4" 
-                            />
-                          </FileThumbnailPreview>
-                        </div>
-                      </TableCell>
-                      {visibleColumns.name && (
-                        <TableCell className="font-medium">
-                          <div className="flex items-center space-x-2">
-                            {item.itemType === 'folder' ? (
-                              <span className="truncate">{item.name}</span>
-                            ) : (
-                              <span 
-                                className="truncate hover:text-blue-600 hover:underline"
-                                title={`Click to ${item.mimeType === 'application/vnd.google-apps.shortcut' ? 'open shortcut' : 'preview'}: ${item.name}`}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  if (item.mimeType === 'application/vnd.google-apps.shortcut') {
-                                    handleFileAction('preview', item.id, item.name);
-                                  } else if (isPreviewable(item.mimeType)) {
-                                    handleFileAction('preview', item.id, item.name);
-                                  } else {
-                                    handleFileAction('download', item.id, item.name);
-                                  }
-                                }}
-                              >
-                                {item.name}
-                              </span>
-                            )}
-                            {item.itemType === 'folder' && <Badge variant="outline" className="text-xs">Folder</Badge>}
-                            {item.itemType === 'file' && item.shared && <Badge variant="secondary" className="text-xs">Shared</Badge>}
-                            {item.itemType === 'file' && item.mimeType === 'application/vnd.google-apps.shortcut' && (
-                              <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">
-                                <Link className="h-3 w-3 mr-1" />
-                                Shortcut
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
-                      )}
-                      {visibleColumns.id && (
-                        <TableCell className="text-muted-foreground">
-                          <code className="text-xs bg-muted px-1 rounded">{item.id}</code>
-                        </TableCell>
-                      )}
-                      {visibleColumns.size && (
-                        <TableCell className="text-muted-foreground">
-                          {item.itemType === 'folder' ? '-' : (item.size ? formatFileSize(item.size) : '-')}
-                        </TableCell>
-                      )}
-                      {visibleColumns.owners && (
-                        <TableCell className="text-muted-foreground">
-                          {item.owners?.map((owner: any) => owner.displayName || owner.emailAddress).join(', ') || '-'}
-                        </TableCell>
-                      )}
-                      {visibleColumns.mimeType && (
-                        <TableCell className="text-muted-foreground">
-                          {item.itemType === 'folder' ? (
-                            <Badge variant="secondary" className="text-xs">Folder</Badge>
-                          ) : (
-                            <code className="text-xs bg-muted px-1 rounded">{item.mimeType}</code>
-                          )}
-                        </TableCell>
-                      )}
-                      {visibleColumns.createdTime && (
-                        <TableCell className="text-muted-foreground">
-                          {formatFileTime(item.createdTime, timezone)}
-                        </TableCell>
-                      )}
-                      {visibleColumns.modifiedTime && (
-                        <TableCell className="text-muted-foreground">
-                          {formatFileTime(item.modifiedTime, timezone)}
-                        </TableCell>
-                      )}
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            {(() => {
-                              const actions = getFileActions(item, activeView);
-                              return (
-                                <>
-                                  {item.itemType === 'file' && actions.canPreview && isPreviewable(item.mimeType) && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('preview', item.id, item.name);
-                                    }}>
-                                      <Eye className="h-4 w-4 mr-2" />
-                                      Preview
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {item.itemType === 'file' && actions.canDownload && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('download', item.id, item.name);
-                                    }}>
-                                      <Download className="h-4 w-4 mr-2" />
-                                      Download
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {actions.canRename && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('rename', item.id, item.name);
-                                    }}>
-                                      <Edit className="h-4 w-4 mr-2" />
-                                      Rename
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {actions.canMove && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('move', item.id, item.name);
-                                    }}>
-                                      <Move className="h-4 w-4 mr-2" />
-                                      Move
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {actions.canCopy && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('copy', item.id, item.name);
-                                    }}>
-                                      <Copy className="h-4 w-4 mr-2" />
-                                      Copy
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {actions.canShare && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('share', item.id, item.name);
-                                    }}>
-                                      <Share className="h-4 w-4 mr-2" />
-                                      Share
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {actions.canDetails && (
-                                    <DropdownMenuItem onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleFileAction('details', item.id, item.name);
-                                    }}>
-                                      <Info className="h-4 w-4 mr-2" />
-                                      Details
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {(actions.canTrash || actions.canRestore || actions.canPermanentDelete) && <DropdownMenuSeparator />}
-
-                                  {actions.canRestore && (
-                                    <DropdownMenuItem 
-                                      className="text-green-600"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleFileAction('restore', item.id, item.name);
-                                      }}
-                                    >
-                                      <RefreshCw className="h-4 w-4 mr-2" />
-                                      Restore
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {actions.canTrash && (
-                                    <DropdownMenuItem 
-                                      className="text-orange-600"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleFileAction('trash', item.id, item.name);
-                                      }}
-                                    >
-                                      <Trash2 className="h-4 w-4 mr-2" />
-                                      Move to Trash
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {actions.canPermanentDelete && (
-                                    <DropdownMenuItem 
-                                      className="text-destructive"
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleFileAction('permanentDelete', item.id, item.name);
-                                      }}
-                                    >
-                                      <AlertTriangle className="h-4 w-4 mr-2" />
-                                      Permanently Delete
-                                    </DropdownMenuItem>
-                                  )}
-                                </>
-                              );
-                            })()}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-
-          {/* Load More Button */}
-          {nextPageToken && !loading && (
-            <div className="flex justify-center mt-6">
-              <Button 
-                variant="outline" 
-                onClick={handleLoadMore}
-                disabled={loadingMore}
-                className="w-full max-w-xs"
-              >
-                {loadingMore ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Loading more...
-                  </>
-                ) : (
-                  'Load More'
-                )}
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Load More Section */}
+      {hasNextPage && !loading && (
+        <div className="flex justify-center p-4">
+          <Button
+            variant="outline"
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="w-full sm:w-auto"
+          >
+            {loadingMore ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                Loading more...
+              </>
+            ) : (
+              'Load More'
+            )}
+          </Button>
+        </div>
+      )}
 
       {/* Dialogs */}
       <FileUploadDialog
@@ -3379,72 +2705,78 @@ export function DriveManager() {
           setIsCreateFolderDialogOpen(false);
           handleRefresh();
         }}
-        parentFolderId={currentFolderId}
+        currentFolderId={currentFolderId}
       />
 
       <FileRenameDialog
-        open={isRenameDialogOpen}
-        onOpenChange={(open) => {
-          setIsRenameDialogOpen(open);
-          if (!open) {
-            setSelectedFileForAction(null);
+        isOpen={isRenameDialogOpen}
+        onClose={() => setIsRenameDialogOpen(false)}
+        onRename={async (newName) => {
+          if (selectedFileForRename) {
+            await handleRenameFile(selectedFileForRename.id, newName);
           }
         }}
-        file={selectedFileForAction}
-        onFileRenamed={handleRenameFile}
+        fileName={selectedFileForRename?.name || ''}
+        fileId={selectedFileForRename?.id || ''}
       />
 
       <FileMoveDialog
         isOpen={isMoveDialogOpen}
-        onClose={() => {
-          setIsMoveDialogOpen(false);
-          setSelectedFileForAction(null);
+        onClose={() => setIsMoveDialogOpen(false)}
+        onMove={async (targetFolderId) => {
+          if (selectedFileForMove) {
+            await handleMoveFile(selectedFileForMove.id, targetFolderId);
+          }
         }}
-        fileName={selectedFileForAction?.name || ''}
-        currentParentId={selectedFileForAction?.parentId || null}
-        onMove={handleMoveFile}
+        fileName={selectedFileForMove?.name || ''}
+        fileId={selectedFileForMove?.id || ''}
       />
 
       <FileCopyDialog
         isOpen={isCopyDialogOpen}
-        onClose={() => {
-          setIsCopyDialogOpen(false);
-          setSelectedFileForAction(null);
+        onClose={() => setIsCopyDialogOpen(false)}
+        onCopy={async (targetFolderId, newName) => {
+          if (selectedFileForCopy) {
+            await handleCopyFile(selectedFileForCopy.id, targetFolderId, newName);
+          }
         }}
-        fileName={selectedFileForAction?.name || ''}
-        currentParentId={selectedFileForAction?.parentId || null}
-        onCopy={handleCopyFile}
+        fileName={selectedFileForCopy?.name || ''}
+        fileId={selectedFileForCopy?.id || ''}
       />
 
-      <PermanentDeleteDialog
-        open={isPermanentDeleteDialogOpen}
-        onOpenChange={setIsPermanentDeleteDialogOpen}
-        itemId={selectedItemForDelete?.id || null}
-        itemName={selectedItemForDelete?.name || null}
-        itemType={selectedItemForDelete?.type || 'file'}
-        onSuccess={async () => {
-          await handleRefresh();
-          setSelectedItemForDelete(null);
+      <FileDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onDelete={async () => {
+          if (selectedFileForDelete) {
+            if (activeView === 'trash') {
+              await handlePermanentDeleteFile(selectedFileForDelete.id);
+            } else {
+              await handleDeleteFile(selectedFileForDelete.id);
+            }
+          }
         }}
+        fileName={selectedFileForDelete?.name || ''}
+        fileId={selectedFileForDelete?.id || ''}
+        isPermanent={activeView === 'trash'}
       />
 
       <FileDetailsDialog
         isOpen={isDetailsDialogOpen}
-        onClose={() => {
-          setIsDetailsDialogOpen(false);
-          setSelectedItemForDetails(null);
-        }}
-        fileId={selectedItemForDetails?.id || ''}
-        fileName={selectedItemForDetails?.name || ''}
-        fileType={selectedItemForDetails?.type || 'file'}
+        onClose={() => setIsDetailsDialogOpen(false)}
+        fileId={selectedFileForDetails?.id || ''}
+      />
+
+      <FileShareDialog
+        isOpen={isShareDialogOpen}
+        onClose={() => setIsShareDialogOpen(false)}
+        fileId={selectedFileForShare?.id || ''}
+        fileName={selectedFileForShare?.name || ''}
       />
 
       <FilePreviewDialog
-        open={isPreviewDialogOpen}
-        onClose={() => {
-          setIsPreviewDialogOpen(false);
-          setSelectedFileForPreview(null);
-        }}
+        isOpen={isPreviewDialogOpen}
+        onClose={() => setIsPreviewDialogOpen(false)}
         file={selectedFileForPreview}
       />
 
@@ -3452,163 +2784,89 @@ export function DriveManager() {
       <BulkDeleteDialog
         isOpen={isBulkDeleteDialogOpen}
         onClose={() => setIsBulkDeleteDialogOpen(false)}
-        onConfirm={handleBulkDelete}
+        onDelete={async () => {
+          const items = getSelectedItemsData();
+          if (activeView === 'trash') {
+            await handleBulkPermanentDelete(items.map(item => item.id));
+          } else {
+            await handleBulkDelete(items.map(item => item.id));
+          }
+        }}
         selectedItems={getSelectedItemsData()}
+        isPermanent={activeView === 'trash'}
       />
 
       <BulkMoveDialog
         isOpen={isBulkMoveDialogOpen}
         onClose={() => setIsBulkMoveDialogOpen(false)}
-        onConfirm={handleBulkMove}
+        onMove={async (targetFolderId) => {
+          const items = getSelectedItemsData();
+          await handleBulkMove(items.map(item => item.id), targetFolderId);
+        }}
         selectedItems={getSelectedItemsData()}
       />
 
       <BulkCopyDialog
         isOpen={isBulkCopyDialogOpen}
         onClose={() => setIsBulkCopyDialogOpen(false)}
-        onConfirm={handleBulkCopy}
-        selectedItems={getSelectedItemsData()}
-      />
-
-      <BulkExportDialog
-        isOpen={isBulkExportDialogOpen}
-        onClose={() => setIsBulkExportDialogOpen(false)}
-        onConfirm={handleBulkExport}
+        onCopy={async (targetFolderId) => {
+          const items = getSelectedItemsData();
+          await handleBulkCopy(items.map(item => item.id), targetFolderId);
+        }}
         selectedItems={getSelectedItemsData()}
       />
 
       <BulkRenameDialog
         isOpen={isBulkRenameDialogOpen}
         onClose={() => setIsBulkRenameDialogOpen(false)}
-        onConfirm={handleBulkRename}
+        onRename={async (renameData) => {
+          await handleBulkRename(renameData);
+        }}
         selectedItems={getSelectedItemsData()}
       />
 
       <BulkRestoreDialog
         isOpen={isBulkRestoreDialogOpen}
         onClose={() => setIsBulkRestoreDialogOpen(false)}
-        onConfirm={handleBulkRestore}
+        onRestore={async () => {
+          const items = getSelectedItemsData();
+          await handleBulkRestore(items.map(item => item.id));
+        }}
         selectedItems={getSelectedItemsData()}
       />
 
-      {/* Enhanced Bulk Permanent Delete Dialog with Security Features */}
-      <BulkPermanentDeleteDialog
-        isOpen={isBulkPermanentDeleteDialogOpen}
-        onClose={() => setIsBulkPermanentDeleteDialogOpen(false)}
-        onConfirm={handleBulkPermanentDelete}
-        selectedItems={getSelectedItemsData()}
-      />
-
-      {/* Enhanced Bulk Operations Progress Indicator */}
-      {bulkOperationProgress.isRunning && (
-        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg min-w-[320px] max-w-[90vw] md:max-w-[400px]">
-          <div className="flex items-start gap-3">
-            <div className="p-1.5 rounded-full bg-primary/10">
-              <RefreshCw className="h-4 w-4 animate-spin text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium mb-1 truncate" title={bulkOperationProgress.operation}>
-                {bulkOperationProgress.operation}
-              </div>
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-                <span>{bulkOperationProgress.current} of {bulkOperationProgress.total} items</span>
-                <span className="font-medium">{Math.round((bulkOperationProgress.current / bulkOperationProgress.total) * 100)}%</span>
-              </div>
-              <Progress 
-                value={(bulkOperationProgress.current / bulkOperationProgress.total) * 100} 
-                className="h-2"
-              />
-              {bulkOperationProgress.total > 5 && (
-                <div className="text-xs text-muted-foreground mt-1">
-                  {bulkOperationProgress.total - bulkOperationProgress.current} remaining
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Single Operation Progress Indicator */}
-      {singleOperationProgress.isRunning && !bulkOperationProgress.isRunning && (
-        <div className="fixed bottom-4 right-4 z-50 bg-background border rounded-lg p-4 shadow-lg min-w-[280px] max-w-[90vw] md:max-w-[350px]">
-          <div className="flex items-center gap-3">
-            <div className="p-1.5 rounded-full bg-primary/10">
-              <RefreshCw className="h-4 w-4 animate-spin text-primary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium truncate" title={singleOperationProgress.operation}>
-                {singleOperationProgress.operation}
-              </div>
-              <div className="flex items-center gap-1 mt-1">
-                <div className="h-1 w-1 bg-primary rounded-full animate-pulse"></div>
-                <div className="h-1 w-1 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
-                <div className="h-1 w-1 bg-primary rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
-                <span className="text-xs text-muted-foreground ml-1">Processing...</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* File Share Dialog */}
-      <FileShareDialog
-        open={isShareDialogOpen}
-        onOpenChange={setIsShareDialogOpen}
-        item={selectedItemForShare}
-        items={selectedItemForShare?.id === 'bulk' ? getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item.type as 'file' | 'folder' })) : undefined}
-        onShare={handleShare}
-      />
-
-      {/* Bulk Share Dialog */}
       <BulkShareDialog
-        open={isBulkShareDialogOpen}
-        onOpenChange={setIsBulkShareDialogOpen}
-        selectedItems={getSelectedItemsData().filter(item => item !== null) as Array<{ id: string; name: string; type: 'file' | 'folder'; mimeType?: string }>}
-        onShare={handleBulkShare}
+        isOpen={isBulkShareDialogOpen}
+        onClose={() => setIsBulkShareDialogOpen(false)}
+        selectedItems={getSelectedItemsData()}
       />
 
-      {/* Mobile Bottom Sheets for Enhanced Touch Experience */}
+      {/* Mobile Components */}
       <MobileActionsBottomSheet
         open={isMobileActionsOpen}
         onOpenChange={setIsMobileActionsOpen}
-        selectedCount={selectedItems.size}
-        selectedItems={getSelectedItemsData().filter(item => item !== null).map(item => ({ ...item, type: item.type as 'file' | 'folder' }))}
-        isInTrash={activeView === 'trash' || searchQuery.includes('trashed:true')}
-        onBulkDownload={handleBulkDownload}
-        onBulkDelete={() => setIsBulkDeleteDialogOpen(true)}
-        onBulkMove={() => setIsBulkMoveDialogOpen(true)}
-        onBulkCopy={() => setIsBulkCopyDialogOpen(true)}
-        onBulkRename={() => setIsBulkRenameDialogOpen(true)}
-        onBulkExport={() => setIsBulkExportDialogOpen(true)}
-        onBulkShare={() => setIsBulkShareDialogOpen(true)}
-        onBulkRestore={() => setIsBulkRestoreDialogOpen(true)}
-        onBulkPermanentDelete={() => setIsBulkPermanentDeleteDialogOpen(true)}
-        onDeselectAll={deselectAll}
+        selectedItems={getSelectedItemsData()}
+        isSelectMode={isSelectMode}
+        onAction={(action) => {
+          setIsMobileActionsOpen(false);
+          handleBulkAction(action);
+        }}
+        onRefresh={handleRefresh}
+        onCreateFolder={() => setIsCreateFolderDialogOpen(true)}
+        onUpload={() => setIsUploadDialogOpen(true)}
       />
 
       <FiltersDialog
         open={isMobileFiltersOpen}
         onOpenChange={setIsMobileFiltersOpen}
-        onFilterChange={(filters: any) => {
-          if (filters.activeView) {
-            handleViewChange(filters.activeView);
-          }
-          if (filters.fileTypeFilter) {
-            setFileTypeFilter(filters.fileTypeFilter);
-          }
-          if (filters.advancedFilters) {
-            setAdvancedFilters(filters.advancedFilters);
-          }
-        }}
-        currentFilters={{
-          activeView,
-          fileTypeFilter,
-          advancedFilters
-        }}
-        hasActiveFilters={!!hasActiveFilters}
+        fileTypeFilter={fileTypeFilter}
+        onFileTypeToggle={handleFileTypeToggle}
+        advancedFilters={advancedFilters}
+        onAdvancedFiltersChange={setAdvancedFilters}
+        sortedFiles={sortedFiles}
+        sortedFolders={sortedFolders}
         onClearFilters={clearAllFilters}
       />
-
     </div>
   );
 }

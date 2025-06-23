@@ -127,13 +127,13 @@ interface DriveToolbarProps {
   setIsMobileFiltersOpen: (open: boolean) => void;
   
   // File data
-  sortedFiles: DriveFile[];
-  sortedFolders: DriveFile[];
-  files: DriveFile[];
-  folders: DriveFile[];
+  sortedFiles: import("@/lib/google-drive/types").DriveFile[];
+  sortedFolders: import("@/lib/google-drive/types").DriveFolder[];
+  files: import("@/lib/google-drive/types").DriveFile[];
+  folders: import("@/lib/google-drive/types").DriveFolder[];
   
   // Actions
-  getFileActions: (file: DriveFile, view: string) => any;
+  getFileActions: (file: import("@/lib/google-drive/types").DriveFile | import("@/lib/google-drive/types").DriveFolder, view: string) => any;
   handleBulkDownload: () => void;
   handleRefresh: () => void;
   fetchFiles: (folderId?: string) => void;
