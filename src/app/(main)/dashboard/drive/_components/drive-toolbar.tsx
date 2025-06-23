@@ -270,7 +270,7 @@ export function DriveToolbar({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onSelectAll}>
                     <CheckSquare className="h-4 w-4 mr-2" />
-                    Select All ({folders.length + files.length})
+                    Select All ({files.length + folders.length})
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={onSelectAll}>
                     <Square className="h-4 w-4 mr-2" />
@@ -807,7 +807,14 @@ export function DriveToolbar({
                       <Folder className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">Folders</span>
                     </div>
-                    <Badge variant="outline" className="border-blue-500 text-blue-700 dark:text-blue-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-blue-500 text-blue-700 dark:text-blue-300 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['folder'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {folders.length}
                     </Badge>
                   </div>
@@ -820,7 +827,14 @@ export function DriveToolbar({
                       <FileImage className="h-4 w-4 text-green-500" />
                       <span className="text-sm">Images</span>
                     </div>
-                    <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-green-500 text-green-700 dark:text-green-300 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['image'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.includes('image')).length}
                     </Badge>
                   </div>
@@ -833,7 +847,14 @@ export function DriveToolbar({
                       <Play className="h-4 w-4 text-red-500" />
                       <span className="text-sm">Videos</span>
                     </div>
-                    <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-red-500 text-red-700 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['video'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.includes('video')).length}
                     </Badge>
                   </div>
@@ -846,7 +867,14 @@ export function DriveToolbar({
                       <FileText className="h-4 w-4 text-orange-500" />
                       <span className="text-sm">Documents</span>
                     </div>
-                    <Badge variant="outline" className="border-orange-500 text-orange-700 dark:text-orange-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-orange-500 text-orange-700 dark:text-orange-300 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['document'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
                     </Badge>
                   </div>
@@ -859,7 +887,14 @@ export function DriveToolbar({
                       <FileSpreadsheet className="h-4 w-4 text-green-500" />
                       <span className="text-sm">Spreadsheets</span>
                     </div>
-                    <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-green-500 text-green-700 dark:text-green-300 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['spreadsheet'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
                     </Badge>
                   </div>
@@ -872,7 +907,14 @@ export function DriveToolbar({
                       <Presentation className="h-4 w-4 text-amber-500" />
                       <span className="text-sm">Presentations</span>
                     </div>
-                    <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-amber-500 text-amber-700 dark:text-amber-300 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['presentation'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
                     </Badge>
                   </div>
@@ -885,7 +927,14 @@ export function DriveToolbar({
                       <FileVideo className="h-4 w-4 text-red-500" />
                       <span className="text-sm">Videos</span>
                     </div>
-                    <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-red-500 text-red-700 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['video'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.startsWith('video/')).length}
                     </Badge>
                   </div>
@@ -898,7 +947,14 @@ export function DriveToolbar({
                       <FileAudio className="h-4 w-4 text-indigo-500" />
                       <span className="text-sm">Audio</span>
                     </div>
-                    <Badge variant="outline" className="border-indigo-500 text-indigo-700 dark:text-indigo-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-indigo-500 text-indigo-700 dark:text-indigo-300 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['audio'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.startsWith('audio/')).length}
                     </Badge>
                   </div>
@@ -911,7 +967,14 @@ export function DriveToolbar({
                       <Archive className="h-4 w-4 text-gray-500" />
                       <span className="text-sm">Archives</span>
                     </div>
-                    <Badge variant="outline" className="border-gray-500 text-gray-700 dark:text-gray-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-gray-500 text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['archive'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
                     </Badge>
                   </div>
@@ -924,7 +987,14 @@ export function DriveToolbar({
                       <FileCode className="h-4 w-4 text-emerald-500" />
                       <span className="text-sm">Code Files</span>
                     </div>
-                    <Badge variant="outline" className="border-emerald-500 text-emerald-700 dark:text-emerald-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-emerald-500 text-emerald-700 dark:text-emerald-300 cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['code'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
                     </Badge>
                   </div>
@@ -937,7 +1007,14 @@ export function DriveToolbar({
                       <Link className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">Shortcuts</span>
                     </div>
-                    <Badge variant="outline" className="border-blue-500 text-blue-700 dark:text-blue-300">
+                    <Badge 
+                      variant="outline" 
+                      className="border-blue-500 text-blue-700 dark:text-blue-300 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                      onClick={() => {
+                        onFilterChange({ fileTypeFilter: ['shortcut'] });
+                        onApplyFilters();
+                      }}
+                    >
                       {files.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length}
                     </Badge>
                   </div>
