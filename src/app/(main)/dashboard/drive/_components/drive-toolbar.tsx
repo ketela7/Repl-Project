@@ -123,7 +123,11 @@ interface DriveToolbarProps {
     fileTypeFilter: string[];
     advancedFilters: AdvancedFilters;
   };
-  onFilterChange: (updates: Partial<typeof filters>) => void;
+  onFilterChange: (updates: Partial<{
+    activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash';
+    fileTypeFilter: string[];
+    advancedFilters: AdvancedFilters;
+  }>) => void;
   onApplyFilters: () => void;
   onClearFilters: () => void;
   hasActiveFilters: boolean;
@@ -138,7 +142,6 @@ interface DriveToolbarProps {
   
   // Loading states
   loading: boolean;
-  refreshing: boolean;
 }
 
 export function DriveToolbar({

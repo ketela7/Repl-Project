@@ -153,7 +153,10 @@ export function DriveManager() {
     advancedFilters: {
       sizeRange: { unit: 'MB' as 'B' | 'KB' | 'MB' | 'GB' },
       sortBy: 'modified' as 'name' | 'modified' | 'created' | 'size',
-      sortOrder: 'desc' as 'asc' | 'desc'
+      sortOrder: 'desc' as 'asc' | 'desc',
+      createdDateRange: {},
+      modifiedDateRange: {},
+      owner: undefined
     }
   });
 
@@ -166,6 +169,10 @@ export function DriveManager() {
     createdTime: false,
     modifiedTime: false,
   });
+
+  // Dialog state
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [isCreateFolderDialogOpen, setIsCreateFolderDialogOpen] = useState(false);
 
   // Sorting state
   const [sortConfig, setSortConfig] = useState<{
@@ -323,8 +330,8 @@ export function DriveManager() {
           bValue = (b.id || '').toLowerCase();
           break;
         case 'size':
-          aValue = isFolder(a) ? 0 : normalizeFileSize(a.size);
-          bValue = isFolder(b) ? 0 : normalizeFileSize(b.size);
+          aValue = isFolder(a) ? 0 : normalizeFileSize((a as any).size);
+          bValue = isFolder(b) ? 0 : normalizeFileSize((b as any).size);
           break;
         case 'modifiedTime':
           aValue = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0;
@@ -449,7 +456,7 @@ export function DriveManager() {
         setDriveAccessError(error);
       } else {
         setDriveAccessError(error);
-        errorToast.apiError('Failed to load files', error);
+        errorToast.apiError('Failed to load files');
       }
       setHasAccess(false);
     } finally {
@@ -531,7 +538,7 @@ export function DriveManager() {
             advancedFilters={filters.advancedFilters}
             onViewChange={(view) => handleFilter({ activeView: view })}
             onFileTypeFilterChange={(types) => handleFilter({ fileTypeFilter: types })}
-            onAdvancedFiltersChange={(advanced) => handleFilter({ advancedFilters: advanced })}
+            onAdvancedFiltersChange={(advanced) => handleFilter({ advancedFilters: advanced as any })}
             onClearFilters={clearAllFilters}
             onApplyFilters={applyFilters}
             hasActiveFilters={hasActiveFilters}
@@ -566,6 +573,14 @@ export function DriveManager() {
             hasActiveFilters={hasActiveFilters}
             files={files}
             folders={folders}
+            visibleColumns={visibleColumns}
+            setVisibleColumns={setVisibleColumns}
+            setIsUploadDialogOpen={setIsUploadDialogOpen}
+            setIsCreateFolderDialogOpen={setIsCreateFolderDialogOpen}
+            loading={loading}
+            setIsUploadDialogOpen={setIsUploadDialogOpen}
+            setIsCreateFolderDialogOpen={setIsCreateFolderDialogOpen}
+            loading={loading}
           />
 
           {currentFolderId && (
