@@ -1594,10 +1594,10 @@ export function DriveManager() {
         params.append('viewStatus', currentView); // Add viewStatus for backend API compatibility
       }
 
-      // Add file type filters
-      // Add file type filters
+      // Add file type filters  
       if (fileTypeFilter && fileTypeFilter.length > 0) {
         params.append('fileType', fileTypeFilter.join(','));
+        console.log('Frontend sending fileType:', fileTypeFilter.join(','));
       }
 
       // Add advanced filters
@@ -1627,6 +1627,8 @@ export function DriveManager() {
       if (advancedFilters.owner) {
         params.append('owner', advancedFilters.owner);
       }
+      
+      console.log('Frontend sending all params:', Object.fromEntries(params.entries()));
 
       // Optimized page size for better performance
       params.append('pageSize', '50');
@@ -1771,7 +1773,10 @@ export function DriveManager() {
 
   const handleAdvancedFiltersChange = (filters: any) => {
     setAdvancedFilters(filters);
-    // Note: No need to call fetchFiles here as client-side filtering handles this
+    // Apply advanced filters immediately
+    setTimeout(() => {
+      fetchFiles(currentFolderId || undefined, searchQuery || undefined);
+    }, 0);
   };
 
   const handleFileTypeToggle = (type: string) => {
@@ -1779,9 +1784,14 @@ export function DriveManager() {
       const newFilter = prev.includes(type) 
         ? prev.filter(t => t !== type)
         : [...prev, type];
+      
+      // Immediately fetch files with new filter - this was missing!
+      setTimeout(() => {
+        fetchFiles(currentFolderId || undefined, searchQuery || undefined);
+      }, 0);
+      
       return newFilter;
     });
-    // Note: No need to call fetchFiles here as client-side filtering handles this
   };
 
   const handleFolderClick = useCallback((folderId: string) => {
@@ -2520,16 +2530,16 @@ export function DriveManager() {
     }
   }, [submittedSearchQuery, currentFolderId, hasAccess]);
 
-  // Force re-render when filters change to update the visual display
+  // Apply filters when they change - fetch from API with new filters
   useEffect(() => {
-    // Only trigger re-render if we have data and access is confirmed
-    // This prevents unnecessary API calls during initial load
-    if ((files.length > 0 || folders.length > 0) && hasAccess === true) {
-      // Force a minimal state update to trigger re-render without API calls
-      setFiles(prev => [...prev]);
-      setFolders(prev => [...prev]);
+    // Skip if this is the initial load or no access yet
+    if (hasAccess !== true) return;
+    
+    // Only fetch if we already have some data (not initial load)
+    if (files.length > 0 || folders.length > 0) {
+      fetchFiles(currentFolderId || undefined, searchQuery || undefined);
     }
-  }, [fileTypeFilter, advancedFilters, activeView, files.length, folders.length, hasAccess]);
+  }, [fileTypeFilter, advancedFilters, activeView, hasAccess]);
 
   // Handle view mode change for toggle group
   const handleViewModeChange = (value: string) => {
