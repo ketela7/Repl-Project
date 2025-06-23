@@ -174,7 +174,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }
   },
   trustHost: true,
-  secret: process.env.NEXTAUTH_SECRET,
-  debug: false, // Disable debug to reduce noise
-  useSecureCookies: process.env.NODE_ENV === 'production',
+  secret: process.env.NEXTAUTH_SECRET!,
+  debug: process.env.NODE_ENV === 'development',
 })
