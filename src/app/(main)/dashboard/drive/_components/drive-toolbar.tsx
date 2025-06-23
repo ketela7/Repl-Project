@@ -313,25 +313,38 @@ export function DriveToolbar({
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters;
 
-
-
   // Track active filter state
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
+  // Memoize category counts to avoid repetitive filtering
+  const categoryCounts = useMemo(() => {
+    return {
+      images: items.filter(f => f.mimeType?.includes('image')).length,
+      videos: items.filter(f => f.mimeType?.includes('video')).length,
+      documents: items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length,
+      spreadsheets: items.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length,
+      presentations: items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length,
+      audio: items.filter(f => f.mimeType?.startsWith('audio/')).length,
+      archives: items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length,
+      code: items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length,
+      design: items.filter(f => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')).length,
+      database: items.filter(f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length,
+      ebooks: items.filter(f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length,
+      fonts: items.filter(f => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')).length,
+      shortcuts: items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length,
+      folders: items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').length
+    };
+  }, [items]);
+
   // Handle badge click for client-side filtering
   const handleCategoryClick = useCallback((category: string) => {
-    console.log('Badge clicked:', category, 'Items:', items.length);
     if (onClientSideFilter) {
       const filteredItems = filterByMimeType(items, category);
-      console.log('Filtered items:', filteredItems.length, 'Category:', category);
       onClientSideFilter(filteredItems);
       setActiveFilter(category);
-      // Show success toast
       successToast.generic(`Filtered to ${filteredItems.length} ${category.toLowerCase()}`, {
         description: `Showing only ${category.toLowerCase()} from ${items.length} total items`
       });
-    } else {
-      console.log('onClientSideFilter callback not available');
     }
   }, [items, onClientSideFilter]);
 
@@ -998,7 +1011,7 @@ export function DriveToolbar({
                 </div>
 
                 {/* Images */}
-                {items.filter(f => f.mimeType?.includes('image')).length > 0 && (
+                {categoryCounts.images > 0 && (
                   <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileImage className="h-4 w-4 text-green-500" />
@@ -1013,13 +1026,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Images')}
                     >
-                      {items.filter(f => f.mimeType?.includes('image')).length}
+                      {categoryCounts.images}
                     </Badge>
                   </div>
                 )}
 
                 {/* Videos */}
-                {items.filter(f => f.mimeType?.includes('video')).length > 0 && (
+                {categoryCounts.videos > 0 && (
                   <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Play className="h-4 w-4 text-red-500" />
@@ -1034,13 +1047,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Videos')}
                     >
-                      {items.filter(f => f.mimeType?.includes('video')).length}
+                      {categoryCounts.videos}
                     </Badge>
                   </div>
                 )}
 
                 {/* Documents */}
-                {items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
+                {categoryCounts.documents > 0 && (
                   <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-orange-500" />
@@ -1055,13 +1068,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Documents')}
                     >
-                      {items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
+                      {categoryCounts.documents}
                     </Badge>
                   </div>
                 )}
 
                 {/* Spreadsheets */}
-                {items.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length > 0 && (
+                {categoryCounts.spreadsheets > 0 && (
                   <div className="flex items-center justify-between p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileSpreadsheet className="h-4 w-4 text-emerald-500" />
@@ -1076,13 +1089,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Spreadsheets')}
                     >
-                      {items.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
+                      {categoryCounts.spreadsheets}
                     </Badge>
                   </div>
                 )}
 
                 {/* Presentations */}
-                {items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length > 0 && (
+                {categoryCounts.presentations > 0 && (
                   <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Presentation className="h-4 w-4 text-amber-500" />
@@ -1097,13 +1110,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Presentations')}
                     >
-                      {items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
+                      {categoryCounts.presentations}
                     </Badge>
                   </div>
                 )}
 
                 {/* Audio */}
-                {items.filter(f => f.mimeType?.startsWith('audio/')).length > 0 && (
+                {categoryCounts.audio > 0 && (
                   <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Music className="h-4 w-4 text-indigo-500" />
@@ -1118,13 +1131,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Audio')}
                     >
-                      {items.filter(f => f.mimeType?.startsWith('audio/')).length}
+                      {categoryCounts.audio}
                     </Badge>
                   </div>
                 )}
 
                 {/* Archives */}
-                {items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length > 0 && (
+                {categoryCounts.archives > 0 && (
                   <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Archive className="h-4 w-4 text-gray-500" />
@@ -1139,13 +1152,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Archives')}
                     >
-                      {items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
+                      {categoryCounts.archives}
                     </Badge>
                   </div>
                 )}
 
                 {/* Code Files */}
-                {items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length > 0 && (
+                {categoryCounts.code > 0 && (
                   <div className="flex items-center justify-between p-2 bg-cyan-50 dark:bg-cyan-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileCode className="h-4 w-4 text-cyan-500" />
@@ -1160,13 +1173,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Code')}
                     >
-                      {items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
+                      {categoryCounts.code}
                     </Badge>
                   </div>
                 )}
 
                 {/* Design Files */}
-                {items.filter(f => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')).length > 0 && (
+                {categoryCounts.design > 0 && (
                   <div className="flex items-center justify-between p-2 bg-purple-50 dark:bg-purple-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Palette className="h-4 w-4 text-purple-500" />
@@ -1181,13 +1194,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Design')}
                     >
-                      {items.filter(f => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')).length}
+                      {categoryCounts.design}
                     </Badge>
                   </div>
                 )}
 
                 {/* Database Files */}
-                {items.filter(f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length > 0 && (
+                {categoryCounts.database > 0 && (
                   <div className="flex items-center justify-between p-2 bg-teal-50 dark:bg-teal-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Database className="h-4 w-4 text-teal-500" />
@@ -1202,13 +1215,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Database')}
                     >
-                      {items.filter(f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length}
+                      {categoryCounts.database}
                     </Badge>
                   </div>
                 )}
 
                 {/* E-books */}
-                {items.filter(f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length > 0 && (
+                {categoryCounts.ebooks > 0 && (
                   <div className="flex items-center justify-between p-2 bg-rose-50 dark:bg-rose-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-4 w-4 text-rose-500" />
@@ -1223,13 +1236,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Ebooks')}
                     >
-                      {items.filter(f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length}
+                      {categoryCounts.ebooks}
                     </Badge>
                   </div>
                 )}
 
                 {/* Fonts */}
-                {items.filter(f => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')).length > 0 && (
+                {categoryCounts.fonts > 0 && (
                   <div className="flex items-center justify-between p-2 bg-stone-50 dark:bg-stone-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileType className="h-4 w-4 text-stone-500" />
@@ -1244,13 +1257,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Fonts')}
                     >
-                      {items.filter(f => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')).length}
+                      {categoryCounts.fonts}
                     </Badge>
                   </div>
                 )}
 
                 {/* Shortcuts */}
-                {items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length > 0 && (
+                {categoryCounts.shortcuts > 0 && (
                   <div className="flex items-center justify-between p-2 bg-sky-50 dark:bg-sky-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Link className="h-4 w-4 text-sky-500" />
@@ -1265,13 +1278,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Shortcuts')}
                     >
-                      {items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length}
+                      {categoryCounts.shortcuts}
                     </Badge>
                   </div>
                 )}
 
                 {/* Folders */}
-                {items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').length > 0 && (
+                {categoryCounts.folders > 0 && (
                   <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Folder className="h-4 w-4 text-blue-500" />
@@ -1286,7 +1299,7 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Folders')}
                     >
-                      {items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').length}
+                      {categoryCounts.folders}
                     </Badge>
                   </div>
                 )}

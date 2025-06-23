@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { 
   FileVideo, 
   FileText, 
@@ -17,7 +16,6 @@ import {
   BookOpen,
   Link
 } from "lucide-react";
-import { getCategoryIcon, getCategoryColor, getFileCategory } from '@/lib/google-drive/utils';
 
 interface DriveFile {
   id: string;

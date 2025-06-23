@@ -1,89 +1,19 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { 
-  Upload, 
-  FolderPlus, 
-  Search, 
-  MoreVertical,
-  Download,
-  Trash2,
-  Share,
-  Edit,
-  Eye,
-  RefreshCw,
-  Move,
-  Copy,
-  X,
-  AlertTriangle,
-  Info,
-  Grid3X3,
-  List,
-  Settings,
   ChevronUp,
   ChevronDown,
   ChevronsUpDown,
-  CheckSquare,
-  Folder,
-  Star
+  RefreshCw
 } from "lucide-react";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { 
-  ToggleGroup, 
-  ToggleGroupItem 
-} from "@/components/ui/toggle-group";
-import { 
-  Checkbox 
-} from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { Separator } from "@/components/ui/separator";
 
 // Import from utils
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
-import { 
-  formatFileSize, 
-  formatDriveFileDate, 
-  isPreviewable, 
-  getFileActions,
-  normalizeFileSize,
-  getSizeMultiplier,
-  isFileSizeInRange
-} from '@/lib/google-drive/utils';
-import { formatFileTime, getRelativeTime } from '@/lib/timezone';
-import { useTimezoneContext } from '@/components/timezone-provider';
-import { FileIcon } from '@/components/file-icon';
-import { successToast, errorToast, warningToast, infoToast, loadingToast, toastUtils } from '@/lib/toast';
+import { normalizeFileSize } from '@/lib/google-drive/utils';
+import { successToast, errorToast, infoToast } from '@/lib/toast';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTimezoneContext } from '@/components/timezone-provider';
 
 // Component imports
 import { FileUploadDialog } from './file-upload-dialog';
@@ -99,12 +29,8 @@ import { FilePreviewDialog } from './file-preview-dialog';
 import { DriveGridSkeleton } from './drive-skeleton';
 import { BulkDeleteDialog } from './bulk-delete-dialog';
 import { BulkMoveDialog } from './bulk-move-dialog';
-import { BulkExportDialog } from './bulk-export-dialog';
-import { BulkRenameDialog } from './bulk-rename-dialog';
-import { BulkRestoreDialog } from './bulk-restore-dialog';
-import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog';
 import { BulkCopyDialog } from './bulk-copy-dialog';
-import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview';
+import { Progress } from '@/components/ui/progress';
 import { FileShareDialog } from './file-share-dialog';
 import { BulkShareDialog } from './bulk-share-dialog';
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet';
@@ -113,7 +39,6 @@ import { DriveToolbar } from './drive-toolbar';
 import { DriveDataView } from './drive-data-view';
 import { DriveErrorDisplay } from '@/components/drive-error-display';
 import { DrivePermissionRequired } from '@/components/drive-permission-required';
-import { FileCategoryBadges } from '@/components/file-category-badges';
 
 // Unified item type
 type DriveItem = (DriveFile | DriveFolder) & {
@@ -909,47 +834,7 @@ export function DriveManager() {
         selectedItems={selectedItemsWithDetails}
       />
 
-      <BulkExportDialog
-        isOpen={dialogs.bulkExport}
-        onClose={() => closeDialog('bulkExport')}
-        selectedItems={selectedItemsWithDetails}
-        onConfirm={(format) => {
-          closeDialog('bulkExport');
-        }}
-      />
-
-      <BulkRenameDialog
-        isOpen={dialogs.bulkRename}
-        onClose={() => closeDialog('bulkRename')}
-        selectedItems={selectedItemsWithDetails}
-        onConfirm={() => {
-          closeDialog('bulkRename');
-          setSelectedItems(new Set());
-          handleRefresh();
-        }}
-      />
-
-      <BulkRestoreDialog
-        isOpen={dialogs.bulkRestore}
-        onClose={() => closeDialog('bulkRestore')}
-        selectedItems={selectedItemsWithDetails}
-        onConfirm={() => {
-          closeDialog('bulkRestore');
-          setSelectedItems(new Set());
-          handleRefresh();
-        }}
-      />
-
-      <BulkPermanentDeleteDialog
-        isOpen={dialogs.bulkPermanentDelete}
-        onClose={() => closeDialog('bulkPermanentDelete')}
-        selectedItems={selectedItemsWithDetails}
-        onConfirm={() => {
-          closeDialog('bulkPermanentDelete');
-          setSelectedItems(new Set());
-          handleRefresh();
-        }}
-      />
+      {/* TODO: Add bulk operation dialogs when needed */}
 
       {/* Mobile components */}
       <MobileActionsBottomSheet

@@ -4,7 +4,6 @@ import { GoogleDriveService } from '@/lib/google-drive/service'
 import { driveCache } from '@/lib/cache'
 import { requestDeduplicator } from '@/lib/request-deduplication'
 import { retryDriveApiCall } from '@/lib/api-retry'
-//import { searchOptimizer } from '@/lib/search-optimizer'
 
 interface FileFilter {
   fileType?: string
@@ -45,14 +44,8 @@ function buildDriveQuery(filters: FileFilter): string {
       conditions.push('trashed=false')
       conditions.push("'me' in owners")
       break
-    //case 'recent':
-    // Recent files - show files accessed in the last 30 days
-    //  conditions.push('trashed=false');
-    //  const thirtyDaysAgo = new Date();
-    //  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    //  conditions.push(`viewedByMeTime >= '${thirtyDaysAgo.toISOString()}'`);
-    //  break;
-    //case 'all':
+
+
     default:
       // All files view - show non-trashed files by default
       conditions.push('trashed=false')
