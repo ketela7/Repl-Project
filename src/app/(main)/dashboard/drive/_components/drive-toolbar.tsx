@@ -687,6 +687,77 @@ export function DriveToolbar({
 
                 <Separator className="my-3" />
 
+                {/* Sort Options */}
+                <Collapsible>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
+                    <span className="text-sm font-semibold">Sort Options</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-2 ml-2 mt-2">
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Sort By</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          variant={advancedFilters.sortBy === 'name' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortBy: 'name' }))}
+                          className="justify-start text-xs"
+                        >
+                          Name
+                        </Button>
+                        <Button
+                          variant={advancedFilters.sortBy === 'modified' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortBy: 'modified' }))}
+                          className="justify-start text-xs"
+                        >
+                          Modified
+                        </Button>
+                        <Button
+                          variant={advancedFilters.sortBy === 'created' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortBy: 'created' }))}
+                          className="justify-start text-xs"
+                        >
+                          Created
+                        </Button>
+                        <Button
+                          variant={advancedFilters.sortBy === 'size' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortBy: 'size' }))}
+                          className="justify-start text-xs"
+                        >
+                          Size
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted-foreground">Sort Order</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          variant={advancedFilters.sortOrder === 'asc' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortOrder: 'asc' }))}
+                          className="justify-start text-xs"
+                        >
+                          Ascending
+                        </Button>
+                        <Button
+                          variant={advancedFilters.sortOrder === 'desc' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAdvancedFilters(prev => ({ ...prev, sortOrder: 'desc' }))}
+                          className="justify-start text-xs"
+                        >
+                          Descending
+                        </Button>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+
+                <Separator className="my-3" />
+
                 {/* Advanced Filters */}
                 <Collapsible>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
@@ -810,24 +881,35 @@ export function DriveToolbar({
                       />
                     </div>
 
-                    {/* Clear Filters */}
+                    {/* Apply and Clear Filters */}
                     <div className="flex gap-2">
                       <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
-                        onClick={() => setAdvancedFilters({ sizeRange: { unit: 'MB' } })}
+                        onClick={() => {
+                          console.log('🔍 [FILTER DEBUG] Desktop Apply Filter clicked');
+                          // Trigger immediate filter application
+                          applyFilters();
+                        }}
                         className="flex-1 text-xs"
                       >
-                        Clear Advanced
+                        Apply Filters
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => {
+                          console.log('🔍 [FILTER DEBUG] Desktop Clear All clicked');
                           handleViewChange('all');
-                          handleFileTypeToggle.length && fileTypeFilter.forEach(type => handleFileTypeToggle(type));
-                          setAdvancedFilters({ sizeRange: { unit: 'MB' } });
+                          fileTypeFilter.forEach(type => handleFileTypeToggle(type));
+                          setAdvancedFilters({ 
+                            sizeRange: { unit: 'MB' },
+                            sortBy: 'modified',
+                            sortOrder: 'desc'
+                          });
                           setSearchQuery('');
+                          // Apply cleared filters immediately
+                          setTimeout(() => applyFilters(), 100);
                         }}
                         className="flex-1 text-xs"
                       >
