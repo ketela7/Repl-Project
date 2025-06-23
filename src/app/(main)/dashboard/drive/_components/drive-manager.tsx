@@ -1767,16 +1767,17 @@ export function DriveManager() {
 
   const handleFileTypeFilterChange = (newFileTypes: string[]) => {
     setFileTypeFilter(newFileTypes);
-    // Refresh files with new filter
+    // Don't refresh immediately - wait for Apply Filter button
+  };
+
+  // New function to apply all filters when Apply Filter button is pressed
+  const applyFilters = () => {
     fetchFiles(currentFolderId || undefined, searchQuery || undefined);
   };
 
   const handleAdvancedFiltersChange = (filters: any) => {
     setAdvancedFilters(filters);
-    // Apply advanced filters immediately
-    setTimeout(() => {
-      fetchFiles(currentFolderId || undefined, searchQuery || undefined);
-    }, 0);
+    // Don't fetch files immediately - wait for Apply Filter button
   };
 
   const handleFileTypeToggle = (type: string) => {
@@ -1785,11 +1786,7 @@ export function DriveManager() {
         ? prev.filter(t => t !== type)
         : [...prev, type];
       
-      // Immediately fetch files with new filter - this was missing!
-      setTimeout(() => {
-        fetchFiles(currentFolderId || undefined, searchQuery || undefined);
-      }, 0);
-      
+      // Don't fetch files immediately - wait for Apply Filter button
       return newFilter;
     });
   };
@@ -2530,16 +2527,16 @@ export function DriveManager() {
     }
   }, [submittedSearchQuery, currentFolderId, hasAccess]);
 
-  // Apply filters when they change - fetch from API with new filters
+  // Only apply view changes immediately, not file type or advanced filters
   useEffect(() => {
     // Skip if this is the initial load or no access yet
     if (hasAccess !== true) return;
     
-    // Only fetch if we already have some data (not initial load)
+    // Only fetch if we already have some data (not initial load) and only for view changes
     if (files.length > 0 || folders.length > 0) {
       fetchFiles(currentFolderId || undefined, searchQuery || undefined);
     }
-  }, [fileTypeFilter, advancedFilters, activeView, hasAccess]);
+  }, [activeView, hasAccess]);
 
   // Handle view mode change for toggle group
   const handleViewModeChange = (value: string) => {

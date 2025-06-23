@@ -84,11 +84,24 @@ export function FiltersDialog({
   hasActiveFilters,
   onClearFilters
 }: FiltersDialogProps) {
-  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilters>({});
+  // Temporary state for filter changes (not applied until "Apply Filter" is clicked)
+  const [tempActiveView, setTempActiveView] = useState(currentFilters?.activeView || 'all');
+  const [tempFileTypeFilter, setTempFileTypeFilter] = useState(currentFilters?.fileTypeFilter || []);
+  const [tempAdvancedFilters, setTempAdvancedFilters] = useState<AdvancedFilters>(currentFilters?.advancedFilters || {});
+  
   const [showViewStatus, setShowViewStatus] = useState(false);
   const [showFileTypes, setShowFileTypes] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const isMobile = useIsMobile();
+
+  // Update temp states when current filters change
+  React.useEffect(() => {
+    if (open) {
+      setTempActiveView(currentFilters?.activeView || 'all');
+      setTempFileTypeFilter(currentFilters?.fileTypeFilter || []);
+      setTempAdvancedFilters(currentFilters?.advancedFilters || {});
+    }
+  }, [open, currentFilters]);
 
   // Basic Menu Items
   const basicMenuItems = [
@@ -123,14 +136,13 @@ export function FiltersDialog({
   ];
 
   const handleBasicFilter = (viewId: string) => {
-    onFilterChange({ activeView: viewId });
-    // Close dialog after selection
-    onOpenChange(false);
+    setTempActiveView(viewId);
+    // Don't apply immediately - wait for Apply Filter button
   };
 
   const handleFileTypeFilter = (typeId: string) => {
     // Always handle as array for consistency
-    const currentFilter = currentFilters?.fileTypeFilter || [];
+    const currentFilter = tempFileTypeFilter || [];
     const isArray = Array.isArray(currentFilter);
     
     const currentArray = isArray ? currentFilter : (currentFilter ? [currentFilter] : []);
@@ -140,21 +152,24 @@ export function FiltersDialog({
       ? currentArray.filter((type: string) => type !== typeId)
       : [...currentArray, typeId];
     
-    onFilterChange({ fileTypeFilter: newFilter });
+    setTempFileTypeFilter(newFilter);
+    // Don't apply immediately - wait for Apply Filter button
   };
 
   const handleAdvancedFiltersChange = (newFilters: AdvancedFilters) => {
-    setAdvancedFilters(newFilters);
-    onFilterChange({ advancedFilters: newFilters });
+    setTempAdvancedFilters(newFilters);
+    // Don't apply immediately - wait for Apply Filter button
   };
 
   const handleClearAdvanced = () => {
-    setAdvancedFilters({});
-    onFilterChange({ advancedFilters: {} });
+    setTempAdvancedFilters({});
+    // Don't apply immediately - wait for Apply Filter button
   };
 
   const handleClearAll = () => {
-    setAdvancedFilters({});
+    setTempActiveView('all');
+    setTempFileTypeFilter([]);
+    setTempAdvancedFilters({});
     onClearFilters();
     onOpenChange(false);
   };
@@ -177,7 +192,7 @@ export function FiltersDialog({
             <div className="grid grid-cols-2 gap-2 pt-2">
               {basicMenuItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = currentFilters?.activeView === item.id;
+                const isActive = tempActiveView === item.id;
                 
                 return (
                   <Button
@@ -217,7 +232,7 @@ export function FiltersDialog({
             <div className="grid grid-cols-2 gap-2 pt-2">
               {fileTypeFilters.map((filter) => {
                 const Icon = filter.icon;
-                const currentFilter = currentFilters?.fileTypeFilter || [];
+                const currentFilter = tempFileTypeFilter || [];
                 const isArray = Array.isArray(currentFilter);
                 const currentArray = isArray ? currentFilter : (currentFilter ? [currentFilter] : []);
                 const isActive = currentArray.includes(filter.id);
@@ -264,13 +279,13 @@ export function FiltersDialog({
                         type="number"
                         placeholder="0"
                         className="text-sm"
-                        value={advancedFilters.sizeRange?.min || ''}
+                        value={tempAdvancedFilters.sizeRange?.min || ''}
                         onChange={(e) => handleAdvancedFiltersChange({
-                          ...advancedFilters,
+                          ...tempAdvancedFilters,
                           sizeRange: {
-                            ...advancedFilters.sizeRange,
+                            ...tempAdvancedFilters.sizeRange,
                             min: Number(e.target.value) || undefined,
-                            unit: advancedFilters.sizeRange?.unit || 'MB'
+                            unit: tempAdvancedFilters.sizeRange?.unit || 'MB'
                           }
                         })}
                       />
@@ -304,13 +319,13 @@ export function FiltersDialog({
                         type="number"
                         placeholder="∞"
                         className="text-sm"
-                        value={advancedFilters.sizeRange?.max || ''}
+                        value={tempAdvancedFilters.sizeRange?.max || ''}
                         onChange={(e) => handleAdvancedFiltersChange({
-                          ...advancedFilters,
+                          ...tempAdvancedFilters,
                           sizeRange: {
-                            ...advancedFilters.sizeRange,
+                            ...tempAdvancedFilters.sizeRange,
                             max: Number(e.target.value) || undefined,
-                            unit: advancedFilters.sizeRange?.unit || 'MB'
+                            unit: tempAdvancedFilters.sizeRange?.unit || 'MB'
                           }
                         })}
                       />
@@ -350,11 +365,11 @@ export function FiltersDialog({
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">From</Label>
                       <SimpleDatePicker
-                        date={advancedFilters.createdDateRange?.from}
+                        date={tempAdvancedFilters.createdDateRange?.from}
                         onDateChange={(date) => handleAdvancedFiltersChange({
-                          ...advancedFilters,
+                          ...tempAdvancedFilters,
                           createdDateRange: {
-                            ...advancedFilters.createdDateRange,
+                            ...tempAdvancedFilters.createdDateRange,
                             from: date || undefined
                           }
                         })}
@@ -364,11 +379,11 @@ export function FiltersDialog({
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">To</Label>
                       <SimpleDatePicker
-                        date={advancedFilters.createdDateRange?.to}
+                        date={tempAdvancedFilters.createdDateRange?.to}
                         onDateChange={(date) => handleAdvancedFiltersChange({
-                          ...advancedFilters,
+                          ...tempAdvancedFilters,
                           createdDateRange: {
-                            ...advancedFilters.createdDateRange,
+                            ...tempAdvancedFilters.createdDateRange,
                             to: date || undefined
                           }
                         })}
@@ -387,11 +402,11 @@ export function FiltersDialog({
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">From</Label>
                       <SimpleDatePicker
-                        date={advancedFilters.modifiedDateRange?.from}
+                        date={tempAdvancedFilters.modifiedDateRange?.from}
                         onDateChange={(date) => handleAdvancedFiltersChange({
-                          ...advancedFilters,
+                          ...tempAdvancedFilters,
                           modifiedDateRange: {
-                            ...advancedFilters.modifiedDateRange,
+                            ...tempAdvancedFilters.modifiedDateRange,
                             from: date || undefined
                           }
                         })}
@@ -401,11 +416,11 @@ export function FiltersDialog({
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">To</Label>
                       <SimpleDatePicker
-                        date={advancedFilters.modifiedDateRange?.to}
+                        date={tempAdvancedFilters.modifiedDateRange?.to}
                         onDateChange={(date) => handleAdvancedFiltersChange({
-                          ...advancedFilters,
+                          ...tempAdvancedFilters,
                           modifiedDateRange: {
-                            ...advancedFilters.modifiedDateRange,
+                            ...tempAdvancedFilters.modifiedDateRange,
                             to: date || undefined
                           }
                         })}
@@ -426,9 +441,9 @@ export function FiltersDialog({
                   type="email"
                   placeholder="Search by owner email"
                   className={`${cn("min-h-[44px]")} text-sm`}
-                  value={advancedFilters.owner || ''}
+                  value={tempAdvancedFilters.owner || ''}
                   onChange={(e) => handleAdvancedFiltersChange({
-                    ...advancedFilters,
+                    ...tempAdvancedFilters,
                     owner: e.target.value || undefined
                   })}
                 />
@@ -503,7 +518,15 @@ export function FiltersDialog({
           <BottomSheetFooter className={cn("grid gap-4")}>
             <Button 
               variant="outline" 
-              onClick={() => onOpenChange(false)} 
+              onClick={() => {
+                // Apply all temporary filter changes
+                onFilterChange({
+                  activeView: tempActiveView,
+                  fileTypeFilter: tempFileTypeFilter,
+                  advancedFilters: tempAdvancedFilters
+                });
+                onOpenChange(false);
+              }} 
               className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               Apply Filter
@@ -547,7 +570,15 @@ export function FiltersDialog({
         </DialogHeader>
 
         <DialogFooter className="flex justify-between">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => {
+            // Apply all temporary filter changes
+            onFilterChange({
+              activeView: tempActiveView,
+              fileTypeFilter: tempFileTypeFilter,
+              advancedFilters: tempAdvancedFilters
+            });
+            onOpenChange(false);
+          }}>
             Apply Filter
           </Button>
           {hasActiveFilters && (
