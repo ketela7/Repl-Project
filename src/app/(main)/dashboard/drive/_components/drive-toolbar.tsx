@@ -105,13 +105,13 @@ interface DriveToolbarProps {
   handleSearchInput: (value: string) => void;
   handleSearch: () => void;
   setSubmittedSearchQuery: (query: string) => void;
-  
+
   // View state
   viewMode: 'grid' | 'table';
   setViewMode: (mode: 'grid' | 'table') => void;
   activeView: string;
   handleViewChange: (view: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash') => void;
-  
+
   // Selection state
   selectedItems: Set<string>;
   isSelectMode: boolean;
@@ -120,25 +120,25 @@ interface DriveToolbarProps {
   deselectAll: () => void;
   getSelectedItemsData: () => any[];
   setIsMobileActionsOpen: (open: boolean) => void;
-  
+
   // Filter state
   fileTypeFilter: string[];
   handleFileTypeToggle: (type: string) => void;
   advancedFilters: AdvancedFilters;
   setAdvancedFilters: (filters: AdvancedFilters | ((prev: AdvancedFilters) => AdvancedFilters)) => void;
   setIsMobileFiltersOpen: (open: boolean) => void;
-  
+
   // File data - unified items approach
   files: import("@/lib/google-drive/types").DriveFile[];
   folders: import("@/lib/google-drive/types").DriveFolder[];
-  
+
   // Actions
   getFileActions: (file: import("@/lib/google-drive/types").DriveFile | import("@/lib/google-drive/types").DriveFolder, view: string) => any;
   handleBulkDownload: () => void;
   handleRefresh: () => void;
   fetchFiles: (folderId?: string) => void;
   currentFolderId: string | null;
-  
+
   // Dialog state
   setIsBulkRenameDialogOpen: (open: boolean) => void;
   setIsBulkExportDialogOpen: (open: boolean) => void;
@@ -150,11 +150,11 @@ interface DriveToolbarProps {
   setIsBulkPermanentDeleteDialogOpen: (open: boolean) => void;
   setIsUploadDialogOpen: (open: boolean) => void;
   setIsCreateFolderDialogOpen: (open: boolean) => void;
-  
+
   // Table columns
   visibleColumns: VisibleColumns;
   setVisibleColumns: (columns: VisibleColumns | ((prev: VisibleColumns) => VisibleColumns)) => void;
-  
+
   // Loading states
   loading: boolean;
   refreshing: boolean;
@@ -213,7 +213,7 @@ export function DriveToolbar({
            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {/* Main Menu - 5 Items - Horizontal Scrollable */}
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 min-w-0">
-          
+
           {/* Search */}
           <Button
             variant={searchQuery ? 'default' : 'ghost'}
@@ -260,7 +260,7 @@ export function DriveToolbar({
           </Button>
 
           {/* Batch - Mobile opens bottom sheet when items selected, Desktop uses dropdown */}
-          {isMobile && selectedItems.size > 0 ? (
+          {isMobile && (selectedItems?.size ?? 0) > 0 ? (
             <Button
               variant="default"
               size="sm"
@@ -270,7 +270,7 @@ export function DriveToolbar({
               <Square className="h-4 w-4 md:mr-2" />
               <span className="hidden md:inline">Actions</span>
               <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                {selectedItems.size}
+                {selectedItems?.size ?? 0}
               </Badge>
               {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
                 <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
@@ -290,9 +290,9 @@ export function DriveToolbar({
                 >
                   <Square className="h-4 w-4 md:mr-2" />
                   <span className="hidden md:inline">Batch</span>
-                  {selectedItems.size > 0 && (
+                  {(selectedItems?.size ?? 0) > 0 && (
                     <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                      {selectedItems.size}
+                      {selectedItems?.size ?? 0}
                     </Badge>
                   )}
                   {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
@@ -317,7 +317,7 @@ export function DriveToolbar({
                   </>
                 )}
               </DropdownMenuItem>
-              
+
               {isSelectMode && (
                 <>
                   <DropdownMenuSeparator />
@@ -329,14 +329,14 @@ export function DriveToolbar({
                     <Square className="h-4 w-4 mr-2" />
                     Clear Selection
                   </DropdownMenuItem>
-                  
-                  {selectedItems.size > 0 && (
+
+                  {(selectedItems?.size ?? 0) > 0 && (
                     <>
                       <DropdownMenuSeparator />
                       <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        File Operations ({selectedItems.size} selected)
+                        File Operations ({(selectedItems?.size ?? 0)} selected)
                       </div>
-                      
+
                       {/* Download Selected - Smart visibility: only show if there are actual downloadable files (not folders) */}
                       {(() => {
                         const selectedItems = getSelectedItemsData();
@@ -345,7 +345,7 @@ export function DriveToolbar({
                           return item.type === 'file' && 
                                  item.mimeType !== 'application/vnd.google-apps.folder';
                         });
-                        
+
                         return downloadableFiles.length > 0 && (
                           <DropdownMenuItem onClick={handleBulkDownload}>
                             <Download className="h-4 w-4 mr-2" />
@@ -353,9 +353,9 @@ export function DriveToolbar({
                           </DropdownMenuItem>
                         );
                       })()}
-                      
+
                       {/* Rename Selected - Available if any item can be renamed */}
-                      {getSelectedItemsData().some(item => {
+                      {(getSelectedItemsData?.() ?? []).some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canRename;
@@ -365,9 +365,9 @@ export function DriveToolbar({
                           Rename Selected
                         </DropdownMenuItem>
                       )}
-                      
+
                       {/* Export Selected - Available if any Google Workspace file can be exported */}
-                      {getSelectedItemsData().some(item => {
+                      {(getSelectedItemsData?.() ?? []).some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         return item.type === 'file' && 
                                item.mimeType && 
@@ -380,9 +380,9 @@ export function DriveToolbar({
                           Export Selected
                         </DropdownMenuItem>
                       )}
-                      
+
                       {/* Move Selected - Available if any item can be moved */}
-                      {getSelectedItemsData().some(item => {
+                      {(getSelectedItemsData?.() ?? []).some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canMove;
@@ -392,9 +392,9 @@ export function DriveToolbar({
                           Move Selected
                         </DropdownMenuItem>
                       )}
-                      
+
                       {/* Copy Selected - Available if any item can be copied */}
-                      {getSelectedItemsData().some(item => {
+                      {(getSelectedItemsData?.() ?? []).some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canCopy;
@@ -404,9 +404,9 @@ export function DriveToolbar({
                           Copy Selected
                         </DropdownMenuItem>
                       )}
-                      
+
                       {/* Share Selected - Available if any item can be shared */}
-                      {getSelectedItemsData().some(item => {
+                      {(getSelectedItemsData?.() ?? []).some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canShare;
@@ -416,14 +416,14 @@ export function DriveToolbar({
                           Share Selected
                         </DropdownMenuItem>
                       )}
-                      
+
                       <DropdownMenuSeparator />
                       <div className="px-2 py-1.5 text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider">
                         Actions
                       </div>
-                      
+
                       {/* Check if any selected item can be restored (only for trashed items) */}
-                      {getSelectedItemsData().some(item => {
+                      {(getSelectedItemsData?.() ?? []).some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canRestore;
@@ -436,9 +436,9 @@ export function DriveToolbar({
                           Restore Selected
                         </DropdownMenuItem>
                       )}
-                      
+
                       {/* Check if any selected item can be moved to trash - owner is me, not shared */}
-                      {getSelectedItemsData().some(item => {
+                      {(getSelectedItemsData?.() ?? []).some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         if (!fileOrFolder) return false;
                         // Can trash if: owner is me, not shared, not already in trash
@@ -455,9 +455,9 @@ export function DriveToolbar({
                           Move to Trash
                         </DropdownMenuItem>
                       )}
-                      
+
                       {/* Check if any selected item can be permanently deleted */}
-                      {getSelectedItemsData().some(item => {
+                      {(getSelectedItemsData?.() ?? []).some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canPermanentDelete;
@@ -539,7 +539,7 @@ export function DriveToolbar({
                     </Badge>
                   )}
                 </div>
-                
+
                 {/* Basic Filter */}
                 <Collapsible defaultOpen>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
@@ -747,7 +747,7 @@ export function DriveToolbar({
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-muted-foreground">Sort Order</label>
                       <div className="grid grid-cols-2 gap-2">
@@ -952,7 +952,7 @@ export function DriveToolbar({
             <DropdownMenuContent align="center" className="w-80 p-4">
               <div className="space-y-4">
                 <div className="text-sm font-semibold border-b pb-2">File Statistics</div>
-                
+
                 {/* Total Files */}
                 <div className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
                   <div className="flex items-center gap-2">
@@ -1129,9 +1129,9 @@ export function DriveToolbar({
               <FolderPlus className="h-4 w-4 mr-2" />
               Create Folder
             </DropdownMenuItem>
-            
+
             <DropdownMenuSeparator />
-            
+
             {/* Table Column Settings - Only show in table mode */}
             {viewMode === 'table' && (
               <>
@@ -1171,9 +1171,9 @@ export function DriveToolbar({
                 </Collapsible>
               </>
             )}
-            
+
             <DropdownMenuSeparator />
-            
+
             {/* Additional Actions */}
             <DropdownMenuItem onClick={handleRefresh} disabled={refreshing}>
               <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
