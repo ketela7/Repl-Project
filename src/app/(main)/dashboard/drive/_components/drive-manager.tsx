@@ -2719,6 +2719,8 @@ export function DriveManager() {
         visibleColumns={visibleColumns}
         sortConfig={sortConfig}
         onSort={handleSort}
+        selectAll={selectAll}
+        deselectAll={deselectAll}
         toggleItemSelection={toggleItemSelection}
         handleFolderClick={handleFolderClick}
         handleFileAction={handleFileAction}

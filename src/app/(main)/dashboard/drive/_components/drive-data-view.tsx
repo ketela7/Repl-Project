@@ -55,8 +55,10 @@ interface DriveDataViewProps {
   sortConfig?: {
     key: string;
     direction: 'asc' | 'desc';
-  };
+  } | null;
   onSort?: (field: string) => void;
+  selectAll: () => void;
+  deselectAll: () => void;
   toggleItemSelection: (id: string) => void;
   handleFolderClick: (id: string) => void;
   handleFileAction: (action: string, fileId: string, fileName: string) => void;
@@ -97,6 +99,8 @@ export function DriveDataView({
   visibleColumns,
   sortConfig,
   onSort,
+  selectAll,
+  deselectAll,
   toggleItemSelection,
   handleFolderClick,
   handleFileAction,
@@ -446,21 +450,15 @@ export function DriveDataView({
             onSort={onSort || (() => {})}
             onItemSelect={(id) => toggleItemSelection(id)}
             onSelectAll={() => {
-              // Toggle select all functionality - this needs to be handled by the parent component
-              const allIds = [...sortedFolders.map(f => f.id), ...sortedFiles.map(f => f.id)];
-              const isAllSelected = allIds.every(id => selectedItems.has(id));
+              // Check if all visible items are selected
+              const allVisibleIds = [...sortedFolders.map(f => f.id), ...sortedFiles.map(f => f.id)];
+              const allSelected = allVisibleIds.length > 0 && allVisibleIds.every(id => selectedItems.has(id));
               
-              // Call toggleItemSelection for each item to trigger the proper state update
-              allIds.forEach(id => {
-                const isCurrentlySelected = selectedItems.has(id);
-                if (isAllSelected && isCurrentlySelected) {
-                  // Deselect if all are selected
-                  toggleItemSelection(id);
-                } else if (!isAllSelected && !isCurrentlySelected) {
-                  // Select if not all are selected
-                  toggleItemSelection(id);
-                }
-              });
+              if (allSelected) {
+                deselectAll();
+              } else {
+                selectAll();
+              }
             }}
             onFileAction={(action, item) => {
               if (typeof item === 'object' && item !== null && 'id' in item && 'name' in item) {
