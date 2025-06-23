@@ -23,7 +23,6 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses, getMobileGridClasses, getMobileInputClasses } from "@/lib/mobile-optimization";
 import { 
   Edit3, 
   Hash, 
@@ -250,7 +249,7 @@ export function BulkRenameDialog({
                     value={regexPattern}
                     onChange={(e) => setRegexPattern(e.target.value)}
                     placeholder="e.g., \d{4} or [A-Z]+ or \s+"
-                    className={`${getMobileInputClasses()} font-mono text-sm`}
+                    className={`${cn("min-h-[44px]")} font-mono text-sm`}
                   />
                 </div>
 
@@ -263,7 +262,7 @@ export function BulkRenameDialog({
                     value={regexReplacement}
                     onChange={(e) => setRegexReplacement(e.target.value)}
                     placeholder="e.g., NewText or $1 or leave empty to remove"
-                    className={`${getMobileInputClasses()} font-mono text-sm`}
+                    className={`${cn("min-h-[44px]")} font-mono text-sm`}
                   />
                 </div>
 
@@ -276,7 +275,7 @@ export function BulkRenameDialog({
                     value={regexFlags}
                     onChange={(e) => setRegexFlags(e.target.value)}
                     placeholder="g, i, m, etc."
-                    className={`${getMobileInputClasses()} font-mono text-sm`}
+                    className={`${cn("min-h-[44px]")} font-mono text-sm`}
                     maxLength={10}
                   />
                   <div className="text-xs text-muted-foreground mt-1">
@@ -342,7 +341,7 @@ export function BulkRenameDialog({
                   renameType === 'suffix' ? 'Enter suffix text...' :
                   'Enter base name for numbering...'
                 }
-                className={`${getMobileInputClasses()} w-full`}
+                className={`${cn("min-h-[44px]")} w-full`}
               />
             </div>
           )}
@@ -406,11 +405,11 @@ export function BulkRenameDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className={`${getMobileGridClasses({ columns: 2, gap: 'normal' })} px-4`}>
+          <BottomSheetFooter className={`${cn("grid gap-4")} px-4`}>
             <Button 
               variant="outline" 
               onClick={onClose} 
-              className={getTouchButtonClasses('secondary')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               Cancel
             </Button>
@@ -421,7 +420,7 @@ export function BulkRenameDialog({
                   !regexPattern.trim() : 
                   (!renamePattern.trim() && renameType !== 'timestamp')
               }
-              className={getTouchButtonClasses('primary')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               <Edit3 className="h-4 w-4 mr-2" />
               Rename All

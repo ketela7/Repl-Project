@@ -14,7 +14,6 @@ import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from "@/components/ui/bottom-sheet";
 import { 
   FileDown, 
@@ -363,18 +362,18 @@ export function BulkExportDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className={getMobileGridClasses({ columns: compatibleFiles.length > 0 ? 2 : 1, gap: 'normal' })}>
+          <BottomSheetFooter className={cn("grid gap-4")}>
             <Button 
               variant="outline" 
               onClick={onClose} 
-              className={getTouchButtonClasses('secondary')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               Cancel
             </Button>
             {compatibleFiles.length > 0 && (
               <Button 
                 onClick={handleExport}
-                className={getTouchButtonClasses('primary')}
+                className={cn("touch-target min-h-[44px] active:scale-95")}
               >
                 <FileDown className="h-4 w-4 mr-2" />
                 Export {compatibleFiles.length} File{compatibleFiles.length > 1 ? 's' : ''}

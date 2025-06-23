@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/bottom-sheet";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses } from "@/lib/mobile-optimization";
 import { Trash2 } from "lucide-react";
 
 interface FileDeleteDialogProps {
@@ -73,14 +72,14 @@ export function FileDeleteDialog({
             <Button
               variant="outline"
               onClick={onClose}
-              className={getTouchButtonClasses('default')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={onConfirm}
-              className={getTouchButtonClasses('default')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               Move to Trash
             </Button>

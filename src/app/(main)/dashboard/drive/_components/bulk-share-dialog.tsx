@@ -35,7 +35,6 @@ import {
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { 
   Share2, 
   Globe, 

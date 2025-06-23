@@ -19,7 +19,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses } from "@/lib/mobile-optimization";
 import { 
   Trash2, 
   Download, 
@@ -132,7 +131,7 @@ export function FileBulkOperationsDialog({
             <Button
               key={operation.label}
               variant={operation.variant}
-              className={`${getTouchButtonClasses('default')} justify-start h-auto p-3`}
+              className={`${cn("touch-target min-h-[44px] active:scale-95")} justify-start h-auto p-3`}
               onClick={() => {
                 operation.action();
                 onClose();

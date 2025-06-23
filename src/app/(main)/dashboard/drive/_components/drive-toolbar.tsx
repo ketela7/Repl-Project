@@ -36,7 +36,6 @@ import {
   ChevronDown
 } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses } from "@/lib/mobile-optimization";
 
 interface DriveToolbarProps {
   searchQuery: string;
@@ -92,7 +91,7 @@ export function DriveToolbar({
         <div className="flex items-center gap-2">
           <Button
             onClick={onUpload}
-            className={getTouchButtonClasses('default')}
+            className={cn("touch-target min-h-[44px] active:scale-95")}
             disabled={isLoading}
           >
             <Upload className="h-4 w-4 mr-2" />
@@ -102,7 +101,7 @@ export function DriveToolbar({
           <Button
             variant="outline"
             onClick={onCreateFolder}
-            className={getTouchButtonClasses('default')}
+            className={cn("touch-target min-h-[44px] active:scale-95")}
             disabled={isLoading}
           >
             <FolderPlus className="h-4 w-4 mr-2" />
@@ -125,7 +124,7 @@ export function DriveToolbar({
                     variant="outline"
                     size="sm"
                     onClick={onBulkDownload}
-                    className={getTouchButtonClasses('sm')}
+                    className={cn("touch-target min-h-[44px] active:scale-95")}
                   >
                     <Download className="h-4 w-4" />
                     {!isMobile && <span className="ml-1">Download</span>}
@@ -137,7 +136,7 @@ export function DriveToolbar({
                     variant="outline"
                     size="sm"
                     onClick={onBulkShare}
-                    className={getTouchButtonClasses('sm')}
+                    className={cn("touch-target min-h-[44px] active:scale-95")}
                   >
                     <Share className="h-4 w-4" />
                     {!isMobile && <span className="ml-1">Share</span>}
@@ -149,7 +148,7 @@ export function DriveToolbar({
                     variant="outline"
                     size="sm"
                     onClick={onBulkDelete}
-                    className={getTouchButtonClasses('sm')}
+                    className={cn("touch-target min-h-[44px] active:scale-95")}
                   >
                     <Trash2 className="h-4 w-4" />
                     {!isMobile && <span className="ml-1">Delete</span>}
@@ -165,7 +164,7 @@ export function DriveToolbar({
               <Button 
                 variant="outline" 
                 size="sm"
-                className={getTouchButtonClasses('sm')}
+                className={cn("touch-target min-h-[44px] active:scale-95")}
               >
                 <span className="hidden sm:inline">Sort:</span>
                 <span className="capitalize">
@@ -219,7 +218,7 @@ export function DriveToolbar({
               <Button 
                 variant="outline" 
                 size="sm"
-                className={getTouchButtonClasses('sm')}
+                className={cn("touch-target min-h-[44px] active:scale-95")}
               >
                 <MoreVertical className="h-4 w-4" />
               </Button>

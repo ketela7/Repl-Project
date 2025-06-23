@@ -29,7 +29,6 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses, getMobileGridClasses } from "@/lib/mobile-optimization";
 import { FolderIcon, Move, ExternalLink } from "lucide-react";
 import { DriveFolder } from '@/lib/google-drive/types';
 import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
@@ -236,19 +235,19 @@ export function FileMoveDialog({
             {renderContent()}
           </div>
 
-          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+          <BottomSheetFooter className={cn("grid gap-4")}>
             <Button 
               variant="outline" 
               onClick={handleClose} 
               disabled={moving} 
-              className={getTouchButtonClasses('secondary')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               Cancel
             </Button>
             <Button 
               onClick={handleMove} 
               disabled={!getTargetFolderId() || getTargetFolderId() === currentParentId || moving || loading}
-              className={getTouchButtonClasses('primary')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               {moving ? (
                 <>

@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { getTouchButtonClasses, getMobileGridClasses, getMobileInputClasses } from "@/lib/mobile-optimization";
 import { toast } from "sonner";
 import { successToast, errorToast, loadingToast } from '@/lib/toast';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -418,7 +417,7 @@ export function FileShareDialog({
                   placeholder="Enter email address"
                   value={emailAddress}
                   onChange={(e) => setEmailAddress(e.target.value)}
-                  className={getMobileInputClasses()}
+                  className={cn("min-h-[44px]")}
                 />
               </div>
 
@@ -429,7 +428,7 @@ export function FileShareDialog({
                   placeholder="Add a message"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  className={getMobileInputClasses()}
+                  className={cn("min-h-[44px]")}
                 />
               </div>
             </>

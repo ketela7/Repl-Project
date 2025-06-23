@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
-import { getTouchButtonClasses, getMobileGridClasses, getMobileInputClasses } from "@/lib/mobile-optimization";
 import { 
   BottomSheet, 
   BottomSheetContent, 
@@ -145,7 +144,7 @@ export function FileRenameDialog({
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Enter new file name..."
                 disabled={renaming}
-                className={`${getMobileInputClasses()} text-base`}
+                className={`${cn("min-h-[44px]")} text-base`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleRename();
@@ -165,19 +164,19 @@ export function FileRenameDialog({
             </div>
           </div>
 
-          <BottomSheetFooter className={getMobileGridClasses({ columns: 2, gap: 'normal' })}>
+          <BottomSheetFooter className={cn("grid gap-4")}>
             <Button 
               variant="outline" 
               onClick={handleClose} 
               disabled={renaming} 
-              className={getTouchButtonClasses('secondary')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               Cancel
             </Button>
             <Button 
               onClick={handleRename} 
               disabled={!newName?.trim() || newName === file?.name || renaming}
-              className={getTouchButtonClasses('primary')}
+              className={cn("touch-target min-h-[44px] active:scale-95")}
             >
               {renaming ? (
                 <>
