@@ -168,6 +168,14 @@ const filterByMimeType = (items: any[], category: string) => {
       return items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z'));
     case 'Code':
       return items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml'));
+    case 'Design':
+      return items.filter(f => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma'));
+    case 'Database':
+      return items.filter(f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite'));
+    case 'Ebooks':
+      return items.filter(f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle'));
+    case 'Fonts':
+      return items.filter(f => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff'));
     case 'Shortcuts':
       return items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut');
     case 'Folders':
@@ -328,7 +336,7 @@ export function DriveToolbar({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={onSelectAll}>
                     <CheckSquare className="h-4 w-4 mr-2" />
-                    Select All ({items.length})
+                    Select All ({files.length + folders.length})
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={onSelectAll}>
                     <Square className="h-4 w-4 mr-2" />
@@ -906,6 +914,176 @@ export function DriveToolbar({
                       onClick={() => handleCategoryClick('Documents')}
                     >
                       {items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Spreadsheets */}
+                {items.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileSpreadsheet className="h-4 w-4 text-emerald-500" />
+                      <span className="text-sm">Spreadsheets</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-emerald-500 text-emerald-700 dark:text-emerald-300 cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-900/50"
+                      onClick={() => handleCategoryClick('Spreadsheets')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Presentations */}
+                {items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Presentation className="h-4 w-4 text-amber-500" />
+                      <span className="text-sm">Presentations</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-amber-500 text-amber-700 dark:text-amber-300 cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/50"
+                      onClick={() => handleCategoryClick('Presentations')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Audio */}
+                {items.filter(f => f.mimeType?.startsWith('audio/')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Music className="h-4 w-4 text-indigo-500" />
+                      <span className="text-sm">Audio</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-indigo-500 text-indigo-700 dark:text-indigo-300 cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
+                      onClick={() => handleCategoryClick('Audio')}
+                    >
+                      {items.filter(f => f.mimeType?.startsWith('audio/')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Archives */}
+                {items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Archive className="h-4 w-4 text-gray-500" />
+                      <span className="text-sm">Archives</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-gray-500 text-gray-700 dark:text-gray-300 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900/50"
+                      onClick={() => handleCategoryClick('Archives')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Code Files */}
+                {items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-cyan-50 dark:bg-cyan-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileCode className="h-4 w-4 text-cyan-500" />
+                      <span className="text-sm">Code Files</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-cyan-500 text-cyan-700 dark:text-cyan-300 cursor-pointer hover:bg-cyan-100 dark:hover:bg-cyan-900/50"
+                      onClick={() => handleCategoryClick('Code')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Design Files */}
+                {items.filter(f => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-purple-50 dark:bg-purple-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Palette className="h-4 w-4 text-purple-500" />
+                      <span className="text-sm">Design Files</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-purple-500 text-purple-700 dark:text-purple-300 cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/50"
+                      onClick={() => handleCategoryClick('Design')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Database Files */}
+                {items.filter(f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-teal-50 dark:bg-teal-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Database className="h-4 w-4 text-teal-500" />
+                      <span className="text-sm">Database Files</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-teal-500 text-teal-700 dark:text-teal-300 cursor-pointer hover:bg-teal-100 dark:hover:bg-teal-900/50"
+                      onClick={() => handleCategoryClick('Database')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* E-books */}
+                {items.filter(f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-rose-50 dark:bg-rose-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-rose-500" />
+                      <span className="text-sm">E-books</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-rose-500 text-rose-700 dark:text-rose-300 cursor-pointer hover:bg-rose-100 dark:hover:bg-rose-900/50"
+                      onClick={() => handleCategoryClick('Ebooks')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Fonts */}
+                {items.filter(f => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-stone-50 dark:bg-stone-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileType className="h-4 w-4 text-stone-500" />
+                      <span className="text-sm">Fonts</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-stone-500 text-stone-700 dark:text-stone-300 cursor-pointer hover:bg-stone-100 dark:hover:bg-stone-900/50"
+                      onClick={() => handleCategoryClick('Fonts')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Shortcuts */}
+                {items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-sky-50 dark:bg-sky-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Link className="h-4 w-4 text-sky-500" />
+                      <span className="text-sm">Shortcuts</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-sky-500 text-sky-700 dark:text-sky-300 cursor-pointer hover:bg-sky-100 dark:hover:bg-sky-900/50"
+                      onClick={() => handleCategoryClick('Shortcuts')}
+                    >
+                      {items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length}
                     </Badge>
                   </div>
                 )}
