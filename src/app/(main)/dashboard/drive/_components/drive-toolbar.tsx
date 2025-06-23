@@ -328,8 +328,7 @@ export function DriveToolbar({
                 </>
               )}
             </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+          </DropdownMenu>
 
           {/* Filter - Mobile uses Bottom Sheet, Desktop uses Dropdown */}
           {isMobile ? (

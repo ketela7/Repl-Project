@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FileIcon } from "@/components/file-icon";
-import { DriveManagerSkeleton } from "./drive-manager-skeleton";
+import { DriveGridSkeleton } from "./drive-skeleton";
 import { useTimezone } from "@/hooks/use-timezone";
 import { formatFileTime } from "@/lib/timezone";
 import {
@@ -91,7 +91,7 @@ export function DriveDataView({
   };
 
   if (loading && items.length === 0) {
-    return <DriveManagerSkeleton />;
+    return <DriveGridSkeleton />;
   }
 
   return (
