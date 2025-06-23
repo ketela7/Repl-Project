@@ -213,22 +213,15 @@ export function DriveToolbar({
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters;
 
-  // Separate files and folders from items
-  const files = useMemo(() => {
-    return items.filter(item => item.mimeType !== 'application/vnd.google-apps.folder');
-  }, [items]);
 
-  const folders = useMemo(() => {
-    return items.filter(item => item.mimeType === 'application/vnd.google-apps.folder');
-  }, [items]);
 
   // Handle badge click for client-side filtering
-  const handleCategoryClick = (category: string) => {
+  const handleCategoryClick = useCallback((category: string) => {
     if (onClientSideFilter) {
       const filteredItems = filterByMimeType(items, category);
       onClientSideFilter(filteredItems);
     }
-  };
+  }, [items, onClientSideFilter]);
 
   return (
     <div className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b shadow-sm transition-transform duration-200 ease-in-out"
@@ -849,36 +842,88 @@ export function DriveToolbar({
               <Button variant="ghost" size="sm" className="h-8 px-2 md:px-3">
                 <HardDrive className="h-4 w-4 md:mr-2" />
                 <span className="hidden md:inline">Badge</span>
-                {items.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
-                    {items.length}
-                  </Badge>
-                )}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="center" className="w-96 p-4">
+            <DropdownMenuContent align="center" className="w-80 p-4">
               <div className="space-y-4">
-                <div className="text-sm font-semibold border-b pb-2">File Categories (Click to Filter)</div>
+                <div className="text-sm font-semibold border-b pb-2">File Statistics</div>
                 
-                {/* File Category Badges Component */}
-                <FileCategoryBadges
-                  files={files}
-                  folders={folders}
-                  onCategoryClick={handleCategoryClick}
-                  className="w-full"
-                />
-                
-                {/* Reset Filter Button */}
-                {onClientSideFilter && (
-                  <div className="pt-2 border-t">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onClientSideFilter(items)}
-                      className="w-full text-xs"
+                {/* Total Files */}
+                <div className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
+                  <div className="flex items-center gap-2">
+                    <HardDrive className="h-4 w-4 text-gray-600" />
+                    <span className="text-sm">Total Items</span>
+                  </div>
+                  <Badge variant="outline" className="font-medium">
+                    {items.length}
+                  </Badge>
+                </div>
+
+                {/* Images */}
+                {items.filter(f => f.mimeType?.includes('image')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileImage className="h-4 w-4 text-green-500" />
+                      <span className="text-sm">Images</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-green-500 text-green-700 dark:text-green-300 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
+                      onClick={() => handleCategoryClick('Images')}
                     >
-                      Total ({items.length})
-                    </Button>
+                      {items.filter(f => f.mimeType?.includes('image')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Videos */}
+                {items.filter(f => f.mimeType?.includes('video')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Play className="h-4 w-4 text-red-500" />
+                      <span className="text-sm">Videos</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-red-500 text-red-700 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/50"
+                      onClick={() => handleCategoryClick('Videos')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('video')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Documents */}
+                {items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-orange-500" />
+                      <span className="text-sm">Documents</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-orange-500 text-orange-700 dark:text-orange-300 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/50"
+                      onClick={() => handleCategoryClick('Documents')}
+                    >
+                      {items.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
+                    </Badge>
+                  </div>
+                )}
+
+                {/* Folders */}
+                {items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
+                    <div className="flex items-center gap-2">
+                      <Folder className="h-4 w-4 text-blue-500" />
+                      <span className="text-sm">Folders</span>
+                    </div>
+                    <Badge 
+                      variant="outline" 
+                      className="border-blue-500 text-blue-700 dark:text-blue-300 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
+                      onClick={() => handleCategoryClick('Folders')}
+                    >
+                      {items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').length}
+                    </Badge>
                   </div>
                 )}
               </div>
