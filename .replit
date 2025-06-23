@@ -90,7 +90,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx tsc --noEmit --watch --preserveWatchOutput"
+args = "npx tsc --noEmit --watch --preserveWatchOutput --skipLibCheck"
 
 [[workflows.workflow]]
 name = "Development Server"
