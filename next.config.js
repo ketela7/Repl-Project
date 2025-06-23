@@ -34,10 +34,7 @@ const nextConfig = {
   },
   // Fix cross-origin warnings for Replit environment
   allowedDevOrigins: [
-    '13f4781b-9fdf-40b6-bdba-6b071dd4b066-00-339bmatv4yw0f.pike.replit.dev',
-    '9b88c5ad-5abe-46e2-9b53-4e226583ddb7-00-1oik9eyz6sqi3.pike.replit.dev',
-    '127.0.0.1',
-    'localhost'
+    '*'
   ],
   async headers() {
     return [
