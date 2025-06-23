@@ -105,13 +105,13 @@ interface DriveToolbarProps {
   handleSearchInput: (value: string) => void;
   handleSearch: () => void;
   setSubmittedSearchQuery: (query: string) => void;
-
+  
   // View state
   viewMode: 'grid' | 'table';
   setViewMode: (mode: 'grid' | 'table') => void;
   activeView: string;
   handleViewChange: (view: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash') => void;
-
+  
   // Selection state
   selectedItems: Set<string>;
   isSelectMode: boolean;
@@ -120,25 +120,25 @@ interface DriveToolbarProps {
   deselectAll: () => void;
   getSelectedItemsData: () => any[];
   setIsMobileActionsOpen: (open: boolean) => void;
-
+  
   // Filter state
   fileTypeFilter: string[];
   handleFileTypeToggle: (type: string) => void;
   advancedFilters: AdvancedFilters;
   setAdvancedFilters: (filters: AdvancedFilters | ((prev: AdvancedFilters) => AdvancedFilters)) => void;
   setIsMobileFiltersOpen: (open: boolean) => void;
-
+  
   // File data - unified items approach
   files: import("@/lib/google-drive/types").DriveFile[];
   folders: import("@/lib/google-drive/types").DriveFolder[];
-
+  
   // Actions
   getFileActions: (file: import("@/lib/google-drive/types").DriveFile | import("@/lib/google-drive/types").DriveFolder, view: string) => any;
   handleBulkDownload: () => void;
   handleRefresh: () => void;
   fetchFiles: (folderId?: string) => void;
   currentFolderId: string | null;
-
+  
   // Dialog state
   setIsBulkRenameDialogOpen: (open: boolean) => void;
   setIsBulkExportDialogOpen: (open: boolean) => void;
@@ -150,18 +150,18 @@ interface DriveToolbarProps {
   setIsBulkPermanentDeleteDialogOpen: (open: boolean) => void;
   setIsUploadDialogOpen: (open: boolean) => void;
   setIsCreateFolderDialogOpen: (open: boolean) => void;
-
+  
   // Table columns
   visibleColumns: VisibleColumns;
   setVisibleColumns: (columns: VisibleColumns | ((prev: VisibleColumns) => VisibleColumns)) => void;
-
+  
   // Loading states
   loading: boolean;
   refreshing: boolean;
 }
 
 export function DriveToolbar({
-  searchQuery = '',
+  searchQuery,
   setSearchQuery,
   handleSearchInput,
   handleSearch,
@@ -213,7 +213,7 @@ export function DriveToolbar({
            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {/* Main Menu - 5 Items - Horizontal Scrollable */}
         <div className="flex items-center gap-2 md:gap-3 flex-shrink-0 min-w-0">
-
+          
           {/* Search */}
           <Button
             variant={searchQuery ? 'default' : 'ghost'}
@@ -260,7 +260,7 @@ export function DriveToolbar({
           </Button>
 
           {/* Batch - Mobile opens bottom sheet when items selected, Desktop uses dropdown */}
-          {isMobile && (selectedItems?.size ?? 0) > 0 ? (
+          {isMobile && selectedItems.size > 0 ? (
             <Button
               variant="default"
               size="sm"
@@ -270,9 +270,9 @@ export function DriveToolbar({
               <Square className="h-4 w-4 md:mr-2" />
               <span className="hidden md:inline">Actions</span>
               <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                {selectedItems?.size ?? 0}
+                {selectedItems.size}
               </Badge>
-              {(activeView === 'trash' || (searchQuery && searchQuery.includes('trashed:true'))) && (
+              {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
                 <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
                   <span className="hidden md:inline">Trash</span>
                   <span className="md:hidden">T</span>
@@ -285,17 +285,17 @@ export function DriveToolbar({
                 <Button
                   variant={isSelectMode ? 'default' : 'ghost'}
                   size="sm"
-                  disabled={(files?.length || 0) === 0 && (folders?.length || 0) === 0}
+                  disabled={files.length === 0 && folders.length === 0}
                   className="h-8 px-2 md:px-3"
                 >
                   <Square className="h-4 w-4 md:mr-2" />
                   <span className="hidden md:inline">Batch</span>
-                  {(selectedItems?.size ?? 0) > 0 && (
+                  {selectedItems.size > 0 && (
                     <Badge variant="secondary" className="ml-1 md:ml-2 h-4 px-1 text-xs">
-                      {selectedItems?.size ?? 0}
+                      {selectedItems.size}
                     </Badge>
                   )}
-                  {(activeView === 'trash' || (searchQuery && searchQuery.includes('trashed:true'))) && (
+                  {(activeView === 'trash' || searchQuery.includes('trashed:true')) && (
                     <Badge variant="destructive" className="ml-1 md:ml-2 h-4 px-1 text-xs">
                       <span className="hidden md:inline">Trash Mode</span>
                       <span className="md:hidden">T</span>
@@ -317,26 +317,26 @@ export function DriveToolbar({
                   </>
                 )}
               </DropdownMenuItem>
-
+              
               {isSelectMode && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={selectAll}>
                     <CheckSquare className="h-4 w-4 mr-2" />
-                    Select All ({(folders?.length || 0) + (files?.length || 0)})
+                    Select All ({folders.length + files.length})
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={deselectAll}>
                     <Square className="h-4 w-4 mr-2" />
                     Clear Selection
                   </DropdownMenuItem>
-
-                  {(selectedItems?.size ?? 0) > 0 && (
+                  
+                  {selectedItems.size > 0 && (
                     <>
                       <DropdownMenuSeparator />
                       <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        File Operations ({(selectedItems?.size ?? 0)} selected)
+                        File Operations ({selectedItems.size} selected)
                       </div>
-
+                      
                       {/* Download Selected - Smart visibility: only show if there are actual downloadable files (not folders) */}
                       {(() => {
                         const selectedItems = getSelectedItemsData();
@@ -345,7 +345,7 @@ export function DriveToolbar({
                           return item.type === 'file' && 
                                  item.mimeType !== 'application/vnd.google-apps.folder';
                         });
-
+                        
                         return downloadableFiles.length > 0 && (
                           <DropdownMenuItem onClick={handleBulkDownload}>
                             <Download className="h-4 w-4 mr-2" />
@@ -353,9 +353,9 @@ export function DriveToolbar({
                           </DropdownMenuItem>
                         );
                       })()}
-
+                      
                       {/* Rename Selected - Available if any item can be renamed */}
-                      {(getSelectedItemsData?.() ?? []).some(item => {
+                      {getSelectedItemsData().some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canRename;
@@ -365,9 +365,9 @@ export function DriveToolbar({
                           Rename Selected
                         </DropdownMenuItem>
                       )}
-
+                      
                       {/* Export Selected - Available if any Google Workspace file can be exported */}
-                      {(getSelectedItemsData?.() ?? []).some(item => {
+                      {getSelectedItemsData().some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         return item.type === 'file' && 
                                item.mimeType && 
@@ -380,9 +380,9 @@ export function DriveToolbar({
                           Export Selected
                         </DropdownMenuItem>
                       )}
-
+                      
                       {/* Move Selected - Available if any item can be moved */}
-                      {(getSelectedItemsData?.() ?? []).some(item => {
+                      {getSelectedItemsData().some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canMove;
@@ -392,9 +392,9 @@ export function DriveToolbar({
                           Move Selected
                         </DropdownMenuItem>
                       )}
-
+                      
                       {/* Copy Selected - Available if any item can be copied */}
-                      {(getSelectedItemsData?.() ?? []).some(item => {
+                      {getSelectedItemsData().some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canCopy;
@@ -404,9 +404,9 @@ export function DriveToolbar({
                           Copy Selected
                         </DropdownMenuItem>
                       )}
-
+                      
                       {/* Share Selected - Available if any item can be shared */}
-                      {(getSelectedItemsData?.() ?? []).some(item => {
+                      {getSelectedItemsData().some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canShare;
@@ -416,14 +416,14 @@ export function DriveToolbar({
                           Share Selected
                         </DropdownMenuItem>
                       )}
-
+                      
                       <DropdownMenuSeparator />
                       <div className="px-2 py-1.5 text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wider">
                         Actions
                       </div>
-
+                      
                       {/* Check if any selected item can be restored (only for trashed items) */}
-                      {(getSelectedItemsData?.() ?? []).some(item => {
+                      {getSelectedItemsData().some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canRestore;
@@ -436,9 +436,9 @@ export function DriveToolbar({
                           Restore Selected
                         </DropdownMenuItem>
                       )}
-
+                      
                       {/* Check if any selected item can be moved to trash - owner is me, not shared */}
-                      {(getSelectedItemsData?.() ?? []).some(item => {
+                      {getSelectedItemsData().some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         if (!fileOrFolder) return false;
                         // Can trash if: owner is me, not shared, not already in trash
@@ -455,9 +455,9 @@ export function DriveToolbar({
                           Move to Trash
                         </DropdownMenuItem>
                       )}
-
+                      
                       {/* Check if any selected item can be permanently deleted */}
-                      {(getSelectedItemsData?.() ?? []).some(item => {
+                      {getSelectedItemsData().some(item => {
                         const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canPermanentDelete;
@@ -539,7 +539,7 @@ export function DriveToolbar({
                     </Badge>
                   )}
                 </div>
-
+                
                 {/* Basic Filter */}
                 <Collapsible defaultOpen>
                   <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-accent rounded-md">
@@ -747,7 +747,7 @@ export function DriveToolbar({
                         </Button>
                       </div>
                     </div>
-
+                    
                     <div className="space-y-2">
                       <label className="text-xs font-medium text-muted-foreground">Sort Order</label>
                       <div className="grid grid-cols-2 gap-2">
@@ -952,7 +952,7 @@ export function DriveToolbar({
             <DropdownMenuContent align="center" className="w-80 p-4">
               <div className="space-y-4">
                 <div className="text-sm font-semibold border-b pb-2">File Statistics</div>
-
+                
                 {/* Total Files */}
                 <div className="flex items-center justify-between p-2 bg-muted/50 rounded-md">
                   <div className="flex items-center gap-2">
@@ -960,149 +960,149 @@ export function DriveToolbar({
                     <span className="text-sm">Total Items</span>
                   </div>
                   <Badge variant="outline" className="font-medium">
-                    {(files?.length || 0) + (folders?.length || 0)}
+                    {files.length + folders.length}
                   </Badge>
                 </div>
 
                 {/* Folders */}
-                {(folders?.length || 0) > 0 && (
+                {folders.length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Folder className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">Folders</span>
                     </div>
                     <Badge variant="outline" className="border-blue-500 text-blue-700 dark:text-blue-300">
-                      {folders?.length || 0}
+                      {folders.length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Images */}
-                {(files?.filter(f => f.mimeType?.includes('image')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.includes('image')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileImage className="h-4 w-4 text-green-500" />
                       <span className="text-sm">Images</span>
                     </div>
                     <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
-                      {files?.filter(f => f.mimeType?.includes('image')).length || 0}
+                      {files.filter(f => f.mimeType?.includes('image')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Videos */}
-                {(files?.filter(f => f.mimeType?.includes('video')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.includes('video')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Play className="h-4 w-4 text-red-500" />
                       <span className="text-sm">Videos</span>
                     </div>
                     <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
-                      {files?.filter(f => f.mimeType?.includes('video')).length || 0}
+                      {files.filter(f => f.mimeType?.includes('video')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Documents */}
-                {(files?.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-orange-500" />
                       <span className="text-sm">Documents</span>
                     </div>
                     <Badge variant="outline" className="border-orange-500 text-orange-700 dark:text-orange-300">
-                      {files?.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length || 0}
+                      {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Spreadsheets */}
-                {(files?.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileSpreadsheet className="h-4 w-4 text-green-500" />
                       <span className="text-sm">Spreadsheets</span>
                     </div>
                     <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
-                      {files?.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length || 0}
+                      {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Presentations */}
-                {(files?.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Presentation className="h-4 w-4 text-amber-500" />
                       <span className="text-sm">Presentations</span>
                     </div>
                     <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-300">
-                      {files?.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length || 0}
+                      {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Videos */}
-                {(files?.filter(f => f.mimeType?.startsWith('video/')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.startsWith('video/')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileVideo className="h-4 w-4 text-red-500" />
                       <span className="text-sm">Videos</span>
                     </div>
                     <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
-                      {files?.filter(f => f.mimeType?.startsWith('video/')).length || 0}
+                      {files.filter(f => f.mimeType?.startsWith('video/')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Audio */}
-                {(files?.filter(f => f.mimeType?.startsWith('audio/')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.startsWith('audio/')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileAudio className="h-4 w-4 text-indigo-500" />
                       <span className="text-sm">Audio</span>
                     </div>
                     <Badge variant="outline" className="border-indigo-500 text-indigo-700 dark:text-indigo-300">
-                      {files?.filter(f => f.mimeType?.startsWith('audio/')).length || 0}
+                      {files.filter(f => f.mimeType?.startsWith('audio/')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Archives */}
-                {(files?.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Archive className="h-4 w-4 text-gray-500" />
                       <span className="text-sm">Archives</span>
                     </div>
                     <Badge variant="outline" className="border-gray-500 text-gray-700 dark:text-gray-300">
-                      {files?.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length || 0}
+                      {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Code Files */}
-                {(files?.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length || 0) > 0 && (
+                {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileCode className="h-4 w-4 text-emerald-500" />
                       <span className="text-sm">Code Files</span>
                     </div>
                     <Badge variant="outline" className="border-emerald-500 text-emerald-700 dark:text-emerald-300">
-                      {files?.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length || 0}
+                      {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Shortcuts */}
-                {(files?.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length || 0) > 0 && (
+                {files.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Link className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">Shortcuts</span>
                     </div>
                     <Badge variant="outline" className="border-blue-500 text-blue-700 dark:text-blue-300">
-                      {files?.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length || 0}
+                      {files.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length}
                     </Badge>
                   </div>
                 )}
@@ -1129,9 +1129,9 @@ export function DriveToolbar({
               <FolderPlus className="h-4 w-4 mr-2" />
               Create Folder
             </DropdownMenuItem>
-
+            
             <DropdownMenuSeparator />
-
+            
             {/* Table Column Settings - Only show in table mode */}
             {viewMode === 'table' && (
               <>
@@ -1171,9 +1171,9 @@ export function DriveToolbar({
                 </Collapsible>
               </>
             )}
-
+            
             <DropdownMenuSeparator />
-
+            
             {/* Additional Actions */}
             <DropdownMenuItem onClick={handleRefresh} disabled={refreshing}>
               <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
