@@ -133,6 +133,7 @@ interface DriveToolbarProps {
   onApplyFilters: () => void;
   onClearFilters: () => void;
   hasActiveFilters: boolean;
+  onClientSideFilter?: (mimeTypeFilter: string[]) => void;
   files: import("@/lib/google-drive/types").DriveFile[];
   folders: import("@/lib/google-drive/types").DriveFolder[];
   setIsUploadDialogOpen: (open: boolean) => void;
@@ -172,6 +173,7 @@ export function DriveToolbar({
   onApplyFilters,
   onClearFilters,
   hasActiveFilters,
+  onClientSideFilter,
   files,
   folders,
   visibleColumns,
@@ -829,8 +831,12 @@ export function DriveToolbar({
                       variant="outline" 
                       className="border-blue-500 text-blue-700 dark:text-blue-300 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/50"
                       onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['folder'] });
-                        onApplyFilters();
+                        if (onClientSideFilter) {
+                          onClientSideFilter(['application/vnd.google-apps.folder']);
+                        } else {
+                          onFilterChange({ fileTypeFilter: ['folder'] });
+                          onApplyFilters();
+                        }
                       }}
                     >
                       {folders.length}
@@ -849,8 +855,12 @@ export function DriveToolbar({
                       variant="outline" 
                       className="border-green-500 text-green-700 dark:text-green-300 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
                       onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['image'] });
-                        onApplyFilters();
+                        if (onClientSideFilter) {
+                          onClientSideFilter(['image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/tiff']);
+                        } else {
+                          onFilterChange({ fileTypeFilter: ['image'] });
+                          onApplyFilters();
+                        }
                       }}
                     >
                       {files.filter(f => f.mimeType?.includes('image')).length}
@@ -869,8 +879,12 @@ export function DriveToolbar({
                       variant="outline" 
                       className="border-red-500 text-red-700 dark:text-red-300 cursor-pointer hover:bg-red-100 dark:hover:bg-red-900/50"
                       onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['video'] });
-                        onApplyFilters();
+                        if (onClientSideFilter) {
+                          onClientSideFilter(['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/mkv', 'video/webm', 'video/flv']);
+                        } else {
+                          onFilterChange({ fileTypeFilter: ['video'] });
+                          onApplyFilters();
+                        }
                       }}
                     >
                       {files.filter(f => f.mimeType?.includes('video')).length}
@@ -889,8 +903,12 @@ export function DriveToolbar({
                       variant="outline" 
                       className="border-orange-500 text-orange-700 dark:text-orange-300 cursor-pointer hover:bg-orange-100 dark:hover:bg-orange-900/50"
                       onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['document'] });
-                        onApplyFilters();
+                        if (onClientSideFilter) {
+                          onClientSideFilter(['application/vnd.google-apps.document', 'application/pdf', 'text/plain', 'text/html', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']);
+                        } else {
+                          onFilterChange({ fileTypeFilter: ['document'] });
+                          onApplyFilters();
+                        }
                       }}
                     >
                       {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
@@ -909,8 +927,12 @@ export function DriveToolbar({
                       variant="outline" 
                       className="border-green-500 text-green-700 dark:text-green-300 cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/50"
                       onClick={() => {
-                        onFilterChange({ fileTypeFilter: ['spreadsheet'] });
-                        onApplyFilters();
+                        if (onClientSideFilter) {
+                          onClientSideFilter(['application/vnd.google-apps.spreadsheet', 'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv']);
+                        } else {
+                          onFilterChange({ fileTypeFilter: ['spreadsheet'] });
+                          onApplyFilters();
+                        }
                       }}
                     >
                       {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
@@ -1185,68 +1207,6 @@ export function DriveToolbar({
         </DropdownMenu>
       </div>
 
-      {/* Enhanced Search Bar - Expandable with better UX */}
-      <div id="search-expanded" style={{ display: 'none' }} className="border-t bg-muted/30 p-3 md:p-4">
-        <div className="flex items-center gap-2 md:gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search files and folders..."
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit(e)}
-              className="pl-10 pr-20 h-10"
-              disabled={false}
-            />
-            <div className="absolute right-1 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-              {searchQuery && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 hover:bg-muted"
-                  onClick={() => {
-                    onSearchChange('');
-                    onRefresh();
-                  }}
-                  title="Clear search"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 hover:bg-muted"
-                onClick={() => {
-                  const searchExpanded = document.querySelector('#search-expanded') as HTMLElement;
-                  if (searchExpanded) {
-                    searchExpanded.style.display = 'none';
-                  }
-                }}
-                title="Close search"
-              >
-                <ChevronUp className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={(e) => onSearchSubmit(e)}
-            disabled={!searchQuery.trim()}
-            className="px-4 h-10"
-          >
-            {refreshing ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                <Search className="h-4 w-4" />
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }
