@@ -128,9 +128,7 @@ interface DriveToolbarProps {
   setAdvancedFilters: (filters: AdvancedFilters | ((prev: AdvancedFilters) => AdvancedFilters)) => void;
   setIsMobileFiltersOpen: (open: boolean) => void;
   
-  // File data
-  sortedFiles: import("@/lib/google-drive/types").DriveFile[];
-  sortedFolders: import("@/lib/google-drive/types").DriveFolder[];
+  // File data - unified items approach
   files: import("@/lib/google-drive/types").DriveFile[];
   folders: import("@/lib/google-drive/types").DriveFolder[];
   
@@ -184,8 +182,6 @@ export function DriveToolbar({
   advancedFilters,
   setAdvancedFilters,
   setIsMobileFiltersOpen,
-  sortedFiles,
-  sortedFolders,
   files,
   folders,
   getFileActions,
@@ -289,7 +285,7 @@ export function DriveToolbar({
                 <Button
                   variant={isSelectMode ? 'default' : 'ghost'}
                   size="sm"
-                  disabled={sortedFiles.length === 0 && sortedFolders.length === 0}
+                  disabled={files.length === 0 && folders.length === 0}
                   className="h-8 px-2 md:px-3"
                 >
                   <Square className="h-4 w-4 md:mr-2" />
@@ -360,7 +356,7 @@ export function DriveToolbar({
                       
                       {/* Rename Selected - Available if any item can be renamed */}
                       {getSelectedItemsData().some(item => {
-                        const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                        const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canRename;
                       }) && (
@@ -372,7 +368,7 @@ export function DriveToolbar({
                       
                       {/* Export Selected - Available if any Google Workspace file can be exported */}
                       {getSelectedItemsData().some(item => {
-                        const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                        const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         return item.type === 'file' && 
                                item.mimeType && 
                                item.mimeType.startsWith('application/vnd.google-apps.') &&
@@ -387,7 +383,7 @@ export function DriveToolbar({
                       
                       {/* Move Selected - Available if any item can be moved */}
                       {getSelectedItemsData().some(item => {
-                        const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                        const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canMove;
                       }) && (
@@ -399,7 +395,7 @@ export function DriveToolbar({
                       
                       {/* Copy Selected - Available if any item can be copied */}
                       {getSelectedItemsData().some(item => {
-                        const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                        const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canCopy;
                       }) && (
@@ -411,7 +407,7 @@ export function DriveToolbar({
                       
                       {/* Share Selected - Available if any item can be shared */}
                       {getSelectedItemsData().some(item => {
-                        const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                        const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canShare;
                       }) && (
@@ -428,7 +424,7 @@ export function DriveToolbar({
                       
                       {/* Check if any selected item can be restored (only for trashed items) */}
                       {getSelectedItemsData().some(item => {
-                        const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                        const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canRestore;
                       }) && (
@@ -443,7 +439,7 @@ export function DriveToolbar({
                       
                       {/* Check if any selected item can be moved to trash - owner is me, not shared */}
                       {getSelectedItemsData().some(item => {
-                        const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                        const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         if (!fileOrFolder) return false;
                         // Can trash if: owner is me, not shared, not already in trash
                         const isOwner = fileOrFolder.ownedByMe === true;
@@ -462,7 +458,7 @@ export function DriveToolbar({
                       
                       {/* Check if any selected item can be permanently deleted */}
                       {getSelectedItemsData().some(item => {
-                        const fileOrFolder = [...sortedFiles, ...sortedFolders].find(f => f.id === item.id);
+                        const fileOrFolder = [...files, ...folders].find(f => f.id === item.id);
                         const actions = fileOrFolder ? getFileActions(fileOrFolder, activeView) : null;
                         return actions?.canPermanentDelete;
                       }) && (
@@ -964,149 +960,149 @@ export function DriveToolbar({
                     <span className="text-sm">Total Items</span>
                   </div>
                   <Badge variant="outline" className="font-medium">
-                    {sortedFiles.length + sortedFolders.length}
+                    {files.length + folders.length}
                   </Badge>
                 </div>
 
                 {/* Folders */}
-                {sortedFolders.length > 0 && (
+                {folders.length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Folder className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">Folders</span>
                     </div>
                     <Badge variant="outline" className="border-blue-500 text-blue-700 dark:text-blue-300">
-                      {sortedFolders.length}
+                      {folders.length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Images */}
-                {sortedFiles.filter(f => f.mimeType?.includes('image')).length > 0 && (
+                {files.filter(f => f.mimeType?.includes('image')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileImage className="h-4 w-4 text-green-500" />
                       <span className="text-sm">Images</span>
                     </div>
                     <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
-                      {sortedFiles.filter(f => f.mimeType?.includes('image')).length}
+                      {files.filter(f => f.mimeType?.includes('image')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Videos */}
-                {sortedFiles.filter(f => f.mimeType?.includes('video')).length > 0 && (
+                {files.filter(f => f.mimeType?.includes('video')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Play className="h-4 w-4 text-red-500" />
                       <span className="text-sm">Videos</span>
                     </div>
                     <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
-                      {sortedFiles.filter(f => f.mimeType?.includes('video')).length}
+                      {files.filter(f => f.mimeType?.includes('video')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Documents */}
-                {sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
+                {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-orange-50 dark:bg-orange-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-orange-500" />
                       <span className="text-sm">Documents</span>
                     </div>
                     <Badge variant="outline" className="border-orange-500 text-orange-700 dark:text-orange-300">
-                      {sortedFiles.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
+                      {files.filter(f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Spreadsheets */}
-                {sortedFiles.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length > 0 && (
+                {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-green-50 dark:bg-green-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileSpreadsheet className="h-4 w-4 text-green-500" />
                       <span className="text-sm">Spreadsheets</span>
                     </div>
                     <Badge variant="outline" className="border-green-500 text-green-700 dark:text-green-300">
-                      {sortedFiles.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
+                      {files.filter(f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Presentations */}
-                {sortedFiles.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length > 0 && (
+                {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Presentation className="h-4 w-4 text-amber-500" />
                       <span className="text-sm">Presentations</span>
                     </div>
                     <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-300">
-                      {sortedFiles.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
+                      {files.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Videos */}
-                {sortedFiles.filter(f => f.mimeType?.startsWith('video/')).length > 0 && (
+                {files.filter(f => f.mimeType?.startsWith('video/')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-red-50 dark:bg-red-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileVideo className="h-4 w-4 text-red-500" />
                       <span className="text-sm">Videos</span>
                     </div>
                     <Badge variant="outline" className="border-red-500 text-red-700 dark:text-red-300">
-                      {sortedFiles.filter(f => f.mimeType?.startsWith('video/')).length}
+                      {files.filter(f => f.mimeType?.startsWith('video/')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Audio */}
-                {sortedFiles.filter(f => f.mimeType?.startsWith('audio/')).length > 0 && (
+                {files.filter(f => f.mimeType?.startsWith('audio/')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileAudio className="h-4 w-4 text-indigo-500" />
                       <span className="text-sm">Audio</span>
                     </div>
                     <Badge variant="outline" className="border-indigo-500 text-indigo-700 dark:text-indigo-300">
-                      {sortedFiles.filter(f => f.mimeType?.startsWith('audio/')).length}
+                      {files.filter(f => f.mimeType?.startsWith('audio/')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Archives */}
-                {sortedFiles.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length > 0 && (
+                {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Archive className="h-4 w-4 text-gray-500" />
                       <span className="text-sm">Archives</span>
                     </div>
                     <Badge variant="outline" className="border-gray-500 text-gray-700 dark:text-gray-300">
-                      {sortedFiles.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
+                      {files.filter(f => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Code Files */}
-                {sortedFiles.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length > 0 && (
+                {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-emerald-50 dark:bg-emerald-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <FileCode className="h-4 w-4 text-emerald-500" />
                       <span className="text-sm">Code Files</span>
                     </div>
                     <Badge variant="outline" className="border-emerald-500 text-emerald-700 dark:text-emerald-300">
-                      {sortedFiles.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
+                      {files.filter(f => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml')).length}
                     </Badge>
                   </div>
                 )}
 
                 {/* Shortcuts */}
-                {sortedFiles.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length > 0 && (
+                {files.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length > 0 && (
                   <div className="flex items-center justify-between p-2 bg-blue-50 dark:bg-blue-950/30 rounded-md">
                     <div className="flex items-center gap-2">
                       <Link className="h-4 w-4 text-blue-500" />
                       <span className="text-sm">Shortcuts</span>
                     </div>
                     <Badge variant="outline" className="border-blue-500 text-blue-700 dark:text-blue-300">
-                      {sortedFiles.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length}
+                      {files.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length}
                     </Badge>
                   </div>
                 )}
