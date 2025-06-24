@@ -83,6 +83,7 @@ interface FiltersDialogProps {
   currentFilters: any
   hasActiveFilters: boolean
   onClearFilters: () => void
+  isApplying?: boolean
 }
 
 export function FiltersDialog({
@@ -93,6 +94,7 @@ export function FiltersDialog({
   currentFilters,
   hasActiveFilters,
   onClearFilters,
+  isApplying = false,
 }: FiltersDialogProps) {
   // Temporary state for filter changes (not applied until "Apply Filter" is clicked)
   const [tempActiveView, setTempActiveView] = useState(
@@ -806,6 +808,7 @@ export function FiltersDialog({
         <DialogFooter className="flex justify-between">
           <Button
             variant="outline"
+            disabled={isApplying}
             onClick={() => {
               console.log('Filter Debug - Apply button clicked:', {
                 tempActiveView,
@@ -826,14 +829,32 @@ export function FiltersDialog({
               onOpenChange(false)
             }}
           >
-            Apply Filter
+            {isApplying ? (
+              <>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Applying...
+              </>
+            ) : (
+              'Apply Filter'
+            )}
           </Button>
-          {hasTempActiveFilters && (
-            <Button onClick={handleClearAll} variant="destructive">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Clear All
-            </Button>
-          )}
+          <Button
+            variant="ghost"
+            disabled={isApplying}
+            onClick={() => {
+              onClearFilters()
+              onOpenChange(false)
+            }}
+          >
+            {isApplying ? (
+              <>
+                <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Clearing...
+              </>
+            ) : (
+              'Clear All'
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

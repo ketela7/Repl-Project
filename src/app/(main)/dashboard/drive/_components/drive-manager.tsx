@@ -751,6 +751,7 @@ export function DriveManager() {
             loading={loading}
             onClientSideFilter={handleClientSideFilter}
             onClearClientSideFilter={clearClientSideFilter}
+            isApplying={applyingFilters}
           />
 
           {currentFolderId && (
