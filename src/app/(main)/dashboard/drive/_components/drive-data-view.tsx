@@ -295,7 +295,7 @@ export function DriveDataView({
                     onClick={() => onColumnsChange({ sortBy: 'owners' })}
                   >
                     <div className="flex items-center space-x-1">
-                      <span>Owner</span>
+                      <span>Owner (Click to Copy Email)</span>
                       {sortConfig?.key === 'owners' && (
                         <span className="text-xs">
                           {sortConfig.direction === 'asc' ? '↑' : '↓'}
@@ -401,8 +401,31 @@ export function DriveDataView({
                     </TableCell>
                   )}
                   {visibleColumns.owners && (
-                    <TableCell>
-                      {item.owners?.[0]?.displayName || 'Unknown'}
+                    <TableCell 
+                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        const email = item.owners?.[0]?.emailAddress
+                        if (email) {
+                          try {
+                            await navigator.clipboard.writeText(email)
+                            // Show brief visual feedback
+                            const target = e.currentTarget
+                            const originalText = target.textContent
+                            target.textContent = 'Copied!'
+                            target.classList.add('text-green-600')
+                            setTimeout(() => {
+                              target.textContent = originalText
+                              target.classList.remove('text-green-600')
+                            }, 1000)
+                          } catch (err) {
+                            console.error('Failed to copy email:', err)
+                          }
+                        }
+                      }}
+                      title={`Click to copy: ${item.owners?.[0]?.emailAddress || 'No email available'}`}
+                    >
+                      {item.owners?.[0]?.emailAddress || item.owners?.[0]?.displayName || 'Unknown'}
                     </TableCell>
                   )}
                   {visibleColumns.mimeType && (

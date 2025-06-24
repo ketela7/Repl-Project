@@ -365,35 +365,24 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  // Size filters - Convert to bytes for Google Drive API
-  const fileSizeConditions: string[] = []
+  // Size filters - Google Drive API supports size filtering with proper syntax
+  // Note: Google Drive API size filter works only for files, not folders
+  // According to API docs: size >= <number> and size <= <number>
   const sizeUnit = filters.sizeUnit || 'MB'
   
   if (filters.minSize !== undefined && filters.minSize > 0) {
     const minSizeBytes = convertSizeToBytes(filters.minSize, sizeUnit)
-    fileSizeConditions.push(`size >= ${minSizeBytes}`)
+    // Apply size filter only to files (exclude folders, apps, shortcuts)
+    conditions.push(`size >= ${minSizeBytes}`)
+    conditions.push(`not mimeType = 'application/vnd.google-apps.folder'`)
+    conditions.push(`not mimeType = 'application/vnd.google-apps.shortcut'`)
   }
   if (filters.maxSize !== undefined && filters.maxSize > 0) {
     const maxSizeBytes = convertSizeToBytes(filters.maxSize, sizeUnit)
-    fileSizeConditions.push(`size <= ${maxSizeBytes}`)
-  }
-
-  // Apply size filters only to files (not folders)
-  if (fileSizeConditions.length > 0) {
-    // Check if folder filter is active
-    const includesFolders = filters.fileType?.includes('folder') || 
-                           !filters.fileType || 
-                           filters.fileType.length === 0
-
-    if (includesFolders) {
-      // Include folders OR files matching size criteria
-      conditions.push(
-        `((${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder') or mimeType = 'application/vnd.google-apps.folder'`
-      )
-    } else {
-      // Just apply size filters to files (exclude folders)
-      conditions.push(`(${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder'`)
-    }
+    // Apply size filter only to files (exclude folders, apps, shortcuts)
+    conditions.push(`size <= ${maxSizeBytes}`)
+    conditions.push(`not mimeType = 'application/vnd.google-apps.folder'`)
+    conditions.push(`not mimeType = 'application/vnd.google-apps.shortcut'`)
   }
 
 
@@ -457,8 +446,8 @@ export async function GET(request: NextRequest) {
     sortBy: searchParams.get('sortBy') || 'modifiedTime',
     sortOrder,
     search: searchParams.get('search') || undefined,
-    minSize: Number(searchParams.get('minSize')) || undefined,
-    maxSize: Number(searchParams.get('maxSize')) || undefined,
+    minSize: searchParams.get('minSize') ? Number(searchParams.get('minSize')) : undefined,
+    maxSize: searchParams.get('maxSize') ? Number(searchParams.get('maxSize')) : undefined,
     sizeUnit: searchParams.get('sizeUnit') || 'MB',
     createdAfter: searchParams.get('createdAfter') || undefined,
     createdBefore: searchParams.get('createdBefore') || undefined,
