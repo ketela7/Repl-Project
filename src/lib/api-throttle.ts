@@ -14,8 +14,8 @@ interface ThrottleQueue {
 class APIThrottle {
   private queue: ThrottleQueue[] = []
   private processing = false
-  private readonly maxRequestsPerSecond = 10 // Google Drive API limit
-  private readonly requestInterval = 1000 / this.maxRequestsPerSecond // 100ms between requests
+  private readonly maxRequestsPerSecond = 25 // Increased for better performance
+  private readonly requestInterval = 1000 / this.maxRequestsPerSecond // 40ms between requests
   private lastRequestTime = 0
 
   /**

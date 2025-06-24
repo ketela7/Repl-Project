@@ -9,6 +9,7 @@ import { normalizeFileSize } from '@/lib/google-drive/utils'
 import { successToast, errorToast, infoToast } from '@/lib/toast'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { useTimezoneContext } from '@/components/timezone-provider'
+import { PerformanceMonitor } from './performance-monitor'
 
 // Component imports - Use dynamic imports for heavy dialogs
 import { FileBreadcrumb } from './file-breadcrumb'

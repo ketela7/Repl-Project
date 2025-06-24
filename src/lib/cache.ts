@@ -11,9 +11,9 @@ interface CacheEntry<T> {
 
 class MemoryCache {
   private cache = new Map<string, CacheEntry<any>>();
-  private maxSize = 500; // Maximum number of entries
+  private maxSize = 1000; // Increased cache size for better performance
 
-  set<T>(key: string, data: T, ttlMinutes: number = 5): void {
+  set<T>(key: string, data: T, ttlMinutes: number = 10): void { // Increased default TTL
     // Clean up old entries if cache is getting too large
     if (this.cache.size >= this.maxSize) {
       this.cleanup();

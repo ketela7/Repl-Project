@@ -4,7 +4,8 @@ import { GoogleDriveService } from '@/lib/google-drive/service'
 import { driveCache } from '@/lib/cache'
 import { requestDeduplicator } from '@/lib/request-deduplication'
 import { retryDriveApiCall } from '@/lib/api-retry'
-import { throttledDriveRequest } from '@/lib/api-throttle'
+import { optimizedApiCall } from '@/lib/api-performance'
+import { withEnhancedErrorHandling } from '@/lib/enhanced-error-handler'
 
 interface FileFilter {
   fileType?: string

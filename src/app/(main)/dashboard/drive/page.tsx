@@ -23,7 +23,6 @@ export default function DrivePage() {
       <Suspense fallback={<DriveGridSkeleton />}>
         <DriveManager />
       </Suspense>
-
     </div>
   )
 }
