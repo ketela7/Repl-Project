@@ -50,6 +50,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.rememberMe = false
       }
 
+      // Handle token refresh on every request if needed
+      if (token.refreshToken && (!token.accessToken || (account?.expires_at && Date.now() >= account.expires_at * 1000))) {
+        try {
+          const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+              client_id: process.env.AUTH_GOOGLE_ID!,
+              client_secret: process.env.AUTH_GOOGLE_SECRET!,
+              grant_type: 'refresh_token',
+              refresh_token: token.refreshToken as string,
+            }),
+          })
+          
+          if (response.ok) {
+            const refreshedTokens = await response.json()
+            token.accessToken = refreshedTokens.access_token
+            if (refreshedTokens.refresh_token) {
+              token.refreshToken = refreshedTokens.refresh_token
+            }
+            token.exp = Math.floor(Date.now() / 1000) + (refreshedTokens.expires_in || 3600)
+          } else {
+            console.error('Token refresh failed:', response.status)
+            token.accessToken = undefined
+          }
+        } catch (error) {
+          console.error('Token refresh error:', error)
+          token.accessToken = undefined
+        }
+      }
+
       // Handle remember me preference updates from client-side session update
       if (trigger === 'update' && session?.rememberMe !== undefined) {
         token.rememberMe = session.rememberMe

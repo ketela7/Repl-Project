@@ -378,7 +378,11 @@ export async function GET(request: NextRequest) {
     const session = await auth()
 
     if (!session?.accessToken) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ 
+        error: 'Authentication expired',
+        needsReauth: true,
+        redirect: '/auth/v1/login'
+      }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
@@ -422,7 +426,13 @@ export async function GET(request: NextRequest) {
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
 
-    const driveService = new GoogleDriveService(session.accessToken)
+    const driveService = new GoogleDriveService(session.accessToken!)
+    
+    console.log('🚀 DRIVE SERVICE - Initialized with token:', {
+      hasToken: Boolean(session.accessToken),
+      tokenLength: session.accessToken?.length || 0,
+      userId: session.user?.email
+    })
 
     const result = await driveService.listFiles({
       parentId: folderId,

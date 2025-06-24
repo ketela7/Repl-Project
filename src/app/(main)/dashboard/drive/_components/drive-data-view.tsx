@@ -411,14 +411,11 @@ export function DriveDataView({
                           try {
                             await navigator.clipboard.writeText(email)
                             // Show toast notification
-                            const { toast } = await import('@/shared/utils/toast')
-                            toast.success('Copied to clipboard', {
-                              description: email,
-                              duration: 2000,
-                            })
+                            const { successToast } = await import('@/shared/utils/toast')
+                            successToast.copied()
                           } catch (err) {
-                            const { toast } = await import('@/shared/utils/toast')
-                            toast.error('Failed to copy email')
+                            const { errorToast } = await import('@/shared/utils/toast')
+                            errorToast.generic('Failed to copy email')
                             console.error('Failed to copy email:', err)
                           }
                         }

@@ -556,10 +556,13 @@ export function DriveManager() {
 
         if (
           error.message?.includes('Authentication') ||
-          error.message?.includes('401')
+          error.message?.includes('401') ||
+          error.status === 401
         ) {
           setNeedsReauth(true)
           setDriveAccessError(error)
+          // Force re-authentication by redirecting to login
+          window.location.href = '/auth/v1/login'
         } else {
           setDriveAccessError(error)
           errorToast.apiError('Failed to load files')
