@@ -1,6 +1,9 @@
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Fast development optimizations
+  reactStrictMode: false, // Disable for faster development
+  
   experimental: {
     optimizePackageImports: [
       'lucide-react',
@@ -14,35 +17,58 @@ const nextConfig = {
       'recharts'
     ],
     optimisticClientCache: true,
-    // Improve compilation speed
     useWasmBinary: false,
-    // Reduce memory usage
-    //cpus: 1
   },
-  // Turbopack configuration (moved from experimental.turbo)
-  turbopack: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    }
-  },
-  serverExternalPackages: ['postgres'],
+  
+  serverExternalPackages: ['postgres', 'googleapis'],
+  
+  // Fast TypeScript compilation
   typescript: {
     ignoreBuildErrors: true,
     tsconfigPath: './tsconfig.json'
   },
+  
+  // Skip ESLint during builds for speed
   eslint: {
     ignoreDuringBuilds: true
   },
-  // SWC is enabled by default in Next.js 15
 
-  allowedDevOrigins : ['*.pike.replit.dev', '*.sisko.replit.dev'],
+  allowedDevOrigins: ['*.pike.replit.dev', '*.sisko.replit.dev'],
+  
+  // Optimized webpack for development speed
+  webpack: (config, { dev, isServer }) => {
+    if (dev) {
+      // Fast development builds
+      config.watchOptions = {
+        poll: false, // Use native file watching
+        aggregateTimeout: 200,
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**', 
+          '**/.next/**',
+          '**/coverage/**',
+          '**/drizzle/**'
+        ],
+      }
+      
+      config.optimization = {
+        ...config.optimization,
+        removeAvailableModules: false,
+        removeEmptyChunks: false,
+        splitChunks: false,
+      }
+
+      config.resolve.symlinks = false
+    }
+    return config
+  },
+  
   // Performance optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production'
   },
+  
+  // Simplified headers for development speed
   async headers() {
     return [
       {
@@ -60,7 +86,16 @@ const nextConfig = {
       },
     ]
   },
+
+  // Fast compilation settings
+  output: 'standalone',
+  productionBrowserSourceMaps: false,
   
+  // Development optimizations
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: 2,
+  },
 }
 
 module.exports = nextConfig

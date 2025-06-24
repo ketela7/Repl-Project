@@ -124,6 +124,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 - June 24, 2025: API ROUTE SIMPLIFICATION - Mengurangi kompleksitas dari 460 baris → 30 baris untuk mengatasi compile time yang lambat
 - June 24, 2025: AUTH.TS CLEANUP - Menghilangkan session cache kompleks yang menyebabkan TypeScript errors
 - June 24, 2025: CRITICAL BUG FIX - Fixed Google Drive API "Invalid Value" error, authentication now working properly, API returning 50 files successfully
+- June 24, 2025: PERFORMANCE OPTIMIZATION - Optimized Next.js config for faster development: disabled strict mode, skip lib check, simplified headers, faster webpack builds
 
 ## Changelog
 

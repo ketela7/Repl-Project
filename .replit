@@ -18,6 +18,10 @@ deploymentTarget = "autoscale"
 ignorePorts = false
 
 [[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
 localPort = 5000
 externalPort = 80
 
@@ -60,7 +64,6 @@ name = "Project"
 mode = "parallel"
 author = "agent"
 
-
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Test Runner"
@@ -71,7 +74,7 @@ args = "Type Checker"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Server" 
+args = "Server"
 
 [[workflows.workflow]]
 name = "Test Runner"
