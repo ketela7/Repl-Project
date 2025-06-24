@@ -698,65 +698,61 @@ export function DriveToolbar({
                 </DropdownMenuItem>
 
                 {selectedCount > 0 && (
-                <>
-                  {isMobile ? (
-                    <DropdownMenuItem onClick={onMobileActionsOpen}>
-                      <MoreVertical className="mr-2 h-4 w-4" />
-                      More Actions
-                    </DropdownMenuItem>
-                  ) : (
-                    <>
-                      <DropdownMenuSeparator />
-                      <div className="text-muted-foreground px-2 py-1.5 text-xs font-semibold tracking-wider uppercase">
-                        File Operations ({selectedCount} selected)
-                      </div>
-
-                      <DropdownMenuItem onClick={onBulkDelete}>
-                        <Download className="mr-2 h-4 w-4" />
-                        Download Selected
+                  <>
+                    {isMobile ? (
+                      <DropdownMenuItem onClick={onMobileActionsOpen}>
+                        <MoreVertical className="mr-2 h-4 w-4" />
+                        More Actions
                       </DropdownMenuItem>
+                    ) : (
+                      <>
+                        <DropdownMenuSeparator />
+                        <div className="text-muted-foreground px-2 py-1.5 text-xs font-semibold tracking-wider uppercase">
+                          File Operations ({selectedCount} selected)
+                        </div>
 
-                      <DropdownMenuItem onClick={onBulkMove}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Rename Selected
-                      </DropdownMenuItem>
-                    </>
-                  )}
-                </>
-              )}m>
+                        <DropdownMenuItem onClick={onBulkDelete}>
+                          <Download className="mr-2 h-4 w-4" />
+                          Download Selected
+                        </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={onBulkCopy}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      Export Selected
-                    </DropdownMenuItem>
+                        <DropdownMenuItem onClick={onBulkMove}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Rename Selected
+                        </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={onBulkMove}>
-                      <Move className="mr-2 h-4 w-4" />
-                      Move Selected
-                    </DropdownMenuItem>
+                        <DropdownMenuItem onClick={onBulkCopy}>
+                          <FileText className="mr-2 h-4 w-4" />
+                          Export Selected
+                        </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={onBulkCopy}>
-                      <Copy className="mr-2 h-4 w-4" />
-                      Copy Selected
-                    </DropdownMenuItem>
+                        <DropdownMenuItem onClick={onBulkMove}>
+                          <Move className="mr-2 h-4 w-4" />
+                          Move Selected
+                        </DropdownMenuItem>
 
-                    <DropdownMenuItem onClick={onBulkShare}>
-                      <Share2 className="mr-2 h-4 w-4" />
-                      Share Selected
-                    </DropdownMenuItem>
+                        <DropdownMenuItem onClick={onBulkCopy}>
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy Selected
+                        </DropdownMenuItem>
 
-                    <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={onBulkShare}>
+                          <Share2 className="mr-2 h-4 w-4" />
+                          Share Selected
+                        </DropdownMenuItem>
 
-                    <DropdownMenuItem
-                      onClick={onBulkDelete}
-                      className="text-orange-600 dark:text-orange-400"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Move to Trash
-                    </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                          onClick={onBulkDelete}
+                          className="text-orange-600 dark:text-orange-400"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Move to Trash
+                        </DropdownMenuItem>
+                      </>
+                    )}
                   </>
-              )
-                 
                 )}
                 
               </DropdownMenuContent>
