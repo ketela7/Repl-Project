@@ -25,10 +25,7 @@ export const FileBulkOperationsDialog = lazy(() =>
   import("@/app/(main)/dashboard/drive/_components/bulk-operations-dialog").then(mod => ({ default: mod.BulkOperationsDialog }))
 );
 
-// Lazy load heavy table components
-export const FileList = lazy(() => 
-  import("@/app/(main)/dashboard/drive/_components/drive-data-view").then(mod => ({ default: mod.DriveDataView }))
-);
+// FileList removed - not used in project
 
 export const DriveToolbar = lazy(() => 
   import("@/app/(main)/dashboard/drive/_components/drive-toolbar").then(mod => ({ default: mod.DriveToolbar }))

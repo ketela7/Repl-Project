@@ -26,6 +26,7 @@ import { BulkCopyDialog } from './bulk-copy-dialog'
 import { FileShareDialog } from './file-share-dialog'
 import { BulkShareDialog } from './bulk-share-dialog'
 import { BulkOperationsDialogMobile } from './bulk-operations-dialog-mobile'
+import { FiltersDialog } from './filters-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
 import { DriveErrorDisplay } from '@/components/drive-error-display'
@@ -125,6 +126,7 @@ export function DriveManager() {
 
   // Helper functions
   const openDialog = (dialogName: keyof typeof dialogs) => {
+    console.log('Opening dialog:', dialogName)
     setDialogs((prev) => ({ ...prev, [dialogName]: true }))
   }
 
@@ -842,6 +844,19 @@ export function DriveManager() {
         }}
       /> 
 
+      {/* Mobile Filters Dialog */}
+      <FiltersDialog
+        open={dialogs.mobileFilters}
+        onOpenChange={(open) => {
+          if (!open) closeDialog('mobileFilters')
+        }}
+        onFilterChange={handleFilter}
+        onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
+        currentFilters={filters}
+        hasActiveFilters={hasActiveFilters}
+        onClearFilters={clearAllFilters}
+        isApplying={loading}
+      />
 
       {/* Progress indicators */}
       {bulkOperationProgress.isRunning && (

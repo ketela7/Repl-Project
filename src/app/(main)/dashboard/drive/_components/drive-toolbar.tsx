@@ -645,7 +645,11 @@ export function DriveToolbar({
             <Button
               variant="default"
               size="sm"
-              onClick={onMobileActionsOpen}
+              onClick={() => {
+                console.log('Mobile Bulk Actions Button Clicked!')
+                console.log('onMobileActionsOpen function:', onMobileActionsOpen)
+                onMobileActionsOpen()
+              }}
               className="h-8 bg-blue-600 px-3 text-white hover:bg-blue-700"
             >
               <MoreVertical className="mr-1 h-4 w-4" />
@@ -773,7 +777,8 @@ export function DriveToolbar({
               variant="ghost"
               size="sm"
               onClick={() => {
-                console.log('Filter Debug - Toolbar click: Filter')
+                console.log('Filter Debug - Mobile Filter Button Clicked!')
+                console.log('onFiltersOpen function:', onFiltersOpen)
                 onFiltersOpen()
               }}
               className={`h-8 px-2 md:px-3 ${
