@@ -31,6 +31,7 @@ import { DriveDataView } from './drive-data-view'
 import { DriveErrorDisplay } from '@/shared/components/drive-error-display'
 import { DrivePermissionRequired } from '@/shared/components/drive-permission-required'
 
+
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
 
 const isFolder = (item: DriveItem): boolean => {
