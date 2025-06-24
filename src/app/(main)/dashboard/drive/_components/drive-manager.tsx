@@ -233,10 +233,6 @@ export function DriveManager() {
     })
   }, [items, sortConfig])
 
-  // Derived data
-  const files = useMemo(() => sortedItems.filter((item) => !isFolder(item)) as DriveFile[], [sortedItems])
-  const folders = useMemo(() => sortedItems.filter((item) => isFolder(item)) as DriveFolder[], [sortedItems])
-
   // Convert selected items for bulk operations
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
@@ -252,6 +248,7 @@ export function DriveManager() {
 
   // API call function
   const fetchFiles = useCallback(async (folderId?: string, searchQuery?: string, pageToken?: string) => {
+    let callId = ''
     try {
       if (!folderId && folderId !== '') folderId = currentFolderId || undefined
 
@@ -262,49 +259,32 @@ export function DriveManager() {
         modified: filters.advancedFilters.modifiedDateRange, owner: filters.advancedFilters.owner,
       })
 
-      const callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
+      callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
 
       if (activeRequestsRef.current.has(callId)) return
       if (filterKey !== lastFiltersRef.current && pageToken) return
       lastFiltersRef.current = filterKey
 
-      if (!pageToken) {
-        setLoading(true)
-      } else {
-        setLoadingMore(true)
-      }
+      setLoading(!pageToken)
+      setLoadingMore(!!pageToken)
 
       activeRequestsRef.current.add(callId)
 
-      const params = new URLSearchParams()
+      const params = new URLSearchParams({
+        sortBy: filters.advancedFilters.sortBy || 'modified',
+        sortOrder: filters.advancedFilters.sortOrder || 'desc'
+      })
+
       if (folderId) params.append('folderId', folderId)
       if (searchQuery) params.append('search', searchQuery)
       if (pageToken) params.append('pageToken', pageToken)
-
-      if (filters.activeView && filters.activeView !== 'all') {
-        params.append('viewStatus', filters.activeView)
-      }
-      if (filters.fileTypeFilter && filters.fileTypeFilter.length > 0) {
-        params.append('fileType', filters.fileTypeFilter.join(','))
-      }
-      params.append('sortBy', filters.advancedFilters.sortBy || 'modified')
-      params.append('sortOrder', filters.advancedFilters.sortOrder || 'desc')
-
-      if (filters.advancedFilters.createdDateRange?.from) {
-        params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
-      }
-      if (filters.advancedFilters.createdDateRange?.to) {
-        params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
-      }
-      if (filters.advancedFilters.modifiedDateRange?.from) {
-        params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
-      }
-      if (filters.advancedFilters.modifiedDateRange?.to) {
-        params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
-      }
-      if (filters.advancedFilters.owner && filters.advancedFilters.owner.trim()) {
-        params.append('owner', filters.advancedFilters.owner.trim())
-      }
+      if (filters.activeView && filters.activeView !== 'all') params.append('viewStatus', filters.activeView)
+      if (filters.fileTypeFilter?.length > 0) params.append('fileType', filters.fileTypeFilter.join(','))
+      if (filters.advancedFilters.createdDateRange?.from) params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
+      if (filters.advancedFilters.createdDateRange?.to) params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
+      if (filters.advancedFilters.modifiedDateRange?.from) params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
+      if (filters.advancedFilters.modifiedDateRange?.to) params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
+      if (filters.advancedFilters.owner?.trim()) params.append('owner', filters.advancedFilters.owner.trim())
 
       const response = await fetch(`/api/drive/files?${params}`, {
         credentials: 'include',
@@ -322,28 +302,12 @@ export function DriveManager() {
       const data = await response.json()
       if (data.error) throw new Error(data.error)
 
-      const allFiles = data.files || data || []
-      const folders: DriveItem[] = []
-      const files: DriveItem[] = []
+      const newItems = (data.files || data || []).map((item: any) => ({
+        ...item,
+        itemType: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+      }))
 
-      for (const item of allFiles) {
-        if (item.mimeType === 'application/vnd.google-apps.folder') {
-          folders.push(item)
-        } else {
-          files.push(item)
-        }
-      }
-
-      const newItems: DriveItem[] = [
-        ...folders.map((folder: DriveFolder) => ({ ...folder, itemType: 'folder' as const })),
-        ...files.map((file: DriveFile) => ({ ...file, itemType: 'file' as const })),
-      ]
-
-      if (pageToken) {
-        setItems((prev) => [...prev, ...newItems])
-      } else {
-        setItems(newItems)
-      }
+      setItems(prev => pageToken ? [...prev, ...newItems] : newItems)
 
       setNextPageToken(data.nextPageToken || null)
       setHasAccess(true)
@@ -362,7 +326,7 @@ export function DriveManager() {
       setLoading(false)
       setLoadingMore(false)
       setRefreshing(false)
-      activeRequestsRef.current.delete(callId)
+      if (callId) activeRequestsRef.current.delete(callId)
     }
   }, [currentFolderId, filters])
 
