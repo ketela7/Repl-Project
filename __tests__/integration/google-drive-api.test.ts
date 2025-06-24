@@ -11,20 +11,21 @@ describe('Google Drive API Integration', () => {
         {
           id: '1',
           name: 'Document.docx',
-          mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          mimeType:
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
           size: '15420',
           modifiedTime: '2025-06-21T10:00:00.000Z',
-          parents: ['root']
+          parents: ['root'],
         },
         {
           id: '2',
           name: 'Images',
           mimeType: 'application/vnd.google-apps.folder',
           modifiedTime: '2025-06-20T15:30:00.000Z',
-          parents: ['root']
-        }
+          parents: ['root'],
+        },
       ],
-      nextPageToken: null
+      nextPageToken: null,
     }
 
     mockFetch(mockResponse)
@@ -42,7 +43,7 @@ describe('Google Drive API Integration', () => {
     mockFetch({ error: 'Invalid credentials' }, 401)
 
     const response = await fetch('/api/drive/files')
-    
+
     expect(response.ok).toBe(false)
     expect(response.status).toBe(401)
   })
@@ -51,9 +52,9 @@ describe('Google Drive API Integration', () => {
     const mockResponse = {
       files: [
         { id: '1', name: 'File1.txt', mimeType: 'text/plain' },
-        { id: '2', name: 'File2.txt', mimeType: 'text/plain' }
+        { id: '2', name: 'File2.txt', mimeType: 'text/plain' },
       ],
-      nextPageToken: 'next_page_token'
+      nextPageToken: 'next_page_token',
     }
 
     mockFetch(mockResponse)
@@ -72,14 +73,16 @@ describe('Google Drive API Integration', () => {
       fileType: 'documents',
       search: 'test',
       sortBy: 'name',
-      sortOrder: 'asc'
+      sortOrder: 'asc',
     })
 
     const response = await fetch(`/api/drive/files?${searchParams}`)
-    
+
     expect(response.ok).toBe(true)
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/drive/files?fileType=documents&search=test&sortBy=name&sortOrder=asc')
+      expect.stringContaining(
+        '/api/drive/files?fileType=documents&search=test&sortBy=name&sortOrder=asc'
+      )
     )
   })
 
@@ -88,7 +91,7 @@ describe('Google Drive API Integration', () => {
       success: true,
       processed: 5,
       failed: 0,
-      results: []
+      results: [],
     }
 
     mockFetch(bulkResponse)
@@ -97,12 +100,12 @@ describe('Google Drive API Integration', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        fileIds: ['1', '2', '3', '4', '5']
-      })
+        fileIds: ['1', '2', '3', '4', '5'],
+      }),
     })
 
     const data = await response.json()
-    
+
     expect(response.ok).toBe(true)
     expect(data.success).toBe(true)
     expect(data.processed).toBe(5)

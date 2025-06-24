@@ -1,7 +1,95 @@
 # Project Structure
 
 ## Overview
-This document outlines the new organized structure for the Google Drive Management application, implementing a feature-based architecture for better maintainability and scalability.
+This document outlines the organized structure for the Google Drive Pro application, implementing a feature-based architecture for better maintainability and scalability.
+
+## Current Structure (Real-time Updated)
+
+```
+src/
+├── app/                         # Next.js 15 App Router
+│   ├── (main)/                  # Main application layout group
+│   │   └── dashboard/           # Dashboard pages
+│   │       ├── drive/           # Drive management
+│   │       │   ├── _components/ # Drive-specific components
+│   │       │   └── page.tsx     # Drive main page
+│   │       └── layout.tsx       # Dashboard layout
+│   ├── api/                     # API routes
+│   │   ├── auth/                # Authentication endpoints
+│   │   │   └── [...nextauth]/   # NextAuth handlers
+│   │   ├── drive/               # Google Drive API endpoints
+│   │   │   ├── files/           # File operations
+│   │   │   └── folders/         # Folder operations
+│   │   └── health/              # Health check endpoints
+│   ├── globals.css              # Global styles
+│   ├── layout.tsx               # Root layout
+│   └── page.tsx                 # Landing page
+├── components/                  # Reusable UI components
+│   ├── auth/                    # Authentication components
+│   ├── providers/               # React context providers
+│   ├── ui/                      # Base UI components (shadcn/ui)
+│   ├── error-boundary.tsx       # Error boundary component
+│   ├── file-category-badges.tsx # File categorization
+│   ├── file-icon.tsx           # File type icons
+│   ├── drive-error-display.tsx # Drive error handling
+│   ├── drive-permission-required.tsx # Permission prompts
+│   ├── lazy-imports.tsx        # Dynamic imports
+│   └── timezone-provider.tsx   # Timezone context
+├── core/                       # Core application services
+│   ├── config/                 # Configuration files
+│   └── index.ts               # Core exports
+├── hooks/                      # Custom React hooks
+│   ├── use-debounced-value.ts  # Debouncing utility
+│   ├── use-intersection-observer.ts # Intersection observer
+│   ├── use-mobile.ts           # Mobile detection
+│   └── use-timezone.ts         # Timezone utilities
+├── lib/                        # Utility libraries
+│   ├── actions.ts              # Server actions
+│   ├── api-retry.ts            # API retry logic
+│   ├── cache.ts                # Caching utilities
+│   ├── clipboard.ts            # Clipboard operations
+│   ├── config.ts               # Environment config
+│   ├── db.ts                   # Database connection
+│   ├── middleware.ts           # Auth middleware
+│   ├── request-deduplication.ts # Request optimization
+│   ├── schema.ts               # Database schema (Drizzle)
+│   ├── search-optimizer.ts     # Search optimization
+│   ├── session-cache.ts        # Session caching
+│   ├── timezone.ts             # Timezone utilities
+│   ├── toast.ts                # Toast notifications
+│   └── utils.ts                # General utilities
+└── shared/                     # Shared resources
+    └── index.ts                # Shared exports
+```
+
+## Key Architectural Decisions
+
+### File Naming Convention
+- Simple kebab-case naming without prefixes or suffixes
+- Examples: `drive-manager.tsx`, `file-list.tsx`, `user-profile.tsx`
+- Avoid: `enhanced-drive-manager.tsx`, `optimized-file-list.tsx`
+
+### Component Organization
+- Feature-based grouping under `_components/` directories
+- Shared components in `/components/`
+- UI primitives in `/components/ui/`
+
+### API Structure
+- RESTful endpoints under `/api/`
+- Grouped by feature (auth, drive, health)
+- Consistent response formats
+
+### State Management
+- TanStack Query for server state
+- React hooks for client state
+- Custom session caching layer
+
+### Security
+- No NEXT_PUBLIC_ environment variables
+- Server-side configuration only
+- Secure token handling with NextAuth.js
+
+Last Updated: June 24, 2025
 
 ## Directory Structure
 

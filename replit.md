@@ -130,21 +130,24 @@ Preferred communication style: Simple, everyday language.
 
 ### Development Standards
 - No NEXT_PUBLIC_ prefix - only use private secrets
-- Simple file naming without prefixes/suffixes (drive-manager.tsx ✅, enhanced-drive-manager.tsx ❌)
+- Simple file naming without prefixes/suffixes (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
 - Always ensure project is clean when starting
 - Thorough testing before commits
 - Professional code quality standards
 - Well-structured project organization
+- Real-time documentation updates (API docs, routes, project structure)
 - Update README.md for public understanding of changes
+- Work like professional coder with thorough planning
 
 ## Recent Changes
 
 - June 24, 2025: Initial setup with Google Drive authentication
 - June 24, 2025: Updated project rules - no NEXT_PUBLIC_ prefix, only private secrets
 - June 24, 2025: Simplified file naming (removed "optimized" prefix from theme provider)
-- June 24, 2025: Fixed ESLint configuration and migrated to flat config
+- June 24, 2025: Created comprehensive API documentation with real-time updates
+- June 24, 2025: Updated project structure documentation with current architecture
 - June 24, 2025: All tests passing (76 test cases), TypeScript compilation successful
-- June 24, 2025: Project cleaned and verified to follow professional standards
+- June 24, 2025: Project follows professional development standards with clean structure
 
 ## Changelog
 

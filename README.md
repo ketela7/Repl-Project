@@ -2,7 +2,13 @@
 
 A comprehensive, enterprise-grade Google Drive management application built with Next.js 15, featuring advanced file operations, intelligent filtering, and responsive design optimized for professional workflows.
 
-## 🚀 Quick Start
+## Documentation
+
+- [API Documentation](./API_DOCUMENTATION.md) - Complete API reference
+- [Project Structure](./PROJECT_STRUCTURE.md) - Codebase organization  
+- [Development Rules](./PROJECT_RULES.md) - Coding standards and guidelines
+
+## Quick Start
 
 ### Prerequisites
 - Node.js 20 or higher
@@ -17,9 +23,11 @@ A comprehensive, enterprise-grade Google Drive management application built with
 
 ### Development Standards
 - **Security**: Only private secrets, no NEXT_PUBLIC_ environment variables
-- **File Naming**: Simple naming without prefixes or suffixes (drive-manager.tsx ✅, enhanced-drive-manager.tsx ❌)
+- **File Naming**: Simple naming without prefixes or suffixes (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
 - **Code Quality**: Clean project structure with comprehensive testing
 - **Professional Standards**: Thorough testing and validation before any commits
+- **Documentation**: Real-time updates to API docs, routes, and project structure
+- **Clean Development**: Always ensure project is clean when starting work
 
 ## 🚀 Features
 

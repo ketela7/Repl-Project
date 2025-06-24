@@ -29,7 +29,9 @@ describe('Authentication Flow Integration', () => {
     )
 
     // Should show sign in prompt
-    expect(screen.getByText('Access denied. Please sign in.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Access denied. Please sign in.')
+    ).toBeInTheDocument()
 
     // Render Google Auth Button
     rerender(
@@ -42,13 +44,19 @@ describe('Authentication Flow Integration', () => {
     )
 
     // Click sign in button
-    mockSignIn.mockResolvedValue({ ok: true, error: undefined, status: 200, url: null, code: undefined } as any)
+    mockSignIn.mockResolvedValue({
+      ok: true,
+      error: undefined,
+      status: 200,
+      url: null,
+      code: undefined,
+    } as any)
     const signInButton = screen.getByRole('button')
     fireEvent.click(signInButton)
 
     await waitFor(() => {
       expect(mockSignIn).toHaveBeenCalledWith('google', {
-        callbackUrl: '/dashboard/drive'
+        callbackUrl: '/dashboard/drive',
       })
     })
 
@@ -74,7 +82,9 @@ describe('Authentication Flow Integration', () => {
 
     // Should now show protected content
     expect(screen.getByText('Protected Content')).toBeInTheDocument()
-    expect(screen.queryByText('Access denied. Please sign in.')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText('Access denied. Please sign in.')
+    ).not.toBeInTheDocument()
   })
 
   it('handles authentication loading state', () => {
@@ -95,8 +105,10 @@ describe('Authentication Flow Integration', () => {
   })
 
   it('handles sign in errors gracefully', async () => {
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
-    
+    const consoleError = jest
+      .spyOn(console, 'error')
+      .mockImplementation(() => {})
+
     mockUseSession.mockReturnValue({
       data: null,
       status: 'unauthenticated',
@@ -116,7 +128,7 @@ describe('Authentication Flow Integration', () => {
 
     // Should not crash and remain functional
     expect(button).toBeInTheDocument()
-    
+
     consoleError.mockRestore()
   })
 })

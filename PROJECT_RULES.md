@@ -161,7 +161,9 @@ npm run build        # Production build succeeds
 - **Professional Standards**: Work with professional coder discipline
 - **No Errors**: Ensure zero errors in production-ready code
 - **Well Structured**: Maintain clean, organized project structure
-- **Documentation**: Update README.md for any project changes to ensure public understanding
+- **Real-time Documentation**: Always update API documentation, routes, and project structure in real time
+- **README Updates**: Update README.md for any project changes to ensure public understanding
+- **Professional Work**: Work like a professional coder with thorough planning and execution
 
 ### Continuous Integration
 - **Automated Testing**: All tests must pass
