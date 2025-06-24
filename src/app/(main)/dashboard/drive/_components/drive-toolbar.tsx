@@ -647,8 +647,6 @@ export function DriveToolbar({
               size="sm"
               onClick={() => {
                 console.log('Mobile Bulk Actions Button Clicked!')
-                console.log('selectedCount:', selectedCount)
-                console.log('isMobile:', isMobile)
                 onMobileActionsOpen()
               }}
               className="h-8 bg-blue-600 px-3 text-white hover:bg-blue-700"
@@ -657,11 +655,37 @@ export function DriveToolbar({
               Actions ({selectedCount})
             </Button>
           )}
+
+          {/* Mobile Select All Button - Show when in select mode but no items selected */}
+          {isMobile && isSelectMode && selectedCount === 0 && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onSelectAll}
+              className="h-8 px-3"
+            >
+              <SquareCheck className="mr-1 h-4 w-4" />
+              Select All ({totalCount})
+            </Button>
+          )}
+
+          {/* Mobile Select Mode Toggle - Show when not in select mode */}
+          {isMobile && !isSelectMode && items.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onSelectModeChange(true)}
+              className="h-8 px-3"
+            >
+              <Square className="mr-1 h-4 w-4" />
+              Select
+            </Button>
+          )}
           
           {/* Debug: Show mobile bulk button conditions - VISIBLE FOR DEBUGGING */}
           {isMobile && (
             <div className="text-xs text-blue-600 p-1 border border-blue-300 rounded bg-blue-50 ml-1">
-              Debug: selected={selectedCount}, selectMode={isSelectMode ? 'ON' : 'OFF'}, handler={onMobileActionsOpen ? 'OK' : 'MISSING'}
+              Debug: select={selectedCount}/{totalCount}, mode={isSelectMode ? 'ON' : 'OFF'}
             </div>
           )}
 
@@ -692,7 +716,7 @@ export function DriveToolbar({
                   Copy Selected
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={onBulkShare}>
-                  <Share className="mr-2 h-4 w-4" />
+                  <Share2 className="mr-2 h-4 w-4" />
                   Share Selected
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
