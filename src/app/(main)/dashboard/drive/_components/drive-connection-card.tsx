@@ -1,25 +1,31 @@
-"use client";
+'use client'
 
-import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { HardDrive, Shield, Upload, Search, Folder } from "lucide-react";
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { HardDrive, Shield, Upload, Search, Folder } from 'lucide-react'
 
 export function DriveConnectionCard() {
-  const [connecting, setConnecting] = useState(false);
+  const [connecting, setConnecting] = useState(false)
 
   const handleConnect = () => {
-    setConnecting(true);
+    setConnecting(true)
     // Request additional Google Drive permissions
-    window.location.href = '/api/auth/reauth-drive';
-  };
+    window.location.href = '/api/auth/reauth-drive'
+  }
 
   return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <Card className="max-w-lg mx-auto">
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <Card className="mx-auto max-w-lg">
         <CardHeader className="text-center">
-          <div className="mx-auto w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-            <HardDrive className="h-8 w-8 text-primary" />
+          <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+            <HardDrive className="text-primary h-8 w-8" />
           </div>
           <CardTitle className="text-2xl">Grant Google Drive Access</CardTitle>
           <CardDescription className="text-base">
@@ -28,48 +34,54 @@ export function DriveConnectionCard() {
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
-            <div className="text-center space-y-2">
-              <Upload className="h-8 w-8 mx-auto text-muted-foreground opacity-60" />
+            <div className="space-y-2 text-center">
+              <Upload className="text-muted-foreground mx-auto h-8 w-8 opacity-60" />
               <p className="text-sm font-medium">Upload Files</p>
-              <p className="text-xs text-muted-foreground">Coming soon</p>
+              <p className="text-muted-foreground text-xs">Coming soon</p>
             </div>
-            <div className="text-center space-y-2">
-              <Folder className="h-8 w-8 mx-auto text-muted-foreground" />
+            <div className="space-y-2 text-center">
+              <Folder className="text-muted-foreground mx-auto h-8 w-8" />
               <p className="text-sm font-medium">Organize Folders</p>
-              <p className="text-xs text-muted-foreground">Create and manage folder structure</p>
+              <p className="text-muted-foreground text-xs">
+                Create and manage folder structure
+              </p>
             </div>
-            <div className="text-center space-y-2">
-              <Search className="h-8 w-8 mx-auto text-muted-foreground" />
+            <div className="space-y-2 text-center">
+              <Search className="text-muted-foreground mx-auto h-8 w-8" />
               <p className="text-sm font-medium">Search Files</p>
-              <p className="text-xs text-muted-foreground">Find files quickly with search</p>
+              <p className="text-muted-foreground text-xs">
+                Find files quickly with search
+              </p>
             </div>
-            <div className="text-center space-y-2">
-              <Shield className="h-8 w-8 mx-auto text-muted-foreground" />
+            <div className="space-y-2 text-center">
+              <Shield className="text-muted-foreground mx-auto h-8 w-8" />
               <p className="text-sm font-medium">Secure Access</p>
-              <p className="text-xs text-muted-foreground">Protected with OAuth 2.0</p>
+              <p className="text-muted-foreground text-xs">
+                Protected with OAuth 2.0
+              </p>
             </div>
           </div>
-          
-          <div className="text-center space-y-4">
-            <p className="text-sm text-muted-foreground">
-              Click the button below to grant Google Drive access. 
-              You'll be redirected to Google to authorize permissions.
+
+          <div className="space-y-4 text-center">
+            <p className="text-muted-foreground text-sm">
+              Click the button below to grant Google Drive access. You'll be
+              redirected to Google to authorize permissions.
             </p>
-            
-            <Button 
-              onClick={handleConnect} 
+
+            <Button
+              onClick={handleConnect}
               disabled={connecting}
               size="lg"
               className="w-full"
             >
               {connecting ? (
                 <>
-                  <HardDrive className="h-4 w-4 mr-2 animate-pulse" />
+                  <HardDrive className="mr-2 h-4 w-4 animate-pulse" />
                   Connecting...
                 </>
               ) : (
                 <>
-                  <HardDrive className="h-4 w-4 mr-2" />
+                  <HardDrive className="mr-2 h-4 w-4" />
                   Grant Drive Access
                 </>
               )}
@@ -78,5 +90,5 @@ export function DriveConnectionCard() {
         </CardContent>
       </Card>
     </div>
-  );
+  )
 }

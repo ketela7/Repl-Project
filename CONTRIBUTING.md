@@ -2,29 +2,41 @@
 
 ## Development Rules
 
+### Priority Order (Tinggi ke Rendah)
+1. 🔴 **Bug atau kesalahan logika** - Prioritas tertinggi
+2. 🟠 **Struktur & arsitektur** - Konsistensi arsitektur Next.js App Router
+3. 🟡 **Redundansi & kode tak terpakai** - Import unused, duplikasi, refactor
+4. 🔵 **Inkonistensi UI/UX** - Desain dan pengalaman pengguna
+5. ⚪ **Hal minor** - Whitespace, komentar, typo
+
 ### Environment Variables
-- **No NEXT_PUBLIC_ prefix**: Only use private secrets, never client-side environment variables
-- **Server-side only**: All configuration must be handled securely on the server
-- **Private secrets only**: Use Replit secrets or server environment variables exclusively
+- **❌ Jangan gunakan NEXT_PUBLIC_**: Hanya gunakan variabel rahasia (private env) secara aman
+- **Server-side only**: Semua konfigurasi harus ditangani dengan aman di server
+- **Private secrets only**: Gunakan Replit secrets atau server environment variables eksklusif
 
 ### File Naming Convention
-- **Simple naming**: Use kebab-case without prefixes or suffixes
-- **Examples**: `drive-manager.tsx`, `file-list.tsx`, `user-profile.tsx`
-- **Avoid**: `enhanced-drive-manager.tsx`, `optimized-file-list.tsx`, `custom-theme-provider.tsx`
+- **📁 Penamaan sederhana**: Gunakan kebab-case tanpa awalan/akhiran yang tidak perlu
+- **Contoh benar**: `drive-manager.tsx`, `drive-toolbar.tsx`, `file-list.tsx`
+- **Contoh salah**: `optimized-drive-manager.tsx`, `drive-clean.tsx`, `enhanced-file-list.tsx`
 
 ### Code Quality Standards
 
+#### 🧼 Cleanup Requirements
+- **Import unused**: Hapus semua import yang tidak digunakan
+- **Duplikasi kode**: Refactor kode yang berulang
+- **Fungsi tidak terpakai**: Hapus fungsi/komponen yang tidak digunakan
+- **ESLint + Prettier**: Auto-fix dengan `npx eslint --fix`
+
 #### TypeScript Requirements
-- **Strict Mode**: Always use TypeScript strict mode
-- **Type Safety**: No `any` types except for legacy API compatibility
-- **Interface Definitions**: Define interfaces for all data structures
-- **JSDoc Comments**: Document all public functions and complex logic
+- **Strict Mode**: Selalu gunakan TypeScript strict mode
+- **Type Safety**: Hindari `any` types kecuali legacy API
+- **Interface Definitions**: Definisikan interface untuk semua struktur data
+- **JSDoc Comments**: Dokumentasi untuk fungsi public dan logika kompleks
 
 #### Code Style
-- **ESLint + Prettier**: Mandatory code formatting
-- **Naming Convention**: Use kebab-case for files, camelCase for variables
-- **Component Structure**: Follow React functional component patterns
-- **Error Handling**: Comprehensive try-catch blocks for async operations
+- **Naming Convention**: kebab-case untuk file, camelCase untuk variabel
+- **Component Structure**: Pola React functional component
+- **Error Handling**: Try-catch komprehensif untuk operasi async
 
 ### Quality Assurance
 - **Clean Project Start**: Always ensure project is clean when starting work

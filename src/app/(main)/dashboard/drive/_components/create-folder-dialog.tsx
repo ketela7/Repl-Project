@@ -1,9 +1,9 @@
-"use client";
+'use client'
 
-import { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -11,37 +11,37 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { FolderPlus } from "lucide-react";
-import { toast } from "sonner";
+} from '@/components/ui/dialog'
+import { FolderPlus } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface CreateFolderDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onFolderCreated: () => void;
-  parentFolderId?: string | null;
-  currentFolderId?: string | null;
+  isOpen: boolean
+  onClose: () => void
+  onFolderCreated: () => void
+  parentFolderId?: string | null
+  currentFolderId?: string | null
 }
 
-export function CreateFolderDialog({ 
-  isOpen, 
-  onClose, 
-  onFolderCreated, 
-  parentFolderId 
+export function CreateFolderDialog({
+  isOpen,
+  onClose,
+  onFolderCreated,
+  parentFolderId,
 }: CreateFolderDialogProps) {
-  const [folderName, setFolderName] = useState('');
-  const [creating, setCreating] = useState(false);
+  const [folderName, setFolderName] = useState('')
+  const [creating, setCreating] = useState(false)
   // Rename parentFolderId to actualParentId to be used in the API call
-  const actualParentId = parentFolderId;
+  const actualParentId = parentFolderId
 
   const handleCreate = async () => {
     if (!folderName.trim()) {
-      toast.error('Please enter a folder name');
-      return;
+      toast.error('Please enter a folder name')
+      return
     }
 
     try {
-      setCreating(true);
+      setCreating(true)
 
       const response = await fetch('/api/drive/folders', {
         method: 'POST',
@@ -50,46 +50,54 @@ export function CreateFolderDialog({
         },
         body: JSON.stringify({
           name: folderName.trim(),
-          parentId: actualParentId
+          parentId: actualParentId,
         }),
-      });
+      })
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json()
 
         // Handle reauthentication needed
-        if (errorData.needsReauth || response.status === 401 || response.status === 403) {
-          toast.error(errorData.error || 'Google Drive access expired. Please reconnect your account.');
+        if (
+          errorData.needsReauth ||
+          response.status === 401 ||
+          response.status === 403
+        ) {
+          toast.error(
+            errorData.error ||
+              'Google Drive access expired. Please reconnect your account.'
+          )
           // Trigger parent component to show connection card
-          window.location.reload();
-          return;
+          window.location.reload()
+          return
         }
 
-        throw new Error(errorData.error || 'Failed to create folder');
+        throw new Error(errorData.error || 'Failed to create folder')
       }
 
-      const result = await response.json();
+      const result = await response.json()
 
-      toast.success(`Folder "${result.name}" created successfully`);
-      onFolderCreated();
-      handleClose();
+      toast.success(`Folder "${result.name}" created successfully`)
+      onFolderCreated()
+      handleClose()
     } catch (error) {
       // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
-        console.error('Create folder error:', error);
       }
-      toast.error(error instanceof Error ? error.message : 'Failed to create folder');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to create folder'
+      )
     } finally {
-      setCreating(false);
+      setCreating(false)
     }
-  };
+  }
 
   const handleClose = () => {
     if (!creating) {
-      setFolderName('');
-      onClose();
+      setFolderName('')
+      onClose()
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -113,7 +121,7 @@ export function CreateFolderDialog({
               disabled={creating}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  handleCreate();
+                  handleCreate()
                 }
               }}
               autoFocus
@@ -125,15 +133,18 @@ export function CreateFolderDialog({
           <Button variant="outline" onClick={handleClose} disabled={creating}>
             Cancel
           </Button>
-          <Button onClick={handleCreate} disabled={!folderName.trim() || creating}>
+          <Button
+            onClick={handleCreate}
+            disabled={!folderName.trim() || creating}
+          >
             {creating ? (
               <>
-                <FolderPlus className="h-4 w-4 mr-2 animate-pulse" />
+                <FolderPlus className="mr-2 h-4 w-4 animate-pulse" />
                 Creating...
               </>
             ) : (
               <>
-                <FolderPlus className="h-4 w-4 mr-2" />
+                <FolderPlus className="mr-2 h-4 w-4" />
                 Create Folder
               </>
             )}
@@ -141,5 +152,5 @@ export function CreateFolderDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

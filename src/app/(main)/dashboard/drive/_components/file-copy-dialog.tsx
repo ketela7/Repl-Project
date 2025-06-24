@@ -1,9 +1,9 @@
-"use client";
+'use client'
 
-import { useState, useEffect } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -11,149 +11,160 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { 
-  BottomSheet, 
-  BottomSheetContent, 
-  BottomSheetHeader, 
-  BottomSheetTitle, 
+} from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
   BottomSheetDescription,
-  BottomSheetFooter 
-} from "@/components/ui/bottom-sheet";
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { FolderIcon, Copy, ExternalLink } from "lucide-react";
-import { DriveFolder } from '@/lib/google-drive/types';
-import { extractFolderIdFromUrl, isValidFolderId } from '@/lib/google-drive/utils';
-import { toast } from "sonner";
-import { successToast, errorToast, loadingToast } from '@/lib/toast';
-import { cn } from "@/lib/utils";
+} from '@/components/ui/select'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { FolderIcon, Copy, ExternalLink } from 'lucide-react'
+import { DriveFolder } from '@/lib/google-drive/types'
+import {
+  extractFolderIdFromUrl,
+  isValidFolderId,
+} from '@/lib/google-drive/utils'
+import { toast } from 'sonner'
+import { successToast, errorToast, loadingToast } from '@/lib/toast'
+import { cn } from '@/lib/utils'
 
 interface FileCopyDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  fileName: string;
-  currentParentId: string | null;
-  onCopy: (newName: string, parentId: string) => Promise<void>;
+  isOpen: boolean
+  onClose: () => void
+  fileName: string
+  currentParentId: string | null
+  onCopy: (newName: string, parentId: string) => Promise<void>
 }
 
-export function FileCopyDialog({ 
-  isOpen, 
-  onClose, 
+export function FileCopyDialog({
+  isOpen,
+  onClose,
   fileName,
   currentParentId,
-  onCopy
+  onCopy,
 }: FileCopyDialogProps) {
-  const [folders, setFolders] = useState<DriveFolder[]>([]);
-  const [selectedFolderId, setSelectedFolderId] = useState<string>('');
-  const [customTargetInput, setCustomTargetInput] = useState<string>('');
-  const [newFileName, setNewFileName] = useState<string>('');
-  const [activeTab, setActiveTab] = useState<string>('select');
-  const [loading, setLoading] = useState(false);
-  const [copying, setCopying] = useState(false);
-  const isMobile = useIsMobile();
+  const [folders, setFolders] = useState<DriveFolder[]>([])
+  const [selectedFolderId, setSelectedFolderId] = useState<string>('')
+  const [customTargetInput, setCustomTargetInput] = useState<string>('')
+  const [newFileName, setNewFileName] = useState<string>('')
+  const [activeTab, setActiveTab] = useState<string>('select')
+  const [loading, setLoading] = useState(false)
+  const [copying, setCopying] = useState(false)
+  const isMobile = useIsMobile()
 
   const fetchFolders = async () => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/drive/folders');
-      
+      setLoading(true)
+      const response = await fetch('/api/drive/folders')
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch folders');
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to fetch folders')
       }
-      
-      const foldersData = await response.json();
-      
+
+      const foldersData = await response.json()
+
       // Add root folder option
       const allFolders = [
-        { id: 'root', name: 'My Drive', createdTime: '', modifiedTime: '', parents: [], shared: false, trashed: false },
-        ...foldersData
-      ];
-      
-      setFolders(allFolders);
+        {
+          id: 'root',
+          name: 'My Drive',
+          createdTime: '',
+          modifiedTime: '',
+          parents: [],
+          shared: false,
+          trashed: false,
+        },
+        ...foldersData,
+      ]
+
+      setFolders(allFolders)
     } catch (error) {
       // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
-        console.error('Error fetching folders:', error);
       }
-      toast.error('Failed to load folders');
+      toast.error('Failed to load folders')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const getTargetFolderId = (): string | null => {
     if (activeTab === 'select') {
-      return selectedFolderId || null;
+      return selectedFolderId || null
     } else {
       // Custom input tab
-      const extractedId = extractFolderIdFromUrl(customTargetInput);
-      return extractedId && isValidFolderId(extractedId) ? extractedId : null;
+      const extractedId = extractFolderIdFromUrl(customTargetInput)
+      return extractedId && isValidFolderId(extractedId) ? extractedId : null
     }
-  };
+  }
 
   const handleCopy = async () => {
-    const targetFolderId = getTargetFolderId();
-    
+    const targetFolderId = getTargetFolderId()
+
     if (!targetFolderId) {
-      errorToast.generic('Please select a valid destination folder');
-      return;
+      errorToast.generic('Please select a valid destination folder')
+      return
     }
 
-    const copyName = newFileName.trim() || `Copy of ${fileName}`;
-    const loadingId = "file-copy";
+    const copyName = newFileName.trim() || `Copy of ${fileName}`
+    const loadingId = 'file-copy'
 
     try {
-      setCopying(true);
-      loadingToast.start(`Copying "${fileName}"...`, loadingId);
-      
+      setCopying(true)
+      loadingToast.start(`Copying "${fileName}"...`, loadingId)
+
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Copying to folder ID: ${targetFolderId} with name: ${copyName}`);
+        console.log(
+          `Copying to folder ID: ${targetFolderId} with name: ${copyName}`
+        )
       }
-      
-      await onCopy(copyName, targetFolderId);
-      loadingToast.success(`Successfully copied "${fileName}"`, loadingId);
-      handleClose();
+
+      await onCopy(copyName, targetFolderId)
+      loadingToast.success(`Successfully copied "${fileName}"`, loadingId)
+      handleClose()
     } catch (error) {
       if (process.env.NODE_ENV === 'development') {
-        console.error('Copy operation failed:', error);
       }
-      loadingToast.error(`Failed to copy "${fileName}"`, loadingId);
+      loadingToast.error(`Failed to copy "${fileName}"`, loadingId)
     } finally {
-      setCopying(false);
+      setCopying(false)
     }
-  };
+  }
 
   const handleClose = () => {
     if (!copying) {
-      setSelectedFolderId('');
-      setCustomTargetInput('');
-      setNewFileName('');
-      setActiveTab('select');
-      onClose();
+      setSelectedFolderId('')
+      setCustomTargetInput('')
+      setNewFileName('')
+      setActiveTab('select')
+      onClose()
     }
-  };
+  }
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
-      handleClose();
+      handleClose()
     }
-  };
+  }
 
   useEffect(() => {
     if (isOpen) {
-      fetchFolders();
-      setNewFileName(`Copy of ${fileName}`);
+      fetchFolders()
+      setNewFileName(`Copy of ${fileName}`)
     }
-  }, [isOpen, fileName]);
+  }, [isOpen, fileName])
 
   const renderContent = () => (
     <>
@@ -167,12 +178,12 @@ export function FileCopyDialog({
           disabled={copying}
           onFocus={(e) => {
             // Select filename without extension for easier editing
-            const name = e.target.value;
-            const lastDot = name.lastIndexOf('.');
+            const name = e.target.value
+            const lastDot = name.lastIndexOf('.')
             if (lastDot > 0) {
-              e.target.setSelectionRange(0, lastDot);
+              e.target.setSelectionRange(0, lastDot)
             } else {
-              e.target.select();
+              e.target.select()
             }
           }}
         />
@@ -183,24 +194,25 @@ export function FileCopyDialog({
           <TabsTrigger value="select">Select Folder</TabsTrigger>
           <TabsTrigger value="custom">Custom Target</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="select" className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="folder-select">Destination Folder</Label>
-            <Select 
-              value={selectedFolderId} 
+            <Select
+              value={selectedFolderId}
               onValueChange={setSelectedFolderId}
               disabled={loading || copying}
             >
               <SelectTrigger>
-                <SelectValue placeholder={loading ? "Loading folders..." : "Select a folder"} />
+                <SelectValue
+                  placeholder={
+                    loading ? 'Loading folders...' : 'Select a folder'
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
                 {folders.map((folder) => (
-                  <SelectItem 
-                    key={folder.id} 
-                    value={folder.id}
-                  >
+                  <SelectItem key={folder.id} value={folder.id}>
                     <div className="flex items-center gap-2">
                       <FolderIcon className="h-4 w-4" />
                       <span>{folder.name}</span>
@@ -211,7 +223,7 @@ export function FileCopyDialog({
             </Select>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="custom" className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="custom-target">Custom Destination</Label>
@@ -221,19 +233,21 @@ export function FileCopyDialog({
               onChange={(e) => setCustomTargetInput(e.target.value)}
               placeholder="Enter folder ID or Google Drive URL..."
               disabled={copying}
-              className={`${cn("min-h-[44px]")} font-mono text-sm`}
+              className={`${cn('min-h-[44px]')} font-mono text-sm`}
             />
-            <div className="text-xs text-muted-foreground space-y-1">
+            <div className="text-muted-foreground space-y-1 text-xs">
               <p className="flex items-center gap-1">
                 <ExternalLink className="h-3 w-3" />
-                Supports full URLs like: https://drive.google.com/drive/folders/1h7S-ebE1A5sEREQhawwWLVrqTZe47fez
+                Supports full URLs like:
+                https://drive.google.com/drive/folders/1h7S-ebE1A5sEREQhawwWLVrqTZe47fez
               </p>
               <p>Or direct folder ID: 1h7S-ebE1A5sEREQhawwWLVrqTZe47fez</p>
               {customTargetInput && (
-                <div className="mt-2 p-2 bg-muted rounded text-xs">
+                <div className="bg-muted mt-2 rounded p-2 text-xs">
                   <span className="font-medium">Extracted ID: </span>
                   <span className="font-mono">
-                    {extractFolderIdFromUrl(customTargetInput) || 'Invalid ID/URL'}
+                    {extractFolderIdFromUrl(customTargetInput) ||
+                      'Invalid ID/URL'}
                   </span>
                 </div>
               )}
@@ -242,7 +256,7 @@ export function FileCopyDialog({
         </TabsContent>
       </Tabs>
     </>
-  );
+  )
 
   if (isMobile) {
     return (
@@ -255,32 +269,35 @@ export function FileCopyDialog({
             </BottomSheetDescription>
           </BottomSheetHeader>
 
-          <div className="px-4 pb-4 space-y-4">
-            {renderContent()}
-          </div>
+          <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
-          <BottomSheetFooter className={cn("grid gap-4")}>
-            <Button 
-              variant="outline" 
-              onClick={handleClose} 
-              disabled={copying} 
-              className={cn("touch-target min-h-[44px] active:scale-95")}
+          <BottomSheetFooter className={cn('grid gap-4')}>
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={copying}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
             >
               Cancel
             </Button>
-            <Button 
-              onClick={handleCopy} 
-              disabled={!getTargetFolderId() || !newFileName.trim() || copying || loading}
-              className={cn("touch-target min-h-[44px] active:scale-95")}
+            <Button
+              onClick={handleCopy}
+              disabled={
+                !getTargetFolderId() ||
+                !newFileName.trim() ||
+                copying ||
+                loading
+              }
+              className={cn('touch-target min-h-[44px] active:scale-95')}
             >
               {copying ? (
                 <>
-                  <Copy className="h-4 w-4 mr-2 animate-pulse" />
+                  <Copy className="mr-2 h-4 w-4 animate-pulse" />
                   Copying...
                 </>
               ) : (
                 <>
-                  <Copy className="h-4 w-4 mr-2" />
+                  <Copy className="mr-2 h-4 w-4" />
                   Copy File
                 </>
               )}
@@ -288,7 +305,7 @@ export function FileCopyDialog({
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
-    );
+    )
   }
 
   return (
@@ -301,27 +318,32 @@ export function FileCopyDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="px-1">
-          {renderContent()}
-        </div>
+        <div className="px-1">{renderContent()}</div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button variant="outline" onClick={handleClose} disabled={copying} className="w-full sm:w-auto">
+        <DialogFooter className="flex-col gap-2 sm:flex-row">
+          <Button
+            variant="outline"
+            onClick={handleClose}
+            disabled={copying}
+            className="w-full sm:w-auto"
+          >
             Cancel
           </Button>
-          <Button 
-            onClick={handleCopy} 
-            disabled={!getTargetFolderId() || !newFileName.trim() || copying || loading}
+          <Button
+            onClick={handleCopy}
+            disabled={
+              !getTargetFolderId() || !newFileName.trim() || copying || loading
+            }
             className="w-full sm:w-auto"
           >
             {copying ? (
               <>
-                <Copy className="h-4 w-4 mr-2 animate-pulse" />
+                <Copy className="mr-2 h-4 w-4 animate-pulse" />
                 Copying...
               </>
             ) : (
               <>
-                <Copy className="h-4 w-4 mr-2" />
+                <Copy className="mr-2 h-4 w-4" />
                 Copy File
               </>
             )}
@@ -329,5 +351,5 @@ export function FileCopyDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

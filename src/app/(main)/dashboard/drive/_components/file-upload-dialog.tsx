@@ -1,11 +1,11 @@
-"use client";
+'use client'
 
-import { useState, useRef } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
+import { useState, useRef } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Progress } from '@/components/ui/progress'
 import {
   Dialog,
   DialogContent,
@@ -13,110 +13,114 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Upload, X } from "lucide-react";
-import { toast } from "sonner";
-import { formatFileSize } from "@/lib/google-drive/utils";
+} from '@/components/ui/dialog'
+import { Upload, X } from 'lucide-react'
+import { toast } from 'sonner'
+import { formatFileSize } from '@/lib/google-drive/utils'
 
 interface FileUploadDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onUploadComplete: () => void;
-  currentFolderId?: string | null;
+  isOpen: boolean
+  onClose: () => void
+  onUploadComplete: () => void
+  currentFolderId?: string | null
 }
 
-export function FileUploadDialog({ 
-  isOpen, 
-  onClose, 
-  onUploadComplete, 
-  currentFolderId 
+export function FileUploadDialog({
+  isOpen,
+  onClose,
+  onUploadComplete,
+  currentFolderId,
 }: FileUploadDialogProps) {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState('');
-  const [description, setDescription] = useState('');
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [fileName, setFileName] = useState('')
+  const [description, setDescription] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+    const file = event.target.files?.[0]
     if (file) {
-      setSelectedFile(file);
-      setFileName(file.name);
+      setSelectedFile(file)
+      setFileName(file.name)
     }
-  };
+  }
 
   const handleUpload = async () => {
     if (!selectedFile) {
-      toast.error('Please select a file to upload');
-      return;
+      toast.error('Please select a file to upload')
+      return
     }
 
     try {
-      setUploading(true);
-      setUploadProgress(0);
+      setUploading(true)
+      setUploadProgress(0)
 
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('name', fileName || selectedFile.name);
-      if (description) formData.append('description', description);
-      if (currentFolderId) formData.append('parentId', currentFolderId);
+      const formData = new FormData()
+      formData.append('file', selectedFile)
+      formData.append('name', fileName || selectedFile.name)
+      if (description) formData.append('description', description)
+      if (currentFolderId) formData.append('parentId', currentFolderId)
 
       // Upload progress will be handled by the actual upload stream
-      setUploadProgress(50);
+      setUploadProgress(50)
 
       const response = await fetch('/api/drive/files', {
         method: 'POST',
         body: formData,
-      });
+      })
 
       // Progress interval would be cleared here if implemented
-      setUploadProgress(100);
+      setUploadProgress(100)
 
       if (!response.ok) {
-        const errorData = await response.json();
-        
+        const errorData = await response.json()
+
         // Handle reauthentication needed
-        if (errorData.needsReauth || response.status === 401 || response.status === 403) {
-          toast.error(errorData.error || 'Google Drive access expired. Please reconnect your account.');
-          window.location.reload();
-          return;
+        if (
+          errorData.needsReauth ||
+          response.status === 401 ||
+          response.status === 403
+        ) {
+          toast.error(
+            errorData.error ||
+              'Google Drive access expired. Please reconnect your account.'
+          )
+          window.location.reload()
+          return
         }
-        
-        throw new Error(errorData.error || 'Upload failed');
+
+        throw new Error(errorData.error || 'Upload failed')
       }
 
-      const result = await response.json();
-      
-      toast.success(`${result.name} uploaded successfully`);
-      onUploadComplete();
-      handleClose();
+      const result = await response.json()
+
+      toast.success(`${result.name} uploaded successfully`)
+      onUploadComplete()
+      handleClose()
     } catch (error) {
       // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
-        console.error('Upload error:', error);
       }
-      toast.error(error instanceof Error ? error.message : 'Upload failed');
-      setUploadProgress(0);
+      toast.error(error instanceof Error ? error.message : 'Upload failed')
+      setUploadProgress(0)
     } finally {
-      setUploading(false);
+      setUploading(false)
     }
-  };
+  }
 
   const handleClose = () => {
     if (!uploading) {
-      setSelectedFile(null);
-      setFileName('');
-      setDescription('');
-      setUploadProgress(0);
+      setSelectedFile(null)
+      setFileName('')
+      setDescription('')
+      setUploadProgress(0)
       if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        fileInputRef.current.value = ''
       }
-      onClose();
+      onClose()
     }
-  };
-
-
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -140,11 +144,11 @@ export function FileUploadDialog({
                 type="file"
                 onChange={handleFileSelect}
                 disabled={uploading}
-                className="file:mr-2 file:px-2 file:py-1 file:rounded file:border-0 file:text-sm file:bg-primary file:text-primary-foreground"
+                className="file:bg-primary file:text-primary-foreground file:mr-2 file:rounded file:border-0 file:px-2 file:py-1 file:text-sm"
               />
             </div>
             {selectedFile && (
-              <div className="flex items-center justify-between p-2 bg-muted rounded text-sm">
+              <div className="bg-muted flex items-center justify-between rounded p-2 text-sm">
                 <span className="truncate">{selectedFile.name}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">
@@ -155,10 +159,10 @@ export function FileUploadDialog({
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setSelectedFile(null);
-                        setFileName('');
+                        setSelectedFile(null)
+                        setFileName('')
                         if (fileInputRef.current) {
-                          fileInputRef.current.value = '';
+                          fileInputRef.current.value = ''
                         }
                       }}
                     >
@@ -214,12 +218,12 @@ export function FileUploadDialog({
           <Button onClick={handleUpload} disabled={!selectedFile || uploading}>
             {uploading ? (
               <>
-                <Upload className="h-4 w-4 mr-2 animate-pulse" />
+                <Upload className="mr-2 h-4 w-4 animate-pulse" />
                 Uploading...
               </>
             ) : (
               <>
-                <Upload className="h-4 w-4 mr-2" />
+                <Upload className="mr-2 h-4 w-4" />
                 Upload
               </>
             )}
@@ -227,5 +231,5 @@ export function FileUploadDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

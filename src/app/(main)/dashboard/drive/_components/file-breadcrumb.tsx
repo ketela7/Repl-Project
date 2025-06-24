@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,99 +8,105 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Home, Folder, ChevronRight, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/breadcrumb'
+import { Home, Folder, ChevronRight, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
 interface BreadcrumbItemData {
-  id: string;
-  name: string;
+  id: string
+  name: string
 }
 
 interface FileBreadcrumbProps {
-  currentFolderId: string | null;
-  onNavigate: (folderId: string | null) => void;
-  onBackToRoot?: () => void;
-  loading?: boolean;
+  currentFolderId: string | null
+  onNavigate: (folderId: string | null) => void
+  onBackToRoot?: () => void
+  loading?: boolean
 }
 
-export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalLoading }: FileBreadcrumbProps) {
-  const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function FileBreadcrumb({
+  currentFolderId,
+  onNavigate,
+  loading: externalLoading,
+}: FileBreadcrumbProps) {
+  const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>(
+    []
+  )
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const fetchFolderPath = async (folderId: string) => {
     try {
-      setLoading(true);
-      setError(null);
-      
-      const response = await fetch(`/api/drive/files/${folderId}`);
+      setLoading(true)
+      setError(null)
+
+      const response = await fetch(`/api/drive/files/${folderId}`)
       if (!response.ok) {
-        throw new Error(`Failed to fetch folder: ${response.status}`);
+        throw new Error(`Failed to fetch folder: ${response.status}`)
       }
 
-      const folder = await response.json();
-      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }];
+      const folder = await response.json()
+      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }]
 
       // Build path by traversing parent folders
-      let currentParent = folder.parents?.[0];
-      let depth = 0;
-      const maxDepth = 10; // Prevent infinite loops
-      
+      let currentParent = folder.parents?.[0]
+      let depth = 0
+      const maxDepth = 10 // Prevent infinite loops
+
       while (currentParent && currentParent !== 'root' && depth < maxDepth) {
         try {
-          const parentResponse = await fetch(`/api/drive/files/${currentParent}`);
-          if (!parentResponse.ok) break;
+          const parentResponse = await fetch(
+            `/api/drive/files/${currentParent}`
+          )
+          if (!parentResponse.ok) break
 
-          const parentFolder = await parentResponse.json();
-          items.unshift({ id: parentFolder.id, name: parentFolder.name });
-          currentParent = parentFolder.parents?.[0];
-          depth++;
+          const parentFolder = await parentResponse.json()
+          items.unshift({ id: parentFolder.id, name: parentFolder.name })
+          currentParent = parentFolder.parents?.[0]
+          depth++
         } catch (err) {
           if (process.env.NODE_ENV === 'development') {
-            console.warn('Failed to fetch parent folder:', err);
           }
-          break;
+          break
         }
       }
 
-      setBreadcrumbItems(items);
+      setBreadcrumbItems(items)
     } catch (error) {
       // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
-        console.error('Error fetching folder path:', error);
       }
-      setError('Failed to load folder path');
-      setBreadcrumbItems([]);
+      setError('Failed to load folder path')
+      setBreadcrumbItems([])
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   useEffect(() => {
     if (currentFolderId) {
-      fetchFolderPath(currentFolderId);
+      fetchFolderPath(currentFolderId)
     } else {
-      setBreadcrumbItems([]);
-      setError(null);
+      setBreadcrumbItems([])
+      setError(null)
     }
-  }, [currentFolderId]);
+  }, [currentFolderId])
 
-  const isLoading = loading || externalLoading;
+  const isLoading = loading || externalLoading
 
   return (
-    <div className="flex items-center gap-2 overflow-x-auto py-3 px-2 bg-muted/30 rounded-lg border">
+    <div className="bg-muted/30 flex items-center gap-2 overflow-x-auto rounded-lg border px-2 py-3">
       <Breadcrumb>
-        <BreadcrumbList className="flex-nowrap min-w-0">
+        <BreadcrumbList className="min-w-0 flex-nowrap">
           {/* Root Drive Link */}
           <BreadcrumbItem>
-            <BreadcrumbLink 
-              href="#" 
+            <BreadcrumbLink
+              href="#"
               onClick={(e) => {
-                e.preventDefault();
-                onNavigate(null);
+                e.preventDefault()
+                onNavigate(null)
               }}
-              className={`flex items-center gap-2 whitespace-nowrap transition-colors hover:text-primary ${
+              className={`hover:text-primary flex items-center gap-2 whitespace-nowrap transition-colors ${
                 !currentFolderId ? 'text-primary font-medium' : ''
               }`}
             >
@@ -118,18 +124,20 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
               </BreadcrumbSeparator>
               <BreadcrumbItem>
                 {index === breadcrumbItems.length - 1 ? (
-                  <BreadcrumbPage className="flex items-center gap-2 whitespace-nowrap max-w-[120px] sm:max-w-[200px] md:max-w-none">
-                    <Folder className="h-4 w-4 flex-shrink-0 text-primary" />
-                    <span className="truncate font-medium text-primary">{folder.name}</span>
+                  <BreadcrumbPage className="flex max-w-[120px] items-center gap-2 whitespace-nowrap sm:max-w-[200px] md:max-w-none">
+                    <Folder className="text-primary h-4 w-4 flex-shrink-0" />
+                    <span className="text-primary truncate font-medium">
+                      {folder.name}
+                    </span>
                   </BreadcrumbPage>
                 ) : (
-                  <BreadcrumbLink 
-                    href="#" 
+                  <BreadcrumbLink
+                    href="#"
                     onClick={(e) => {
-                      e.preventDefault();
-                      onNavigate(folder.id);
+                      e.preventDefault()
+                      onNavigate(folder.id)
                     }}
-                    className="flex items-center gap-2 whitespace-nowrap max-w-[120px] sm:max-w-[200px] md:max-w-none transition-colors hover:text-primary"
+                    className="hover:text-primary flex max-w-[120px] items-center gap-2 whitespace-nowrap transition-colors sm:max-w-[200px] md:max-w-none"
                   >
                     <Folder className="h-4 w-4 flex-shrink-0" />
                     <span className="truncate">{folder.name}</span>
@@ -143,15 +151,15 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
       {/* Loading Indicator */}
       {isLoading && (
-        <div className="flex items-center gap-1 text-muted-foreground ml-2">
+        <div className="text-muted-foreground ml-2 flex items-center gap-1">
           <Loader2 className="h-3 w-3 animate-spin" />
-          <span className="text-xs hidden sm:inline">Loading...</span>
+          <span className="hidden text-xs sm:inline">Loading...</span>
         </div>
       )}
 
       {/* Error Display */}
       {error && (
-        <div className="flex items-center gap-1 text-destructive ml-2">
+        <div className="text-destructive ml-2 flex items-center gap-1">
           <span className="text-xs">{error}</span>
           <Button
             variant="ghost"
@@ -164,5 +172,5 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
         </div>
       )}
     </div>
-  );
+  )
 }

@@ -3,7 +3,7 @@
  * Components will be gradually moved here as the architecture evolves
  */
 
-// TODO: Move drive components here from src/app/(main)/dashboard/drive/_components/
+
 // This module will contain:
 // - Drive management components
 // - File operation dialogs

@@ -1,20 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { driveCache } from '@/lib/cache';
+import { NextRequest, NextResponse } from 'next/server'
+import { driveCache } from '@/lib/cache'
 
 export async function POST(request: NextRequest) {
   try {
     // Clear the entire cache
-    driveCache.clear();
-    
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Cache cleared successfully' 
-    });
+    driveCache.clear()
+
+    return NextResponse.json({
+      success: true,
+      message: 'Cache cleared successfully',
+    })
   } catch (error) {
-    console.error('Cache clear error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to clear cache' },
       { status: 500 }
-    );
+    )
   }
 }

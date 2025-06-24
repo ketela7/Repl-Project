@@ -1,13 +1,13 @@
-"use client";
+'use client'
 
-import React from 'react';
-import { 
-  FileText, 
-  Folder, 
-  FileCheck, 
-  Palette, 
-  BookOpen, 
-  Music, 
+import React from 'react'
+import {
+  FileText,
+  Folder,
+  FileCheck,
+  Palette,
+  BookOpen,
+  Music,
   Archive,
   File,
   FileSpreadsheet,
@@ -31,46 +31,46 @@ import {
   Smartphone,
   Camera,
   Printer,
-  HardDrive
-} from 'lucide-react';
-import { getFileIconProps } from '@/lib/google-drive/utils';
+  HardDrive,
+} from 'lucide-react'
+import { getFileIconProps } from '@/lib/google-drive/utils'
 
 interface FileIconProps {
-  mimeType: string;
-  fileName?: string;
-  className?: string;
-  strokeWidth?: number;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  mimeType: string
+  fileName?: string
+  className?: string
+  strokeWidth?: number
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
-export function FileIcon({ 
-  mimeType, 
+export function FileIcon({
+  mimeType,
   fileName,
-  className, 
+  className,
   strokeWidth = 2,
-  size = 'md'
+  size = 'md',
 }: FileIconProps) {
-  const { iconName, colorClass } = getFileIconProps(mimeType, fileName);
-  
+  const { iconName, colorClass } = getFileIconProps(mimeType, fileName)
+
   // Size mapping for consistency
   const sizeMap = {
-    'sm': 'h-3 w-3',
-    'md': 'h-4 w-4', 
-    'lg': 'h-8 w-8',
-    'xl': 'h-6 w-6'
-  };
-  
-  const sizeClass = sizeMap[size];
-  const baseClasses = 'drop-shadow-sm transition-colors duration-200';
-  const finalClassName = className ? 
-    `${className} ${colorClass} ${baseClasses}` : 
-    `${sizeClass} ${colorClass} ${baseClasses}`;
-  
+    sm: 'h-3 w-3',
+    md: 'h-4 w-4',
+    lg: 'h-8 w-8',
+    xl: 'h-6 w-6',
+  }
+
+  const sizeClass = sizeMap[size]
+  const baseClasses = 'drop-shadow-sm transition-colors duration-200'
+  const finalClassName = className
+    ? `${className} ${colorClass} ${baseClasses}`
+    : `${sizeClass} ${colorClass} ${baseClasses}`
+
   const iconProps = {
     className: finalClassName,
     strokeWidth,
-    'data-testid': 'file-icon'
-  };
+    'data-testid': 'file-icon',
+  }
 
   const iconComponents: Record<string, React.ComponentType<any>> = {
     Folder,
@@ -101,15 +101,21 @@ export function FileIcon({
     Smartphone,
     Camera,
     Printer,
-    HardDrive
-  };
+    HardDrive,
+  }
 
-  const IconComponent = iconComponents[iconName] || File;
-  
-  return <IconComponent {...iconProps} />;
+  const IconComponent = iconComponents[iconName] || File
+
+  return <IconComponent {...iconProps} />
 }
 
 // Helper function that can be used in both client and server components
-export function getFileIcon(mimeType: string, fileName?: string, className?: string) {
-  return <FileIcon mimeType={mimeType} fileName={fileName} className={className} />;
+export function getFileIcon(
+  mimeType: string,
+  fileName?: string,
+  className?: string
+) {
+  return (
+    <FileIcon mimeType={mimeType} fileName={fileName} className={className} />
+  )
 }

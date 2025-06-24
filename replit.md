@@ -107,6 +107,8 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 - June 24, 2025: Enhanced development rules - double check/retest code, rapid development process
 - June 24, 2025: Routes documentation added for complete API reference
 - June 24, 2025: Replaced PROJECT_RULES.md with CONTRIBUTING.md as development guidelines
+- June 24, 2025: Implemented priority-based development rules (Bug → Struktur → Redundansi → UI/UX → Minor)
+- June 24, 2025: Code cleanup - removed TODO comments, unused components, fixed ESLint config
 - June 24, 2025: All tests passing (76 test cases), TypeScript compilation successful
 - June 24, 2025: Project follows professional development standards with clean structure and rapid development
 
@@ -118,14 +120,13 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 
 Preferred communication style: Simple, everyday language.
 
-### Development Standards
-- No NEXT_PUBLIC_ prefix - only use private secrets
-- Simple file naming without prefixes/suffixes (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
-- Always ensure project is clean when starting
-- Double check and retest code before commits - ensure follows project rules and works correctly
-- Always improve development process for faster completion
-- Professional code quality standards with rapid development
-- Well-structured project organization when safe and error-free
-- Real-time documentation updates (API docs, routes, project structure)
-- Update README.md for public understanding of changes
-- Work like professional coder with thorough planning and execution
+### Development Standards (Prioritas Review: Bug → Struktur → Redundansi → UI/UX → Minor)
+- ❌ Tidak gunakan NEXT_PUBLIC_ - hanya variabel rahasia private
+- 📁 Penamaan file sederhana tanpa awalan/akhiran (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
+- 🧼 Hapus import unused, duplikasi kode, refactor untuk kesederhanaan
+- 📐 Struktur proyek Next.js App Router: app/, components/, lib/, utils/
+- 🧪 Uji kode sebelum commit - pastikan tidak ada error/warning
+- 📖 Dokumentasi real-time (API docs, routes, project structure)
+- 📝 Update README.md untuk pemahaman publik
+- ⚙️ Tingkatkan efisiensi dengan ESLint, Prettier, automation
+- 💼 Kode profesional: clean, modular, maintainable

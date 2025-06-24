@@ -32,7 +32,6 @@ export function DrivePermissionRequired({
       // Redirect to login with reauth parameter
       window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive';
     } catch (error) {
-      console.error('Signout error:', error);
       // Fallback: direct redirect to login
       window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive';
     }

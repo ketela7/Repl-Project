@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   Dialog,
@@ -7,43 +7,43 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { 
-  BottomSheet, 
-  BottomSheetContent, 
-  BottomSheetHeader, 
-  BottomSheetTitle, 
+} from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
   BottomSheetDescription,
-  BottomSheetFooter 
-} from "@/components/ui/bottom-sheet";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { 
-  Trash2, 
-  Download, 
-  Share, 
-  Move, 
-  Copy, 
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { useIsMobile } from '@/hooks/use-mobile'
+import {
+  Trash2,
+  Download,
+  Share,
+  Move,
+  Copy,
   Edit,
-  FolderOpen 
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+  FolderOpen,
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface FileBulkOperationsDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
   selectedItems: Array<{
-    id: string;
-    name: string;
-    type: 'file' | 'folder';
-  }>;
-  onBulkDelete: () => void;
-  onBulkDownload: () => void;
-  onBulkShare: () => void;
-  onBulkMove: () => void;
-  onBulkCopy: () => void;
-  onBulkRename: () => void;
+    id: string
+    name: string
+    type: 'file' | 'folder'
+  }>
+  onBulkDelete: () => void
+  onBulkDownload: () => void
+  onBulkShare: () => void
+  onBulkMove: () => void
+  onBulkCopy: () => void
+  onBulkRename: () => void
 }
 
 export function FileBulkOperationsDialog({
@@ -55,63 +55,63 @@ export function FileBulkOperationsDialog({
   onBulkShare,
   onBulkMove,
   onBulkCopy,
-  onBulkRename
+  onBulkRename,
 }: FileBulkOperationsDialogProps) {
-  const isMobile = useIsMobile();
-  const fileCount = selectedItems.filter(item => item.type === 'file').length;
-  const folderCount = selectedItems.filter(item => item.type === 'folder').length;
+  const isMobile = useIsMobile()
+  const fileCount = selectedItems.filter((item) => item.type === 'file').length
+  const folderCount = selectedItems.filter(
+    (item) => item.type === 'folder'
+  ).length
 
   const operations = [
     {
       icon: Download,
-      label: "Download",
-      description: "Download selected items",
+      label: 'Download',
+      description: 'Download selected items',
       action: onBulkDownload,
-      variant: "default" as const
+      variant: 'default' as const,
     },
     {
       icon: Share,
-      label: "Share",
-      description: "Share selected items",
+      label: 'Share',
+      description: 'Share selected items',
       action: onBulkShare,
-      variant: "default" as const
+      variant: 'default' as const,
     },
     {
       icon: Move,
-      label: "Move",
-      description: "Move to another folder",
+      label: 'Move',
+      description: 'Move to another folder',
       action: onBulkMove,
-      variant: "default" as const
+      variant: 'default' as const,
     },
     {
       icon: Copy,
-      label: "Copy",
-      description: "Create copies",
+      label: 'Copy',
+      description: 'Create copies',
       action: onBulkCopy,
-      variant: "default" as const
+      variant: 'default' as const,
     },
     {
       icon: Edit,
-      label: "Rename",
-      description: "Bulk rename with patterns",
+      label: 'Rename',
+      description: 'Bulk rename with patterns',
       action: onBulkRename,
-      variant: "default" as const
+      variant: 'default' as const,
     },
     {
       icon: Trash2,
-      label: "Delete",
-      description: "Move to trash",
+      label: 'Delete',
+      description: 'Move to trash',
       action: onBulkDelete,
-      variant: "destructive" as const
-    }
-  ];
+      variant: 'destructive' as const,
+    },
+  ]
 
   const renderContent = () => (
     <>
-      <div className="flex items-center gap-2 mb-4">
-        <Badge variant="secondary">
-          {selectedItems.length} items selected
-        </Badge>
+      <div className="mb-4 flex items-center gap-2">
+        <Badge variant="secondary">{selectedItems.length} items selected</Badge>
         {fileCount > 0 && (
           <Badge variant="outline">
             {fileCount} file{fileCount !== 1 ? 's' : ''}
@@ -119,7 +119,7 @@ export function FileBulkOperationsDialog({
         )}
         {folderCount > 0 && (
           <Badge variant="outline">
-            <FolderOpen className="h-3 w-3 mr-1" />
+            <FolderOpen className="mr-1 h-3 w-3" />
             {folderCount} folder{folderCount !== 1 ? 's' : ''}
           </Badge>
         )}
@@ -127,30 +127,30 @@ export function FileBulkOperationsDialog({
 
       <div className="grid gap-2">
         {operations.map((operation) => {
-          const Icon = operation.icon;
+          const Icon = operation.icon
           return (
             <Button
               key={operation.label}
               variant={operation.variant}
-              className={`${cn("touch-target min-h-[44px] active:scale-95")} justify-start h-auto p-3`}
+              className={`${cn('touch-target min-h-[44px] active:scale-95')} h-auto justify-start p-3`}
               onClick={() => {
-                operation.action();
-                onClose();
+                operation.action()
+                onClose()
               }}
             >
-              <Icon className="h-4 w-4 mr-3" />
+              <Icon className="mr-3 h-4 w-4" />
               <div className="text-left">
                 <div className="font-medium">{operation.label}</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-muted-foreground text-xs">
                   {operation.description}
                 </div>
               </div>
             </Button>
-          );
+          )
         })}
       </div>
     </>
-  );
+  )
 
   if (isMobile) {
     return (
@@ -162,12 +162,10 @@ export function FileBulkOperationsDialog({
               Choose an action for the selected items
             </BottomSheetDescription>
           </BottomSheetHeader>
-          <div className="px-4 pb-4">
-            {renderContent()}
-          </div>
+          <div className="px-4 pb-4">{renderContent()}</div>
         </BottomSheetContent>
       </BottomSheet>
-    );
+    )
   }
 
   return (
@@ -179,10 +177,8 @@ export function FileBulkOperationsDialog({
             Choose an action for the selected items
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          {renderContent()}
-        </div>
+        <div className="py-4">{renderContent()}</div>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

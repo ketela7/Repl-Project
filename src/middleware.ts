@@ -8,13 +8,11 @@ export async function middleware(req: NextRequest) {
   try {
     // Log middleware activity in development only
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Middleware] Protecting: ${pathname}`);
     }
     
     // Skip middleware for auth callback to prevent redirect loops
     if (pathname.startsWith('/api/auth/')) {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Middleware] Skipping auth route: ${pathname}`);
       }
       return NextResponse.next()
     }
@@ -31,7 +29,6 @@ export async function middleware(req: NextRequest) {
       const cachedAuth = sessionCache.get(`middleware:${sessionCookie.value}`);
       if (cachedAuth && cachedAuth.email) {
         if (process.env.NODE_ENV === 'development') {
-          console.log(`[Middleware] Cached auth for: ${cachedAuth.email}`);
         }
         return NextResponse.next();
       }
@@ -48,7 +45,6 @@ export async function middleware(req: NextRequest) {
     
     if (!token) {
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Middleware] No valid session - redirecting to login`);
       }
       const url = new URL('/auth/v1/login', req.url)
       url.searchParams.set('callbackUrl', pathname)
@@ -61,11 +57,9 @@ export async function middleware(req: NextRequest) {
     }
     
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Middleware] Access granted to: ${token.email}`);
     }
     return NextResponse.next()
   } catch (error) {
-    console.error(`[Middleware] Error:`, error);
     // On error, redirect to login
     const url = new URL('/auth/v1/login', req.url)
     return NextResponse.redirect(url)

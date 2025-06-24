@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { HardDrive } from "lucide-react";
+import { HardDrive } from 'lucide-react'
 
 import {
   Sidebar,
@@ -10,12 +10,12 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar";
-import { APP_CONFIG } from "@/config/app-config";
-import { sidebarItems } from "@/components/navigation/sidebar/sidebar-items";
+} from '@/components/ui/sidebar'
+import { APP_CONFIG } from '@/config/app-config'
+import { sidebarItems } from '@/components/navigation/sidebar/sidebar-items'
 
-import { NavMain } from "./nav-main";
-import { AuthNavUser } from "./auth-nav-user";
+import { NavMain } from './nav-main'
+import { AuthNavUser } from './auth-nav-user'
 
 // Timezone is now auto-detected in the background via TimezoneProvider
 
@@ -25,10 +25,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
               <a href="/dashboard/drive">
                 <HardDrive className="h-5 w-5" />
-                <span className="text-base font-semibold truncate">{APP_CONFIG.name}</span>
+                <span className="truncate text-base font-semibold">
+                  {APP_CONFIG.name}
+                </span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -41,5 +46,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <AuthNavUser />
       </SidebarFooter>
     </Sidebar>
-  );
+  )
 }

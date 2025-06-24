@@ -91,7 +91,6 @@ class SessionCache {
     }
 
     keysToDelete.forEach(key => this.cache.delete(key));
-    console.log(`[SessionCache] Cleared ${keysToDelete.length} session entries for user: ${userId}`);
   }
 }
 

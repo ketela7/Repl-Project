@@ -1,9 +1,9 @@
-"use client";
+'use client'
 
-import React, { useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import React, { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -11,80 +11,81 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { toast } from "sonner";
-import { 
-  BottomSheet, 
-  BottomSheetContent, 
-  BottomSheetHeader, 
-  BottomSheetTitle, 
+} from '@/components/ui/dialog'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { toast } from 'sonner'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
   BottomSheetDescription,
-  BottomSheetFooter 
-} from "@/components/ui/bottom-sheet";
-import { Edit } from "lucide-react";
-import { cn } from "@/lib/utils";
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import { Edit } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface FileRenameDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onConfirm: (newName: string) => Promise<void>;
-  fileName: string;
-  fileId: string;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onConfirm: (newName: string) => Promise<void>
+  fileName: string
+  fileId: string
 }
 
-export function FileRenameDialog({ 
-  open, 
-  onOpenChange, 
+export function FileRenameDialog({
+  open,
+  onOpenChange,
   onConfirm,
   fileName,
-  fileId
+  fileId,
 }: FileRenameDialogProps) {
-  const [newName, setNewName] = useState(fileName || '');
-  const [renaming, setRenaming] = useState(false);
-  const isMobile = useIsMobile();
+  const [newName, setNewName] = useState(fileName || '')
+  const [renaming, setRenaming] = useState(false)
+  const isMobile = useIsMobile()
 
   const handleRename = async () => {
     if (!newName?.trim() || !fileId || newName === fileName) {
-      handleClose();
-      return;
+      handleClose()
+      return
     }
 
     try {
-      setRenaming(true);
-      await onConfirm(newName.trim());
-      handleClose();
+      setRenaming(true)
+      await onConfirm(newName.trim())
+      handleClose()
     } catch (error) {
-      console.error('Error renaming file:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to rename file');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to rename file'
+      )
     } finally {
-      setRenaming(false);
+      setRenaming(false)
     }
-  };
+  }
 
   const handleClose = () => {
     if (!renaming) {
-      setNewName(fileName || '');
-      onOpenChange(false);
+      setNewName(fileName || '')
+      onOpenChange(false)
     }
-  };
+  }
 
   const handleDialogOpenChange = (isOpen: boolean) => {
     if (!isOpen) {
-      handleClose();
+      handleClose()
     }
-  };
+  }
 
   // Update newName when fileName prop changes
   React.useEffect(() => {
     if (fileName) {
-      setNewName(fileName);
+      setNewName(fileName)
     }
-  }, [fileName]);
+  }, [fileName])
 
   // Add React import
   if (!fileId || !fileName) {
-    return null;
+    return null
   }
 
   if (isMobile) {
@@ -101,57 +102,59 @@ export function FileRenameDialog({
             </BottomSheetDescription>
           </BottomSheetHeader>
 
-          <div className="px-4 pb-4 space-y-4">
+          <div className="space-y-4 px-4 pb-4">
             <div className="space-y-2">
-              <Label htmlFor="file-name-mobile" className="text-sm font-medium">File Name</Label>
+              <Label htmlFor="file-name-mobile" className="text-sm font-medium">
+                File Name
+              </Label>
               <Input
                 id="file-name-mobile"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="Enter new file name..."
                 disabled={renaming}
-                className={`${cn("min-h-[44px]")} text-base`}
+                className={`${cn('min-h-[44px]')} text-base`}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
-                    handleRename();
+                    handleRename()
                   }
                 }}
                 autoFocus
                 onFocus={(e) => {
-                  const name = e.target.value;
-                  const lastDot = name.lastIndexOf('.');
+                  const name = e.target.value
+                  const lastDot = name.lastIndexOf('.')
                   if (lastDot > 0) {
-                    e.target.setSelectionRange(0, lastDot);
+                    e.target.setSelectionRange(0, lastDot)
                   } else {
-                    e.target.select();
+                    e.target.select()
                   }
                 }}
               />
             </div>
           </div>
 
-          <BottomSheetFooter className={cn("grid gap-4")}>
-            <Button 
-              variant="outline" 
-              onClick={handleClose} 
-              disabled={renaming} 
-              className={cn("touch-target min-h-[44px] active:scale-95")}
+          <BottomSheetFooter className={cn('grid gap-4')}>
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={renaming}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
             >
               Cancel
             </Button>
-            <Button 
-              onClick={handleRename} 
+            <Button
+              onClick={handleRename}
               disabled={!newName?.trim() || newName === fileName || renaming}
-              className={cn("touch-target min-h-[44px] active:scale-95")}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
             >
               {renaming ? (
                 <>
-                  <Edit className="h-4 w-4 mr-2 animate-pulse" />
+                  <Edit className="mr-2 h-4 w-4 animate-pulse" />
                   Renaming...
                 </>
               ) : (
                 <>
-                  <Edit className="h-4 w-4 mr-2" />
+                  <Edit className="mr-2 h-4 w-4" />
                   Rename
                 </>
               )}
@@ -159,7 +162,7 @@ export function FileRenameDialog({
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
-    );
+    )
   }
 
   return (
@@ -186,17 +189,17 @@ export function FileRenameDialog({
               disabled={renaming}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  handleRename();
+                  handleRename()
                 }
               }}
               autoFocus
               onFocus={(e) => {
-                const name = e.target.value;
-                const lastDot = name.lastIndexOf('.');
+                const name = e.target.value
+                const lastDot = name.lastIndexOf('.')
                 if (lastDot > 0) {
-                  e.target.setSelectionRange(0, lastDot);
+                  e.target.setSelectionRange(0, lastDot)
                 } else {
-                  e.target.select();
+                  e.target.select()
                 }
               }}
             />
@@ -207,18 +210,18 @@ export function FileRenameDialog({
           <Button variant="outline" onClick={handleClose} disabled={renaming}>
             Close
           </Button>
-          <Button 
-            onClick={handleRename} 
+          <Button
+            onClick={handleRename}
             disabled={!newName?.trim() || newName === fileName || renaming}
           >
             {renaming ? (
               <>
-                <Edit className="h-4 w-4 mr-2 animate-pulse" />
+                <Edit className="mr-2 h-4 w-4 animate-pulse" />
                 Renaming...
               </>
             ) : (
               <>
-                <Edit className="h-4 w-4 mr-2" />
+                <Edit className="mr-2 h-4 w-4" />
                 Rename
               </>
             )}
@@ -226,5 +229,5 @@ export function FileRenameDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

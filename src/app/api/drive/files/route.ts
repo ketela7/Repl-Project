@@ -45,7 +45,6 @@ function buildDriveQuery(filters: FileFilter): string {
       conditions.push("'me' in owners")
       break
 
-
     default:
       // All files view - show non-trashed files by default
       conditions.push('trashed=false')
@@ -289,10 +288,9 @@ function buildDriveQuery(filters: FileFilter): string {
           case 'contact':
             typeConditions.push(
               '(' +
-                [
-                  "mimeType = 'text/vcard'",
-                  "mimeType = 'text/x-vcard'",
-                ].join(' or ') +
+                ["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(
+                  ' or '
+                ) +
                 ')'
             )
             break
@@ -354,25 +352,29 @@ function buildDriveQuery(filters: FileFilter): string {
 
   // Size filter - only apply to files, not folders
   if (filters.minSize || filters.maxSize) {
-    const fileSizeConditions = [];
+    const fileSizeConditions = []
     if (filters.minSize) {
-      fileSizeConditions.push(`size >= ${filters.minSize}`);
+      fileSizeConditions.push(`size >= ${filters.minSize}`)
     }
     if (filters.maxSize) {
-      fileSizeConditions.push(`size <= ${filters.maxSize}`);
+      fileSizeConditions.push(`size <= ${filters.maxSize}`)
     }
-    
+
     // Check if folders are included in file type filter
-    const includesFolders = filters.fileType && filters.fileType !== 'all' && 
-      (filters.fileType.includes('folder') || filters.fileType === 'folder');
-    
+    const includesFolders =
+      filters.fileType &&
+      filters.fileType !== 'all' &&
+      (filters.fileType.includes('folder') || filters.fileType === 'folder')
+
     if (fileSizeConditions.length > 0) {
       if (includesFolders) {
         // If folders are requested, create OR condition: (size filters for files) OR (folders)
-        conditions.push(`(((${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder') or mimeType = 'application/vnd.google-apps.folder')`);
+        conditions.push(
+          `(((${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder') or mimeType = 'application/vnd.google-apps.folder')`
+        )
       } else {
         // If no folders requested, just apply size filters normally
-        conditions.push(fileSizeConditions.join(' and '));
+        conditions.push(fileSizeConditions.join(' and '))
       }
     }
   }
@@ -400,28 +402,24 @@ function getSortKey(sortBy: string) {
 export async function GET(request: NextRequest) {
   try {
     if (process.env.NODE_ENV === 'development') {
-      console.log('=== Drive Files API Called ===')
     }
 
     const session = await auth()
 
     if (!session?.user) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('No session found')
       }
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const user = session.user
     if (process.env.NODE_ENV === 'development') {
-      console.log('User found:', user.email)
     }
 
     const accessToken = session.accessToken
 
     if (!accessToken) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('No access token found')
       }
       return NextResponse.json(
         {
@@ -433,7 +431,6 @@ export async function GET(request: NextRequest) {
     }
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Access token found, proceeding with Drive API call')
     }
 
     const { searchParams } = new URL(request.url)
@@ -487,31 +484,29 @@ export async function GET(request: NextRequest) {
     if (pageToken) {
       try {
         // Handle double-encoded pageTokens
-        let decodedToken = pageToken;
-        
+        let decodedToken = pageToken
+
         // Keep decoding until we get a stable result or hit limit
-        let attempts = 0;
+        let attempts = 0
         while (decodedToken.includes('%') && attempts < 3) {
-          const previousToken = decodedToken;
-          decodedToken = decodeURIComponent(decodedToken);
-          attempts++;
-          
+          const previousToken = decodedToken
+          decodedToken = decodeURIComponent(decodedToken)
+          attempts++
+
           // If decoding doesn't change the token, we're done
           if (previousToken === decodedToken) {
-            break;
+            break
           }
         }
-        
-        pageToken = decodedToken;
-        
+
+        pageToken = decodedToken
+
         // Validate the final pageToken
         if (pageToken.length > 1000 || /[<>{}\\|\s]/.test(pageToken)) {
-          console.warn('PageToken appears invalid after decoding, ignoring');
-          pageToken = undefined;
+          pageToken = undefined
         }
       } catch (error) {
-        console.warn('Failed to decode pageToken, ignoring:', error);
-        pageToken = undefined;
+        pageToken = undefined
       }
     }
 
@@ -519,7 +514,6 @@ export async function GET(request: NextRequest) {
       searchParams.get('folderId') || searchParams.get('parentId') || undefined
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Drive API filters:', filters);
     }
 
     // Check cache first - include viewStatus in cache key for proper filtering
@@ -550,8 +544,6 @@ export async function GET(request: NextRequest) {
     // For "All Files" view (when viewStatus is 'all' or not specified), show everything without parent restriction
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Final Drive query:', driveQuery)
-      console.log('View Status:', filters.viewStatus)
     }
 
     // Get sort configuration
@@ -562,7 +554,6 @@ export async function GET(request: NextRequest) {
         : `${sortKey} ${filters.sortOrder}`
 
     if (process.env.NODE_ENV === 'development') {
-      console.log('Order by:', orderBy)
     }
 
     // Generate deduplication key to prevent multiple identical requests
@@ -578,7 +569,8 @@ export async function GET(request: NextRequest) {
       pageToken: pageToken,
     })
 
-    {/*// Use search optimization for search queries
+    {
+      /*// Use search optimization for search queries
                 if (filters.search) {
       const searchResult = await searchOptimizer.optimizedSearch(
         filters.search,
@@ -604,7 +596,6 @@ export async function GET(request: NextRequest) {
       const filteredFiles = applyClientSideFilters(searchResult.files, filters)
 
       if (process.env.NODE_ENV === 'development') {
-        console.log(
           `Search "${filters.search}": ${searchResult.files.length} -> ${filteredFiles.length} files after filtering`
         )
       }
@@ -615,12 +606,12 @@ export async function GET(request: NextRequest) {
         totalCount: filteredFiles.length,
       })
     }
-                */}
+                */
+    }
     // Check cache first - before deduplication
     const cachedData = driveCache.get(cacheKey)
     if (cachedData) {
       if (process.env.NODE_ENV === 'development') {
-        console.log('Cache hit for:', cacheKey)
       }
 
       // Direct API filtering from cache
@@ -664,7 +655,6 @@ export async function GET(request: NextRequest) {
     )
 
     if (process.env.NODE_ENV === 'development') {
-      console.log(`Retrieved ${result.files?.length || 0} files from Drive API`)
     }
 
     // Direct API filtering - no client-side processing needed
@@ -678,18 +668,19 @@ export async function GET(request: NextRequest) {
       console.log('API returning:', {
         filesCount: finalResult.files?.length || 0,
         hasNextPageToken: !!finalResult.nextPageToken,
-        sampleFile: finalResult.files?.[0] ? {
-          id: finalResult.files[0].id,
-          name: finalResult.files[0].name,
-          mimeType: finalResult.files[0].mimeType
-        } : null
-      });
+        sampleFile: finalResult.files?.[0]
+          ? {
+              id: finalResult.files[0].id,
+              name: finalResult.files[0].name,
+              mimeType: finalResult.files[0].mimeType,
+            }
+          : null,
+      })
     }
 
     return NextResponse.json(finalResult)
   } catch (error) {
     if (process.env.NODE_ENV === 'development') {
-      console.error('Drive files API error:', error)
     }
     return NextResponse.json(
       {

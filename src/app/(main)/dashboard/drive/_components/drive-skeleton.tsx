@@ -1,5 +1,5 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 export function DriveGridSkeleton() {
   // Fixed width patterns to avoid hydration mismatch
@@ -11,8 +11,8 @@ export function DriveGridSkeleton() {
     { main: '90%', sub: '55%' },
     { main: '80%', sub: '48%' },
     { main: '60%', sub: '38%' },
-    { main: '95%', sub: '42%' }
-  ];
+    { main: '95%', sub: '42%' },
+  ]
 
   return (
     <Card>
@@ -25,43 +25,41 @@ export function DriveGridSkeleton() {
       <CardContent>
         <div className="space-y-3">
           {Array.from({ length: 8 }).map((_, i) => {
-            const pattern = widthPatterns[i % widthPatterns.length];
-            
+            const pattern = widthPatterns[i % widthPatterns.length]
+
             return (
               <div key={i} className="flex items-center gap-3 p-2">
-                <Skeleton className="h-4 w-4 rounded flex-shrink-0" />
-                <Skeleton className="h-4 w-4 rounded flex-shrink-0" />
+                <Skeleton className="h-4 w-4 flex-shrink-0 rounded" />
+                <Skeleton className="h-4 w-4 flex-shrink-0 rounded" />
                 <div className="flex-1 space-y-1">
-                  <Skeleton 
-                    className="h-4 rounded" 
-                    style={{ width: pattern.main }} 
+                  <Skeleton
+                    className="h-4 rounded"
+                    style={{ width: pattern.main }}
                   />
-                  <Skeleton 
-                    className="h-3 rounded" 
-                    style={{ width: pattern.sub }} 
+                  <Skeleton
+                    className="h-3 rounded"
+                    style={{ width: pattern.sub }}
                   />
                 </div>
                 <Skeleton className="h-4 w-16 rounded" />
                 <Skeleton className="h-4 w-4 rounded" />
               </div>
-            );
+            )
           })}
         </div>
       </CardContent>
     </Card>
-  );
+  )
 }
-
-
 
 export function BreadcrumbSkeleton() {
   return (
-    <div className="flex items-center space-x-2 mb-4">
+    <div className="mb-4 flex items-center space-x-2">
       <Skeleton className="h-4 w-16" />
       <span className="text-muted-foreground">/</span>
       <Skeleton className="h-4 w-20" />
       <span className="text-muted-foreground">/</span>
       <Skeleton className="h-4 w-24" />
     </div>
-  );
+  )
 }

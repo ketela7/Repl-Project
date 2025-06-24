@@ -1,49 +1,59 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/auth';
-import { GoogleDriveService } from '@/lib/google-drive/service';
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import { GoogleDriveService } from '@/lib/google-drive/service'
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const session = await auth();
+    const session = await auth()
 
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const accessToken = session.accessToken;
-    
+    const accessToken = session.accessToken
+
     if (!accessToken) {
-      return NextResponse.json({ 
-        error: 'Google Drive access not found. Please reconnect your Google account.',
-        needsReauth: true 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            'Google Drive access not found. Please reconnect your Google account.',
+          needsReauth: true,
+        },
+        { status: 400 }
+      )
     }
 
-    const { fileId } = await params;
-    const driveService = new GoogleDriveService(accessToken);
-    
+    const { fileId } = await params
+    const driveService = new GoogleDriveService(accessToken)
+
     // Get file metadata first
-    const fileDetails = await driveService.getFileDetails(fileId);
-    
+    const fileDetails = await driveService.getFileDetails(fileId)
+
     if (!fileDetails) {
-      return NextResponse.json({ error: 'File not found' }, { status: 404 });
+      return NextResponse.json({ error: 'File not found' }, { status: 404 })
     }
 
     // Check if it's a folder - folders cannot be downloaded
     if (fileDetails.mimeType === 'application/vnd.google-apps.folder') {
-      return NextResponse.json({ 
-        error: 'Cannot download folders. Only files can be downloaded.' 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Cannot download folders. Only files can be downloaded.',
+        },
+        { status: 400 }
+      )
     }
 
     // Get the file stream directly from Google Drive
-    const fileStream = await driveService.downloadFileStream(fileId);
-    
+    const fileStream = await driveService.downloadFileStream(fileId)
+
     if (!fileStream) {
-      return NextResponse.json({ error: 'Failed to get file stream' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Failed to get file stream' },
+        { status: 500 }
+      )
     }
 
     // Return the stream with direct download headers
@@ -54,28 +64,43 @@ export async function GET(
         'Content-Disposition': `attachment; filename="${encodeURIComponent(fileDetails.name)}"`,
         'Content-Length': fileDetails.size || '',
         'Cache-Control': 'no-cache',
-      }
-    });
+      },
+    })
   } catch (error) {
-    console.error('Download API error:', error);
-    
+
     if (error instanceof Error) {
-      if (error.message.includes('Invalid Credentials') || error.message.includes('unauthorized')) {
-        return NextResponse.json({ 
-          error: 'Google Drive access expired. Please reconnect your account.',
-          needsReauth: true 
-        }, { status: 401 });
+      if (
+        error.message.includes('Invalid Credentials') ||
+        error.message.includes('unauthorized')
+      ) {
+        return NextResponse.json(
+          {
+            error:
+              'Google Drive access expired. Please reconnect your account.',
+            needsReauth: true,
+          },
+          { status: 401 }
+        )
       }
 
-      if (error.message.includes('not found') || error.message.includes('404')) {
-        return NextResponse.json({ 
-          error: 'File not found' 
-        }, { status: 404 });
+      if (
+        error.message.includes('not found') ||
+        error.message.includes('404')
+      ) {
+        return NextResponse.json(
+          {
+            error: 'File not found',
+          },
+          { status: 404 }
+        )
       }
     }
 
-    return NextResponse.json({ 
-      error: 'Failed to download file' 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Failed to download file',
+      },
+      { status: 500 }
+    )
   }
 }

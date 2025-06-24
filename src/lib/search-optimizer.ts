@@ -93,7 +93,6 @@ class SearchOptimizer {
           file.mimeType?.toLowerCase().includes(query)
         );
 
-        console.log(`[SearchOptimizer] Incremental search (folder: ${folderId || 'root'}): "${cachedQuery}" -> "${query}" (${result.files.length} -> ${filteredFiles.length} files)`);
 
         return {
           files: filteredFiles,
@@ -122,7 +121,6 @@ class SearchOptimizer {
       const result = await apiCall();
       const duration = Date.now() - startTime;
       
-      console.log(`[SearchOptimizer] Search "${query}" completed in ${duration}ms (${result.files?.length || 0} files)`);
 
       return {
         files: result.files || [],
@@ -133,7 +131,6 @@ class SearchOptimizer {
         timestamp: Date.now()
       };
     } catch (error) {
-      console.error(`[SearchOptimizer] Search failed for "${query}":`, error);
       throw error;
     }
   }
@@ -209,7 +206,6 @@ class SearchOptimizer {
       try {
         await this.optimizedSearch(query, userId, () => apiCall(query));
       } catch (error) {
-        console.warn(`[SearchOptimizer] Preload failed for "${query}":`, error);
       }
     });
 

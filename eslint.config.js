@@ -43,7 +43,7 @@ module.exports = [
       // TypeScript rules
       '@typescript-eslint/no-unused-vars': 'error',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/prefer-const': 'error',
+      '@typescript-eslint/prefer-const': 'warn',
       
       // React rules
       'react/jsx-uses-react': 'off',

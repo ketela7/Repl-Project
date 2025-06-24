@@ -9,7 +9,6 @@ export function getUserTimezone(): string {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone;
   } catch (error) {
-    console.warn('Failed to get user timezone:', error);
     return 'UTC';
   }
 }
@@ -41,7 +40,6 @@ export function formatDateToUserTimezone(
       timeZone: userTimezone
     }).format(dateObj);
   } catch (error) {
-    console.warn('Failed to format date to timezone:', error);
     return dateObj.toLocaleString();
   }
 }

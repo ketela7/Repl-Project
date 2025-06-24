@@ -23,11 +23,9 @@ class RequestDeduplicator {
     const existing = this.pendingRequests.get(key);
     
     if (existing) {
-      console.log(`[Deduplication] Reusing existing request for key: ${key}`);
       return existing.promise;
     }
 
-    console.log(`[Deduplication] Creating new request for key: ${key}`);
     const promise = requestFn().finally(() => {
       // Clean up after request completes
       this.pendingRequests.delete(key);

@@ -1,47 +1,47 @@
-"use client";
+'use client'
 
-import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { 
-  BottomSheet, 
-  BottomSheetContent, 
-  BottomSheetHeader, 
-  BottomSheetTitle, 
+
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
   BottomSheetDescription,
-  BottomSheetFooter 
-} from "@/components/ui/bottom-sheet";
-import { 
-  Download, 
-  Trash2, 
-  Move, 
-  Copy, 
-  Edit2, 
-  Share2, 
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import {
+  Download,
+  Trash2,
+  Move,
+  Copy,
+  Edit2,
+  Share2,
   RotateCcw,
   Trash,
   FileText,
   X,
   AlertTriangle,
-} from "lucide-react";
-import { BulkOperationItem } from '@/lib/google-drive/types';
+} from 'lucide-react'
+import { BulkOperationItem } from '@/lib/google-drive/types'
 
 interface MobileActionsBottomSheetProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  selectedCount: number;
-  selectedItems: BulkOperationItem[];
-  isInTrash?: boolean;
-  onBulkDownload: () => void;
-  onBulkDelete: () => void;
-  onBulkMove: () => void;
-  onBulkCopy: () => void;
-  onBulkRename: () => void;
-  onBulkExport: () => void;
-  onBulkShare: () => void;
-  onBulkRestore?: () => void;
-  onBulkPermanentDelete?: () => void;
-  onDeselectAll: () => void;
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  selectedCount: number
+  selectedItems: BulkOperationItem[]
+  isInTrash?: boolean
+  onBulkDownload: () => void
+  onBulkDelete: () => void
+  onBulkMove: () => void
+  onBulkCopy: () => void
+  onBulkRename: () => void
+  onBulkExport: () => void
+  onBulkShare: () => void
+  onBulkRestore?: () => void
+  onBulkPermanentDelete?: () => void
+  onDeselectAll: () => void
 }
 
 export function MobileActionsBottomSheet({
@@ -59,16 +59,15 @@ export function MobileActionsBottomSheet({
   onBulkShare,
   onBulkRestore,
   onBulkPermanentDelete,
-  onDeselectAll
+  onDeselectAll,
 }: MobileActionsBottomSheetProps) {
-  
   const handleAction = (action: () => void) => {
-    action();
-    onOpenChange(false);
-  };
+    action()
+    onOpenChange(false)
+  }
 
-  const hasFiles = selectedItems.some(item => item.type === 'file');
-  const hasOnlyFiles = selectedItems.every(item => item.type === 'file');
+  const hasFiles = selectedItems.some((item) => item.type === 'file')
+  const hasOnlyFiles = selectedItems.every((item) => item.type === 'file')
 
   return (
     <BottomSheet open={open} onOpenChange={onOpenChange}>
@@ -99,14 +98,16 @@ export function MobileActionsBottomSheet({
             {hasFiles && (
               <Button
                 variant="outline"
-                className="w-full justify-start h-12 text-left"
+                className="h-12 w-full justify-start text-left"
                 onClick={() => handleAction(onBulkDownload)}
               >
-                <Download className="h-4 w-4 mr-3" />
+                <Download className="mr-3 h-4 w-4" />
                 <div>
                   <div className="font-medium">Download</div>
-                  <div className="text-xs text-muted-foreground">
-                    {hasOnlyFiles ? 'Download selected files' : 'Download files only'}
+                  <div className="text-muted-foreground text-xs">
+                    {hasOnlyFiles
+                      ? 'Download selected files'
+                      : 'Download files only'}
                   </div>
                 </div>
               </Button>
@@ -114,13 +115,13 @@ export function MobileActionsBottomSheet({
 
             <Button
               variant="outline"
-              className="w-full justify-start h-12 text-left"
+              className="h-12 w-full justify-start text-left"
               onClick={() => handleAction(onBulkExport)}
             >
-              <FileText className="h-4 w-4 mr-3" />
+              <FileText className="mr-3 h-4 w-4" />
               <div>
                 <div className="font-medium">Export</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-muted-foreground text-xs">
                   Export as different formats
                 </div>
               </div>
@@ -129,13 +130,13 @@ export function MobileActionsBottomSheet({
             {hasFiles && !isInTrash && (
               <Button
                 variant="outline"
-                className="w-full justify-start h-12 text-left"
+                className="h-12 w-full justify-start text-left"
                 onClick={() => handleAction(onBulkShare)}
               >
-                <Share2 className="h-4 w-4 mr-3" />
+                <Share2 className="mr-3 h-4 w-4" />
                 <div>
                   <div className="font-medium">Share</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-muted-foreground text-xs">
                     Share selected items
                   </div>
                 </div>
@@ -148,13 +149,13 @@ export function MobileActionsBottomSheet({
               <>
                 <Button
                   variant="outline"
-                  className="w-full justify-start h-12 text-left"
+                  className="h-12 w-full justify-start text-left"
                   onClick={() => handleAction(onBulkMove)}
                 >
-                  <Move className="h-4 w-4 mr-3" />
+                  <Move className="mr-3 h-4 w-4" />
                   <div>
                     <div className="font-medium">Move to folder</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-muted-foreground text-xs">
                       Move to another location
                     </div>
                   </div>
@@ -163,13 +164,13 @@ export function MobileActionsBottomSheet({
                 {hasFiles && (
                   <Button
                     variant="outline"
-                    className="w-full justify-start h-12 text-left"
+                    className="h-12 w-full justify-start text-left"
                     onClick={() => handleAction(onBulkCopy)}
                   >
-                    <Copy className="h-4 w-4 mr-3" />
+                    <Copy className="mr-3 h-4 w-4" />
                     <div>
                       <div className="font-medium">Make a copy</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-muted-foreground text-xs">
                         Copy files to current folder
                       </div>
                     </div>
@@ -178,13 +179,13 @@ export function MobileActionsBottomSheet({
 
                 <Button
                   variant="outline"
-                  className="w-full justify-start h-12 text-left"
+                  className="h-12 w-full justify-start text-left"
                   onClick={() => handleAction(onBulkRename)}
                 >
-                  <Edit2 className="h-4 w-4 mr-3" />
+                  <Edit2 className="mr-3 h-4 w-4" />
                   <div>
                     <div className="font-medium">Rename</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-muted-foreground text-xs">
                       Rename selected items
                     </div>
                   </div>
@@ -194,13 +195,13 @@ export function MobileActionsBottomSheet({
 
                 <Button
                   variant="outline"
-                  className="w-full justify-start h-12 text-left text-orange-600 hover:text-orange-700 border-orange-200 hover:bg-orange-50"
+                  className="h-12 w-full justify-start border-orange-200 text-left text-orange-600 hover:bg-orange-50 hover:text-orange-700"
                   onClick={() => handleAction(onBulkDelete)}
                 >
-                  <Trash className="h-4 w-4 mr-3" />
+                  <Trash className="mr-3 h-4 w-4" />
                   <div>
                     <div className="font-medium">Move to trash</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-muted-foreground text-xs">
                       Items can be restored later
                     </div>
                   </div>
@@ -212,13 +213,13 @@ export function MobileActionsBottomSheet({
             {onBulkPermanentDelete && (
               <Button
                 variant="outline"
-                className="w-full justify-start h-12 text-left text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
+                className="h-12 w-full justify-start border-red-200 text-left text-red-600 hover:bg-red-50 hover:text-red-700"
                 onClick={() => handleAction(onBulkPermanentDelete)}
               >
-                <AlertTriangle className="h-4 w-4 mr-3" />
+                <AlertTriangle className="mr-3 h-4 w-4" />
                 <div>
                   <div className="font-medium">Permanently Delete</div>
-                  <div className="text-xs text-muted-foreground">
+                  <div className="text-muted-foreground text-xs">
                     Cannot be undone
                   </div>
                 </div>
@@ -230,13 +231,13 @@ export function MobileActionsBottomSheet({
                 {onBulkRestore && (
                   <Button
                     variant="outline"
-                    className="w-full justify-start h-12 text-left text-green-600 hover:text-green-700 border-green-200 hover:bg-green-50"
+                    className="h-12 w-full justify-start border-green-200 text-left text-green-600 hover:bg-green-50 hover:text-green-700"
                     onClick={() => handleAction(onBulkRestore)}
                   >
-                    <RotateCcw className="h-4 w-4 mr-3" />
+                    <RotateCcw className="mr-3 h-4 w-4" />
                     <div>
                       <div className="font-medium">Restore</div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-muted-foreground text-xs">
                         Restore to original location
                       </div>
                     </div>
@@ -245,17 +246,21 @@ export function MobileActionsBottomSheet({
 
                 <Button
                   variant="outline"
-                  className="w-full justify-start h-12 text-left text-red-600 hover:text-red-700 border-red-200 hover:bg-red-50"
-                  onClick={() => handleAction(onBulkPermanentDelete || (() => {
-                    if (process.env.NODE_ENV === 'development') {
-                      console.log('Permanent delete action triggered');
-                    }
-                  }))}
+                  className="h-12 w-full justify-start border-red-200 text-left text-red-600 hover:bg-red-50 hover:text-red-700"
+                  onClick={() =>
+                    handleAction(
+                      onBulkPermanentDelete ||
+                        (() => {
+                          if (process.env.NODE_ENV === 'development') {
+                          }
+                        })
+                    )
+                  }
                 >
-                  <Trash2 className="h-4 w-4 mr-3" />
+                  <Trash2 className="mr-3 h-4 w-4" />
                   <div>
                     <div className="font-medium">Delete forever</div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-muted-foreground text-xs">
                       Permanently delete items
                     </div>
                   </div>
@@ -269,8 +274,8 @@ export function MobileActionsBottomSheet({
           <Button
             variant="ghost"
             onClick={() => {
-              onDeselectAll();
-              onOpenChange(false);
+              onDeselectAll()
+              onOpenChange(false)
             }}
             className="w-full"
           >
@@ -279,5 +284,5 @@ export function MobileActionsBottomSheet({
         </BottomSheetFooter>
       </BottomSheetContent>
     </BottomSheet>
-  );
+  )
 }

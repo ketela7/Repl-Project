@@ -34,7 +34,6 @@ export async function copyToClipboard(text: string, label?: string): Promise<boo
     successToast.copied();
     return true;
   } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
     errorToast.generic(
       'Failed to copy to clipboard',
       {
@@ -102,7 +101,6 @@ export async function readFromClipboard(): Promise<string | null> {
     const text = await navigator.clipboard.readText();
     return text;
   } catch (error) {
-    console.error('Failed to read from clipboard:', error);
     errorToast.generic('Failed to read from clipboard');
     return null;
   }

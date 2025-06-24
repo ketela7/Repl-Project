@@ -6,7 +6,7 @@
 // Configuration
 export { config } from './config/environment';
 
-// TODO: Gradually move core services here from src/lib/
+
 // This module will contain:
 // - Configuration management
 // - Core services (cache, retry, database)

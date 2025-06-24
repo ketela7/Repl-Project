@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import React from 'react';
+
 import {
   Table,
   TableBody,
@@ -8,21 +8,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/table'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { FileIcon } from '@/components/file-icon';
-import { formatFileSize, formatDriveFileDate } from '@/lib/google-drive/utils';
-import { formatFileTime } from '@/lib/timezone';
-import { useTimezoneContext } from '@/components/timezone-provider';
-import { 
+} from '@/components/ui/dropdown-menu'
+import { FileIcon } from '@/components/file-icon'
+import { formatFileSize, formatDriveFileDate } from '@/lib/google-drive/utils'
+import { formatFileTime } from '@/lib/timezone'
+import { useTimezoneContext } from '@/components/timezone-provider'
+import {
   MoreVertical,
   Download,
   Share2,
@@ -31,33 +31,33 @@ import {
   Eye,
   Move,
   Copy,
-  Star
-} from "lucide-react";
-import { DriveFile, DriveFolder } from '@/lib/google-drive/types';
+  Star,
+} from 'lucide-react'
+import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 
 interface FileListProps {
-  files: DriveFile[];
-  folders: DriveFolder[];
-  selectedItems: string[];
-  isSelectMode: boolean;
+  files: DriveFile[]
+  folders: DriveFolder[]
+  selectedItems: string[]
+  isSelectMode: boolean
   visibleColumns: {
-    name: boolean;
-    size: boolean;
-    owners: boolean;
-    mimeType: boolean;
-    createdTime: boolean;
-    modifiedTime: boolean;
-  };
-  activeView: string;
-  sortBy: string;
-  sortOrder: 'asc' | 'desc';
-  onSort: (field: string) => void;
-  onItemSelect: (id: string) => void;
-  onSelectAll: () => void;
-  onFileAction: (action: string, item: DriveFile | DriveFolder) => void;
-  toggleItemSelection: (id: string) => void;
-  handleFolderClick: (id: string) => void;
-  getFileActions: (file: DriveFile | DriveFolder, view: string) => any;
+    name: boolean
+    size: boolean
+    owners: boolean
+    mimeType: boolean
+    createdTime: boolean
+    modifiedTime: boolean
+  }
+  activeView: string
+  sortBy: string
+  sortOrder: 'asc' | 'desc'
+  onSort: (field: string) => void
+  onItemSelect: (id: string) => void
+  onSelectAll: () => void
+  onFileAction: (action: string, item: DriveFile | DriveFolder) => void
+  toggleItemSelection: (id: string) => void
+  handleFolderClick: (id: string) => void
+  getFileActions: (file: DriveFile | DriveFolder, view: string) => any
 }
 
 export function FileList({
@@ -75,81 +75,83 @@ export function FileList({
   onFileAction,
   toggleItemSelection,
   handleFolderClick,
-  getFileActions
+  getFileActions,
 }: FileListProps) {
-  const { timezone } = useTimezoneContext();
-  const allItems = [...folders, ...files];
-  const allSelected = allItems.length > 0 && selectedItems.length === allItems.length;
-  const someSelected = selectedItems.length > 0 && selectedItems.length < allItems.length;
+  const { timezone } = useTimezoneContext()
+  const allItems = [...folders, ...files]
+  const allSelected =
+    allItems.length > 0 && selectedItems.length === allItems.length
+  const someSelected =
+    selectedItems.length > 0 && selectedItems.length < allItems.length
 
-  const SortableHeader = ({ column, children }: { column: string; children: React.ReactNode }) => (
-    <TableHead 
-      className="cursor-pointer hover:bg-muted/50"
+  const SortableHeader = ({
+    column,
+    children,
+  }: {
+    column: string
+    children: React.ReactNode
+  }) => (
+    <TableHead
+      className="hover:bg-muted/50 cursor-pointer"
       onClick={() => onSort(column)}
     >
       <div className="flex items-center gap-1">
         {children}
         {sortBy === column && (
-          <span className="text-xs">
-            {sortOrder === 'asc' ? '↑' : '↓'}
-          </span>
+          <span className="text-xs">{sortOrder === 'asc' ? '↑' : '↓'}</span>
         )}
       </div>
     </TableHead>
-  );
+  )
 
   const FileActions = ({ item }: { item: DriveFile | DriveFolder }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="sm"
-          className="h-8 w-8 p-0"
-        >
+        <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <MoreVertical className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => onFileAction('preview', item)}>
-          <Eye className="h-4 w-4 mr-2" />
+          <Eye className="mr-2 h-4 w-4" />
           Preview
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onFileAction('download', item)}>
-          <Download className="h-4 w-4 mr-2" />
+          <Download className="mr-2 h-4 w-4" />
           Download
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onFileAction('share', item)}>
-          <Share2 className="h-4 w-4 mr-2" />
+          <Share2 className="mr-2 h-4 w-4" />
           Share
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => onFileAction('rename', item)}>
-          <Edit className="h-4 w-4 mr-2" />
+          <Edit className="mr-2 h-4 w-4" />
           Rename
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onFileAction('move', item)}>
-          <Move className="h-4 w-4 mr-2" />
+          <Move className="mr-2 h-4 w-4" />
           Move
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => onFileAction('copy', item)}>
-          <Copy className="h-4 w-4 mr-2" />
+          <Copy className="mr-2 h-4 w-4" />
           Copy
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => onFileAction('star', item)}>
-          <Star className="h-4 w-4 mr-2" />
+          <Star className="mr-2 h-4 w-4" />
           {item.starred ? 'Remove Star' : 'Add Star'}
         </DropdownMenuItem>
-        <DropdownMenuItem 
+        <DropdownMenuItem
           onClick={() => onFileAction('delete', item)}
           className="text-destructive"
         >
-          <Trash2 className="h-4 w-4 mr-2" />
+          <Trash2 className="mr-2 h-4 w-4" />
           Move to Trash
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  );
+  )
 
   return (
     <div className="rounded-md border">
@@ -157,10 +159,7 @@ export function FileList({
         <TableHeader>
           <TableRow>
             <TableHead className="w-12">
-              <Checkbox
-                checked={allSelected}
-                onCheckedChange={onSelectAll}
-              />
+              <Checkbox checked={allSelected} onCheckedChange={onSelectAll} />
             </TableHead>
             <SortableHeader column="name">Name</SortableHeader>
             <SortableHeader column="size">Size</SortableHeader>
@@ -172,23 +171,26 @@ export function FileList({
         <TableBody>
           {allItems.length === 0 ? (
             <TableRow>
-              <TableCell 
-                colSpan={6} 
-                className="text-center py-8 text-muted-foreground"
+              <TableCell
+                colSpan={6}
+                className="text-muted-foreground py-8 text-center"
               >
                 No files or folders found
               </TableCell>
             </TableRow>
           ) : (
             allItems.map((item) => (
-              <TableRow 
+              <TableRow
                 key={item.id}
                 className="hover:bg-muted/50 cursor-pointer"
                 onClick={() => {
-                  if ('mimeType' in item && item.mimeType === 'application/vnd.google-apps.folder') {
-                    handleFolderClick(item.id);
+                  if (
+                    'mimeType' in item &&
+                    item.mimeType === 'application/vnd.google-apps.folder'
+                  ) {
+                    handleFolderClick(item.id)
                   } else {
-                    onFileAction('preview', item);
+                    onFileAction('preview', item)
                   }
                 }}
               >
@@ -200,29 +202,37 @@ export function FileList({
                 </TableCell>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-3">
-                    <FileIcon 
-                      mimeType={item.mimeType} 
+                    <FileIcon
+                      mimeType={item.mimeType}
                       fileName={item.name}
                       className="h-5 w-5"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-medium">{item.name}</div>
-                      {'mimeType' in item && item.mimeType !== 'application/vnd.google-apps.folder' && (
-                        <div className="text-xs text-muted-foreground truncate">
-                          {item.mimeType.split('/').pop()?.toUpperCase()}
-                        </div>
-                      )}
+                      {'mimeType' in item &&
+                        item.mimeType !==
+                          'application/vnd.google-apps.folder' && (
+                          <div className="text-muted-foreground truncate text-xs">
+                            {item.mimeType.split('/').pop()?.toUpperCase()}
+                          </div>
+                        )}
                     </div>
                   </div>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {'size' in item && item.size ? formatFileSize(Number(item.size)) : '—'}
+                  {'size' in item && item.size
+                    ? formatFileSize(Number(item.size))
+                    : '—'}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
                   {formatFileTime(item.modifiedTime, timezone)}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {'ownedByMe' in item ? (item.ownedByMe ? 'Me' : item.owners?.[0]?.displayName || 'Unknown') : 'Me'}
+                  {'ownedByMe' in item
+                    ? item.ownedByMe
+                      ? 'Me'
+                      : item.owners?.[0]?.displayName || 'Unknown'
+                    : 'Me'}
                 </TableCell>
                 <TableCell onClick={(e) => e.stopPropagation()}>
                   <FileActions item={item} />
@@ -233,5 +243,5 @@ export function FileList({
         </TableBody>
       </Table>
     </div>
-  );
+  )
 }

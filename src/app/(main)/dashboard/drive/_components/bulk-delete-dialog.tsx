@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import {
   AlertDialog,
@@ -9,56 +9,66 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { 
-  BottomSheet, 
-  BottomSheetContent, 
-  BottomSheetHeader, 
-  BottomSheetTitle, 
+} from '@/components/ui/alert-dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
   BottomSheetDescription,
-  BottomSheetFooter 
-} from "@/components/ui/bottom-sheet";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Trash2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { Trash2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface BulkDeleteDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
   selectedItems: Array<{
-    id: string;
-    name: string;
-    type: 'file' | 'folder';
-  }>;
+    id: string
+    name: string
+    type: 'file' | 'folder'
+  }>
 }
 
 export function BulkDeleteDialog({
   isOpen,
   onClose,
   onConfirm,
-  selectedItems
+  selectedItems,
 }: BulkDeleteDialogProps) {
-  const fileCount = selectedItems.filter(item => item.type === 'file').length;
-  const folderCount = selectedItems.filter(item => item.type === 'folder').length;
-  const isMobile = useIsMobile();
+  const fileCount = selectedItems.filter((item) => item.type === 'file').length
+  const folderCount = selectedItems.filter(
+    (item) => item.type === 'folder'
+  ).length
+  const isMobile = useIsMobile()
 
   const renderContent = () => (
     <>
       <div className="text-base">
-        Are you sure you want to move <span className="font-semibold">{selectedItems.length}</span> item{selectedItems.length > 1 ? 's' : ''} to trash?
+        Are you sure you want to move{' '}
+        <span className="font-semibold">{selectedItems.length}</span> item
+        {selectedItems.length > 1 ? 's' : ''} to trash?
       </div>
-      
+
       <div className="flex flex-wrap gap-2">
         {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+          >
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+          <Badge
+            variant="secondary"
+            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
+          >
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
@@ -67,11 +77,11 @@ export function BulkDeleteDialog({
       {selectedItems.length <= 5 ? (
         <div className="space-y-2">
           <div className="text-sm font-semibold">Items to be deleted:</div>
-          <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 dark:bg-slate-900/50 p-3">
-            <ul className="text-sm space-y-1">
+          <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+            <ul className="space-y-1 text-sm">
               {selectedItems.map((item) => (
                 <li key={item.id} className="flex items-center gap-2 truncate">
-                  <div className="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                   <span className="truncate">{item.name}</span>
                 </li>
               ))}
@@ -81,16 +91,16 @@ export function BulkDeleteDialog({
       ) : (
         <div className="space-y-2">
           <div className="text-sm font-semibold">Preview (first 3 items):</div>
-          <div className="rounded-md bg-slate-50 dark:bg-slate-900/50 p-3">
-            <ul className="text-sm space-y-1">
+          <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+            <ul className="space-y-1 text-sm">
               {selectedItems.slice(0, 3).map((item) => (
                 <li key={item.id} className="flex items-center gap-2 truncate">
-                  <div className="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                   <span className="truncate">{item.name}</span>
                 </li>
               ))}
-              <li className="flex items-center gap-2 text-muted-foreground/70 italic">
-                <div className="h-1.5 w-1.5 rounded-full bg-slate-300 flex-shrink-0" />
+              <li className="text-muted-foreground/70 flex items-center gap-2 italic">
+                <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
                 and {selectedItems.length - 3} more items...
               </li>
             </ul>
@@ -98,16 +108,17 @@ export function BulkDeleteDialog({
         </div>
       )}
 
-      <div className="flex items-start gap-2 rounded-lg bg-amber-50 dark:bg-amber-950/20 p-3 border border-amber-200 dark:border-amber-800">
-        <div className="h-4 w-4 rounded-full bg-amber-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+      <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20">
+        <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-amber-500">
           <div className="h-1.5 w-1.5 rounded-full bg-white" />
         </div>
         <div className="text-sm text-amber-800 dark:text-amber-200">
-          These items will be moved to your Google Drive trash and can be restored later.
+          These items will be moved to your Google Drive trash and can be
+          restored later.
         </div>
       </div>
     </>
-  );
+  )
 
   if (isMobile) {
     return (
@@ -120,35 +131,33 @@ export function BulkDeleteDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Move to Trash</div>
-                <div className="text-sm font-normal text-muted-foreground">
+                <div className="text-muted-foreground text-sm font-normal">
                   Bulk delete operation
                 </div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="px-4 pb-4 space-y-4">
-            {renderContent()}
-          </div>
+          <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
-          <BottomSheetFooter className={cn("grid gap-4")}>
-            <Button 
-              variant="outline" 
-              onClick={onClose} 
-              className={cn("touch-target min-h-[44px] active:scale-95")}
+          <BottomSheetFooter className={cn('grid gap-4')}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
             >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={onConfirm}
-              className={`${cn("touch-target min-h-[44px] active:scale-95")} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800`}
+              className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800`}
             >
               Move to Trash
             </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
-    );
+    )
   }
 
   return (
@@ -161,27 +170,27 @@ export function BulkDeleteDialog({
             </div>
             <div>
               <div className="text-lg font-semibold">Move to Trash</div>
-              <div className="text-sm font-normal text-muted-foreground">
+              <div className="text-muted-foreground text-sm font-normal">
                 Bulk delete operation
               </div>
             </div>
           </AlertDialogTitle>
         </AlertDialogHeader>
 
-        <div className="space-y-4 px-1">
-          {renderContent()}
-        </div>
+        <div className="space-y-4 px-1">{renderContent()}</div>
 
-        <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-          <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
-          <AlertDialogAction 
+        <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+          <AlertDialogCancel className="w-full sm:w-auto">
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
             onClick={onConfirm}
-            className="w-full sm:w-auto bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800"
+            className="w-full bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800"
           >
             Move to Trash
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  );
+  )
 }

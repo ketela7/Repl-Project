@@ -78,18 +78,15 @@ export class GoogleDriveService {
         
         // Basic validation for pageToken format
         if (typeof validPageToken !== 'string' || validPageToken.length === 0 || validPageToken.length > 2048) {
-          console.warn('Invalid pageToken format, ignoring:', validPageToken);
           validPageToken = undefined;
         } else {
           // Additional validation: pageToken should not contain certain invalid characters
           const invalidChars = /[<>"'&\x00-\x1f\x7f-\x9f\s]/;
           if (invalidChars.test(validPageToken)) {
-            console.warn('PageToken contains invalid characters, ignoring:', validPageToken);
             validPageToken = undefined;
           }
         }
       } catch (error) {
-        console.warn('Failed to process pageToken, ignoring:', pageToken);
         validPageToken = undefined;
       }
     }
@@ -123,8 +120,6 @@ export class GoogleDriveService {
 
     // Log query for debugging in development only
     if (process.env.NODE_ENV === 'development') {
-      console.log('Google Drive Service - Final Query:', searchQuery);
-      console.log('Google Drive Service - Order By:', orderBy);
     }
 
     // Prepare API request parameters with proper validation
@@ -148,7 +143,6 @@ export class GoogleDriveService {
       const files = response.data.files?.map(convertGoogleDriveFile) || [];
 
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Google Drive Service - Retrieved ${files.length} files`);
       }
 
       return {
@@ -159,11 +153,9 @@ export class GoogleDriveService {
     } catch (error: any) {
       // Handle specific Google Drive API errors
       if (error.code === 400 && error.message?.includes('Invalid Value')) {
-        console.warn('Google Drive API Invalid Value error, likely due to malformed pageToken');
         
         // If pageToken was the issue, retry without it
         if (validPageToken) {
-          console.log('Retrying request without pageToken');
           const retryParams = { ...requestParams };
           delete retryParams.pageToken;
           
@@ -616,7 +608,6 @@ export class GoogleDriveService {
 
       return convertGoogleDriveFile(response.data);
     } catch (error: any) {
-      console.error(`Move operation failed for file ${fileId}:`, error);
       
       // Handle specific Google API errors according to documentation
       if (error.code === 403) {
@@ -728,7 +719,6 @@ export class GoogleDriveService {
   // Unified share operation for both files and folders
   async shareFile(fileId: string, permission: DrivePermission): Promise<void> {
     try {
-      console.log('Creating permission for file:', fileId, 'with permission:', permission);
       
       const permissionRequest: any = {
         role: permission.role,
@@ -757,9 +747,7 @@ export class GoogleDriveService {
         ...(permission.sendNotificationEmail && { emailMessage: 'File shared with you via Drive Manager' })
       });
 
-      console.log('Permission created successfully for file:', fileId);
     } catch (error: any) {
-      console.error('Error creating permission:', error);
       
       // Handle specific API errors according to documentation
       if (error.code === 403) {
@@ -789,7 +777,6 @@ export class GoogleDriveService {
 
       return response.data.permissions || [];
     } catch (error) {
-      console.error('Error getting file permissions:', error);
       throw error;
     }
   }
@@ -802,7 +789,6 @@ export class GoogleDriveService {
         permissionId
       });
     } catch (error) {
-      console.error('Error removing file permission:', error);
       throw error;
     }
   }
@@ -817,7 +803,6 @@ export class GoogleDriveService {
       });
       return response.data;
     } catch (error) {
-      console.error('Error creating permission:', error);
       throw error;
     }
   }
@@ -832,7 +817,6 @@ export class GoogleDriveService {
         permissionId
       });
     } catch (error) {
-      console.error('Error deleting permission:', error);
       throw error;
     }
   }
@@ -843,6 +827,5 @@ export class GoogleDriveService {
   async sendNotificationEmail(fileId: string, emailData: any, _accessToken?: string): Promise<void> {
     // Note: This would typically use the Gmail API or similar service
     // For now, we'll just log the action
-    console.log('Notification email would be sent for file:', fileId, 'with data:', emailData);
   }
 }

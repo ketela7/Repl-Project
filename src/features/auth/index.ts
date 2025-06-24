@@ -3,7 +3,7 @@
  * Components will be gradually moved here as the architecture evolves
  */
 
-// TODO: Move auth components here from src/components/auth/
+
 // This module will contain:
 // - Authentication components
 // - Session management

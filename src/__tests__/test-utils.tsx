@@ -31,9 +31,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider session={mockSession}>
-        <div className="light">
-          {children}
-        </div>
+        <div className="light">{children}</div>
       </SessionProvider>
     </QueryClientProvider>
   )

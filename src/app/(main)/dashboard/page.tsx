@@ -1,6 +1,6 @@
-import { redirect } from 'next/navigation';
+import { redirect } from 'next/navigation'
 
 export default function DashboardPage() {
   // Redirect to drive page directly
-  redirect('/dashboard/drive');
+  redirect('/dashboard/drive')
 }

@@ -21,14 +21,14 @@ A comprehensive, enterprise-grade Google Drive management application built with
 3. Set up Google OAuth credentials in Replit secrets
 4. Run development server: `npm run dev`
 
-### Development Standards
-- **Security**: Only private secrets, no NEXT_PUBLIC_ environment variables
-- **File Naming**: Simple naming without prefixes or suffixes (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
-- **Code Quality**: Clean project structure with comprehensive testing
-- **Professional Standards**: Double check and retest code before commits, ensure follows project rules
-- **Rapid Development**: Improved development process for faster completion
-- **Documentation**: Real-time updates to API docs, routes, and project structure
-- **Clean Development**: Always ensure project is clean when starting work
+### Development Standards (Prioritas: Bug → Struktur → Redundansi → UI/UX → Minor)
+- **❌ Security**: Tidak gunakan NEXT_PUBLIC_ - hanya variabel rahasia private
+- **📁 File Naming**: Penamaan sederhana tanpa awalan/akhiran (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
+- **🧼 Code Quality**: Hapus import unused, duplikasi kode, refactor untuk kesederhanaan
+- **📐 Architecture**: Struktur Next.js App Router yang konsisten
+- **🧪 Testing**: Double check dan retest kode sebelum commit
+- **⚙️ Automation**: ESLint, Prettier, workflow otomatis untuk efisiensi
+- **📖 Documentation**: Update real-time untuk API docs, routes, project structure
 
 ## 🚀 Features
 

@@ -159,7 +159,6 @@ class MemoryCache {
     }
     
     keysToDelete.forEach(key => this.cache.delete(key));
-    console.log(`[Cache] Cleared ${keysToDelete.length} cache entries for user: ${userId}`);
   }
 }
 

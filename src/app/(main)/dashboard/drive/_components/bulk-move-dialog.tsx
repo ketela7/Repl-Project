@@ -1,6 +1,6 @@
-"use client";
+'use client'
 
-import { useState } from "react";
+import { useState } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -8,64 +8,74 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { 
-  BottomSheet, 
-  BottomSheetContent, 
-  BottomSheetHeader, 
-  BottomSheetTitle, 
+} from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
   BottomSheetDescription,
-  BottomSheetFooter 
-} from "@/components/ui/bottom-sheet";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Move } from "lucide-react";
-import { FileMoveDialog } from "./file-move-dialog";
-import { cn } from "@/lib/utils";
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { useIsMobile } from '@/hooks/use-mobile'
+import { Move } from 'lucide-react'
+import { FileMoveDialog } from './file-move-dialog'
+import { cn } from '@/lib/utils'
 
 interface BulkMoveDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: (targetFolderId: string) => void;
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: (targetFolderId: string) => void
   selectedItems: Array<{
-    id: string;
-    name: string;
-    type: 'file' | 'folder';
-  }>;
+    id: string
+    name: string
+    type: 'file' | 'folder'
+  }>
 }
 
 export function BulkMoveDialog({
   isOpen,
   onClose,
   onConfirm,
-  selectedItems
+  selectedItems,
 }: BulkMoveDialogProps) {
-  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false);
-  const isMobile = useIsMobile();
+  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
+  const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter(item => item.type === 'file').length;
-  const folderCount = selectedItems.filter(item => item.type === 'folder').length;
+  const fileCount = selectedItems.filter((item) => item.type === 'file').length
+  const folderCount = selectedItems.filter(
+    (item) => item.type === 'folder'
+  ).length
 
   const handleMoveConfirm = (targetFolderId: string) => {
-    onConfirm(targetFolderId);
-    setIsMoveDialogOpen(false);
-  };
+    onConfirm(targetFolderId)
+    setIsMoveDialogOpen(false)
+  }
 
   const renderContent = () => (
     <>
       <div className="text-base">
-        You are about to move <span className="font-semibold">{selectedItems.length}</span> item{selectedItems.length > 1 ? 's' : ''} to a new location.
+        You are about to move{' '}
+        <span className="font-semibold">{selectedItems.length}</span> item
+        {selectedItems.length > 1 ? 's' : ''} to a new location.
       </div>
-      
+
       <div className="flex flex-wrap gap-2">
         {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+          >
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+          <Badge
+            variant="secondary"
+            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
+          >
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
@@ -74,11 +84,11 @@ export function BulkMoveDialog({
       {selectedItems.length <= 5 ? (
         <div className="space-y-2">
           <div className="text-sm font-semibold">Items to be moved:</div>
-          <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 dark:bg-slate-900/50 p-3">
-            <ul className="text-sm space-y-1">
+          <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+            <ul className="space-y-1 text-sm">
               {selectedItems.map((item) => (
                 <li key={item.id} className="flex items-center gap-2 truncate">
-                  <div className="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                   <span className="truncate">{item.name}</span>
                 </li>
               ))}
@@ -88,16 +98,16 @@ export function BulkMoveDialog({
       ) : (
         <div className="space-y-2">
           <div className="text-sm font-semibold">Preview (first 3 items):</div>
-          <div className="rounded-md bg-slate-50 dark:bg-slate-900/50 p-3">
-            <ul className="text-sm space-y-1">
+          <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+            <ul className="space-y-1 text-sm">
               {selectedItems.slice(0, 3).map((item) => (
                 <li key={item.id} className="flex items-center gap-2 truncate">
-                  <div className="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                   <span className="truncate">{item.name}</span>
                 </li>
               ))}
-              <li className="flex items-center gap-2 text-muted-foreground/70 italic">
-                <div className="h-1.5 w-1.5 rounded-full bg-slate-300 flex-shrink-0" />
+              <li className="text-muted-foreground/70 flex items-center gap-2 italic">
+                <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
                 and {selectedItems.length - 3} more items...
               </li>
             </ul>
@@ -105,7 +115,7 @@ export function BulkMoveDialog({
         </div>
       )}
     </>
-  );
+  )
 
   if (isMobile) {
     return (
@@ -119,30 +129,28 @@ export function BulkMoveDialog({
                 </div>
                 <div>
                   <div className="text-lg font-semibold">Move Items</div>
-                  <div className="text-sm font-normal text-muted-foreground">
+                  <div className="text-muted-foreground text-sm font-normal">
                     Bulk move operation
                   </div>
                 </div>
               </BottomSheetTitle>
             </BottomSheetHeader>
 
-            <div className="px-4 pb-4 space-y-4">
-              {renderContent()}
-            </div>
+            <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
-            <BottomSheetFooter className={cn("grid gap-4")}>
-              <Button 
-                variant="outline" 
-                onClick={onClose} 
-                className={cn("touch-target min-h-[44px] active:scale-95")}
+            <BottomSheetFooter className={cn('grid gap-4')}>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className={cn('touch-target min-h-[44px] active:scale-95')}
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 onClick={() => setIsMoveDialogOpen(true)}
-                className={cn("touch-target min-h-[44px] active:scale-95")}
+                className={cn('touch-target min-h-[44px] active:scale-95')}
               >
-                <Move className="h-4 w-4 mr-2" />
+                <Move className="mr-2 h-4 w-4" />
                 Choose Destination
               </Button>
             </BottomSheetFooter>
@@ -154,10 +162,12 @@ export function BulkMoveDialog({
           onClose={() => setIsMoveDialogOpen(false)}
           fileName={`${selectedItems.length} items`}
           currentParentId={null}
-          onMove={async (newParentId: string) => { handleMoveConfirm(newParentId); }}
+          onMove={async (newParentId: string) => {
+            handleMoveConfirm(newParentId)
+          }}
         />
       </>
-    );
+    )
   }
 
   return (
@@ -171,24 +181,32 @@ export function BulkMoveDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Move Items</div>
-                <div className="text-sm font-normal text-muted-foreground">
+                <div className="text-muted-foreground text-sm font-normal">
                   Bulk move operation
                 </div>
               </div>
             </DialogTitle>
             <DialogDescription className="space-y-4 pt-2">
               <div className="text-base">
-                You are about to move <span className="font-semibold">{selectedItems.length}</span> item{selectedItems.length > 1 ? 's' : ''} to a new location.
+                You are about to move{' '}
+                <span className="font-semibold">{selectedItems.length}</span>{' '}
+                item{selectedItems.length > 1 ? 's' : ''} to a new location.
               </div>
-              
+
               <div className="flex flex-wrap gap-2">
                 {fileCount > 0 && (
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                  <Badge
+                    variant="secondary"
+                    className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+                  >
                     {fileCount} file{fileCount > 1 ? 's' : ''}
                   </Badge>
                 )}
                 {folderCount > 0 && (
-                  <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+                  <Badge
+                    variant="secondary"
+                    className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
+                  >
                     {folderCount} folder{folderCount > 1 ? 's' : ''}
                   </Badge>
                 )}
@@ -196,12 +214,17 @@ export function BulkMoveDialog({
 
               {selectedItems.length <= 5 ? (
                 <div className="space-y-2">
-                  <div className="text-sm font-semibold">Items to be moved:</div>
-                  <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 dark:bg-slate-900/50 p-3">
-                    <ul className="text-sm space-y-1">
+                  <div className="text-sm font-semibold">
+                    Items to be moved:
+                  </div>
+                  <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+                    <ul className="space-y-1 text-sm">
                       {selectedItems.map((item) => (
-                        <li key={item.id} className="flex items-center gap-2 truncate">
-                          <div className="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                        <li
+                          key={item.id}
+                          className="flex items-center gap-2 truncate"
+                        >
+                          <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                           <span className="truncate">{item.name}</span>
                         </li>
                       ))}
@@ -210,17 +233,22 @@ export function BulkMoveDialog({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="text-sm font-semibold">Preview (first 3 items):</div>
-                  <div className="rounded-md bg-slate-50 dark:bg-slate-900/50 p-3">
-                    <ul className="text-sm space-y-1">
+                  <div className="text-sm font-semibold">
+                    Preview (first 3 items):
+                  </div>
+                  <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+                    <ul className="space-y-1 text-sm">
                       {selectedItems.slice(0, 3).map((item) => (
-                        <li key={item.id} className="flex items-center gap-2 truncate">
-                          <div className="h-1.5 w-1.5 rounded-full bg-slate-400 flex-shrink-0" />
+                        <li
+                          key={item.id}
+                          className="flex items-center gap-2 truncate"
+                        >
+                          <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                           <span className="truncate">{item.name}</span>
                         </li>
                       ))}
-                      <li className="flex items-center gap-2 text-muted-foreground/70 italic">
-                        <div className="h-1.5 w-1.5 rounded-full bg-slate-300 flex-shrink-0" />
+                      <li className="text-muted-foreground/70 flex items-center gap-2 italic">
+                        <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
                         and {selectedItems.length - 3} more items...
                       </li>
                     </ul>
@@ -228,23 +256,28 @@ export function BulkMoveDialog({
                 </div>
               )}
 
-              <div className="flex items-start gap-2 rounded-lg bg-blue-50 dark:bg-blue-950/20 p-3 border border-blue-200 dark:border-blue-800">
-                <div className="h-4 w-4 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
+                <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-500">
                   <div className="h-1.5 w-1.5 rounded-full bg-white" />
                 </div>
                 <div className="text-sm text-blue-800 dark:text-blue-200">
-                  Click "Choose Destination" to select where you want to move these items.
+                  Click "Choose Destination" to select where you want to move
+                  these items.
                 </div>
               </div>
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="w-full sm:w-auto"
+            >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={() => setIsMoveDialogOpen(true)}
-              className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-800"
+              className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
             >
               Choose Destination
             </Button>
@@ -255,10 +288,12 @@ export function BulkMoveDialog({
       <FileMoveDialog
         isOpen={isMoveDialogOpen}
         onClose={() => setIsMoveDialogOpen(false)}
-        onMove={async (newParentId: string) => { handleMoveConfirm(newParentId); }}
+        onMove={async (newParentId: string) => {
+          handleMoveConfirm(newParentId)
+        }}
         fileName={`${selectedItems.length} items`}
         currentParentId={null}
       />
     </>
-  );
+  )
 }
