@@ -405,12 +405,16 @@ export function DriveManager() {
         if (!folderId && folderId !== '')
           folderId = currentFolderId || undefined
 
-        // Create a unique key for the request including filters
+        // Create a unique key for the request including all filters
         const filterKey = JSON.stringify({
           view: filters.activeView,
           types: filters.fileTypeFilter,
           sort: filters.advancedFilters.sortBy,
-          order: filters.advancedFilters.sortOrder
+          order: filters.advancedFilters.sortOrder,
+          size: filters.advancedFilters.sizeRange,
+          created: filters.advancedFilters.createdDateRange,
+          modified: filters.advancedFilters.modifiedDateRange,
+          owner: filters.advancedFilters.owner
         })
         
         const callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
@@ -426,7 +430,11 @@ export function DriveManager() {
           view: filters.activeView,
           types: filters.fileTypeFilter,
           sort: filters.advancedFilters.sortBy,
-          order: filters.advancedFilters.sortOrder
+          order: filters.advancedFilters.sortOrder,
+          size: filters.advancedFilters.sizeRange,
+          created: filters.advancedFilters.createdDateRange,
+          modified: filters.advancedFilters.modifiedDateRange,
+          owner: filters.advancedFilters.owner
         })
         if (currentFiltersKey !== lastFiltersRef.current && pageToken) {
           return
@@ -455,6 +463,36 @@ export function DriveManager() {
         }
         params.append('sortBy', filters.advancedFilters.sortBy || 'modified')
         params.append('sortOrder', filters.advancedFilters.sortOrder || 'desc')
+
+        // Add size filter parameters
+        if (filters.advancedFilters.sizeRange?.min !== undefined && filters.advancedFilters.sizeRange.min > 0) {
+          params.append('minSize', filters.advancedFilters.sizeRange.min.toString())
+        }
+        if (filters.advancedFilters.sizeRange?.max !== undefined && filters.advancedFilters.sizeRange.max > 0) {
+          params.append('maxSize', filters.advancedFilters.sizeRange.max.toString())
+        }
+        if (filters.advancedFilters.sizeRange?.unit) {
+          params.append('sizeUnit', filters.advancedFilters.sizeRange.unit)
+        }
+
+        // Add date range filters
+        if (filters.advancedFilters.createdDateRange?.from) {
+          params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
+        }
+        if (filters.advancedFilters.createdDateRange?.to) {
+          params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
+        }
+        if (filters.advancedFilters.modifiedDateRange?.from) {
+          params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
+        }
+        if (filters.advancedFilters.modifiedDateRange?.to) {
+          params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
+        }
+
+        // Add owner filter
+        if (filters.advancedFilters.owner && filters.advancedFilters.owner.trim()) {
+          params.append('owner', filters.advancedFilters.owner.trim())
+        }
 
         console.log('Filter Debug - Frontend:', {
           currentFilters: filters,

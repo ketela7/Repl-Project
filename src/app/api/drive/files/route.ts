@@ -11,11 +11,28 @@ interface FileFilter {
   search?: string
   minSize?: number
   maxSize?: number
+  sizeUnit?: string
   createdAfter?: string
   createdBefore?: string
   modifiedAfter?: string
   modifiedBefore?: string
   owner?: string
+}
+
+// Convert size with unit to bytes for Google Drive API
+function convertSizeToBytes(size: number, unit: string): number {
+  switch (unit.toUpperCase()) {
+    case 'B':
+      return size
+    case 'KB':
+      return size * 1024
+    case 'MB':
+      return size * 1024 * 1024
+    case 'GB':
+      return size * 1024 * 1024 * 1024
+    default:
+      return size * 1024 * 1024 // Default to MB
+  }
 }
 
 function buildDriveQuery(filters: FileFilter): string {
@@ -348,34 +365,38 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  // Size filter - only apply to files, not folders
-  if (filters.minSize || filters.maxSize) {
-    const fileSizeConditions = []
-    if (filters.minSize) {
-      fileSizeConditions.push(`size >= ${filters.minSize}`)
-    }
-    if (filters.maxSize) {
-      fileSizeConditions.push(`size <= ${filters.maxSize}`)
-    }
+  // Size filters - Convert to bytes for Google Drive API
+  const fileSizeConditions: string[] = []
+  const sizeUnit = filters.sizeUnit || 'MB'
+  
+  if (filters.minSize !== undefined && filters.minSize > 0) {
+    const minSizeBytes = convertSizeToBytes(filters.minSize, sizeUnit)
+    fileSizeConditions.push(`size >= ${minSizeBytes}`)
+  }
+  if (filters.maxSize !== undefined && filters.maxSize > 0) {
+    const maxSizeBytes = convertSizeToBytes(filters.maxSize, sizeUnit)
+    fileSizeConditions.push(`size <= ${maxSizeBytes}`)
+  }
 
-    // Check if folders are included in file type filter
-    const includesFolders =
-      filters.fileType &&
-      filters.fileType !== 'all' &&
-      (filters.fileType.includes('folder') || filters.fileType === 'folder')
+  // Apply size filters only to files (not folders)
+  if (fileSizeConditions.length > 0) {
+    // Check if folder filter is active
+    const includesFolders = filters.fileType?.includes('folder') || 
+                           !filters.fileType || 
+                           filters.fileType.length === 0
 
-    if (fileSizeConditions.length > 0) {
-      if (includesFolders) {
-        // If folders are requested, create OR condition: (size filters for files) OR (folders)
-        conditions.push(
-          `(((${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder') or mimeType = 'application/vnd.google-apps.folder')`
-        )
-      } else {
-        // If no folders requested, just apply size filters normally
-        conditions.push(fileSizeConditions.join(' and '))
-      }
+    if (includesFolders) {
+      // Include folders OR files matching size criteria
+      conditions.push(
+        `((${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder') or mimeType = 'application/vnd.google-apps.folder'`
+      )
+    } else {
+      // Just apply size filters to files (exclude folders)
+      conditions.push(`(${fileSizeConditions.join(' and ')}) and not mimeType = 'application/vnd.google-apps.folder'`)
     }
   }
+
+
 
   return conditions.join(' and ')
 }
@@ -415,6 +436,7 @@ export async function GET(request: NextRequest) {
       search: searchParams.get('search') || null,
       minSize: searchParams.get('minSize') || null,
       maxSize: searchParams.get('maxSize') || null,
+      sizeUnit: searchParams.get('sizeUnit') || 'MB',
       createdAfter: searchParams.get('createdAfter') || null,
       createdBefore: searchParams.get('createdBefore') || null,
       modifiedAfter: searchParams.get('modifiedAfter') || null,
@@ -437,6 +459,7 @@ export async function GET(request: NextRequest) {
     search: searchParams.get('search') || undefined,
     minSize: Number(searchParams.get('minSize')) || undefined,
     maxSize: Number(searchParams.get('maxSize')) || undefined,
+    sizeUnit: searchParams.get('sizeUnit') || 'MB',
     createdAfter: searchParams.get('createdAfter') || undefined,
     createdBefore: searchParams.get('createdBefore') || undefined,
     modifiedAfter: searchParams.get('modifiedAfter') || undefined,
