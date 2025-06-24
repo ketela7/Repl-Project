@@ -1,23 +1,23 @@
 'use client'
 
 import { Suspense, useMemo, useCallback, useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Button } from '@/shared/components/ui/button'
+import { Badge } from '@/shared/components/ui/badge'
+import { Input } from '@/shared/components/ui/input'
+import { Separator } from '@/shared/components/ui/separator'
+import { Checkbox } from '@/shared/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+} from '@/shared/components/ui/dropdown-menu'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+} from '@/shared/components/ui/collapsible'
 import {
   Search,
   List,
@@ -59,10 +59,10 @@ import {
   BookOpen,
   FileType,
 } from 'lucide-react'
-import { FileIcon } from '@/components/file-icon'
-import { useIsMobile } from '@/hooks/use-mobile'
-import { FileCategoryBadges } from '@/components/file-category-badges'
-import { successToast, infoToast } from '@/lib/toast'
+import { FileIcon } from '@/shared/components/file-icon'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { FileCategoryBadges } from '@/shared/components/file-category-badges'
+import { successToast, infoToast } from '@/shared/utils'
 
 // Types
 interface DriveFile {

@@ -1,14 +1,14 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { AuthWrapper } from '@/components/auth/auth-wrapper'
+import { AuthWrapper } from '@/features/auth/components/auth-wrapper'
 import { AppSidebar } from '@/app/(main)/dashboard/_components/sidebar/app-sidebar'
-import { Separator } from '@/components/ui/separator'
+import { Separator } from '@/shared/components/ui/separator'
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from '@/components/ui/sidebar'
+} from '@/shared/components/ui/sidebar'
 import { ThemeSwitcher } from './_components/sidebar/theme-switcher'
 
 export default function Layout({

@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/shared/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -15,10 +15,10 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { useIsMobile } from '@/hooks/use-mobile'
+} from '@/shared/components/ui/bottom-sheet'
+import { Button } from '@/shared/components/ui/button'
+import { Badge } from '@/shared/components/ui/badge'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   Trash2,
   Download,
@@ -28,7 +28,7 @@ import {
   Edit,
   FolderOpen,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/utils'
 
 interface FileBulkOperationsDialogProps {
   isOpen: boolean

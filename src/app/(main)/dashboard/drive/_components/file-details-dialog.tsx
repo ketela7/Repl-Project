@@ -6,11 +6,11 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
+} from '@/shared/components/ui/dialog'
+import { Badge } from '@/shared/components/ui/badge'
+import { Button } from '@/shared/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar'
+import { Separator } from '@/shared/components/ui/separator'
 import {
   FileText,
   Folder,
@@ -47,10 +47,10 @@ import {
 } from 'lucide-react'
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 import { formatFileSize, formatDriveFileDate } from '@/lib/google-drive/utils'
-import { formatFileTime, formatCreationTime } from '@/lib/timezone'
-import { FileIcon } from '@/components/file-icon'
+import { formatFileTime, formatCreationTime } from '@/shared/utils'
+import { FileIcon } from '@/shared/components/file-icon'
 import { toast } from 'sonner'
-import { getInitials } from '@/lib/utils'
+import { getInitials } from '@/shared/utils'
 
 // Global cache and request tracking for file details
 const fileDetailsCache = new Map<string, DetailedFileInfo>()

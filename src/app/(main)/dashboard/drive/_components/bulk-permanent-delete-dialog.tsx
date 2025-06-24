@@ -10,7 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+} from '@/shared/components/ui/alert-dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -18,15 +18,15 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { useIsMobile } from '@/hooks/use-mobile'
+} from '@/shared/components/ui/bottom-sheet'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import { Badge } from '@/shared/components/ui/badge'
+import { Button } from '@/shared/components/ui/button'
+import { Checkbox } from '@/shared/components/ui/checkbox'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { Trash2, AlertTriangle, Shield, Clock } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/utils'
 
 interface BulkPermanentDeleteDialogProps {
   isOpen: boolean

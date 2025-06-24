@@ -2,20 +2,20 @@ import { ReactNode } from 'react'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
-import { CustomThemeProvider } from '@/components/providers/theme-provider'
-import { Toaster } from '@/components/ui/sonner'
-import { AuthProvider } from '@/components/providers/auth-provider'
-import { TimezoneProvider } from '@/components/timezone-provider'
-import { ErrorBoundary } from '@/components/error-boundary'
-import { APP_CONFIG } from '@/config/app-config'
+import { CustomThemeProvider } from '@/shared/components/providers/theme-provider'
+import { Toaster } from '@/shared/components/ui/sonner'
+import { AuthProvider } from '@/shared/components/providers/auth-provider'
+import { TimezoneProvider } from '@/shared/components/timezone-provider'
+import { ErrorBoundary } from '@/shared/components/error-boundary'
+import { APP_CONFIG } from '@/shared/constants/app-constants'
 
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: APP_CONFIG.meta.title,
-  description: APP_CONFIG.meta.description,
+  title: "Google Drive Pro - Professional Drive Management",
+  description: "Advanced Google Drive management application with enterprise features",
   keywords: [
     'Professional Google Drive',
     'Enterprise File Management',
@@ -36,14 +36,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://professional-drive-manager.replit.app',
-    title: APP_CONFIG.meta.title,
-    description: APP_CONFIG.meta.description,
+    title: "Google Drive Pro",
+    description: "Professional Google Drive Management",
     siteName: APP_CONFIG.name,
   },
   twitter: {
     card: 'summary_large_image',
-    title: APP_CONFIG.meta.title,
-    description: APP_CONFIG.meta.description,
+    title: "Google Drive Pro",
+    description: "Professional Google Drive Management",
   },
   icons: {
     icon: [

@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/shared/components/ui/skeleton";
 
 // Drive-specific toolbar skeleton for consistent loading states
 export function DriveToolbarSkeleton() {

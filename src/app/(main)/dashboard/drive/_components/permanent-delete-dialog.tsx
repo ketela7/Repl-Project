@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/shared/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/shared/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -17,11 +17,11 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
-import { useIsMobile } from '@/hooks/use-mobile'
+} from '@/shared/components/ui/bottom-sheet'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/utils'
 
 interface PermanentDeleteDialogProps {
   open: boolean

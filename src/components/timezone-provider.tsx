@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useTimezone } from '@/hooks/use-timezone';
+import { useTimezone } from '@/shared/hooks/use-timezone';
 
 interface TimezoneContextType {
   timezone: string;

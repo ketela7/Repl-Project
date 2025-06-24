@@ -33,6 +33,12 @@ export { DataTable } from './components/data-table/data-table';
 export { dragColumn as DragColumn } from './components/data-table/drag-column';
 export { DraggableRow } from './components/data-table/draggable-row';
 
+// Lazy Imports
+export * from './components/lazy-imports';
+
+// Loading Optimization
+export { LoadingOptimization } from './components/loading-optimization';
+
 // Common Hooks
 export { useIsMobile } from './hooks/use-mobile';
 export { useDebouncedValue } from './hooks/use-debounced-value';

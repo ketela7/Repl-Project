@@ -2,8 +2,8 @@
 
 import React, { Component, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw, Home, Wifi } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/shared/components/ui/card'
 import { errorHandler, type DriveError } from '@/lib/enhanced-error-handler'
 
 interface Props {

@@ -1,20 +1,20 @@
 'use client'
 
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
+import { Card, CardContent } from '@/shared/components/ui/card'
+import { Button } from '@/shared/components/ui/button'
+import { Checkbox } from '@/shared/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { FileIcon } from '@/components/file-icon'
-import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
+} from '@/shared/components/ui/dropdown-menu'
+import { FileIcon } from '@/shared/components/file-icon'
+import { FileThumbnailPreview } from '@/shared/components/ui/file-thumbnail-preview'
 import { DriveGridSkeleton } from './drive-skeleton'
-import { useTimezone } from '@/hooks/use-timezone'
-import { formatFileTime } from '@/lib/timezone'
+import { useTimezone } from '@/shared/hooks/use-timezone'
+import { formatFileTime } from '@/shared/utils'
 import {
   MoreVertical,
   Eye,
@@ -33,7 +33,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
+} from '@/shared/components/ui/table'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import type { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 

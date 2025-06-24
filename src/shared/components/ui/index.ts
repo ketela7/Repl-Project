@@ -48,18 +48,30 @@ export {
   SelectLabel,
   SelectItem,
   SelectSeparator,
-  SelectScrollUpButton,
-  SelectScrollDownButton,
 } from './select';
 export { Checkbox } from './checkbox';
 export { Switch } from './switch';
-export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from './tabs';
 export {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
   TooltipProvider,
 } from './tooltip';
+export {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetDescription,
+  BottomSheetFooter,
+} from './bottom-sheet';
+export { SimpleDatePicker } from './simple-date-picker';
 export {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -103,3 +115,4 @@ export {
   TableCell,
   TableCaption,
 } from './table';
+export { FileThumbnailPreview } from './file-thumbnail-preview';

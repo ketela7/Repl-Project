@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getUserTimezone, initializeTimezone } from '@/lib/timezone';
+import { getUserTimezone, initializeTimezone } from '@/shared/utils';
 
 export function useTimezone() {
   const [timezone, setTimezone] = useState<string>('UTC');

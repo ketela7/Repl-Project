@@ -6,8 +6,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+} from '@/shared/components/ui/dialog'
+import { Button } from '@/shared/components/ui/button'
 import {
   X,
   Download,
@@ -29,7 +29,7 @@ import {
   isDocumentFile,
   formatFileSize,
 } from '@/lib/google-drive/utils'
-import { successToast, errorToast, toastUtils } from '@/lib/toast'
+import { successToast, errorToast, toastUtils } from '@/shared/utils'
 
 interface FilePreviewDialogProps {
   open: boolean

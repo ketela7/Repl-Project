@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import { errorToast, loadingToast } from '@/lib/toast'
+import { Button } from '@/shared/components/ui/button'
+import { cn } from '@/shared/utils'
+import { errorToast, loadingToast } from '@/shared/utils'
 
 interface GoogleAuthButtonProps {
   className?: string

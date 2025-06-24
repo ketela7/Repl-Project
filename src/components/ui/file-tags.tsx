@@ -4,7 +4,7 @@ import { Badge } from './badge';
 import { Button } from './button';
 import { Input } from './input';
 import { X, Plus, Tag, Sparkles } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/utils';
 
 interface FileTagsProps {
   autoTags?: string[];

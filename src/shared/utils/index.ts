@@ -1,10 +1,25 @@
-/**
- * Shared Utilities - Common utility functions
- */
-
+// Re-export from cn.ts for compatibility
 export { cn } from './cn';
-export * from './formatting';
-export * from './validation';
-export * from './file-utils';
-export * from './date-utils';
-export * from './string-utils';
+
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export const getInitials = (str: string): string => {
+  if (typeof str !== "string" || !str.trim()) return "?";
+
+  return (
+    str
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase() || "?"
+  );
+};
+
+// Toast utilities
+export * from './toast';
+
+// Timezone utilities
+export * from './timezone';

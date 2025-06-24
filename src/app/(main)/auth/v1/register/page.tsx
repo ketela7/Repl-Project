@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { Command } from 'lucide-react'
 
-import { Button } from '@/components/ui/button'
+import { Button } from '@/shared/components/ui/button'
 
 import { RegisterFormV1 } from './_components/register-form'
 

@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
+} from '@/shared/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -16,13 +16,13 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { useIsMobile } from '@/hooks/use-mobile'
+} from '@/shared/components/ui/bottom-sheet'
+import { Button } from '@/shared/components/ui/button'
+import { Input } from '@/shared/components/ui/input'
+import { Label } from '@/shared/components/ui/label'
+import { Badge } from '@/shared/components/ui/badge'
+import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   Edit3,
   Hash,
@@ -33,7 +33,7 @@ import {
   Code2,
   HelpCircle,
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/utils'
 
 interface BulkRenameDialogProps {
   isOpen: boolean

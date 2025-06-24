@@ -8,21 +8,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/components/ui/button'
+} from '@/shared/components/ui/table'
+import { Checkbox } from '@/shared/components/ui/checkbox'
+import { Button } from '@/shared/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { FileIcon } from '@/components/file-icon'
-import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
+} from '@/shared/components/ui/dropdown-menu'
+import { FileIcon } from '@/shared/components/file-icon'
+import { FileThumbnailPreview } from '@/shared/components/ui/file-thumbnail-preview'
 import { formatFileSize, formatDriveFileDate } from '@/lib/google-drive/utils'
-import { formatFileTime } from '@/lib/timezone'
-import { useTimezoneContext } from '@/components/timezone-provider'
+import { formatFileTime } from '@/shared/utils'
+import { useTimezoneContext } from '@/shared/components/timezone-provider'
 import {
   MoreVertical,
   Download,

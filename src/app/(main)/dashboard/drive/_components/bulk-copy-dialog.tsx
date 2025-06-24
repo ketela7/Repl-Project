@@ -8,20 +8,20 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { useIsMobile } from '@/hooks/use-mobile'
+} from '@/shared/components/ui/dialog'
+import { Button } from '@/shared/components/ui/button'
+import { Badge } from '@/shared/components/ui/badge'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   BottomSheet,
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+} from '@/shared/components/ui/bottom-sheet'
 import { Copy, AlertTriangle } from 'lucide-react'
 import { FileCopyDialog } from './file-copy-dialog'
-import { cn } from '@/lib/utils'
+import { cn } from '@/shared/utils'
 
 interface BulkCopyDialogProps {
   isOpen: boolean

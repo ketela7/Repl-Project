@@ -6,16 +6,16 @@ import { ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw } from 'lucide-react'
 // Import from utils
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 import { normalizeFileSize } from '@/lib/google-drive/utils'
-import { successToast, errorToast, infoToast } from '@/lib/toast'
-import { useIsMobile } from '@/hooks/use-mobile'
-import { useTimezoneContext } from '@/components/timezone-provider'
+import { successToast, errorToast, infoToast } from '@/shared/utils'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useTimezoneContext } from '@/shared/components/timezone-provider'
 import { PerformanceMonitor } from './performance-monitor'
 
 // Component imports - Use dynamic imports for heavy dialogs
 import { FileBreadcrumb } from './file-breadcrumb'
 import { DriveConnectionCard } from './drive-connection-card'
 import { DriveGridSkeleton } from './drive-skeleton'
-import { Progress } from '@/components/ui/progress'
+import { Progress } from '@/shared/components/ui/progress'
 
 // Component imports
 import { FileUploadDialog } from './file-upload-dialog'
@@ -35,8 +35,8 @@ import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet'
 import { FiltersDialog } from './filters-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
-import { DriveErrorDisplay } from '@/components/drive-error-display'
-import { DrivePermissionRequired } from '@/components/drive-permission-required'
+import { DriveErrorDisplay } from '@/shared/components/drive-error-display'
+import { DrivePermissionRequired } from '@/shared/components/drive-permission-required'
 
 // Unified item type
 type DriveItem = (DriveFile | DriveFolder) & {
@@ -751,7 +751,7 @@ export function DriveManager() {
             loading={loading}
             onClientSideFilter={handleClientSideFilter}
             onClearClientSideFilter={clearClientSideFilter}
-            isApplying={applyingFilters}
+            isApplying={false}
           />
 
           {currentFolderId && (

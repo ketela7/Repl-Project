@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { AlertTriangle, RefreshCw, Settings, Wifi, Lock, HardDrive, FileX, Clock } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/shared/components/ui/button';
+import { Alert, AlertDescription } from '@/shared/components/ui/alert';
+import { Badge } from '@/shared/components/ui/badge';
+import { Card, CardContent } from '@/shared/components/ui/card';
 
 interface DriveErrorDisplayProps {
   error: any;
