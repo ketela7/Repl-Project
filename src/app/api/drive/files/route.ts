@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
+import { getCachedSession } from '@/lib/session-cache'
 import { GoogleDriveService } from '@/lib/google-drive/service'
 import { driveCache } from '@/lib/cache'
 import { requestDeduplicator } from '@/lib/request-deduplication'
@@ -402,262 +402,55 @@ function getSortKey(sortBy: string) {
 }
 
 export async function GET(request: NextRequest) {
-  return await withErrorHandling(async () => {
-    const session = await auth()
+  const session = await getCachedSession()
+  
+  if (!session?.accessToken) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  const { searchParams } = new URL(request.url)
 
-    const user = session.user
-    if (process.env.NODE_ENV === 'development') {
-    }
+  const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
+  const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc'
+  
+  const filters: FileFilter = {
+    fileType: searchParams.get('fileType') || 'all',
+    viewStatus: searchParams.get('viewStatus') || 'all', 
+    sortBy: searchParams.get('sortBy') || 'modifiedTime',
+    sortOrder,
+    search: searchParams.get('search') || undefined,
+  }
 
-    const accessToken = session.accessToken
+  const pageToken = searchParams.get('pageToken') || undefined
+  const folderId = searchParams.get('folderId') || 'root'
 
-    if (!accessToken) {
-      if (process.env.NODE_ENV === 'development') {
-      }
-      return NextResponse.json(
-        {
-          error: 'No access token found',
-          needsReauth: true,
-        },
-        { status: 401 }
-      )
-    }
+  const cacheKey = driveCache.generateDriveKey({
+    folderId,
+    userId: session.user?.email || '',
+    pageToken,
+    pageSize,
+    filters,
+  })
 
-    if (process.env.NODE_ENV === 'development') {
-    }
+  const cachedData = driveCache.get(cacheKey)
+  if (cachedData) {
+    return NextResponse.json(cachedData)
+  }
 
-    const { searchParams } = new URL(request.url)
+  const query = buildDriveQuery(filters)
+  const orderBy = `${filters.sortBy} ${filters.sortOrder}`
 
-    // Parse and validate query parameters
-    const pageSize = Math.min(
-      Math.max(parseInt(searchParams.get('pageSize') || '50'), 1),
-      1000
-    )
-    const sortOrder = searchParams.get('sortOrder')
-    const validateSortOrder = (order: string | null): 'asc' | 'desc' => {
-      return order === 'asc' || order === 'desc' ? order : 'desc'
-    }
+  const driveService = new GoogleDriveService(session.accessToken)
+  
+  const result = await driveService.listFiles({
+    folderId,
+    query,
+    pageToken,
+    pageSize,
+    orderBy,
+  })
 
-    const filters: FileFilter = {
-      fileType:
-        searchParams.get('fileTypes') || searchParams.get('fileType') || 'all',
-      viewStatus:
-        searchParams.get('viewStatus') || searchParams.get('view') || 'all',
-      sortBy: searchParams.get('sortBy') || 'modified',
-      sortOrder: validateSortOrder(sortOrder),
-      search:
-        searchParams.get('search') || searchParams.get('query') || undefined,
-      minSize:
-        searchParams.get('sizeMin') || searchParams.get('minSize')
-          ? Math.max(
-              parseInt(
-                searchParams.get('sizeMin') || searchParams.get('minSize')!
-              ) || 0,
-              0
-            )
-          : undefined,
-      maxSize:
-        searchParams.get('sizeMax') || searchParams.get('maxSize')
-          ? Math.max(
-              parseInt(
-                searchParams.get('sizeMax') || searchParams.get('maxSize')!
-              ) || 0,
-              0
-            )
-          : undefined,
-      createdAfter: searchParams.get('createdAfter') || undefined,
-      createdBefore: searchParams.get('createdBefore') || undefined,
-      modifiedAfter: searchParams.get('modifiedAfter') || undefined,
-      modifiedBefore: searchParams.get('modifiedBefore') || undefined,
-      owner: searchParams.get('owner') || undefined,
-    }
-
-    // Properly decode pageToken to handle URL encoding issues
-    let pageToken = searchParams.get('pageToken') || undefined
-    if (pageToken) {
-      try {
-        // Handle double-encoded pageTokens
-        let decodedToken = pageToken
-
-        // Keep decoding until we get a stable result or hit limit
-        let attempts = 0
-        while (decodedToken.includes('%') && attempts < 3) {
-          const previousToken = decodedToken
-          decodedToken = decodeURIComponent(decodedToken)
-          attempts++
-
-          // If decoding doesn't change the token, we're done
-          if (previousToken === decodedToken) {
-            break
-          }
-        }
-
-        pageToken = decodedToken
-
-        // Validate the final pageToken
-        if (pageToken.length > 1000 || /[<>{}\\|\s]/.test(pageToken)) {
-          pageToken = undefined
-        }
-      } catch (error) {
-        pageToken = undefined
-      }
-    }
-
-    const folderId =
-      searchParams.get('folderId') || searchParams.get('parentId') || undefined
-
-    if (process.env.NODE_ENV === 'development') {
-    }
-
-    // Check cache first - include viewStatus in cache key for proper filtering
-    const cacheKey = driveCache.generateDriveKey({
-      pageToken,
-      parentId: folderId,
-      userId: user.email || 'unknown',
-      viewStatus: filters.viewStatus,
-      fileType: filters.fileType,
-      search: filters.search,
-    })
-
-    // Build the Drive API query using the consolidated function
-    let driveQuery = buildDriveQuery(filters)
-
-    // Add parent folder constraint if needed
-    if (folderId) {
-      // When navigating into a specific folder, show its contents regardless of view
-      driveQuery = 'trashed=false' // Reset query for folder contents
-      driveQuery += ` and '${folderId}' in parents`
-    } // else if (!folderId && !filters.search) {
-    // For special views (starred, shared, trash), don't add parent restrictions
-    //  if (filters.viewStatus === 'my-drive') {
-    //    driveQuery += " and 'root' in parents";
-    //  }
-    // For starred, shared, trash views - no parent restriction needed
-    //   }
-    // For "All Files" view (when viewStatus is 'all' or not specified), show everything without parent restriction
-
-    if (process.env.NODE_ENV === 'development') {
-    }
-
-    // Get sort configuration
-    const sortKey = getSortKey(filters.sortBy || 'modified')
-    const orderBy =
-      filters.viewStatus === 'recent'
-        ? 'viewedByMeTime desc, modifiedTime desc'
-        : `${sortKey} ${filters.sortOrder}`
-
-    if (process.env.NODE_ENV === 'development') {
-    }
-
-    // Generate deduplication key to prevent multiple identical requests
-    const deduplicationKey = requestDeduplicator.generateDriveFilesKey({
-      userId: user.email!,
-      pageSize,
-      fileType: filters.fileType,
-      viewStatus: filters.viewStatus,
-      sortBy: filters.sortBy,
-      sortOrder: filters.sortOrder,
-      search: filters.search,
-      folderId: folderId,
-      pageToken: pageToken,
-    })
-
-    {
-      /*// Use search optimization for search queries
-                if (filters.search) {
-      const searchResult = await searchOptimizer.optimizedSearch(
-        filters.search,
-        user.email!,
-        async () => {
-          const driveService = new GoogleDriveService(accessToken)
-          return await retryDriveApiCall(
-            () =>
-              driveService.listFiles({
-                query: driveQuery,
-                orderBy,
-                pageSize,
-                pageToken,
-                parentId: folderId,
-              }),
-            `Drive API search for "${filters.search}" for user ${user.email}${folderId ? ` in folder ${folderId}` : ''}`
-          )
-        },
-        folderId
-      )
-
-      // Apply client-side filters to search results
-      const filteredFiles = applyClientSideFilters(searchResult.files, filters)
-
-      if (process.env.NODE_ENV === 'development') {
-          `Search "${filters.search}": ${searchResult.files.length} -> ${filteredFiles.length} files after filtering`
-        )
-      }
-
-      return NextResponse.json({
-        files: filteredFiles,
-        nextPageToken: searchResult.nextPageToken,
-        totalCount: filteredFiles.length,
-      })
-    }
-                */
-    }
-    // Check cache first - before deduplication
-    const cachedData = driveCache.get(cacheKey)
-    if (cachedData) {
-      if (process.env.NODE_ENV === 'development') {
-      }
-
-      // Direct API filtering from cache
-
-
-      return NextResponse.json({
-        files: (cachedData as any)?.files || [],
-        nextPageToken: (cachedData as any)?.nextPageToken,
-        totalCount: (cachedData as any)?.files?.length || 0,
-      })
-    }
-
-    // Use optimized API call with performance enhancements
-    const result = await apiCall(
-      deduplicationKey,
-      async () => {
-        const driveService = new GoogleDriveService(accessToken)
-
-        const apiResult = await retryDriveApiCall(
-          () =>
-            driveService.listFiles({
-              query: driveQuery,
-              orderBy,
-              pageSize,
-              pageToken,
-              parentId: folderId,
-            }),
-          `Drive API listFiles for user ${user.email}`
-        )
-
-        // Cache with extended TTL for better performance
-        driveCache.set(cacheKey, apiResult, 15) // Cache for 15 minutes
-
-        return apiResult
-      },
-      'high'
-    )
-
-    if (process.env.NODE_ENV === 'development') {
-    }
-
-    // Direct API filtering - no client-side processing needed
-    const finalResult = {
-      ...result,
-      files: result.files || [],
-    }
-
-
-
-    return NextResponse.json(finalResult)
-  }, 'drive-files-list', false)
+  driveCache.set(cacheKey, result, 15)
+  
+  return NextResponse.json(result)
 }
