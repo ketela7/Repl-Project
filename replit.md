@@ -132,12 +132,13 @@ Preferred communication style: Simple, everyday language.
 - No NEXT_PUBLIC_ prefix - only use private secrets
 - Simple file naming without prefixes/suffixes (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
 - Always ensure project is clean when starting
-- Thorough testing before commits
-- Professional code quality standards
-- Well-structured project organization
+- Double check and retest code before commits - ensure follows project rules and works correctly
+- Always improve development process for faster completion
+- Professional code quality standards with rapid development
+- Well-structured project organization when safe and error-free
 - Real-time documentation updates (API docs, routes, project structure)
 - Update README.md for public understanding of changes
-- Work like professional coder with thorough planning
+- Work like professional coder with thorough planning and execution
 
 ## Recent Changes
 
@@ -146,8 +147,10 @@ Preferred communication style: Simple, everyday language.
 - June 24, 2025: Simplified file naming (removed "optimized" prefix from theme provider)
 - June 24, 2025: Created comprehensive API documentation with real-time updates
 - June 24, 2025: Updated project structure documentation with current architecture
+- June 24, 2025: Enhanced development rules - double check/retest code, rapid development process
+- June 24, 2025: Routes documentation added for complete API reference
 - June 24, 2025: All tests passing (76 test cases), TypeScript compilation successful
-- June 24, 2025: Project follows professional development standards with clean structure
+- June 24, 2025: Project follows professional development standards with clean structure and rapid development
 
 ## Changelog
 

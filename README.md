@@ -25,7 +25,8 @@ A comprehensive, enterprise-grade Google Drive management application built with
 - **Security**: Only private secrets, no NEXT_PUBLIC_ environment variables
 - **File Naming**: Simple naming without prefixes or suffixes (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
 - **Code Quality**: Clean project structure with comprehensive testing
-- **Professional Standards**: Thorough testing and validation before any commits
+- **Professional Standards**: Double check and retest code before commits, ensure follows project rules
+- **Rapid Development**: Improved development process for faster completion
 - **Documentation**: Real-time updates to API docs, routes, and project structure
 - **Clean Development**: Always ensure project is clean when starting work
 

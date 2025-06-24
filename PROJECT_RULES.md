@@ -157,13 +157,13 @@ npm run build        # Production build succeeds
 
 ### Quality Assurance
 - **Clean Project Start**: Always ensure project is clean when starting work
-- **Recheck & Retest**: Always verify code works before commit
-- **Professional Standards**: Work with professional coder discipline
+- **Double Check & Retest**: Double check and retest code before committing, ensure it follows project rules and works correctly
+- **Rapid Development**: Always improve development process for faster completion
+- **Professional Standards**: Work like a professional coder with thorough planning and execution
 - **No Errors**: Ensure zero errors in production-ready code
-- **Well Structured**: Maintain clean, organized project structure
+- **Well Structured**: Maintain clean, organized project structure only when safe
 - **Real-time Documentation**: Always update API documentation, routes, and project structure in real time
 - **README Updates**: Update README.md for any project changes to ensure public understanding
-- **Professional Work**: Work like a professional coder with thorough planning and execution
 
 ### Continuous Integration
 - **Automated Testing**: All tests must pass
