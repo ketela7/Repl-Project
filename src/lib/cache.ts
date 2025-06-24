@@ -11,7 +11,7 @@ interface CacheEntry<T> {
 
 class MemoryCache {
   private cache = new Map<string, CacheEntry<any>>();
-  private maxSize = 1000; // Increased cache size for better performance
+  private maxSize = 20000; // Increased cache size for better performance
 
   set<T>(key: string, data: T, ttlMinutes: number = 10): void { // Increased default TTL
     // Clean up old entries if cache is getting too large
@@ -92,41 +92,15 @@ class MemoryCache {
   // Generate cache key for Drive API requests
   generateDriveKey(params: {
     parentId?: string;
-    query?: string;
-    mimeType?: string;
-    pageToken?: string;
     userId: string;
-    viewStatus?: string;
-    fileType?: string;
-    search?: string;
-    pageSize?: number;
-    orderBy?: string;
-    sortBy?: string;
-    sortOrder?: string;
-    createdAfter?: string;
-    createdBefore?: string;
-    modifiedAfter?: string;
-    modifiedBefore?: string;
-    owner?: string;
+    pageToken?: string;
+    query?: string;
   }): string {
     const { 
-      parentId = 'root', 
-      query = '', 
-      mimeType = '', 
-      pageToken = '', 
+      parentId = 'root',
       userId,
-      viewStatus = 'all',
-      fileType = 'all',
-      search = '',
-      pageSize = 50,
-      orderBy = 'modified',
-      sortBy = 'modified',
-      sortOrder = 'desc',
-      createdAfter = '',
-      createdBefore = '',
-      modifiedAfter = '',
-      modifiedBefore = '',
-      owner = ''
+      pageToken = 'p1',
+      query = '',
     } = params;
     
     // Create a more comprehensive cache key with all filter parameters
@@ -134,21 +108,8 @@ class MemoryCache {
       'drive',
       userId,
       parentId,
-      viewStatus,
-      fileType,
-      search,
-      sortBy,
-      sortOrder,
-      pageSize,
-      pageToken || 'p1',
-      createdAfter,
-      createdBefore,
-      modifiedAfter,
-      modifiedBefore,
-      owner,
-      query,
-      mimeType,
-      orderBy
+      pageToken,
+      query
     ];
     
     // Join with ':' and remove empty parts to avoid unnecessary cache misses

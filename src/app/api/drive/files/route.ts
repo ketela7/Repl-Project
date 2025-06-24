@@ -9,12 +9,12 @@ interface FileFilter {
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
   search?: string
-
   createdAfter?: string
   createdBefore?: string
   modifiedAfter?: string
   modifiedBefore?: string
   owner?: string
+  size?: string
 }
 
 function buildDriveQuery(filters: FileFilter): string {
@@ -347,6 +347,8 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
+  //size on front-end ,client side to best result
+
   return conditions.join(' and ')
 }
 
@@ -368,6 +370,11 @@ function getSortKey(sortBy: string) {
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
+    
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[DRIVE API] - Session:', session)
+    }
+    
 
     if (!session?.accessToken) {
       return NextResponse.json(
@@ -396,45 +403,29 @@ export async function GET(request: NextRequest) {
       modifiedAfter: searchParams.get('modifiedAfter') || undefined,
       modifiedBefore: searchParams.get('modifiedBefore') || undefined,
       owner: searchParams.get('owner') || undefined,
-    }
-
-    const cacheKey = driveCache.generateDriveKey({
-      parentId: folderId,
-      userId: session.user?.email || '',
-      pageToken,
-      pageSize,
-      viewStatus: filters.viewStatus,
-      fileType: filters.fileType,
-      search: filters.search,
-      sortBy: filters.sortBy,
-      sortOrder: filters.sortOrder,
-      createdAfter: filters.createdAfter,
-      createdBefore: filters.createdBefore,
-      modifiedAfter: filters.modifiedAfter,
-      modifiedBefore: filters.modifiedBefore,
-      owner: filters.owner,
-      query,
-      orderBy
-    })
-
-    const cachedData = driveCache.get(cacheKey)
-    if (cachedData) {
-      console.log('✅ DRIVE API CACHE HIT - Cache Key:', cacheKey)
-      return NextResponse.json(cachedData)
+      size: searchParams.get('size') || undefined
     }
 
     const query = buildDriveQuery(filters)
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
 
-    const driveService = new GoogleDriveService(session.accessToken!)
-
-    console.log('🚀 DRIVE SERVICE - Initialized with token:', {
-      hasToken: Boolean(session.accessToken),
-      tokenLength: session.accessToken?.length || 0,
-      userId: session.user?.email,
+    const cacheKey = driveCache.generateDriveKey({
+      parentId: folderId,
+      userId: session.user?.email || '',
+      pageToken,
+      query: query,
     })
 
+    const cachedData = driveCache.get(cacheKey)
+    if (cachedData) {
+      console.log('[USING CACHE] - Key:', cacheKey)
+      return NextResponse.json(cachedData)
+    }
+
+    const driveService = new GoogleDriveService(session.accessToken!)
+
+    
     const result = await driveService.listFiles({
       parentId: folderId,
       query,

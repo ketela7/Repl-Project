@@ -118,15 +118,7 @@ export class GoogleDriveService {
       searchQuery = 'trashed=false';
     }
 
-    // Log query for debugging in development only
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Drive API Request:', {
-        q: searchQuery,
-        pageSize: validPageSize,
-        orderBy,
-        pageToken: validPageToken
-      });
-    }
+    
 
     // Prepare API request parameters with proper validation
     const requestParams: any = {
@@ -137,6 +129,11 @@ export class GoogleDriveService {
       supportsAllDrives: includeTeamDriveItems,
       fields: 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, ownedByMe, viewedByMeTime, capabilities, owners, viewedByMe)',
     };
+    // Log query for debugging in development only
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Drive API Query:', searchQuery)
+    }
+    
 
     // Only add pageToken if it's valid
     if (validPageToken) {
@@ -149,7 +146,7 @@ export class GoogleDriveService {
       const files = response.data.files?.map(convertGoogleDriveFile) || [];
 
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Drive API Success: Found ${files.length} files`);
+        console.log(`Drive API Result: ${files.length} items`);
       }
 
       return {

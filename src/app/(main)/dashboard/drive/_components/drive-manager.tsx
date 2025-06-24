@@ -228,24 +228,27 @@ export function DriveManager() {
     }
   }, [currentFolderId, searchQuery, filters])
 
-  const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
-    console.log('Filter Debug - handleFilter called:', {
-      newFilters,
-      currentFilters: filters
-    })
-    setFilters((prev) => {
-      const updated = {
-        ...prev,
-        ...newFilters,
-        advancedFilters: {
-          ...prev.advancedFilters,
-          ...newFilters.advancedFilters,
-        },
-      }
-      console.log('Filter Debug - updated filters:', updated)
-      return updated
-    })
-  }, [filters])
+  const handleFilter = useCallback(
+    (newFilters: Partial<typeof filters>) => {
+      console.log('Filter Debug - handleFilter called:', {
+        newFilters,
+        currentFilters: filters,
+      })
+      setFilters((prev) => {
+        const updated = {
+          ...prev,
+          ...newFilters,
+          advancedFilters: {
+            ...prev.advancedFilters,
+            ...newFilters.advancedFilters,
+          },
+        }
+        console.log('Filter Debug - updated filters:', updated)
+        return updated
+      })
+    },
+    [filters]
+  )
 
   // Check if any filters are active
   const hasActiveFilters: boolean =
@@ -339,14 +342,8 @@ export function DriveManager() {
           bValue = isFolder(b) ? 'folder' : (b.mimeType || '').toLowerCase()
           break
         case 'owners':
-          aValue = (
-            a.owners?.[0]?.emailAddress ||
-            ''
-          ).toLowerCase()
-          bValue = (
-            b.owners?.[0]?.emailAddress ||
-            ''
-          ).toLowerCase()
+          aValue = (a.owners?.[0]?.emailAddress || '').toLowerCase()
+          bValue = (b.owners?.[0]?.emailAddress || '').toLowerCase()
           break
         default:
           return 0
@@ -412,7 +409,7 @@ export function DriveManager() {
           size: filters.advancedFilters.sizeRange,
           created: filters.advancedFilters.createdDateRange,
           modified: filters.advancedFilters.modifiedDateRange,
-          owner: filters.advancedFilters.owner
+          owner: filters.advancedFilters.owner,
         })
 
         const callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
@@ -453,20 +450,30 @@ export function DriveManager() {
         params.append('sortBy', filters.advancedFilters.sortBy || 'modified')
         params.append('sortOrder', filters.advancedFilters.sortOrder || 'desc')
 
-
-
         // Add date range filters
         if (filters.advancedFilters.createdDateRange?.from) {
-          params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
+          params.append(
+            'createdAfter',
+            filters.advancedFilters.createdDateRange.from.toISOString()
+          )
         }
         if (filters.advancedFilters.createdDateRange?.to) {
-          params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
+          params.append(
+            'createdBefore',
+            filters.advancedFilters.createdDateRange.to.toISOString()
+          )
         }
         if (filters.advancedFilters.modifiedDateRange?.from) {
-          params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
+          params.append(
+            'modifiedAfter',
+            filters.advancedFilters.modifiedDateRange.from.toISOString()
+          )
         }
         if (filters.advancedFilters.modifiedDateRange?.to) {
-          params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
+          params.append(
+            'modifiedBefore',
+            filters.advancedFilters.modifiedDateRange.to.toISOString()
+          )
         }
 
         // owner
@@ -477,14 +484,14 @@ export function DriveManager() {
         console.info('[Frontend] [Filter]:', {
           currentFilters: filters,
           apiParams: params.toString(),
-          requestUrl: `/api/drive/files?${params}`
+          requestUrl: `/api/drive/files?${params}`,
         })
 
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
-          }
+          },
         })
 
         if (!response.ok) {
@@ -502,18 +509,20 @@ export function DriveManager() {
           throw new Error(data.error)
         }
 
-
-
         // The API returns an array of files directly, not separated files and folders
         const allFiles = data.files || data || []
 
         // Separate files and folders based on mimeType
-        const folders = allFiles.filter(
-          (item: any) => item.mimeType === 'application/vnd.google-apps.folder'
-        )
-        const files = allFiles.filter(
-          (item: any) => item.mimeType !== 'application/vnd.google-apps.folder'
-        )
+        const folders: DriveItem[] = []
+        const files: DriveItem[] = []
+
+        for (const item of allFiles) {
+          if (item.mimeType === 'application/vnd.google-apps.folder') {
+            folders.push(item)
+          } else {
+            files.push(item)
+          }
+        }
 
         // Transform and combine data
         const newItems: DriveItem[] = [
@@ -528,6 +537,104 @@ export function DriveManager() {
         ]
 
 
+        
+        const response = await fetch(`/api/drive/files?${params}`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.log('401 error - triggering reauth')
+            setNeedsReauth(true)
+            throw new Error('Authentication required')
+          }
+          throw new Error(`Failed to fetch files: ${response.statusText}`)
+        }
+
+        const data = await response.json()
+
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
+        // The API returns an array of files directly, not separated files and folders
+        const allFiles = data.files || data || []
+
+        // Separate files and folders based on mimeType
+        const folders: DriveItem[] = []
+        const files: DriveItem[] = []
+
+        for (const item of allFiles) {
+          if (item.mimeType === 'application/vnd.google-apps.folder') {
+            folders.push(item)
+          } else {
+            files.push(item)
+          }
+        }
+
+        // Transform and combine data
+        const newItems: DriveItem[] = [
+          ...folders.map((folder: DriveFolder) => ({
+            ...folder,
+            itemType: 'folder' as const,
+          })),
+          ...files.map((file: DriveFile) => ({
+            ...file,
+            itemType: 'file' as const,
+          })),
+        ]
+
+        const response = await fetch(`/api/drive/files?${params}`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            console.log('401 error - triggering reauth')
+            setNeedsReauth(true)
+            throw new Error('Authentication required')
+          }
+          throw new Error(`Failed to fetch files: ${response.statusText}`)
+        }
+
+        const data = await response.json()
+
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
+        // The API returns an array of files directly, not separated files and folders
+        const allFiles = data.files || data || []
+
+        // Separate files and folders based on mimeType
+        const folders: DriveItem[] = []
+        const files: DriveItem[] = []
+
+        for (const item of allFiles) {
+          if (item.mimeType === 'application/vnd.google-apps.folder') {
+            folders.push(item)
+          } else {
+            files.push(item)
+          }
+        }
+
+        // Transform and combine data
+        const newItems: DriveItem[] = [
+          ...folders.map((folder: DriveFolder) => ({
+            ...folder,
+            itemType: 'folder' as const,
+          })),
+          ...files.map((file: DriveFile) => ({
+            ...file,
+            itemType: 'file' as const,
+          })),
+        ]
 
 
         if (pageToken) {
@@ -540,7 +647,6 @@ export function DriveManager() {
         setHasAccess(true)
         setDriveAccessError(null)
       } catch (error: any) {
-
         if (
           error.message?.includes('Authentication') ||
           error.message?.includes('401') ||
@@ -563,7 +669,7 @@ export function DriveManager() {
           view: filters.activeView,
           types: filters.fileTypeFilter,
           sort: filters.advancedFilters.sortBy,
-          order: filters.advancedFilters.sortOrder
+          order: filters.advancedFilters.sortOrder,
         })
         const callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
         activeRequestsRef.current.delete(callId)
@@ -592,7 +698,10 @@ export function DriveManager() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (typeof fetchFiles === 'function') {
-        fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+        fetchFiles(
+          currentFolderId || undefined,
+          searchQuery.trim() || undefined
+        )
       }
     }, 300) // Debounce filter changes
 
@@ -670,7 +779,10 @@ export function DriveManager() {
 
   // Apply client-side size filtering
   const sizeFilteredItems = useMemo(() => {
-    if (!filters.advancedFilters.sizeRange?.min && !filters.advancedFilters.sizeRange?.max) {
+    if (
+      !filters.advancedFilters.sizeRange?.min &&
+      !filters.advancedFilters.sizeRange?.max
+    ) {
       return items
     }
 
@@ -682,7 +794,13 @@ export function DriveManager() {
 
       // Convert "-", undefined, null, empty string to 0 bytes
       let sizeBytes = 0
-      if (sizeStr && sizeStr !== '-' && sizeStr !== 'undefined' && sizeStr !== 'null' && sizeStr.trim() !== '') {
+      if (
+        sizeStr &&
+        sizeStr !== '-' &&
+        sizeStr !== 'undefined' &&
+        sizeStr !== 'null' &&
+        sizeStr.trim() !== ''
+      ) {
         const parsed = parseInt(sizeStr, 10)
         if (!isNaN(parsed)) {
           sizeBytes = parsed
@@ -696,16 +814,23 @@ export function DriveManager() {
       // Convert filter values to bytes
       const getBytes = (size: number, unit: string) => {
         switch (unit.toUpperCase()) {
-          case 'B': return size
-          case 'KB': return size * 1024
-          case 'MB': return size * 1024 * 1024
-          case 'GB': return size * 1024 * 1024 * 1024
-          default: return size * 1024 * 1024
+          case 'B':
+            return size
+          case 'KB':
+            return size * 1024
+          case 'MB':
+            return size * 1024 * 1024
+          case 'GB':
+            return size * 1024 * 1024 * 1024
+          default:
+            return size * 1024 * 1024
         }
       }
 
-      if (minSize !== undefined && sizeBytes < getBytes(minSize, sizeUnit)) return false
-      if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit)) return false
+      if (minSize !== undefined && sizeBytes < getBytes(minSize, sizeUnit))
+        return false
+      if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit))
+        return false
 
       return true
     })
@@ -784,8 +909,6 @@ export function DriveManager() {
   if (loading && items.length === 0) {
     return <DriveGridSkeleton />
   }
-
-
 
   if (hasAccess === false && driveAccessError) {
     if (needsReauth) {
