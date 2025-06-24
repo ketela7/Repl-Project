@@ -259,17 +259,6 @@ export function FiltersDialog({
     // Don't apply immediately - wait for Apply Filter button
   }
 
-  // Helper function to convert size to bytes
-  const convertToBytes = (size: number, unit: 'B' | 'KB' | 'MB' | 'GB'): number => {
-    switch (unit) {
-      case 'B': return size
-      case 'KB': return size * 1024
-      case 'MB': return size * 1024 * 1024
-      case 'GB': return size * 1024 * 1024 * 1024
-      default: return size
-    }
-  }
-
   const handleAdvancedFiltersChange = (newFilters: AdvancedFilters) => {
     setTempAdvancedFilters(newFilters)
     // Don't apply immediately - wait for Apply Filter button
@@ -431,17 +420,16 @@ export function FiltersDialog({
                         placeholder="0"
                         className="text-sm"
                         value={tempAdvancedFilters.sizeRange?.min || ''}
-                        onChange={(e) => {
-                          const sizeInBytes = convertToBytes(Number(e.target.value) || 0, tempAdvancedFilters.sizeRange?.unit || 'MB')
+                        onChange={(e) =>
                           handleAdvancedFiltersChange({
                             ...tempAdvancedFilters,
                             sizeRange: {
                               ...tempAdvancedFilters.sizeRange,
-                              min: sizeInBytes || undefined,
+                              min: Number(e.target.value) || undefined,
                               unit: tempAdvancedFilters.sizeRange?.unit || 'MB',
                             },
                           })
-                        }}
+                        }
                       />
                       <Select
                         value={tempAdvancedFilters.sizeRange?.unit || 'MB'}
@@ -478,17 +466,16 @@ export function FiltersDialog({
                         placeholder="∞"
                         className="text-sm"
                         value={tempAdvancedFilters.sizeRange?.max || ''}
-                        onChange={(e) => {
-                          const sizeInBytes = convertToBytes(Number(e.target.value) || 0, tempAdvancedFilters.sizeRange?.unit || 'MB')
+                        onChange={(e) =>
                           handleAdvancedFiltersChange({
                             ...tempAdvancedFilters,
                             sizeRange: {
                               ...tempAdvancedFilters.sizeRange,
-                              max: sizeInBytes || undefined,
+                              max: Number(e.target.value) || undefined,
                               unit: tempAdvancedFilters.sizeRange?.unit || 'MB',
                             },
                           })
-                        }}
+                        }
                       />
                       <Select
                         value={tempAdvancedFilters.sizeRange?.unit || 'MB'}
