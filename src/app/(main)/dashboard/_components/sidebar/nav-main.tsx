@@ -216,7 +216,7 @@ export function NavMain({ items }: NavMainProps) {
           {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
           <SidebarGroupContent className="flex flex-col gap-2">
             <SidebarMenu>
-              {group.items.map((item) =>
+              {group.items?.map((item) =>
                 state === 'collapsed' && !isMobile ? (
                   <NavItemCollapsed
                     key={item.title}
