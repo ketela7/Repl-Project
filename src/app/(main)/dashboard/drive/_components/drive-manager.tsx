@@ -563,6 +563,7 @@ export function DriveManager() {
             visibleColumns={visibleColumns}
             sortConfig={sortConfig}
             onSelectItem={handleSelectItem}
+            onSelectModeChange={setIsSelectMode}
             onFolderClick={handleFolderClick}
             onColumnsChange={(changes: any) => {
               if (changes.sortBy) {

@@ -640,8 +640,8 @@ export function DriveToolbar({
             )}
           </Button>
 
-          {/* Mobile Bulk Actions Button - Show when items are selected on mobile */}
-          {isMobile && selectedCount > 0 && onMobileActionsOpen ? (
+          {/* Mobile Bulk Actions Button - Show when items are selected */}
+          {selectedCount > 0 && isMobile && onMobileActionsOpen && (
             <Button
               variant="default"
               size="sm"
@@ -649,7 +649,6 @@ export function DriveToolbar({
                 console.log('Mobile Bulk Actions Button Clicked!')
                 console.log('selectedCount:', selectedCount)
                 console.log('isMobile:', isMobile)
-                console.log('onMobileActionsOpen function:', onMobileActionsOpen)
                 onMobileActionsOpen()
               }}
               className="h-8 bg-blue-600 px-3 text-white hover:bg-blue-700"
@@ -657,26 +656,56 @@ export function DriveToolbar({
               <MoreVertical className="mr-1 h-4 w-4" />
               Actions ({selectedCount})
             </Button>
-          ) : isMobile && selectedCount > 0 ? (
-            <Button
-              variant="destructive" 
-              size="sm"
-              className="h-8 px-3"
-              disabled
-            >
-              Missing Handler ({selectedCount})
-            </Button>
-          ) : null}
+          )}
           
           {/* Debug: Show mobile bulk button conditions - VISIBLE FOR DEBUGGING */}
           {isMobile && (
             <div className="text-xs text-blue-600 p-1 border border-blue-300 rounded bg-blue-50 ml-1">
-              Mobile Debug: selected={selectedCount}, selectMode={isSelectMode ? 'ON' : 'OFF'}, handler={onMobileActionsOpen ? 'OK' : 'MISSING'}
+              Debug: selected={selectedCount}, selectMode={isSelectMode ? 'ON' : 'OFF'}, handler={onMobileActionsOpen ? 'OK' : 'MISSING'}
             </div>
           )}
 
+          {/* Desktop Bulk Actions - Show when items are selected on desktop */}
+          {!isMobile && selectedCount > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="h-8 bg-blue-600 px-3 text-white hover:bg-blue-700"
+                >
+                  <MoreVertical className="mr-1 h-4 w-4" />
+                  Actions ({selectedCount})
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-64">
+                <DropdownMenuItem onClick={onBulkDelete}>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Selected
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onBulkMove}>
+                  <Move className="mr-2 h-4 w-4" />
+                  Move Selected
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onBulkCopy}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy Selected
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onBulkShare}>
+                  <Share className="mr-2 h-4 w-4" />
+                  Share Selected
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onSelectModeChange(false)}>
+                  <X className="mr-2 h-4 w-4" />
+                  Exit Selection ({selectedCount})
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
           {/* Batch - Desktop dropdown interface */}
-          {!isMobile && (
+          {!isMobile && selectedCount === 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
