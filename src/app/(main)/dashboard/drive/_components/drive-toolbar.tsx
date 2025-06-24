@@ -669,6 +669,19 @@ export function DriveToolbar({
             </Button>
           )}
 
+          {/* Mobile Exit Selection Button - Show when in select mode */}
+          {isMobile && isSelectMode && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onSelectModeChange(false)}
+              className="h-8 px-3"
+            >
+              <X className="mr-1 h-4 w-4" />
+              Exit Selection
+            </Button>
+          )}
+
           {/* Mobile Select Mode Toggle - Show when not in select mode */}
           {isMobile && !isSelectMode && items.length > 0 && (
             <Button
@@ -683,11 +696,12 @@ export function DriveToolbar({
           )}
           
           {/* Debug: Show mobile bulk button conditions - VISIBLE FOR DEBUGGING */}
-          {isMobile && (
+          {/* {isMobile && (
             <div className="text-xs text-blue-600 p-1 border border-blue-300 rounded bg-blue-50 ml-1">
               Debug: select={selectedCount}/{totalCount}, mode={isSelectMode ? 'ON' : 'OFF'}
             </div>
           )}
+          */}
 
           {/* Desktop Bulk Actions - Show when items are selected on desktop */}
           {!isMobile && selectedCount > 0 && (
