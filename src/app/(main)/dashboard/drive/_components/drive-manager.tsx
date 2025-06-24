@@ -479,7 +479,7 @@ export function DriveManager() {
           params.append('size', `${filters.advancedFilters.sizeRange?.min || ''}-${filters.advancedFilters.sizeRange?.max || ''}`)
         }
 
-        console.info('[Frontend] [Filter] :', {
+        console.info('[Frontend] [Filter]:', {
           currentFilters: filters,
           apiParams: params.toString(),
           requestUrl: `/api/drive/files?${params}`
@@ -648,49 +648,11 @@ export function DriveManager() {
     setFilteredItems([])
   }, [])
 
-  // Apply client-side size filtering since Google Drive API doesn't support it
-  const sizeFilteredItems = useMemo(() => {
-    if (!filters.advancedFilters.sizeRange?.min && !filters.advancedFilters.sizeRange?.max) {
-      return items
-    }
-
-    return items.filter((item) => {
-      // Skip size filtering for folders
-      if (isFolder(item)) return true
-      
-      const sizeStr = (item as any).size
-      if (!sizeStr || sizeStr === '0' || sizeStr === '-') return false
-      
-      const sizeBytes = parseInt(sizeStr, 10)
-      if (isNaN(sizeBytes)) return false
-
-      const sizeUnit = filters.advancedFilters.sizeRange?.unit
-      const minSize = filters.advancedFilters.sizeRange?.min
-      const maxSize = filters.advancedFilters.sizeRange?.max
-
-      // Convert filter values to bytes
-      const getBytes = (size: number, unit: string) => {
-        switch (unit.toUpperCase()) {
-          case 'B': return size
-          case 'KB': return size * 1024
-          case 'MB': return size * 1024 * 1024
-          case 'GB': return size * 1024 * 1024 * 1024
-          default: return size * 1024 * 1024
-        }
-      }
-
-      if (minSize && sizeBytes < getBytes(minSize, sizeUnit)) return false
-      if (maxSize && sizeBytes > getBytes(maxSize, sizeUnit)) return false
-      
-      return true
-    })
-  }, [items, filters.advancedFilters.sizeRange])
-
-  // Use filtered items when available, otherwise use size-filtered items
+  // Use filtered items when available, otherwise use all items (size filtering now handled server-side)
   const displayItems = useMemo(() => {
-    const result = filteredItems.length > 0 ? filteredItems : sizeFilteredItems
+    const result = filteredItems.length > 0 ? filteredItems : items
     return result
-  }, [filteredItems, sizeFilteredItems])
+  }, [filteredItems, items])
 
   // Apply sorting to display items (includes filtering)
   const sortedDisplayItems = useMemo(() => {

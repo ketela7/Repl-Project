@@ -15,6 +15,7 @@ interface FileFilter {
   modifiedAfter?: string
   modifiedBefore?: string
   owner?: string
+  size?: string
 }
 
 function buildDriveQuery(filters: FileFilter): string {
@@ -351,10 +352,10 @@ function buildDriveQuery(filters: FileFilter): string {
   if (filters.size) {
     conditions.push(`size ${filters.size}`)
   }
-  
 
-  
-  
+
+
+
   return conditions.join(' and ')
 }
 
