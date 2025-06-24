@@ -16,10 +16,10 @@ A comprehensive, enterprise-grade Google Drive management application built with
 4. Run development server: `npm run dev`
 
 ### Development Standards
-- No NEXT_PUBLIC_ environment variables - all config is server-side
-- Simple file naming without prefixes or suffixes
-- Professional code quality with comprehensive testing
-- Well-structured project organization following established patterns
+- **Security**: Only private secrets, no NEXT_PUBLIC_ environment variables
+- **File Naming**: Simple naming without prefixes or suffixes (drive-manager.tsx ✅, enhanced-drive-manager.tsx ❌)
+- **Code Quality**: Clean project structure with comprehensive testing
+- **Professional Standards**: Thorough testing and validation before any commits
 
 ## 🚀 Features
 

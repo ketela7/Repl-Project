@@ -26,9 +26,9 @@
 ```
 
 ### Environment Variables
-- **No NEXT_PUBLIC_ prefix**: Avoid client-side environment variables
-- **Server-side only**: Keep sensitive data on server
-- **Secure handling**: Use proper environment variable management
+- **No NEXT_PUBLIC_ prefix**: Only use private secrets, never client-side environment variables
+- **Server-side only**: All configuration must be handled securely on the server
+- **Private secrets only**: Use Replit secrets or server environment variables exclusively
 
 ## 🏗 Architecture Guidelines
 
@@ -156,10 +156,12 @@ npm run build        # Production build succeeds
 - **Code Review**: Mandatory peer review
 
 ### Quality Assurance
+- **Clean Project Start**: Always ensure project is clean when starting work
 - **Recheck & Retest**: Always verify code works before commit
 - **Professional Standards**: Work with professional coder discipline
 - **No Errors**: Ensure zero errors in production-ready code
 - **Well Structured**: Maintain clean, organized project structure
+- **Documentation**: Update README.md for any project changes to ensure public understanding
 
 ### Continuous Integration
 - **Automated Testing**: All tests must pass

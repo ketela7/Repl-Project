@@ -129,19 +129,22 @@ The application uses a modular, feature-based architecture:
 Preferred communication style: Simple, everyday language.
 
 ### Development Standards
-- No NEXT_PUBLIC_ environment variables
-- Simple file naming without prefixes/suffixes
+- No NEXT_PUBLIC_ prefix - only use private secrets
+- Simple file naming without prefixes/suffixes (drive-manager.tsx ✅, enhanced-drive-manager.tsx ❌)
+- Always ensure project is clean when starting
 - Thorough testing before commits
 - Professional code quality standards
 - Well-structured project organization
-- Update README.md for public understanding
+- Update README.md for public understanding of changes
 
 ## Recent Changes
 
 - June 24, 2025: Initial setup with Google Drive authentication
-- June 24, 2025: Updated project rules - removed NEXT_PUBLIC_ env vars, simplified file naming
-- June 24, 2025: Fixed theme provider naming and removed complex file names
+- June 24, 2025: Updated project rules - no NEXT_PUBLIC_ prefix, only private secrets
+- June 24, 2025: Simplified file naming (removed "optimized" prefix from theme provider)
+- June 24, 2025: Fixed ESLint configuration and migrated to flat config
 - June 24, 2025: All tests passing (76 test cases), TypeScript compilation successful
+- June 24, 2025: Project cleaned and verified to follow professional standards
 
 ## Changelog
 
