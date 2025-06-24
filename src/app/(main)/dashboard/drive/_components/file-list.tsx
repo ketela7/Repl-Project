@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { FileIcon } from '@/components/file-icon'
+import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
 import { formatFileSize, formatDriveFileDate } from '@/lib/google-drive/utils'
 import { formatFileTime } from '@/lib/timezone'
 import { useTimezoneContext } from '@/components/timezone-provider'
@@ -202,11 +203,18 @@ export function FileList({
                 </TableCell>
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-3">
-                    <FileIcon
-                      mimeType={item.mimeType}
+                    <FileThumbnailPreview
+                      thumbnailLink={item.thumbnailLink}
                       fileName={item.name}
-                      className="h-5 w-5"
-                    />
+                      mimeType={item.mimeType}
+                      modifiedTime={item.modifiedTime}
+                    >
+                      <FileIcon
+                        mimeType={item.mimeType}
+                        fileName={item.name}
+                        className="h-5 w-5"
+                      />
+                    </FileThumbnailPreview>
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-medium">{item.name}</div>
                       {'mimeType' in item &&

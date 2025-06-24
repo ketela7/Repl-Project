@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { FileIcon } from '@/components/file-icon'
+import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
 import { DriveGridSkeleton } from './drive-skeleton'
 import { useTimezone } from '@/hooks/use-timezone'
 import { formatFileTime } from '@/lib/timezone'
@@ -144,10 +145,17 @@ export function DriveDataView({
                   <div
                     className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}
                   >
-                    <FileIcon
+                    <FileThumbnailPreview
+                      thumbnailLink={item.thumbnailLink}
+                      fileName={item.name}
                       mimeType={item.mimeType}
-                      className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-                    />
+                      modifiedTime={item.modifiedTime}
+                    >
+                      <FileIcon
+                        mimeType={item.mimeType}
+                        className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
+                      />
+                    </FileThumbnailPreview>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger
@@ -368,10 +376,17 @@ export function DriveDataView({
                   {visibleColumns.name && (
                     <TableCell>
                       <div className="flex items-center space-x-3">
-                        <FileIcon
+                        <FileThumbnailPreview
+                          thumbnailLink={item.thumbnailLink}
+                          fileName={item.name}
                           mimeType={item.mimeType}
-                          className="h-6 w-6"
-                        />
+                          modifiedTime={item.modifiedTime}
+                        >
+                          <FileIcon
+                            mimeType={item.mimeType}
+                            className="h-6 w-6"
+                          />
+                        </FileThumbnailPreview>
                         <span className="font-medium">{item.name}</span>
                       </div>
                     </TableCell>
