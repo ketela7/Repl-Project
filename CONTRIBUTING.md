@@ -1,36 +1,42 @@
-# Project Development Rules
+# Contributing to Google Drive Pro
 
-## 🎯 Code Quality Standards
-
-### TypeScript Requirements
-- **Strict Mode**: Always use TypeScript strict mode
-- **Type Safety**: No `any` types except for legacy API compatibility
-- **Interface Definitions**: Define interfaces for all data structures
-- **JSDoc Comments**: Document all public functions and complex logic
-
-### Code Style
-- **ESLint + Prettier**: Mandatory code formatting
-- **Naming Convention**: Use kebab-case for files, camelCase for variables
-- **Component Structure**: Follow React functional component patterns
-- **Error Handling**: Comprehensive try-catch blocks for async operations
-
-### File Organization
-```
-- Use kebab-case for file names (user-profile.tsx)
-- Simple file naming without prefixes or suffixes
-  ✅ drive-manager.tsx, drive-toolbar.tsx
-  ❌ drive-manager-enhanced.tsx, enhanced-drive-manager.tsx
-- Group related components in feature folders
-- Keep components under 300 lines when possible
-- Separate logic into custom hooks when appropriate
-```
+## Development Rules
 
 ### Environment Variables
 - **No NEXT_PUBLIC_ prefix**: Only use private secrets, never client-side environment variables
 - **Server-side only**: All configuration must be handled securely on the server
 - **Private secrets only**: Use Replit secrets or server environment variables exclusively
 
-## 🏗 Architecture Guidelines
+### File Naming Convention
+- **Simple naming**: Use kebab-case without prefixes or suffixes
+- **Examples**: `drive-manager.tsx`, `file-list.tsx`, `user-profile.tsx`
+- **Avoid**: `enhanced-drive-manager.tsx`, `optimized-file-list.tsx`, `custom-theme-provider.tsx`
+
+### Code Quality Standards
+
+#### TypeScript Requirements
+- **Strict Mode**: Always use TypeScript strict mode
+- **Type Safety**: No `any` types except for legacy API compatibility
+- **Interface Definitions**: Define interfaces for all data structures
+- **JSDoc Comments**: Document all public functions and complex logic
+
+#### Code Style
+- **ESLint + Prettier**: Mandatory code formatting
+- **Naming Convention**: Use kebab-case for files, camelCase for variables
+- **Component Structure**: Follow React functional component patterns
+- **Error Handling**: Comprehensive try-catch blocks for async operations
+
+### Quality Assurance
+- **Clean Project Start**: Always ensure project is clean when starting work
+- **Double Check & Retest**: Double check and retest code before committing, ensure it follows project rules and works correctly
+- **Rapid Development**: Always improve development process for faster completion
+- **Professional Standards**: Work like a professional coder with thorough planning and execution
+- **No Errors**: Ensure zero errors in production-ready code
+- **Well Structured**: Maintain clean, organized project structure only when safe
+- **Real-time Documentation**: Always update API documentation, routes, and project structure in real time
+- **README Updates**: Update README.md for any project changes to ensure public understanding
+
+## Architecture Guidelines
 
 ### Component Design
 - **Extend Over Create**: Always extend existing components rather than creating new ones
@@ -50,7 +56,7 @@
 - **No Raw SQL**: Avoid direct SQL queries except for complex operations
 - **Type Safety**: Use generated types from Drizzle schema
 
-## 📱 Design Requirements
+## Design Requirements
 
 ### Mobile-First Approach
 - **Touch Targets**: Minimum 44px touch targets for interactive elements
@@ -70,7 +76,7 @@
 - **Performance**: Optimize for various network conditions
 - **Offline Support**: Implement offline capabilities where applicable
 
-## 🧪 Testing Standards
+## Testing Standards
 
 ### Coverage Requirements
 - **Minimum Coverage**: 70% code coverage for all new features
@@ -78,62 +84,27 @@
 - **Integration Tests**: Test critical user flows
 - **Component Tests**: Test component rendering and interactions
 
-### Testing Guidelines
-- **Test File Location**: Co-locate tests with source files or in `__tests__` folders
-- **Naming Convention**: Use `.test.ts` or `.test.tsx` extensions
-- **Mock Strategy**: Mock external dependencies and API calls
-- **Test Data**: Use realistic test data, avoid placeholder content
+### Performance Standards
 
-### Quality Checks
-```bash
-# Before committing, ensure:
-npm run lint          # No ESLint errors
-npm run type-check    # No TypeScript errors
-npm test             # All tests pass
-npm run build        # Production build succeeds
-```
-
-## 🔒 Security Requirements
-
-### Authentication
-- **NextAuth.js**: Use only NextAuth.js for authentication
-- **Session Management**: Implement secure session handling
-- **JWT Tokens**: Proper token validation and refresh
-- **Protected Routes**: Middleware-based route protection
-
-### Data Protection
-- **Input Validation**: Validate all user inputs
-- **SQL Injection**: Use parameterized queries only
-- **XSS Prevention**: Sanitize all user-generated content
-- **CSRF Protection**: Enable Next.js built-in CSRF protection
-
-### Environment Security
-- **Secret Management**: Use Replit Secrets for sensitive data
-- **Environment Variables**: Never commit secrets to version control
-- **API Keys**: Validate API key presence and permissions
-- **Error Handling**: Limit error details in production
-
-## 🚀 Performance Standards
-
-### Loading Performance
+#### Loading Performance
 - **Initial Load**: Target <2s for initial page load
 - **Code Splitting**: Implement lazy loading for heavy components
 - **Bundle Size**: Monitor and optimize bundle size
 - **Image Optimization**: Use Next.js Image component
 
-### Runtime Performance
+#### Runtime Performance
 - **Memory Usage**: Monitor memory consumption
 - **API Response**: Target <1s for API responses
 - **Caching Strategy**: Implement intelligent caching
 - **Database Queries**: Optimize database operations
 
-### Mobile Performance
+#### Mobile Performance
 - **Touch Response**: Immediate visual feedback for touch events
 - **Animation Performance**: Use CSS transforms for animations
 - **Network Optimization**: Minimize API calls on mobile
 - **Battery Efficiency**: Avoid excessive background processing
 
-## 📚 Documentation Standards
+## Documentation Standards
 
 ### Code Documentation
 - **README**: Comprehensive project setup and usage
@@ -147,23 +118,13 @@ npm run build        # Production build succeeds
 - **Changelog**: Document all feature changes
 - **Deployment**: Clear deployment instructions
 
-## 🔄 Development Workflow
+## Development Workflow
 
 ### Git Workflow
 - **Branch Strategy**: Feature branches from main
 - **Commit Messages**: Clear, descriptive commit messages
 - **Pull Requests**: Required for all changes
 - **Code Review**: Mandatory peer review
-
-### Quality Assurance
-- **Clean Project Start**: Always ensure project is clean when starting work
-- **Double Check & Retest**: Double check and retest code before committing, ensure it follows project rules and works correctly
-- **Rapid Development**: Always improve development process for faster completion
-- **Professional Standards**: Work like a professional coder with thorough planning and execution
-- **No Errors**: Ensure zero errors in production-ready code
-- **Well Structured**: Maintain clean, organized project structure only when safe
-- **Real-time Documentation**: Always update API documentation, routes, and project structure in real time
-- **README Updates**: Update README.md for any project changes to ensure public understanding
 
 ### Continuous Integration
 - **Automated Testing**: All tests must pass
@@ -177,7 +138,7 @@ npm run build        # Production build succeeds
 - **Rollback Plan**: Always have rollback capability
 - **Monitoring**: Monitor application health post-deployment
 
-## 🎯 User Experience Requirements
+## User Experience Requirements
 
 ### Loading States
 - **Skeleton Loaders**: Use skeleton loaders for content loading
@@ -199,6 +160,6 @@ npm run build        # Production build succeeds
 
 ---
 
-**Last Updated**: June 2025  
-**Version**: 2.0  
+**Last Updated**: June 24, 2025  
+**Version**: 1.0  
 **Enforcement**: Mandatory for all contributors

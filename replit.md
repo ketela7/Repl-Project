@@ -1,128 +1,118 @@
-# Google Drive Pro - Replit Configuration
+# Google Drive Pro - Replit Development Guide
 
 ## Overview
 
-Google Drive Pro is a modern, enterprise-grade Google Drive file management application built with Next.js 15, TypeScript, and shadcn/ui components. The application provides comprehensive file management capabilities with intelligent filtering, secure authentication, and a responsive design optimized for both desktop and mobile devices.
+Google Drive Pro is a comprehensive, enterprise-grade Google Drive management application built with Next.js 15. It provides advanced file operations, intelligent filtering, and responsive design optimized for professional workflows. The application leverages Google Drive API for direct integration with user's Google Drive accounts.
 
 ## System Architecture
 
 ### Frontend Architecture
 - **Framework**: Next.js 15 with App Router
-- **Language**: TypeScript with strict mode enabled
-- **UI Library**: shadcn/ui components built on Radix UI primitives
+- **UI Library**: shadcn/ui components with Radix UI primitives
 - **Styling**: Tailwind CSS with custom design system
-- **State Management**: TanStack Query for server state and React hooks for client state
-- **Responsive Design**: Mobile-first approach with adaptive layouts
+- **State Management**: React Query (TanStack Query) for server state
+- **Component Pattern**: Feature-based architecture with shared components
+- **Responsive Design**: Mobile-first approach with progressive enhancement
 
 ### Backend Architecture
-- **API Routes**: Next.js API routes in `src/app/api/`
+- **API Routes**: Next.js API routes for server-side logic
 - **Authentication**: NextAuth.js with Google OAuth 2.0
-- **Database**: PostgreSQL with Drizzle ORM (configured but not fully implemented)
-- **Session Management**: Custom session caching with Redis-like patterns
-- **External API**: Google Drive API integration for file operations
-
-### Feature-Based Architecture
-The application uses a modular, feature-based architecture:
-- **Features**: Organized by domain (drive, auth, analytics)
-- **Shared**: Common components, hooks, and utilities
-- **Core**: Application-wide services and configuration
+- **Database**: PostgreSQL with Drizzle ORM (configured but database schema not yet implemented)
+- **Session Management**: JWT-based sessions with server-side caching
+- **File Operations**: Direct Google Drive API integration
 
 ## Key Components
 
 ### Authentication System
-- **Provider**: Google OAuth 2.0 with offline access
-- **Scopes**: OpenID, email, profile, and Google Drive API access
-- **Session Handling**: JWT tokens with refresh token support
-- **Middleware**: Route protection and automatic token refresh
+- **Provider**: Google OAuth 2.0 with Drive API permissions
+- **Session Handling**: NextAuth.js with custom JWT callbacks
+- **Token Management**: Automatic refresh token handling
+- **Security**: Private environment variables only, no client-side secrets
 
 ### Google Drive Integration
 - **API Client**: Custom Google Drive API wrapper
-- **File Operations**: Complete CRUD operations (create, read, update, delete)
-- **Batch Operations**: Multi-select bulk operations
-- **Real-time Updates**: Automatic refresh on Drive content changes
-- **Error Handling**: Comprehensive error recovery with user-friendly messages
+- **File Operations**: Upload, download, rename, move, copy, delete
+- **Search & Filtering**: Advanced search with multiple criteria
+- **Permissions**: Comprehensive permission handling
+- **Caching**: Smart caching for improved performance
 
 ### UI Components
-- **Design System**: Based on shadcn/ui with custom extensions
-- **Responsive**: Mobile-first design with touch-friendly interactions
-- **Accessibility**: WCAG 2.1 compliant with screen reader support
-- **Theming**: Dark/light mode support with system preference detection
-
-### Performance Optimizations
-- **Caching**: Intelligent caching with session-based storage
-- **Lazy Loading**: Code splitting and progressive loading
-- **Optimization**: Bundle optimization with Turbopack
-- **Error Boundaries**: Graceful error handling with fallback UI
+- **Design System**: Consistent component library with variants
+- **File Management**: Grid and table views with drag-and-drop
+- **Error Handling**: Comprehensive error boundaries and displays
+- **Loading States**: Skeleton components for better UX
+- **Responsive Design**: Mobile-optimized interface
 
 ## Data Flow
 
-### Authentication Flow
-1. User initiates login via Google OAuth
-2. NextAuth handles OAuth flow and token exchange
-3. Tokens stored in encrypted JWT session
-4. Middleware validates sessions on protected routes
-5. Automatic token refresh on expiration
+1. **Authentication Flow**:
+   - User initiates Google OAuth sign-in
+   - Google redirects back with authorization code
+   - Server exchanges code for access/refresh tokens
+   - JWT session created with embedded tokens
+   - Client receives session cookie
 
-### Drive Operations Flow
-1. User actions trigger API calls to Next.js routes
-2. Server-side validation and authentication check
-3. Google Drive API calls with proper error handling
-4. Response processing and caching
-5. UI updates with optimistic updates where appropriate
+2. **Drive Operations Flow**:
+   - Client requests protected API endpoint
+   - Middleware validates session
+   - Server uses stored tokens to call Google Drive API
+   - Response cached and returned to client
+   - Client updates UI optimistically
 
-### State Management
-- **Server State**: TanStack Query for API data with caching
-- **Client State**: React hooks for UI state
-- **Session State**: Custom session cache for user data
-- **Form State**: React Hook Form for form management
+3. **Error Handling Flow**:
+   - API errors caught by error boundaries
+   - Specific error types displayed with appropriate actions
+   - Retry mechanisms for transient failures
+   - Permission re-authorization for expired tokens
 
 ## External Dependencies
 
 ### Core Dependencies
-- **next**: ^15.0.0 - React framework
-- **react**: ^18.0.0 - UI library
-- **typescript**: ^5.0.0 - Type safety
-- **tailwindcss**: ^3.0.0 - Styling
-- **next-auth**: ^4.0.0 - Authentication
-- **@tanstack/react-query**: ^5.0.0 - Server state management
-
-### UI Dependencies
-- **@radix-ui/react-***: Component primitives
-- **lucide-react**: Icon library
-- **class-variance-authority**: Variant management
-- **tailwind-merge**: Utility merging
+- **Next.js 15**: Full-stack React framework
+- **NextAuth.js**: Authentication library
+- **Google APIs**: Drive API client library
+- **Drizzle ORM**: Database toolkit (configured for future use)
+- **TanStack Query**: Server state management
+- **Radix UI**: Headless UI components
+- **Tailwind CSS**: Utility-first CSS framework
 
 ### Development Dependencies
-- **eslint**: Code linting
-- **prettier**: Code formatting
-- **jest**: Testing framework
-- **@testing-library/react**: Component testing
-- **husky**: Git hooks
+- **TypeScript**: Static type checking
+- **ESLint**: Code linting with custom rules
+- **Prettier**: Code formatting
+- **Jest**: Testing framework
+- **Husky**: Git hooks for quality assurance
 
 ## Deployment Strategy
 
-### Development Environment
-- **Runtime**: Node.js 20
-- **Package Manager**: npm
-- **Dev Server**: Next.js dev server with Turbopack
-- **Hot Reload**: Automatic refresh on file changes
+### Replit Configuration
+- **Runtime**: Node.js 20 with PostgreSQL 16 module
+- **Development Server**: Custom workflow on port 5000
+- **Build Process**: Next.js optimized build
+- **Environment**: Replit secrets for secure configuration
 
-### Production Build
-- **Build Command**: `npm run build`
-- **Start Command**: `npm start`
-- **Optimization**: Automatic code splitting and tree shaking
-- **Static Generation**: Pre-rendered pages where possible
+### Production Considerations
+- **Deployment Target**: Autoscale deployment on Replit
+- **Database**: PostgreSQL ready for schema implementation
+- **Caching**: Built-in Next.js caching with custom session cache
+- **Security**: Server-side environment variables only
 
-### Environment Configuration
-- **Environment Variables**: Managed through `.env` files
-- **Secrets**: Google OAuth credentials and NextAuth secret
-- **Database**: PostgreSQL connection string (when implemented)
-- **Caching**: Redis or similar for session storage
+## Recent Changes
 
-### Platform-Specific Settings
-- **Replit**: Configured for Replit deployment with proper port mapping
-- **Vercel**: Ready for Vercel deployment with automatic optimization
-- **Docker**: Containerization support for consistent deployment
+- June 24, 2025: Initial setup with Google Drive authentication
+- June 24, 2025: Updated project rules - no NEXT_PUBLIC_ prefix, only private secrets
+- June 24, 2025: Simplified file naming (removed "optimized" prefix from theme provider)
+- June 24, 2025: Created comprehensive API documentation with real-time updates
+- June 24, 2025: Updated project structure documentation with current architecture
+- June 24, 2025: Enhanced development rules - double check/retest code, rapid development process
+- June 24, 2025: Routes documentation added for complete API reference
+- June 24, 2025: Replaced PROJECT_RULES.md with CONTRIBUTING.md as development guidelines
+- June 24, 2025: All tests passing (76 test cases), TypeScript compilation successful
+- June 24, 2025: Project follows professional development standards with clean structure and rapid development
+
+## Changelog
+
+- June 24, 2025: Initial setup and comprehensive development standards implementation
 
 ## User Preferences
 
@@ -139,21 +129,3 @@ Preferred communication style: Simple, everyday language.
 - Real-time documentation updates (API docs, routes, project structure)
 - Update README.md for public understanding of changes
 - Work like professional coder with thorough planning and execution
-
-## Recent Changes
-
-- June 24, 2025: Initial setup with Google Drive authentication
-- June 24, 2025: Updated project rules - no NEXT_PUBLIC_ prefix, only private secrets
-- June 24, 2025: Simplified file naming (removed "optimized" prefix from theme provider)
-- June 24, 2025: Created comprehensive API documentation with real-time updates
-- June 24, 2025: Updated project structure documentation with current architecture
-- June 24, 2025: Enhanced development rules - double check/retest code, rapid development process
-- June 24, 2025: Routes documentation added for complete API reference
-- June 24, 2025: All tests passing (76 test cases), TypeScript compilation successful
-- June 24, 2025: Project follows professional development standards with clean structure and rapid development
-
-## Changelog
-
-- June 24, 2025: Project rules updated for professional development standards
-- June 24, 2025: Codebase cleaned up to follow new naming conventions
-- June 24, 2025: Environment variables secured (no client-side exposure)

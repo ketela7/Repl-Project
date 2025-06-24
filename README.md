@@ -6,7 +6,7 @@ A comprehensive, enterprise-grade Google Drive management application built with
 
 - [API Documentation](./API_DOCUMENTATION.md) - Complete API reference
 - [Project Structure](./PROJECT_STRUCTURE.md) - Codebase organization  
-- [Development Rules](./PROJECT_RULES.md) - Coding standards and guidelines
+- [Contributing Guidelines](./CONTRIBUTING.md) - Development rules and coding standards
 
 ## Quick Start
 
