@@ -15,7 +15,6 @@ interface FileFilter {
   modifiedAfter?: string
   modifiedBefore?: string
   owner?: string
-  size?: string
 }
 
 function buildDriveQuery(filters: FileFilter): string {
@@ -348,14 +347,6 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  // Size
-  if (filters.size) {
-    conditions.push(`size ${filters.size}`)
-  }
-
-
-
-
   return conditions.join(' and ')
 }
 
@@ -400,7 +391,6 @@ export async function GET(request: NextRequest) {
       sortBy: searchParams.get('sortBy') || undefined,
       sortOrder: searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc',
       search: searchParams.get('search') || undefined,
-			size: searchParams.get('size') || undefined,
       createdAfter: searchParams.get('createdAfter') || undefined,
       createdBefore: searchParams.get('createdBefore') || undefined,
       modifiedAfter: searchParams.get('modifiedAfter') || undefined,
