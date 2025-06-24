@@ -521,7 +521,7 @@ export function DriveManager() {
     }
   }, [sortedDisplayItems, selectedItems.size])
 
-  if (loading && items.length === 0) {
+  if (loading) {
     return <DriveGridSkeleton />
   }
 
@@ -914,7 +914,7 @@ export function DriveManager() {
         </div>
       )}
 
-      <PerformanceMonitor />
+      {/* <PerformanceMonitor /> */}
     </div>
   )
 }
