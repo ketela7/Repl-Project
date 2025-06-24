@@ -128,7 +128,23 @@ The application uses a modular, feature-based architecture:
 
 Preferred communication style: Simple, everyday language.
 
+### Development Standards
+- No NEXT_PUBLIC_ environment variables
+- Simple file naming without prefixes/suffixes
+- Thorough testing before commits
+- Professional code quality standards
+- Well-structured project organization
+- Update README.md for public understanding
+
+## Recent Changes
+
+- June 24, 2025: Initial setup with Google Drive authentication
+- June 24, 2025: Updated project rules - removed NEXT_PUBLIC_ env vars, simplified file naming
+- June 24, 2025: Fixed theme provider naming and removed complex file names
+- June 24, 2025: All tests passing (76 test cases), TypeScript compilation successful
+
 ## Changelog
 
-Changelog:
-- June 24, 2025. Initial setup
+- June 24, 2025: Project rules updated for professional development standards
+- June 24, 2025: Codebase cleaned up to follow new naming conventions
+- June 24, 2025: Environment variables secured (no client-side exposure)

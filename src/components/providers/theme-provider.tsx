@@ -3,11 +3,11 @@
 import { ThemeProvider } from "next-themes";
 import { ReactNode } from "react";
 
-interface OptimizedThemeProviderProps {
+interface ThemeProviderProps {
   children: ReactNode;
 }
 
-export function OptimizedThemeProvider({ children }: OptimizedThemeProviderProps) {
+export function CustomThemeProvider({ children }: ThemeProviderProps) {
   return (
     <ThemeProvider
       attribute="class"

@@ -17,10 +17,18 @@
 ### File Organization
 ```
 - Use kebab-case for file names (user-profile.tsx)
+- Simple file naming without prefixes or suffixes
+  ✅ drive-manager.tsx, drive-toolbar.tsx
+  ❌ drive-manager-enhanced.tsx, enhanced-drive-manager.tsx
 - Group related components in feature folders
 - Keep components under 300 lines when possible
 - Separate logic into custom hooks when appropriate
 ```
+
+### Environment Variables
+- **No NEXT_PUBLIC_ prefix**: Avoid client-side environment variables
+- **Server-side only**: Keep sensitive data on server
+- **Secure handling**: Use proper environment variable management
 
 ## 🏗 Architecture Guidelines
 
@@ -146,6 +154,12 @@ npm run build        # Production build succeeds
 - **Commit Messages**: Clear, descriptive commit messages
 - **Pull Requests**: Required for all changes
 - **Code Review**: Mandatory peer review
+
+### Quality Assurance
+- **Recheck & Retest**: Always verify code works before commit
+- **Professional Standards**: Work with professional coder discipline
+- **No Errors**: Ensure zero errors in production-ready code
+- **Well Structured**: Maintain clean, organized project structure
 
 ### Continuous Integration
 - **Automated Testing**: All tests must pass

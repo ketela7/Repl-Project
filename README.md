@@ -1,6 +1,25 @@
-# Professional Google Drive Management Application
+# Google Drive Pro - Professional Drive Management
 
-A modern, enterprise-grade Google Drive file management application built with Next.js 15, TypeScript, and shadcn/ui components. Features comprehensive file management, intelligent filtering, and real-time synchronization with Google Drive.
+A comprehensive, enterprise-grade Google Drive management application built with Next.js 15, featuring advanced file operations, intelligent filtering, and responsive design optimized for professional workflows.
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 20 or higher
+- Google Cloud Console project with Drive API enabled
+- PostgreSQL database (provided by Replit)
+
+### Installation
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Set up Google OAuth credentials in Replit secrets
+4. Run development server: `npm run dev`
+
+### Development Standards
+- No NEXT_PUBLIC_ environment variables - all config is server-side
+- Simple file naming without prefixes or suffixes
+- Professional code quality with comprehensive testing
+- Well-structured project organization following established patterns
 
 ## 🚀 Features
 
