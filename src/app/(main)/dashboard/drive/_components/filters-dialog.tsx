@@ -680,31 +680,12 @@ export function FiltersDialog({
                 />
               </div>
 
-              {/* Clear Advanced Button */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleClearAdvanced}
-                className="w-full"
-              >
-                <RefreshCw className="mr-1 h-3 w-3" />
-                Clear Advanced
-              </Button>
+
             </div>
           )}
         </div>
 
-        {/* Active Filters Indicator */}
-        {hasActiveFilters && (
-          <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
-            <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-500">
-              <div className="h-1.5 w-1.5 rounded-full bg-white" />
-            </div>
-            <div className="text-sm text-blue-800 dark:text-blue-200">
-              Active filters are applied. Use "Clear All" to reset all filters.
-            </div>
-          </div>
-        )}
+
       </div>
     </>
   )
@@ -753,21 +734,40 @@ export function FiltersDialog({
           <BottomSheetFooter className={cn('grid gap-4')}>
             <Button
               variant="outline"
+              disabled={isApplying}
               onClick={() => {
                 onFilterChange({
                   activeView: tempActiveView,
                   fileTypeFilter: tempFileTypeFilter,
                   advancedFilters: tempAdvancedFilters,
                 })
+                // Trigger the actual API call
+                if (onApplyFilters) {
+                  setTimeout(() => {
+                    onApplyFilters()
+                  }, 100)
+                }
                 onOpenChange(false)
               }}
               className={cn('touch-target min-h-[44px] active:scale-95')}
             >
-              Apply Filter
+              {isApplying ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  Applying...
+                </>
+              ) : (
+                'Apply Filter'
+              )}
             </Button>
             {hasTempActiveFilters && (
               <Button
-                onClick={handleClearAll}
+                variant="ghost"
+                disabled={isApplying}
+                onClick={() => {
+                  onClearFilters()
+                  onOpenChange(false)
+                }}
                 className={cn('touch-target min-h-[44px] active:scale-95')}
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
@@ -810,11 +810,6 @@ export function FiltersDialog({
             variant="outline"
             disabled={isApplying}
             onClick={() => {
-              console.log('Filter Debug - Apply button clicked:', {
-                tempActiveView,
-                tempFileTypeFilter,
-                tempAdvancedFilters
-              })
               onFilterChange({
                 activeView: tempActiveView,
                 fileTypeFilter: tempFileTypeFilter,

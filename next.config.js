@@ -20,6 +20,15 @@ const nextConfig = {
     useWasmBinary: false,
   },
   
+  turbo: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
+  },
+  
   serverExternalPackages: ['postgres', 'googleapis'],
   
   // Fast TypeScript compilation
@@ -34,34 +43,6 @@ const nextConfig = {
   },
 
   allowedDevOrigins: ['*.pike.replit.dev', '*.sisko.replit.dev'],
-  
-  // Optimized webpack for development speed
-  webpack: (config, { dev, isServer }) => {
-    if (dev) {
-      // Fast development builds
-      config.watchOptions = {
-        poll: false, // Use native file watching
-        aggregateTimeout: 200,
-        ignored: [
-          '**/node_modules/**',
-          '**/.git/**', 
-          '**/.next/**',
-          '**/coverage/**',
-          '**/drizzle/**'
-        ],
-      }
-      
-      config.optimization = {
-        ...config.optimization,
-        removeAvailableModules: false,
-        removeEmptyChunks: false,
-        splitChunks: false,
-      }
-
-      config.resolve.symlinks = false
-    }
-    return config
-  },
   
   // Performance optimizations
   compiler: {
