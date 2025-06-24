@@ -224,15 +224,23 @@ export function DriveManager() {
   }, [currentFolderId, searchQuery, filters, fetchFiles])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
-    setFilters((prev) => ({
-      ...prev,
-      ...newFilters,
-      advancedFilters: {
-        ...prev.advancedFilters,
-        ...newFilters.advancedFilters,
-      },
-    }))
-  }, [])
+    console.log('Filter Debug - handleFilter called:', {
+      newFilters,
+      currentFilters: filters
+    })
+    setFilters((prev) => {
+      const updated = {
+        ...prev,
+        ...newFilters,
+        advancedFilters: {
+          ...prev.advancedFilters,
+          ...newFilters.advancedFilters,
+        },
+      }
+      console.log('Filter Debug - updated filters:', updated)
+      return updated
+    })
+  }, [filters])
 
   // Check if any filters are active
   const hasActiveFilters: boolean =
@@ -436,10 +444,22 @@ export function DriveManager() {
         params.append('sortBy', filters.advancedFilters.sortBy || 'modified')
         params.append('sortOrder', filters.advancedFilters.sortOrder || 'desc')
 
-        const response = await fetch(`/api/drive/files?${params}`)
+        console.log('Filter Debug - Frontend:', {
+          currentFilters: filters,
+          apiParams: params.toString(),
+          requestUrl: `/api/drive/files?${params}`
+        })
+        
+        const response = await fetch(`/api/drive/files?${params}`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
 
         if (!response.ok) {
           if (response.status === 401) {
+            console.log('401 error - triggering reauth')
             setNeedsReauth(true)
             throw new Error('Authentication required')
           }

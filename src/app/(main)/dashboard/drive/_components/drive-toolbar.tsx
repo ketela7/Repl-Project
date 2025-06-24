@@ -869,7 +869,10 @@ export function DriveToolbar({
                             filters.activeView === 'all' ? 'default' : 'outline'
                           }
                           size="sm"
-                          onClick={() => onFilterChange({ activeView: 'all' })}
+                          onClick={() => {
+                            console.log('Filter Debug - Toolbar click: All Files')
+                            onFilterChange({ activeView: 'all' })
+                          }}
                           className="justify-start text-xs"
                         >
                           All Files
@@ -881,9 +884,10 @@ export function DriveToolbar({
                               : 'outline'
                           }
                           size="sm"
-                          onClick={() =>
+                          onClick={() => {
+                            console.log('Filter Debug - Toolbar click: My Drive')
                             onFilterChange({ activeView: 'my-drive' })
-                          }
+                          }}
                           className="justify-start text-xs"
                         >
                           My Drive
@@ -895,9 +899,10 @@ export function DriveToolbar({
                               : 'outline'
                           }
                           size="sm"
-                          onClick={() =>
+                          onClick={() => {
+                            console.log('Filter Debug - Toolbar click: Recent')
                             onFilterChange({ activeView: 'recent' })
-                          }
+                          }}
                           className="justify-start text-xs"
                         >
                           Recent
@@ -909,9 +914,10 @@ export function DriveToolbar({
                               : 'outline'
                           }
                           size="sm"
-                          onClick={() =>
+                          onClick={() => {
+                            console.log('Filter Debug - Toolbar click: Trash')
                             onFilterChange({ activeView: 'trash' })
-                          }
+                          }}
                           className="justify-start text-xs"
                         >
                           Trash
@@ -923,9 +929,10 @@ export function DriveToolbar({
                               : 'outline'
                           }
                           size="sm"
-                          onClick={() =>
+                          onClick={() => {
+                            console.log('Filter Debug - Toolbar click: Starred')
                             onFilterChange({ activeView: 'starred' })
-                          }
+                          }}
                           className="justify-start text-xs"
                         >
                           Starred
@@ -1044,6 +1051,7 @@ export function DriveToolbar({
                                         (t) => t !== filter.type
                                       )
                                     : [...filters.fileTypeFilter, filter.type]
+                                console.log('Filter Debug - File type click:', filter.type, 'New types:', newTypes)
                                 onFilterChange({ fileTypeFilter: newTypes })
                               }}
                               className="justify-center p-2 text-xs"
