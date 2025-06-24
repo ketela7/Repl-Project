@@ -698,9 +698,7 @@ export function DriveToolbar({
                 </DropdownMenuItem>
 
                 {selectedCount > 0 && (
-              
-              
-                  
+                  <>
                     <DropdownMenuSeparator />
                     <div className="text-muted-foreground px-2 py-1.5 text-xs font-semibold tracking-wider uppercase">
                       File Operations ({selectedCount} selected)
@@ -745,10 +743,7 @@ export function DriveToolbar({
                       <Trash2 className="mr-2 h-4 w-4" />
                       Move to Trash
                     </DropdownMenuItem>
-
-									
-
-                  
+                  </>
                 )}
                 
               </DropdownMenuContent>
