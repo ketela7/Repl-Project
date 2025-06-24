@@ -217,11 +217,11 @@ export function DriveManager() {
     setTimeout(() => {
       fetchFiles(currentFolderId || undefined, undefined)
     }, 0)
-  }, [currentFolderId])
+  }, [currentFolderId, fetchFiles])
 
   const applyFilters = useCallback(() => {
     fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
-  }, [currentFolderId, searchQuery, filters])
+  }, [currentFolderId, searchQuery, filters, fetchFiles])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
     setFilters((prev) => ({
@@ -385,17 +385,33 @@ export function DriveManager() {
     })
   }, [selectedItems, items])
 
-  // API call function
+  // API call function with deduplication
   const fetchFiles = useCallback(
     async (folderId?: string, searchQuery?: string, pageToken?: string) => {
       try {
         if (!folderId && folderId !== '')
           folderId = currentFolderId || undefined
 
-        const callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}`
+        // Create a unique key for the request including filters
+        const filterKey = JSON.stringify({
+          view: filters.activeView,
+          types: filters.fileTypeFilter,
+          sort: filters.advancedFilters.sortBy,
+          order: filters.advancedFilters.sortOrder
+        })
+        
+        const callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
+        
+        // Prevent duplicate requests
         if (activeRequestsRef.current.has(callId)) {
           return
         }
+        
+        // Check if filters changed, reset pagination
+        if (filterKey !== lastFiltersRef.current && pageToken) {
+          return // Don't make paginated requests with old filters
+        }
+        lastFiltersRef.current = filterKey
 
         if (!pageToken) {
           setLoading(true)
@@ -410,19 +426,15 @@ export function DriveManager() {
         if (searchQuery) params.append('search', searchQuery)
         if (pageToken) params.append('pageToken', pageToken)
 
-        // Add filter params
-        if (filters.activeView !== 'all') {
+        // Add filter params only if they have meaningful values
+        if (filters.activeView && filters.activeView !== 'all') {
           params.append('viewStatus', filters.activeView)
         }
-        if (filters.fileTypeFilter.length > 0) {
+        if (filters.fileTypeFilter && filters.fileTypeFilter.length > 0) {
           params.append('fileType', filters.fileTypeFilter.join(','))
         }
-        if (filters.advancedFilters.sortBy) {
-          params.append('sortBy', filters.advancedFilters.sortBy)
-        }
-        if (filters.advancedFilters.sortOrder) {
-          params.append('sortOrder', filters.advancedFilters.sortOrder)
-        }
+        params.append('sortBy', filters.advancedFilters.sortBy || 'modified')
+        params.append('sortOrder', filters.advancedFilters.sortOrder || 'desc')
 
         const response = await fetch(`/api/drive/files?${params}`)
 
@@ -494,9 +506,14 @@ export function DriveManager() {
         setLoading(false)
         setLoadingMore(false)
         setRefreshing(false)
-        activeRequestsRef.current.delete(
-          `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}`
-        )
+        const filterKey = JSON.stringify({
+          view: filters.activeView,
+          types: filters.fileTypeFilter,
+          sort: filters.advancedFilters.sortBy,
+          order: filters.advancedFilters.sortOrder
+        })
+        const callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
+        activeRequestsRef.current.delete(callId)
       }
     },
     [currentFolderId, filters]
@@ -514,7 +531,16 @@ export function DriveManager() {
   // Initial load and folder navigation
   useEffect(() => {
     fetchFiles()
-  }, [])
+  }, [fetchFiles])
+
+  // Auto-apply filters when they change
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+    }, 300) // Debounce filter changes
+    
+    return () => clearTimeout(timeoutId)
+  }, [filters, fetchFiles, currentFolderId, searchQuery])
 
   // Navigation handlers
   const handleFolderClick = useCallback(
