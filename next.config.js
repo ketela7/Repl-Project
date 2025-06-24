@@ -17,7 +17,7 @@ const nextConfig = {
     // Improve compilation speed
     useWasmBinary: false,
     // Reduce memory usage
-    cpus: 1
+    //cpus: 1
   },
   // Turbopack configuration (moved from experimental.turbo)
   turbopack: {

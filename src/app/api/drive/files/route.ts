@@ -437,7 +437,8 @@ export async function GET(request: NextRequest) {
   }
 
   const query = buildDriveQuery(filters)
-  const orderBy = `${filters.sortBy} ${filters.sortOrder}`
+  const sortKey = getSortKey(filters.sortBy || 'modified')
+  const orderBy = `${sortKey} ${filters.sortOrder}`
 
   const driveService = new GoogleDriveService(session.accessToken)
   

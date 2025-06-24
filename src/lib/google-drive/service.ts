@@ -120,6 +120,12 @@ export class GoogleDriveService {
 
     // Log query for debugging in development only
     if (process.env.NODE_ENV === 'development') {
+      console.log('Drive API Request:', {
+        q: searchQuery,
+        pageSize: validPageSize,
+        orderBy,
+        pageToken: validPageToken
+      });
     }
 
     // Prepare API request parameters with proper validation
@@ -143,6 +149,7 @@ export class GoogleDriveService {
       const files = response.data.files?.map(convertGoogleDriveFile) || [];
 
       if (process.env.NODE_ENV === 'development') {
+        console.log(`Drive API Success: Found ${files.length} files`);
       }
 
       return {
