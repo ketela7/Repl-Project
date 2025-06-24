@@ -8,9 +8,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog'
-import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   BottomSheet,
@@ -18,7 +18,7 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
+} from '@/components/ui/bottom-sheet'
 import { Copy, AlertTriangle } from 'lucide-react'
 import { FileCopyDialog } from './file-copy-dialog'
 import { cn } from '@/shared/utils'

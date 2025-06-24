@@ -9,15 +9,15 @@ import {
   User,
   CheckCircle,
 } from 'lucide-react'
-import { Button } from '@/shared/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/components/ui/card'
-import { Alert, AlertDescription } from '@/shared/components/ui/alert'
+} from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useEffect, useState } from 'react'
 
 export default function ServerOfflinePage() {

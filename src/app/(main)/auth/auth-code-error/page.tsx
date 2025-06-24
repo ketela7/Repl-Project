@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { AlertCircle } from 'lucide-react'
-import { Button } from '@/shared/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/shared/components/ui/card'
+} from '@/components/ui/card'
 
 export default function AuthCodeErrorPage() {
   return (

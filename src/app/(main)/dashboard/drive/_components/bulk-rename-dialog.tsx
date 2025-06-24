@@ -8,7 +8,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -16,12 +16,12 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
-import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
-import { Label } from '@/shared/components/ui/label'
-import { Badge } from '@/shared/components/ui/badge'
-import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group'
+} from '@/components/ui/bottom-sheet'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   Edit3,

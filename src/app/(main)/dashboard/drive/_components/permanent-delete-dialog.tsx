@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/shared/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -17,7 +17,7 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
+} from '@/components/ui/bottom-sheet'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'

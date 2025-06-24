@@ -1,5 +1,5 @@
-import { Skeleton } from '@/shared/components/ui/skeleton'
-import { Card, CardContent, CardHeader } from '@/shared/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 export function DriveGridSkeleton() {
   // Fixed width patterns to avoid hydration mismatch

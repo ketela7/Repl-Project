@@ -9,7 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog'
+} from '@/components/ui/alert-dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -17,8 +17,8 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
-import { Button } from '@/shared/components/ui/button'
+} from '@/components/ui/bottom-sheet'
+import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { Trash2 } from 'lucide-react'
 import { cn } from '@/shared/utils'

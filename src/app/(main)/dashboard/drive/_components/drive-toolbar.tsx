@@ -1,23 +1,23 @@
 'use client'
 
 import { Suspense, useMemo, useCallback, useState } from 'react'
-import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
-import { Input } from '@/shared/components/ui/input'
-import { Separator } from '@/shared/components/ui/separator'
-import { Checkbox } from '@/shared/components/ui/checkbox'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Separator } from '@/components/ui/separator'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/shared/components/ui/collapsible'
+} from '@/components/ui/collapsible'
 import {
   Search,
   List,
@@ -60,9 +60,9 @@ import {
   FileType,
   EllipsisVertical,
 } from 'lucide-react'
-import { FileIcon } from '@/shared/components/file-icon'
+import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { FileCategoryBadges } from '@/shared/components/file-category-badges'
+import { FileCategoryBadges } from '@/components/file-category-badges'
 import { successToast, infoToast } from '@/shared/utils'
 
 // Types

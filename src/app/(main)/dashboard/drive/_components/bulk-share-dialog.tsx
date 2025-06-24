@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
@@ -10,7 +10,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog'
+} from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -18,22 +18,22 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
+} from '@/components/ui/bottom-sheet'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/shared/components/ui/select'
+} from '@/components/ui/select'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
-import { Label } from '@/shared/components/ui/label'
-import { Separator } from '@/shared/components/ui/separator'
+} from '@/components/ui/dropdown-menu'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   Share2,
@@ -51,7 +51,7 @@ import {
   Download,
   ChevronDown,
 } from 'lucide-react'
-import { FileIcon } from '@/shared/components/file-icon'
+import { FileIcon } from '@/components/file-icon'
 import { toast } from 'sonner'
 
 interface BulkShareDialogProps {

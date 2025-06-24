@@ -5,18 +5,18 @@ import { usePathname } from 'next/navigation'
 
 import { PlusCircle, Mail, ChevronRight } from 'lucide-react'
 
-import { Button } from '@/shared/components/ui/button'
+import { Button } from '@/components/ui/button'
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/shared/components/ui/collapsible'
+} from '@/components/ui/collapsible'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -28,7 +28,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   useSidebar,
-} from '@/shared/components/ui/sidebar'
+} from '@/components/ui/sidebar'
 import {
   type NavGroup,
   type NavMainItem,

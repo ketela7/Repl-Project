@@ -8,9 +8,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/shared/components/ui/breadcrumb'
+} from '@/components/ui/breadcrumb'
 import { Home, Folder, ChevronRight, Loader2 } from 'lucide-react'
-import { Button } from '@/shared/components/ui/button'
+import { Button } from '@/components/ui/button'
 
 interface BreadcrumbItemData {
   id: string

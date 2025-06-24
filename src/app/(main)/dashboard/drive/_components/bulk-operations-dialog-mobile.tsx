@@ -1,8 +1,8 @@
 'use client'
 
 
-import { Button } from '@/shared/components/ui/button'
-import { Separator } from '@/shared/components/ui/separator'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -10,7 +10,7 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
+} from '@/components/ui/bottom-sheet'
 import {
   Download,
   Trash2,

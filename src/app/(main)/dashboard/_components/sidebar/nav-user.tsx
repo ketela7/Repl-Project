@@ -8,7 +8,7 @@ import {
   LogOut,
 } from 'lucide-react'
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/shared/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,13 +17,13 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/shared/components/ui/dropdown-menu'
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from '@/shared/components/ui/sidebar'
+} from '@/components/ui/sidebar'
 import { getInitials } from '@/shared/utils'
 
 export function NavUser({

@@ -8,11 +8,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog'
-import { Button } from '@/shared/components/ui/button'
-import { Badge } from '@/shared/components/ui/badge'
-import { Label } from '@/shared/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/shared/components/ui/radio-group'
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   BottomSheet,
@@ -20,7 +20,7 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
+} from '@/components/ui/bottom-sheet'
 import {
   FileDown,
   AlertTriangle,

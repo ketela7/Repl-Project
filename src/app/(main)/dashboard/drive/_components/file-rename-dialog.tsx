@@ -1,9 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/shared/components/ui/button'
-import { Input } from '@/shared/components/ui/input'
-import { Label } from '@/shared/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/shared/components/ui/dialog'
+} from '@/components/ui/dialog'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { toast } from 'sonner'
 import {
@@ -21,7 +21,7 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
+} from '@/components/ui/bottom-sheet'
 import { Edit } from 'lucide-react'
 import { cn } from '@/shared/utils'
 

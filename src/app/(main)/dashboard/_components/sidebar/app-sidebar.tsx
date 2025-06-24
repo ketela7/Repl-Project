@@ -10,7 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@/shared/components/ui/sidebar'
+} from '@/components/ui/sidebar'
 import { APP_CONFIG } from '@/shared/constants/app-constants'
 import { sidebarItems } from '@/features/navigation/components/sidebar/sidebar-items'
 

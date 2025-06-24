@@ -9,9 +9,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/shared/components/ui/alert-dialog'
-import { Badge } from '@/shared/components/ui/badge'
-import { Button } from '@/shared/components/ui/button'
+} from '@/components/ui/alert-dialog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   BottomSheet,
@@ -19,7 +19,7 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
-} from '@/shared/components/ui/bottom-sheet'
+} from '@/components/ui/bottom-sheet'
 import { RotateCcw, Info } from 'lucide-react'
 import { cn } from '@/shared/utils'
 

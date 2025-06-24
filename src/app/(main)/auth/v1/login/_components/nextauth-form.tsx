@@ -5,9 +5,9 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useSession } from 'next-auth/react'
-import { GoogleAuthButton } from '@/features/auth/components/google-auth-button'
-import { Checkbox } from '@/shared/components/ui/checkbox'
-import { Alert, AlertDescription } from '@/shared/components/ui/alert'
+import { GoogleAuthButton } from '@/components/auth/google-auth-button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Shield } from 'lucide-react'
 
 const FormSchema = z.object({
