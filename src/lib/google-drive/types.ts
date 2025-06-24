@@ -82,6 +82,7 @@ export interface DriveFolder {
   mimeType: string;
   createdTime: string;
   modifiedTime: string;
+  thumbnailLink?: string;
   parents?: string[];
   shared?: boolean;
   trashed?: boolean;
