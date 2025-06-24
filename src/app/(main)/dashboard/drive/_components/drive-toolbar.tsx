@@ -641,7 +641,7 @@ export function DriveToolbar({
           </Button>
 
           {/* Mobile Bulk Actions Button - Show when items are selected on mobile */}
-          {isMobile && selectedCount > 0 && onMobileActionsOpen && (
+          {isMobile && selectedCount > 0 && onMobileActionsOpen ? (
             <Button
               variant="default"
               size="sm"
@@ -657,12 +657,21 @@ export function DriveToolbar({
               <MoreVertical className="mr-1 h-4 w-4" />
               Actions ({selectedCount})
             </Button>
-          )}
+          ) : isMobile && selectedCount > 0 ? (
+            <Button
+              variant="destructive" 
+              size="sm"
+              className="h-8 px-3"
+              disabled
+            >
+              Missing Handler ({selectedCount})
+            </Button>
+          ) : null}
           
-          {/* Debug: Show mobile bulk button conditions */}
+          {/* Debug: Show mobile bulk button conditions - VISIBLE FOR DEBUGGING */}
           {isMobile && (
-            <div className="hidden">
-              Debug: isMobile={String(isMobile)}, selectedCount={selectedCount}, hasOnMobileActionsOpen={Boolean(onMobileActionsOpen)}
+            <div className="text-xs text-blue-600 p-1 border border-blue-300 rounded bg-blue-50 ml-1">
+              Mobile Debug: selected={selectedCount}, handler={onMobileActionsOpen ? 'OK' : 'MISSING'}
             </div>
           )}
 

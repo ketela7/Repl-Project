@@ -523,7 +523,10 @@ export function DriveManager() {
             onBulkCopy={() => openDialog('bulkCopy')}
             onBulkShare={() => openDialog('bulkShare')}
             onFiltersOpen={() => openDialog('mobileFilters')}
-            onMobileActionsOpen={() => openDialog('mobileActions')}
+            onMobileActionsOpen={() => {
+              console.log('Mobile Actions Open Handler Called')
+              openDialog('mobileActions')
+            }}
             filters={filters}
             onFilterChange={handleFilter as any}
             onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
