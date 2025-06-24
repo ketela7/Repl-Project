@@ -16,11 +16,17 @@ export function GoogleAuthButton({
   variant = "default",
   onClick
 }: GoogleAuthButtonProps) {
-  const handleClick = () => {
+  const handleClick = async () => {
     if (onClick) {
       onClick()
     } else {
-      signIn("google")
+      try {
+        await signIn("google", {
+          callbackUrl: "/dashboard/drive"
+        })
+      } catch (error) {
+        console.error("Sign in failed:", error)
+      }
     }
   }
 

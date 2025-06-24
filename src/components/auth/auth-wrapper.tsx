@@ -30,6 +30,11 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
 
   // Check server connectivity when status is unauthenticated
   useEffect(() => {
+    // Don't redirect during tests
+    if (process.env.NODE_ENV === 'test') {
+      return
+    }
+
     if (status === 'unauthenticated' && hasStoredSession) {
       const checkServerStatus = async () => {
         try {

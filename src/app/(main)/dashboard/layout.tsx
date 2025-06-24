@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { AuthWrapper } from '@/features/auth/components/auth-wrapper'
+import { AuthWrapper } from '@/components/auth/auth-wrapper'
 import { AppSidebar } from '@/app/(main)/dashboard/_components/sidebar/app-sidebar'
 import { Separator } from '@/shared/components/ui/separator'
 import {
