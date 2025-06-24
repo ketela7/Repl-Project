@@ -26,7 +26,7 @@ import { BulkCopyDialog } from './bulk-copy-dialog'
 import { FileShareDialog } from './file-share-dialog'
 import { BulkShareDialog } from './bulk-share-dialog'
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet'
-import { FiltersDialog } from './filters-dialog'
+//import { FiltersDialog } from './filters-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
 import { DriveErrorDisplay } from '@/shared/components/drive-error-display'
@@ -73,8 +73,8 @@ export function DriveManager() {
 
   // Table state
   const [visibleColumns, setVisibleColumns] = useState({
-    name: true, size: true, owners: true, mimeType: true,
-    createdTime: false, modifiedTime: true,
+    name: true, size: false, owners: false, mimeType: false,
+    createdTime: false, modifiedTime: false,
   })
 
   // Dialog state - consolidated
@@ -177,7 +177,7 @@ export function DriveManager() {
       <ChevronDown className="h-4 w-4" />
   }
 
-  // Optimized sorting
+  // Sorting <Header Tabel>
   const sortedItems = useMemo(() => {
     if (!sortConfig) {
       return [...items].sort((a, b) => {
@@ -259,7 +259,7 @@ export function DriveManager() {
         modified: filters.advancedFilters.modifiedDateRange, owner: filters.advancedFilters.owner,
       })
 
-      callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
+      callId = `${folderId}-${searchQuery}-${pageToken}-${filterKey}`
 
       if (activeRequestsRef.current.has(callId)) return
       if (filterKey !== lastFiltersRef.current && pageToken) return
@@ -271,8 +271,8 @@ export function DriveManager() {
       activeRequestsRef.current.add(callId)
 
       const params = new URLSearchParams({
-        sortBy: filters.advancedFilters.sortBy || 'modified',
-        sortOrder: filters.advancedFilters.sortOrder || 'desc'
+        sortBy: filters.advancedFilters.sortBy,
+        sortOrder: filters.advancedFilters.sortOrder
       })
 
       if (folderId) params.append('folderId', folderId)
@@ -842,7 +842,7 @@ export function DriveManager() {
         }}
       />
 
-      <FiltersDialog
+      {/* <FiltersDialog
         open={dialogs.mobileFilters}
         onOpenChange={(open) => {
           if (!open) closeDialog('mobileFilters')
@@ -851,7 +851,7 @@ export function DriveManager() {
         onFilterChange={handleFilter}
         onClearFilters={clearAllFilters}
         hasActiveFilters={hasActiveFilters}
-      />
+      /> */}
 
       {/* Progress indicators */}
       {bulkOperationProgress.isRunning && (

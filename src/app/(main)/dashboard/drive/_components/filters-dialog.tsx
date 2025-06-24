@@ -367,15 +367,15 @@ export function FiltersDialog({
                     onClick={() => {
                       handleFileTypeFilter(filter.id)
                       // Apply immediately like View Status
-                      onFilterChange({
-                        activeView: tempActiveView,
-                        fileTypeFilter: tempFileTypeFilter.includes(filter.id)
-                          ? tempFileTypeFilter.filter(
-                              (t: string) => t !== filter.id
-                            )
-                          : [...tempFileTypeFilter, filter.id],
-                        advancedFilters: tempAdvancedFilters,
-                      })
+                      // onFilterChange({
+                      //   activeView: tempActiveView,
+                      //   fileTypeFilter: tempFileTypeFilter.includes(filter.id)
+                      //     ? tempFileTypeFilter.filter(
+                      //         (t: string) => t !== filter.id
+                      //       )
+                      //     : [...tempFileTypeFilter, filter.id],
+                      //   advancedFilters: tempAdvancedFilters,
+                      // })
                     }}
                   >
                     <Icon className={`mr-2 h-4 w-4 ${filter.color}`} />
@@ -700,7 +700,7 @@ export function FiltersDialog({
                   </div>
                   <div>
                     <div className="text-lg font-semibold">
-                      Filters & Search
+                      Filters
                     </div>
                     <div className="text-muted-foreground text-sm font-normal">
                       {hasActiveFilters && (
@@ -792,14 +792,13 @@ export function FiltersDialog({
               <Filter className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <div className="text-lg font-semibold">Filters & Search</div>
+              <div className="text-lg font-semibold">Filters</div>
               <div className="text-muted-foreground text-sm font-normal">
                 {hasTempActiveFilters && (
                   <Badge variant="secondary" className="mr-1 text-xs">
                     Active
                   </Badge>
                 )}
-                Filter files by type, size, date, and owner
               </div>
             </div>
           </DialogTitle>
@@ -807,32 +806,14 @@ export function FiltersDialog({
             {renderContent()}
           </DialogDescription>
         </DialogHeader>
+        
 
         <DialogFooter className="flex justify-between">
           <Button
             variant="outline"
             disabled={isApplying}
             onClick={() => {
-              console.log('🎯 FILTER APPLY - Complete Parameters Being Sent:', {
-                activeView: tempActiveView,
-                fileTypeFilter: tempFileTypeFilter,
-                advancedFilters: tempAdvancedFilters,
-                timestamp: new Date().toISOString(),
-                combinedFilters: {
-                  viewStatus: tempActiveView,
-                  fileTypes: tempFileTypeFilter,
-                  sizeRange: tempAdvancedFilters?.sizeRange,
-                  dateRanges: {
-                    created: tempAdvancedFilters?.createdDateRange,
-                    modified: tempAdvancedFilters?.modifiedDateRange
-                  },
-                  owner: tempAdvancedFilters?.owner,
-                  sorting: {
-                    sortBy: tempAdvancedFilters?.sortBy || 'modified',
-                    sortOrder: tempAdvancedFilters?.sortOrder || 'desc'
-                  }
-                }
-              })
+              
               onFilterChange({
                 activeView: tempActiveView,
                 fileTypeFilter: tempFileTypeFilter,
