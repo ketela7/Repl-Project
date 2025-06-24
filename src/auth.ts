@@ -70,59 +70,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token
     },
     async session({ session, token }) {
-      try {
-        // Validate token structure
-        if (!token || typeof token !== 'object') {
-
-          return null
-        }
-
-        // Generate cache key
-        const cacheKey = generateSessionCacheKey(
-          token.sub || '',
-          token.email || ''
-        )
-
-        // Check cache first
-        const cachedSession = sessionCache.get(cacheKey)
-        if (cachedSession) {
-          return cachedSession
-        }
-
-        // Check if session should expire based on remember me preference
-        const now = Math.floor(Date.now() / 1000)
-        const sessionDuration = token.rememberMe
-          ? 30 * 24 * 60 * 60
-          : 24 * 60 * 60 // 30 days or 1 day
-        const sessionExpiry = (token.iat || now) + sessionDuration
-
-        // If session has expired based on remember me preference, return null to force re-login
-        if (now > sessionExpiry) {
-          return null
-        }
-
-        // Build session object
-        const sessionData = {
-          ...session,
-          accessToken: (token.accessToken as string) || undefined,
-          refreshToken: (token.refreshToken as string) || undefined,
-          provider: (token.provider as string) || 'google',
-          rememberMe: Boolean(token.rememberMe),
-        }
-
-        // Cache the session for 5 minutes
-        sessionCache.set(cacheKey, sessionData, 5 * 60 * 1000)
-
-        return sessionData
-      } catch (error) {
-        // Return basic session without tokens to maintain user info
-        return {
-          ...session,
-          accessToken: undefined,
-          refreshToken: undefined,
-          provider: 'google',
-          rememberMe: false,
-        }
+      // Build session object with tokens
+      return {
+        ...session,
+        accessToken: (token.accessToken as string) || undefined,
+        refreshToken: (token.refreshToken as string) || undefined,
+        provider: (token.provider as string) || 'google',
+        rememberMe: Boolean(token.rememberMe),
       }
     },
     async redirect({ url, baseUrl }) {
