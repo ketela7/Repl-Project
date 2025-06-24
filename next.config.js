@@ -13,8 +13,11 @@ const nextConfig = {
       '@tanstack/react-table',
       'recharts'
     ],
-    // Faster builds
-    optimisticClientCache: true
+    optimisticClientCache: true,
+    // Improve compilation speed
+    useWasmBinary: false,
+    // Reduce memory usage
+    cpus: 1
   },
   // Turbopack configuration (moved from experimental.turbo)
   turbopack: {
@@ -27,10 +30,17 @@ const nextConfig = {
   },
   serverExternalPackages: ['postgres'],
   typescript: {
-    ignoreBuildErrors: true
+    ignoreBuildErrors: true,
+    tsconfigPath: './tsconfig.json'
   },
   eslint: {
     ignoreDuringBuilds: true
+  },
+  // SWC is enabled by default in Next.js 15
+  modularizeImports: {
+    'lucide-react': {
+      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}'
+    }
   },
   allowedDevOrigins : ['*.pike.replit.dev', '*.sisko.replit.dev'],
   // Performance optimizations
