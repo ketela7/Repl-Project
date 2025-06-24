@@ -154,6 +154,7 @@ interface DriveToolbarProps {
 
   // Loading states
   loading: boolean
+  isApplying?: boolean
 
   // Client-side filtering
   onClientSideFilter?: (filteredItems: any[]) => void
