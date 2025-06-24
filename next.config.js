@@ -37,11 +37,7 @@ const nextConfig = {
     ignoreDuringBuilds: true
   },
   // SWC is enabled by default in Next.js 15
-  modularizeImports: {
-    'lucide-react': {
-      transform: 'lucide-react/dist/esm/icons/{{kebabCase member}}'
-    }
-  },
+
   allowedDevOrigins : ['*.pike.replit.dev', '*.sisko.replit.dev'],
   // Performance optimizations
   compiler: {

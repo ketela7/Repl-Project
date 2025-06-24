@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
-import { PlusCircleIcon, MailIcon, ChevronRight } from 'lucide-react'
+import { PlusCircle, Mail, ChevronRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -196,7 +196,7 @@ export function NavMain({ items }: NavMainProps) {
                 tooltip="Quick Create"
                 className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
               >
-                <PlusCircleIcon />
+                <PlusCircle />
                 <span>Quick Create</span>
               </SidebarMenuButton>
               <Button
@@ -204,7 +204,7 @@ export function NavMain({ items }: NavMainProps) {
                 className="h-9 w-9 shrink-0 group-data-[collapsible=icon]:opacity-0"
                 variant="outline"
               >
-                <MailIcon />
+                <Mail />
                 <span className="sr-only">Inbox</span>
               </Button>
             </SidebarMenuItem>

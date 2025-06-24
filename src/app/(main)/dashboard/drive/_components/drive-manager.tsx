@@ -16,21 +16,20 @@ import { DriveConnectionCard } from './drive-connection-card'
 import { DriveGridSkeleton } from './drive-skeleton'
 import { Progress } from '@/components/ui/progress'
 
-// Lazy load heavy dialog components
-import { lazy } from 'react'
-const FileUploadDialog = lazy(() => import('./file-upload-dialog').then(m => ({ default: m.FileUploadDialog })))
-const CreateFolderDialog = lazy(() => import('./create-folder-dialog').then(m => ({ default: m.CreateFolderDialog })))
-const FileRenameDialog = lazy(() => import('./file-rename-dialog').then(m => ({ default: m.FileRenameDialog })))
-const FileMoveDialog = lazy(() => import('./file-move-dialog').then(m => ({ default: m.FileMoveDialog })))
-const FileCopyDialog = lazy(() => import('./file-copy-dialog').then(m => ({ default: m.FileCopyDialog })))
-const PermanentDeleteDialog = lazy(() => import('./permanent-delete-dialog').then(m => ({ default: m.PermanentDeleteDialog })))
-const FileDetailsDialog = lazy(() => import('./file-details-dialog').then(m => ({ default: m.FileDetailsDialog })))
-const FilePreviewDialog = lazy(() => import('./file-preview-dialog').then(m => ({ default: m.FilePreviewDialog })))
-const BulkDeleteDialog = lazy(() => import('./bulk-delete-dialog').then(m => ({ default: m.BulkDeleteDialog })))
-const BulkMoveDialog = lazy(() => import('./bulk-move-dialog').then(m => ({ default: m.BulkMoveDialog })))
-const BulkCopyDialog = lazy(() => import('./bulk-copy-dialog').then(m => ({ default: m.BulkCopyDialog })))
-const FileShareDialog = lazy(() => import('./file-share-dialog').then(m => ({ default: m.FileShareDialog })))
-const BulkShareDialog = lazy(() => import('./bulk-share-dialog').then(m => ({ default: m.BulkShareDialog })))
+// Component imports
+import { FileUploadDialog } from './file-upload-dialog'
+import { CreateFolderDialog } from './create-folder-dialog'
+import { FileRenameDialog } from './file-rename-dialog'
+import { FileMoveDialog } from './file-move-dialog'
+import { FileCopyDialog } from './file-copy-dialog'
+import { PermanentDeleteDialog } from './permanent-delete-dialog'
+import { FileDetailsDialog } from './file-details-dialog'
+import { FilePreviewDialog } from './file-preview-dialog'
+import { BulkDeleteDialog } from './bulk-delete-dialog'
+import { BulkMoveDialog } from './bulk-move-dialog'
+import { BulkCopyDialog } from './bulk-copy-dialog'
+import { FileShareDialog } from './file-share-dialog'
+import { BulkShareDialog } from './bulk-share-dialog'
 import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet'
 import { FiltersDialog } from './filters-dialog'
 import { DriveToolbar } from './drive-toolbar'
