@@ -406,6 +406,15 @@ export async function GET(request: NextRequest) {
       viewStatus: filters.viewStatus,
       fileType: filters.fileType,
       search: filters.search,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      createdAfter: filters.createdAfter,
+      createdBefore: filters.createdBefore,
+      modifiedAfter: filters.modifiedAfter,
+      modifiedBefore: filters.modifiedBefore,
+      owner: filters.owner,
+      query,
+      orderBy
     })
 
     const cachedData = driveCache.get(cacheKey)

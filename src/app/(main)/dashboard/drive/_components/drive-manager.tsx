@@ -414,17 +414,17 @@ export function DriveManager() {
           modified: filters.advancedFilters.modifiedDateRange,
           owner: filters.advancedFilters.owner
         })
-        
+
         const callId = `${folderId || 'root'}-${searchQuery || ''}-${pageToken || ''}-${filterKey}`
-        
+
         // Prevent duplicate requests
         if (activeRequestsRef.current.has(callId)) {
           return
         }
-        
+
         // Check if filters changed, reset pagination
         // Skip if filters changed for paginated requests
-        
+
         if (filterKey !== lastFiltersRef.current && pageToken) {
           return
         }
@@ -479,7 +479,7 @@ export function DriveManager() {
           apiParams: params.toString(),
           requestUrl: `/api/drive/files?${params}`
         })
-        
+
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',
           headers: {
@@ -595,7 +595,7 @@ export function DriveManager() {
         fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
       }
     }, 300) // Debounce filter changes
-    
+
     return () => clearTimeout(timeoutId)
   }, [filters, currentFolderId, searchQuery])
 
@@ -634,6 +634,31 @@ export function DriveManager() {
   }, [fetchFiles, currentFolderId, searchQuery])
 
   // Client-side filtering handler with reset option
+
+  // Define initial filters outside of the component
+  const initialFilters = {
+    activeView: 'all' as
+      | 'all'
+      | 'my-drive'
+      | 'shared'
+      | 'starred'
+      | 'recent'
+      | 'trash',
+    fileTypeFilter: [] as string[],
+    advancedFilters: {
+      sizeRange: {
+        unit: 'MB' as 'B' | 'KB' | 'MB' | 'GB',
+        min: undefined,
+        max: undefined,
+      },
+      sortBy: 'modified' as 'name' | 'modified' | 'created' | 'size',
+      sortOrder: 'desc' as 'asc' | 'desc',
+      createdDateRange: { from: undefined, to: undefined },
+      modifiedDateRange: { from: undefined, to: undefined },
+      owner: undefined,
+    },
+  }
+
   const handleClientSideFilter = useCallback((filteredItems: any[]) => {
     setFilteredItems(filteredItems)
   }, [])
@@ -652,9 +677,9 @@ export function DriveManager() {
     return items.filter((item) => {
       // Skip size filtering for folders - folders always pass
       if (isFolder(item)) return true
-      
+
       const sizeStr = (item as any).size
-      
+
       // Convert "-", undefined, null, empty string to 0 bytes
       let sizeBytes = 0
       if (sizeStr && sizeStr !== '-' && sizeStr !== 'undefined' && sizeStr !== 'null' && sizeStr.trim() !== '') {
@@ -681,7 +706,7 @@ export function DriveManager() {
 
       if (minSize !== undefined && sizeBytes < getBytes(minSize, sizeUnit)) return false
       if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit)) return false
-      
+
       return true
     })
   }, [items, filters.advancedFilters.sizeRange])

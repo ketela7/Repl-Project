@@ -101,6 +101,13 @@ class MemoryCache {
     search?: string;
     pageSize?: number;
     orderBy?: string;
+    sortBy?: string;
+    sortOrder?: string;
+    createdAfter?: string;
+    createdBefore?: string;
+    modifiedAfter?: string;
+    modifiedBefore?: string;
+    owner?: string;
   }): string {
     const { 
       parentId = 'root', 
@@ -112,9 +119,40 @@ class MemoryCache {
       fileType = 'all',
       search = '',
       pageSize = 50,
-      orderBy = 'modified'
+      orderBy = 'modified',
+      sortBy = 'modified',
+      sortOrder = 'desc',
+      createdAfter = '',
+      createdBefore = '',
+      modifiedAfter = '',
+      modifiedBefore = '',
+      owner = ''
     } = params;
-    return `drive:${userId}:${parentId}:${query}:${mimeType}:${pageToken}:${viewStatus}:${fileType}:${search}:${pageSize}:${orderBy}`;
+    
+    // Create a more comprehensive cache key with all filter parameters
+    const keyParts = [
+      'drive',
+      userId,
+      parentId,
+      viewStatus,
+      fileType,
+      search,
+      sortBy,
+      sortOrder,
+      pageSize,
+      pageToken || 'p1',
+      createdAfter,
+      createdBefore,
+      modifiedAfter,
+      modifiedBefore,
+      owner,
+      query,
+      mimeType,
+      orderBy
+    ];
+    
+    // Join with ':' and remove empty parts to avoid unnecessary cache misses
+    return keyParts.map(part => part || 'empty').join(':');
   }
 
   // Generate cache key for file details
@@ -154,6 +192,65 @@ class MemoryCache {
     
     for (const key of this.cache.keys()) {
       if (key.includes(userId)) {
+        keysToDelete.push(key);
+      }
+    }
+    
+    keysToDelete.forEach(key => this.cache.delete(key));
+  }
+
+  // Clear cache entries for specific folder/context
+  clearFolderCache(userId: string, folderId: string = 'root'): void {
+    const keysToDelete: string[] = [];
+    
+    for (const key of this.cache.keys()) {
+      if (key.includes(userId) && key.includes(folderId)) {
+        keysToDelete.push(key);
+      }
+    }
+    
+    keysToDelete.forEach(key => this.cache.delete(key));
+  }
+
+  // Clear cache entries that match specific filter patterns
+  clearFilterCache(userId: string, filterType: string): void {
+    const keysToDelete: string[] = [];
+    
+    for (const key of this.cache.keys()) {
+      if (key.includes(userId) && key.includes(filterType)) {
+        keysToDelete.push(key);
+      }
+    }
+    
+    keysToDelete.forEach(key => this.cache.delete(key));
+  }
+
+  // Smart cache invalidation - clear only related entries
+  invalidateRelatedCache(userId: string, context: {
+    folderId?: string;
+    viewStatus?: string;
+    fileType?: string;
+  }): void {
+    const keysToDelete: string[] = [];
+    
+    for (const key of this.cache.keys()) {
+      if (!key.includes(userId)) continue;
+      
+      let shouldDelete = false;
+      
+      if (context.folderId && key.includes(context.folderId)) {
+        shouldDelete = true;
+      }
+      
+      if (context.viewStatus && key.includes(context.viewStatus)) {
+        shouldDelete = true;
+      }
+      
+      if (context.fileType && key.includes(context.fileType)) {
+        shouldDelete = true;
+      }
+      
+      if (shouldDelete) {
         keysToDelete.push(key);
       }
     }
