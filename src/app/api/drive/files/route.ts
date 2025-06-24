@@ -407,12 +407,23 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     
-    console.log('Filter Debug - API Route Params:', {
-      viewStatus: searchParams.get('viewStatus'),
-      fileType: searchParams.get('fileType'),
-      sortBy: searchParams.get('sortBy'),
-      sortOrder: searchParams.get('sortOrder'),
-      search: searchParams.get('search')
+    console.log('🔍 FILTER DEBUG - Complete API Route Parameters:', {
+      viewStatus: searchParams.get('viewStatus') || null,
+      fileType: searchParams.get('fileType') || null,
+      sortBy: searchParams.get('sortBy') || 'modified',
+      sortOrder: searchParams.get('sortOrder') || 'desc',
+      search: searchParams.get('search') || null,
+      minSize: searchParams.get('minSize') || null,
+      maxSize: searchParams.get('maxSize') || null,
+      createdAfter: searchParams.get('createdAfter') || null,
+      createdBefore: searchParams.get('createdBefore') || null,
+      modifiedAfter: searchParams.get('modifiedAfter') || null,
+      modifiedBefore: searchParams.get('modifiedBefore') || null,
+      owner: searchParams.get('owner') || null,
+      pageToken: searchParams.get('pageToken') || null,
+      folderId: searchParams.get('folderId') || 'root',
+      pageSize: searchParams.get('pageSize') || '50',
+      rawParams: Object.fromEntries(searchParams.entries())
     })
 
   const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
@@ -424,6 +435,13 @@ export async function GET(request: NextRequest) {
     sortBy: searchParams.get('sortBy') || 'modifiedTime',
     sortOrder,
     search: searchParams.get('search') || undefined,
+    minSize: Number(searchParams.get('minSize')) || undefined,
+    maxSize: Number(searchParams.get('maxSize')) || undefined,
+    createdAfter: searchParams.get('createdAfter') || undefined,
+    createdBefore: searchParams.get('createdBefore') || undefined,
+    modifiedAfter: searchParams.get('modifiedAfter') || undefined,
+    modifiedBefore: searchParams.get('modifiedBefore') || undefined,
+    owner: searchParams.get('owner') || undefined,
   }
 
   const pageToken = searchParams.get('pageToken') || undefined
@@ -448,6 +466,32 @@ export async function GET(request: NextRequest) {
   const sortKey = getSortKey(filters.sortBy || 'modified')
   const orderBy = `${sortKey} ${filters.sortOrder}`
 
+  console.log('🚀 DRIVE API REQUEST - Complete Query:', {
+    q: query,
+    pageSize,
+    orderBy,
+    pageToken: pageToken || undefined,
+    builtQuery: query,
+    filterMapping: {
+      viewStatus: filters.viewStatus,
+      fileType: filters.fileType,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+      search: filters.search,
+      sizeFilters: {
+        min: filters.minSize,
+        max: filters.maxSize
+      },
+      dateFilters: {
+        createdAfter: filters.createdAfter,
+        createdBefore: filters.createdBefore,
+        modifiedAfter: filters.modifiedAfter,
+        modifiedBefore: filters.modifiedBefore
+      },
+      owner: filters.owner
+    }
+  })
+
   const driveService = new GoogleDriveService(session.accessToken)
   
   const result = await driveService.listFiles({
@@ -457,6 +501,14 @@ export async function GET(request: NextRequest) {
     pageSize,
     orderBy,
   })
+
+    console.log('✅ DRIVE API SUCCESS - Results:', {
+      filesFound: result.files?.length || 0,
+      hasNextPage: !!result.nextPageToken,
+      nextPageToken: result.nextPageToken || null,
+      executedQuery: query,
+      timestamp: new Date().toISOString()
+    })
 
     driveCache.set(cacheKey, result, 15)
     

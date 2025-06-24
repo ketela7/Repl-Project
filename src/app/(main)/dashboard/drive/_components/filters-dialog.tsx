@@ -264,10 +264,7 @@ export function FiltersDialog({
     // Don't apply immediately - wait for Apply Filter button
   }
 
-  const handleClearAdvanced = () => {
-    setTempAdvancedFilters({})
-    // Don't apply immediately - wait for Apply Filter button
-  }
+
 
   const handleClearAll = () => {
     setTempActiveView('all')
@@ -736,6 +733,12 @@ export function FiltersDialog({
               variant="outline"
               disabled={isApplying}
               onClick={() => {
+                console.log('📱 MOBILE FILTER APPLY - Complete Parameters:', {
+                  activeView: tempActiveView,
+                  fileTypeFilter: tempFileTypeFilter,
+                  advancedFilters: tempAdvancedFilters,
+                  timestamp: new Date().toISOString()
+                })
                 onFilterChange({
                   activeView: tempActiveView,
                   fileTypeFilter: tempFileTypeFilter,
@@ -810,6 +813,26 @@ export function FiltersDialog({
             variant="outline"
             disabled={isApplying}
             onClick={() => {
+              console.log('🎯 FILTER APPLY - Complete Parameters Being Sent:', {
+                activeView: tempActiveView,
+                fileTypeFilter: tempFileTypeFilter,
+                advancedFilters: tempAdvancedFilters,
+                timestamp: new Date().toISOString(),
+                combinedFilters: {
+                  viewStatus: tempActiveView,
+                  fileTypes: tempFileTypeFilter,
+                  sizeRange: tempAdvancedFilters?.sizeRange,
+                  dateRanges: {
+                    created: tempAdvancedFilters?.createdDateRange,
+                    modified: tempAdvancedFilters?.modifiedDateRange
+                  },
+                  owner: tempAdvancedFilters?.owner,
+                  sorting: {
+                    sortBy: tempAdvancedFilters?.sortBy || 'modified',
+                    sortOrder: tempAdvancedFilters?.sortOrder || 'desc'
+                  }
+                }
+              })
               onFilterChange({
                 activeView: tempActiveView,
                 fileTypeFilter: tempFileTypeFilter,

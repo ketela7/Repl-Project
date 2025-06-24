@@ -20,14 +20,7 @@ const nextConfig = {
     useWasmBinary: false,
   },
   
-  turbo: {
-    rules: {
-      '*.svg': {
-        loaders: ['@svgr/webpack'],
-        as: '*.js',
-      },
-    },
-  },
+
   
   serverExternalPackages: ['postgres', 'googleapis'],
   
