@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCachedSession } from '@/lib/session-cache'
+import { auth } from '@/auth'
 import { GoogleDriveService } from '@/lib/google-drive/service'
 import { driveCache } from '@/lib/cache'
-import { requestDeduplicator } from '@/lib/request-deduplication'
-import { retryDriveApiCall } from '@/lib/api-retry'
-import { apiCall } from '@/lib/api-performance'
-import { withErrorHandling } from '@/lib/enhanced-error-handler'
 
 interface FileFilter {
   fileType?: string
@@ -402,7 +398,8 @@ function getSortKey(sortBy: string) {
 }
 
 export async function GET(request: NextRequest) {
-  const session = await getCachedSession()
+  try {
+    const session = await auth()
   
   if (!session?.accessToken) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -450,7 +447,14 @@ export async function GET(request: NextRequest) {
     orderBy,
   })
 
-  driveCache.set(cacheKey, result, 15)
-  
-  return NextResponse.json(result)
+    driveCache.set(cacheKey, result, 15)
+    
+    return NextResponse.json(result)
+  } catch (error) {
+    console.error('Drive API Error:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch files' },
+      { status: 500 }
+    )
+  }
 }

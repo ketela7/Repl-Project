@@ -136,7 +136,9 @@ Preferred communication style: Simple, everyday language.
 - 🔧 Class dan function nama sederhana (ErrorHandler ✅, EnhancedErrorHandler ❌)
 - 🧼 Hapus import unused, duplikasi kode, refactor untuk kesederhanaan
 - 📐 Struktur proyek Next.js App Router: app/, components/, lib/, utils/
-- 🧪 Uji kode sebelum commit - pastikan tidak ada error/warning
+- 🧪 Uji kode sebelum commit - pastikan tidak ada error/warning (WAJIB: npx tsc --noEmit)
+- ⚠️ DOUBLE CHECK imports dan exports sebelum commit
+- 🔄 Test setelah setiap perubahan untuk memastikan tidak ada breaking changes
 - 📖 Dokumentasi real-time (API docs, routes, project structure)
 - 📝 Update README.md untuk pemahaman publik
 - ⚙️ Tingkatkan efisiensi dengan ESLint, Prettier, automation
