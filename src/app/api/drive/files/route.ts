@@ -4,10 +4,7 @@ import { GoogleDriveService } from '@/lib/google-drive/service'
 import { driveCache } from '@/lib/cache'
 import { requestDeduplicator } from '@/lib/request-deduplication'
 import { retryDriveApiCall } from '@/lib/api-retry'
-
-// Cache the auth function for better performance
-const authCache = new Map()
-const AUTH_CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+import { throttledDriveRequest } from '@/lib/api-throttle'
 
 interface FileFilter {
   fileType?: string

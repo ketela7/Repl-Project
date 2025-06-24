@@ -37,6 +37,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
   callbacks: {
     async jwt({ token, account, user, trigger, session }) {
+      // Store tokens for API access
+      if (account && user) {
+        token.userId = user.id
+        console.log(`User ${user.email} logged in via ${account.provider}`)
+      }
       if (account) {
         token.accessToken = account.access_token
         token.refreshToken = account.refresh_token
