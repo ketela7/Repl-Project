@@ -11,7 +11,7 @@ interface CachedSession {
 
 class SessionCache {
   private cache = new Map<string, CachedSession>();
-  private readonly DEFAULT_TTL = 1 * 60 * 1000; // 1 minute - reduced for frequent session calls
+  private readonly DEFAULT_TTL = 5 * 60 * 1000; // 5 minutes - optimized for session reuse
   private readonly MAX_SIZE = 1000;
 
   set(key: string, session: any, ttlMs: number = this.DEFAULT_TTL): void {

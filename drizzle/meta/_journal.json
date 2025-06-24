@@ -15,6 +15,13 @@
       "when": 1750506293740,
       "tag": "0001_windy_umar",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1750729524316,
+      "tag": "0002_black_ultimo",
+      "breakpoints": true
     }
   ]
 }
