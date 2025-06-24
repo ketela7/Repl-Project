@@ -698,7 +698,12 @@ export function DriveToolbar({
                 </DropdownMenuItem>
 
                 {selectedCount > 0 && (
-                  <>
+              isMobile ? (
+                <DropdownMenuItem onClick={onMobileActionsOpen}>
+                  <MoreVertical className="mr-2 h-4 w-4" />
+                  More Actions
+              ):(
+                   <>
                     <DropdownMenuSeparator />
                     <div className="text-muted-foreground px-2 py-1.5 text-xs font-semibold tracking-wider uppercase">
                       File Operations ({selectedCount} selected)
@@ -744,6 +749,8 @@ export function DriveToolbar({
                       Move to Trash
                     </DropdownMenuItem>
                   </>
+              )
+                 
                 )}
                 
               </DropdownMenuContent>
