@@ -40,7 +40,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Store tokens for API access
       if (account && user) {
         token.userId = user.id
-        console.log(`User ${user.email} logged in via ${account.provider}`)
+
       }
       if (account) {
         token.accessToken = account.access_token
@@ -73,7 +73,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       try {
         // Validate token structure
         if (!token || typeof token !== 'object') {
-          console.log('[NextAuth] Invalid token structure, forcing re-authentication')
+
           return null
         }
 

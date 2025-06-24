@@ -11,9 +11,7 @@ export async function GET(request: NextRequest) {
 
     // Simple approach: Sign out current session and redirect to login
     // This will force a new OAuth flow with consent prompt
-    console.log(
-      '[Reauth Drive] Signing out current session to force re-authentication'
-    )
+
 
     // Sign out and redirect to login with a special parameter
     const loginUrl = new URL('/auth/v1/login', request.url)

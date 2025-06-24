@@ -125,11 +125,7 @@ export function FileCopyDialog({
       setCopying(true)
       loadingToast.start(`Copying "${fileName}"...`, loadingId)
 
-      if (process.env.NODE_ENV === 'development') {
-        console.log(
-          `Copying to folder ID: ${targetFolderId} with name: ${copyName}`
-        )
-      }
+
 
       await onCopy(copyName, targetFolderId)
       loadingToast.success(`Successfully copied "${fileName}"`, loadingId)

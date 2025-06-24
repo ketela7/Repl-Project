@@ -439,11 +439,7 @@ export function DriveManager() {
           throw new Error(data.error)
         }
 
-        console.log(
-          'Retrieved',
-          data.files?.length || 0,
-          'files from Drive API'
-        )
+
 
         // The API returns an array of files directly, not separated files and folders
         const allFiles = data.files || data || []
@@ -469,14 +465,7 @@ export function DriveManager() {
         ]
 
 
-        console.log(
-          'Drive items loaded:',
-          newItems.length,
-          'folders:',
-          folders.length,
-          'files:',
-          files.length
-        )
+
 
         if (pageToken) {
           setItems((prev) => [...prev, ...newItems])
@@ -573,17 +562,7 @@ export function DriveManager() {
   // Use filtered items when available, otherwise use all items
   const displayItems = useMemo(() => {
     const result = filteredItems.length > 0 ? filteredItems : items
-    console.log(
-      'DriveManager displayItems:',
-      result.length,
-      'Filtered:'
-    )
-    console.log(
-      'Debug items:',
-      filteredItems.length,
-      'Original:',
-      items.length
-    )
+
     return result
   }, [filteredItems, items])
 
@@ -655,14 +634,7 @@ export function DriveManager() {
     return <DriveGridSkeleton />
   }
 
-  // Debug: Log current state
-  console.log('Debug state:', {
-    loading,
-    itemsLength: items.length,
-    hasAccess,
-    driveAccessError: !!driveAccessError,
-    needsReauth,
-  })
+
 
   if (hasAccess === false && driveAccessError) {
     if (needsReauth) {

@@ -13,7 +13,7 @@ const db = drizzle(client);
 
 async function resetDatabase() {
   try {
-    console.log('🗄️ Resetting database...');
+
     
     // Drop all tables in reverse order (due to foreign keys)
     await db.execute(sql`DROP TABLE IF EXISTS activity_logs CASCADE`);
@@ -21,16 +21,16 @@ async function resetDatabase() {
     await db.execute(sql`DROP TABLE IF EXISTS user_sessions CASCADE`);
     await db.execute(sql`DROP TABLE IF EXISTS users CASCADE`);
     
-    console.log('✅ All tables dropped successfully');
+
     
     // Push the schema to recreate tables
-    console.log('🔄 Recreating tables...');
+
     
     await client.end();
-    console.log('✅ Database reset completed!');
+
     
   } catch (error) {
-    console.error('❌ Error resetting database:', error);
+    // Error resetting database;
     process.exit(1);
   }
 }

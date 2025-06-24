@@ -37,14 +37,7 @@ export async function POST(
       )
     }
 
-    console.log(
-      'Copying item:',
-      fileId,
-      'with name:',
-      name,
-      'to parent:',
-      parentId
-    )
+
 
     const driveService = new GoogleDriveService(accessToken)
     const copiedFile = await driveService.copyFile(fileId, {

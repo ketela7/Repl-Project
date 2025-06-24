@@ -219,10 +219,7 @@ export function FileDetailsDialog({
 
       // Check if request is already active
       if (activeFileDetailRequests.has(fileId)) {
-        console.log(
-          '[File Details Dedup] Skipping duplicate active request for:',
-          fileId
-        )
+
         setLoading(false)
         return
       }
