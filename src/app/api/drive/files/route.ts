@@ -437,8 +437,33 @@ export async function GET(request: NextRequest) {
     driveCache.set(cacheKey, result, 15)
 
     return NextResponse.json(result)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Drive API Error:', error)
+    
+    // Handle authentication errors
+    if (error.name === 'AuthenticationError' || error.code === 401) {
+      return NextResponse.json(
+        {
+          error: 'Authentication expired',
+          needsReauth: true,
+          redirect: '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive',
+        },
+        { status: 401 }
+      )
+    }
+
+    // Handle permission errors
+    if (error.name === 'PermissionError' || error.code === 403) {
+      return NextResponse.json(
+        {
+          error: 'Insufficient Drive permissions',
+          needsReauth: true,
+          redirect: '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive',
+        },
+        { status: 403 }
+      )
+    }
+
     return NextResponse.json(
       { error: 'Failed to fetch files' },
       { status: 500 }

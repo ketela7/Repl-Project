@@ -155,6 +155,24 @@ export class GoogleDriveService {
         incompleteSearch: response.data.incompleteSearch || false,
       };
     } catch (error: any) {
+      // Handle authentication errors
+      if (error.code === 401 || error.status === 401) {
+        const authError = new Error('Authentication required');
+        authError.name = 'AuthenticationError';
+        (authError as any).code = 401;
+        (authError as any).needsReauth = true;
+        throw authError;
+      }
+
+      // Handle insufficient permissions
+      if (error.code === 403 || error.status === 403) {
+        const permissionError = new Error('Insufficient permissions');
+        permissionError.name = 'PermissionError';
+        (permissionError as any).code = 403;
+        (permissionError as any).needsReauth = true;
+        throw permissionError;
+      }
+
       // Handle specific Google Drive API errors
       if (error.code === 400 && error.message?.includes('Invalid Value')) {
         
