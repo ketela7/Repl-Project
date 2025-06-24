@@ -26,7 +26,7 @@ import {
 } from 'lucide-react'
 import { BulkOperationItem } from '@/lib/google-drive/types'
 
-interface MobileActionsBottomSheetProps {
+interface BulkOperationsDialogMobileProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   selectedCount: number
@@ -44,7 +44,7 @@ interface MobileActionsBottomSheetProps {
   onDeselectAll: () => void
 }
 
-export function MobileActionsBottomSheet({
+export function BulkOperationsDialogMobile({
   open,
   onOpenChange,
   selectedCount,
@@ -60,7 +60,7 @@ export function MobileActionsBottomSheet({
   onBulkRestore,
   onBulkPermanentDelete,
   onDeselectAll,
-}: MobileActionsBottomSheetProps) {
+}: BulkOperationsDialogMobileProps) {
   const handleAction = (action: () => void) => {
     action()
     onOpenChange(false)

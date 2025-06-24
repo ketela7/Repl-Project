@@ -58,6 +58,7 @@ import {
   Database,
   BookOpen,
   FileType,
+  EllipsisVertical,
 } from 'lucide-react'
 import { FileIcon } from '@/shared/components/file-icon'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
@@ -771,7 +772,10 @@ export function DriveToolbar({
             <Button
               variant="ghost"
               size="sm"
-              onClick={onFiltersOpen}
+              onClick={
+                (onFiltersOpen,
+                console.log('Filter Debug - Toolbar click: Filter'))
+              }
               className={`h-8 px-2 md:px-3 ${
                 filters.activeView !== 'all' ||
                 filters.fileTypeFilter.length > 0 ||
@@ -871,7 +875,9 @@ export function DriveToolbar({
                           }
                           size="sm"
                           onClick={() => {
-                            console.log('Filter Debug - Toolbar click: All Files')
+                            console.log(
+                              'Filter Debug - Toolbar click: All Files'
+                            )
                             onFilterChange({ activeView: 'all' })
                           }}
                           className="justify-start text-xs"
@@ -886,7 +892,9 @@ export function DriveToolbar({
                           }
                           size="sm"
                           onClick={() => {
-                            console.log('Filter Debug - Toolbar click: My Drive')
+                            console.log(
+                              'Filter Debug - Toolbar click: My Drive'
+                            )
                             onFilterChange({ activeView: 'my-drive' })
                           }}
                           className="justify-start text-xs"
@@ -1052,7 +1060,12 @@ export function DriveToolbar({
                                         (t) => t !== filter.type
                                       )
                                     : [...filters.fileTypeFilter, filter.type]
-                                console.log('Filter Debug - File type click:', filter.type, 'New types:', newTypes)
+                                console.log(
+                                  'Filter Debug - File type click:',
+                                  filter.type,
+                                  'New types:',
+                                  newTypes
+                                )
                                 onFilterChange({ fileTypeFilter: newTypes })
                               }}
                               className="justify-center p-2 text-xs"
@@ -1816,7 +1829,7 @@ export function DriveToolbar({
               size="sm"
               className="h-8 flex-shrink-0 px-2"
             >
-              <Settings className="h-4 w-4" />
+              <EllipsisVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-64">
@@ -1992,7 +2005,7 @@ export function DriveToolbar({
         </DropdownMenu>
       </div>
 
-      {/* Enhanced Search Bar - Expandable with better UX */}
+      {/* Search Expanded - Hidden by default */}
       <div
         id="search-expanded"
         style={{ display: 'none' }}

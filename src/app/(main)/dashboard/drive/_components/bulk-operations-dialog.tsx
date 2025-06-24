@@ -30,7 +30,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/shared/utils'
 
-interface FileBulkOperationsDialogProps {
+interface BulkOperationsDialogProps {
   isOpen: boolean
   onClose: () => void
   selectedItems: Array<{
@@ -46,7 +46,7 @@ interface FileBulkOperationsDialogProps {
   onBulkRename: () => void
 }
 
-export function FileBulkOperationsDialog({
+export function BulkOperationsDialog({
   isOpen,
   onClose,
   selectedItems,
@@ -56,7 +56,7 @@ export function FileBulkOperationsDialog({
   onBulkMove,
   onBulkCopy,
   onBulkRename,
-}: FileBulkOperationsDialogProps) {
+}: BulkOperationsDialogProps) {
   const isMobile = useIsMobile()
   const fileCount = selectedItems.filter((item) => item.type === 'file').length
   const folderCount = selectedItems.filter(

@@ -25,8 +25,7 @@ import { BulkMoveDialog } from './bulk-move-dialog'
 import { BulkCopyDialog } from './bulk-copy-dialog'
 import { FileShareDialog } from './file-share-dialog'
 import { BulkShareDialog } from './bulk-share-dialog'
-import { MobileActionsBottomSheet } from './mobile-actions-bottom-sheet'
-//import { FiltersDialog } from './filters-dialog'
+import { BulkOperationsDialogMobile } from './bulk-operations-dialog-mobile'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
 import { DriveErrorDisplay } from '@/shared/components/drive-error-display'
@@ -761,7 +760,7 @@ export function DriveManager() {
         />
       )}
 
-      {/* Bulk operation dialogs */}
+
       <BulkDeleteDialog
         isOpen={dialogs.bulkDelete}
         onClose={() => closeDialog('bulkDelete')}
@@ -803,8 +802,8 @@ export function DriveManager() {
         selectedItems={selectedItemsWithDetails}
       />
 
-      {/* Mobile components */}
-      <MobileActionsBottomSheet
+      {/* Bulk Dialog Menu*/}
+      <BulkOperationsDialogMobile
         open={dialogs.mobileActions}
         onOpenChange={(open) => {
           if (!open) closeDialog('mobileActions')
@@ -840,18 +839,8 @@ export function DriveManager() {
           setSelectedItems(new Set())
           closeDialog('mobileActions')
         }}
-      />
+      /> 
 
-      {/* <FiltersDialog
-        open={dialogs.mobileFilters}
-        onOpenChange={(open) => {
-          if (!open) closeDialog('mobileFilters')
-        }}
-        currentFilters={filters}
-        onFilterChange={handleFilter}
-        onClearFilters={clearAllFilters}
-        hasActiveFilters={hasActiveFilters}
-      /> */}
 
       {/* Progress indicators */}
       {bulkOperationProgress.isRunning && (
