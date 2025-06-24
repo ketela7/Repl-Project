@@ -456,6 +456,29 @@ export function DriveManager() {
         params.append('sortBy', filters.advancedFilters.sortBy || 'modified')
         params.append('sortOrder', filters.advancedFilters.sortOrder || 'desc')
 
+        // Add advanced filter parameters
+        if (filters.advancedFilters.sizeRange?.min) {
+          params.append('minSize', filters.advancedFilters.sizeRange.min.toString())
+        }
+        if (filters.advancedFilters.sizeRange?.max) {
+          params.append('maxSize', filters.advancedFilters.sizeRange.max.toString())
+        }
+        if (filters.advancedFilters.createdDateRange?.from) {
+          params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
+        }
+        if (filters.advancedFilters.createdDateRange?.to) {
+          params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
+        }
+        if (filters.advancedFilters.modifiedDateRange?.from) {
+          params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
+        }
+        if (filters.advancedFilters.modifiedDateRange?.to) {
+          params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
+        }
+        if (filters.advancedFilters.owner?.trim()) {
+          params.append('owner', filters.advancedFilters.owner.trim())
+        }
+
         console.log('Filter Debug - Frontend:', {
           currentFilters: filters,
           apiParams: params.toString(),

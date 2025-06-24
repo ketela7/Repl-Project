@@ -219,13 +219,13 @@ export function NavMain({ items }: NavMainProps) {
               {group.items?.map((item) =>
                 state === 'collapsed' && !isMobile ? (
                   <NavItemCollapsed
-                    key={item.title}
+                    key={`nav-item-collapsed-${item.title}`}
                     item={item}
                     isActive={isItemActive}
                   />
                 ) : (
                   <NavItemExpanded
-                    key={item.title}
+                    key={`nav-item-expanded-${item.title}`}
                     item={item}
                     isActive={isItemActive}
                     isSubmenuOpen={isSubmenuOpen}
