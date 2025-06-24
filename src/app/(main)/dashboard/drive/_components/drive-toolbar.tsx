@@ -698,26 +698,32 @@ export function DriveToolbar({
                 </DropdownMenuItem>
 
                 {selectedCount > 0 && (
-              isMobile ? (
-                <DropdownMenuItem onClick={onMobileActionsOpen}>
-                  <MoreVertical className="mr-2 h-4 w-4" />
-                  More Actions
-              ):(
-                   <>
-                    <DropdownMenuSeparator />
-                    <div className="text-muted-foreground px-2 py-1.5 text-xs font-semibold tracking-wider uppercase">
-                      File Operations ({selectedCount} selected)
-                    </div>
-
-                    <DropdownMenuItem onClick={onBulkDelete}>
-                      <Download className="mr-2 h-4 w-4" />
-                      Download Selected
+                <>
+                  {isMobile ? (
+                    <DropdownMenuItem onClick={onMobileActionsOpen}>
+                      <MoreVertical className="mr-2 h-4 w-4" />
+                      More Actions
                     </DropdownMenuItem>
+                  ) : (
+                    <>
+                      <DropdownMenuSeparator />
+                      <div className="text-muted-foreground px-2 py-1.5 text-xs font-semibold tracking-wider uppercase">
+                        File Operations ({selectedCount} selected)
+                      </div>
 
-                    <DropdownMenuItem onClick={onBulkMove}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Rename Selected
-                    </DropdownMenuItem>
+                      <DropdownMenuItem onClick={onBulkDelete}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Download Selected
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem onClick={onBulkMove}>
+                        <Edit className="mr-2 h-4 w-4" />
+                        Rename Selected
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </>
+              )}m>
 
                     <DropdownMenuItem onClick={onBulkCopy}>
                       <FileText className="mr-2 h-4 w-4" />
