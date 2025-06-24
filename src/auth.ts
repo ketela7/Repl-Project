@@ -80,10 +80,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
     },
     async redirect({ url, baseUrl }) {
-      // After successful sign in, redirect to dashboard
+      // Always redirect to dashboard after successful authentication
+      if (url === baseUrl || url === `${baseUrl}/` || url === `${baseUrl}/auth/v1/login`) {
+        return `${baseUrl}/dashboard/drive`
+      }
+      // If it's a valid internal URL, use it
       if (url.startsWith(baseUrl)) {
         return url
       }
+      // Default fallback to dashboard
       return `${baseUrl}/dashboard/drive`
     },
   },

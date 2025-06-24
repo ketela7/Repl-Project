@@ -22,7 +22,8 @@ export function GoogleAuthButton({
     } else {
       try {
         await signIn("google", {
-          callbackUrl: "/dashboard/drive"
+          callbackUrl: "/dashboard/drive",
+          redirect: true
         })
       } catch (error) {
         console.error("Sign in failed:", error)
