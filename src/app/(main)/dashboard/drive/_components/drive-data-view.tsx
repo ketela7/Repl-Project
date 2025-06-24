@@ -122,13 +122,35 @@ export function DriveDataView({
                     ? 'ring-primary bg-primary/5 ring-2'
                     : ''
                 }`}
-                onClick={() =>
-                  isSelectMode
-                    ? onSelectItem(item.id)
-                    : isFolder(item)
-                      ? onFolderClick(item.id)
-                      : onItemAction('preview', item)
-                }
+                onClick={() => {
+                  console.log('Grid item clicked:', { isSelectMode, itemId: item.id })
+                  if (isSelectMode) {
+                    onSelectItem(item.id)
+                  } else if (isFolder(item)) {
+                    onFolderClick(item.id)
+                  } else {
+                    onItemAction('preview', item)
+                  }
+                }}
+                onTouchStart={(e) => {
+                  const touch = e.touches[0];
+                  const startTime = Date.now();
+                  const timer = setTimeout(() => {
+                    console.log('Long press detected on mobile for item:', item.id);
+                    if (!isSelectMode) {
+                      console.log('Enabling select mode via long press');
+                      onSelectModeChange(true);
+                    }
+                    onSelectItem(item.id);
+                  }, 500); // 500ms for long press
+                  
+                  const handleTouchEnd = () => {
+                    clearTimeout(timer);
+                    document.removeEventListener('touchend', handleTouchEnd);
+                  };
+                  
+                  document.addEventListener('touchend', handleTouchEnd);
+                }}
               >
                 {isSelectMode && (
                   <div

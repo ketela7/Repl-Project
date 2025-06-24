@@ -671,7 +671,7 @@ export function DriveToolbar({
           {/* Debug: Show mobile bulk button conditions - VISIBLE FOR DEBUGGING */}
           {isMobile && (
             <div className="text-xs text-blue-600 p-1 border border-blue-300 rounded bg-blue-50 ml-1">
-              Mobile Debug: selected={selectedCount}, handler={onMobileActionsOpen ? 'OK' : 'MISSING'}
+              Mobile Debug: selected={selectedCount}, selectMode={isSelectMode ? 'ON' : 'OFF'}, handler={onMobileActionsOpen ? 'OK' : 'MISSING'}
             </div>
           )}
 
@@ -1851,6 +1851,7 @@ export function DriveToolbar({
               variant="ghost"
               size="sm"
               className="h-8 flex-shrink-0 px-2"
+              onClick={() => console.log('More Settings Menu Button Clicked!')}
             >
               <EllipsisVertical className="h-4 w-4" />
             </Button>
