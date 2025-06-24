@@ -404,6 +404,8 @@ export async function GET(request: NextRequest) {
     if (!session?.accessToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+    const { searchParams } = new URL(request.url)
     
     console.log('Filter Debug - API Route Params:', {
       viewStatus: searchParams.get('viewStatus'),
@@ -412,8 +414,6 @@ export async function GET(request: NextRequest) {
       sortOrder: searchParams.get('sortOrder'),
       search: searchParams.get('search')
     })
-
-  const { searchParams } = new URL(request.url)
 
   const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
   const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc'

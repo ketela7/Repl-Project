@@ -190,6 +190,7 @@ export function DriveManager() {
   const lastFetchCallRef = useRef<string>('')
   const fetchThrottleTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const activeRequestsRef = useRef<Set<string>>(new Set())
+  const lastFiltersRef = useRef<string>('')
 
   // Helper functions
   const openDialog = (dialogName: keyof typeof dialogs) => {
@@ -214,14 +215,18 @@ export function DriveManager() {
       },
     })
     setSearchQuery('')
-    setTimeout(() => {
-      fetchFiles(currentFolderId || undefined, undefined)
-    }, 0)
-  }, [currentFolderId, fetchFiles])
+    if (typeof fetchFiles === 'function') {
+      setTimeout(() => {
+        fetchFiles(currentFolderId || undefined, undefined)
+      }, 0)
+    }
+  }, [currentFolderId])
 
   const applyFilters = useCallback(() => {
-    fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
-  }, [currentFolderId, searchQuery, filters, fetchFiles])
+    if (typeof fetchFiles === 'function') {
+      fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+    }
+  }, [currentFolderId, searchQuery, filters])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
     console.log('Filter Debug - handleFilter called:', {
@@ -416,10 +421,17 @@ export function DriveManager() {
         }
         
         // Check if filters changed, reset pagination
-        if (filterKey !== lastFiltersRef.current && pageToken) {
-          return // Don't make paginated requests with old filters
+        // Skip if filters changed for paginated requests
+        const currentFiltersKey = JSON.stringify({
+          view: filters.activeView,
+          types: filters.fileTypeFilter,
+          sort: filters.advancedFilters.sortBy,
+          order: filters.advancedFilters.sortOrder
+        })
+        if (currentFiltersKey !== lastFiltersRef.current && pageToken) {
+          return
         }
-        lastFiltersRef.current = filterKey
+        lastFiltersRef.current = currentFiltersKey
 
         if (!pageToken) {
           setLoading(true)
@@ -550,17 +562,21 @@ export function DriveManager() {
 
   // Initial load and folder navigation
   useEffect(() => {
-    fetchFiles()
-  }, [fetchFiles])
+    if (typeof fetchFiles === 'function') {
+      fetchFiles()
+    }
+  }, [])
 
   // Auto-apply filters when they change
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+      if (typeof fetchFiles === 'function') {
+        fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+      }
     }, 300) // Debounce filter changes
     
     return () => clearTimeout(timeoutId)
-  }, [filters, fetchFiles, currentFolderId, searchQuery])
+  }, [filters, currentFolderId, searchQuery])
 
   // Navigation handlers
   const handleFolderClick = useCallback(
