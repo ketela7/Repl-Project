@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { apiPerformanceOptimizer } from '@/lib/api-performance'
+import { apiOptimizer } from '@/lib/api-performance'
 import { driveCache } from '@/lib/cache'
-import { enhancedErrorHandler } from '@/lib/enhanced-error-handler'
+import { errorHandler } from '@/lib/enhanced-error-handler'
 
 interface PerformanceStats {
   apiQueue: number
@@ -22,9 +22,9 @@ export function PerformanceMonitor() {
 
   useEffect(() => {
     const updateStats = () => {
-      const apiStats = apiPerformanceOptimizer.getStats()
+      const apiStats = apiOptimizer.getStats()
       const cacheStats = driveCache.getStats()
-      const errorStats = enhancedErrorHandler.getErrorStats()
+      const errorStats = errorHandler.getErrorStats()
       
       setStats({
         apiQueue: apiStats.queueSize,

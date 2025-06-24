@@ -4,8 +4,8 @@ import { GoogleDriveService } from '@/lib/google-drive/service'
 import { driveCache } from '@/lib/cache'
 import { requestDeduplicator } from '@/lib/request-deduplication'
 import { retryDriveApiCall } from '@/lib/api-retry'
-import { optimizedApiCall } from '@/lib/api-performance'
-import { withEnhancedErrorHandling } from '@/lib/enhanced-error-handler'
+import { apiCall } from '@/lib/api-performance'
+import { withErrorHandling } from '@/lib/enhanced-error-handler'
 
 interface FileFilter {
   fileType?: string
@@ -402,15 +402,10 @@ function getSortKey(sortBy: string) {
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    if (process.env.NODE_ENV === 'development') {
-    }
-
+  return await withErrorHandling(async () => {
     const session = await auth()
 
     if (!session?.user) {
-      if (process.env.NODE_ENV === 'development') {
-      }
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -626,13 +621,12 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Use request deduplication only for uncached requests
-    const result = await requestDeduplicator.deduplicate(
+    // Use optimized API call with performance enhancements
+    const result = await apiCall(
       deduplicationKey,
       async () => {
         const driveService = new GoogleDriveService(accessToken)
 
-        // Make the actual API call with retry mechanism
         const apiResult = await retryDriveApiCall(
           () =>
             driveService.listFiles({
@@ -645,11 +639,12 @@ export async function GET(request: NextRequest) {
           `Drive API listFiles for user ${user.email}`
         )
 
-        // Cache the result
-        driveCache.set(cacheKey, apiResult, 5) // Cache for 5 minutes
+        // Cache with extended TTL for better performance
+        driveCache.set(cacheKey, apiResult, 15) // Cache for 15 minutes
 
         return apiResult
-      }
+      },
+      'high'
     )
 
     if (process.env.NODE_ENV === 'development') {
@@ -664,15 +659,5 @@ export async function GET(request: NextRequest) {
 
 
     return NextResponse.json(finalResult)
-  } catch (error) {
-    if (process.env.NODE_ENV === 'development') {
-    }
-    return NextResponse.json(
-      {
-        error: 'Failed to fetch files',
-        // Don't expose error details in production for security
-      },
-      { status: 500 }
-    )
-  }
+  }, 'drive-files-list', false)
 }

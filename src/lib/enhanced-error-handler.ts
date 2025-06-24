@@ -1,6 +1,6 @@
 /**
- * Enhanced error handling for Google Drive API
- * Provides intelligent retry, fallback, and user-friendly error messages
+ * Error handling for Google Drive API
+ * Provides retry, fallback, and user-friendly error messages
  */
 
 import { toast } from 'sonner'
@@ -14,7 +14,7 @@ export interface DriveError {
   action?: 'retry' | 'reconnect' | 'refresh' | 'none'
 }
 
-class EnhancedErrorHandler {
+class ErrorHandler {
   private errorCounts = new Map<string, number>()
   private readonly MAX_RETRY_COUNT = 3
   private readonly ERROR_RESET_TIME = 5 * 60 * 1000 // 5 minutes
@@ -190,12 +190,12 @@ class EnhancedErrorHandler {
   }
 }
 
-export const enhancedErrorHandler = new EnhancedErrorHandler()
+export const errorHandler = new ErrorHandler()
 
 /**
- * Wrapper for API calls with enhanced error handling
+ * Wrapper for API calls with error handling
  */
-export async function withEnhancedErrorHandling<T>(
+export async function withErrorHandling<T>(
   apiCall: () => Promise<T>,
   context?: string,
   showToast = true
@@ -203,10 +203,10 @@ export async function withEnhancedErrorHandling<T>(
   try {
     return await apiCall()
   } catch (error) {
-    const processedError = enhancedErrorHandler.processError(error, context)
+    const processedError = errorHandler.processError(error, context)
     
     if (showToast) {
-      enhancedErrorHandler.showErrorToast(processedError)
+      errorHandler.showErrorToast(processedError)
     }
     
     throw processedError

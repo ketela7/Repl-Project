@@ -1,6 +1,6 @@
 /**
- * API Performance optimization utilities
- * Implements intelligent batching, prefetching, and connection pooling
+ * API optimization utilities
+ * Implements batching, prefetching, and connection pooling
  */
 
 import { driveCache } from './cache'
@@ -15,7 +15,7 @@ interface BatchRequest {
   timestamp: number
 }
 
-class APIPerformanceOptimizer {
+class APIOptimizer {
   private batchQueue: BatchRequest[] = []
   private processing = false
   private readonly BATCH_SIZE = 5
@@ -150,15 +150,15 @@ class APIPerformanceOptimizer {
   }
 }
 
-export const apiPerformanceOptimizer = new APIPerformanceOptimizer()
+export const apiOptimizer = new APIOptimizer()
 
 /**
- * Optimized API call wrapper
+ * API call wrapper
  */
-export async function optimizedApiCall<T>(
+export async function apiCall<T>(
   requestId: string,
   requestFn: () => Promise<T>,
   priority: 'high' | 'medium' | 'low' = 'medium'
 ): Promise<T> {
-  return apiPerformanceOptimizer.batchRequest(requestId, requestFn, priority)
+  return apiOptimizer.batchRequest(requestId, requestFn, priority)
 }

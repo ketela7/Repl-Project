@@ -6,7 +6,6 @@
 export const loadHeavyComponents = {
   DriveManager: () => import('@/app/(main)/dashboard/drive/_components/drive-manager'),
   FilePreviewDialog: () => import('@/app/(main)/dashboard/drive/_components/file-preview-dialog'),
-  BulkOperationsDialog: () => import('@/app/(main)/dashboard/drive/_components/bulk-operations-dialog'),
   DriveDataView: () => import('@/app/(main)/dashboard/drive/_components/drive-data-view'),
 }
 
@@ -31,7 +30,6 @@ export const preloadCriticalComponents = () => {
     // Preload on first user interaction
     const preloadOnInteraction = () => {
       loadHeavyComponents.FilePreviewDialog()
-      loadHeavyComponents.BulkOperationsDialog()
       
       // Remove listeners after first interaction
       document.removeEventListener('mousedown', preloadOnInteraction)

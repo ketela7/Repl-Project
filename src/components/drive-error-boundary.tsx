@@ -4,7 +4,7 @@ import React, { Component, ReactNode } from 'react'
 import { AlertTriangle, RefreshCw, Home, Wifi } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { enhancedErrorHandler, type DriveError } from '@/lib/enhanced-error-handler'
+import { errorHandler, type DriveError } from '@/lib/enhanced-error-handler'
 
 interface Props {
   children: ReactNode
@@ -24,7 +24,7 @@ export class DriveErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
-    const processedError = enhancedErrorHandler.processError(error, 'error-boundary')
+    const processedError = errorHandler.processError(error, 'error-boundary')
     return { 
       hasError: true, 
       error: processedError 

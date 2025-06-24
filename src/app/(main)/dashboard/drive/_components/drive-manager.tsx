@@ -1057,6 +1057,7 @@ export function DriveManager() {
           </div>
         </div>
       )}
+      <PerformanceMonitor />
     </div>
   )
 }
