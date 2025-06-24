@@ -772,10 +772,10 @@ export function DriveToolbar({
             <Button
               variant="ghost"
               size="sm"
-              onClick={
-                (onFiltersOpen,
-                console.log('Filter Debug - Toolbar click: Filter'))
-              }
+              onClick={() => {
+                console.log('Filter Debug - Toolbar click: Filter')
+                onFiltersOpen()
+              }}
               className={`h-8 px-2 md:px-3 ${
                 filters.activeView !== 'all' ||
                 filters.fileTypeFilter.length > 0 ||

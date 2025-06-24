@@ -22,12 +22,12 @@ export const FileDeleteDialog = lazy(() =>
 );
 
 export const FileBulkOperationsDialog = lazy(() => 
-  import("@/app/(main)/dashboard/drive/_components/file-bulk-operations-dialog").then(mod => ({ default: mod.FileBulkOperationsDialog }))
+  import("@/app/(main)/dashboard/drive/_components/bulk-operations-dialog").then(mod => ({ default: mod.BulkOperationsDialog }))
 );
 
 // Lazy load heavy table components
 export const FileList = lazy(() => 
-  import("@/app/(main)/dashboard/drive/_components/file-list").then(mod => ({ default: mod.FileList }))
+  import("@/app/(main)/dashboard/drive/_components/drive-data-view").then(mod => ({ default: mod.DriveDataView }))
 );
 
 export const DriveToolbar = lazy(() => 
