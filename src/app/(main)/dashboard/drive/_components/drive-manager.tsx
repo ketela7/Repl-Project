@@ -127,6 +127,7 @@ export function DriveManager() {
   // Helper functions
   const openDialog = (dialogName: keyof typeof dialogs) => {
     console.log('Opening dialog:', dialogName)
+    console.log('Current dialogs state:', dialogs)
     setDialogs((prev) => ({ ...prev, [dialogName]: true }))
   }
 
@@ -809,6 +810,7 @@ export function DriveManager() {
       <BulkOperationsDialogMobile
         open={dialogs.mobileActions}
         onOpenChange={(open) => {
+          console.log('BulkOperationsDialogMobile onOpenChange:', open)
           if (!open) closeDialog('mobileActions')
         }}
         selectedItems={selectedItemsWithDetails}

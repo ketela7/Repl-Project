@@ -647,6 +647,8 @@ export function DriveToolbar({
               size="sm"
               onClick={() => {
                 console.log('Mobile Bulk Actions Button Clicked!')
+                console.log('selectedCount:', selectedCount)
+                console.log('isMobile:', isMobile)
                 console.log('onMobileActionsOpen function:', onMobileActionsOpen)
                 onMobileActionsOpen()
               }}
@@ -655,6 +657,13 @@ export function DriveToolbar({
               <MoreVertical className="mr-1 h-4 w-4" />
               Actions ({selectedCount})
             </Button>
+          )}
+          
+          {/* Debug: Show mobile bulk button conditions */}
+          {isMobile && (
+            <div className="hidden">
+              Debug: isMobile={String(isMobile)}, selectedCount={selectedCount}, hasOnMobileActionsOpen={Boolean(onMobileActionsOpen)}
+            </div>
           )}
 
           {/* Batch - Desktop dropdown interface */}
