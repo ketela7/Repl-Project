@@ -25,6 +25,7 @@ import {
   Share,
   RefreshCw,
   Trash2,
+  Copy as CopyIcon,
 } from 'lucide-react'
 import {
   Table,
@@ -295,7 +296,7 @@ export function DriveDataView({
                     onClick={() => onColumnsChange({ sortBy: 'owners' })}
                   >
                     <div className="flex items-center space-x-1">
-                      <span>Owner (Click to Copy Email)</span>
+                      <span>Owner</span>
                       {sortConfig?.key === 'owners' && (
                         <span className="text-xs">
                           {sortConfig.direction === 'asc' ? '↑' : '↓'}
@@ -402,30 +403,34 @@ export function DriveDataView({
                   )}
                   {visibleColumns.owners && (
                     <TableCell 
-                      className="cursor-pointer hover:bg-muted/50 transition-colors"
+                      className="cursor-pointer hover:bg-muted/50 transition-colors group"
                       onClick={async (e) => {
                         e.stopPropagation()
                         const email = item.owners?.[0]?.emailAddress
                         if (email) {
                           try {
                             await navigator.clipboard.writeText(email)
-                            // Show brief visual feedback
-                            const target = e.currentTarget
-                            const originalText = target.textContent
-                            target.textContent = 'Copied!'
-                            target.classList.add('text-green-600')
-                            setTimeout(() => {
-                              target.textContent = originalText
-                              target.classList.remove('text-green-600')
-                            }, 1000)
+                            // Show toast notification
+                            const { toast } = await import('@/shared/utils/toast')
+                            toast.success('Copied to clipboard', {
+                              description: email,
+                              duration: 2000,
+                            })
                           } catch (err) {
+                            const { toast } = await import('@/shared/utils/toast')
+                            toast.error('Failed to copy email')
                             console.error('Failed to copy email:', err)
                           }
                         }
                       }}
                       title={`Click to copy: ${item.owners?.[0]?.emailAddress || 'No email available'}`}
                     >
-                      {item.owners?.[0]?.emailAddress || item.owners?.[0]?.displayName || 'Unknown'}
+                      <div className="flex items-center gap-2">
+                        <span>{item.owners?.[0]?.emailAddress || item.owners?.[0]?.displayName || 'Unknown'}</span>
+                        {item.owners?.[0]?.emailAddress && (
+                          <CopyIcon className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        )}
+                      </div>
                     </TableCell>
                   )}
                   {visibleColumns.mimeType && (

@@ -9,9 +9,8 @@ interface FileFilter {
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
   search?: string
-  minSize?: number
-  maxSize?: number
-  sizeUnit?: string
+
+
   createdAfter?: string
   createdBefore?: string
   modifiedAfter?: string
@@ -19,21 +18,7 @@ interface FileFilter {
   owner?: string
 }
 
-// Convert size with unit to bytes for Google Drive API
-function convertSizeToBytes(size: number, unit: string): number {
-  switch (unit.toUpperCase()) {
-    case 'B':
-      return size
-    case 'KB':
-      return size * 1024
-    case 'MB':
-      return size * 1024 * 1024
-    case 'GB':
-      return size * 1024 * 1024 * 1024
-    default:
-      return size * 1024 * 1024 // Default to MB
-  }
-}
+
 
 function buildDriveQuery(filters: FileFilter): string {
   const conditions: string[] = []
@@ -365,32 +350,13 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  // Size filters - Google Drive API supports size filtering with proper syntax
-  // Note: Google Drive API size filter works only for files, not folders
-  // According to API docs: size >= <number> and size <= <number>
-  const sizeUnit = filters.sizeUnit || 'MB'
-  
-  if (filters.minSize !== undefined && filters.minSize > 0) {
-    const minSizeBytes = convertSizeToBytes(filters.minSize, sizeUnit)
-    // Apply size filter only to files (exclude folders, apps, shortcuts)
-    conditions.push(`size >= ${minSizeBytes}`)
-    conditions.push(`not mimeType = 'application/vnd.google-apps.folder'`)
-    conditions.push(`not mimeType = 'application/vnd.google-apps.shortcut'`)
-  }
-  if (filters.maxSize !== undefined && filters.maxSize > 0) {
-    const maxSizeBytes = convertSizeToBytes(filters.maxSize, sizeUnit)
-    // Apply size filter only to files (exclude folders, apps, shortcuts)
-    conditions.push(`size <= ${maxSizeBytes}`)
-    conditions.push(`not mimeType = 'application/vnd.google-apps.folder'`)
-    conditions.push(`not mimeType = 'application/vnd.google-apps.shortcut'`)
-  }
-
-
+  // Note: Google Drive API doesn't support size filtering in query
+  // Size filtering will be handled client-side after fetching results
 
   return conditions.join(' and ')
 }
 
-// Removed applyClientSideFilters - now using Google Drive API directly with proper query parameters
+
 
 function getSortKey(sortBy: string) {
   switch (sortBy) {
@@ -410,120 +376,64 @@ function getSortKey(sortBy: string) {
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    
+
     if (!session?.accessToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
+    const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
+    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc'
+    const pageToken = searchParams.get('pageToken') || undefined
+    const folderId = searchParams.get('folderId') || 'root'
+
+    const filters: FileFilter = {
+      fileType: searchParams.get('fileType') || 'all',
+      viewStatus: searchParams.get('viewStatus') || 'all',
+      sortBy: searchParams.get('sortBy') || 'modifiedTime',
+      sortOrder,
+      search: searchParams.get('search') || undefined,
+
     
-    console.log('🔍 FILTER DEBUG - Complete API Route Parameters:', {
-      viewStatus: searchParams.get('viewStatus') || null,
-      fileType: searchParams.get('fileType') || null,
-      sortBy: searchParams.get('sortBy') || 'modified',
-      sortOrder: searchParams.get('sortOrder') || 'desc',
-      search: searchParams.get('search') || null,
-      minSize: searchParams.get('minSize') || null,
-      maxSize: searchParams.get('maxSize') || null,
-      sizeUnit: searchParams.get('sizeUnit') || 'MB',
-      createdAfter: searchParams.get('createdAfter') || null,
-      createdBefore: searchParams.get('createdBefore') || null,
-      modifiedAfter: searchParams.get('modifiedAfter') || null,
-      modifiedBefore: searchParams.get('modifiedBefore') || null,
-      owner: searchParams.get('owner') || null,
-      pageToken: searchParams.get('pageToken') || null,
-      folderId: searchParams.get('folderId') || 'root',
-      pageSize: searchParams.get('pageSize') || '50',
-      rawParams: Object.fromEntries(searchParams.entries())
-    })
+      createdAfter: searchParams.get('createdAfter') || undefined,
+      createdBefore: searchParams.get('createdBefore') || undefined,
+      modifiedAfter: searchParams.get('modifiedAfter') || undefined,
+      modifiedBefore: searchParams.get('modifiedBefore') || undefined,
+      owner: searchParams.get('owner') || undefined,
+    }
 
-  const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
-  const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc'
-  
-  const filters: FileFilter = {
-    fileType: searchParams.get('fileType') || 'all',
-    viewStatus: searchParams.get('viewStatus') || 'all', 
-    sortBy: searchParams.get('sortBy') || 'modifiedTime',
-    sortOrder,
-    search: searchParams.get('search') || undefined,
-    minSize: searchParams.get('minSize') ? Number(searchParams.get('minSize')) : undefined,
-    maxSize: searchParams.get('maxSize') ? Number(searchParams.get('maxSize')) : undefined,
-    sizeUnit: searchParams.get('sizeUnit') || 'MB',
-    createdAfter: searchParams.get('createdAfter') || undefined,
-    createdBefore: searchParams.get('createdBefore') || undefined,
-    modifiedAfter: searchParams.get('modifiedAfter') || undefined,
-    modifiedBefore: searchParams.get('modifiedBefore') || undefined,
-    owner: searchParams.get('owner') || undefined,
-  }
-
-  const pageToken = searchParams.get('pageToken') || undefined
-  const folderId = searchParams.get('folderId') || 'root'
-
-  const cacheKey = driveCache.generateDriveKey({
-    parentId: folderId,
-    userId: session.user?.email || '',
-    pageToken,
-    pageSize,
-    viewStatus: filters.viewStatus,
-    fileType: filters.fileType,
-    search: filters.search,
-  })
-
-  const cachedData = driveCache.get(cacheKey)
-  if (cachedData) {
-    return NextResponse.json(cachedData)
-  }
-
-  const query = buildDriveQuery(filters)
-  const sortKey = getSortKey(filters.sortBy || 'modified')
-  const orderBy = `${sortKey} ${filters.sortOrder}`
-
-  console.log('🚀 DRIVE API REQUEST - Complete Query:', {
-    q: query,
-    pageSize,
-    orderBy,
-    pageToken: pageToken || undefined,
-    builtQuery: query,
-    filterMapping: {
+    const cacheKey = driveCache.generateDriveKey({
+      parentId: folderId,
+      userId: session.user?.email || '',
+      pageToken,
+      pageSize,
       viewStatus: filters.viewStatus,
       fileType: filters.fileType,
-      sortBy: filters.sortBy,
-      sortOrder: filters.sortOrder,
       search: filters.search,
-      sizeFilters: {
-        min: filters.minSize,
-        max: filters.maxSize
-      },
-      dateFilters: {
-        createdAfter: filters.createdAfter,
-        createdBefore: filters.createdBefore,
-        modifiedAfter: filters.modifiedAfter,
-        modifiedBefore: filters.modifiedBefore
-      },
-      owner: filters.owner
+    })
+
+    const cachedData = driveCache.get(cacheKey)
+    if (cachedData) {
+      console.log('✅ DRIVE API CACHE HIT - Cache Key:', cacheKey)
+      return NextResponse.json(cachedData)
     }
-  })
 
-  const driveService = new GoogleDriveService(session.accessToken)
-  
-  const result = await driveService.listFiles({
-    parentId: folderId,
-    query,
-    pageToken,
-    pageSize,
-    orderBy,
-  })
+    const query = buildDriveQuery(filters)
+    const sortKey = getSortKey(filters.sortBy)
+    const orderBy = `${sortKey} ${filters.sortOrder}`
 
-    console.log('✅ DRIVE API SUCCESS - Results:', {
-      filesFound: result.files?.length || 0,
-      hasNextPage: !!result.nextPageToken,
-      nextPageToken: result.nextPageToken || null,
-      executedQuery: query,
-      timestamp: new Date().toISOString()
+    const driveService = new GoogleDriveService(session.accessToken)
+
+    const result = await driveService.listFiles({
+      parentId: folderId,
+      query,
+      pageToken,
+      pageSize,
+      orderBy,
     })
 
     driveCache.set(cacheKey, result, 15)
-    
+
     return NextResponse.json(result)
   } catch (error) {
     console.error('Drive API Error:', error)

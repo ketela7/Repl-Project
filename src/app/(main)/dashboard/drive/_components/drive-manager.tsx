@@ -464,16 +464,9 @@ export function DriveManager() {
         params.append('sortBy', filters.advancedFilters.sortBy || 'modified')
         params.append('sortOrder', filters.advancedFilters.sortOrder || 'desc')
 
-        // Add size filter parameters
-        if (filters.advancedFilters.sizeRange?.min !== undefined && filters.advancedFilters.sizeRange.min > 0) {
-          params.append('minSize', filters.advancedFilters.sizeRange.min.toString())
-        }
-        if (filters.advancedFilters.sizeRange?.max !== undefined && filters.advancedFilters.sizeRange.max > 0) {
-          params.append('maxSize', filters.advancedFilters.sizeRange.max.toString())
-        }
-        if (filters.advancedFilters.sizeRange?.unit) {
-          params.append('sizeUnit', filters.advancedFilters.sizeRange.unit)
-        }
+        // Note: Size filtering removed from API params - Google Drive API doesn't support it
+        // Size filtering will be handled client-side
+
 
         // Add date range filters
         if (filters.advancedFilters.createdDateRange?.from) {
@@ -660,12 +653,49 @@ export function DriveManager() {
     setFilteredItems([])
   }, [])
 
-  // Use filtered items when available, otherwise use all items
-  const displayItems = useMemo(() => {
-    const result = filteredItems.length > 0 ? filteredItems : items
+  // Apply client-side size filtering since Google Drive API doesn't support it
+  const sizeFilteredItems = useMemo(() => {
+    if (!filters.advancedFilters.sizeRange?.min && !filters.advancedFilters.sizeRange?.max) {
+      return items
+    }
 
+    return items.filter((item) => {
+      // Skip size filtering for folders
+      if (isFolder(item)) return true
+      
+      const sizeStr = (item as any).size
+      if (!sizeStr || sizeStr === '0' || sizeStr === '-') return false
+      
+      const sizeBytes = parseInt(sizeStr, 10)
+      if (isNaN(sizeBytes)) return false
+
+      const sizeUnit = filters.advancedFilters.sizeRange?.unit || 'MB'
+      const minSize = filters.advancedFilters.sizeRange?.min
+      const maxSize = filters.advancedFilters.sizeRange?.max
+
+      // Convert filter values to bytes
+      const getBytes = (size: number, unit: string) => {
+        switch (unit.toUpperCase()) {
+          case 'B': return size
+          case 'KB': return size * 1024
+          case 'MB': return size * 1024 * 1024
+          case 'GB': return size * 1024 * 1024 * 1024
+          default: return size * 1024 * 1024
+        }
+      }
+
+      if (minSize && sizeBytes < getBytes(minSize, sizeUnit)) return false
+      if (maxSize && sizeBytes > getBytes(maxSize, sizeUnit)) return false
+      
+      return true
+    })
+  }, [items, filters.advancedFilters.sizeRange])
+
+  // Use filtered items when available, otherwise use size-filtered items
+  const displayItems = useMemo(() => {
+    const result = filteredItems.length > 0 ? filteredItems : sizeFilteredItems
     return result
-  }, [filteredItems, items])
+  }, [filteredItems, sizeFilteredItems])
 
   // Apply sorting to display items (includes filtering)
   const sortedDisplayItems = useMemo(() => {
