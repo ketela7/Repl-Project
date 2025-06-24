@@ -79,6 +79,7 @@ interface FiltersDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onFilterChange: (filters: any) => void
+  onApplyFilters?: () => void
   currentFilters: any
   hasActiveFilters: boolean
   onClearFilters: () => void
@@ -88,6 +89,7 @@ export function FiltersDialog({
   open,
   onOpenChange,
   onFilterChange,
+  onApplyFilters,
   currentFilters,
   hasActiveFilters,
   onClearFilters,
@@ -805,11 +807,22 @@ export function FiltersDialog({
           <Button
             variant="outline"
             onClick={() => {
+              console.log('Filter Debug - Apply button clicked:', {
+                tempActiveView,
+                tempFileTypeFilter,
+                tempAdvancedFilters
+              })
               onFilterChange({
                 activeView: tempActiveView,
                 fileTypeFilter: tempFileTypeFilter,
                 advancedFilters: tempAdvancedFilters,
               })
+              // Trigger the actual API call
+              if (onApplyFilters) {
+                setTimeout(() => {
+                  onApplyFilters()
+                }, 100)
+              }
               onOpenChange(false)
             }}
           >
