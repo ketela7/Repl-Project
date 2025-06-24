@@ -116,7 +116,7 @@ interface DriveToolbarProps {
   isSelectMode: boolean
   onSelectModeChange: (mode: boolean) => void
   selectedCount: number
-  totalCount: number
+
   onSelectAll: () => void
   onRefresh: () => void
   refreshing: boolean
@@ -447,7 +447,7 @@ export function DriveToolbar({
   isSelectMode,
   onSelectModeChange,
   selectedCount,
-  totalCount,
+
   onSelectAll,
   onRefresh,
   refreshing,
@@ -640,110 +640,8 @@ export function DriveToolbar({
             )}
           </Button>
 
-          {/* Mobile Bulk Actions Button - Show when items are selected */}
-          {selectedCount > 0 && isMobile && onMobileActionsOpen && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => {
-                console.log('Mobile Bulk Actions Button Clicked!')
-                onMobileActionsOpen()
-              }}
-              className="h-8 bg-blue-600 px-3 text-white hover:bg-blue-700"
-            >
-              <MoreVertical className="mr-1 h-4 w-4" />
-              Actions ({selectedCount})
-            </Button>
-          )}
-
-          {/* Mobile Select All Button - Show when in select mode but no items selected */}
-          {isMobile && isSelectMode && selectedCount === 0 && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onSelectAll}
-              className="h-8 px-3"
-            >
-              <SquareCheck className="mr-1 h-4 w-4" />
-              Select All ({totalCount})
-            </Button>
-          )}
-
-          {/* Mobile Exit Selection Button - Show when in select mode */}
-          {isMobile && isSelectMode && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onSelectModeChange(false)}
-              className="h-8 px-3"
-            >
-              <X className="mr-1 h-4 w-4" />
-              Exit Selection
-            </Button>
-          )}
-
-          {/* Mobile Select Mode Toggle - Show when not in select mode */}
-          {isMobile && !isSelectMode && items.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onSelectModeChange(true)}
-              className="h-8 px-3"
-            >
-              <Square className="mr-1 h-4 w-4" />
-              Select
-            </Button>
-          )}
-          
-          {/* Debug: Show mobile bulk button conditions - VISIBLE FOR DEBUGGING */}
-          {/* {isMobile && (
-            <div className="text-xs text-blue-600 p-1 border border-blue-300 rounded bg-blue-50 ml-1">
-              Debug: select={selectedCount}/{totalCount}, mode={isSelectMode ? 'ON' : 'OFF'}
-            </div>
-          )}
-          */}
-
-          {/* Desktop Bulk Actions - Show when items are selected on desktop */}
-          {!isMobile && selectedCount > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="h-8 bg-blue-600 px-3 text-white hover:bg-blue-700"
-                >
-                  <MoreVertical className="mr-1 h-4 w-4" />
-                  Actions ({selectedCount})
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-64">
-                <DropdownMenuItem onClick={onBulkDelete}>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Selected
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onBulkMove}>
-                  <Move className="mr-2 h-4 w-4" />
-                  Move Selected
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onBulkCopy}>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Copy Selected
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onBulkShare}>
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share Selected
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => onSelectModeChange(false)}>
-                  <X className="mr-2 h-4 w-4" />
-                  Exit Selection ({selectedCount})
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-
-          {/* Batch - Desktop dropdown interface */}
-          {!isMobile && selectedCount === 0 && (
+          {/* Bulk Operations */}
+          {selectedCount <= items.length && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -789,69 +687,70 @@ export function DriveToolbar({
                   )}
                 </DropdownMenuItem>
 
-                {isSelectMode && (
-                  <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onSelectAll}>
+                  <CheckSquare className="mr-2 h-4 w-4" />
+                  Select All ({selectedCount}/{items.length})
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onSelectAll}>
+                  <Square className="mr-2 h-4 w-4" />
+                  Clear Selection
+                </DropdownMenuItem>
+
+                {selectedCount > 0 && (
+              
+              
+                  
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={onSelectAll}>
-                      <CheckSquare className="mr-2 h-4 w-4" />
-                      Select All ({items.length})
+                    <div className="text-muted-foreground px-2 py-1.5 text-xs font-semibold tracking-wider uppercase">
+                      File Operations ({selectedCount} selected)
+                    </div>
+
+                    <DropdownMenuItem onClick={onBulkDelete}>
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Selected
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={onSelectAll}>
-                      <Square className="mr-2 h-4 w-4" />
-                      Clear Selection
+
+                    <DropdownMenuItem onClick={onBulkMove}>
+                      <Edit className="mr-2 h-4 w-4" />
+                      Rename Selected
                     </DropdownMenuItem>
 
-                    {selectedCount > 0 && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <div className="text-muted-foreground px-2 py-1.5 text-xs font-semibold tracking-wider uppercase">
-                          File Operations ({selectedCount} selected)
-                        </div>
+                    <DropdownMenuItem onClick={onBulkCopy}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export Selected
+                    </DropdownMenuItem>
 
-                        {/* Download Selected - Smart visibility: only show if there are actual downloadable files (not folders) */}
-                        <DropdownMenuItem onClick={onBulkDelete}>
-                          <Download className="mr-2 h-4 w-4" />
-                          Download Selected
-                        </DropdownMenuItem>
+                    <DropdownMenuItem onClick={onBulkMove}>
+                      <Move className="mr-2 h-4 w-4" />
+                      Move Selected
+                    </DropdownMenuItem>
 
-                        <DropdownMenuItem onClick={onBulkMove}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Rename Selected
-                        </DropdownMenuItem>
+                    <DropdownMenuItem onClick={onBulkCopy}>
+                      <Copy className="mr-2 h-4 w-4" />
+                      Copy Selected
+                    </DropdownMenuItem>
 
-                        <DropdownMenuItem onClick={onBulkCopy}>
-                          <FileText className="mr-2 h-4 w-4" />
-                          Export Selected
-                        </DropdownMenuItem>
+                    <DropdownMenuItem onClick={onBulkShare}>
+                      <Share2 className="mr-2 h-4 w-4" />
+                      Share Selected
+                    </DropdownMenuItem>
 
-                        <DropdownMenuItem onClick={onBulkMove}>
-                          <Move className="mr-2 h-4 w-4" />
-                          Move Selected
-                        </DropdownMenuItem>
+                    <DropdownMenuSeparator />
 
-                        <DropdownMenuItem onClick={onBulkCopy}>
-                          <Copy className="mr-2 h-4 w-4" />
-                          Copy Selected
-                        </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={onBulkDelete}
+                      className="text-orange-600 dark:text-orange-400"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Move to Trash
+                    </DropdownMenuItem>
 
-                        <DropdownMenuItem onClick={onBulkShare}>
-                          <Share2 className="mr-2 h-4 w-4" />
-                          Share Selected
-                        </DropdownMenuItem>
+									
 
-                        <DropdownMenuSeparator />
-
-                        <DropdownMenuItem
-                          onClick={onBulkDelete}
-                          className="text-orange-600 dark:text-orange-400"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Move to Trash
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                  </>
+                  
                 )}
+                
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -862,8 +761,6 @@ export function DriveToolbar({
               variant="ghost"
               size="sm"
               onClick={() => {
-                console.log('Filter Debug - Mobile Filter Button Clicked!')
-                console.log('onFiltersOpen function:', onFiltersOpen)
                 onFiltersOpen()
               }}
               className={`h-8 px-2 md:px-3 ${

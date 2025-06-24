@@ -516,7 +516,7 @@ export function DriveManager() {
             isSelectMode={isSelectMode}
             onSelectModeChange={setIsSelectMode}
             selectedCount={selectedItems.size}
-            totalCount={items.length}
+            
             onSelectAll={handleSelectAll}
             onRefresh={handleRefresh}
             refreshing={refreshing}
@@ -528,7 +528,7 @@ export function DriveManager() {
             onBulkShare={() => openDialog('bulkShare')}
             onFiltersOpen={() => openDialog('mobileFilters')}
             onMobileActionsOpen={() => {
-              console.log('Mobile Actions Open Handler Called')
+              
               openDialog('mobileActions')
             }}
             filters={filters}
@@ -818,7 +818,6 @@ export function DriveManager() {
       <BulkOperationsDialogMobile
         open={dialogs.mobileActions}
         onOpenChange={(open) => {
-          console.log('BulkOperationsDialogMobile onOpenChange:', open)
           if (!open) closeDialog('mobileActions')
         }}
         selectedItems={selectedItemsWithDetails}
