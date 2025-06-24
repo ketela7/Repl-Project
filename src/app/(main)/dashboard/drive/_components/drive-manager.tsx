@@ -340,12 +340,10 @@ export function DriveManager() {
           break
         case 'owners':
           aValue = (
-            a.owners?.[0]?.displayName ||
             a.owners?.[0]?.emailAddress ||
             ''
           ).toLowerCase()
           bValue = (
-            b.owners?.[0]?.displayName ||
             b.owners?.[0]?.emailAddress ||
             ''
           ).toLowerCase()
@@ -426,20 +424,11 @@ export function DriveManager() {
         
         // Check if filters changed, reset pagination
         // Skip if filters changed for paginated requests
-        const currentFiltersKey = JSON.stringify({
-          view: filters.activeView,
-          types: filters.fileTypeFilter,
-          sort: filters.advancedFilters.sortBy,
-          order: filters.advancedFilters.sortOrder,
-          size: filters.advancedFilters.sizeRange,
-          created: filters.advancedFilters.createdDateRange,
-          modified: filters.advancedFilters.modifiedDateRange,
-          owner: filters.advancedFilters.owner
-        })
-        if (currentFiltersKey !== lastFiltersRef.current && pageToken) {
+        
+        if (filterKey !== lastFiltersRef.current && pageToken) {
           return
         }
-        lastFiltersRef.current = currentFiltersKey
+        lastFiltersRef.current = filterKey
 
         if (!pageToken) {
           setLoading(true)
@@ -464,8 +453,6 @@ export function DriveManager() {
         params.append('sortBy', filters.advancedFilters.sortBy || 'modified')
         params.append('sortOrder', filters.advancedFilters.sortOrder || 'desc')
 
-        // Note: Size filtering removed from API params - Google Drive API doesn't support it
-        // Size filtering will be handled client-side
 
 
         // Add date range filters
@@ -482,12 +469,17 @@ export function DriveManager() {
           params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
         }
 
-        // Add owner filter
-        if (filters.advancedFilters.owner && filters.advancedFilters.owner.trim()) {
+        // owner
+        if (filters.advancedFilters.owner.trim()) {
           params.append('owner', filters.advancedFilters.owner.trim())
         }
 
-        console.log('Filter Debug - Frontend:', {
+        // size
+        if (filters.advancedFilters.sizeRange?.min || filters.advancedFilters.sizeRange?.max) {
+          params.append('size', `${filters.advancedFilters.sizeRange?.min || ''}-${filters.advancedFilters.sizeRange?.max || ''}`)
+        }
+
+        console.info('[Frontend] [Filter] :', {
           currentFilters: filters,
           apiParams: params.toString(),
           requestUrl: `/api/drive/files?${params}`
@@ -672,7 +664,7 @@ export function DriveManager() {
       const sizeBytes = parseInt(sizeStr, 10)
       if (isNaN(sizeBytes)) return false
 
-      const sizeUnit = filters.advancedFilters.sizeRange?.unit || 'MB'
+      const sizeUnit = filters.advancedFilters.sizeRange?.unit
       const minSize = filters.advancedFilters.sizeRange?.min
       const maxSize = filters.advancedFilters.sizeRange?.max
 

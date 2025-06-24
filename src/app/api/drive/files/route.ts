@@ -10,15 +10,12 @@ interface FileFilter {
   sortOrder?: 'asc' | 'desc'
   search?: string
 
-
   createdAfter?: string
   createdBefore?: string
   modifiedAfter?: string
   modifiedBefore?: string
   owner?: string
 }
-
-
 
 function buildDriveQuery(filters: FileFilter): string {
   const conditions: string[] = []
@@ -350,13 +347,16 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  // Note: Google Drive API doesn't support size filtering in query
-  // Size filtering will be handled client-side after fetching results
+  // Size
+  if (filters.size) {
+    conditions.push(`size ${filters.size}`)
+  }
+  
 
+  
+  
   return conditions.join(' and ')
 }
-
-
 
 function getSortKey(sortBy: string) {
   switch (sortBy) {
@@ -378,27 +378,28 @@ export async function GET(request: NextRequest) {
     const session = await auth()
 
     if (!session?.accessToken) {
-      return NextResponse.json({ 
-        error: 'Authentication expired',
-        needsReauth: true,
-        redirect: '/auth/v1/login'
-      }, { status: 401 })
+      return NextResponse.json(
+        {
+          error: 'Authentication expired',
+          needsReauth: true,
+          redirect: '/auth/v1/login',
+        },
+        { status: 401 }
+      )
     }
 
     const { searchParams } = new URL(request.url)
     const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
-    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc'
     const pageToken = searchParams.get('pageToken') || undefined
     const folderId = searchParams.get('folderId') || 'root'
 
     const filters: FileFilter = {
       fileType: searchParams.get('fileType') || 'all',
-      viewStatus: searchParams.get('viewStatus') || 'all',
-      sortBy: searchParams.get('sortBy') || 'modifiedTime',
-      sortOrder,
+      viewStatus: searchParams.get('viewStatus') || undefined,
+      sortBy: searchParams.get('sortBy') || undefined,
+      sortOrder: searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc',
       search: searchParams.get('search') || undefined,
-
-    
+			size: searchParams.get('size') || undefined,
       createdAfter: searchParams.get('createdAfter') || undefined,
       createdBefore: searchParams.get('createdBefore') || undefined,
       modifiedAfter: searchParams.get('modifiedAfter') || undefined,
@@ -427,11 +428,11 @@ export async function GET(request: NextRequest) {
     const orderBy = `${sortKey} ${filters.sortOrder}`
 
     const driveService = new GoogleDriveService(session.accessToken!)
-    
+
     console.log('🚀 DRIVE SERVICE - Initialized with token:', {
       hasToken: Boolean(session.accessToken),
       tokenLength: session.accessToken?.length || 0,
-      userId: session.user?.email
+      userId: session.user?.email,
     })
 
     const result = await driveService.listFiles({
