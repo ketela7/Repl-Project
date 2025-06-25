@@ -31,24 +31,29 @@ import {
 import { cn } from '@/shared/utils'
 
 interface BulkOperationsDialogProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen?: boolean
+  open?: boolean
+  onClose?: () => void
+  onOpenChange?: (open: boolean) => void
   selectedItems: Array<{
     id: string
     name: string
     type: 'file' | 'folder'
   }>
-  onBulkDelete: () => void
-  onBulkDownload: () => void
-  onBulkShare: () => void
-  onBulkMove: () => void
-  onBulkCopy: () => void
-  onBulkRename: () => void
+  onBulkDelete?: () => void
+  onBulkDownload?: () => void
+  onBulkShare?: () => void
+  onBulkMove?: () => void
+  onBulkCopy?: () => void
+  onBulkRename?: () => void
+  onRefreshAfterBulkOp?: () => void
 }
 
 export function BulkOperationsDialog({
   isOpen,
+  open,
   onClose,
+  onOpenChange,
   selectedItems,
   onBulkDelete,
   onBulkDownload,
@@ -56,6 +61,7 @@ export function BulkOperationsDialog({
   onBulkMove,
   onBulkCopy,
   onBulkRename,
+  onRefreshAfterBulkOp,
 }: BulkOperationsDialogProps) {
   const isMobile = useIsMobile()
   const fileCount = selectedItems.filter((item) => item.type === 'file').length
@@ -63,47 +69,59 @@ export function BulkOperationsDialog({
     (item) => item.type === 'folder'
   ).length
 
+  // Determine dialog open state
+  const dialogOpen = open ?? isOpen ?? false
+  const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
+
+  // Default handlers for operations
+  const handleBulkDelete = onBulkDelete || (() => console.log('Bulk delete'))
+  const handleBulkDownload = onBulkDownload || (() => console.log('Bulk download'))
+  const handleBulkShare = onBulkShare || (() => console.log('Bulk share'))
+  const handleBulkMove = onBulkMove || (() => console.log('Bulk move'))
+  const handleBulkCopy = onBulkCopy || (() => console.log('Bulk copy'))
+  const handleBulkRename = onBulkRename || (() => console.log('Bulk rename'))
+
   const operations = [
     {
       icon: Download,
       label: 'Download',
       description: 'Download selected items',
-      action: onBulkDownload,
+      action: handleBulkDownload,
       variant: 'default' as const,
     },
     {
       icon: Share,
       label: 'Share',
       description: 'Share selected items',
-      action: onBulkShare,
+      action: handleBulkShare,
       variant: 'default' as const,
     },
     {
       icon: Move,
       label: 'Move',
       description: 'Move to another folder',
-      action: onBulkMove,
+      action: handleBulkMove,
       variant: 'default' as const,
     },
     {
       icon: Copy,
       label: 'Copy',
       description: 'Create copies',
-      action: onBulkCopy,
+      action: handleBulkCopy,
       variant: 'default' as const,
     },
     {
       icon: Edit,
       label: 'Rename',
       description: 'Bulk rename with patterns',
-      action: onBulkRename,
+      action: handleBulkRename,
       variant: 'default' as const,
     },
     {
       icon: Trash2,
       label: 'Delete',
       description: 'Move to trash',
-      action: onBulkDelete,
+      action: handleBulkDelete,
       variant: 'destructive' as const,
     },
   ]
@@ -135,7 +153,8 @@ export function BulkOperationsDialog({
               className={`${cn('touch-target min-h-[44px] active:scale-95')} h-auto justify-start p-3`}
               onClick={() => {
                 operation.action()
-                onClose()
+                onRefreshAfterBulkOp?.()
+                handleClose()
               }}
             >
               <Icon className="mr-3 h-4 w-4" />
@@ -154,7 +173,7 @@ export function BulkOperationsDialog({
 
   if (isMobile) {
     return (
-      <BottomSheet open={isOpen} onOpenChange={onClose}>
+      <BottomSheet open={dialogOpen} onOpenChange={onOpenChange || onClose}>
         <BottomSheetContent>
           <BottomSheetHeader>
             <BottomSheetTitle>Bulk Operations</BottomSheetTitle>
@@ -169,7 +188,7 @@ export function BulkOperationsDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={dialogOpen} onOpenChange={onOpenChange || onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Bulk Operations</DialogTitle>
