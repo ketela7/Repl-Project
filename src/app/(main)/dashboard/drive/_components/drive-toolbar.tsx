@@ -719,7 +719,7 @@ export function DriveToolbar({
           </Button>
 
           {/* Bulk Operations */}
-          {selectedCount === 0 && (
+          {selectedCount !== items.length && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -772,10 +772,13 @@ export function DriveToolbar({
                       <CheckSquare className="mr-2 h-4 w-4" />
                       Select All ({selectedCount}/{items.length})
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={onSelectAll}>
+                    if (selectedCount > 0){
+                      <DropdownMenuItem onClick={onSelectAll}>
                       <Square className="mr-2 h-4 w-4" />
                       Clear Selection
                     </DropdownMenuItem>
+                    }
+                    
                   </>
                 )}
 
