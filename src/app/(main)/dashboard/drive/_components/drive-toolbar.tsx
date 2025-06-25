@@ -1,6 +1,40 @@
 'use client'
 
-import { Suspense, useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback, useState } from 'react'
+import {
+  Search,
+  List,
+  Grid3X3,
+  Square,
+  SquareCheck,
+  X,
+  CheckSquare,
+  FileText,
+  RefreshCw,
+  Calendar,
+  Settings,
+  ChevronDown,
+  HardDrive,
+  Folder,
+  FileImage,
+  Play,
+  FileSpreadsheet,
+  Presentation,
+  Archive,
+  FileCode,
+  Link,
+  Upload,
+  FolderPlus,
+  ChevronUp,
+  MoreVertical,
+  Music,
+  Palette,
+  Database,
+  BookOpen,
+  FileType,
+  EllipsisVertical,
+} from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -18,52 +52,10 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
-import {
-  Search,
-  List,
-  Grid3X3,
-  Square,
-  SquareCheck,
-  X,
-  CheckSquare,
-  Download,
-  Edit,
-  FileText,
-  Move,
-  Copy,
-  Share2,
-  RefreshCw,
-  Trash2,
-  AlertTriangle,
-  Calendar,
-  Settings,
-  ChevronDown,
-  HardDrive,
-  Folder,
-  FileImage,
-  Play,
-  FileSpreadsheet,
-  Presentation,
-  FileVideo,
-  FileAudio,
-  Archive,
-  FileCode,
-  Link,
-  Upload,
-  FolderPlus,
-  ChevronUp,
-  MoreVertical,
-  Music,
-  Palette,
-  Database,
-  BookOpen,
-  FileType,
-  EllipsisVertical,
-} from 'lucide-react'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { FileCategoryBadges } from '@/components/file-category-badges'
 import { successToast, infoToast } from '@/shared/utils'
+
 import { BulkOperationsDialogDekstop } from './bulk-operations-dialog-dekstop'
 import { BulkOperationsDialogMobile } from './bulk-operations-dialog-mobile'
 import { BulkMoveDialog } from './bulk-move-dialog'
@@ -72,17 +64,18 @@ import { BulkDeleteDialog } from './bulk-delete-dialog'
 import { BulkShareDialog } from './bulk-share-dialog'
 
 // Types
-interface DriveFile {
+interface DriveItem {
   id: string
   name: string
   mimeType: string
   size?: string
-  modifiedTime: string
+  modifiedTime?: string
   createdTime?: string
   ownedByMe?: boolean
   shared?: boolean
   trashed?: boolean
   type: 'file' | 'folder'
+  itemType?: 'file' | 'folder'
 }
 
 interface AdvancedFilters {
@@ -115,12 +108,12 @@ interface VisibleColumns {
 
 interface DriveToolbarProps {
   searchQuery: string
-  onSearchChange: (query: string) => void
-  onSearchSubmit: (e: React.FormEvent) => void
+  onSearchChange: (_query: string) => void
+  onSearchSubmit: (_e: React.FormEvent) => void
   viewMode: 'grid' | 'table'
-  onViewModeChange: (mode: 'grid' | 'table') => void
+  onViewModeChange: (_mode: 'grid' | 'table') => void
   isSelectMode: boolean
-  onSelectModeChange: (mode: boolean) => void
+  onSelectModeChange: (_mode: boolean) => void
   selectedCount: number
 
   onSelectAll: () => void
@@ -135,7 +128,7 @@ interface DriveToolbarProps {
   onFiltersOpen: () => void
 
   // Mobile Actions Dialog Props
-  selectedItems: any[]
+  selectedItems: DriveItem[]
   onBulkDownload: () => void
   onBulkRename: () => void
   onBulkExport: () => void
@@ -147,7 +140,7 @@ interface DriveToolbarProps {
     advancedFilters: AdvancedFilters
   }
   onFilterChange: (
-    updates: Partial<{
+    _updates: Partial<{
       activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'
       fileTypeFilter: string[]
       advancedFilters: AdvancedFilters
@@ -156,14 +149,14 @@ interface DriveToolbarProps {
   onApplyFilters: () => void
   onClearFilters: () => void
   hasActiveFilters: boolean
-  items: any[]
-  setIsUploadDialogOpen: (open: boolean) => void
-  setIsCreateFolderDialogOpen: (open: boolean) => void
+  items: DriveItem[]
+  setIsUploadDialogOpen: (_open: boolean) => void
+  setIsCreateFolderDialogOpen: (_open: boolean) => void
 
   // Table columns
   visibleColumns: VisibleColumns
   setVisibleColumns: (
-    columns: VisibleColumns | ((prev: VisibleColumns) => VisibleColumns)
+    _columns: VisibleColumns | ((_prev: VisibleColumns) => VisibleColumns)
   ) => void
 
   // Loading states
@@ -171,13 +164,13 @@ interface DriveToolbarProps {
   isApplying?: boolean
 
   // Client-side filtering
-  onClientSideFilter?: (filteredItems: any[]) => void
+  onClientSideFilter?: (_filteredItems: DriveItem[]) => void
   onClearClientSideFilter?: () => void
 }
 
 // Enhanced client-side filtering function using comprehensive mimeType matching
-const filterByMimeType = (items: any[], category: string) => {
-  return items.filter((item) => {
+const filterByMimeType = (items: DriveItem[], category: string) => {
+  return items.filter((item: DriveItem) => {
     const mime = item.mimeType?.toLowerCase() || ''
     const name = item.name?.toLowerCase() || ''
 
@@ -460,16 +453,11 @@ export function DriveToolbar({
   isSelectMode,
   onSelectModeChange,
   selectedCount,
-
   onSelectAll,
   onRefresh,
   refreshing,
   onUpload,
   onCreateFolder,
-  onBulkDelete,
-  onBulkMove,
-  onBulkCopy,
-  onBulkShare,
   onFiltersOpen,
   selectedItems,
   onBulkDownload,
@@ -481,7 +469,6 @@ export function DriveToolbar({
   onFilterChange,
   onApplyFilters,
   onClearFilters,
-  hasActiveFilters,
   items,
   visibleColumns,
   setVisibleColumns,
@@ -772,12 +759,12 @@ export function DriveToolbar({
                       <CheckSquare className="mr-2 h-4 w-4" />
                       Select All ({selectedCount}/{items.length})
                     </DropdownMenuItem>
-                    if (selectedCount > 0){
-                      <DropdownMenuItem onClick={onSelectAll}>
-                      <Square className="mr-2 h-4 w-4" />
-                      Clear Selection
-                    </DropdownMenuItem>
-                    }
+                    {selectedCount > 0 && (
+                      <DropdownMenuItem onClick={onDeselectAll}>
+                        <Square className="mr-2 h-4 w-4" />
+                        Clear Selection
+                      </DropdownMenuItem>
+                    )}
                     
                   </>
                 )}
@@ -917,9 +904,6 @@ export function DriveToolbar({
                           }
                           size="sm"
                           onClick={() => {
-                            console.log(
-                              'Filter Debug - Toolbar click: All Files'
-                            )
                             onFilterChange({ activeView: 'all' })
                           }}
                           className="justify-start text-xs"
@@ -934,9 +918,6 @@ export function DriveToolbar({
                           }
                           size="sm"
                           onClick={() => {
-                            console.log(
-                              'Filter Debug - Toolbar click: My Drive'
-                            )
                             onFilterChange({ activeView: 'my-drive' })
                           }}
                           className="justify-start text-xs"
@@ -951,7 +932,6 @@ export function DriveToolbar({
                           }
                           size="sm"
                           onClick={() => {
-                            console.log('Filter Debug - Toolbar click: Recent')
                             onFilterChange({ activeView: 'recent' })
                           }}
                           className="justify-start text-xs"
@@ -2141,7 +2121,7 @@ export function DriveToolbar({
         isOpen={bulkDialogs.move}
         onClose={() => closeBulkDialog('move')}
         selectedItems={selectedItems}
-        onConfirm={(targetFolderId: string) => {
+        onConfirm={() => {
           closeBulkDialog('move')
           handleBulkOperationComplete()
         }}
@@ -2151,7 +2131,7 @@ export function DriveToolbar({
         isOpen={bulkDialogs.copy}
         onClose={() => closeBulkDialog('copy')}
         selectedItems={selectedItems}
-        onConfirm={(targetFolderId: string) => {
+        onConfirm={() => {
           closeBulkDialog('copy')
           handleBulkOperationComplete()
         }}

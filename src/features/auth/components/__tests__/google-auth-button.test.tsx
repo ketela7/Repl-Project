@@ -37,6 +37,7 @@ describe('GoogleAuthButton', () => {
     await waitFor(() => {
       expect(mockSignIn).toHaveBeenCalledWith('google', {
         callbackUrl: '/dashboard/drive',
+        redirect: true,
       })
     })
   })

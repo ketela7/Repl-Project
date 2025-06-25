@@ -124,8 +124,6 @@ export function DriveManager() {
 
   // Helper functions
   const openDialog = (dialogName: keyof typeof dialogs) => {
-    console.log('Opening dialog:', dialogName)
-    console.log('Current dialogs state:', dialogs)
     setDialogs((prev) => ({ ...prev, [dialogName]: true }))
   }
 
@@ -232,7 +230,7 @@ export function DriveManager() {
       return 0
     })
   }, [items, sortConfig])
-	// Sorting End
+        // Sorting End
 
   
   // Convert selected items for bulk operations
@@ -243,7 +241,13 @@ export function DriveManager() {
         id: itemId,
         name: item?.name || 'Unknown',
         type: item && isFolder(item) ? ('folder' as const) : ('file' as const),
-        mimeType: item?.mimeType,
+        mimeType: item?.mimeType || '',
+        modifiedTime: item?.modifiedTime || '',
+        size: item?.size,
+        createdTime: item?.createdTime,
+        ownedByMe: item?.ownedByMe,
+        shared: item?.shared,
+        trashed: item?.trashed,
       }
     })
   }, [selectedItems, items])
@@ -549,7 +553,10 @@ export function DriveManager() {
             onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
-            items={items}
+            items={items.map(item => ({
+              ...item,
+              type: isFolder(item) ? 'folder' as const : 'file' as const
+            }))}
             visibleColumns={visibleColumns}
             setVisibleColumns={setVisibleColumns}
             setIsUploadDialogOpen={() => openDialog('upload')}
