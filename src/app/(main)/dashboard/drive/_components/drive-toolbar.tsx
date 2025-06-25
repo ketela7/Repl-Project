@@ -484,12 +484,7 @@ export function DriveToolbar({
   // Actions Dialog State
   const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
   
-  // Debug state changes
-  console.log('DriveToolbar render:', { 
-    isBulkOperationsOpen, 
-    selectedCount, 
-    selectedItemsLength: selectedItems.length 
-  })
+
 
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters
@@ -715,7 +710,7 @@ export function DriveToolbar({
                     {selectedCount < items.length && (
                       <DropdownMenuItem 
                         onClick={(e) => {
-                          console.log('Select All clicked')
+
                           e.preventDefault()
                           e.stopPropagation()
                           onSelectAll()
@@ -729,7 +724,7 @@ export function DriveToolbar({
                     {selectedCount > 0 && (
                       <DropdownMenuItem 
                         onClick={(e) => {
-                          console.log('Clear Selection clicked')
+
                           e.preventDefault()
                           e.stopPropagation()
                           onDeselectAll()
@@ -747,7 +742,7 @@ export function DriveToolbar({
                     {isMobile ? (
                       <DropdownMenuItem
                         onClick={(e) => {
-                          console.log('Mobile More Actions clicked')
+
                           e.preventDefault()
                           e.stopPropagation()
                           setIsBulkOperationsOpen(true)
@@ -760,7 +755,6 @@ export function DriveToolbar({
                       <>
                         <DropdownMenuItem
                           onClick={(e) => {
-                            console.log('Desktop Bulk Operations clicked')
                             e.preventDefault()
                             e.stopPropagation()
                             setIsBulkOperationsOpen(true)
@@ -1830,7 +1824,7 @@ export function DriveToolbar({
               variant="ghost"
               size="sm"
               className="h-8 flex-shrink-0 px-2"
-              onClick={() => console.log('More Settings Menu Button Clicked!')}
+              onClick={() => {}}
             >
               <EllipsisVertical className="h-4 w-4" />
             </Button>
@@ -2079,13 +2073,10 @@ export function DriveToolbar({
 
 
 
-      {/* Bulk Operations Dialog - Always render dengan debugging */}
+      {/* Bulk Operations Dialog */}
       <BulkOperationsDialog
         isOpen={isBulkOperationsOpen}
-        onClose={() => {
-          console.log('CLOSING BULK OPERATIONS FROM TOOLBAR')
-          setIsBulkOperationsOpen(false)
-        }}
+        onClose={() => setIsBulkOperationsOpen(false)}
         selectedItems={selectedItems}
         onRefreshAfterBulkOp={handleBulkOperationComplete}
       />

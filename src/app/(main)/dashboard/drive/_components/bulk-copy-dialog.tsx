@@ -40,7 +40,7 @@ function BulkCopyDialog({
   onConfirm,
   selectedItems,
 }: BulkCopyDialogProps) {
-  console.log('BulkCopyDialog rendered:', { isOpen, selectedItemsCount: selectedItems.length })
+
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 

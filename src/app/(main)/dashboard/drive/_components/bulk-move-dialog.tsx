@@ -42,7 +42,7 @@ function BulkMoveDialog({
   onConfirm,
   selectedItems,
 }: BulkMoveDialogProps) {
-  console.log('BulkMoveDialog rendered:', { open, selectedItemsCount: selectedItems.length })
+
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 

@@ -67,7 +67,6 @@ function BulkOperationsDialog({
   selectedItems,
   onRefreshAfterBulkOp,
 }: BulkOperationsDialogProps) {
-  console.log('BulkOperationsDialog rendered with:', { isOpen, open, selectedItemsCount: selectedItems.length })
   const isMobile = useIsMobile()
   const fileCount = selectedItems.filter((item) => item.type === 'file').length
   const folderCount = selectedItems.filter(
@@ -88,65 +87,45 @@ function BulkOperationsDialog({
   const dialogOpen = open ?? isOpen ?? false
   const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
   
-  console.log('BulkOperationsDialog open state:', { dialogOpen, open, isOpen })
-  
-  // Debug dialog states
-  console.log('Dialog states:', {
-    isMoveDialogOpen,
-    isCopyDialogOpen, 
-    isDeleteDialogOpen,
-    isShareDialogOpen,
-    selectedItems: selectedItems.length
-  })
 
-  // Individual dialog handlers dengan debugging
+
+  // Individual dialog handlers
   const handleMoveClick = () => {
-    console.log('MOVE BUTTON CLICKED!')
-    alert('Move button clicked - check console')
     setIsMoveDialogOpen(true)
     handleClose()
   }
 
   const handleCopyClick = () => {
-    console.log('COPY BUTTON CLICKED!')
-    alert('Copy button clicked - check console')
     setIsCopyDialogOpen(true)
     handleClose()
   }
 
   const handleDeleteClick = () => {
-    console.log('DELETE BUTTON CLICKED!')
-    alert('Delete button clicked - check console')
     setIsDeleteDialogOpen(true)
     handleClose()
   }
 
   const handleShareClick = () => {
-    console.log('Opening share dialog...')
     setIsShareDialogOpen(true)
     handleClose()
   }
 
   const handleRenameClick = () => {
-    console.log('Opening rename dialog...')
     setIsRenameDialogOpen(true)
     handleClose()
   }
 
   const handleExportClick = () => {
-    console.log('Opening export dialog...')
     setIsExportDialogOpen(true)
     handleClose()
   }
 
   const handlePermanentDeleteClick = () => {
-    console.log('Opening permanent delete dialog...')
     setIsPermanentDeleteDialogOpen(true)
     handleClose()
   }
 
   const handleRestoreClick = () => {
-    console.log('Opening restore dialog...')
     setIsRestoreDialogOpen(true)
     handleClose()
   }
@@ -488,30 +467,21 @@ function BulkOperationsDialog({
       {/* Individual Bulk Operation Dialogs - Direct rendering tanpa Suspense */}
       <BulkMoveDialog
         open={isMoveDialogOpen}
-        onOpenChange={(open) => {
-          console.log('Move dialog state changed:', open)
-          setIsMoveDialogOpen(open)
-        }}
+        onOpenChange={setIsMoveDialogOpen}
         onConfirm={handleMoveComplete}
         selectedItems={selectedItems}
       />
 
       <BulkCopyDialog
         isOpen={isCopyDialogOpen}
-        onClose={() => {
-          console.log('Copy dialog closed')
-          setIsCopyDialogOpen(false)
-        }}
+        onClose={() => setIsCopyDialogOpen(false)}
         onConfirm={handleCopyComplete}
         selectedItems={selectedItems}
       />
 
       <BulkDeleteDialog
         isOpen={isDeleteDialogOpen}
-        onClose={() => {
-          console.log('Delete dialog closed')
-          setIsDeleteDialogOpen(false)
-        }}
+        onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleDeleteComplete}
         selectedItems={selectedItems}
       />
