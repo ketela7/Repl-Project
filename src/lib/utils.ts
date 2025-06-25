@@ -96,6 +96,19 @@ export function formatFileTime(dateString: string, timezone?: string): string {
   }
 }
 
+export function formatCreationTime(dateString: string, timezone?: string): string {
+  return formatFileTime(dateString, timezone)
+}
+
+export function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map(word => word.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+}
+
 export const toastUtils = {
   success: successToast,
   error: errorToast,
@@ -103,16 +116,4 @@ export const toastUtils = {
   info: infoToast,
 }
 
-export const getInitials = (str: string): string => {
-  if (typeof str !== 'string' || !str.trim()) return '?'
 
-  return (
-    str
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((word) => word[0])
-      .join('')
-      .toUpperCase() || '?'
-  )
-}

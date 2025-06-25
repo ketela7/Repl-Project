@@ -17,7 +17,7 @@ const nextConfig = {
     ],
     optimisticClientCache: true,
     useWasmBinary: false,
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled to avoid critters dependency
   },
 
   serverExternalPackages: ['postgres', 'googleapis'],
