@@ -61,20 +61,46 @@ errorToast.apiError = (message: string, details?: string) => {
 
 errorToast.driveAccessDenied = () => {
   toast.error('Google Drive access denied', {
-    description: 'Please reconnect your Google Drive account'
+    description: 'Please reconnect your Google Drive account',
   })
 }
 
 errorToast.permissionDenied = () => {
   toast.error('Permission denied', {
-    description: 'You do not have permission to perform this action'
+    description: 'You do not have permission to perform this action',
   })
+}
+
+export function infoToast(message: string, description?: string) {
+  toast.info(message, {
+    description,
+    duration: 4000,
+  })
+}
+
+export function formatFileTime(dateString: string, timezone?: string): string {
+  try {
+    const date = new Date(dateString)
+    if (isNaN(date.getTime())) return 'Invalid date'
+
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: timezone || 'UTC',
+    }).format(date)
+  } catch {
+    return 'Invalid date'
+  }
 }
 
 export const toastUtils = {
   success: successToast,
   error: errorToast,
   loading: loadingToast,
+  info: infoToast,
 }
 
 export const getInitials = (str: string): string => {

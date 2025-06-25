@@ -39,7 +39,7 @@ export function formatDateToUserTimezone(
       ...defaultOptions,
       timeZone: userTimezone,
     }).format(dateObj)
-  } catch (error) {
+  } catch {
     return dateObj.toLocaleString()
   }
 }

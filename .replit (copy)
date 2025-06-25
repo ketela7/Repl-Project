@@ -26,20 +26,8 @@ localPort = 5000
 externalPort = 80
 
 [workflows]
-runButton = "Main"
+runButton = "Project"
 
-[[workflows.workflow]]
-name = "Main"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Check Type"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Check Duplicate"
 
 [[workflows.workflow]]
 name = "DB Reset"
@@ -105,16 +93,6 @@ task = "shell.exec"
 args = "npm run lint:fix"
 
 [[workflows.workflow]]
-name = "Development"
-mode = "sequential"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev -- -p 5000 -H 0.0.0.0 --turbo"
-waitForPort = 5000
-
-[[workflows.workflow]]
 name = "Build"
 mode = "sequential"
 
@@ -153,4 +131,22 @@ args = "npm install"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm audit fix"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Server"
+
+[[workflows.workflow]]
+name = "Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev -- -p 5000 -H 0.0.0.0 --turbo"
+waitForPort = 5000
 

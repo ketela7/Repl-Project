@@ -36,7 +36,7 @@ module.exports = [
       import: importPlugin,
       security,
       sonarjs,
-      unicorn,
+      // unicorn: unicorn,
       'unused-imports': unusedImports,
     },
     rules: {

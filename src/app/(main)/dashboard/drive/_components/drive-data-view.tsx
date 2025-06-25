@@ -443,14 +443,10 @@ export function DriveDataView({
                           try {
                             await navigator.clipboard.writeText(email)
                             // Show toast notification
-                            const { successToast } = await import(
-                              '@/lib/utils/toast'
-                            )
+                            const { successToast } = await import('@/lib/utils')
                             successToast.copied()
                           } catch (err) {
-                            const { errorToast } = await import(
-                              '@/lib/utils/toast'
-                            )
+                            const { errorToast } = await import('@/lib/utils')
                             errorToast.generic('Failed to copy email')
                             console.error('Failed to copy email:', err)
                           }

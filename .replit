@@ -28,18 +28,6 @@ externalPort = 80
 [workflows]
 runButton = "Project"
 
-[[workflows.workflow]]
-name = "Main"
-mode = "parallel"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Check Type"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Check Duplicate"
 
 [[workflows.workflow]]
 name = "DB Reset"
