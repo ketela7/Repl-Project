@@ -21,8 +21,8 @@ import {
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { cn } from '@/shared/utils'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { cn } from '@/lib/utils'
 
 interface FileDeleteDialogProps {
   isOpen: boolean

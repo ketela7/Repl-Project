@@ -25,8 +25,8 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { FileIcon } from '@/components/file-icon'
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
-import { useTimezone } from '@/shared/hooks/use-timezone'
-import { formatFileTime } from '@/shared/utils'
+import { useTimezone } from '@/lib/hooks/use-timezone'
+import { formatFileTime } from '@/lib/utils'
 import {
   Table,
   TableBody,
@@ -444,12 +444,12 @@ export function DriveDataView({
                             await navigator.clipboard.writeText(email)
                             // Show toast notification
                             const { successToast } = await import(
-                              '@/shared/utils/toast'
+                              '@/lib/utils/toast'
                             )
                             successToast.copied()
                           } catch (err) {
                             const { errorToast } = await import(
-                              '@/shared/utils/toast'
+                              '@/lib/utils/toast'
                             )
                             errorToast.generic('Failed to copy email')
                             console.error('Failed to copy email:', err)

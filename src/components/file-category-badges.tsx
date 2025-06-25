@@ -16,7 +16,7 @@ import {
   Link,
 } from 'lucide-react'
 
-import { Badge } from '@/shared/components/ui/badge'
+import { Badge } from '@/components/ui/badge'
 
 interface DriveFile {
   id: string

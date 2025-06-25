@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Drawer } from "vaul";
 
-import { cn } from "@/shared/utils";
+import { cn } from "@/lib/utils";
 
 interface BottomSheetProps {
   children: React.ReactNode;

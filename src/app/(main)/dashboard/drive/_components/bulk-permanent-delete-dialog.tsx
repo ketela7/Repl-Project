@@ -25,8 +25,8 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { cn } from '@/shared/utils'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { cn } from '@/lib/utils'
 
 interface BulkPermanentDeleteDialogProps {
   isOpen: boolean
@@ -135,7 +135,9 @@ function BulkPermanentDeleteDialog({
           <Checkbox
             id="acknowledge-warning"
             checked={acknowledgeWarning}
-            onCheckedChange={(checked) => setAcknowledgeWarning(checked === true)}
+            onCheckedChange={(checked) =>
+              setAcknowledgeWarning(checked === true)
+            }
             className="mt-1"
           />
           <Label

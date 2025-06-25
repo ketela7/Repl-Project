@@ -53,8 +53,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { SimpleDatePicker } from '@/components/ui/simple-date-picker'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { cn } from '@/shared/utils'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { cn } from '@/lib/utils'
 
 interface AdvancedFilters {
   sizeRange?: {

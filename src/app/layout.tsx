@@ -7,7 +7,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/components/providers/auth-provider'
 import { TimezoneProvider } from '@/components/timezone-provider'
 import { ErrorBoundary } from '@/components/error-boundary'
-import { APP_CONFIG } from '@/shared/constants/app-constants'
+import { APP_CONFIG } from '@/config/app-config'
 
 import './globals.css'
 

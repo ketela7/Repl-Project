@@ -2,7 +2,7 @@
 import React from 'react';
 import { X, Plus, Tag, Sparkles } from 'lucide-react';
 
-import { cn } from '@/shared/utils';
+import { cn } from '@/lib/utils';
 
 import { Badge } from './badge';
 import { Button } from './button';

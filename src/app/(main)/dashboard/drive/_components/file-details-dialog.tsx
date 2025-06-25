@@ -43,9 +43,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Separator } from '@/components/ui/separator'
 import { DriveFile } from '@/lib/google-drive/types'
 import { formatFileSize } from '@/lib/google-drive/utils'
-import { formatFileTime, formatCreationTime } from '@/shared/utils'
+import { formatFileTime, formatCreationTime } from '@/lib/utils'
 import { FileIcon } from '@/components/file-icon'
-import { getInitials } from '@/shared/utils'
+import { getInitials } from '@/lib/utils'
 
 // Global cache and request tracking for file details
 const fileDetailsCache = new Map<string, DetailedFileInfo>()

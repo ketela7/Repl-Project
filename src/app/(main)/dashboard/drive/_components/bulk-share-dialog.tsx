@@ -1,14 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Share2,
-  Globe,
-  Users,
-  Lock,
-  Eye,
-  Edit,
-} from 'lucide-react'
+import { Share2, Globe, Users, Lock, Eye, Edit } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -36,7 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 
 interface BulkShareDialogProps {
   open: boolean

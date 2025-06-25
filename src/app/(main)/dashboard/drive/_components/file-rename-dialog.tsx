@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -24,7 +24,7 @@ import {
   BottomSheetDescription,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import { cn } from '@/shared/utils'
+import { cn } from '@/lib/utils'
 
 interface FileRenameDialogProps {
   open: boolean

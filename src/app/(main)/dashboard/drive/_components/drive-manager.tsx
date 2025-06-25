@@ -5,8 +5,8 @@ import { ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw } from 'lucide-react'
 
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 import { normalizeFileSize } from '@/lib/google-drive/utils'
-import { errorToast } from '@/shared/utils'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { errorToast } from '@/lib/utils'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { useTimezoneContext } from '@/components/timezone-provider'
 import { Progress } from '@/components/ui/progress'
 import { DriveErrorDisplay } from '@/components/drive-error-display'
@@ -26,7 +26,6 @@ import { FileShareDialog } from './file-share-dialog'
 import { FiltersDialog } from './filters-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
-
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
 

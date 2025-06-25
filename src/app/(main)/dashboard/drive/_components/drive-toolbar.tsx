@@ -53,8 +53,8 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { successToast, infoToast } from '@/shared/utils'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { successToast, infoToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
 import { BulkOperationsDialog } from './bulk-operations-dialog'
@@ -684,8 +684,8 @@ export function DriveToolbar({
               <DropdownMenuContent align="start" className="w-64">
                 <DropdownMenuItem
                   onClick={() => {
-                    isSelectMode && onDeselectAll(),
-                      onSelectModeChange(!isSelectMode)
+                    ;(isSelectMode && onDeselectAll(),
+                      onSelectModeChange(!isSelectMode))
                   }}
                 >
                   {isSelectMode ? (

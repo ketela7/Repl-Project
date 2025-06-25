@@ -1,13 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {
-  X,
-  Download,
-  ExternalLink,
-  Maximize2,
-  Minimize2,
-} from 'lucide-react'
+import { X, Download, ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
 
 import {
   Dialog,
@@ -17,11 +11,8 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { DriveFile } from '@/lib/google-drive/types'
-import {
-  getPreviewUrl,
-  formatFileSize,
-} from '@/lib/google-drive/utils'
-import { errorToast, toastUtils } from '@/shared/utils'
+import { getPreviewUrl, formatFileSize } from '@/lib/google-drive/utils'
+import { errorToast, toastUtils } from '@/lib/utils'
 
 interface FilePreviewDialogProps {
   open: boolean

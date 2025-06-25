@@ -20,11 +20,10 @@ import {
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { cn } from '@/shared/utils'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { cn } from '@/lib/utils'
 
 import { FileMoveDialog } from './file-move-dialog'
-
 
 interface BulkMoveDialogProps {
   open: boolean

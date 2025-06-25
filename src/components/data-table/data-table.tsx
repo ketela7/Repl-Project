@@ -19,7 +19,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/shared/components/ui/table'
+} from '@/components/ui/table'
 
 import { DraggableRow } from './draggable-row'
 

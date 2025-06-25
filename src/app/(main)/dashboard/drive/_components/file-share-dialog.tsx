@@ -2,15 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Share2,
-  Users,
-  Globe,
-  Lock,
-  Mail,
-  Eye,
-  Edit,
-} from 'lucide-react'
+import { Share2, Users, Globe, Lock, Mail, Eye, Edit } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,10 +31,10 @@ import {
 } from '@/components/ui/select'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { successToast, errorToast, loadingToast } from '@/shared/utils'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { successToast, errorToast, loadingToast } from '@/lib/utils'
 import { copyToClipboard } from '@/lib/clipboard'
-import { cn } from '@/shared/utils'
+import { cn } from '@/lib/utils'
 
 interface FileShareDialogProps {
   open: boolean

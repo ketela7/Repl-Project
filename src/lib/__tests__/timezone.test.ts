@@ -5,7 +5,7 @@ import {
   getRelativeTime,
   formatFileTime,
   getTimezoneDisplayName,
-} from '../timezone'
+} from '../utils/timezone'
 
 // Mock Intl.DateTimeFormat
 const mockDateTimeFormat = jest.fn().mockImplementation(() => ({

@@ -7,7 +7,7 @@ const importPlugin = require('eslint-plugin-import')
 const react = require('eslint-plugin-react')
 const security = require('eslint-plugin-security')
 const sonarjs = require('eslint-plugin-sonarjs')
-const unicorn = require('eslint-plugin-unicorn')
+// const unicorn = require('eslint-plugin-unicorn')
 const unusedImports = require('eslint-plugin-unused-imports')
 
 const compat = new FlatCompat({

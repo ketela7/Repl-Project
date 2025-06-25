@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from 'react'
 
-import { useTimezone } from '@/shared/hooks/use-timezone'
+import { useTimezone } from '@/lib/hooks/use-timezone'
 
 interface TimezoneContextType {
   timezone: string

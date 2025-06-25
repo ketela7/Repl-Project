@@ -31,7 +31,7 @@ import {
 import {
   type NavGroup,
   type NavMainItem,
-} from '@/features/navigation/components/sidebar/sidebar-items'
+} from '@/app/(main)/dashboard/_components/sidebar/sidebar-items'
 
 interface NavMainProps {
   readonly items: readonly NavGroup[]

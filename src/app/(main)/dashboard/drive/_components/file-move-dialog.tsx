@@ -31,13 +31,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { DriveFolder } from '@/lib/google-drive/types'
 import {
   extractFolderIdFromUrl,
   isValidFolderId,
 } from '@/lib/google-drive/utils'
-import { cn } from '@/shared/utils'
+import { cn } from '@/lib/utils'
 
 interface FileMoveDialogProps {
   isOpen: boolean

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -21,10 +21,9 @@ import {
   BottomSheetTitle,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import { cn } from '@/shared/utils'
+import { cn } from '@/lib/utils'
 
 import { FileCopyDialog } from './file-copy-dialog'
-
 
 interface BulkCopyDialogProps {
   isOpen: boolean

@@ -1,13 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  Edit3,
-  Hash,
-  Calendar,
-  AlignLeft,
-  Code2,
-} from 'lucide-react'
+import { Edit3, Hash, Calendar, AlignLeft, Code2 } from 'lucide-react'
 
 import {
   Dialog,
@@ -28,8 +22,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { cn } from '@/shared/utils'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { cn } from '@/lib/utils'
 
 interface BulkRenameDialogProps {
   isOpen: boolean

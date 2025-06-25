@@ -11,8 +11,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
-import { APP_CONFIG } from '@/shared/constants/app-constants'
-import { sidebarItems } from '@/features/navigation/components/sidebar/sidebar-items'
+import { APP_CONFIG } from '@/config/app-config'
+import { sidebarItems } from './sidebar-items'
 
 import { NavMain } from './nav-main'
 import { AuthNavUser } from './auth-nav-user'
