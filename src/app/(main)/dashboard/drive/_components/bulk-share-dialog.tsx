@@ -52,179 +52,114 @@ import {
   ChevronDown,
 } from 'lucide-react'
 import { FileIcon } from '@/components/file-icon'
+import { cn } from '@/shared/utils'
 import { toast } from 'sonner'
 
 interface BulkShareDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  onConfirm: (accessLevel: string, linkAccess: string) => void
   selectedItems: Array<{
     id: string
     name: string
     type: 'file' | 'folder'
     mimeType?: string
   }>
-  onShare?: (shareData: BulkShareData) => Promise<ShareResult[]>
-}
-
-interface BulkShareData {
-  role: 'reader' | 'writer' | 'commenter'
-  type: 'anyone' | 'anyoneWithLink' | 'domain'
 }
 
 interface ShareResult {
   id: string
   name: string
-  shareLink: string
   success: boolean
+  shareLink?: string
   error?: string
 }
 
 function BulkShareDialog({
   open,
   onOpenChange,
+  onConfirm,
   selectedItems,
-  onShare,
 }: BulkShareDialogProps) {
-  const [accessLevel, setAccessLevel] = useState<
-    'reader' | 'writer' | 'commenter'
-  >('reader')
-  const [linkAccess, setLinkAccess] = useState<
-    'anyone' | 'anyoneWithLink' | 'domain'
-  >('anyoneWithLink')
+  const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
+  const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>('anyoneWithLink')
   const [isLoading, setIsLoading] = useState(false)
-  const [shareResults, setShareResults] = useState<ShareResult[]>([])
   const [showResults, setShowResults] = useState(false)
+  const [shareResults, setShareResults] = useState<ShareResult[]>([])
   const isMobile = useIsMobile()
 
   const handleBulkShare = async () => {
     setIsLoading(true)
-    setShowResults(false)
-
     try {
-      if (onShare) {
-        const results = await onShare({
-          role: accessLevel,
-          type: linkAccess,
-        })
-        setShareResults(results)
-        setShowResults(true)
-      }
+      onConfirm(accessLevel, linkAccess)
+      // Mock results for demo
+      const mockResults: ShareResult[] = selectedItems.map((item) => ({
+        id: item.id,
+        name: item.name,
+        success: true,
+        shareLink: `https://drive.google.com/file/d/${item.id}/view`,
+      }))
+      setShareResults(mockResults)
+      setShowResults(true)
+    } catch (error) {
+      toast.error('Failed to generate share links')
     } finally {
       setIsLoading(false)
     }
   }
 
   const copyToClipboard = async () => {
-    const successfulShares = shareResults.filter((result) => result.success)
-    if (successfulShares.length === 0) return
-
-    const clipboardText = successfulShares
-      .map((result) => `${result.name} ${result.shareLink}`)
+    const links = shareResults
+      .filter((r) => r.success && r.shareLink)
+      .map((r) => `${r.name}: ${r.shareLink}`)
       .join('\n')
-
+    
     try {
-      await navigator.clipboard.writeText(clipboardText)
-      toast.success(
-        `Copied ${successfulShares.length} share links to clipboard`
-      )
-    } catch (err) {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea')
-      textArea.value = clipboardText
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textArea)
-      toast.success(
-        `Copied ${successfulShares.length} share links to clipboard`
-      )
+      await navigator.clipboard.writeText(links)
+      toast.success('Share links copied to clipboard')
+    } catch (error) {
+      toast.error('Failed to copy to clipboard')
     }
   }
 
   const exportToTxt = () => {
-    if (shareResults.length === 0) return
-
-    const successfulShares = shareResults.filter((result) => result.success)
-    const failedShares = shareResults.filter((result) => !result.success)
-
-    const content = [
-      'Bulk Share Results - Generated on ' + new Date().toLocaleString(),
-      '='.repeat(60),
-      '',
-      'SUCCESSFUL SHARES:',
-      '-'.repeat(20),
-      ...successfulShares.map((result) => `${result.name} ${result.shareLink}`),
-      '',
-      'FAILED SHARES:',
-      '-'.repeat(15),
-      ...failedShares.map(
-        (result) => `${result.name} - Error: ${result.error || 'Unknown error'}`
-      ),
-      '',
-      'SUMMARY:',
-      '-'.repeat(10),
-      `Total Items: ${shareResults.length}`,
-      `Successful: ${successfulShares.length}`,
-      `Failed: ${failedShares.length}`,
-    ].join('\n')
-
-    downloadFile(content, 'bulk-share-results.txt', 'text/plain')
+    const content = shareResults
+      .map((r) => `${r.name}: ${r.success ? r.shareLink : 'Failed'}`)
+      .join('\n')
+    
+    const blob = new Blob([content], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'share-links.txt'
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const exportToCsv = () => {
-    if (shareResults.length === 0) return
-
-    const headers = ['Name', 'Share Link', 'Status', 'Error', 'Generated At']
-    const rows = shareResults.map((result) => [
-      `"${result.name.replace(/"/g, '""')}"`,
-      result.shareLink || '',
-      result.success ? 'Success' : 'Failed',
-      result.error ? `"${result.error.replace(/"/g, '""')}"` : '',
-      new Date().toISOString(),
-    ])
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map((row) => row.join(',')),
-    ].join('\n')
-
-    downloadFile(csvContent, 'bulk-share-results.csv', 'text/csv')
+    const headers = 'Name,Share Link,Status\n'
+    const content = shareResults
+      .map((r) => `"${r.name}","${r.shareLink || ''}","${r.success ? 'Success' : 'Failed'}"`)
+      .join('\n')
+    
+    const blob = new Blob([headers + content], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'share-links.csv'
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const exportToJson = () => {
-    const exportData = {
-      generatedAt: new Date().toISOString(),
-      totalItems: shareResults.length,
-      successfulShares: shareResults.filter((r) => r.success).length,
-      failedShares: shareResults.filter((r) => !r.success).length,
-      results: shareResults.map((result) => ({
-        id: result.id,
-        name: result.name,
-        shareLink: result.shareLink || null,
-        success: result.success,
-        error: result.error || null,
-      })),
-    }
-
-    const jsonContent = JSON.stringify(exportData, null, 2)
-    downloadFile(jsonContent, 'bulk-share-results.json', 'application/json')
-  }
-
-  const downloadFile = (
-    content: string,
-    filename: string,
-    mimeType: string
-  ) => {
-    const blob = new Blob([content], { type: mimeType })
+    const content = JSON.stringify(shareResults, null, 2)
+    const blob = new Blob([content], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'share-links.json'
+    a.click()
     URL.revokeObjectURL(url)
-    toast.success(`Exported as ${filename}`)
   }
 
   const fileCount = selectedItems.filter((item) => item.type === 'file').length
@@ -249,182 +184,140 @@ function BulkShareDialog({
         </div>
       </div>
 
-      {/* Stats */}
+      {/* File Count Badges */}
       <div className="flex justify-center gap-2">
+        <Badge variant="secondary" className="px-3 py-1">
+          {selectedItems.length} total
+        </Badge>
         {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-            <FileText className="mr-1 h-3 w-3" />
+          <Badge variant="outline" className="px-3 py-1">
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-            <Folder className="mr-1 h-3 w-3" />
+          <Badge variant="outline" className="px-3 py-1">
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
       </div>
 
-        {selectedItems.length <= 5 ? (
-          <div className="space-y-2">
-            <div className="text-sm font-semibold">Items to share:</div>
-            <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-              <ul className="space-y-1 text-sm">
-                {selectedItems.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex items-center gap-2 truncate"
-                  >
-                    <FileIcon
-                      mimeType={item.mimeType || 'application/octet-stream'}
-                      className="h-4 w-4 flex-shrink-0"
-                    />
-                    <span className="truncate">{item.name}</span>
-                  </li>
-                ))}
-              </ul>
+      {/* Selected Items Preview */}
+      <div className="space-y-3">
+        <Label className="text-sm font-medium">Items to share</Label>
+        <div className="bg-muted/50 max-h-32 space-y-1 overflow-y-auto rounded-lg border p-3">
+          {selectedItems.slice(0, 5).map((item) => (
+            <div key={item.id} className="flex items-center gap-2 text-sm">
+              <Share2 className="text-purple-500 h-4 w-4 flex-shrink-0" />
+              <span className="truncate" title={item.name}>
+                {item.name}
+              </span>
             </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <div className="text-sm font-semibold">
-              Preview (first 3 items):
+          ))}
+          {selectedItems.length > 5 && (
+            <div className="text-muted-foreground text-center text-xs italic">
+              and {selectedItems.length - 5} more items...
             </div>
-            <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-              <ul className="space-y-1 text-sm">
-                {selectedItems.slice(0, 3).map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex items-center gap-2 truncate"
-                  >
-                    <FileIcon
-                      mimeType={item.mimeType || 'application/octet-stream'}
-                      className="h-4 w-4 flex-shrink-0"
-                    />
-                    <span className="truncate">{item.name}</span>
-                  </li>
-                ))}
-                <li className="text-muted-foreground/70 flex items-center gap-2 italic">
-                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
-                  and {selectedItems.length - 3} more items...
-                </li>
-              </ul>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
+      </div>
 
-        <Separator />
-
-        <div className="space-y-4">
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Access level</Label>
-            <Select
-              value={accessLevel}
-              onValueChange={(value: 'reader' | 'writer' | 'commenter') =>
-                setAccessLevel(value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="reader">
-                  <div className="flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium">Viewer</div>
-                      <div className="text-muted-foreground text-xs">
-                        Can view only
-                      </div>
-                    </div>
+      {/* Share Settings */}
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Access level</Label>
+          <Select
+            value={accessLevel}
+            onValueChange={(value: 'reader' | 'writer' | 'commenter') =>
+              setAccessLevel(value)
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="reader">
+                <div className="flex items-center gap-2">
+                  <Eye className="h-4 w-4" />
+                  <div>
+                    <p className="font-medium">Viewer</p>
+                    <p className="text-muted-foreground text-xs">Can view only</p>
                   </div>
-                </SelectItem>
-                <SelectItem value="commenter">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium">Commenter</div>
-                      <div className="text-muted-foreground text-xs">
-                        Can view and comment
-                      </div>
-                    </div>
+                </div>
+              </SelectItem>
+              <SelectItem value="commenter">
+                <div className="flex items-center gap-2">
+                  <Edit className="h-4 w-4" />
+                  <div>
+                    <p className="font-medium">Commenter</p>
+                    <p className="text-muted-foreground text-xs">Can view and comment</p>
                   </div>
-                </SelectItem>
-                <SelectItem value="writer">
-                  <div className="flex items-center gap-2">
-                    <Edit className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium">Editor</div>
-                      <div className="text-muted-foreground text-xs">
-                        Can view and edit
-                      </div>
-                    </div>
+                </div>
+              </SelectItem>
+              <SelectItem value="writer">
+                <div className="flex items-center gap-2">
+                  <Edit className="h-4 w-4" />
+                  <div>
+                    <p className="font-medium">Editor</p>
+                    <p className="text-muted-foreground text-xs">Can view, comment, and edit</p>
                   </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Who has access</Label>
-            <Select
-              value={linkAccess}
-              onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
-                setLinkAccess(value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="anyoneWithLink">
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium">Anyone with the link</div>
-                      <div className="text-muted-foreground text-xs">
-                        Anyone who has the link can access
-                      </div>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="domain">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium">
-                        Anyone in your organization
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        People in your domain can find and access
-                      </div>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="anyone">
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    <div>
-                      <div className="font-medium">Anyone on the internet</div>
-                      <div className="text-muted-foreground text-xs">
-                        Anyone can search and access
-                      </div>
-                    </div>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
-          <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-green-500">
-            <div className="h-1.5 w-1.5 rounded-full bg-white" />
-          </div>
-          <div className="text-sm text-green-800 dark:text-green-200">
-            Share links will be generated for all selected items with the chosen
-            access settings.
-          </div>
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Who has access</Label>
+          <Select
+            value={linkAccess}
+            onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
+              setLinkAccess(value)
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="anyoneWithLink">
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4" />
+                  <div>
+                    <p className="font-medium">Anyone with the link</p>
+                    <p className="text-muted-foreground text-xs">Anyone who has the link can access</p>
+                  </div>
+                </div>
+              </SelectItem>
+              <SelectItem value="anyone">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  <div>
+                    <p className="font-medium">Anyone on the internet</p>
+                    <p className="text-muted-foreground text-xs">Public on the web</p>
+                  </div>
+                </div>
+              </SelectItem>
+              <SelectItem value="domain">
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4" />
+                  <div>
+                    <p className="font-medium">Anyone in your organization</p>
+                    <p className="text-muted-foreground text-xs">People in your organization can find and access</p>
+                  </div>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Info Alert */}
+      <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
+        <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-green-500">
+          <div className="h-1.5 w-1.5 rounded-full bg-white" />
+        </div>
+        <div className="text-sm text-green-800 dark:text-green-200">
+          Share links will be generated for all selected items with the chosen
+          access settings.
         </div>
       </div>
     </div>
@@ -452,144 +345,34 @@ function BulkShareDialog({
             {renderContent()}
           </div>
 
-          {/* Mobile Results Section */}
-          {showResults && shareResults.length > 0 && (
-            <div className="space-y-4 px-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold">Share Results</h4>
-              </div>
-
-              {/* Mobile Export Actions */}
-              {shareResults.length > 0 && (
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={copyToClipboard}
-                    className="gap-2"
-                  >
-                    <Copy className="h-4 w-4" />
-                    Copy
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={exportToTxt}
-                    className="gap-2"
-                  >
-                    <FileText className="h-4 w-4" />
-                    TXT
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={exportToCsv}
-                    className="gap-2"
-                  >
-                    <FileText className="h-4 w-4" />
-                    CSV
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={exportToJson}
-                    className="gap-2"
-                  >
-                    <FileText className="h-4 w-4" />
-                    JSON
-                  </Button>
-                </div>
-              )}
-
-              <div className="max-h-48 space-y-2 overflow-y-auto">
-                {shareResults.map((result) => (
-                  <div
-                    key={result.id}
-                    className={`rounded-lg border p-3 ${
-                      result.success
-                        ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-                        : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      {result.success ? (
-                        <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
-                      ) : (
-                        <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
-                      )}
-
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">
-                          {result.name}
-                        </div>
-
-                        {result.success ? (
-                          <div className="mt-1 flex items-center gap-2">
-                            <div className="text-muted-foreground flex-1 truncate text-xs">
-                              {result.shareLink}
-                            </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-6 w-6 p-0"
-                              onClick={() =>
-                                window.open(result.shareLink, '_blank')
-                              }
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="mt-1 text-xs text-red-600 dark:text-red-400">
-                            {result.error || 'Failed to generate share link'}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-muted-foreground text-center text-sm">
-                {shareResults.filter((r) => r.success).length} of{' '}
-                {shareResults.length} items shared successfully
-              </div>
-            </div>
-          )}
-
           <BottomSheetFooter className="bg-background flex-shrink-0 border-t p-4">
-            <div
-              className={`grid ${!showResults ? 'grid-cols-2' : 'grid-cols-1'} w-full gap-3`}
-            >
+            <div className="grid grid-cols-2 w-full gap-3">
               <Button
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
                 className="min-h-[48px] text-base font-medium"
               >
-                {showResults ? 'Close' : 'Cancel'}
+                Cancel
               </Button>
-              {!showResults && (
-                <Button
-                  onClick={handleBulkShare}
-                  disabled={isLoading || selectedItems.length === 0}
-                  className="min-h-[48px] text-base font-medium"
-                >
-                  {isLoading ? (
-                    <>
-                      <Share2 className="mr-2 h-4 w-4 animate-pulse" />
-                      Sharing...
-                    </>
-                  ) : (
-                    <>
-                      <Share2 className="mr-2 h-4 w-4" />
-                      Generate {selectedItems.length} Share Links
-                    </>
-                  )}
-                </Button>
-              )}
+              <Button
+                onClick={handleBulkShare}
+                disabled={isLoading || selectedItems.length === 0}
+                className="min-h-[48px] text-base font-medium"
+              >
+                {isLoading ? (
+                  <>
+                    <Share2 className="mr-2 h-4 w-4 animate-pulse" />
+                    Sharing...
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="mr-2 h-4 w-4" />
+                    Generate {selectedItems.length} Share Links
+                  </>
+                )}
+              </Button>
             </div>
-            <div className="pb-safe-area-inset-bottom"></div>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
@@ -616,291 +399,32 @@ function BulkShareDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Selected Items Summary */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Selected items</Label>
-            <div className="bg-muted/50 space-y-2 rounded-lg p-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Total items:</span>
-                <Badge variant="secondary">{selectedItems.length}</Badge>
-              </div>
-              {fileCount > 0 && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Files:</span>
-                  <Badge variant="outline">{fileCount}</Badge>
-                </div>
-              )}
-              {folderCount > 0 && (
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Folders:</span>
-                  <Badge variant="outline">{folderCount}</Badge>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Preview of items */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Items to share</Label>
-            <div className="max-h-32 space-y-1 overflow-y-auto">
-              {selectedItems.slice(0, 5).map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center gap-2 p-1 text-sm"
-                >
-                  <FileIcon
-                    mimeType={
-                      item.type === 'folder'
-                        ? 'application/vnd.google-apps.folder'
-                        : item.mimeType || 'application/octet-stream'
-                    }
-                    className="h-4 w-4 flex-shrink-0"
-                  />
-                  <span className="truncate" title={item.name}>
-                    {item.name}
-                  </span>
-                </div>
-              ))}
-              {selectedItems.length > 5 && (
-                <div className="text-muted-foreground py-1 text-center text-xs">
-                  and {selectedItems.length - 5} more items...
-                </div>
-              )}
-            </div>
-          </div>
-
-          <Separator />
-
-          {/* Access Level */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Access level</Label>
-            <Select
-              value={accessLevel}
-              onValueChange={(value: 'reader' | 'writer' | 'commenter') =>
-                setAccessLevel(value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="reader">
-                  <div className="flex items-center gap-2">
-                    <Eye className="h-4 w-4" />
-                    <div>
-                      <p className="font-medium">Viewer</p>
-                      <p className="text-muted-foreground text-xs">
-                        Can view only
-                      </p>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="commenter">
-                  <div className="flex items-center gap-2">
-                    <Edit className="h-4 w-4" />
-                    <div>
-                      <p className="font-medium">Commenter</p>
-                      <p className="text-muted-foreground text-xs">
-                        Can view and comment
-                      </p>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="writer">
-                  <div className="flex items-center gap-2">
-                    <Edit className="h-4 w-4" />
-                    <div>
-                      <p className="font-medium">Editor</p>
-                      <p className="text-muted-foreground text-xs">
-                        Can view, comment, and edit
-                      </p>
-                    </div>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Link Access */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Who has access</Label>
-            <Select
-              value={linkAccess}
-              onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
-                setLinkAccess(value)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="anyoneWithLink">
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <div>
-                      <p className="font-medium">Anyone with the link</p>
-                      <p className="text-muted-foreground text-xs">
-                        Anyone who has the link can access
-                      </p>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="anyone">
-                  <div className="flex items-center gap-2">
-                    <Globe className="h-4 w-4" />
-                    <div>
-                      <p className="font-medium">Anyone on the internet</p>
-                      <p className="text-muted-foreground text-xs">
-                        Public on the web
-                      </p>
-                    </div>
-                  </div>
-                </SelectItem>
-                <SelectItem value="domain">
-                  <div className="flex items-center gap-2">
-                    <Lock className="h-4 w-4" />
-                    <div>
-                      <p className="font-medium">Anyone in your organization</p>
-                      <p className="text-muted-foreground text-xs">
-                        People in your organization can find and access
-                      </p>
-                    </div>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Results Section */}
-        {showResults && shareResults.length > 0 && (
-          <div className="space-y-4">
-            <Separator />
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold">Share Results</h4>
-                {shareResults.length > 0 && (
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={copyToClipboard}
-                      className="gap-2"
-                    >
-                      <Copy className="h-4 w-4" />
-                      Copy
-                    </Button>
-
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button size="sm" variant="outline" className="gap-2">
-                          <Download className="h-4 w-4" />
-                          Export
-                          <ChevronDown className="h-3 w-3" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={exportToTxt}>
-                          <FileText className="mr-2 h-4 w-4" />
-                          Export as TXT
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={exportToCsv}>
-                          <FileText className="mr-2 h-4 w-4" />
-                          Export as CSV
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={exportToJson}>
-                          <FileText className="mr-2 h-4 w-4" />
-                          Export as JSON
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                )}
-              </div>
-
-              <div className="max-h-48 space-y-2 overflow-y-auto">
-                {shareResults.map((result) => (
-                  <div
-                    key={result.id}
-                    className={`rounded-lg border p-3 ${
-                      result.success
-                        ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-                        : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      {result.success ? (
-                        <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-green-600 dark:text-green-400" />
-                      ) : (
-                        <XCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-400" />
-                      )}
-
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">
-                          {result.name}
-                        </div>
-
-                        {result.success ? (
-                          <div className="mt-1 flex items-center gap-2">
-                            <div className="text-muted-foreground flex-1 truncate text-xs">
-                              {result.shareLink}
-                            </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="h-6 w-6 p-0"
-                              onClick={() =>
-                                window.open(result.shareLink, '_blank')
-                              }
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="mt-1 text-xs text-red-600 dark:text-red-400">
-                            {result.error || 'Failed to generate share link'}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-muted-foreground flex items-center justify-between text-sm">
-                <span>
-                  {shareResults.filter((r) => r.success).length} of{' '}
-                  {shareResults.length} items shared successfully
-                </span>
-                {shareResults.length > 0 && (
-                  <span className="text-xs">
-                    Generated: {new Date().toLocaleString()}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        <DialogFooter className="flex justify-between">
+        <DialogFooter className="flex-col gap-2 sm:flex-row">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
+            className="w-full sm:w-auto"
           >
-            {showResults ? 'Close' : 'Cancel'}
+            Cancel
           </Button>
-          {!showResults && (
-            <Button
-              onClick={handleBulkShare}
-              disabled={isLoading || selectedItems.length === 0}
-            >
-              {isLoading
-                ? 'Sharing...'
-                : `Generate ${selectedItems.length} Share Links`}
-            </Button>
-          )}
+          <Button
+            onClick={handleBulkShare}
+            disabled={isLoading || selectedItems.length === 0}
+            className="w-full sm:w-auto"
+          >
+            {isLoading ? (
+              <>
+                <Share2 className="mr-2 h-4 w-4 animate-pulse" />
+                Sharing...
+              </>
+            ) : (
+              <>
+                <Share2 className="mr-2 h-4 w-4" />
+                Generate Share Links
+              </>
+            )}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

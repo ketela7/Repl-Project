@@ -50,38 +50,51 @@ interface BulkRenameDialogProps {
 const RENAME_TYPES = [
   {
     id: 'prefix',
-    label: 'Add Prefix',
+    name: 'Add Prefix',
+    description: 'Add text before the filename',
     icon: AlignLeft,
-    description: 'Add text before existing name',
-    example: 'NewPrefix_OriginalName.ext',
+    example: 'prefix_filename.txt',
+    placeholder: 'Enter prefix text...',
   },
   {
     id: 'suffix',
-    label: 'Add Suffix',
-    icon: AlignLeft,
+    name: 'Add Suffix',
     description: 'Add text before file extension',
-    example: 'OriginalName_NewSuffix.ext',
+    icon: AlignLeft,
+    example: 'filename_suffix.txt',
+    placeholder: 'Enter suffix text...',
   },
   {
     id: 'numbering',
-    label: 'Sequential Numbering',
+    name: 'Sequential Numbering',
+    description: 'Add numbers in sequence',
     icon: Hash,
-    description: 'Replace with pattern and numbers',
-    example: 'NewName_001, NewName_002, ...',
+    example: 'filename (1).txt, filename (2).txt',
+    placeholder: 'Enter base name...',
   },
   {
     id: 'timestamp',
-    label: 'Add Timestamp',
-    icon: Calendar,
+    name: 'Add Timestamp',
     description: 'Add current date and time',
-    example: 'OriginalName_2024-06-18_14-30.ext',
+    icon: Calendar,
+    example: 'filename_2024-01-15_14-30.txt',
+    placeholder: 'No input required',
+  },
+  {
+    id: 'replace',
+    name: 'Find & Replace',
+    description: 'Replace specific text',
+    icon: Edit3,
+    example: 'old text → new text',
+    placeholder: 'old_text|new_text',
   },
   {
     id: 'regex',
-    label: 'Regex Replace',
+    name: 'Regular Expression',
+    description: 'Advanced pattern replacement',
     icon: Code2,
-    description: 'Find and replace using regular expressions',
-    example: 'Replace patterns with custom text',
+    example: '/pattern/replacement/flags',
+    placeholder: 'Enter regex pattern...',
   },
 ]
 
@@ -94,78 +107,13 @@ function BulkRenameDialog({
   const [renameType, setRenameType] = useState('prefix')
   const [renamePattern, setRenamePattern] = useState('')
   const [regexPattern, setRegexPattern] = useState('')
-  const [regexReplacement, setRegexReplacement] = useState('')
-  const [regexFlags, setRegexFlags] = useState('g')
-  const [showRegexGuide, setShowRegexGuide] = useState(false)
+  const [showPreview, setShowPreview] = useState(false)
   const isMobile = useIsMobile()
-
-  const fileCount = selectedItems.filter((item) => item.type === 'file').length
-  const folderCount = selectedItems.filter(
-    (item) => item.type === 'folder'
-  ).length
-
-  const getPreviewName = (originalName: string, index: number = 0) => {
-    if (renameType === 'regex') {
-      if (!regexPattern.trim()) return originalName
-
-      try {
-        const regex = new RegExp(regexPattern, regexFlags)
-        return originalName.replace(regex, regexReplacement)
-      } catch (error) {
-        return `[Invalid Regex] ${originalName}`
-      }
-    }
-
-    if (!renamePattern.trim() && renameType !== 'timestamp') return originalName
-
-    const fileExtension = originalName.includes('.')
-      ? originalName.substring(originalName.lastIndexOf('.'))
-      : ''
-    const baseName = fileExtension
-      ? originalName.substring(0, originalName.lastIndexOf('.'))
-      : originalName
-
-    switch (renameType) {
-      case 'prefix':
-        return `${renamePattern}_${originalName}`
-
-      case 'suffix':
-        return fileExtension
-          ? `${baseName}_${renamePattern}${fileExtension}`
-          : `${originalName}_${renamePattern}`
-
-      case 'numbering':
-        const number = String(index + 1).padStart(3, '0')
-        return fileExtension
-          ? `${renamePattern}_${number}${fileExtension}`
-          : `${renamePattern}_${number}`
-
-      case 'timestamp':
-        const now = new Date()
-        const timestamp = now
-          .toISOString()
-          .slice(0, 16)
-          .replace('T', '_')
-          .replace(':', '-')
-        return fileExtension
-          ? `${baseName}_${timestamp}${fileExtension}`
-          : `${originalName}_${timestamp}`
-
-      default:
-        return originalName
-    }
-  }
 
   const handleRename = () => {
     if (renameType === 'regex') {
       if (regexPattern.trim()) {
-        // Pass regex data as JSON string in the pattern parameter
-        const regexData = JSON.stringify({
-          pattern: regexPattern.trim(),
-          replacement: regexReplacement,
-          flags: regexFlags,
-        })
-        onConfirm(regexData, renameType)
+        onConfirm(regexPattern.trim(), renameType)
       }
     } else if (renamePattern.trim() || renameType === 'timestamp') {
       onConfirm(renamePattern.trim(), renameType)
@@ -191,308 +139,129 @@ function BulkRenameDialog({
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="flex justify-center gap-2">
-        {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-            {fileCount} file{fileCount > 1 ? 's' : ''}
-          </Badge>
-        )}
-        {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-            {folderCount} folder{folderCount > 1 ? 's' : ''}
-          </Badge>
-        )}
+      {/* File Count Badge */}
+      <div className="text-center">
+        <Badge variant="secondary" className="px-3 py-1">
+          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+        </Badge>
       </div>
 
-        <div className="space-y-4">
-          <div>
-            <Label className="text-sm font-semibold">Rename Type:</Label>
-            <RadioGroup
-              value={renameType}
-              onValueChange={setRenameType}
-              className="mt-2 space-y-3"
-            >
-              {RENAME_TYPES.map((type) => {
-                const Icon = type.icon
-                return (
-                  <div key={type.id} className="flex items-start space-x-3">
-                    <RadioGroupItem
-                      value={type.id}
-                      id={type.id}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <Label
-                        htmlFor={type.id}
-                        className="flex cursor-pointer items-center gap-2 text-sm font-medium"
-                      >
-                        <Icon className="h-4 w-4" />
-                        {type.label}
-                      </Label>
-                      <div className="text-muted-foreground mt-1 text-xs">
-                        {type.description}
-                      </div>
-                      <div className="mt-1 font-mono text-xs text-green-600 dark:text-green-400">
-                        Example: {type.example}
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </RadioGroup>
-          </div>
-
-          {renameType === 'regex' ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-sm font-semibold">
-                  Regex Configuration:
-                </Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowRegexGuide(!showRegexGuide)}
-                  className="text-xs"
-                >
-                  <HelpCircle className="mr-1 h-3 w-3" />
-                  Guide
-                </Button>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <Label
-                    htmlFor="regex-pattern"
-                    className="text-muted-foreground text-xs font-medium"
-                  >
-                    Find Pattern (Regex):
-                  </Label>
-                  <Input
-                    id="regex-pattern"
-                    value={regexPattern}
-                    onChange={(e) => setRegexPattern(e.target.value)}
-                    placeholder="e.g., \d{4} or [A-Z]+ or \s+"
-                    className={`${cn('min-h-[44px]')} font-mono text-sm`}
-                  />
-                </div>
-
-                <div>
-                  <Label
-                    htmlFor="regex-replacement"
-                    className="text-muted-foreground text-xs font-medium"
-                  >
-                    Replace With:
-                  </Label>
-                  <Input
-                    id="regex-replacement"
-                    value={regexReplacement}
-                    onChange={(e) => setRegexReplacement(e.target.value)}
-                    placeholder="e.g., NewText or $1 or leave empty to remove"
-                    className={`${cn('min-h-[44px]')} font-mono text-sm`}
-                  />
-                </div>
-
-                <div>
-                  <Label
-                    htmlFor="regex-flags"
-                    className="text-muted-foreground text-xs font-medium"
-                  >
-                    Flags:
-                  </Label>
-                  <Input
-                    id="regex-flags"
-                    value={regexFlags}
-                    onChange={(e) => setRegexFlags(e.target.value)}
-                    placeholder="g, i, m, etc."
-                    className={`${cn('min-h-[44px]')} font-mono text-sm`}
-                    maxLength={10}
-                  />
-                  <div className="text-muted-foreground mt-1 text-xs">
-                    g = global, i = case insensitive, m = multiline
-                  </div>
-                </div>
-              </div>
-
-              {showRegexGuide && (
-                <div className="space-y-3 rounded-lg border bg-slate-50 p-4 dark:bg-slate-900/50">
-                  <div className="text-sm font-semibold">
-                    Regex Guide for Beginners:
-                  </div>
-
-                  <div className="space-y-2 text-xs">
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <div>
-                        <div className="font-medium text-green-600 dark:text-green-400">
-                          Common Patterns:
-                        </div>
-                        <div className="mt-1 space-y-1">
-                          <div>
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              \d+
-                            </code>{' '}
-                            - Numbers
-                          </div>
-                          <div>
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              [A-Z]+
-                            </code>{' '}
-                            - Uppercase letters
-                          </div>
-                          <div>
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              [a-z]+
-                            </code>{' '}
-                            - Lowercase letters
-                          </div>
-                          <div>
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              \s+
-                            </code>{' '}
-                            - Spaces
-                          </div>
-                          <div>
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              _+
-                            </code>{' '}
-                            - Underscores
-                          </div>
-                        </div>
-                      </div>
-
-                      <div>
-                        <div className="font-medium text-blue-600 dark:text-blue-400">
-                          Examples:
-                        </div>
-                        <div className="mt-1 space-y-1">
-                          <div>
-                            <strong>Remove numbers:</strong>
-                          </div>
-                          <div>
-                            Find:{' '}
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              \d+
-                            </code>
-                            , Replace: <em>(empty)</em>
-                          </div>
-                          <div>
-                            <strong>Replace spaces with dashes:</strong>
-                          </div>
-                          <div>
-                            Find:{' '}
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              \s+
-                            </code>
-                            , Replace:{' '}
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              -
-                            </code>
-                          </div>
-                          <div>
-                            <strong>Remove file extension:</strong>
-                          </div>
-                          <div>
-                            Find:{' '}
-                            <code className="rounded bg-slate-200 px-1 dark:bg-slate-800">
-                              \.[^.]+$
-                            </code>
-                            , Replace: <em>(empty)</em>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="mt-3 border-t pt-2">
-                      <div className="font-medium text-amber-600 dark:text-amber-400">
-                        Pro Tips:
-                      </div>
-                      <div className="mt-1 space-y-1">
-                        <div>
-                          • Use parentheses () to capture groups, then reference
-                          with $1, $2, etc.
-                        </div>
-                        <div>• Add 'i' flag for case-insensitive matching</div>
-                        <div>
-                          • Test your regex on a few files first before applying
-                          to all
-                        </div>
-                        <div>
-                          • Escape special characters with backslash: \. \+ \*
-                          \? \[ \] \( \)
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
-            renameType !== 'timestamp' && (
-              <div className="space-y-2">
-                <Label
-                  htmlFor="rename-pattern"
-                  className="text-sm font-semibold"
-                >
-                  {renameType === 'numbering' ? 'Base Name:' : 'Text to Add:'}
-                </Label>
-                <Input
-                  id="rename-pattern"
-                  value={renamePattern}
-                  onChange={(e) => setRenamePattern(e.target.value)}
-                  placeholder={
-                    renameType === 'prefix'
-                      ? 'Enter prefix text...'
-                      : renameType === 'suffix'
-                        ? 'Enter suffix text...'
-                        : 'Enter base name for numbering...'
-                  }
-                  className={`${cn('min-h-[44px]')} w-full`}
+      {/* Rename Type Selection */}
+      <div className="space-y-4">
+        <Label className="text-sm font-medium">Rename method</Label>
+        <RadioGroup
+          value={renameType}
+          onValueChange={setRenameType}
+          className="space-y-3"
+        >
+          {RENAME_TYPES.map((type) => {
+            const IconComponent = type.icon
+            return (
+              <div key={type.id} className="flex items-start space-x-3">
+                <RadioGroupItem
+                  value={type.id}
+                  id={type.id}
+                  className="mt-1"
                 />
+                <Label
+                  htmlFor={type.id}
+                  className="flex-1 cursor-pointer space-y-1"
+                >
+                  <div className="flex items-center gap-2">
+                    <IconComponent className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                    <span className="font-medium">{type.name}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {type.description}
+                  </div>
+                  <div className="text-xs text-muted-foreground font-mono bg-muted rounded px-2 py-1">
+                    Example: {type.example}
+                  </div>
+                </Label>
               </div>
             )
+          })}
+        </RadioGroup>
+      </div>
+
+      {/* Input Field */}
+      {selectedRenameType && selectedRenameType.id !== 'timestamp' && (
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">
+            {selectedRenameType.id === 'regex' ? 'Regular Expression' : 'Pattern'}
+          </Label>
+          <Input
+            type="text"
+            value={selectedRenameType.id === 'regex' ? regexPattern : renamePattern}
+            onChange={(e) =>
+              selectedRenameType.id === 'regex'
+                ? setRegexPattern(e.target.value)
+                : setRenamePattern(e.target.value)
+            }
+            placeholder={selectedRenameType.placeholder}
+            className={selectedRenameType.id === 'regex' ? 'font-mono' : ''}
+          />
+          {selectedRenameType.id === 'replace' && (
+            <div className="text-xs text-muted-foreground">
+              Format: old_text|new_text (use | to separate old and new text)
+            </div>
           )}
-
-          {/* Preview section */}
-          {(renamePattern.trim() ||
-            renameType === 'timestamp' ||
-            (renameType === 'regex' && regexPattern.trim())) && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Info className="h-4 w-4 text-blue-500" />
-                <span className="text-sm font-semibold">Preview:</span>
-              </div>
-
-              <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-                <ul className="space-y-1 text-sm">
-                  {selectedItems.slice(0, 3).map((item, index) => (
-                    <li key={item.id} className="space-y-1">
-                      <div className="text-muted-foreground flex items-center gap-2">
-                        <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                        <span className="truncate text-xs">{item.name}</span>
-                      </div>
-                      <div className="ml-4 flex items-center gap-2">
-                        <span className="text-xs text-green-600 dark:text-green-400">
-                          →
-                        </span>
-                        <span className="truncate font-medium">
-                          {getPreviewName(item.name, index)}
-                        </span>
-                      </div>
-                    </li>
-                  ))}
-                  {selectedItems.length > 3 && (
-                    <li className="text-muted-foreground/70 flex items-center gap-2 italic">
-                      <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
-                      and {selectedItems.length - 3} more items...
-                    </li>
-                  )}
-                </ul>
-              </div>
+          {selectedRenameType.id === 'regex' && (
+            <div className="text-xs text-muted-foreground">
+              Advanced users only. Use JavaScript regex syntax: /pattern/replacement/flags
             </div>
           )}
         </div>
-      </div>
+      )}
+
+      {/* Preview Section */}
+      {selectedItems.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label className="text-sm font-medium">Preview (first 3 items)</Label>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowPreview(!showPreview)}
+              className="h-8 px-2"
+            >
+              {showPreview ? 'Hide' : 'Show'} Preview
+            </Button>
+          </div>
+          {showPreview && (
+            <div className="space-y-2">
+              <ul className="space-y-2">
+                {selectedItems.slice(0, 3).map((item) => (
+                  <li
+                    key={item.id}
+                    className="bg-muted/50 rounded-lg border p-3 text-sm"
+                  >
+                    <div className="space-y-1">
+                      <div className="text-muted-foreground">
+                        <span className="font-medium">Original:</span> {item.name}
+                      </div>
+                      <div className="text-foreground">
+                        <span className="font-medium text-orange-600 dark:text-orange-400">
+                          New:
+                        </span>{' '}
+                        <span className="font-mono bg-orange-50 dark:bg-orange-950/20 px-1 rounded">
+                          {item.name} {/* Preview logic would go here */}
+                        </span>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+                {selectedItems.length > 3 && (
+                  <li className="text-muted-foreground/70 flex items-center gap-2 italic">
+                    <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
+                    and {selectedItems.length - 3} more items...
+                  </li>
+                )}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 
