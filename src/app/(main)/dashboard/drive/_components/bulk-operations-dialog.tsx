@@ -88,44 +88,61 @@ export function BulkOperationsDialog({
   // Determine dialog open state
   const dialogOpen = open ?? isOpen ?? false
   const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
+  
+  // Debug dialog states
+  console.log('Dialog states:', {
+    isMoveDialogOpen,
+    isCopyDialogOpen, 
+    isDeleteDialogOpen,
+    isShareDialogOpen,
+    selectedItems: selectedItems.length
+  })
 
   // Individual dialog handlers
   const handleMoveClick = () => {
+    console.log('Opening move dialog...')
     setIsMoveDialogOpen(true)
     handleClose()
   }
 
   const handleCopyClick = () => {
+    console.log('Opening copy dialog...')
     setIsCopyDialogOpen(true)
     handleClose()
   }
 
   const handleDeleteClick = () => {
+    console.log('Opening delete dialog...')
     setIsDeleteDialogOpen(true)
     handleClose()
   }
 
   const handleShareClick = () => {
+    console.log('Opening share dialog...')
     setIsShareDialogOpen(true)
     handleClose()
   }
 
   const handleRenameClick = () => {
+    console.log('Opening rename dialog...')
     setIsRenameDialogOpen(true)
     handleClose()
   }
 
   const handleExportClick = () => {
+    console.log('Opening export dialog...')
     setIsExportDialogOpen(true)
     handleClose()
   }
 
   const handlePermanentDeleteClick = () => {
+    console.log('Opening permanent delete dialog...')
     setIsPermanentDeleteDialogOpen(true)
     handleClose()
   }
 
   const handleRestoreClick = () => {
+    console.log('Opening restore dialog...')
     setIsRestoreDialogOpen(true)
     handleClose()
   }
@@ -451,10 +468,13 @@ export function BulkOperationsDialog({
 
       {/* Individual Bulk Operation Dialogs */}
       {isMoveDialogOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>Loading move dialog...</div>}>
           <BulkMoveDialog
             open={isMoveDialogOpen}
-            onOpenChange={() => setIsMoveDialogOpen(false)}
+            onOpenChange={(open) => {
+              console.log('Move dialog state changed:', open)
+              setIsMoveDialogOpen(open)
+            }}
             onConfirm={handleMoveComplete}
             selectedItems={selectedItems}
           />
@@ -462,10 +482,13 @@ export function BulkOperationsDialog({
       )}
 
       {isCopyDialogOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>Loading copy dialog...</div>}>
           <BulkCopyDialog
             isOpen={isCopyDialogOpen}
-            onClose={() => setIsCopyDialogOpen(false)}
+            onClose={() => {
+              console.log('Copy dialog closed')
+              setIsCopyDialogOpen(false)
+            }}
             onConfirm={handleCopyComplete}
             selectedItems={selectedItems}
           />
@@ -473,10 +496,13 @@ export function BulkOperationsDialog({
       )}
 
       {isDeleteDialogOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>Loading delete dialog...</div>}>
           <BulkDeleteDialog
             isOpen={isDeleteDialogOpen}
-            onClose={() => setIsDeleteDialogOpen(false)}
+            onClose={() => {
+              console.log('Delete dialog closed')
+              setIsDeleteDialogOpen(false)
+            }}
             onConfirm={handleDeleteComplete}
             selectedItems={selectedItems}
           />

@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/auth'
+import { auth } from '@/auth'
 import { google } from 'googleapis'
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
     if (!session?.accessToken) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { operation, fileIds, options } = await request.json()
     
-    const auth = new google.auth.OAuth2()
+    const oauth2Client = new google.auth.OAuth2()
+    oauth2Client.setCredentials({ access_token: session.accessToken })
+    const drive = google.drive({ version: 'v3', auth: oauth2Client })
     auth.setCredentials({ access_token: session.accessToken })
     const drive = google.drive({ version: 'v3', auth })
 
