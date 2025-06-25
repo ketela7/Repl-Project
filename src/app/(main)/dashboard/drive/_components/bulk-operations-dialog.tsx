@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
@@ -14,7 +13,6 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetDescription,
-  BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -69,12 +67,6 @@ export function BulkOperationsDialog({
   onClose,
   onOpenChange,
   selectedItems,
-  onBulkDelete,
-  onBulkDownload,
-  onBulkShare,
-  onBulkMove,
-  onBulkCopy,
-  onBulkRename,
   onRefreshAfterBulkOp,
 }: BulkOperationsDialogProps) {
   const isMobile = useIsMobile()
@@ -139,189 +131,291 @@ export function BulkOperationsDialog({
   }
 
   const handleDownloadClick = () => {
-    if (onBulkDownload) {
-      onBulkDownload()
-    } else {
-      console.log('Bulk download:', selectedItems.length, 'items')
-    }
-    onRefreshAfterBulkOp?.()
-    handleClose()
+    handleExportClick()
   }
 
-  // Completion handlers for individual dialogs
-  const handleMoveComplete = (targetFolderId: string) => {
-    if (onBulkMove) {
-      onBulkMove()
+  // Bulk operation completion handlers with actual API calls
+  const handleMoveComplete = async (targetFolderId: string) => {
+    try {
+      const response = await fetch('/api/drive/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'move',
+          fileIds: selectedItems.map(item => item.id),
+          options: { targetFolderId }
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Move completed:', result.summary)
+      }
+    } catch (error) {
+      console.error('Move failed:', error)
     }
     setIsMoveDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
-  const handleCopyComplete = (targetFolderId: string) => {
-    if (onBulkCopy) {
-      onBulkCopy()
+  const handleCopyComplete = async (targetFolderId: string) => {
+    try {
+      const response = await fetch('/api/drive/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'copy',
+          fileIds: selectedItems.filter(item => item.type === 'file').map(item => item.id),
+          options: { targetFolderId }
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Copy completed:', result.summary)
+      }
+    } catch (error) {
+      console.error('Copy failed:', error)
     }
     setIsCopyDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
-  const handleDeleteComplete = () => {
-    if (onBulkDelete) {
-      onBulkDelete()
+  const handleDeleteComplete = async () => {
+    try {
+      const response = await fetch('/api/drive/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'delete',
+          fileIds: selectedItems.map(item => item.id),
+          options: {}
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Delete completed:', result.summary)
+      }
+    } catch (error) {
+      console.error('Delete failed:', error)
     }
     setIsDeleteDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
-  const handleShareComplete = () => {
-    if (onBulkShare) {
-      onBulkShare()
+  const handleShareComplete = async (shareOptions: any) => {
+    try {
+      const response = await fetch('/api/drive/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'share',
+          fileIds: selectedItems.map(item => item.id),
+          options: shareOptions
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Share completed:', result.summary)
+        return result.results
+      }
+      return []
+    } catch (error) {
+      console.error('Share failed:', error)
+      return []
+    } finally {
+      setIsShareDialogOpen(false)
+      onRefreshAfterBulkOp?.()
     }
-    setIsShareDialogOpen(false)
-    onRefreshAfterBulkOp?.()
   }
 
-  const handleRenameComplete = (renamePattern: string, renameType: string) => {
-    if (onBulkRename) {
-      onBulkRename()
+  const handleRenameComplete = async (pattern: string, type: string) => {
+    try {
+      const response = await fetch('/api/drive/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'rename',
+          fileIds: selectedItems.map(item => item.id),
+          options: { 
+            pattern, 
+            type,
+            originalNames: selectedItems.map(item => item.name)
+          }
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Rename completed:', result.summary)
+      }
+    } catch (error) {
+      console.error('Rename failed:', error)
     }
     setIsRenameDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
-  const handleExportComplete = (exportFormat: string) => {
-    console.log('Bulk export:', selectedItems.length, 'items as', exportFormat)
+  const handleExportComplete = async () => {
+    try {
+      for (const item of selectedItems.filter(item => item.type === 'file')) {
+        const link = document.createElement('a')
+        link.href = `/api/drive/download/${item.id}`
+        link.download = item.name
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+    } catch (error) {
+      console.error('Export failed:', error)
+    }
     setIsExportDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
-  const handlePermanentDeleteComplete = () => {
-    console.log('Bulk permanent delete:', selectedItems.length, 'items')
+  const handlePermanentDeleteComplete = async () => {
+    try {
+      const response = await fetch('/api/drive/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'permanently_delete',
+          fileIds: selectedItems.map(item => item.id),
+          options: {}
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Permanent delete completed:', result.summary)
+      }
+    } catch (error) {
+      console.error('Permanent delete failed:', error)
+    }
     setIsPermanentDeleteDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
-  const handleRestoreComplete = () => {
-    console.log('Bulk restore:', selectedItems.length, 'items')
+  const handleRestoreComplete = async () => {
+    try {
+      const response = await fetch('/api/drive/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          operation: 'restore',
+          fileIds: selectedItems.map(item => item.id),
+          options: {}
+        })
+      })
+      
+      if (response.ok) {
+        const result = await response.json()
+        console.log('Restore completed:', result.summary)
+      }
+    } catch (error) {
+      console.error('Restore failed:', error)
+    }
     setIsRestoreDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
-  // Determine operations based on context (trash vs regular view)
-  const isTrashView = selectedItems.some(item => item.name?.includes('trashed')) // You may need to adjust this logic based on your data structure
-  
-  const operations = [
-    {
-      icon: FileDown,
-      label: 'Download',
-      description: 'Download selected items',
-      action: handleDownloadClick,
-      variant: 'default' as const,
-      show: !isTrashView,
-    },
-    {
-      icon: FileOutput,
-      label: 'Export',
-      description: 'Export in different formats',
-      action: handleExportClick,
-      variant: 'default' as const,
-      show: !isTrashView,
-    },
-    {
-      icon: Share,
-      label: 'Share',
-      description: 'Share selected items',
-      action: handleShareClick,
-      variant: 'default' as const,
-      show: !isTrashView,
-    },
-    {
-      icon: Move,
-      label: 'Move',
-      description: 'Move to another folder',
-      action: handleMoveClick,
-      variant: 'default' as const,
-      show: !isTrashView,
-    },
-    {
-      icon: Copy,
-      label: 'Copy',
-      description: 'Create copies',
-      action: handleCopyClick,
-      variant: 'default' as const,
-      show: !isTrashView,
-    },
-    {
-      icon: Edit,
-      label: 'Rename',
-      description: 'Bulk rename with patterns',
-      action: handleRenameClick,
-      variant: 'default' as const,
-      show: !isTrashView,
-    },
-    {
-      icon: Trash2,
-      label: 'Delete',
-      description: 'Move to trash',
-      action: handleDeleteClick,
-      variant: 'destructive' as const,
-      show: !isTrashView,
-    },
-    {
-      icon: Trash2,
-      label: 'Permanently Delete',
-      description: 'Delete forever (cannot be undone)',
-      action: handlePermanentDeleteClick,
-      variant: 'destructive' as const,
-      show: isTrashView,
-    },
-    {
-      icon: FolderOpen,
-      label: 'Restore',
-      description: 'Restore from trash',
-      action: handleRestoreClick,
-      variant: 'default' as const,
-      show: isTrashView,
-    },
-  ].filter(op => op.show)
-
   const renderContent = () => (
     <>
-      <div className="mb-4 flex items-center gap-2">
-        <Badge variant="secondary">{selectedItems.length} items selected</Badge>
-        {fileCount > 0 && (
-          <Badge variant="outline">
-            {fileCount} file{fileCount !== 1 ? 's' : ''}
-          </Badge>
-        )}
-        {folderCount > 0 && (
-          <Badge variant="outline">
-            <FolderOpen className="mr-1 h-3 w-3" />
-            {folderCount} folder{folderCount !== 1 ? 's' : ''}
-          </Badge>
-        )}
+      <div className="mb-4">
+        <div className="mb-2 text-sm text-muted-foreground">
+          Selected {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {fileCount > 0 && (
+            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+              {fileCount} file{fileCount > 1 ? 's' : ''}
+            </Badge>
+          )}
+          {folderCount > 0 && (
+            <Badge variant="secondary" className="bg-amber-100 text-amber-800">
+              {folderCount} folder{folderCount > 1 ? 's' : ''}
+            </Badge>
+          )}
+        </div>
       </div>
 
-      <div className="grid gap-2">
-        {operations.map((operation) => {
-          const Icon = operation.icon
-          return (
-            <Button
-              key={operation.label}
-              variant={operation.variant}
-              className={`${cn('touch-target min-h-[44px] active:scale-95')} h-auto justify-start p-3`}
-              onClick={operation.action}
-            >
-              <Icon className="mr-3 h-4 w-4" />
-              <div className="text-left">
-                <div className="font-medium">{operation.label}</div>
-                <div className="text-muted-foreground text-xs">
-                  {operation.description}
-                </div>
-              </div>
-            </Button>
-          )
-        })}
+      <div className="grid grid-cols-2 gap-2">
+        <Button
+          variant="outline"
+          onClick={handleMoveClick}
+          className="flex items-center gap-2"
+        >
+          <Move className="h-4 w-4" />
+          Move
+        </Button>
+        
+        <Button
+          variant="outline"
+          onClick={handleCopyClick}
+          className="flex items-center gap-2"
+          disabled={fileCount === 0}
+        >
+          <Copy className="h-4 w-4" />
+          Copy
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleDeleteClick}
+          className="flex items-center gap-2"
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleShareClick}
+          className="flex items-center gap-2"
+        >
+          <Share className="h-4 w-4" />
+          Share
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleRenameClick}
+          className="flex items-center gap-2"
+        >
+          <Edit className="h-4 w-4" />
+          Rename
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleDownloadClick}
+          className="flex items-center gap-2"
+          disabled={fileCount === 0}
+        >
+          <Download className="h-4 w-4" />
+          Export
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handlePermanentDeleteClick}
+          className="flex items-center gap-2 text-red-600"
+        >
+          <FileOutput className="h-4 w-4" />
+          Permanent Delete
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={handleRestoreClick}
+          className="flex items-center gap-2"
+        >
+          <FolderOpen className="h-4 w-4" />
+          Restore
+        </Button>
       </div>
     </>
   )
@@ -394,17 +488,7 @@ export function BulkOperationsDialog({
           <BulkShareDialog
             open={isShareDialogOpen}
             onOpenChange={() => setIsShareDialogOpen(false)}
-            onShare={async (shareData) => {
-              // Mock implementation - replace with actual share logic
-              const results = selectedItems.map(item => ({
-                id: item.id,
-                name: item.name,
-                shareLink: `https://drive.google.com/file/d/${item.id}/view`,
-                success: true
-              }))
-              handleShareComplete()
-              return results
-            }}
+            onShare={handleShareComplete}
             selectedItems={selectedItems}
           />
         </Suspense>
