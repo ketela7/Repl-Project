@@ -161,7 +161,7 @@ export function DriveManager() {
     !!filters.advancedFilters.modifiedDateRange.to ||
     !!(filters.advancedFilters.owner && String(filters.advancedFilters.owner).trim())
 
-  // Sorting functionality
+  // Sorting Start
   const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
     let direction: 'asc' | 'desc' = 'asc'
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
@@ -179,7 +179,6 @@ export function DriveManager() {
       <ChevronDown className="h-4 w-4" />
   }
 
-  // Sorting <Header Tabel>
   const sortedItems = useMemo(() => {
     if (!sortConfig) {
       return [...items].sort((a, b) => {
@@ -234,7 +233,9 @@ export function DriveManager() {
       return 0
     })
   }, [items, sortConfig])
+	// Sorting End
 
+  
   // Convert selected items for bulk operations
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
@@ -338,17 +339,18 @@ export function DriveManager() {
     fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
   }, [fetchFiles, currentFolderId, searchQuery])
 
-  // Effects
+  // Effects for initial load and dependencies
   useEffect(() => {
     fetchFiles()
   }, [])
 
-  useEffect(() => {
+  
+  {/*useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchFiles(currentFolderId || undefined, undefined)
     }, 300)
     return () => clearTimeout(timeoutId)
-  }, [filters, currentFolderId])
+  }, [filters, currentFolderId])*/}
 
   // Navigation handlers
   const handleFolderClick = useCallback((folderId: string) => {
@@ -527,7 +529,7 @@ export function DriveManager() {
             onBulkShare={() => openDialog('bulkShare')}
             onFiltersOpen={() => openDialog('mobileFilters')}
             
-            // Mobile Actions Props
+            
             selectedItems={selectedItemsWithDetails}
             onBulkDownload={() => {
               // Handle bulk download
