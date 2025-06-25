@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { auth } from '@/auth'
-import { GoogleDriveService } from '@/lib/google-drive/service'
 import { driveCache } from '@/lib/cache'
 
 interface FileFilter {
@@ -370,21 +368,9 @@ function getSortKey(sortBy: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth()
-
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[DRIVE API] - Session:', session)
-    }
-
-    if (!session?.accessToken) {
-      return NextResponse.json(
-        {
-          error: 'Authentication expired',
-          needsReauth: true,
-          redirect: '/auth/v1/login',
-        },
-        { status: 401 }
-      )
+    const authResult = await initDriveService()
+    if (!authResult.success) {
+      return authResult.response!
     }
 
     const { searchParams } = new URL(request.url)
@@ -423,7 +409,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    const driveService = new GoogleDriveService(session.accessToken!)
+    const driveService = authResult.driveService!
 
     const result = await driveService.listFiles({
       parentId: folderId,

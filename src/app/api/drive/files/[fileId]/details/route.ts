@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { GoogleDriveService } from '@/lib/google-drive/service'
-import { auth } from '@/auth'
+import {
+  initDriveService,
+  handleApiError,
+  getFileIdFromParams,
+} from '@/lib/api-utils'
 import { driveCache } from '@/lib/cache'
 
 export async function GET(
@@ -9,7 +12,7 @@ export async function GET(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const { fileId } = await params
+    const fileId = await getFileIdFromParams(params)
 
     if (!fileId) {
       return NextResponse.json(
@@ -18,82 +21,28 @@ export async function GET(
       )
     }
 
-    const session = await auth()
-    if (!session?.accessToken || !session?.user) {
-      return NextResponse.json(
-        {
-          error:
-            'Google Drive access token not found. Please reconnect your account.',
-          needsReauth: true,
-        },
-        { status: 401 }
-      )
+    const authResult = await initDriveService()
+    if (!authResult.success) {
+      return authResult.response!
     }
 
     // Check cache first (5 minute TTL for file details)
     const cacheKey = driveCache.generateFileDetailsKey(
       fileId,
-      session.user.email || session.user.id || ''
+      authResult.session!.user.email || authResult.session!.user.id || ''
     )
     const cachedDetails = driveCache.get(cacheKey)
     if (cachedDetails) {
       return NextResponse.json(cachedDetails)
     }
 
-    const driveService = new GoogleDriveService(session.accessToken)
-    const fileDetails = await driveService.getFileDetails(fileId)
+    const fileDetails = await authResult.driveService!.getFileDetails(fileId)
 
     // Cache the result for 5 minutes
     driveCache.set(cacheKey, fileDetails, 5)
 
     return NextResponse.json(fileDetails)
   } catch (error) {
-    if (error instanceof Error) {
-      // Handle Google API specific errors
-      if (
-        error.message.includes('Invalid Credentials') ||
-        error.message.includes('unauthorized')
-      ) {
-        return NextResponse.json(
-          {
-            error:
-              'Google Drive access expired. Please reconnect your account.',
-            needsReauth: true,
-          },
-          { status: 401 }
-        )
-      }
-
-      if (
-        error.message.includes('insufficient') ||
-        error.message.includes('403')
-      ) {
-        return NextResponse.json(
-          {
-            error:
-              'Insufficient permissions to view file details. Please check your Google Drive permissions.',
-            needsReauth: false,
-          },
-          { status: 403 }
-        )
-      }
-
-      if (
-        error.message.includes('not found') ||
-        error.message.includes('404')
-      ) {
-        return NextResponse.json(
-          {
-            error: 'File not found',
-          },
-          { status: 404 }
-        )
-      }
-    }
-
-    return NextResponse.json(
-      { error: 'Failed to retrieve file details' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 }

@@ -1,19 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { google } from 'googleapis'
 
-import { auth } from '@/auth'
+import {
+  initDriveService,
+  handleApiError,
+  validateBulkRequest,
+} from '@/lib/api-utils'
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await auth()
-    if (!session?.accessToken) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const authResult = await initDriveService()
+    if (!authResult.success) {
+      return authResult.response!
     }
 
     const { operation, fileIds, options } = await request.json()
 
+    if (!validateBulkRequest({ operation, fileIds })) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      )
+    }
+
     const oauth2Client = new google.auth.OAuth2()
-    oauth2Client.setCredentials({ access_token: session.accessToken })
+    oauth2Client.setCredentials({
+      access_token: authResult.session!.accessToken,
+    })
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
 
     const results = []
@@ -28,9 +41,13 @@ export async function POST(request: NextRequest) {
               removeParents: options.currentParentId || 'root',
               fields: 'id,name,parents',
             })
-            results.push({ id: fileId, success: true, data: result.data })
-          } catch (error: any) {
-            results.push({ id: fileId, success: false, error: error.message })
+            results.push({ fileId, success: true, data: result.data })
+          } catch (error) {
+            results.push({
+              fileId,
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error',
+            })
           }
         }
         break
@@ -41,29 +58,41 @@ export async function POST(request: NextRequest) {
             const result = await drive.files.copy({
               fileId,
               requestBody: {
-                parents: [options.targetFolderId || 'root'],
-                name: options.newName || undefined,
+                name: options.namePrefix
+                  ? `${options.namePrefix} ${await getFileName(drive, fileId)}`
+                  : undefined,
+                parents: options.targetFolderId
+                  ? [options.targetFolderId]
+                  : undefined,
               },
               fields: 'id,name,parents',
             })
-            results.push({ id: fileId, success: true, data: result.data })
-          } catch (error: any) {
-            results.push({ id: fileId, success: false, error: error.message })
+            results.push({ fileId, success: true, data: result.data })
+          } catch (error) {
+            results.push({
+              fileId,
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error',
+            })
           }
         }
         break
 
-      case 'delete':
+      case 'trash':
         for (const fileId of fileIds) {
           try {
-            await drive.files.update({
+            const result = await drive.files.update({
               fileId,
               requestBody: { trashed: true },
               fields: 'id,name,trashed',
             })
-            results.push({ id: fileId, success: true })
-          } catch (error: any) {
-            results.push({ id: fileId, success: false, error: error.message })
+            results.push({ fileId, success: true, data: result.data })
+          } catch (error) {
+            results.push({
+              fileId,
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error',
+            })
           }
         }
         break
@@ -71,91 +100,33 @@ export async function POST(request: NextRequest) {
       case 'restore':
         for (const fileId of fileIds) {
           try {
-            await drive.files.update({
+            const result = await drive.files.update({
               fileId,
               requestBody: { trashed: false },
               fields: 'id,name,trashed',
             })
-            results.push({ id: fileId, success: true })
-          } catch (error: any) {
-            results.push({ id: fileId, success: false, error: error.message })
+            results.push({ fileId, success: true, data: result.data })
+          } catch (error) {
+            results.push({
+              fileId,
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error',
+            })
           }
         }
         break
 
-      case 'permanently_delete':
+      case 'delete':
         for (const fileId of fileIds) {
           try {
             await drive.files.delete({ fileId })
-            results.push({ id: fileId, success: true })
-          } catch (error: any) {
-            results.push({ id: fileId, success: false, error: error.message })
-          }
-        }
-        break
-
-      case 'rename':
-        for (let i = 0; i < fileIds.length; i++) {
-          const fileId = fileIds[i]
-          try {
-            let newName = options.pattern
-
-            // Apply rename pattern
-            if (options.type === 'prefix') {
-              newName = `${options.pattern}${options.originalNames[i]}`
-            } else if (options.type === 'suffix') {
-              const name = options.originalNames[i]
-              const lastDot = name.lastIndexOf('.')
-              if (lastDot > 0) {
-                newName = `${name.substring(0, lastDot)}${options.pattern}${name.substring(lastDot)}`
-              } else {
-                newName = `${name}${options.pattern}`
-              }
-            } else if (options.type === 'numbered') {
-              newName = `${options.pattern} ${i + 1}`
-            } else if (options.type === 'timestamp') {
-              const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
-              newName = `${options.originalNames[i]}_${timestamp}`
-            }
-
-            const result = await drive.files.update({
-              fileId,
-              requestBody: { name: newName },
-              fields: 'id,name',
-            })
-            results.push({ id: fileId, success: true, data: result.data })
-          } catch (error: any) {
-            results.push({ id: fileId, success: false, error: error.message })
-          }
-        }
-        break
-
-      case 'share':
-        for (const fileId of fileIds) {
-          try {
-            // Create permission
-            await drive.permissions.create({
-              fileId,
-              requestBody: {
-                role: options.role || 'reader',
-                type: options.type || 'anyone',
-              },
-            })
-
-            // Get shareable link
-            const file = await drive.files.get({
-              fileId,
-              fields: 'webViewLink,webContentLink',
-            })
-
+            results.push({ fileId, success: true, data: { deleted: true } })
+          } catch (error) {
             results.push({
-              id: fileId,
-              success: true,
-              shareLink: file.data.webViewLink,
-              downloadLink: file.data.webContentLink,
+              fileId,
+              success: false,
+              error: error instanceof Error ? error.message : 'Unknown error',
             })
-          } catch (error: any) {
-            results.push({ id: fileId, success: false, error: error.message })
           }
         }
         break
@@ -167,23 +138,25 @@ export async function POST(request: NextRequest) {
         )
     }
 
-    const successCount = results.filter((r) => r.success).length
-    const failureCount = results.filter((r) => !r.success).length
-
     return NextResponse.json({
-      success: true,
+      operation,
       results,
       summary: {
         total: fileIds.length,
-        successful: successCount,
-        failed: failureCount,
+        successful: results.filter((r) => r.success).length,
+        failed: results.filter((r) => !r.success).length,
       },
     })
-  } catch (error: any) {
-    console.error('Bulk operation error:', error)
-    return NextResponse.json(
-      { error: 'Failed to perform bulk operation' },
-      { status: 500 }
-    )
+  } catch (error) {
+    return handleApiError(error)
+  }
+}
+
+async function getFileName(drive: any, fileId: string): Promise<string> {
+  try {
+    const result = await drive.files.get({ fileId, fields: 'name' })
+    return result.data.name || 'Untitled'
+  } catch {
+    return 'Untitled'
   }
 }

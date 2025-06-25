@@ -1,55 +1,67 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { auth } from '@/auth'
-import { GoogleDriveService } from '@/lib/google-drive/service'
+import {
+  initDriveService,
+  handleApiError,
+  getFileIdFromParams,
+} from '@/lib/api-utils'
 
 // MIME type mappings for Google Workspace exports
 const EXPORT_MIME_TYPES = {
-  // PDF exports (universal)
-  pdf: {
-    'application/vnd.google-apps.document': 'application/pdf',
-    'application/vnd.google-apps.spreadsheet': 'application/pdf',
-    'application/vnd.google-apps.presentation': 'application/pdf',
+  // Google Docs
+  'application/vnd.google-apps.document': {
+    pdf: 'application/pdf',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    odt: 'application/vnd.oasis.opendocument.text',
+    rtf: 'application/rtf',
+    txt: 'text/plain',
+    html: 'text/html',
+    epub: 'application/epub+zip',
   },
-  // Microsoft Office formats
-  docx: {
-    'application/vnd.google-apps.document':
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  // Google Sheets
+  'application/vnd.google-apps.spreadsheet': {
+    pdf: 'application/pdf',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ods: 'application/vnd.oasis.opendocument.spreadsheet',
+    csv: 'text/csv',
+    tsv: 'text/tab-separated-values',
+    html: 'text/html',
   },
-  xlsx: {
-    'application/vnd.google-apps.spreadsheet':
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  // Google Slides
+  'application/vnd.google-apps.presentation': {
+    pdf: 'application/pdf',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    odp: 'application/vnd.oasis.opendocument.presentation',
+    txt: 'text/plain',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    svg: 'image/svg+xml',
   },
-  pptx: {
-    'application/vnd.google-apps.presentation':
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-  },
-  // OpenDocument formats
-  odt: {
-    'application/vnd.google-apps.document':
-      'application/vnd.oasis.opendocument.text',
-  },
-  ods: {
-    'application/vnd.google-apps.spreadsheet':
-      'application/vnd.oasis.opendocument.spreadsheet',
-  },
-  // Image formats for Google Drawings
-  png: {
-    'application/vnd.google-apps.drawing': 'image/png',
-  },
-  jpeg: {
-    'application/vnd.google-apps.drawing': 'image/jpeg',
+  // Google Drawings
+  'application/vnd.google-apps.drawing': {
+    pdf: 'application/pdf',
+    svg: 'image/svg+xml',
+    png: 'image/png',
+    jpeg: 'image/jpeg',
   },
 }
 
-// File extensions for downloads
+// File extensions for download
 const FILE_EXTENSIONS = {
   pdf: 'pdf',
   docx: 'docx',
-  xlsx: 'xlsx',
-  pptx: 'pptx',
   odt: 'odt',
+  rtf: 'rtf',
+  txt: 'txt',
+  html: 'html',
+  epub: 'epub',
+  xlsx: 'xlsx',
   ods: 'ods',
+  csv: 'csv',
+  tsv: 'tsv',
+  pptx: 'pptx',
+  odp: 'odp',
+  svg: 'svg',
   png: 'png',
   jpeg: 'jpg',
 }
@@ -59,32 +71,17 @@ export async function GET(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-    const session = await auth()
-
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const authResult = await initDriveService()
+    if (!authResult.success) {
+      return authResult.response!
     }
 
-    const accessToken = session.accessToken
-    if (!accessToken) {
-      return NextResponse.json(
-        {
-          error:
-            'Google Drive access not found. Please reconnect your Google account.',
-          needsReauth: true,
-        },
-        { status: 400 }
-      )
-    }
-
-    const { fileId } = await params
+    const fileId = await getFileIdFromParams(params)
     const { searchParams } = new URL(request.url)
     const format = searchParams.get('format') || 'pdf'
 
-    const driveService = new GoogleDriveService(accessToken)
-
     // Get file metadata first to check if it's exportable
-    const fileDetails = await driveService.getFile(fileId)
+    const fileDetails = await authResult.driveService!.getFile(fileId)
 
     if (!fileDetails) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 })
@@ -100,110 +97,61 @@ export async function GET(
       )
     }
 
-    // Check if the requested format is supported for this file type
-    const exportMimeTypes =
-      EXPORT_MIME_TYPES[format as keyof typeof EXPORT_MIME_TYPES]
-    if (
-      !exportMimeTypes ||
-      !exportMimeTypes[fileDetails.mimeType as keyof typeof exportMimeTypes]
-    ) {
+    // Get the available export formats for this file type
+    const availableFormats =
+      EXPORT_MIME_TYPES[fileDetails.mimeType as keyof typeof EXPORT_MIME_TYPES]
+
+    if (!availableFormats) {
       return NextResponse.json(
         {
-          error: `Format ${format} is not supported for this file type`,
+          error: 'This file type cannot be exported',
         },
         { status: 400 }
       )
     }
 
-    const exportMimeType =
-      exportMimeTypes[fileDetails.mimeType as keyof typeof exportMimeTypes]
-
-    // Export the file using Google Drive API
-    const response = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=${encodeURIComponent(exportMimeType)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+    if (!availableFormats[format as keyof typeof availableFormats]) {
+      return NextResponse.json(
+        {
+          error: `Format '${format}' is not available for this file type`,
+          availableFormats: Object.keys(availableFormats),
         },
-      }
-    )
-
-    if (!response.ok) {
-      if (response.status === 403) {
-        return NextResponse.json(
-          {
-            error: 'Insufficient permissions to export this file',
-          },
-          { status: 403 }
-        )
-      }
-      if (response.status === 404) {
-        return NextResponse.json(
-          {
-            error: 'File not found or cannot be exported',
-          },
-          { status: 404 }
-        )
-      }
-      throw new Error(`Export failed: ${response.status}`)
+        { status: 400 }
+      )
     }
 
-    const fileBuffer = await response.arrayBuffer()
+    // Get the target MIME type
+    const targetMimeType =
+      availableFormats[format as keyof typeof availableFormats]
+
+    // Export the file
+    const exportedData = await authResult.driveService!.exportFile(
+      fileId,
+      targetMimeType
+    )
+
+    if (!exportedData) {
+      return NextResponse.json(
+        { error: 'Failed to export file' },
+        { status: 500 }
+      )
+    }
 
     // Generate filename with appropriate extension
-    const extension = FILE_EXTENSIONS[format as keyof typeof FILE_EXTENSIONS]
-    const fileName = `${fileDetails.name.replace(/\.[^/.]+$/, '')}.${extension}`
+    const extension =
+      FILE_EXTENSIONS[format as keyof typeof FILE_EXTENSIONS] || format
+    const filename = `${fileDetails.name}.${extension}`
 
     // Return the exported file
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(exportedData, {
+      status: 200,
       headers: {
-        'Content-Type': exportMimeType,
-        'Content-Disposition': `attachment; filename="${fileName}"`,
-        'Content-Length': fileBuffer.byteLength.toString(),
+        'Content-Type': targetMimeType,
+        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Cache-Control': 'private, no-cache',
       },
     })
   } catch (error) {
-    if (error instanceof Error) {
-      if (
-        error.message.includes('Invalid Credentials') ||
-        error.message.includes('unauthorized')
-      ) {
-        return NextResponse.json(
-          {
-            error:
-              'Google Drive access expired. Please reconnect your account.',
-            needsReauth: true,
-          },
-          { status: 401 }
-        )
-      }
-
-      if (
-        error.message.includes('not found') ||
-        error.message.includes('404')
-      ) {
-        return NextResponse.json(
-          {
-            error: 'File not found or cannot be exported',
-          },
-          { status: 404 }
-        )
-      }
-
-      if (error.message.includes('quota') || error.message.includes('limit')) {
-        return NextResponse.json(
-          {
-            error:
-              'Google Drive quota exceeded. Please free up space and try again.',
-          },
-          { status: 429 }
-        )
-      }
-    }
-
-    return NextResponse.json(
-      { error: 'Failed to export file' },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 }
