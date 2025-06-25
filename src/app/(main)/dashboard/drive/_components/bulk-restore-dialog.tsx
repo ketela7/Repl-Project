@@ -48,84 +48,69 @@ function BulkRestoreDialog({
   const isMobile = useIsMobile()
 
   const renderContent = () => (
-    <>
-      <div className="text-base">
-        Are you sure you want to restore{' '}
-        <span className="font-semibold">{selectedItems.length}</span> item
-        {selectedItems.length > 1 ? 's' : ''} from trash?
+    <div className="space-y-6">
+      {/* Header Info */}
+      <div className="text-center space-y-3">
+        <div className="flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+            <RotateCcw className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
+          </div>
+        </div>
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Restore from Trash</h3>
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to restore {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} from trash?
+          </p>
+        </div>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      {/* Stats */}
+      <div className="flex justify-center gap-2">
         {fileCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-          >
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-          >
+          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
       </div>
 
-      {selectedItems.length <= 5 ? (
-        <div className="space-y-2">
-          <div className="text-sm font-semibold">Items to be restored:</div>
-          <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-            <ul className="space-y-1 text-sm">
-              {selectedItems.map((item) => (
-                <li key={item.id} className="flex items-center gap-2 truncate">
-                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                  <span className="truncate">{item.name}</span>
-                </li>
-              ))}
-            </ul>
+      {/* Items Preview */}
+      <div className="space-y-3">
+        <h4 className="text-sm font-medium text-center">Items to be restored:</h4>
+        <div className="max-h-48 overflow-y-auto rounded-lg border bg-muted/50 p-4">
+          <div className="space-y-2">
+            {selectedItems.slice(0, 5).map((item) => (
+              <div key={item.id} className="flex items-center gap-3 p-2 rounded-md bg-background/50">
+                <div className="h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="text-sm truncate flex-1">{item.name}</span>
+                <Badge variant="outline" className="text-xs">
+                  {item.type}
+                </Badge>
+              </div>
+            ))}
+            {selectedItems.length > 5 && (
+              <div className="text-center text-sm text-muted-foreground py-2">
+                ... and {selectedItems.length - 5} more items
+              </div>
+            )}
           </div>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          <div className="text-sm font-semibold">Preview (first 3 items):</div>
-          <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-            <ul className="space-y-1 text-sm">
-              {selectedItems.slice(0, 3).map((item) => (
-                <li key={item.id} className="flex items-center gap-2 truncate">
-                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                  <span className="truncate">{item.name}</span>
-                </li>
-              ))}
-              <li className="text-muted-foreground/70 flex items-center gap-2 italic">
-                <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
-                and {selectedItems.length - 3} more items...
-              </li>
-            </ul>
-          </div>
-        </div>
-      )}
-
-      <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
-        <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 dark:text-green-400" />
-        <div className="text-sm text-green-800 dark:text-green-200">
-          These items will be restored to their original locations in Google
-          Drive.
         </div>
       </div>
 
-      <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
-        <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-500">
-          <div className="h-1.5 w-1.5 rounded-full bg-white" />
+      {/* Info */}
+      <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/20">
+        <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500">
+          <div className="h-2 w-2 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-blue-800 dark:text-blue-200">
-          If the original parent folder was also deleted, items will be restored
-          to the root of your Drive.
+        <div className="text-sm text-emerald-800 dark:text-emerald-200">
+          If the original parent folder was also deleted, items will be restored to the root of your Drive.
         </div>
       </div>
-    </>
+    </div>
   )
 
   if (isMobile) {

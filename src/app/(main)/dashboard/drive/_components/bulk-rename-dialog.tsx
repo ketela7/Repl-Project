@@ -175,31 +175,35 @@ function BulkRenameDialog({
   const selectedRenameType = RENAME_TYPES.find((type) => type.id === renameType)
 
   const renderContent = () => (
-    <>
-      <div className="space-y-4 pt-2">
-        <div className="text-base">
-          Rename <span className="font-semibold">{selectedItems.length}</span>{' '}
-          item{selectedItems.length > 1 ? 's' : ''} using a consistent pattern.
+    <div className="space-y-6">
+      {/* Header Info */}
+      <div className="text-center space-y-3">
+        <div className="flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30">
+            <Edit3 className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+          </div>
         </div>
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Bulk Rename</h3>
+          <p className="text-sm text-muted-foreground">
+            Rename {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} using a consistent pattern
+          </p>
+        </div>
+      </div>
 
-        <div className="flex flex-wrap gap-2">
-          {fileCount > 0 && (
-            <Badge
-              variant="secondary"
-              className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-            >
-              {fileCount} file{fileCount > 1 ? 's' : ''}
-            </Badge>
-          )}
-          {folderCount > 0 && (
-            <Badge
-              variant="secondary"
-              className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-            >
-              {folderCount} folder{folderCount > 1 ? 's' : ''}
-            </Badge>
-          )}
-        </div>
+      {/* Stats */}
+      <div className="flex justify-center gap-2">
+        {fileCount > 0 && (
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+            {fileCount} file{fileCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+        {folderCount > 0 && (
+          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+            {folderCount} folder{folderCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+      </div>
 
         <div className="space-y-4">
           <div>
@@ -489,7 +493,7 @@ function BulkRenameDialog({
           )}
         </div>
       </div>
-    </>
+    </div>
   )
 
   if (isMobile) {

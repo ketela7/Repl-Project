@@ -233,35 +233,37 @@ function BulkShareDialog({
   ).length
 
   const renderContent = () => (
-    <>
-      <div className="space-y-4 pt-2">
-        <div className="text-base">
-          Generate share links for{' '}
-          <span className="font-semibold">{selectedItems.length}</span> item
-          {selectedItems.length > 1 ? 's' : ''} with customizable privacy
-          settings.
+    <div className="space-y-6">
+      {/* Header Info */}
+      <div className="text-center space-y-3">
+        <div className="flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
+            <Share2 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+          </div>
         </div>
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold">Share Items</h3>
+          <p className="text-sm text-muted-foreground">
+            Generate share links for {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} with customizable privacy settings
+          </p>
+        </div>
+      </div>
 
-        <div className="flex flex-wrap gap-2">
-          {fileCount > 0 && (
-            <Badge
-              variant="secondary"
-              className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-            >
-              <FileText className="mr-1 h-3 w-3" />
-              {fileCount} file{fileCount > 1 ? 's' : ''}
-            </Badge>
-          )}
-          {folderCount > 0 && (
-            <Badge
-              variant="secondary"
-              className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-            >
-              <Folder className="mr-1 h-3 w-3" />
-              {folderCount} folder{folderCount > 1 ? 's' : ''}
-            </Badge>
-          )}
-        </div>
+      {/* Stats */}
+      <div className="flex justify-center gap-2">
+        {fileCount > 0 && (
+          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+            <FileText className="mr-1 h-3 w-3" />
+            {fileCount} file{fileCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+        {folderCount > 0 && (
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+            <Folder className="mr-1 h-3 w-3" />
+            {folderCount} folder{folderCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+      </div>
 
         {selectedItems.length <= 5 ? (
           <div className="space-y-2">
@@ -425,7 +427,7 @@ function BulkShareDialog({
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 
   if (isMobile) {

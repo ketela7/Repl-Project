@@ -74,41 +74,49 @@ function BulkPermanentDeleteDialog({
   }
 
   const renderContent = () => (
-    <>
-      <div className="space-y-4 pt-2">
-        <div className="flex items-start gap-3 rounded-lg border-2 border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/20">
-          <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-red-600 dark:text-red-400" />
-          <div className="space-y-2">
-            <div className="text-base font-semibold text-red-800 dark:text-red-200">
-              ⚠️ DANGER: Permanent Deletion
-            </div>
-            <div className="text-sm text-red-700 dark:text-red-300">
-              You are about to permanently delete{' '}
-              <span className="font-bold">{selectedItems.length}</span> item
-              {selectedItems.length > 1 ? 's' : ''}. These items will be removed
-              forever and cannot be recovered.
-            </div>
+    <div className="space-y-6">
+      {/* Header Info */}
+      <div className="text-center space-y-3">
+        <div className="flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+            <Trash2 className="h-8 w-8 text-red-600 dark:text-red-400" />
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2">
-          {fileCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-            >
-              {fileCount} file{fileCount > 1 ? 's' : ''}
-            </Badge>
-          )}
-          {folderCount > 0 && (
-            <Badge
-              variant="destructive"
-              className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-            >
-              {folderCount} folder{folderCount > 1 ? 's' : ''} + contents
-            </Badge>
-          )}
+        <div className="space-y-2">
+          <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">Permanent Delete</h3>
+          <p className="text-sm text-muted-foreground">
+            DANGER: This action cannot be undone
+          </p>
         </div>
+      </div>
+
+      {/* Warning */}
+      <div className="flex items-start gap-3 rounded-lg border-2 border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/20">
+        <AlertTriangle className="mt-0.5 h-6 w-6 flex-shrink-0 text-red-600 dark:text-red-400" />
+        <div className="space-y-2">
+          <div className="text-base font-semibold text-red-800 dark:text-red-200">
+            DANGER: Permanent Deletion
+          </div>
+          <div className="text-sm text-red-700 dark:text-red-300">
+            You are about to permanently delete {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}. 
+            These items will be removed forever and cannot be recovered.
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="flex justify-center gap-2">
+        {fileCount > 0 && (
+          <Badge variant="destructive" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">
+            {fileCount} file{fileCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+        {folderCount > 0 && (
+          <Badge variant="destructive" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">
+            {folderCount} folder{folderCount > 1 ? 's' : ''} + contents
+          </Badge>
+        )}
+      </div>
 
         {selectedItems.length <= 5 ? (
           <div className="space-y-2">
@@ -224,7 +232,7 @@ function BulkPermanentDeleteDialog({
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 
   if (isMobile) {
