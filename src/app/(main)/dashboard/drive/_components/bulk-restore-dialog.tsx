@@ -203,3 +203,199 @@ export function BulkRestoreDialog({
     </AlertDialog>
   )
 }
+'use client'
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetDescription,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { RotateCcw, Info } from 'lucide-react'
+import { cn } from '@/shared/utils'
+
+interface BulkRestoreDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
+  selectedItems: Array<{
+    id: string
+    name: string
+    type: 'file' | 'folder'
+  }>
+}
+
+export function BulkRestoreDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+  selectedItems,
+}: BulkRestoreDialogProps) {
+  const fileCount = selectedItems.filter((item) => item.type === 'file').length
+  const folderCount = selectedItems.filter(
+    (item) => item.type === 'folder'
+  ).length
+  const isMobile = useIsMobile()
+
+  const renderContent = () => (
+    <>
+      <div className="text-base">
+        Restore <span className="font-semibold">{selectedItems.length}</span> item
+        {selectedItems.length > 1 ? 's' : ''} from trash back to their original location.
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {fileCount > 0 && (
+          <Badge
+            variant="secondary"
+            className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+          >
+            {fileCount} file{fileCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+        {folderCount > 0 && (
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+          >
+            {folderCount} folder{folderCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+      </div>
+
+      {selectedItems.length <= 5 ? (
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">Items to be restored:</div>
+          <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+            <ul className="space-y-1 text-sm">
+              {selectedItems.map((item) => (
+                <li key={item.id} className="flex items-center gap-2 truncate">
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-400" />
+                  <span className="truncate">{item.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">Preview (first 3 items):</div>
+          <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+            <ul className="space-y-1 text-sm">
+              {selectedItems.slice(0, 3).map((item) => (
+                <li key={item.id} className="flex items-center gap-2 truncate">
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-400" />
+                  <span className="truncate">{item.name}</span>
+                </li>
+              ))}
+              <li className="text-muted-foreground/70 flex items-center gap-2 italic">
+                <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-300" />
+                and {selectedItems.length - 3} more items...
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
+        <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 dark:text-green-400" />
+        <div className="text-sm text-green-800 dark:text-green-200">
+          These items will be restored to their original locations in your Google Drive.
+        </div>
+      </div>
+    </>
+  )
+
+  if (isMobile) {
+    return (
+      <BottomSheet open={isOpen} onOpenChange={onClose}>
+        <BottomSheetContent className="max-h-[90vh]">
+          <BottomSheetHeader className="pb-4">
+            <BottomSheetTitle className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+                <RotateCcw className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold">Restore Items</div>
+                <div className="text-muted-foreground text-sm font-normal">
+                  Move items back to their original location
+                </div>
+              </div>
+            </BottomSheetTitle>
+          </BottomSheetHeader>
+
+          <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
+
+          <BottomSheetFooter className={cn('grid gap-4')}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={onConfirm}
+              className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-800`}
+            >
+              <RotateCcw className="mr-2 h-4 w-4" />
+              Restore Items
+            </Button>
+          </BottomSheetFooter>
+        </BottomSheetContent>
+      </BottomSheet>
+    )
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
+              <RotateCcw className="h-5 w-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div>
+              <div className="text-lg font-semibold">Restore Items</div>
+              <div className="text-muted-foreground text-sm font-normal">
+                Move items back to their original location
+              </div>
+            </div>
+          </DialogTitle>
+          <DialogDescription className="space-y-4 pt-2">
+            {renderContent()}
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="flex-col gap-2 sm:flex-row">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={onConfirm}
+            className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800"
+          >
+            <RotateCcw className="mr-2 h-4 w-4" />
+            Restore Items
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

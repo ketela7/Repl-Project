@@ -323,3 +323,196 @@ export function BulkPermanentDeleteDialog({
     </AlertDialog>
   )
 }
+'use client'
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetDescription,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
+import { Trash2, AlertTriangle } from 'lucide-react'
+import { cn } from '@/shared/utils'
+
+interface BulkPermanentDeleteDialogProps {
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
+  selectedItems: Array<{
+    id: string
+    name: string
+    type: 'file' | 'folder'
+  }>
+}
+
+export function BulkPermanentDeleteDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+  selectedItems,
+}: BulkPermanentDeleteDialogProps) {
+  const fileCount = selectedItems.filter((item) => item.type === 'file').length
+  const folderCount = selectedItems.filter(
+    (item) => item.type === 'folder'
+  ).length
+  const isMobile = useIsMobile()
+
+  const renderContent = () => (
+    <>
+      <div className="text-base">
+        Are you sure you want to permanently delete{' '}
+        <span className="font-semibold">{selectedItems.length}</span> item
+        {selectedItems.length > 1 ? 's' : ''}? This action cannot be undone.
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {fileCount > 0 && (
+          <Badge
+            variant="secondary"
+            className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+          >
+            {fileCount} file{fileCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+        {folderCount > 0 && (
+          <Badge
+            variant="secondary"
+            className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+          >
+            {folderCount} folder{folderCount > 1 ? 's' : ''}
+          </Badge>
+        )}
+      </div>
+
+      {selectedItems.length <= 5 ? (
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">Items to be permanently deleted:</div>
+          <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+            <ul className="space-y-1 text-sm">
+              {selectedItems.map((item) => (
+                <li key={item.id} className="flex items-center gap-2 truncate">
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400" />
+                  <span className="truncate">{item.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          <div className="text-sm font-semibold">Preview (first 3 items):</div>
+          <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
+            <ul className="space-y-1 text-sm">
+              {selectedItems.slice(0, 3).map((item) => (
+                <li key={item.id} className="flex items-center gap-2 truncate">
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-400" />
+                  <span className="truncate">{item.name}</span>
+                </li>
+              ))}
+              <li className="text-muted-foreground/70 flex items-center gap-2 italic">
+                <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-300" />
+                and {selectedItems.length - 3} more items...
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
+
+      <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
+        <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
+        <div className="text-sm text-red-800 dark:text-red-200">
+          <strong>Warning:</strong> These items will be permanently deleted and cannot be recovered. This action is irreversible.
+        </div>
+      </div>
+    </>
+  )
+
+  if (isMobile) {
+    return (
+      <BottomSheet open={isOpen} onOpenChange={onClose}>
+        <BottomSheetContent className="max-h-[90vh]">
+          <BottomSheetHeader className="pb-4">
+            <BottomSheetTitle className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+                <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <div className="text-lg font-semibold">Permanently Delete</div>
+                <div className="text-muted-foreground text-sm font-normal">
+                  This action cannot be undone
+                </div>
+              </div>
+            </BottomSheetTitle>
+          </BottomSheetHeader>
+
+          <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
+
+          <BottomSheetFooter className={cn('grid gap-4')}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={onConfirm}
+              className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800`}
+            >
+              Permanently Delete
+            </Button>
+          </BottomSheetFooter>
+        </BottomSheetContent>
+      </BottomSheet>
+    )
+  }
+
+  return (
+    <AlertDialog open={isOpen} onOpenChange={onClose}>
+      <AlertDialogContent className="sm:max-w-lg">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
+              <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <div className="text-lg font-semibold">Permanently Delete</div>
+              <div className="text-muted-foreground text-sm font-normal">
+                This action cannot be undone
+              </div>
+            </div>
+          </AlertDialogTitle>
+        </AlertDialogHeader>
+
+        <div className="space-y-4 px-1">{renderContent()}</div>
+
+        <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
+          <AlertDialogCancel className="w-full sm:w-auto">
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="w-full bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800"
+          >
+            Permanently Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  )
+}

@@ -370,8 +370,8 @@ export function BulkOperationsDialog({
       {isCopyDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkCopyDialog
-            open={isCopyDialogOpen}
-            onOpenChange={() => setIsCopyDialogOpen(false)}
+            isOpen={isCopyDialogOpen}
+            onClose={() => setIsCopyDialogOpen(false)}
             onConfirm={handleCopyComplete}
             selectedItems={selectedItems}
           />
@@ -381,8 +381,8 @@ export function BulkOperationsDialog({
       {isDeleteDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkDeleteDialog
-            open={isDeleteDialogOpen}
-            onOpenChange={() => setIsDeleteDialogOpen(false)}
+            isOpen={isDeleteDialogOpen}
+            onClose={() => setIsDeleteDialogOpen(false)}
             onConfirm={handleDeleteComplete}
             selectedItems={selectedItems}
           />
@@ -413,8 +413,8 @@ export function BulkOperationsDialog({
       {isRenameDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkRenameDialog
-            open={isRenameDialogOpen}
-            onOpenChange={() => setIsRenameDialogOpen(false)}
+            isOpen={isRenameDialogOpen}
+            onClose={() => setIsRenameDialogOpen(false)}
             onConfirm={handleRenameComplete}
             selectedItems={selectedItems}
           />
@@ -424,8 +424,8 @@ export function BulkOperationsDialog({
       {isExportDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkExportDialog
-            open={isExportDialogOpen}
-            onOpenChange={() => setIsExportDialogOpen(false)}
+            isOpen={isExportDialogOpen}
+            onClose={() => setIsExportDialogOpen(false)}
             onConfirm={handleExportComplete}
             selectedItems={selectedItems}
           />
@@ -435,8 +435,8 @@ export function BulkOperationsDialog({
       {isPermanentDeleteDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkPermanentDeleteDialog
-            open={isPermanentDeleteDialogOpen}
-            onOpenChange={() => setIsPermanentDeleteDialogOpen(false)}
+            isOpen={isPermanentDeleteDialogOpen}
+            onClose={() => setIsPermanentDeleteDialogOpen(false)}
             onConfirm={handlePermanentDeleteComplete}
             selectedItems={selectedItems}
           />
@@ -446,8 +446,8 @@ export function BulkOperationsDialog({
       {isRestoreDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkRestoreDialog
-            open={isRestoreDialogOpen}
-            onOpenChange={() => setIsRestoreDialogOpen(false)}
+            isOpen={isRestoreDialogOpen}
+            onClose={() => setIsRestoreDialogOpen(false)}
             onConfirm={handleRestoreComplete}
             selectedItems={selectedItems}
           />
