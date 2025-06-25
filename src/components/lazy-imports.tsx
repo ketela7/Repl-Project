@@ -21,8 +21,21 @@ export const FileDeleteDialog = lazy(() =>
   import("@/app/(main)/dashboard/drive/_components/file-delete-dialog").then(mod => ({ default: mod.FileDeleteDialog }))
 );
 
+// Bulk operations dialogs - now in optimized lazy module
 export const BulkOperationsDialog = lazy(() => 
  import("@/app/(main)/dashboard/drive/_components/bulk-operations-dialog").then(mod => ({ default: mod.BulkOperationsDialog }))
+);
+
+export const BulkMoveDialog = lazy(() => 
+ import("@/app/(main)/dashboard/drive/_components/optimized-lazy-dialogs").then(mod => ({ default: mod.BulkMoveDialog }))
+);
+
+export const BulkCopyDialog = lazy(() => 
+ import("@/app/(main)/dashboard/drive/_components/optimized-lazy-dialogs").then(mod => ({ default: mod.BulkCopyDialog }))
+);
+
+export const BulkDeleteDialog = lazy(() => 
+ import("@/app/(main)/dashboard/drive/_components/optimized-lazy-dialogs").then(mod => ({ default: mod.BulkDeleteDialog }))
 );
 
 

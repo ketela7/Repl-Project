@@ -56,13 +56,16 @@ import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { successToast, infoToast } from '@/shared/utils'
 
-import { BulkOperationsDialogDekstop } from './bulk-operations-dialog-dekstop'
-import { BulkOperationsDialogMobile } from './bulk-operations-dialog-mobile'
-import { BulkMoveDialog } from './bulk-move-dialog'
-import { BulkCopyDialog } from './bulk-copy-dialog'
-import { BulkDeleteDialog } from './bulk-delete-dialog'
-import { BulkShareDialog } from './bulk-share-dialog'
-import { BulkRenameDialog } from './bulk-rename-dialog'
+import { Suspense } from 'react'
+import { 
+  BulkOperationsDialogDekstop,
+  BulkOperationsDialogMobile,
+  BulkMoveDialog,
+  BulkCopyDialog,
+  BulkDeleteDialog,
+  BulkShareDialog,
+  BulkRenameDialog
+} from './optimized-lazy-dialogs'
 
 // Types
 interface DriveItem {
@@ -2105,73 +2108,86 @@ export function DriveToolbar({
       </div>
 
       {/* Mobile Actions Dialog */}
-      <BulkOperationsDialogMobile
-        open={isMobileActionsOpen}
-        onOpenChange={setIsMobileActionsOpen}
-        selectedItems={selectedItems}
-        selectedCount={selectedCount}
-        onBulkDelete={handleBulkDelete}
-        onBulkMove={handleBulkMove}
-        onBulkCopy={handleBulkCopy}
-        onBulkShare={handleBulkShare}
-        onBulkDownload={handleBulkDownload}
-        onBulkRename={handleBulkRename}
-        onBulkExport={handleBulkExport}
-        onDeselectAll={() => {
-          setIsMobileActionsOpen(false)
-          onDeselectAll()
-        }}
-      />
+      <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
+        <BulkOperationsDialogMobile
+          open={isMobileActionsOpen}
+          onOpenChange={setIsMobileActionsOpen}
+          selectedItems={selectedItems}
+          selectedCount={selectedCount}
+          onBulkDelete={handleBulkDelete}
+          onBulkMove={handleBulkMove}
+          onBulkCopy={handleBulkCopy}
+          onBulkShare={handleBulkShare}
+          onBulkDownload={handleBulkDownload}
+          onBulkRename={handleBulkRename}
+          onBulkExport={handleBulkExport}
+          onDeselectAll={() => {
+            setIsMobileActionsOpen(false)
+            onDeselectAll()
+          }}
+        />
+      </Suspense>
 
-      {/* Consolidated Bulk Operations Dialogs */}
-      <BulkMoveDialog
-        isOpen={bulkDialogs.move}
-        onClose={() => closeBulkDialog('move')}
-        selectedItems={selectedItems}
-        onConfirm={() => {
-          closeBulkDialog('move')
-          handleBulkOperationComplete()
-        }}
-      />
+      {/* Consolidated Bulk Operations Dialogs - Lazy Loaded */}
+      <Suspense fallback={<div className="animate-pulse h-8 w-8 bg-gray-200 rounded" />}>
+        {bulkDialogs.move && (
+          <BulkMoveDialog
+            isOpen={bulkDialogs.move}
+            onClose={() => closeBulkDialog('move')}
+            selectedItems={selectedItems}
+            onConfirm={() => {
+              closeBulkDialog('move')
+              handleBulkOperationComplete()
+            }}
+          />
+        )}
 
-      <BulkCopyDialog
-        isOpen={bulkDialogs.copy}
-        onClose={() => closeBulkDialog('copy')}
-        selectedItems={selectedItems}
-        onConfirm={() => {
-          closeBulkDialog('copy')
-          handleBulkOperationComplete()
-        }}
-      />
+        {bulkDialogs.copy && (
+          <BulkCopyDialog
+            isOpen={bulkDialogs.copy}
+            onClose={() => closeBulkDialog('copy')}
+            selectedItems={selectedItems}
+            onConfirm={() => {
+              closeBulkDialog('copy')
+              handleBulkOperationComplete()
+            }}
+          />
+        )}
 
-      <BulkDeleteDialog
-        isOpen={bulkDialogs.delete}
-        onClose={() => closeBulkDialog('delete')}
-        selectedItems={selectedItems}
-        onConfirm={() => {
-          closeBulkDialog('delete')
-          handleBulkOperationComplete()
-        }}
-      />
+        {bulkDialogs.delete && (
+          <BulkDeleteDialog
+            isOpen={bulkDialogs.delete}
+            onClose={() => closeBulkDialog('delete')}
+            selectedItems={selectedItems}
+            onConfirm={() => {
+              closeBulkDialog('delete')
+              handleBulkOperationComplete()
+            }}
+          />
+        )}
 
-      <BulkShareDialog
-        open={bulkDialogs.share}
-        onOpenChange={(open) => {
-          if (!open) closeBulkDialog('share')
-        }}
-        selectedItems={selectedItems}
-      />
+        {bulkDialogs.share && (
+          <BulkShareDialog
+            open={bulkDialogs.share}
+            onOpenChange={(open) => {
+              if (!open) closeBulkDialog('share')
+            }}
+            selectedItems={selectedItems}
+          />
+        )}
 
-      {/* Additional Bulk Operations Dialogs */}
-      <BulkRenameDialog
-        isOpen={bulkDialogs.rename || false}
-        onClose={() => closeBulkDialog('rename' as keyof typeof bulkDialogs)}
-        onConfirm={(renamePattern: string, renameType: string) => {
-          closeBulkDialog('rename' as keyof typeof bulkDialogs)
-          handleBulkOperationComplete()
-        }}
-        selectedItems={selectedItems}
-      />
+        {bulkDialogs.rename && (
+          <BulkRenameDialog
+            isOpen={bulkDialogs.rename}
+            onClose={() => closeBulkDialog('rename')}
+            onConfirm={(renamePattern: string, renameType: string) => {
+              closeBulkDialog('rename')
+              handleBulkOperationComplete()
+            }}
+            selectedItems={selectedItems}
+          />
+        )}
+      </Suspense>
     </div>
   )
 }

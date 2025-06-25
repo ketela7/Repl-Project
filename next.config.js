@@ -18,6 +18,7 @@ const nextConfig = {
     ],
     optimisticClientCache: true,
     useWasmBinary: false,
+    optimizeCss: true,
   },
   
 
@@ -69,6 +70,47 @@ const nextConfig = {
   onDemandEntries: {
     maxInactiveAge: 60 * 1000,
     pagesBufferLength: 2,
+  },
+  
+  // Webpack optimizations for lazy loading
+  webpack: (config, { dev, isServer }) => {
+    if (dev) {
+      // Enable filesystem caching
+      config.cache = {
+        type: 'filesystem',
+        buildDependencies: {
+          config: [__filename],
+        },
+      }
+      
+      // Optimize chunk splitting for lazy components
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: {
+              minChunks: 2,
+              priority: -20,
+              reuseExistingChunk: true,
+            },
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              priority: -10,
+              chunks: 'all',
+            },
+            bulkDialogs: {
+              test: /[\\/](bulk-.*-dialog|optimized-lazy-dialogs)[\\/]/,
+              name: 'bulk-dialogs',
+              priority: 10,
+              chunks: 'async',
+            },
+          },
+        },
+      }
+    }
+    return config
   },
 }
 

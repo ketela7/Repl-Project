@@ -31,7 +31,9 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "importsNotUsedAsValues": "remove",
+    "preserveWatchOutput": true
   },
   "include": [
     "**/*.ts",

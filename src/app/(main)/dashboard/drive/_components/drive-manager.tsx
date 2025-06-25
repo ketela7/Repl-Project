@@ -530,6 +530,9 @@ export function DriveManager() {
             onBulkMove={() => {}}
             onBulkCopy={() => {}}
             onBulkShare={() => {}}
+            onBulkDownload={() => {}}
+            onBulkRename={() => {}}
+            onBulkExport={() => {}}
             onFiltersOpen={() => openDialog('mobileFilters')}
             
             
