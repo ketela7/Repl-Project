@@ -33,13 +33,15 @@ export const lazyWithRetry = (componentImport: () => Promise<any>) => {
 }
 
 // Optimized loading states for different component sizes
-export const getLoaderClassName = (size: 'small' | 'default' | 'large' = 'default') => {
+export const getLoaderClassName = (
+  size: 'small' | 'default' | 'large' = 'default'
+) => {
   const sizeClasses = {
     small: 'h-4 w-4',
-    default: 'h-8 w-8', 
-    large: 'h-12 w-12'
+    default: 'h-8 w-8',
+    large: 'h-12 w-12',
   }
-  
+
   return `animate-pulse bg-gray-200 rounded ${sizeClasses[size]}`
 }
 
@@ -53,7 +55,7 @@ export const optimizeBundleLoading = () => {
       link.href = `//${hostname}`
       document.head.appendChild(link)
     }
-    
+
     // Prefetch critical external resources
     prefetchDNS('accounts.google.com')
     prefetchDNS('apis.google.com')

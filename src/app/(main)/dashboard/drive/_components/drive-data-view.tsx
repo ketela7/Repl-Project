@@ -1,20 +1,5 @@
 'use client'
 
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { FileIcon } from '@/components/file-icon'
-import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
-import { DriveGridSkeleton } from './drive-skeleton'
-import { useTimezone } from '@/shared/hooks/use-timezone'
-import { formatFileTime } from '@/shared/utils'
 import {
   MoreVertical,
   Eye,
@@ -27,6 +12,21 @@ import {
   Trash2,
   Copy as CopyIcon,
 } from 'lucide-react'
+
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { FileIcon } from '@/components/file-icon'
+import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
+import { useTimezone } from '@/shared/hooks/use-timezone'
+import { formatFileTime } from '@/shared/utils'
 import {
   Table,
   TableBody,
@@ -37,6 +37,8 @@ import {
 } from '@/components/ui/table'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import type { DriveFile, DriveFolder } from '@/lib/google-drive/types'
+
+import { DriveGridSkeleton } from './drive-skeleton'
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
 
@@ -125,7 +127,10 @@ export function DriveDataView({
                     : ''
                 }`}
                 onClick={() => {
-                  console.log('Grid item clicked:', { isSelectMode, itemId: item.id })
+                  console.log('Grid item clicked:', {
+                    isSelectMode,
+                    itemId: item.id,
+                  })
                   if (isSelectMode) {
                     onSelectItem(item.id)
                   } else if (isFolder(item)) {
@@ -135,23 +140,26 @@ export function DriveDataView({
                   }
                 }}
                 onTouchStart={(e) => {
-                  const touch = e.touches[0];
-                  const startTime = Date.now();
+                  const touch = e.touches[0]
+                  const startTime = Date.now()
                   const timer = setTimeout(() => {
-                    console.log('Long press detected on mobile for item:', item.id);
+                    console.log(
+                      'Long press detected on mobile for item:',
+                      item.id
+                    )
                     if (!isSelectMode) {
-                      console.log('Enabling select mode via long press');
-                      onSelectModeChange(true);
+                      console.log('Enabling select mode via long press')
+                      onSelectModeChange(true)
                     }
-                    onSelectItem(item.id);
-                  }, 500); // 500ms for long press
-                  
+                    onSelectItem(item.id)
+                  }, 500) // 500ms for long press
+
                   const handleTouchEnd = () => {
-                    clearTimeout(timer);
-                    document.removeEventListener('touchend', handleTouchEnd);
-                  };
-                  
-                  document.addEventListener('touchend', handleTouchEnd);
+                    clearTimeout(timer)
+                    document.removeEventListener('touchend', handleTouchEnd)
+                  }
+
+                  document.addEventListener('touchend', handleTouchEnd)
                 }}
               >
                 {isSelectMode && (
@@ -426,8 +434,8 @@ export function DriveDataView({
                     </TableCell>
                   )}
                   {visibleColumns.owners && (
-                    <TableCell 
-                      className="cursor-pointer hover:bg-muted/50 transition-colors group"
+                    <TableCell
+                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
                       onClick={async (e) => {
                         e.stopPropagation()
                         const email = item.owners?.[0]?.emailAddress
@@ -435,10 +443,14 @@ export function DriveDataView({
                           try {
                             await navigator.clipboard.writeText(email)
                             // Show toast notification
-                            const { successToast } = await import('@/shared/utils/toast')
+                            const { successToast } = await import(
+                              '@/shared/utils/toast'
+                            )
                             successToast.copied()
                           } catch (err) {
-                            const { errorToast } = await import('@/shared/utils/toast')
+                            const { errorToast } = await import(
+                              '@/shared/utils/toast'
+                            )
                             errorToast.generic('Failed to copy email')
                             console.error('Failed to copy email:', err)
                           }
@@ -447,9 +459,13 @@ export function DriveDataView({
                       title={`Click to copy: ${item.owners?.[0]?.emailAddress || 'No email available'}`}
                     >
                       <div className="flex items-center gap-2">
-                        <span>{item.owners?.[0]?.emailAddress || item.owners?.[0]?.displayName || 'Unknown'}</span>
+                        <span>
+                          {item.owners?.[0]?.emailAddress ||
+                            item.owners?.[0]?.displayName ||
+                            'Unknown'}
+                        </span>
                         {item.owners?.[0]?.emailAddress && (
-                          <CopyIcon className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                          <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
                         )}
                       </div>
                     </TableCell>

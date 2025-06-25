@@ -36,19 +36,30 @@ class ErrorHandler {
       this.errorCounts.delete(errorKey)
     }, this.ERROR_RESET_TIME)
 
-    return this.classifyError(errorCode, status, error, currentCount < this.MAX_RETRY_COUNT)
+    return this.classifyError(
+      errorCode,
+      status,
+      error,
+      currentCount < this.MAX_RETRY_COUNT
+    )
   }
 
   private extractErrorCode(error: any): string {
     if (error?.code) return error.code
-    if (error?.response?.data?.error?.code) return error.response.data.error.code
+    if (error?.response?.data?.error?.code)
+      return error.response.data.error.code
     if (error?.message?.includes('timeout')) return 'TIMEOUT'
     if (error?.message?.includes('network')) return 'NETWORK_ERROR'
     if (error?.name === 'TypeError') return 'NETWORK_ERROR'
     return 'UNKNOWN_ERROR'
   }
 
-  private classifyError(code: string, status: number, originalError: any, retryable: boolean): DriveError {
+  private classifyError(
+    code: string,
+    status: number,
+    originalError: any,
+    retryable: boolean
+  ): DriveError {
     switch (code) {
       case 'rateLimitExceeded':
       case '429':
@@ -58,7 +69,7 @@ class ErrorHandler {
           status: 429,
           retryable: true,
           userMessage: 'Server is busy. Trying again in a moment...',
-          action: 'retry'
+          action: 'retry',
         }
 
       case 'quotaExceeded':
@@ -68,7 +79,7 @@ class ErrorHandler {
           status: 403,
           retryable: false,
           userMessage: 'Daily usage limit reached. Please try again tomorrow.',
-          action: 'none'
+          action: 'none',
         }
 
       case 'authError':
@@ -80,7 +91,7 @@ class ErrorHandler {
           status: 401,
           retryable: false,
           userMessage: 'Session expired. Please sign in again.',
-          action: 'reconnect'
+          action: 'reconnect',
         }
 
       case 'forbidden':
@@ -90,8 +101,8 @@ class ErrorHandler {
           message: 'Permission denied',
           status: 403,
           retryable: false,
-          userMessage: 'You don\'t have permission to access this file.',
-          action: 'refresh'
+          userMessage: "You don't have permission to access this file.",
+          action: 'refresh',
         }
 
       case 'notFound':
@@ -102,7 +113,7 @@ class ErrorHandler {
           status: 404,
           retryable: false,
           userMessage: 'File or folder no longer exists.',
-          action: 'refresh'
+          action: 'refresh',
         }
 
       case 'TIMEOUT':
@@ -111,8 +122,10 @@ class ErrorHandler {
           message: 'Request timeout',
           status: 408,
           retryable,
-          userMessage: retryable ? 'Connection slow. Retrying...' : 'Connection timeout. Please check your internet.',
-          action: retryable ? 'retry' : 'refresh'
+          userMessage: retryable
+            ? 'Connection slow. Retrying...'
+            : 'Connection timeout. Please check your internet.',
+          action: retryable ? 'retry' : 'refresh',
         }
 
       case 'NETWORK_ERROR':
@@ -121,8 +134,10 @@ class ErrorHandler {
           message: 'Network error',
           status: 0,
           retryable,
-          userMessage: retryable ? 'Network issue. Retrying...' : 'Connection lost. Please check your internet.',
-          action: retryable ? 'retry' : 'refresh'
+          userMessage: retryable
+            ? 'Network issue. Retrying...'
+            : 'Connection lost. Please check your internet.',
+          action: retryable ? 'retry' : 'refresh',
         }
 
       case 'backendError':
@@ -134,8 +149,10 @@ class ErrorHandler {
           message: 'Server error',
           status: status || 500,
           retryable,
-          userMessage: retryable ? 'Server temporarily unavailable. Retrying...' : 'Server error. Please try again later.',
-          action: retryable ? 'retry' : 'refresh'
+          userMessage: retryable
+            ? 'Server temporarily unavailable. Retrying...'
+            : 'Server error. Please try again later.',
+          action: retryable ? 'retry' : 'refresh',
         }
 
       default:
@@ -144,8 +161,10 @@ class ErrorHandler {
           message: originalError?.message || 'Unknown error',
           status,
           retryable,
-          userMessage: retryable ? 'Something went wrong. Retrying...' : 'An unexpected error occurred.',
-          action: retryable ? 'retry' : 'refresh'
+          userMessage: retryable
+            ? 'Something went wrong. Retrying...'
+            : 'An unexpected error occurred.',
+          action: retryable ? 'retry' : 'refresh',
         }
     }
   }
@@ -155,7 +174,7 @@ class ErrorHandler {
    */
   showErrorToast(error: DriveError): void {
     const actionText = this.getActionText(error.action)
-    
+
     toast.error(error.userMessage, {
       description: actionText,
       duration: error.retryable ? 3000 : 5000,
@@ -204,11 +223,11 @@ export async function withErrorHandling<T>(
     return await apiCall()
   } catch (error) {
     const processedError = errorHandler.processError(error, context)
-    
+
     if (showToast) {
       errorHandler.showErrorToast(processedError)
     }
-    
+
     throw processedError
   }
 }

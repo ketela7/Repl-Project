@@ -1,9 +1,9 @@
-import * as React from "react"
+import * as React from 'react'
 
-import { cn } from "@/shared/utils"
+import { cn } from '@/shared/utils'
 
-interface InputProps extends React.ComponentProps<"input"> {
-  error?: string | boolean;
+interface InputProps extends React.ComponentProps<'input'> {
+  error?: string | boolean
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -12,10 +12,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 touch-manipulation",
-          "selection:bg-primary selection:text-primary-foreground",
-          "transition-all duration-200 ease-in-out",
-          error && "border-destructive focus-visible:ring-destructive",
+          'border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full touch-manipulation rounded-md border px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+          'selection:bg-primary selection:text-primary-foreground',
+          'transition-all duration-200 ease-in-out',
+          error && 'border-destructive focus-visible:ring-destructive',
           className
         )}
         ref={ref}
@@ -24,6 +24,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     )
   }
 )
-Input.displayName = "Input"
+Input.displayName = 'Input'
 
 export { Input, type InputProps }

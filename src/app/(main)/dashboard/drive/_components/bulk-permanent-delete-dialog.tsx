@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +18,6 @@ import {
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
-  BottomSheetDescription,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
 import { Input } from '@/components/ui/input'
@@ -25,7 +26,6 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { Trash2, AlertTriangle, Shield, Clock } from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 interface BulkPermanentDeleteDialogProps {
@@ -69,15 +69,17 @@ function BulkPermanentDeleteDialog({
   const renderContent = () => (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
             <Trash2 className="h-8 w-8 text-red-600 dark:text-red-400" />
           </div>
         </div>
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">Permanent Delete</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">
+            Permanent Delete
+          </h3>
+          <p className="text-muted-foreground text-sm">
             DANGER: This action cannot be undone
           </p>
         </div>
@@ -86,24 +88,27 @@ function BulkPermanentDeleteDialog({
       {/* File Count Badge */}
       <div className="text-center">
         <Badge variant="destructive" className="px-3 py-1">
-          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}{' '}
+          selected
         </Badge>
       </div>
 
       {/* Selected Files Preview */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium text-red-600 dark:text-red-400">Items to be permanently deleted</Label>
-        <div className="border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20 max-h-32 space-y-1 overflow-y-auto rounded-lg border p-3">
+        <Label className="text-sm font-medium text-red-600 dark:text-red-400">
+          Items to be permanently deleted
+        </Label>
+        <div className="max-h-32 space-y-1 overflow-y-auto rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
           {selectedItems.slice(0, 5).map((item) => (
             <div key={item.id} className="flex items-center gap-2 text-sm">
-              <Trash2 className="text-red-500 h-4 w-4 flex-shrink-0" />
+              <Trash2 className="h-4 w-4 flex-shrink-0 text-red-500" />
               <span className="truncate" title={item.name}>
                 {item.name}
               </span>
             </div>
           ))}
           {selectedItems.length > 5 && (
-            <div className="text-red-700 dark:text-red-300 text-center text-xs italic">
+            <div className="text-center text-xs text-red-700 italic dark:text-red-300">
               and {selectedItems.length - 5} more items...
             </div>
           )}
@@ -114,7 +119,8 @@ function BulkPermanentDeleteDialog({
       <div className="space-y-4">
         <div className="space-y-3">
           <Label className="text-sm font-medium">
-            Type <span className="font-mono text-red-600">CONFIRM DELETE</span> to proceed
+            Type <span className="font-mono text-red-600">CONFIRM DELETE</span>{' '}
+            to proceed
           </Label>
           <Input
             type="text"
@@ -129,12 +135,12 @@ function BulkPermanentDeleteDialog({
           <Checkbox
             id="acknowledge-warning"
             checked={acknowledgeWarning}
-            onCheckedChange={setAcknowledgeWarning}
+            onCheckedChange={(checked) => setAcknowledgeWarning(checked === true)}
             className="mt-1"
           />
           <Label
             htmlFor="acknowledge-warning"
-            className="text-sm leading-relaxed cursor-pointer"
+            className="cursor-pointer text-sm leading-relaxed"
           >
             I understand that this action will{' '}
             <span className="font-semibold text-red-600 dark:text-red-400">
@@ -152,8 +158,8 @@ function BulkPermanentDeleteDialog({
           <div className="h-1.5 w-1.5 rounded-full bg-white" />
         </div>
         <div className="text-sm text-red-800 dark:text-red-200">
-          <span className="font-semibold">Final warning:</span> This action
-          will permanently delete all selected items and cannot be reversed.
+          <span className="font-semibold">Final warning:</span> This action will
+          permanently delete all selected items and cannot be reversed.
         </div>
       </div>
     </div>

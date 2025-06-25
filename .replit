@@ -29,14 +29,6 @@ externalPort = 80
 runButton = "Project"
 
 [[workflows.workflow]]
-name = "Check"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run check"
-
-[[workflows.workflow]]
 name = "Server"
 mode = "sequential"
 author = "agent"
@@ -90,5 +82,103 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx tsc --noEmit --watch --preserveWatchOutput"
+args = "npm run typecheck"
+
+[[workflows.workflow]]
+name = "Check Format"
+mode = "sequential"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format"
+
+[[workflows.workflow]]
+name = "Check Lint"
+mode = "sequential"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint"
+
+[[workflows.workflow]]
+name = "Check Type"
+mode = "sequential"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run typecheck"
+
+[[workflows.workflow]]
+name = "Husky Prepare"
+mode = "sequential"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run prepare"
+
+[[workflows.workflow]]
+name = "Development"
+mode = "sequential"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev -- -p 5000 -H 0.0.0.0 --turbo"
+
+[[workflows.workflow]]
+name = "Build"
+mode = "sequential"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build"
+
+[[workflows.workflow]]
+name = "Production"
+mode = "sequential"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run start"
+
+[[workflows.workflow]]
+name = "Main"
+mode = "parallel"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Prepare"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Development"
+
+[[workflows.workflow]]
+name = "Check:Fix"
+mode = "parallel"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format:fix"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint:fix"
+
+[[workflows.workflow]]
+name = "Check Duplicate"
+mode = "sequential"
+author = 44239185
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx jscpd src"
 

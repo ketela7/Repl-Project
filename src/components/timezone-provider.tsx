@@ -1,31 +1,31 @@
+'use client'
 
-'use client';
+import React, { createContext, useContext, ReactNode } from 'react'
 
-import React, { createContext, useContext, ReactNode } from 'react';
-import { useTimezone } from '@/shared/hooks/use-timezone';
+import { useTimezone } from '@/shared/hooks/use-timezone'
 
 interface TimezoneContextType {
-  timezone: string;
-  isLoading: boolean;
-  setTimezone: (tz: string) => void;
+  timezone: string
+  isLoading: boolean
+  setTimezone: (tz: string) => void
 }
 
-const TimezoneContext = createContext<TimezoneContextType | null>(null);
+const TimezoneContext = createContext<TimezoneContextType | null>(null)
 
 export function TimezoneProvider({ children }: { children: ReactNode }) {
-  const timezoneData = useTimezone();
+  const timezoneData = useTimezone()
 
   return (
     <TimezoneContext.Provider value={timezoneData}>
       {children}
     </TimezoneContext.Provider>
-  );
+  )
 }
 
 export function useTimezoneContext() {
-  const context = useContext(TimezoneContext);
+  const context = useContext(TimezoneContext)
   if (!context) {
-    throw new Error('useTimezoneContext must be used within a TimezoneProvider');
+    throw new Error('useTimezoneContext must be used within a TimezoneProvider')
   }
-  return context;
+  return context
 }

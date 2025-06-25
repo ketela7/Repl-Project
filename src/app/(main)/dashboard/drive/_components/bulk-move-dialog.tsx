@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { Move } from 'lucide-react'
+
 import {
   Dialog,
   DialogContent,
@@ -14,15 +16,15 @@ import {
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
-  BottomSheetDescription,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { Move } from 'lucide-react'
-import { FileMoveDialog } from './file-move-dialog'
 import { cn } from '@/shared/utils'
+
+import { FileMoveDialog } from './file-move-dialog'
+
 
 interface BulkMoveDialogProps {
   open: boolean
@@ -42,7 +44,6 @@ function BulkMoveDialog({
   onConfirm,
   selectedItems,
 }: BulkMoveDialogProps) {
-
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 
@@ -59,7 +60,7 @@ function BulkMoveDialog({
   const renderContent = () => (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
             <Move className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -67,8 +68,9 @@ function BulkMoveDialog({
         </div>
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Move Items</h3>
-          <p className="text-sm text-muted-foreground">
-            You are about to move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} to a new location
+          <p className="text-muted-foreground text-sm">
+            You are about to move {selectedItems.length} item
+            {selectedItems.length > 1 ? 's' : ''} to a new location
           </p>
         </div>
       </div>
@@ -76,12 +78,18 @@ function BulkMoveDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+          >
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+          <Badge
+            variant="secondary"
+            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
+          >
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
@@ -89,20 +97,23 @@ function BulkMoveDialog({
 
       {/* Items Preview */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-center">Items to be moved:</h4>
-        <div className="max-h-48 overflow-y-auto rounded-lg border bg-muted/50 p-4">
+        <h4 className="text-center text-sm font-medium">Items to be moved:</h4>
+        <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
           <div className="space-y-2">
             {selectedItems.slice(0, 5).map((item) => (
-              <div key={item.id} className="flex items-center gap-3 p-2 rounded-md bg-background/50">
+              <div
+                key={item.id}
+                className="bg-background/50 flex items-center gap-3 rounded-md p-2"
+              >
                 <div className="h-2 w-2 rounded-full bg-blue-500" />
-                <span className="text-sm truncate flex-1">{item.name}</span>
+                <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
                   {item.type}
                 </Badge>
               </div>
             ))}
             {selectedItems.length > 5 && (
-              <div className="text-center text-sm text-muted-foreground py-2">
+              <div className="text-muted-foreground py-2 text-center text-sm">
                 ... and {selectedItems.length - 5} more items
               </div>
             )}
@@ -116,7 +127,8 @@ function BulkMoveDialog({
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
         <div className="text-sm text-blue-800 dark:text-blue-200">
-          Click "Choose Destination" to select where you want to move these items.
+          Click "Choose Destination" to select where you want to move these
+          items.
         </div>
       </div>
     </div>

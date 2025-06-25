@@ -1,6 +1,7 @@
 # Project Structure
 
 ## Overview
+
 This document outlines the organized structure for the Google Drive Pro application, implementing a feature-based architecture for better maintainability and scalability.
 
 ## Current Structure (Real-time Updated)
@@ -65,27 +66,32 @@ src/
 ## Key Architectural Decisions
 
 ### File Naming Convention
+
 - Simple kebab-case naming without prefixes or suffixes
 - Examples: `drive-manager.tsx`, `file-list.tsx`, `user-profile.tsx`
 - Avoid: `enhanced-drive-manager.tsx`, `optimized-file-list.tsx`
 
 ### Component Organization
+
 - Feature-based grouping under `_components/` directories
 - Shared components in `/components/`
 - UI primitives in `/components/ui/`
 
 ### API Structure
+
 - RESTful endpoints under `/api/`
 - Grouped by feature (auth, drive, health)
 - Consistent response formats
 
 ### State Management
+
 - TanStack Query for server state
 - React hooks for client state
 - Custom session caching layer
 
 ### Security
-- No NEXT_PUBLIC_ environment variables
+
+- No NEXT*PUBLIC* environment variables
 - Server-side configuration only
 - Secure token handling with NextAuth.js
 
@@ -152,16 +158,19 @@ src/
 ## Architecture Principles
 
 ### 1. Feature-Based Organization
+
 - **Drive Feature**: All Google Drive related functionality
 - **Auth Feature**: Authentication and user management
 - **Analytics Feature**: Dashboard and monitoring
 
 ### 2. Shared Resources
+
 - **Components**: Reusable UI components across features
 - **Hooks**: Common React hooks
 - **Utils**: Utility functions used by multiple features
 
 ### 3. Core Services
+
 - **Configuration**: Environment and app configuration
 - **Services**: Infrastructure services (cache, retry, database)
 - **Middleware**: Cross-cutting concerns
@@ -169,21 +178,25 @@ src/
 ## Benefits
 
 ### 1. Better Organization
+
 - Related code is grouped together
 - Clear separation of concerns
 - Easier to locate and maintain code
 
 ### 2. Improved Scalability
+
 - Features can be developed independently
 - Easy to add new features
 - Clear boundaries between modules
 
 ### 3. Enhanced Maintainability
+
 - Modular architecture
 - Centralized exports from each module
 - Clear dependency management
 
 ### 4. Better Testing
+
 - Features can be tested in isolation
 - Shared components have dedicated tests
 - Clear test organization
@@ -191,21 +204,25 @@ src/
 ## Migration Strategy
 
 ### Phase 1: Create Structure
+
 - Create new directory structure
 - Define module boundaries
 - Create index files for exports
 
 ### Phase 2: Move Components
+
 - Move drive components to features/drive/
 - Move auth components to features/auth/
 - Move shared components to shared/
 
 ### Phase 3: Update Imports
+
 - Update all import statements
 - Use centralized exports
 - Remove old file references
 
 ### Phase 4: Optimize
+
 - Remove redundant code
 - Consolidate similar functionality
 - Improve type definitions
@@ -213,27 +230,32 @@ src/
 ## Implementation Guidelines
 
 ### 1. Barrel Exports
+
 Each feature module exports its public API through index.ts files:
+
 ```typescript
 // features/drive/index.ts
-export { DriveManager } from './components/drive-manager';
-export { useDriveFiles } from './hooks/use-drive-files';
+export { DriveManager } from './components/drive-manager'
+export { useDriveFiles } from './hooks/use-drive-files'
 ```
 
 ### 2. Import Conventions
+
 ```typescript
 // Use feature imports
-import { DriveManager } from '@/features/drive';
-import { GoogleAuthButton } from '@/features/auth';
-import { Button, Card } from '@/shared';
+import { DriveManager } from '@/features/drive'
+import { GoogleAuthButton } from '@/features/auth'
+import { Button, Card } from '@/shared'
 ```
 
 ### 3. Type Organization
+
 - Feature-specific types in feature modules
 - Shared types in shared/types/
 - Core types in core/types/
 
 ### 4. Service Layer
+
 - Core services in core/services/
 - Feature-specific services in feature modules
 - Clear service interfaces and contracts

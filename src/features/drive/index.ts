@@ -3,7 +3,6 @@
  * Components will be gradually moved here as the architecture evolves
  */
 
-
 // This module will contain:
 // - Drive management components
 // - File operation dialogs

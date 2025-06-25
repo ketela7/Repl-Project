@@ -2,8 +2,8 @@
 
 import { Suspense } from 'react'
 import dynamic from 'next/dynamic'
-import { DriveGridSkeleton } from './_components/drive-skeleton'
 
+import { DriveGridSkeleton } from './_components/drive-skeleton'
 
 // Lazy load the heavy DriveManager component with optimized loading
 const DriveManager = dynamic(

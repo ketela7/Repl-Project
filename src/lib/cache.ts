@@ -4,131 +4,121 @@
  */
 
 interface CacheEntry<T> {
-  data: T;
-  timestamp: number;
-  ttl: number; // Time to live in milliseconds
+  data: T
+  timestamp: number
+  ttl: number // Time to live in milliseconds
 }
 
 class MemoryCache {
-  private cache = new Map<string, CacheEntry<any>>();
-  private maxSize = 20000; // Increased cache size for better performance
+  private cache = new Map<string, CacheEntry<any>>()
+  private maxSize = 20000 // Increased cache size for better performance
 
-  set<T>(key: string, data: T, ttlMinutes: number = 10): void { // Increased default TTL
+  set<T>(key: string, data: T, ttlMinutes: number = 10): void {
+    // Increased default TTL
     // Clean up old entries if cache is getting too large
     if (this.cache.size >= this.maxSize) {
-      this.cleanup();
+      this.cleanup()
     }
 
-    const ttl = ttlMinutes * 60 * 1000; // Convert to milliseconds
+    const ttl = ttlMinutes * 60 * 1000 // Convert to milliseconds
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
       ttl,
-    });
+    })
   }
 
   get<T>(key: string): T | null {
-    const entry = this.cache.get(key);
+    const entry = this.cache.get(key)
 
     if (!entry) {
-      return null;
+      return null
     }
 
     // Check if entry has expired
     if (Date.now() - entry.timestamp > entry.ttl) {
-      this.cache.delete(key);
-      return null;
+      this.cache.delete(key)
+      return null
     }
 
-    return entry.data as T;
+    return entry.data as T
   }
 
   has(key: string): boolean {
-    const entry = this.cache.get(key);
+    const entry = this.cache.get(key)
 
     if (!entry) {
-      return false;
+      return false
     }
 
     // Check if entry has expired
     if (Date.now() - entry.timestamp > entry.ttl) {
-      this.cache.delete(key);
-      return false;
+      this.cache.delete(key)
+      return false
     }
 
-    return true;
+    return true
   }
 
   delete(key: string): void {
-    this.cache.delete(key);
+    this.cache.delete(key)
   }
 
   clear(): void {
-    this.cache.clear();
+    this.cache.clear()
   }
 
   private cleanup(): void {
-    const now = Date.now();
-    const toDelete: string[] = [];
+    const now = Date.now()
+    const toDelete: string[] = []
 
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > entry.ttl) {
-        toDelete.push(key);
+        toDelete.push(key)
       }
     }
 
-    toDelete.forEach(key => this.cache.delete(key));
+    toDelete.forEach((key) => this.cache.delete(key))
 
     // If still too large, remove oldest entries
     if (this.cache.size >= this.maxSize) {
-      const entries = Array.from(this.cache.entries());
-      entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+      const entries = Array.from(this.cache.entries())
+      entries.sort((a, b) => a[1].timestamp - b[1].timestamp)
 
-      const toRemove = entries.slice(0, entries.length - this.maxSize + 10);
-      toRemove.forEach(([key]) => this.cache.delete(key));
+      const toRemove = entries.slice(0, entries.length - this.maxSize + 10)
+      toRemove.forEach(([key]) => this.cache.delete(key))
     }
   }
 
   // Generate cache key for Drive API requests
   generateDriveKey(params: {
-    parentId?: string;
-    userId: string;
-    pageToken?: string;
-    query?: string;
+    parentId?: string
+    userId: string
+    pageToken?: string
+    query?: string
   }): string {
-    const { 
-      parentId = 'root',
-      userId,
-      pageToken = 'p1',
-      query = '',
-    } = params;
-    
+    const { parentId = 'root', userId, pageToken = 'p1', query = '' } = params
+
     // Create a more comprehensive cache key with all filter parameters
-    const keyParts = [
-      'drive',
-      userId,
-      parentId,
-      pageToken,
-      query
-    ];
-    
+    const keyParts = ['drive', userId, parentId, pageToken, query]
+
     // Join with ':' and remove empty parts to avoid unnecessary cache misses
-    return keyParts.map(part => part || 'empty').join(':');
+    return keyParts.map((part) => part || 'empty').join(':')
   }
 
   // Generate cache key for file details
   generateFileDetailsKey(fileId: string, userId: string): string {
-    return `details:${userId}:${fileId}`;
+    return `details:${userId}:${fileId}`
   }
 
   // Generate cache key for folder structure
   generateFolderStructureKey(userId: string): string {
-    return `folder-structure:${userId}`;
+    return `folder-structure:${userId}`
   }
 
   // Generate cache key for search results
   generateSearchKey(query: string, userId: string): string {
-    return `search:${userId}:${encodeURIComponent(query)}`;
+    return `search:${userId}:${encodeURIComponent(query)}`
   }
 
   // Get cache statistics for debugging
@@ -136,99 +126,102 @@ class MemoryCache {
     return {
       size: this.cache.size,
       maxSize: this.maxSize,
-      keys: Array.from(this.cache.keys())
-    };
+      keys: Array.from(this.cache.keys()),
+    }
   }
 
   setMaxSize(newMaxSize: number): void {
-    this.maxSize = newMaxSize;
+    this.maxSize = newMaxSize
     if (this.cache.size > this.maxSize) {
-      this.cleanup();
+      this.cleanup()
     }
   }
 
   // Clear all cache entries for a specific user
   clearUserCache(userId: string): void {
-    const keysToDelete: string[] = [];
-    
+    const keysToDelete: string[] = []
+
     for (const key of this.cache.keys()) {
       if (key.includes(userId)) {
-        keysToDelete.push(key);
+        keysToDelete.push(key)
       }
     }
-    
-    keysToDelete.forEach(key => this.cache.delete(key));
+
+    keysToDelete.forEach((key) => this.cache.delete(key))
   }
 
   // Clear cache entries for specific folder/context
   clearFolderCache(userId: string, folderId: string = 'root'): void {
-    const keysToDelete: string[] = [];
-    
+    const keysToDelete: string[] = []
+
     for (const key of this.cache.keys()) {
       if (key.includes(userId) && key.includes(folderId)) {
-        keysToDelete.push(key);
+        keysToDelete.push(key)
       }
     }
-    
-    keysToDelete.forEach(key => this.cache.delete(key));
+
+    keysToDelete.forEach((key) => this.cache.delete(key))
   }
 
   // Clear cache entries that match specific filter patterns
   clearFilterCache(userId: string, filterType: string): void {
-    const keysToDelete: string[] = [];
-    
+    const keysToDelete: string[] = []
+
     for (const key of this.cache.keys()) {
       if (key.includes(userId) && key.includes(filterType)) {
-        keysToDelete.push(key);
+        keysToDelete.push(key)
       }
     }
-    
-    keysToDelete.forEach(key => this.cache.delete(key));
+
+    keysToDelete.forEach((key) => this.cache.delete(key))
   }
 
   // Smart cache invalidation - clear only related entries
-  invalidateRelatedCache(userId: string, context: {
-    folderId?: string;
-    viewStatus?: string;
-    fileType?: string;
-  }): void {
-    const keysToDelete: string[] = [];
-    
+  invalidateRelatedCache(
+    userId: string,
+    context: {
+      folderId?: string
+      viewStatus?: string
+      fileType?: string
+    }
+  ): void {
+    const keysToDelete: string[] = []
+
     for (const key of this.cache.keys()) {
-      if (!key.includes(userId)) continue;
-      
-      let shouldDelete = false;
-      
+      if (!key.includes(userId)) continue
+
+      let shouldDelete = false
+
       if (context.folderId && key.includes(context.folderId)) {
-        shouldDelete = true;
+        shouldDelete = true
       }
-      
+
       if (context.viewStatus && key.includes(context.viewStatus)) {
-        shouldDelete = true;
+        shouldDelete = true
       }
-      
+
       if (context.fileType && key.includes(context.fileType)) {
-        shouldDelete = true;
+        shouldDelete = true
       }
-      
+
       if (shouldDelete) {
-        keysToDelete.push(key);
+        keysToDelete.push(key)
       }
     }
-    
-    keysToDelete.forEach(key => this.cache.delete(key));
+
+    keysToDelete.forEach((key) => this.cache.delete(key))
   }
 }
 
 // Export singleton instance
-export const driveCache = new MemoryCache();
+export const driveCache = new MemoryCache()
 
 // Add setMaxSize method to the exported instance
 if (!driveCache.setMaxSize) {
-  (driveCache as any).setMaxSize = function(newMaxSize: number) {
-    (this as any).maxSize = newMaxSize;
+  ;(driveCache as any).setMaxSize = function (newMaxSize: number) {
+    ;(this as any).maxSize = newMaxSize
     if ((this as any).cache.size > (this as any).maxSize) {
-      (this as any).cleanup();
+      ;(this as any).cleanup()
     }
-  };
+  }
 }

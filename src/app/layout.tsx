@@ -14,8 +14,9 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: "Google Drive Pro - Professional Drive Management",
-  description: "Advanced Google Drive management application with enterprise features",
+  title: 'Google Drive Pro - Professional Drive Management',
+  description:
+    'Advanced Google Drive management application with enterprise features',
   keywords: [
     'Professional Google Drive',
     'Enterprise File Management',
@@ -36,14 +37,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: 'https://professional-drive-manager.replit.app',
-    title: "Google Drive Pro",
-    description: "Professional Google Drive Management",
+    title: 'Google Drive Pro',
+    description: 'Professional Google Drive Management',
     siteName: APP_CONFIG.name,
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Google Drive Pro",
-    description: "Professional Google Drive Management",
+    title: 'Google Drive Pro',
+    description: 'Professional Google Drive Management',
   },
   icons: {
     icon: [

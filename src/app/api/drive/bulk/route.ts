@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { google } from 'googleapis'
+
+import { auth } from '@/auth'
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
 
     const { operation, fileIds, options } = await request.json()
-    
+
     const oauth2Client = new google.auth.OAuth2()
     oauth2Client.setCredentials({ access_token: session.accessToken })
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
@@ -25,7 +26,7 @@ export async function POST(request: NextRequest) {
               fileId,
               addParents: options.targetFolderId,
               removeParents: options.currentParentId || 'root',
-              fields: 'id,name,parents'
+              fields: 'id,name,parents',
             })
             results.push({ id: fileId, success: true, data: result.data })
           } catch (error: any) {
@@ -41,9 +42,9 @@ export async function POST(request: NextRequest) {
               fileId,
               requestBody: {
                 parents: [options.targetFolderId || 'root'],
-                name: options.newName || undefined
+                name: options.newName || undefined,
               },
-              fields: 'id,name,parents'
+              fields: 'id,name,parents',
             })
             results.push({ id: fileId, success: true, data: result.data })
           } catch (error: any) {
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
             await drive.files.update({
               fileId,
               requestBody: { trashed: true },
-              fields: 'id,name,trashed'
+              fields: 'id,name,trashed',
             })
             results.push({ id: fileId, success: true })
           } catch (error: any) {
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
             await drive.files.update({
               fileId,
               requestBody: { trashed: false },
-              fields: 'id,name,trashed'
+              fields: 'id,name,trashed',
             })
             results.push({ id: fileId, success: true })
           } catch (error: any) {
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
           const fileId = fileIds[i]
           try {
             let newName = options.pattern
-            
+
             // Apply rename pattern
             if (options.type === 'prefix') {
               newName = `${options.pattern}${options.originalNames[i]}`
@@ -120,7 +121,7 @@ export async function POST(request: NextRequest) {
             const result = await drive.files.update({
               fileId,
               requestBody: { name: newName },
-              fields: 'id,name'
+              fields: 'id,name',
             })
             results.push({ id: fileId, success: true, data: result.data })
           } catch (error: any) {
@@ -137,21 +138,21 @@ export async function POST(request: NextRequest) {
               fileId,
               requestBody: {
                 role: options.role || 'reader',
-                type: options.type || 'anyone'
-              }
+                type: options.type || 'anyone',
+              },
             })
 
             // Get shareable link
             const file = await drive.files.get({
               fileId,
-              fields: 'webViewLink,webContentLink'
+              fields: 'webViewLink,webContentLink',
             })
 
-            results.push({ 
-              id: fileId, 
-              success: true, 
+            results.push({
+              id: fileId,
+              success: true,
               shareLink: file.data.webViewLink,
-              downloadLink: file.data.webContentLink 
+              downloadLink: file.data.webContentLink,
             })
           } catch (error: any) {
             results.push({ id: fileId, success: false, error: error.message })
@@ -160,11 +161,14 @@ export async function POST(request: NextRequest) {
         break
 
       default:
-        return NextResponse.json({ error: 'Invalid operation' }, { status: 400 })
+        return NextResponse.json(
+          { error: 'Invalid operation' },
+          { status: 400 }
+        )
     }
 
-    const successCount = results.filter(r => r.success).length
-    const failureCount = results.filter(r => !r.success).length
+    const successCount = results.filter((r) => r.success).length
+    const failureCount = results.filter((r) => !r.success).length
 
     return NextResponse.json({
       success: true,
@@ -172,10 +176,9 @@ export async function POST(request: NextRequest) {
       summary: {
         total: fileIds.length,
         successful: successCount,
-        failed: failureCount
-      }
+        failed: failureCount,
+      },
     })
-
   } catch (error: any) {
     console.error('Bulk operation error:', error)
     return NextResponse.json(

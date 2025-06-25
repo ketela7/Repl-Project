@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { auth } from '@/auth'
 import { GoogleDriveService } from '@/lib/google-drive/service'
 
@@ -87,7 +88,6 @@ export async function POST(
             }
           }
         } catch (error: any) {
-
           if (error.code === 403) {
             return NextResponse.json(
               {
@@ -143,7 +143,6 @@ export async function POST(
             message: 'Permission added successfully',
           }
         } catch (error: any) {
-
           if (error.code === 403) {
             return NextResponse.json(
               {
@@ -181,7 +180,6 @@ export async function POST(
             message: 'Permission removed successfully',
           }
         } catch (error: any) {
-
           if (error.code === 403) {
             return NextResponse.json(
               {
@@ -269,7 +267,6 @@ export async function GET(
         },
       })
     } catch (error: any) {
-
       if (error.code === 403) {
         return NextResponse.json(
           {

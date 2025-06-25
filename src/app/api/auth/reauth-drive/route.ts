@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth, signOut } from '@/auth'
+
+import { auth } from '@/auth'
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,7 +12,6 @@ export async function GET(request: NextRequest) {
 
     // Simple approach: Sign out current session and redirect to login
     // This will force a new OAuth flow with consent prompt
-
 
     // Sign out and redirect to login with a special parameter
     const loginUrl = new URL('/auth/v1/login', request.url)

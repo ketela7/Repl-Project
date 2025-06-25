@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { auth } from '@/auth'
 import { GoogleDriveService } from '@/lib/google-drive/service'
 
@@ -12,7 +13,6 @@ export async function POST(
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
 
     const accessToken = session.accessToken
 
@@ -37,8 +37,6 @@ export async function POST(
       )
     }
 
-
-
     const driveService = new GoogleDriveService(accessToken)
     const copiedFile = await driveService.copyFile(fileId, {
       name,
@@ -47,7 +45,6 @@ export async function POST(
 
     return NextResponse.json(copiedFile)
   } catch (error) {
-
     if (error instanceof Error) {
       // Handle Google API specific errors
       if (

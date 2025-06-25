@@ -1,27 +1,28 @@
-"use client";
+'use client'
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/shared/components/ui/button';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import React, { Component, ErrorInfo, ReactNode } from 'react'
+import { AlertTriangle, RefreshCw } from 'lucide-react'
+
+import { Button } from '@/shared/components/ui/button'
 
 interface Props {
-  children: ReactNode;
-  fallback?: ReactNode;
+  children: ReactNode
+  fallback?: ReactNode
 }
 
 interface State {
-  hasError: boolean;
-  error?: Error;
+  hasError: boolean
+  error?: Error
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props);
-    this.state = { hasError: false };
+    super(props)
+    this.state = { hasError: false }
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
@@ -33,16 +34,16 @@ export class ErrorBoundary extends Component<Props, State> {
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback;
+        return this.props.fallback
       }
 
       return (
-        <div className="flex flex-col items-center justify-center min-h-[200px] p-6 border border-red-200 rounded-lg bg-red-50 dark:bg-red-950 dark:border-red-800">
-          <AlertTriangle className="h-12 w-12 text-red-500 mb-4" />
-          <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+        <div className="flex min-h-[200px] flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-6 dark:border-red-800 dark:bg-red-950">
+          <AlertTriangle className="mb-4 h-12 w-12 text-red-500" />
+          <h2 className="mb-2 text-lg font-semibold text-red-800 dark:text-red-200">
             Something went wrong
           </h2>
-          <p className="text-sm text-red-600 dark:text-red-300 mb-4 text-center">
+          <p className="mb-4 text-center text-sm text-red-600 dark:text-red-300">
             An unexpected error occurred. Please try refreshing the page.
           </p>
           <Button
@@ -50,14 +51,14 @@ export class ErrorBoundary extends Component<Props, State> {
             variant="outline"
             className="border-red-300 text-red-700 hover:bg-red-100 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900"
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
+            <RefreshCw className="mr-2 h-4 w-4" />
             Refresh Page
           </Button>
         </div>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 

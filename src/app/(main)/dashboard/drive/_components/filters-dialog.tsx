@@ -1,36 +1,6 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetDescription,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { SimpleDatePicker } from '@/components/ui/simple-date-picker'
-import { useIsMobile } from '@/shared/hooks/use-mobile'
 import {
   Archive,
   Calendar,
@@ -54,6 +24,36 @@ import {
   Video,
   X,
 } from 'lucide-react'
+
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { Separator } from '@/components/ui/separator'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { SimpleDatePicker } from '@/components/ui/simple-date-picker'
+import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { cn } from '@/shared/utils'
 
 interface AdvancedFilters {
@@ -263,8 +263,6 @@ export function FiltersDialog({
     setTempAdvancedFilters(newFilters)
     // Don't apply immediately - wait for Apply Filter button
   }
-
-
 
   const handleClearAll = () => {
     setTempActiveView('all')
@@ -676,13 +674,9 @@ export function FiltersDialog({
                   }
                 />
               </div>
-
-
             </div>
           )}
         </div>
-
-
       </div>
     </>
   )
@@ -699,9 +693,7 @@ export function FiltersDialog({
                     <Filter className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                   </div>
                   <div>
-                    <div className="text-lg font-semibold">
-                      Filters
-                    </div>
+                    <div className="text-lg font-semibold">Filters</div>
                     <div className="text-muted-foreground text-sm font-normal">
                       {hasActiveFilters && (
                         <Badge variant="secondary" className="mr-1 text-xs">
@@ -737,7 +729,7 @@ export function FiltersDialog({
                   activeView: tempActiveView,
                   fileTypeFilter: tempFileTypeFilter,
                   advancedFilters: tempAdvancedFilters,
-                  timestamp: new Date().toISOString()
+                  timestamp: new Date().toISOString(),
                 })
                 onFilterChange({
                   activeView: tempActiveView,
@@ -806,14 +798,12 @@ export function FiltersDialog({
             {renderContent()}
           </DialogDescription>
         </DialogHeader>
-        
 
         <DialogFooter className="flex justify-between">
           <Button
             variant="outline"
             disabled={isApplying}
             onClick={() => {
-              
               onFilterChange({
                 activeView: tempActiveView,
                 fileTypeFilter: tempFileTypeFilter,

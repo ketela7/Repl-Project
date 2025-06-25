@@ -1,11 +1,9 @@
 // Re-export from cn.ts for compatibility
-export { cn } from './cn';
+export { cn } from './cn'
 
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
 
 export const getInitials = (str: string): string => {
-  if (typeof str !== "string" || !str.trim()) return "?";
+  if (typeof str !== 'string' || !str.trim()) return '?'
 
   return (
     str
@@ -13,13 +11,13 @@ export const getInitials = (str: string): string => {
       .split(/\s+/)
       .filter(Boolean)
       .map((word) => word[0])
-      .join("")
-      .toUpperCase() || "?"
-  );
-};
+      .join('')
+      .toUpperCase() || '?'
+  )
+}
 
 // Toast utilities
-export * from './toast';
+export * from './toast'
 
 // Timezone utilities
-export * from './timezone';
+export * from './timezone'

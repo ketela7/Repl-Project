@@ -19,7 +19,6 @@ import {
   MapPin,
   Globe,
   Link,
-  ExternalLink,
   FileType,
   FileAudio,
   Package,
@@ -33,6 +32,7 @@ import {
   Printer,
   HardDrive,
 } from 'lucide-react'
+
 import { getFileIconProps } from '@/lib/google-drive/utils'
 
 interface FileIconProps {

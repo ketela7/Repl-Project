@@ -1,6 +1,13 @@
-"use client"
+'use client'
 
-import { BarChart3, FileText, FolderOpen, Settings, Share2, Trash2 } from "lucide-react"
+import {
+  BarChart3,
+  FileText,
+  FolderOpen,
+  Settings,
+  Share2,
+  Trash2,
+} from 'lucide-react'
 
 export interface SidebarItem {
   title: string
@@ -12,33 +19,33 @@ export interface SidebarItem {
 
 export const sidebarItems: SidebarItem[] = [
   {
-    title: "Drive Manager",
-    url: "/dashboard/drive",
+    title: 'Drive Manager',
+    url: '/dashboard/drive',
     icon: FolderOpen,
   },
   {
-    title: "Analytics",
-    url: "/dashboard/analytics",
+    title: 'Analytics',
+    url: '/dashboard/analytics',
     icon: BarChart3,
   },
   {
-    title: "Shared Files",
-    url: "/dashboard/shared",
+    title: 'Shared Files',
+    url: '/dashboard/shared',
     icon: Share2,
   },
   {
-    title: "Trash",
-    url: "/dashboard/trash",
+    title: 'Trash',
+    url: '/dashboard/trash',
     icon: Trash2,
   },
   {
-    title: "Reports",
-    url: "/dashboard/reports",
+    title: 'Reports',
+    url: '/dashboard/reports',
     icon: FileText,
   },
   {
-    title: "Settings",
-    url: "/dashboard/settings",
+    title: 'Settings',
+    url: '/dashboard/settings',
     icon: Settings,
   },
 ]

@@ -1,7 +1,9 @@
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { signIn } from 'next-auth/react'
-import { GoogleAuthButton } from '../google-auth-button'
+
 import { render } from '@/__tests__/test-utils'
+
+import { GoogleAuthButton } from '../google-auth-button'
 
 // Mock next-auth
 jest.mock('next-auth/react')

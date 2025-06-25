@@ -31,5 +31,5 @@ export {
   Video,
   Music,
   Archive,
-  Code
-} from "lucide-react";
+  Code,
+} from 'lucide-react'

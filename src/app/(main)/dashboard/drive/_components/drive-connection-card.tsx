@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { HardDrive, Shield, Upload, Search, Folder } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -9,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { HardDrive, Shield, Upload, Search, Folder } from 'lucide-react'
 
 export function DriveConnectionCard() {
   const [connecting, setConnecting] = useState(false)

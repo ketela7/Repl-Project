@@ -1,4 +1,12 @@
-import { pgTable, serial, text, timestamp, boolean, varchar, jsonb, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  boolean,
+  varchar,
+  integer,
+} from 'drizzle-orm/pg-core'
 
 // Users table
 export const users = pgTable('users', {
@@ -10,7 +18,7 @@ export const users = pgTable('users', {
   isActive: boolean('is_active').default(true),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
-});
+})
 
 // Unused schema definitions removed
 
@@ -27,10 +35,10 @@ export const bulkOperations = pgTable('bulk_operations', {
   startedAt: timestamp('started_at').defaultNow(),
   completedAt: timestamp('completed_at'),
   createdAt: timestamp('created_at').defaultNow(),
-});
+})
 
-export type User = typeof users.$inferSelect;
-export type NewUser = typeof users.$inferInsert;
+export type User = typeof users.$inferSelect
+export type NewUser = typeof users.$inferInsert
 // Note: UserSession and ActivityLog types removed as tables were unused
-export type BulkOperation = typeof bulkOperations.$inferSelect;
-export type NewBulkOperation = typeof bulkOperations.$inferInsert;
+export type BulkOperation = typeof bulkOperations.$inferSelect
+export type NewBulkOperation = typeof bulkOperations.$inferInsert

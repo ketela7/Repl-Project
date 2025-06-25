@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { GoogleDriveService } from '@/lib/google-drive/service'
 import { auth } from '@/auth'
 
@@ -7,7 +8,6 @@ export async function GET(
   { params }: { params: Promise<{ fileId: string }> }
 ) {
   try {
-
     const session = await auth()
 
     if (!session?.user) {
@@ -16,7 +16,6 @@ export async function GET(
         { status: 401 }
       )
     }
-
 
     // Get the access token from session
     const accessToken = session.accessToken
@@ -36,10 +35,8 @@ export async function GET(
     const driveService = new GoogleDriveService(accessToken)
     const file = await driveService.getFile(fileId)
 
-
     return NextResponse.json(file)
   } catch (error) {
-
     if (error instanceof Error) {
       // Handle Google API specific errors
       if (
@@ -118,7 +115,6 @@ export async function PUT(
 
     return NextResponse.json(result)
   } catch (error) {
-
     if (error instanceof Error) {
       // Handle Google API specific errors
       if (
@@ -205,7 +201,6 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-
     if (error instanceof Error) {
       // Handle Google API specific errors
       if (

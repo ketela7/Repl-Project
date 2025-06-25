@@ -1,5 +1,7 @@
 'use client'
 
+import { Trash2 } from 'lucide-react'
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,7 +22,6 @@ import {
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { Trash2 } from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 interface FileDeleteDialogProps {

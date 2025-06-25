@@ -28,7 +28,7 @@ class APIThrottle {
         resolve,
         reject,
         requestFn,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
 
       this.queue.push(queueItem)
@@ -45,7 +45,7 @@ class APIThrottle {
 
     while (this.queue.length > 0) {
       const queueItem = this.queue.shift()!
-      
+
       // Calculate delay needed to respect rate limit
       const now = Date.now()
       const timeSinceLastRequest = now - this.lastRequestTime
@@ -68,17 +68,21 @@ class APIThrottle {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
   /**
    * Get current queue status for monitoring
    */
-  getQueueStatus(): { queueLength: number; processing: boolean; lastRequestTime: number } {
+  getQueueStatus(): {
+    queueLength: number
+    processing: boolean
+    lastRequestTime: number
+  } {
     return {
       queueLength: this.queue.length,
       processing: this.processing,
-      lastRequestTime: this.lastRequestTime
+      lastRequestTime: this.lastRequestTime,
     }
   }
 
@@ -86,7 +90,7 @@ class APIThrottle {
    * Clear the queue (emergency use)
    */
   clearQueue(): void {
-    this.queue.forEach(item => {
+    this.queue.forEach((item) => {
       item.reject(new Error('Queue cleared'))
     })
     this.queue = []
@@ -99,6 +103,8 @@ export const apiThrottle = new APIThrottle()
 /**
  * Convenience wrapper for Google Drive API calls
  */
-export async function throttledDriveRequest<T>(requestFn: () => Promise<T>): Promise<T> {
+export async function throttledDriveRequest<T>(
+  requestFn: () => Promise<T>
+): Promise<T> {
   return apiThrottle.throttleRequest(requestFn)
 }

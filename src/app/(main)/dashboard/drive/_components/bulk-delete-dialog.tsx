@@ -1,11 +1,12 @@
 'use client'
 
+import { Trash2 } from 'lucide-react'
+
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -15,13 +16,11 @@ import {
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
-  BottomSheetDescription,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { Trash2 } from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 interface BulkDeleteDialogProps {
@@ -50,7 +49,7 @@ function BulkDeleteDialog({
   const renderContent = () => (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30">
             <Trash2 className="h-8 w-8 text-yellow-600 dark:text-yellow-400" />
@@ -58,8 +57,9 @@ function BulkDeleteDialog({
         </div>
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Move to Trash</h3>
-          <p className="text-sm text-muted-foreground">
-            Are you sure you want to move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} to trash?
+          <p className="text-muted-foreground text-sm">
+            Are you sure you want to move {selectedItems.length} item
+            {selectedItems.length > 1 ? 's' : ''} to trash?
           </p>
         </div>
       </div>
@@ -67,12 +67,18 @@ function BulkDeleteDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+          >
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+          <Badge
+            variant="secondary"
+            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
+          >
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
@@ -80,20 +86,25 @@ function BulkDeleteDialog({
 
       {/* Items Preview */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-center">Items to be moved to trash:</h4>
-        <div className="max-h-48 overflow-y-auto rounded-lg border bg-muted/50 p-4">
+        <h4 className="text-center text-sm font-medium">
+          Items to be moved to trash:
+        </h4>
+        <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
           <div className="space-y-2">
             {selectedItems.slice(0, 5).map((item) => (
-              <div key={item.id} className="flex items-center gap-3 p-2 rounded-md bg-background/50">
+              <div
+                key={item.id}
+                className="bg-background/50 flex items-center gap-3 rounded-md p-2"
+              >
                 <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                <span className="text-sm truncate flex-1">{item.name}</span>
+                <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
                   {item.type}
                 </Badge>
               </div>
             ))}
             {selectedItems.length > 5 && (
-              <div className="text-center text-sm text-muted-foreground py-2">
+              <div className="text-muted-foreground py-2 text-center text-sm">
                 ... and {selectedItems.length - 5} more items
               </div>
             )}
@@ -107,7 +118,8 @@ function BulkDeleteDialog({
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
         <div className="text-sm text-amber-800 dark:text-amber-200">
-          These items will be moved to your Google Drive trash and can be restored later.
+          These items will be moved to your Google Drive trash and can be
+          restored later.
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { auth } from '@/auth'
 import { GoogleDriveService } from '@/lib/google-drive/service'
 
@@ -67,7 +68,6 @@ export async function GET(
       },
     })
   } catch (error) {
-
     if (error instanceof Error) {
       if (
         error.message.includes('Invalid Credentials') ||

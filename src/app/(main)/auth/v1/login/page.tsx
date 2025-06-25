@@ -1,8 +1,8 @@
 'use client'
 
-import Link from 'next/link'
 import { Command } from 'lucide-react'
 import { Suspense } from 'react'
+
 import { NextAuthForm } from './_components/nextauth-form'
 import { SearchParamsHandler } from './_components/search-params-handler'
 

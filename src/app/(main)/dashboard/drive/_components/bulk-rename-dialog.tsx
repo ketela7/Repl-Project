@@ -2,9 +2,16 @@
 
 import { useState } from 'react'
 import {
+  Edit3,
+  Hash,
+  Calendar,
+  AlignLeft,
+  Code2,
+} from 'lucide-react'
+
+import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -14,7 +21,6 @@ import {
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
-  BottomSheetDescription,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
@@ -23,16 +29,6 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import {
-  Edit3,
-  Hash,
-  Calendar,
-  AlignLeft,
-  AlertTriangle,
-  Info,
-  Code2,
-  HelpCircle,
-} from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 interface BulkRenameDialogProps {
@@ -125,7 +121,7 @@ function BulkRenameDialog({
   const renderContent = () => (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30">
             <Edit3 className="h-8 w-8 text-orange-600 dark:text-orange-400" />
@@ -133,8 +129,9 @@ function BulkRenameDialog({
         </div>
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Bulk Rename</h3>
-          <p className="text-sm text-muted-foreground">
-            Rename {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} using a consistent pattern
+          <p className="text-muted-foreground text-sm">
+            Rename {selectedItems.length} item
+            {selectedItems.length > 1 ? 's' : ''} using a consistent pattern
           </p>
         </div>
       </div>
@@ -142,7 +139,8 @@ function BulkRenameDialog({
       {/* File Count Badge */}
       <div className="text-center">
         <Badge variant="secondary" className="px-3 py-1">
-          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}{' '}
+          selected
         </Badge>
       </div>
 
@@ -158,11 +156,7 @@ function BulkRenameDialog({
             const IconComponent = type.icon
             return (
               <div key={type.id} className="flex items-start space-x-3">
-                <RadioGroupItem
-                  value={type.id}
-                  id={type.id}
-                  className="mt-1"
-                />
+                <RadioGroupItem value={type.id} id={type.id} className="mt-1" />
                 <Label
                   htmlFor={type.id}
                   className="flex-1 cursor-pointer space-y-1"
@@ -171,10 +165,10 @@ function BulkRenameDialog({
                     <IconComponent className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                     <span className="font-medium">{type.name}</span>
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-muted-foreground text-sm">
                     {type.description}
                   </div>
-                  <div className="text-xs text-muted-foreground font-mono bg-muted rounded px-2 py-1">
+                  <div className="text-muted-foreground bg-muted rounded px-2 py-1 font-mono text-xs">
                     Example: {type.example}
                   </div>
                 </Label>
@@ -188,11 +182,15 @@ function BulkRenameDialog({
       {selectedRenameType && selectedRenameType.id !== 'timestamp' && (
         <div className="space-y-3">
           <Label className="text-sm font-medium">
-            {selectedRenameType.id === 'regex' ? 'Regular Expression' : 'Pattern'}
+            {selectedRenameType.id === 'regex'
+              ? 'Regular Expression'
+              : 'Pattern'}
           </Label>
           <Input
             type="text"
-            value={selectedRenameType.id === 'regex' ? regexPattern : renamePattern}
+            value={
+              selectedRenameType.id === 'regex' ? regexPattern : renamePattern
+            }
             onChange={(e) =>
               selectedRenameType.id === 'regex'
                 ? setRegexPattern(e.target.value)
@@ -202,13 +200,14 @@ function BulkRenameDialog({
             className={selectedRenameType.id === 'regex' ? 'font-mono' : ''}
           />
           {selectedRenameType.id === 'replace' && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-muted-foreground text-xs">
               Format: old_text|new_text (use | to separate old and new text)
             </div>
           )}
           {selectedRenameType.id === 'regex' && (
-            <div className="text-xs text-muted-foreground">
-              Advanced users only. Use JavaScript regex syntax: /pattern/replacement/flags
+            <div className="text-muted-foreground text-xs">
+              Advanced users only. Use JavaScript regex syntax:
+              /pattern/replacement/flags
             </div>
           )}
         </div>
@@ -218,7 +217,9 @@ function BulkRenameDialog({
       {selectedItems.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">Preview (first 3 items)</Label>
+            <Label className="text-sm font-medium">
+              Preview (first 3 items)
+            </Label>
             <Button
               variant="ghost"
               size="sm"
@@ -238,13 +239,14 @@ function BulkRenameDialog({
                   >
                     <div className="space-y-1">
                       <div className="text-muted-foreground">
-                        <span className="font-medium">Original:</span> {item.name}
+                        <span className="font-medium">Original:</span>{' '}
+                        {item.name}
                       </div>
                       <div className="text-foreground">
                         <span className="font-medium text-orange-600 dark:text-orange-400">
                           New:
                         </span>{' '}
-                        <span className="font-mono bg-orange-50 dark:bg-orange-950/20 px-1 rounded">
+                        <span className="rounded bg-orange-50 px-1 font-mono dark:bg-orange-950/20">
                           {item.name} {/* Preview logic would go here */}
                         </span>
                       </div>

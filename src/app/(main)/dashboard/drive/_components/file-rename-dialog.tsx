@@ -1,6 +1,9 @@
 'use client'
 
 import React, { useState } from 'react'
+import { toast } from 'sonner'
+import { Edit } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -13,7 +16,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { toast } from 'sonner'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -22,7 +24,6 @@ import {
   BottomSheetDescription,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import { Edit } from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 interface FileRenameDialogProps {

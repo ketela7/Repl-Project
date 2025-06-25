@@ -4,8 +4,7 @@
  */
 
 // Configuration
-export { config } from './config/environment';
-
+export { config } from './config/environment'
 
 // This module will contain:
 // - Configuration management

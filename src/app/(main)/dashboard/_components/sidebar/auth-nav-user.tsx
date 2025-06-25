@@ -7,6 +7,8 @@ import {
   MessageSquareDot,
   LogOut,
 } from 'lucide-react'
+import { useSession, signOut } from 'next-auth/react'
+import { toast } from 'sonner'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -24,8 +26,6 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { useSession, signOut } from 'next-auth/react'
-import { toast } from 'sonner'
 
 export function AuthNavUser() {
   const { data: session, status } = useSession()

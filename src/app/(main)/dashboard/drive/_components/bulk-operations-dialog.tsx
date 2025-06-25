@@ -1,6 +1,17 @@
 'use client'
 
 import {
+  Trash2,
+  Download,
+  Share2,
+  RotateCcw,
+  Copy,
+  Edit,
+  FolderOpen,
+} from 'lucide-react'
+import { useState } from 'react'
+
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -15,27 +26,9 @@ import {
   BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import {
-  Trash2,
-  Download,
-  Share,
-  Share2,
-  RotateCcw,
-  Folder,
-  File,
-  FileText,
-  FilePlus,
-  Move,
-  Copy,
-  Edit,
-  FolderOpen,
-  FileDown,
-  FileOutput,
-} from 'lucide-react'
-import { cn } from '@/shared/utils'
-import { useState } from 'react'
+
+
 import { BulkMoveDialog } from './bulk-move-dialog'
 import { BulkCopyDialog } from './bulk-copy-dialog'
 import { BulkDeleteDialog } from './bulk-delete-dialog'
@@ -86,14 +79,15 @@ function BulkOperationsDialog({
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
-  const [isPermanentDeleteDialogOpen, setIsPermanentDeleteDialogOpen] = useState(false)
+  const [isPermanentDeleteDialogOpen, setIsPermanentDeleteDialogOpen] =
+    useState(false)
   const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
 
   // Determine dialog open state
   const dialogOpen = open ?? isOpen ?? false
-  const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
-  
-
+  const handleClose = onOpenChange
+    ? () => onOpenChange(false)
+    : onClose || (() => {})
 
   // Individual dialog handlers
   const handleMoveClick = () => {
@@ -148,11 +142,11 @@ function BulkOperationsDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           operation: 'move',
-          fileIds: selectedItems.map(item => item.id),
-          options: { targetFolderId }
-        })
+          fileIds: selectedItems.map((item) => item.id),
+          options: { targetFolderId },
+        }),
       })
-      
+
       if (response.ok) {
         const result = await response.json()
         console.log('Move completed:', result.summary)
@@ -171,11 +165,13 @@ function BulkOperationsDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           operation: 'copy',
-          fileIds: selectedItems.filter(item => item.type === 'file').map(item => item.id),
-          options: { targetFolderId }
-        })
+          fileIds: selectedItems
+            .filter((item) => item.type === 'file')
+            .map((item) => item.id),
+          options: { targetFolderId },
+        }),
       })
-      
+
       if (response.ok) {
         const result = await response.json()
         console.log('Copy completed:', result.summary)
@@ -194,11 +190,11 @@ function BulkOperationsDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           operation: 'delete',
-          fileIds: selectedItems.map(item => item.id),
-          options: {}
-        })
+          fileIds: selectedItems.map((item) => item.id),
+          options: {},
+        }),
       })
-      
+
       if (response.ok) {
         const result = await response.json()
         console.log('Delete completed:', result.summary)
@@ -217,11 +213,11 @@ function BulkOperationsDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           operation: 'share',
-          fileIds: selectedItems.map(item => item.id),
-          options: shareOptions
-        })
+          fileIds: selectedItems.map((item) => item.id),
+          options: shareOptions,
+        }),
       })
-      
+
       if (response.ok) {
         const result = await response.json()
         console.log('Share completed:', result.summary)
@@ -244,15 +240,15 @@ function BulkOperationsDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           operation: 'rename',
-          fileIds: selectedItems.map(item => item.id),
-          options: { 
-            pattern, 
+          fileIds: selectedItems.map((item) => item.id),
+          options: {
+            pattern,
             type,
-            originalNames: selectedItems.map(item => item.name)
-          }
-        })
+            originalNames: selectedItems.map((item) => item.name),
+          },
+        }),
       })
-      
+
       if (response.ok) {
         const result = await response.json()
         console.log('Rename completed:', result.summary)
@@ -266,14 +262,14 @@ function BulkOperationsDialog({
 
   const handleExportComplete = async () => {
     try {
-      for (const item of selectedItems.filter(item => item.type === 'file')) {
+      for (const item of selectedItems.filter((item) => item.type === 'file')) {
         const link = document.createElement('a')
         link.href = `/api/drive/download/${item.id}`
         link.download = item.name
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        await new Promise(resolve => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 500))
       }
     } catch (error) {
       console.error('Export failed:', error)
@@ -289,11 +285,11 @@ function BulkOperationsDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           operation: 'permanently_delete',
-          fileIds: selectedItems.map(item => item.id),
-          options: {}
-        })
+          fileIds: selectedItems.map((item) => item.id),
+          options: {},
+        }),
       })
-      
+
       if (response.ok) {
         const result = await response.json()
         console.log('Permanent delete completed:', result.summary)
@@ -312,11 +308,11 @@ function BulkOperationsDialog({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           operation: 'restore',
-          fileIds: selectedItems.map(item => item.id),
-          options: {}
-        })
+          fileIds: selectedItems.map((item) => item.id),
+          options: {},
+        }),
       })
-      
+
       if (response.ok) {
         const result = await response.json()
         console.log('Restore completed:', result.summary)
@@ -335,15 +331,16 @@ function BulkOperationsDialog({
         <Button
           variant="outline"
           onClick={handleMoveClick}
-          className="w-full justify-start gap-3 h-12 text-left hover:bg-blue-50 hover:border-blue-200 dark:hover:bg-blue-950/30"
+          className="h-12 w-full justify-start gap-3 text-left hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/30"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
             <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="flex flex-col items-start">
             <span className="font-medium">Move Items</span>
-            <span className="text-xs text-muted-foreground">
-              Move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} to another location
+            <span className="text-muted-foreground text-xs">
+              Move {selectedItems.length} item
+              {selectedItems.length > 1 ? 's' : ''} to another location
             </span>
           </div>
         </Button>
@@ -352,14 +349,14 @@ function BulkOperationsDialog({
         <Button
           variant="outline"
           onClick={handleCopyClick}
-          className="w-full justify-start gap-3 h-12 text-left hover:bg-green-50 hover:border-green-200 dark:hover:bg-green-950/30"
+          className="h-12 w-full justify-start gap-3 text-left hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-950/30"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
             <Copy className="h-4 w-4 text-green-600 dark:text-green-400" />
           </div>
           <div className="flex flex-col items-start">
             <span className="font-medium">Copy Items</span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-muted-foreground text-xs">
               Create copies in another location
             </span>
           </div>
@@ -369,14 +366,14 @@ function BulkOperationsDialog({
         <Button
           variant="outline"
           onClick={handleShareClick}
-          className="w-full justify-start gap-3 h-12 text-left hover:bg-purple-50 hover:border-purple-200 dark:hover:bg-purple-950/30"
+          className="h-12 w-full justify-start gap-3 text-left hover:border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-950/30"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
             <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
           </div>
           <div className="flex flex-col items-start">
             <span className="font-medium">Share Items</span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-muted-foreground text-xs">
               Generate shareable links for selected items
             </span>
           </div>
@@ -386,14 +383,14 @@ function BulkOperationsDialog({
         <Button
           variant="outline"
           onClick={handleRenameClick}
-          className="w-full justify-start gap-3 h-12 text-left hover:bg-orange-50 hover:border-orange-200 dark:hover:bg-orange-950/30"
+          className="h-12 w-full justify-start gap-3 text-left hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-950/30"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/50">
             <Edit className="h-4 w-4 text-orange-600 dark:text-orange-400" />
           </div>
           <div className="flex flex-col items-start">
             <span className="font-medium">Bulk Rename</span>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-muted-foreground text-xs">
               Rename multiple items with patterns
             </span>
           </div>
@@ -403,36 +400,39 @@ function BulkOperationsDialog({
           <Button
             variant="outline"
             onClick={handleExportClick}
-            className="w-full justify-start gap-3 h-12 text-left hover:bg-indigo-50 hover:border-indigo-200 dark:hover:bg-indigo-950/30"
+            className="h-12 w-full justify-start gap-3 text-left hover:border-indigo-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/30"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
               <Download className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div className="flex flex-col items-start">
               <span className="font-medium">Export Files</span>
-              <span className="text-xs text-muted-foreground">
-                Download {fileCount} file{fileCount > 1 ? 's' : ''} in various formats
+              <span className="text-muted-foreground text-xs">
+                Download {fileCount} file{fileCount > 1 ? 's' : ''} in various
+                formats
               </span>
             </div>
           </Button>
         )}
 
         {/* Separator for destructive actions */}
-        <div className="border-t pt-3 mt-3">
-          <p className="text-xs text-muted-foreground mb-3 font-medium">Destructive Actions</p>
-          
+        <div className="mt-3 border-t pt-3">
+          <p className="text-muted-foreground mb-3 text-xs font-medium">
+            Destructive Actions
+          </p>
+
           {/* Move to Trash */}
           <Button
             variant="outline"
             onClick={handleDeleteClick}
-            className="w-full justify-start gap-3 h-12 text-left hover:bg-yellow-50 hover:border-yellow-200 dark:hover:bg-yellow-950/30 mb-3"
+            className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
               <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
             </div>
             <div className="flex flex-col items-start">
               <span className="font-medium">Move to Trash</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 Move items to trash (can be restored)
               </span>
             </div>
@@ -442,14 +442,14 @@ function BulkOperationsDialog({
           <Button
             variant="outline"
             onClick={handlePermanentDeleteClick}
-            className="w-full justify-start gap-3 h-12 text-left hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-950/30 mb-3"
+            className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
               <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
             </div>
             <div className="flex flex-col items-start">
               <span className="font-medium">Permanent Delete</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 Delete permanently (cannot be undone)
               </span>
             </div>
@@ -459,14 +459,14 @@ function BulkOperationsDialog({
           <Button
             variant="outline"
             onClick={handleRestoreClick}
-            className="w-full justify-start gap-3 h-12 text-left hover:bg-emerald-50 hover:border-emerald-200 dark:hover:bg-emerald-950/30"
+            className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
               <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="flex flex-col items-start">
               <span className="font-medium">Restore from Trash</span>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-muted-foreground text-xs">
                 Restore deleted items to original location
               </span>
             </div>
@@ -483,24 +483,38 @@ function BulkOperationsDialog({
         <BottomSheet open={dialogOpen} onOpenChange={onOpenChange || onClose}>
           <BottomSheetContent>
             <BottomSheetHeader>
-              <BottomSheetTitle className="text-lg font-semibold">Bulk Operations</BottomSheetTitle>
-              <BottomSheetDescription className="text-sm text-muted-foreground">
-                Choose an action for {selectedItems.length} selected item{selectedItems.length > 1 ? 's' : ''} ({fileCount} file{fileCount !== 1 ? 's' : ''}, {folderCount} folder{folderCount !== 1 ? 's' : ''})
+              <BottomSheetTitle className="text-lg font-semibold">
+                Bulk Operations
+              </BottomSheetTitle>
+              <BottomSheetDescription className="text-muted-foreground text-sm">
+                Choose an action for {selectedItems.length} selected item
+                {selectedItems.length > 1 ? 's' : ''} ({fileCount} file
+                {fileCount !== 1 ? 's' : ''}, {folderCount} folder
+                {folderCount !== 1 ? 's' : ''})
               </BottomSheetDescription>
             </BottomSheetHeader>
-            <div className="px-4 pb-6 max-h-[60vh] overflow-y-auto">{renderContent()}</div>
+            <div className="max-h-[60vh] overflow-y-auto px-4 pb-6">
+              {renderContent()}
+            </div>
           </BottomSheetContent>
         </BottomSheet>
       ) : (
         <Dialog open={dialogOpen} onOpenChange={onOpenChange || onClose}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-lg font-semibold">Bulk Operations</DialogTitle>
-              <DialogDescription className="text-sm text-muted-foreground">
-                Choose an action for {selectedItems.length} selected item{selectedItems.length > 1 ? 's' : ''} ({fileCount} file{fileCount !== 1 ? 's' : ''}, {folderCount} folder{folderCount !== 1 ? 's' : ''})
+              <DialogTitle className="text-lg font-semibold">
+                Bulk Operations
+              </DialogTitle>
+              <DialogDescription className="text-muted-foreground text-sm">
+                Choose an action for {selectedItems.length} selected item
+                {selectedItems.length > 1 ? 's' : ''} ({fileCount} file
+                {fileCount !== 1 ? 's' : ''}, {folderCount} folder
+                {folderCount !== 1 ? 's' : ''})
               </DialogDescription>
             </DialogHeader>
-            <div className="py-2 max-h-[70vh] overflow-y-auto">{renderContent()}</div>
+            <div className="max-h-[70vh] overflow-y-auto py-2">
+              {renderContent()}
+            </div>
           </DialogContent>
         </Dialog>
       )}
@@ -530,7 +544,7 @@ function BulkOperationsDialog({
       <BulkShareDialog
         open={isShareDialogOpen}
         onOpenChange={() => setIsShareDialogOpen(false)}
-        onShare={handleShareComplete}
+        onConfirm={handleShareComplete}
         selectedItems={selectedItems}
       />
 

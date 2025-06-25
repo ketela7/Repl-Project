@@ -1,6 +1,16 @@
 'use client'
 
 import { useState } from 'react'
+import {
+  Share2,
+  Globe,
+  Users,
+  Lock,
+  Eye,
+  Edit,
+} from 'lucide-react'
+import { toast } from 'sonner'
+
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -16,7 +26,6 @@ import {
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
-  BottomSheetDescription,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
 import {
@@ -26,34 +35,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import { Label } from '@/components/ui/label'
-import { Separator } from '@/components/ui/separator'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import {
-  Share2,
-  Globe,
-  Users,
-  Lock,
-  Eye,
-  Edit,
-  FileText,
-  Folder,
-  Copy,
-  CheckCircle,
-  XCircle,
-  ExternalLink,
-  Download,
-  ChevronDown,
-} from 'lucide-react'
-import { FileIcon } from '@/components/file-icon'
-import { cn } from '@/shared/utils'
-import { toast } from 'sonner'
 
 interface BulkShareDialogProps {
   open: boolean
@@ -81,8 +64,12 @@ function BulkShareDialog({
   onConfirm,
   selectedItems,
 }: BulkShareDialogProps) {
-  const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
-  const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>('anyoneWithLink')
+  const [accessLevel, setAccessLevel] = useState<
+    'reader' | 'writer' | 'commenter'
+  >('reader')
+  const [linkAccess, setLinkAccess] = useState<
+    'anyone' | 'anyoneWithLink' | 'domain'
+  >('anyoneWithLink')
   const [isLoading, setIsLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [shareResults, setShareResults] = useState<ShareResult[]>([])
@@ -113,7 +100,7 @@ function BulkShareDialog({
       .filter((r) => r.success && r.shareLink)
       .map((r) => `${r.name}: ${r.shareLink}`)
       .join('\n')
-    
+
     try {
       await navigator.clipboard.writeText(links)
       toast.success('Share links copied to clipboard')
@@ -126,7 +113,7 @@ function BulkShareDialog({
     const content = shareResults
       .map((r) => `${r.name}: ${r.success ? r.shareLink : 'Failed'}`)
       .join('\n')
-    
+
     const blob = new Blob([content], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -139,9 +126,12 @@ function BulkShareDialog({
   const exportToCsv = () => {
     const headers = 'Name,Share Link,Status\n'
     const content = shareResults
-      .map((r) => `"${r.name}","${r.shareLink || ''}","${r.success ? 'Success' : 'Failed'}"`)
+      .map(
+        (r) =>
+          `"${r.name}","${r.shareLink || ''}","${r.success ? 'Success' : 'Failed'}"`
+      )
       .join('\n')
-    
+
     const blob = new Blob([headers + content], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -170,7 +160,7 @@ function BulkShareDialog({
   const renderContent = () => (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
             <Share2 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
@@ -178,8 +168,10 @@ function BulkShareDialog({
         </div>
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Share Items</h3>
-          <p className="text-sm text-muted-foreground">
-            Generate share links for {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} with customizable privacy settings
+          <p className="text-muted-foreground text-sm">
+            Generate share links for {selectedItems.length} item
+            {selectedItems.length > 1 ? 's' : ''} with customizable privacy
+            settings
           </p>
         </div>
       </div>
@@ -207,7 +199,7 @@ function BulkShareDialog({
         <div className="bg-muted/50 max-h-32 space-y-1 overflow-y-auto rounded-lg border p-3">
           {selectedItems.slice(0, 5).map((item) => (
             <div key={item.id} className="flex items-center gap-2 text-sm">
-              <Share2 className="text-purple-500 h-4 w-4 flex-shrink-0" />
+              <Share2 className="h-4 w-4 flex-shrink-0 text-purple-500" />
               <span className="truncate" title={item.name}>
                 {item.name}
               </span>
@@ -240,7 +232,9 @@ function BulkShareDialog({
                   <Eye className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Viewer</p>
-                    <p className="text-muted-foreground text-xs">Can view only</p>
+                    <p className="text-muted-foreground text-xs">
+                      Can view only
+                    </p>
                   </div>
                 </div>
               </SelectItem>
@@ -249,7 +243,9 @@ function BulkShareDialog({
                   <Edit className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Commenter</p>
-                    <p className="text-muted-foreground text-xs">Can view and comment</p>
+                    <p className="text-muted-foreground text-xs">
+                      Can view and comment
+                    </p>
                   </div>
                 </div>
               </SelectItem>
@@ -258,7 +254,9 @@ function BulkShareDialog({
                   <Edit className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Editor</p>
-                    <p className="text-muted-foreground text-xs">Can view, comment, and edit</p>
+                    <p className="text-muted-foreground text-xs">
+                      Can view, comment, and edit
+                    </p>
                   </div>
                 </div>
               </SelectItem>
@@ -283,7 +281,9 @@ function BulkShareDialog({
                   <Users className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Anyone with the link</p>
-                    <p className="text-muted-foreground text-xs">Anyone who has the link can access</p>
+                    <p className="text-muted-foreground text-xs">
+                      Anyone who has the link can access
+                    </p>
                   </div>
                 </div>
               </SelectItem>
@@ -292,7 +292,9 @@ function BulkShareDialog({
                   <Globe className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Anyone on the internet</p>
-                    <p className="text-muted-foreground text-xs">Public on the web</p>
+                    <p className="text-muted-foreground text-xs">
+                      Public on the web
+                    </p>
                   </div>
                 </div>
               </SelectItem>
@@ -301,7 +303,9 @@ function BulkShareDialog({
                   <Lock className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Anyone in your organization</p>
-                    <p className="text-muted-foreground text-xs">People in your organization can find and access</p>
+                    <p className="text-muted-foreground text-xs">
+                      People in your organization can find and access
+                    </p>
                   </div>
                 </div>
               </SelectItem>
@@ -346,7 +350,7 @@ function BulkShareDialog({
           </div>
 
           <BottomSheetFooter className="bg-background flex-shrink-0 border-t p-4">
-            <div className="grid grid-cols-2 w-full gap-3">
+            <div className="grid w-full grid-cols-2 gap-3">
               <Button
                 variant="outline"
                 onClick={() => onOpenChange(false)}

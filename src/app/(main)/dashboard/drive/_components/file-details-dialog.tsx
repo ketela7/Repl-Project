@@ -2,16 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Separator } from '@/components/ui/separator'
-import {
   FileText,
   Folder,
   Calendar,
@@ -21,9 +11,6 @@ import {
   Eye,
   Star,
   Shield,
-  HardDrive,
-  Hash,
-  Clock,
   Globe,
   Lock,
   Users,
@@ -32,24 +19,32 @@ import {
   AlertCircle,
   Camera,
   Video,
-  Image,
   MapPin,
   Database,
   Palette,
   Monitor,
   Server,
-  Key,
   Tag,
-  FileType,
   Fingerprint,
   Link,
   Archive,
 } from 'lucide-react'
-import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
-import { formatFileSize, formatDriveFileDate } from '@/lib/google-drive/utils'
+import { toast } from 'sonner'
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Separator } from '@/components/ui/separator'
+import { DriveFile } from '@/lib/google-drive/types'
+import { formatFileSize } from '@/lib/google-drive/utils'
 import { formatFileTime, formatCreationTime } from '@/shared/utils'
 import { FileIcon } from '@/components/file-icon'
-import { toast } from 'sonner'
 import { getInitials } from '@/shared/utils'
 
 // Global cache and request tracking for file details
@@ -219,7 +214,6 @@ export function FileDetailsDialog({
 
       // Check if request is already active
       if (activeFileDetailRequests.has(fileId)) {
-
         setLoading(false)
         return
       }

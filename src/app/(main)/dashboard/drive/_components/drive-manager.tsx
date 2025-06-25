@@ -2,16 +2,18 @@
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw } from 'lucide-react'
+
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 import { normalizeFileSize } from '@/lib/google-drive/utils'
-import { successToast, errorToast, infoToast } from '@/shared/utils'
+import { errorToast } from '@/shared/utils'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { useTimezoneContext } from '@/components/timezone-provider'
-import { PerformanceMonitor } from './performance-monitor'
-import { FileBreadcrumb } from './file-breadcrumb'
-import { DriveConnectionCard } from './drive-connection-card'
-import { DriveGridSkeleton } from './drive-skeleton'
 import { Progress } from '@/components/ui/progress'
+import { DriveErrorDisplay } from '@/components/drive-error-display'
+import { DrivePermissionRequired } from '@/components/drive-permission-required'
+
+import { FileBreadcrumb } from './file-breadcrumb'
+import { DriveGridSkeleton } from './drive-skeleton'
 import { FileUploadDialog } from './file-upload-dialog'
 import { CreateFolderDialog } from './create-folder-dialog'
 import { FileRenameDialog } from './file-rename-dialog'
@@ -20,16 +22,10 @@ import { FileCopyDialog } from './file-copy-dialog'
 import { PermanentDeleteDialog } from './permanent-delete-dialog'
 import { FileDetailsDialog } from './file-details-dialog'
 import { FilePreviewDialog } from './file-preview-dialog'
-import { BulkDeleteDialog } from './bulk-delete-dialog'
-import { BulkMoveDialog } from './bulk-move-dialog'
-import { BulkCopyDialog } from './bulk-copy-dialog'
 import { FileShareDialog } from './file-share-dialog'
-import { BulkShareDialog } from './bulk-share-dialog'
 import { FiltersDialog } from './filters-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
-import { DriveErrorDisplay } from '@/components/drive-error-display'
-import { DrivePermissionRequired } from '@/components/drive-permission-required'
 
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
@@ -39,10 +35,20 @@ const isFolder = (item: DriveItem): boolean => {
 }
 
 const initialFilters = {
-  activeView: 'all' as 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash',
+  activeView: 'all' as
+    | 'all'
+    | 'my-drive'
+    | 'shared'
+    | 'starred'
+    | 'recent'
+    | 'trash',
   fileTypeFilter: [] as string[],
   advancedFilters: {
-    sizeRange: { unit: 'MB' as 'B' | 'KB' | 'MB' | 'GB', min: undefined, max: undefined },
+    sizeRange: {
+      unit: 'MB' as 'B' | 'KB' | 'MB' | 'GB',
+      min: undefined,
+      max: undefined,
+    },
     sortBy: 'modified' as 'name' | 'modified' | 'created' | 'size',
     sortOrder: 'desc' as 'asc' | 'desc',
     createdDateRange: { from: undefined, to: undefined },
@@ -73,20 +79,39 @@ export function DriveManager() {
 
   // Table state
   const [visibleColumns, setVisibleColumns] = useState({
-    name: true, size: false, owners: false, mimeType: false,
-    createdTime: false, modifiedTime: false,
+    name: true,
+    size: false,
+    owners: false,
+    mimeType: false,
+    createdTime: false,
+    modifiedTime: false,
   })
 
   // Dialog state - consolidated
   const [dialogs, setDialogs] = useState({
-    upload: false, createFolder: false, rename: false, move: false, copy: false,
-    permanentDelete: false, details: false, preview: false, delete: false, share: false,
+    upload: false,
+    createFolder: false,
+    rename: false,
+    move: false,
+    copy: false,
+    permanentDelete: false,
+    details: false,
+    preview: false,
+    delete: false,
+    share: false,
     mobileFilters: false,
   })
 
   // Sorting state
   const [sortConfig, setSortConfig] = useState<{
-    key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners'
+    key:
+      | 'name'
+      | 'id'
+      | 'size'
+      | 'modifiedTime'
+      | 'createdTime'
+      | 'mimeType'
+      | 'owners'
     direction: 'asc' | 'desc'
   } | null>(null)
 
@@ -96,26 +121,39 @@ export function DriveManager() {
 
   // Selected items for actions
   const [selectedFileForAction, setSelectedFileForAction] = useState<{
-    id: string; name: string; parentId?: string
+    id: string
+    name: string
+    parentId?: string
   } | null>(null)
-  const [selectedFileForPreview, setSelectedFileForPreview] = useState<DriveFile | null>(null)
+  const [selectedFileForPreview, setSelectedFileForPreview] =
+    useState<DriveFile | null>(null)
   const [selectedItemForDelete, setSelectedItemForDelete] = useState<{
-    id: string; name: string; type: 'file' | 'folder'
+    id: string
+    name: string
+    type: 'file' | 'folder'
   } | null>(null)
   const [selectedItemForDetails, setSelectedItemForDetails] = useState<{
-    id: string; name: string; type: 'file' | 'folder'
+    id: string
+    name: string
+    type: 'file' | 'folder'
   } | null>(null)
   const [selectedItemForShare, setSelectedItemForShare] = useState<{
-    id: string; name: string; type: 'file' | 'folder'
+    id: string
+    name: string
+    type: 'file' | 'folder'
   } | null>(null)
 
   // Progress states
   const [bulkOperationProgress, setBulkOperationProgress] = useState<{
-    isRunning: boolean; current: number; total: number; operation: string
+    isRunning: boolean
+    current: number
+    total: number
+    operation: string
   }>({ isRunning: false, current: 0, total: 0, operation: '' })
 
   const [singleOperationProgress, setSingleOperationProgress] = useState<{
-    isRunning: boolean; operation: string
+    isRunning: boolean
+    operation: string
   }>({ isRunning: false, operation: '' })
 
   // Refs for optimization
@@ -141,12 +179,15 @@ export function DriveManager() {
     setFilters((prev) => ({
       ...prev,
       ...newFilters,
-      advancedFilters: { ...prev.advancedFilters, ...newFilters.advancedFilters },
+      advancedFilters: {
+        ...prev.advancedFilters,
+        ...newFilters.advancedFilters,
+      },
     }))
   }, [])
 
   // Check if any filters are active
-  const hasActiveFilters: boolean = 
+  const hasActiveFilters: boolean =
     filters.activeView !== 'all' ||
     filters.fileTypeFilter.length > 0 ||
     searchQuery.trim() !== '' ||
@@ -156,12 +197,28 @@ export function DriveManager() {
     !!filters.advancedFilters.createdDateRange.to ||
     !!filters.advancedFilters.modifiedDateRange.from ||
     !!filters.advancedFilters.modifiedDateRange.to ||
-    !!(filters.advancedFilters.owner && String(filters.advancedFilters.owner).trim())
+    !!(
+      filters.advancedFilters.owner &&
+      String(filters.advancedFilters.owner).trim()
+    )
 
   // Sorting Start
-  const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
+  const handleSort = (
+    key:
+      | 'name'
+      | 'id'
+      | 'size'
+      | 'modifiedTime'
+      | 'createdTime'
+      | 'mimeType'
+      | 'owners'
+  ) => {
     let direction: 'asc' | 'desc' = 'asc'
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === 'asc'
+    ) {
       direction = 'desc'
     }
     setSortConfig({ key, direction })
@@ -171,9 +228,11 @@ export function DriveManager() {
     if (!sortConfig || sortConfig.key !== columnKey) {
       return <ChevronsUpDown className="h-4 w-4" />
     }
-    return sortConfig.direction === 'asc' ? 
-      <ChevronUp className="h-4 w-4" /> : 
+    return sortConfig.direction === 'asc' ? (
+      <ChevronUp className="h-4 w-4" />
+    ) : (
       <ChevronDown className="h-4 w-4" />
+    )
   }
 
   const sortedItems = useMemo(() => {
@@ -220,9 +279,19 @@ export function DriveManager() {
           return 0
       }
 
-      if (aValue === null || aValue === undefined || aValue === '' || aValue === '-')
+      if (
+        aValue === null ||
+        aValue === undefined ||
+        aValue === '' ||
+        aValue === '-'
+      )
         aValue = key === 'size' ? 0 : ''
-      if (bValue === null || bValue === undefined || bValue === '' || bValue === '-')
+      if (
+        bValue === null ||
+        bValue === undefined ||
+        bValue === '' ||
+        bValue === '-'
+      )
         bValue = key === 'size' ? 0 : ''
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1
@@ -230,9 +299,8 @@ export function DriveManager() {
       return 0
     })
   }, [items, sortConfig])
-        // Sorting End
+  // Sorting End
 
-  
   // Convert selected items for bulk operations
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
@@ -253,114 +321,155 @@ export function DriveManager() {
   }, [selectedItems, items])
 
   // API call function
-  const fetchFiles = useCallback(async (folderId?: string, searchQuery?: string, pageToken?: string) => {
-    let callId = ''
-    try {
-      if (!folderId && folderId !== '') folderId = currentFolderId || undefined
+  const fetchFiles = useCallback(
+    async (folderId?: string, searchQuery?: string, pageToken?: string) => {
+      let callId = ''
+      try {
+        if (!folderId && folderId !== '')
+          folderId = currentFolderId || undefined
 
-      const filterKey = JSON.stringify({
-        view: filters.activeView, types: filters.fileTypeFilter,
-        sort: filters.advancedFilters.sortBy, order: filters.advancedFilters.sortOrder,
-        size: filters.advancedFilters.sizeRange, created: filters.advancedFilters.createdDateRange,
-        modified: filters.advancedFilters.modifiedDateRange, owner: filters.advancedFilters.owner,
-      })
+        const filterKey = JSON.stringify({
+          view: filters.activeView,
+          types: filters.fileTypeFilter,
+          sort: filters.advancedFilters.sortBy,
+          order: filters.advancedFilters.sortOrder,
+          size: filters.advancedFilters.sizeRange,
+          created: filters.advancedFilters.createdDateRange,
+          modified: filters.advancedFilters.modifiedDateRange,
+          owner: filters.advancedFilters.owner,
+        })
 
-      callId = `${folderId}-${searchQuery}-${pageToken}-${filterKey}`
+        callId = `${folderId}-${searchQuery}-${pageToken}-${filterKey}`
 
-      if (activeRequestsRef.current.has(callId)) return
-      if (filterKey !== lastFiltersRef.current && pageToken) return
-      lastFiltersRef.current = filterKey
+        if (activeRequestsRef.current.has(callId)) return
+        if (filterKey !== lastFiltersRef.current && pageToken) return
+        lastFiltersRef.current = filterKey
 
-      setLoading(!pageToken)
-      setLoadingMore(!!pageToken)
+        setLoading(!pageToken)
+        setLoadingMore(!!pageToken)
 
-      activeRequestsRef.current.add(callId)
+        activeRequestsRef.current.add(callId)
 
-      const params = new URLSearchParams({
-        sortBy: filters.advancedFilters.sortBy,
-        sortOrder: filters.advancedFilters.sortOrder
-      })
+        const params = new URLSearchParams({
+          sortBy: filters.advancedFilters.sortBy,
+          sortOrder: filters.advancedFilters.sortOrder,
+        })
 
-      if (folderId) params.append('folderId', folderId)
-      if (searchQuery) params.append('search', searchQuery)
-      if (pageToken) params.append('pageToken', pageToken)
-      if (filters.activeView && filters.activeView !== 'all') params.append('viewStatus', filters.activeView)
-      if (filters.fileTypeFilter?.length > 0) params.append('fileType', filters.fileTypeFilter.join(','))
-      if (filters.advancedFilters.createdDateRange?.from) params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
-      if (filters.advancedFilters.createdDateRange?.to) params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
-      if (filters.advancedFilters.modifiedDateRange?.from) params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
-      if (filters.advancedFilters.modifiedDateRange?.to) params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
-      if (filters.advancedFilters.owner?.trim()) params.append('owner', filters.advancedFilters.owner.trim())
+        if (folderId) params.append('folderId', folderId)
+        if (searchQuery) params.append('search', searchQuery)
+        if (pageToken) params.append('pageToken', pageToken)
+        if (filters.activeView && filters.activeView !== 'all')
+          params.append('viewStatus', filters.activeView)
+        if (filters.fileTypeFilter?.length > 0)
+          params.append('fileType', filters.fileTypeFilter.join(','))
+        if (filters.advancedFilters.createdDateRange?.from)
+          params.append(
+            'createdAfter',
+            filters.advancedFilters.createdDateRange.from.toISOString()
+          )
+        if (filters.advancedFilters.createdDateRange?.to)
+          params.append(
+            'createdBefore',
+            filters.advancedFilters.createdDateRange.to.toISOString()
+          )
+        if (filters.advancedFilters.modifiedDateRange?.from)
+          params.append(
+            'modifiedAfter',
+            filters.advancedFilters.modifiedDateRange.from.toISOString()
+          )
+        if (filters.advancedFilters.modifiedDateRange?.to)
+          params.append(
+            'modifiedBefore',
+            filters.advancedFilters.modifiedDateRange.to.toISOString()
+          )
+        if (filters.advancedFilters.owner?.trim())
+          params.append('owner', filters.advancedFilters.owner.trim())
 
-      const response = await fetch(`/api/drive/files?${params}`, {
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      })
+        const response = await fetch(`/api/drive/files?${params}`, {
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        })
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          setNeedsReauth(true)
-          throw new Error('Authentication required')
+        if (!response.ok) {
+          if (response.status === 401) {
+            setNeedsReauth(true)
+            throw new Error('Authentication required')
+          }
+          throw new Error(`Failed to fetch files: ${response.statusText}`)
         }
-        throw new Error(`Failed to fetch files: ${response.statusText}`)
+
+        const data = await response.json()
+        if (data.error) throw new Error(data.error)
+
+        const newItems = (data.files || data || []).map((item: any) => ({
+          ...item,
+          itemType:
+            item.mimeType === 'application/vnd.google-apps.folder'
+              ? ('folder' as const)
+              : ('file' as const),
+        }))
+
+        setItems((prev) => (pageToken ? [...prev, ...newItems] : newItems))
+
+        setNextPageToken(data.nextPageToken || null)
+        setHasAccess(true)
+        setDriveAccessError(null)
+      } catch (error: any) {
+        if (
+          error.message?.includes('Authentication') ||
+          error.message?.includes('401') ||
+          error.status === 401
+        ) {
+          setNeedsReauth(true)
+          setDriveAccessError(error)
+          window.location.href = '/auth/v1/login'
+        } else {
+          setDriveAccessError(error)
+          errorToast.apiError('Failed to load files')
+        }
+        setHasAccess(false)
+      } finally {
+        setLoading(false)
+        setLoadingMore(false)
+        setRefreshing(false)
+        if (callId) activeRequestsRef.current.delete(callId)
       }
-
-      const data = await response.json()
-      if (data.error) throw new Error(data.error)
-
-      const newItems = (data.files || data || []).map((item: any) => ({
-        ...item,
-        itemType: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
-      }))
-
-      setItems(prev => pageToken ? [...prev, ...newItems] : newItems)
-
-      setNextPageToken(data.nextPageToken || null)
-      setHasAccess(true)
-      setDriveAccessError(null)
-    } catch (error: any) {
-      if (error.message?.includes('Authentication') || error.message?.includes('401') || error.status === 401) {
-        setNeedsReauth(true)
-        setDriveAccessError(error)
-        window.location.href = '/auth/v1/login'
-      } else {
-        setDriveAccessError(error)
-        errorToast.apiError('Failed to load files')
-      }
-      setHasAccess(false)
-    } finally {
-      setLoading(false)
-      setLoadingMore(false)
-      setRefreshing(false)
-      if (callId) activeRequestsRef.current.delete(callId)
-    }
-  }, [currentFolderId, filters])
+    },
+    [currentFolderId, filters]
+  )
 
   // Search submit handler
-  const handleSearchSubmit = useCallback((e: React.FormEvent) => {
-    e.preventDefault()
-    fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
-  }, [fetchFiles, currentFolderId, searchQuery])
+  const handleSearchSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault()
+      fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+    },
+    [fetchFiles, currentFolderId, searchQuery]
+  )
 
   // Effects for initial load and dependencies
   useEffect(() => {
     fetchFiles()
   }, [])
 
-  
-  {/*useEffect(() => {
+  {
+    /*useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchFiles(currentFolderId || undefined, undefined)
     }, 300)
     return () => clearTimeout(timeoutId)
-  }, [filters, currentFolderId])*/}
+  }, [filters, currentFolderId])*/
+  }
 
   // Navigation handlers
-  const handleFolderClick = useCallback((folderId: string) => {
-    setCurrentFolderId(folderId)
-    setSelectedItems(new Set())
-    fetchFiles(folderId)
-  }, [fetchFiles])
+  const handleFolderClick = useCallback(
+    (folderId: string) => {
+      setCurrentFolderId(folderId)
+      setSelectedItems(new Set())
+      fetchFiles(folderId)
+    },
+    [fetchFiles]
+  )
 
   const handleBackToParent = useCallback(() => {
     setCurrentFolderId(null)
@@ -380,7 +489,12 @@ export function DriveManager() {
         newSet.add(itemId)
         console.log('Selected item:', itemId)
       }
-      console.log('New selection set size:', newSet.size, 'items:', Array.from(newSet))
+      console.log(
+        'New selection set size:',
+        newSet.size,
+        'items:',
+        Array.from(newSet)
+      )
       return newSet
     })
   }, [])
@@ -400,7 +514,10 @@ export function DriveManager() {
 
   // Apply client-side size filtering
   const sizeFilteredItems = useMemo(() => {
-    if (!filters.advancedFilters.sizeRange?.min && !filters.advancedFilters.sizeRange?.max) {
+    if (
+      !filters.advancedFilters.sizeRange?.min &&
+      !filters.advancedFilters.sizeRange?.max
+    ) {
       return items
     }
 
@@ -409,8 +526,13 @@ export function DriveManager() {
 
       const sizeStr = (item as any).size
       let sizeBytes = 0
-      if (sizeStr && sizeStr !== '-' && sizeStr !== 'undefined' && 
-          sizeStr !== 'null' && sizeStr.trim() !== '') {
+      if (
+        sizeStr &&
+        sizeStr !== '-' &&
+        sizeStr !== 'undefined' &&
+        sizeStr !== 'null' &&
+        sizeStr.trim() !== ''
+      ) {
         const parsed = parseInt(sizeStr, 10)
         if (!isNaN(parsed)) {
           sizeBytes = parsed
@@ -423,16 +545,23 @@ export function DriveManager() {
 
       const getBytes = (size: number, unit: string) => {
         switch (unit.toUpperCase()) {
-          case 'B': return size
-          case 'KB': return size * 1024
-          case 'MB': return size * 1024 * 1024
-          case 'GB': return size * 1024 * 1024 * 1024
-          default: return size * 1024 * 1024
+          case 'B':
+            return size
+          case 'KB':
+            return size * 1024
+          case 'MB':
+            return size * 1024 * 1024
+          case 'GB':
+            return size * 1024 * 1024 * 1024
+          default:
+            return size * 1024 * 1024
         }
       }
 
-      if (minSize !== undefined && sizeBytes < getBytes(minSize, sizeUnit)) return false
-      if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit)) return false
+      if (minSize !== undefined && sizeBytes < getBytes(minSize, sizeUnit))
+        return false
+      if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit))
+        return false
       return true
     })
   }, [items, filters.advancedFilters.sizeRange])
@@ -470,10 +599,16 @@ export function DriveManager() {
             bValue = isFolder(b) ? 'folder' : (b.mimeType || '').toLowerCase()
             break
           case 'owners':
-            aValue = ((a as any).owners?.[0]?.displayName || 
-                     (a as any).owners?.[0]?.emailAddress || '').toLowerCase()
-            bValue = ((b as any).owners?.[0]?.displayName || 
-                     (b as any).owners?.[0]?.emailAddress || '').toLowerCase()
+            aValue = (
+              (a as any).owners?.[0]?.displayName ||
+              (a as any).owners?.[0]?.emailAddress ||
+              ''
+            ).toLowerCase()
+            bValue = (
+              (b as any).owners?.[0]?.displayName ||
+              (b as any).owners?.[0]?.emailAddress ||
+              ''
+            ).toLowerCase()
             break
           default:
             return 0
@@ -502,9 +637,16 @@ export function DriveManager() {
 
   if (hasAccess === false && driveAccessError) {
     if (needsReauth) {
-      return <DrivePermissionRequired error={driveAccessError} onRetry={handleRefresh} />
+      return (
+        <DrivePermissionRequired
+          error={driveAccessError}
+          onRetry={handleRefresh}
+        />
+      )
     }
-    return <DriveErrorDisplay error={driveAccessError} onRetry={handleRefresh} />
+    return (
+      <DriveErrorDisplay error={driveAccessError} onRetry={handleRefresh} />
+    )
   }
 
   return (
@@ -520,7 +662,6 @@ export function DriveManager() {
             isSelectMode={isSelectMode}
             onSelectModeChange={setIsSelectMode}
             selectedCount={selectedItems.size}
-            
             onSelectAll={handleSelectAll}
             onRefresh={handleRefresh}
             refreshing={refreshing}
@@ -534,22 +675,24 @@ export function DriveManager() {
             onBulkRename={() => {}}
             onBulkExport={() => {}}
             onFiltersOpen={() => openDialog('mobileFilters')}
-            
-            
             selectedItems={selectedItemsWithDetails}
             onDeselectAll={() => {
               setSelectedItems(new Set())
             }}
             onRefreshAfterBulkOp={handleRefresh}
-            
             filters={filters}
             onFilterChange={handleFilter as any}
-            onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
+            onApplyFilters={() =>
+              fetchFiles(
+                currentFolderId || undefined,
+                searchQuery.trim() || undefined
+              )
+            }
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
-            items={items.map(item => ({
+            items={items.map((item) => ({
               ...item,
-              type: isFolder(item) ? 'folder' as const : 'file' as const
+              type: isFolder(item) ? ('folder' as const) : ('file' as const),
             }))}
             visibleColumns={visibleColumns}
             setVisibleColumns={setVisibleColumns}
@@ -564,7 +707,9 @@ export function DriveManager() {
           {currentFolderId && (
             <FileBreadcrumb
               currentFolderId={currentFolderId}
-              onNavigate={(folderId) => folderId ? handleFolderClick(folderId) : handleBackToParent()}
+              onNavigate={(folderId) =>
+                folderId ? handleFolderClick(folderId) : handleBackToParent()
+              }
               onBackToRoot={handleBackToParent}
             />
           )}
@@ -593,43 +738,55 @@ export function DriveManager() {
                   openDialog('preview')
                   break
                 case 'download':
-                  window.open(`https://drive.google.com/uc?export=download&id=${item.id}`, '_blank')
+                  window.open(
+                    `https://drive.google.com/uc?export=download&id=${item.id}`,
+                    '_blank'
+                  )
                   break
                 case 'share':
                   setSelectedItemForShare({
-                    id: item.id, name: item.name,
+                    id: item.id,
+                    name: item.name,
                     type: isFolder(item) ? 'folder' : 'file',
                   })
                   openDialog('share')
                   break
                 case 'rename':
                   setSelectedFileForAction({
-                    id: item.id, name: item.name, parentId: item.parents?.[0],
+                    id: item.id,
+                    name: item.name,
+                    parentId: item.parents?.[0],
                   })
                   openDialog('rename')
                   break
                 case 'move':
                   setSelectedFileForAction({
-                    id: item.id, name: item.name, parentId: item.parents?.[0],
+                    id: item.id,
+                    name: item.name,
+                    parentId: item.parents?.[0],
                   })
                   openDialog('move')
                   break
                 case 'copy':
                   setSelectedFileForAction({
-                    id: item.id, name: item.name, parentId: item.parents?.[0],
+                    id: item.id,
+                    name: item.name,
+                    parentId: item.parents?.[0],
                   })
                   openDialog('copy')
                   break
                 case 'delete':
                   setSelectedItemForDelete({
-                    id: item.id, name: item.name,
+                    id: item.id,
+                    name: item.name,
                     type: isFolder(item) ? 'folder' : 'file',
                   })
                   openDialog('delete')
                   break
                 case 'details':
                   setSelectedItemForDetails({
-                    id: item.id, name: item.name,
+                    id: item.id,
+                    name: item.name,
                     type: isFolder(item) ? 'folder' : 'file',
                   })
                   openDialog('details')
@@ -640,11 +797,13 @@ export function DriveManager() {
             loading={loading}
             loadingMore={loadingMore}
             hasMore={!!nextPageToken}
-            onLoadMore={() => fetchFiles(
-              currentFolderId || undefined,
-              searchQuery.trim() || undefined,
-              nextPageToken || undefined
-            )}
+            onLoadMore={() =>
+              fetchFiles(
+                currentFolderId || undefined,
+                searchQuery.trim() || undefined,
+                nextPageToken || undefined
+              )
+            }
           />
         </div>
       </div>
@@ -779,15 +938,13 @@ export function DriveManager() {
           file={{
             id: selectedItemForShare.id,
             name: selectedItemForShare.name,
-            mimeType: selectedItemForShare.type === 'folder'
-              ? 'application/vnd.google-apps.folder'
-              : 'application/octet-stream',
+            mimeType:
+              selectedItemForShare.type === 'folder'
+                ? 'application/vnd.google-apps.folder'
+                : 'application/octet-stream',
           }}
         />
       )}
-
-
-      
 
       {/* Mobile Filters Dialog */}
       <FiltersDialog
@@ -796,7 +953,12 @@ export function DriveManager() {
           if (!open) closeDialog('mobileFilters')
         }}
         onFilterChange={handleFilter}
-        onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
+        onApplyFilters={() =>
+          fetchFiles(
+            currentFolderId || undefined,
+            searchQuery.trim() || undefined
+          )
+        }
         currentFilters={filters}
         hasActiveFilters={hasActiveFilters}
         onClearFilters={clearAllFilters}
@@ -807,10 +969,15 @@ export function DriveManager() {
       {bulkOperationProgress.isRunning && (
         <div className="bg-background fixed right-4 bottom-4 rounded-lg border p-4 shadow-lg">
           <div className="flex items-center space-x-2">
-            <div className="text-sm font-medium">{bulkOperationProgress.operation}</div>
+            <div className="text-sm font-medium">
+              {bulkOperationProgress.operation}
+            </div>
           </div>
           <Progress
-            value={(bulkOperationProgress.current / bulkOperationProgress.total) * 100}
+            value={
+              (bulkOperationProgress.current / bulkOperationProgress.total) *
+              100
+            }
             className="mt-2 w-64"
           />
           <div className="text-muted-foreground mt-1 text-xs">
@@ -823,7 +990,9 @@ export function DriveManager() {
         <div className="bg-background fixed right-4 bottom-4 rounded-lg border p-4 shadow-lg">
           <div className="flex items-center space-x-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
-            <div className="text-sm font-medium">{singleOperationProgress.operation}</div>
+            <div className="text-sm font-medium">
+              {singleOperationProgress.operation}
+            </div>
           </div>
         </div>
       )}

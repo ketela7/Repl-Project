@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import { Badge } from '@/shared/components/ui/badge'
 import {
   FileVideo,
   FileText,
@@ -16,6 +15,8 @@ import {
   BookOpen,
   Link,
 } from 'lucide-react'
+
+import { Badge } from '@/shared/components/ui/badge'
 
 interface DriveFile {
   id: string

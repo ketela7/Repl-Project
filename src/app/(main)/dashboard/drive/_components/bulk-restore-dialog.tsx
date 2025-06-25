@@ -1,11 +1,12 @@
 'use client'
 
+import { RotateCcw } from 'lucide-react'
+
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -20,7 +21,6 @@ import {
   BottomSheetTitle,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import { RotateCcw, Info } from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 interface BulkRestoreDialogProps {
@@ -50,7 +50,7 @@ function BulkRestoreDialog({
   const renderContent = () => (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
             <RotateCcw className="h-8 w-8 text-emerald-600 dark:text-emerald-400" />
@@ -58,8 +58,9 @@ function BulkRestoreDialog({
         </div>
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Restore from Trash</h3>
-          <p className="text-sm text-muted-foreground">
-            Are you sure you want to restore {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} from trash?
+          <p className="text-muted-foreground text-sm">
+            Are you sure you want to restore {selectedItems.length} item
+            {selectedItems.length > 1 ? 's' : ''} from trash?
           </p>
         </div>
       </div>
@@ -67,12 +68,18 @@ function BulkRestoreDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+          >
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+          <Badge
+            variant="secondary"
+            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
+          >
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
@@ -80,20 +87,25 @@ function BulkRestoreDialog({
 
       {/* Items Preview */}
       <div className="space-y-3">
-        <h4 className="text-sm font-medium text-center">Items to be restored:</h4>
-        <div className="max-h-48 overflow-y-auto rounded-lg border bg-muted/50 p-4">
+        <h4 className="text-center text-sm font-medium">
+          Items to be restored:
+        </h4>
+        <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
           <div className="space-y-2">
             {selectedItems.slice(0, 5).map((item) => (
-              <div key={item.id} className="flex items-center gap-3 p-2 rounded-md bg-background/50">
+              <div
+                key={item.id}
+                className="bg-background/50 flex items-center gap-3 rounded-md p-2"
+              >
                 <div className="h-2 w-2 rounded-full bg-emerald-500" />
-                <span className="text-sm truncate flex-1">{item.name}</span>
+                <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
                   {item.type}
                 </Badge>
               </div>
             ))}
             {selectedItems.length > 5 && (
-              <div className="text-center text-sm text-muted-foreground py-2">
+              <div className="text-muted-foreground py-2 text-center text-sm">
                 ... and {selectedItems.length - 5} more items
               </div>
             )}
@@ -107,7 +119,8 @@ function BulkRestoreDialog({
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
         <div className="text-sm text-emerald-800 dark:text-emerald-200">
-          If the original parent folder was also deleted, items will be restored to the root of your Drive.
+          If the original parent folder was also deleted, items will be restored
+          to the root of your Drive.
         </div>
       </div>
     </div>

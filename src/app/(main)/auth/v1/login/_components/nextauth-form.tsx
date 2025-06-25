@@ -1,14 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useSession } from 'next-auth/react'
+import { Shield } from 'lucide-react'
+
 import { GoogleAuthButton } from '@/components/auth/google-auth-button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Shield } from 'lucide-react'
 
 const FormSchema = z.object({
   remember: z.boolean().default(false),

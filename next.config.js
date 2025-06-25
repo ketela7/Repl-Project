@@ -1,9 +1,8 @@
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Fast development optimizations
   reactStrictMode: false, // Disable for faster development
-  
+
   experimental: {
     optimizePackageImports: [
       'lucide-react',
@@ -14,35 +13,33 @@ const nextConfig = {
       '@radix-ui/react-tabs',
       '@tanstack/react-query',
       '@tanstack/react-table',
-      'recharts'
+      'recharts',
     ],
     optimisticClientCache: true,
     useWasmBinary: false,
     optimizeCss: true,
   },
-  
 
-  
   serverExternalPackages: ['postgres', 'googleapis'],
-  
+
   // Fast TypeScript compilation
   typescript: {
     ignoreBuildErrors: true,
-    tsconfigPath: './tsconfig.json'
+    tsconfigPath: './tsconfig.json',
   },
-  
+
   // Skip ESLint during builds for speed
   eslint: {
-    ignoreDuringBuilds: true
+    ignoreDuringBuilds: true,
   },
 
   allowedDevOrigins: ['*.pike.replit.dev', '*.sisko.replit.dev'],
-  
+
   // Performance optimizations
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production'
+    removeConsole: process.env.NODE_ENV === 'production',
   },
-  
+
   // Simplified headers for development speed
   async headers() {
     return [
@@ -65,13 +62,13 @@ const nextConfig = {
   // Fast compilation settings
   output: 'standalone',
   productionBrowserSourceMaps: false,
-  
+
   // Development optimizations
   onDemandEntries: {
     maxInactiveAge: 60 * 1000,
     pagesBufferLength: 2,
   },
-  
+
   // Webpack optimizations for lazy loading
   webpack: (config, { dev, isServer }) => {
     if (dev) {
@@ -82,7 +79,7 @@ const nextConfig = {
           config: [__filename],
         },
       }
-      
+
       // Optimize chunk splitting for lazy components
       config.optimization = {
         ...config.optimization,

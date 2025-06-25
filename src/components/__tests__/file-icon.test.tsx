@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+
 import { FileIcon, getFileIcon } from '../file-icon'
 import { render } from '../../__tests__/test-utils'
 

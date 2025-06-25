@@ -1,11 +1,12 @@
 import { renderHook } from '@testing-library/react'
+
 import { useIsMobile } from '../use-mobile'
 
 // Mock window.matchMedia
 const mockMatchMedia = (matches: boolean) => {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: jest.fn().mockImplementation(query => ({
+    value: jest.fn().mockImplementation((query) => ({
       matches,
       media: query,
       onchange: null,
@@ -27,9 +28,9 @@ describe('useIsMobile', () => {
       configurable: true,
       value: 600,
     })
-    
+
     const { result } = renderHook(() => useIsMobile())
-    
+
     expect(result.current).toBe(true)
   })
 
@@ -41,9 +42,9 @@ describe('useIsMobile', () => {
       configurable: true,
       value: 1024,
     })
-    
+
     const { result } = renderHook(() => useIsMobile())
-    
+
     expect(result.current).toBe(false)
   })
 
@@ -65,7 +66,7 @@ describe('useIsMobile', () => {
     })
 
     renderHook(() => useIsMobile())
-    
+
     expect(matchMediaSpy).toHaveBeenCalledWith('(max-width: 767px)')
   })
 })

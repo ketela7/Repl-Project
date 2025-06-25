@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox"
-import { CheckIcon } from "lucide-react"
+import * as React from 'react'
+import * as CheckboxPrimitive from '@radix-ui/react-checkbox'
+import { CheckIcon } from 'lucide-react'
 
-import { cn } from "@/shared/utils"
+import { cn } from '@/shared/utils'
 
 function Checkbox({
   className,
@@ -14,19 +14,19 @@ function Checkbox({
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+        'peer border-input dark:bg-input/30 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground dark:data-[state=checked]:bg-primary data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
         // Enhanced cross-platform sizing with consistent 16px (4 * 4px) base
-        "h-4 w-4 min-h-4 min-w-4 max-h-4 max-w-4 shrink-0 flex-none",
+        'h-4 max-h-4 min-h-4 w-4 max-w-4 min-w-4 flex-none shrink-0',
         // Professional rounded corners for better cross-platform appearance
-        "rounded-[3px] border-2 shadow-sm",
+        'rounded-[3px] border-2 shadow-sm',
         // Enhanced transition for smooth interactions
-        "transition-all duration-200 ease-in-out outline-none",
+        'transition-all duration-200 ease-in-out outline-none',
         // Better focus and hover states for cross-platform compatibility
-        "focus-visible:ring-2 focus-visible:ring-offset-1 hover:border-primary/60",
+        'hover:border-primary/60 focus-visible:ring-2 focus-visible:ring-offset-1',
         // Improved disabled state
-        "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-muted",
+        'disabled:bg-muted disabled:cursor-not-allowed disabled:opacity-50',
         // Touch-friendly sizing for mobile devices
-        "touch-manipulation select-none",
+        'touch-manipulation select-none',
         className
       )}
       {...props}

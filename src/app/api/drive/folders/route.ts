@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { auth } from '@/auth'
 import { GoogleDriveService } from '@/lib/google-drive/service'
 
@@ -46,10 +47,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-
     // Get access token from NextAuth session
     const accessToken = session.accessToken
-
 
     if (!accessToken) {
       return NextResponse.json(
@@ -76,7 +75,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(folder)
   } catch (error) {
-
     if (error instanceof Error) {
       // Handle Google API specific errors
       if (

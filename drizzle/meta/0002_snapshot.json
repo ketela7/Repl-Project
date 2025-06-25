@@ -94,9 +94,7 @@
         "bulk_operations_batch_id_unique": {
           "name": "bulk_operations_batch_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "batch_id"
-          ]
+          "columns": ["batch_id"]
         }
       },
       "policies": {},
@@ -167,9 +165,7 @@
         "users_email_unique": {
           "name": "users_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},

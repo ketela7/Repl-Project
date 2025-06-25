@@ -1,7 +1,6 @@
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 
-
 declare module 'next-auth' {
   interface Session {
     accessToken?: string
@@ -40,7 +39,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Store tokens for API access
       if (account && user) {
         token.userId = user.id
-
       }
       if (account) {
         token.accessToken = account.access_token
@@ -51,7 +49,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       // Handle token refresh on every request if needed
-      if (token.refreshToken && (!token.accessToken || (account?.expires_at && Date.now() >= account.expires_at * 1000))) {
+      if (
+        token.refreshToken &&
+        (!token.accessToken ||
+          (account?.expires_at && Date.now() >= account.expires_at * 1000))
+      ) {
         try {
           const response = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
@@ -63,14 +65,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               refresh_token: token.refreshToken as string,
             }),
           })
-          
+
           if (response.ok) {
             const refreshedTokens = await response.json()
             token.accessToken = refreshedTokens.access_token
             if (refreshedTokens.refresh_token) {
               token.refreshToken = refreshedTokens.refresh_token
             }
-            token.exp = Math.floor(Date.now() / 1000) + (refreshedTokens.expires_in || 3600)
+            token.exp =
+              Math.floor(Date.now() / 1000) +
+              (refreshedTokens.expires_in || 3600)
           } else {
             console.error('Token refresh failed:', response.status)
             token.accessToken = undefined
@@ -112,7 +116,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async redirect({ url, baseUrl }) {
       // Always redirect to dashboard after successful authentication
-      if (url === baseUrl || url === `${baseUrl}/` || url === `${baseUrl}/auth/v1/login`) {
+      if (
+        url === baseUrl ||
+        url === `${baseUrl}/` ||
+        url === `${baseUrl}/auth/v1/login`
+      ) {
         return `${baseUrl}/dashboard/drive`
       }
       // If it's a valid internal URL, use it

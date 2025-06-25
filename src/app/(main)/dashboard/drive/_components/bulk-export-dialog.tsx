@@ -2,9 +2,19 @@
 
 import { useState } from 'react'
 import {
+  FileDown,
+  AlertTriangle,
+  FileText,
+  FileSpreadsheet,
+  Presentation,
+  Image,
+  Info,
+} from 'lucide-react'
+import { toast } from 'sonner'
+
+import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -21,16 +31,6 @@ import {
   BottomSheetTitle,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import {
-  FileDown,
-  AlertTriangle,
-  FileText,
-  FileSpreadsheet,
-  Presentation,
-  Image,
-  Info,
-} from 'lucide-react'
-import { toast } from 'sonner'
 import { cn } from '@/shared/utils'
 // Simple error handling without complex recovery
 
@@ -153,7 +153,7 @@ function BulkExportDialog({
   const handleExport = async () => {
     if (compatibleFiles.length === 0) return
 
-    let successfulExports = 0
+    const successfulExports = 0
     const failedExports: { fileName: string; error: string }[] = []
 
     const format = selectedFormat
@@ -221,7 +221,7 @@ function BulkExportDialog({
   const renderContent = () => (
     <div className="space-y-6">
       {/* Header Info */}
-      <div className="text-center space-y-3">
+      <div className="space-y-3 text-center">
         <div className="flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900/30">
             <FileDown className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />
@@ -229,8 +229,9 @@ function BulkExportDialog({
         </div>
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">Export Files</h3>
-          <p className="text-sm text-muted-foreground">
-            Export {exportableFiles.length} Google Workspace file{exportableFiles.length > 1 ? 's' : ''} to your selected format
+          <p className="text-muted-foreground text-sm">
+            Export {exportableFiles.length} Google Workspace file
+            {exportableFiles.length > 1 ? 's' : ''} to your selected format
           </p>
         </div>
       </div>
@@ -238,13 +239,21 @@ function BulkExportDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {exportableFiles.length > 0 && (
-          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-            {exportableFiles.length} exportable file{exportableFiles.length > 1 ? 's' : ''}
+          <Badge
+            variant="secondary"
+            className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+          >
+            {exportableFiles.length} exportable file
+            {exportableFiles.length > 1 ? 's' : ''}
           </Badge>
         )}
         {nonExportableFiles.length > 0 && (
-          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">
-            {nonExportableFiles.length} non-exportable item{nonExportableFiles.length > 1 ? 's' : ''}
+          <Badge
+            variant="secondary"
+            className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+          >
+            {nonExportableFiles.length} non-exportable item
+            {nonExportableFiles.length > 1 ? 's' : ''}
           </Badge>
         )}
       </div>

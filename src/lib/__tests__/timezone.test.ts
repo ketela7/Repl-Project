@@ -48,7 +48,7 @@ describe('Timezone Utils', () => {
       // Mock Intl.DateTimeFormat to return a specific timezone
       const originalDateTimeFormat = Intl.DateTimeFormat
       Intl.DateTimeFormat = jest.fn().mockImplementation(() => ({
-        resolvedOptions: () => ({ timeZone: 'America/New_York' })
+        resolvedOptions: () => ({ timeZone: 'America/New_York' }),
       })) as any
 
       const timezone = getUserTimezone()
@@ -63,7 +63,7 @@ describe('Timezone Utils', () => {
     it('formats date to user timezone', () => {
       const date = new Date('2025-06-21T14:00:00.000Z')
       const formatted = formatDateToUserTimezone(date, 'America/New_York')
-      
+
       expect(mockDateTimeFormat).toHaveBeenCalledWith(
         'en-US',
         expect.objectContaining({
@@ -75,7 +75,7 @@ describe('Timezone Utils', () => {
     it('uses default timezone when none provided', () => {
       const date = new Date('2025-06-21T14:00:00.000Z')
       formatDateToUserTimezone(date)
-      
+
       expect(mockDateTimeFormat).toHaveBeenCalled()
     })
   })
@@ -84,14 +84,14 @@ describe('Timezone Utils', () => {
     it('converts UTC string to user timezone', () => {
       const utcDate = '2025-06-21T14:00:00.000Z'
       const converted = convertUTCToUserTimezone(utcDate, 'America/New_York')
-      
+
       expect(converted).toBeInstanceOf(Date)
     })
 
     it('handles Date object input', () => {
       const utcDate = new Date('2025-06-21T14:00:00.000Z')
       const converted = convertUTCToUserTimezone(utcDate, 'America/New_York')
-      
+
       expect(converted).toBeInstanceOf(Date)
     })
   })
@@ -100,14 +100,14 @@ describe('Timezone Utils', () => {
     it('returns relative time for recent date', () => {
       const recentDate = new Date(Date.now() - 3600000) // 1 hour ago
       const relative = getRelativeTime(recentDate, 'America/New_York')
-      
+
       expect(typeof relative).toBe('string')
     })
 
     it('handles string date input', () => {
       const dateString = '2025-06-21T14:00:00.000Z'
       const relative = getRelativeTime(dateString, 'America/New_York')
-      
+
       expect(typeof relative).toBe('string')
     })
   })
@@ -116,7 +116,7 @@ describe('Timezone Utils', () => {
     it('formats file modification time', () => {
       const dateString = '2025-06-21T14:00:00.000Z'
       const formatted = formatFileTime(dateString, 'America/New_York')
-      
+
       expect(typeof formatted).toBe('string')
       expect(mockDateTimeFormat).toHaveBeenCalled()
     })

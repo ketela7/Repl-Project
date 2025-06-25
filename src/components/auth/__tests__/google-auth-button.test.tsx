@@ -1,5 +1,6 @@
 import { screen, fireEvent, waitFor } from '@testing-library/react'
 import { signIn } from 'next-auth/react'
+
 import { GoogleAuthButton } from '../google-auth-button'
 import { render } from '../../../__tests__/test-utils'
 

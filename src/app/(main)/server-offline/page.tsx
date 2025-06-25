@@ -6,9 +6,10 @@ import {
   RefreshCw,
   AlertTriangle,
   Router,
-  User,
   CheckCircle,
 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -18,7 +19,6 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { useEffect, useState } from 'react'
 
 export default function ServerOfflinePage() {
   const [hasStoredSession, setHasStoredSession] = useState(false)

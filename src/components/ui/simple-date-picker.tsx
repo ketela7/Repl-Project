@@ -1,8 +1,15 @@
 "use client";
 
 import React, { useState } from 'react';
+import { 
+  Calendar as CalendarIcon, 
+  ChevronLeft, 
+  ChevronRight,
+  X
+} from "lucide-react";
+import { format } from "date-fns";
+
 import { Button } from "@/shared/components/ui/button";
-import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
 import {
   Popover,
@@ -16,13 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/shared/components/ui/select";
-import { 
-  Calendar as CalendarIcon, 
-  ChevronLeft, 
-  ChevronRight,
-  X
-} from "lucide-react";
-import { format } from "date-fns";
 
 interface SimpleDatePickerProps {
   date?: Date;

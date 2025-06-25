@@ -7,6 +7,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 ## System Architecture
 
 ### Frontend Architecture
+
 - **Framework**: Next.js 15 with App Router
 - **UI Library**: shadcn/ui components with Radix UI primitives
 - **Styling**: Tailwind CSS with custom design system
@@ -15,6 +16,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 - **Responsive Design**: Mobile-first approach with progressive enhancement
 
 ### Backend Architecture
+
 - **API Routes**: Next.js API routes for server-side logic
 - **Authentication**: NextAuth.js with Google OAuth 2.0
 - **Database**: PostgreSQL with Drizzle ORM (configured but database schema not yet implemented)
@@ -24,12 +26,14 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 ## Key Components
 
 ### Authentication System
+
 - **Provider**: Google OAuth 2.0 with Drive API permissions
 - **Session Handling**: NextAuth.js with custom JWT callbacks
 - **Token Management**: Automatic refresh token handling
 - **Security**: Private environment variables only, no client-side secrets
 
 ### Google Drive Integration
+
 - **API Client**: Custom Google Drive API wrapper
 - **File Operations**: Upload, download, rename, move, copy, delete
 - **Search & Filtering**: Advanced search with multiple criteria
@@ -37,6 +41,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 - **Caching**: Smart caching for improved performance
 
 ### UI Components
+
 - **Design System**: Consistent component library with variants
 - **File Management**: Grid and table views with drag-and-drop
 - **Error Handling**: Comprehensive error boundaries and displays
@@ -46,6 +51,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 ## Data Flow
 
 1. **Authentication Flow**:
+
    - User initiates Google OAuth sign-in
    - Google redirects back with authorization code
    - Server exchanges code for access/refresh tokens
@@ -53,6 +59,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
    - Client receives session cookie
 
 2. **Drive Operations Flow**:
+
    - Client requests protected API endpoint
    - Middleware validates session
    - Server uses stored tokens to call Google Drive API
@@ -68,6 +75,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 ## External Dependencies
 
 ### Core Dependencies
+
 - **Next.js 15**: Full-stack React framework
 - **NextAuth.js**: Authentication library
 - **Google APIs**: Drive API client library
@@ -77,6 +85,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 - **Tailwind CSS**: Utility-first CSS framework
 
 ### Development Dependencies
+
 - **TypeScript**: Static type checking
 - **ESLint**: Code linting with custom rules
 - **Prettier**: Code formatting
@@ -86,12 +95,14 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 ## Deployment Strategy
 
 ### Replit Configuration
+
 - **Runtime**: Node.js 20 with PostgreSQL 16 module
 - **Development Server**: Custom workflow on port 5000
 - **Build Process**: Next.js optimized build
 - **Environment**: Replit secrets for secure configuration
 
 ### Production Considerations
+
 - **Deployment Target**: Autoscale deployment on Replit
 - **Database**: PostgreSQL ready for schema implementation
 - **Caching**: Built-in Next.js caching with custom session cache
@@ -100,7 +111,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 ## Recent Changes
 
 - June 24, 2025: Initial setup with Google Drive authentication
-- June 24, 2025: Updated project rules - no NEXT_PUBLIC_ prefix, only private secrets
+- June 24, 2025: Updated project rules - no NEXT*PUBLIC* prefix, only private secrets
 - June 24, 2025: Simplified file naming (removed "optimized" prefix from theme provider)
 - June 24, 2025: Created comprehensive API documentation with real-time updates
 - June 24, 2025: Updated project structure documentation with current architecture
@@ -142,7 +153,8 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 Preferred communication style: Simple, everyday language.
 
 ### Development Standards (Prioritas Review: Bug → Struktur → Redundansi → UI/UX → Minor)
-- ❌ Tidak gunakan NEXT_PUBLIC_ - hanya variabel rahasia private
+
+- ❌ Tidak gunakan NEXT*PUBLIC* - hanya variabel rahasia private
 - 📁 Penamaan file sederhana tanpa awalan/akhiran (drive-manager.tsx ✅, optimized-drive-manager.tsx ❌)
 - 🔧 Class dan function nama sederhana (ErrorHandler ✅, EnhancedErrorHandler ❌)
 - 🧼 Hapus import unused, duplikasi kode, refactor untuk kesederhanaan

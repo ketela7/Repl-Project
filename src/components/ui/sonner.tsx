@@ -2,6 +2,7 @@
 
 import { useTheme } from "next-themes"
 import { Toaster as Sonner } from "sonner"
+
 import { useIsMobile } from "@/shared/hooks/use-mobile"
 
 type ToasterProps = React.ComponentProps<typeof Sonner>

@@ -1,10 +1,10 @@
-"use client";
+'use client'
 
-import { ThemeProvider } from "next-themes";
-import { ReactNode } from "react";
+import { ThemeProvider } from 'next-themes'
+import { ReactNode } from 'react'
 
 interface ThemeProviderProps {
-  children: ReactNode;
+  children: ReactNode
 }
 
 export function CustomThemeProvider({ children }: ThemeProviderProps) {
@@ -17,5 +17,5 @@ export function CustomThemeProvider({ children }: ThemeProviderProps) {
     >
       {children}
     </ThemeProvider>
-  );
+  )
 }

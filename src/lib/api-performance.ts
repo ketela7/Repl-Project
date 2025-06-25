@@ -37,7 +37,7 @@ class APIOptimizer {
         resolve,
         reject,
         priority,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       }
 
       // Insert based on priority
@@ -59,7 +59,7 @@ class APIOptimizer {
     try {
       while (this.batchQueue.length > 0) {
         const batch = this.batchQueue.splice(0, this.BATCH_SIZE)
-        
+
         // Process batch concurrently
         const promises = batch.map(async (item) => {
           try {
@@ -71,7 +71,7 @@ class APIOptimizer {
         })
 
         await Promise.all(promises)
-        
+
         // Small delay between batches to prevent overwhelming
         if (this.batchQueue.length > 0) {
           await this.sleep(this.BATCH_DELAY)
@@ -87,7 +87,7 @@ class APIOptimizer {
    */
   async prefetchCommonData(userId: string, folderId?: string): Promise<void> {
     const prefetchKey = `${userId}-${folderId || 'root'}`
-    
+
     if (this.prefetchCache.has(prefetchKey)) return
     this.prefetchCache.add(prefetchKey)
 
@@ -106,7 +106,7 @@ class APIOptimizer {
    * Intelligent cache warming
    */
   warmCache(patterns: string[]): void {
-    patterns.forEach(pattern => {
+    patterns.forEach((pattern) => {
       if (!driveCache.has(pattern)) {
         // Warm cache with common patterns
         this.batchRequest(
@@ -122,7 +122,7 @@ class APIOptimizer {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms))
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
   /**
@@ -136,7 +136,7 @@ class APIOptimizer {
     return {
       queueSize: this.batchQueue.length,
       processing: this.processing,
-      prefetchCacheSize: this.prefetchCache.size
+      prefetchCacheSize: this.prefetchCache.size,
     }
   }
 

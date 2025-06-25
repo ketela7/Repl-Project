@@ -1,10 +1,20 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
+import {
+  Share2,
+  Users,
+  Globe,
+  Lock,
+  Mail,
+  Eye,
+  Edit,
+} from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import {
   Dialog,
   DialogContent,
@@ -18,7 +28,6 @@ import {
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
-  BottomSheetDescription,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
 import {
@@ -31,20 +40,8 @@ import {
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
-import { toast } from 'sonner'
 import { successToast, errorToast, loadingToast } from '@/shared/utils'
 import { copyToClipboard } from '@/lib/clipboard'
-import {
-  Share2,
-  Copy,
-  Users,
-  Globe,
-  Lock,
-  Mail,
-  Eye,
-  Edit,
-  Trash2,
-} from 'lucide-react'
 import { cn } from '@/shared/utils'
 
 interface FileShareDialogProps {

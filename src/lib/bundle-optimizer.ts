@@ -4,9 +4,12 @@
 
 // Dynamic imports for heavy components
 export const loadHeavyComponents = {
-  DriveManager: () => import('@/app/(main)/dashboard/drive/_components/drive-manager'),
-  FilePreviewDialog: () => import('@/app/(main)/dashboard/drive/_components/file-preview-dialog'),
-  DriveDataView: () => import('@/app/(main)/dashboard/drive/_components/drive-data-view'),
+  DriveManager: () =>
+    import('@/app/(main)/dashboard/drive/_components/drive-manager'),
+  FilePreviewDialog: () =>
+    import('@/app/(main)/dashboard/drive/_components/file-preview-dialog'),
+  DriveDataView: () =>
+    import('@/app/(main)/dashboard/drive/_components/drive-data-view'),
 }
 
 // Preload critical components
@@ -30,7 +33,7 @@ export const preloadCriticalComponents = () => {
     // Preload on first user interaction
     const preloadOnInteraction = () => {
       loadHeavyComponents.FilePreviewDialog()
-      
+
       // Remove listeners after first interaction
       document.removeEventListener('mousedown', preloadOnInteraction)
       document.removeEventListener('touchstart', preloadOnInteraction)
@@ -39,9 +42,15 @@ export const preloadCriticalComponents = () => {
 
     // Set up preloading
     preloadOnIdle()
-    document.addEventListener('mousedown', preloadOnInteraction, { passive: true })
-    document.addEventListener('touchstart', preloadOnInteraction, { passive: true })
-    document.addEventListener('keydown', preloadOnInteraction, { passive: true })
+    document.addEventListener('mousedown', preloadOnInteraction, {
+      passive: true,
+    })
+    document.addEventListener('touchstart', preloadOnInteraction, {
+      passive: true,
+    })
+    document.addEventListener('keydown', preloadOnInteraction, {
+      passive: true,
+    })
   }
 }
 

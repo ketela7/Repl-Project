@@ -41,7 +41,7 @@ process.env = {
 }
 
 // Mock window.matchMedia
-const mockMatchMedia = jest.fn().mockImplementation(query => ({
+const mockMatchMedia = jest.fn().mockImplementation((query) => ({
   matches: false,
   media: query,
   onchange: null,

@@ -475,7 +475,6 @@ export function DriveToolbar({
 
   // Optimized bulk operation handlers
 
-
   const handleBulkOperationComplete = () => {
     onDeselectAll()
     onRefreshAfterBulkOp()
@@ -483,8 +482,6 @@ export function DriveToolbar({
 
   // Actions Dialog State
   const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
-  
-
 
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters
@@ -708,9 +705,8 @@ export function DriveToolbar({
                   <>
                     <DropdownMenuSeparator />
                     {selectedCount < items.length && (
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={(e) => {
-
                           e.preventDefault()
                           e.stopPropagation()
                           onSelectAll()
@@ -722,9 +718,8 @@ export function DriveToolbar({
                     )}
 
                     {selectedCount > 0 && (
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={(e) => {
-
                           e.preventDefault()
                           e.stopPropagation()
                           onDeselectAll()
@@ -742,7 +737,6 @@ export function DriveToolbar({
                     {isMobile ? (
                       <DropdownMenuItem
                         onClick={(e) => {
-
                           e.preventDefault()
                           e.stopPropagation()
                           setIsBulkOperationsOpen(true)
@@ -2071,8 +2065,6 @@ export function DriveToolbar({
         </div>
       </div>
 
-
-
       {/* Bulk Operations Dialog */}
       <BulkOperationsDialog
         isOpen={isBulkOperationsOpen}
@@ -2080,7 +2072,6 @@ export function DriveToolbar({
         selectedItems={selectedItems}
         onRefreshAfterBulkOp={handleBulkOperationComplete}
       />
-
     </div>
   )
 }

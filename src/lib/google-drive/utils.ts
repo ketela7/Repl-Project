@@ -1,36 +1,49 @@
-import { drive_v3 } from 'googleapis';
-import { DriveFile, DriveFolder, DriveFileCapabilities } from './types';
+import { drive_v3 } from 'googleapis'
+
+import { DriveFile, DriveFolder, DriveFileCapabilities } from './types'
 
 export function formatFileSize(bytes: string | number): string {
-  const size = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes;
+  const size = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes
 
-  if (isNaN(size) || size === 0) return '0 B';
+  if (isNaN(size) || size === 0) return '0 B'
 
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  const i = Math.floor(Math.log(size) / Math.log(1024));
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(size) / Math.log(1024))
 
-  return `${(size / Math.pow(1024, i)).toFixed(1)} ${units[i]}`;
+  return `${(size / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
 }
 
 // File size utilities
 export function normalizeFileSize(size: any): number {
-  if (size === null || size === undefined || size === '' || size === '-') return 0;
-  if (!size && size !== 0) return 0;
+  if (size === null || size === undefined || size === '' || size === '-')
+    return 0
+  if (!size && size !== 0) return 0
 
-  const sizeStr = size.toString().trim();
-  if (sizeStr === '-' || sizeStr === '' || sizeStr === 'undefined' || sizeStr === 'null') return 0;
+  const sizeStr = size.toString().trim()
+  if (
+    sizeStr === '-' ||
+    sizeStr === '' ||
+    sizeStr === 'undefined' ||
+    sizeStr === 'null'
+  )
+    return 0
 
-  const parsedSize = parseInt(sizeStr);
-  return isNaN(parsedSize) || parsedSize < 0 ? 0 : parsedSize;
+  const parsedSize = parseInt(sizeStr)
+  return isNaN(parsedSize) || parsedSize < 0 ? 0 : parsedSize
 }
 
 export function getSizeMultiplier(unit: 'B' | 'KB' | 'MB' | 'GB'): number {
   switch (unit) {
-    case 'B': return 1;
-    case 'KB': return 1024;
-    case 'MB': return 1024 * 1024;
-    case 'GB': return 1024 * 1024 * 1024;
-    default: return 1;
+    case 'B':
+      return 1
+    case 'KB':
+      return 1024
+    case 'MB':
+      return 1024 * 1024
+    case 'GB':
+      return 1024 * 1024 * 1024
+    default:
+      return 1
   }
 }
 
@@ -40,11 +53,11 @@ export function isFileSizeInRange(
   maxSize?: number,
   unit: 'B' | 'KB' | 'MB' | 'GB' = 'MB'
 ): boolean {
-  const normalizedFileSize = normalizeFileSize(fileSize);
-  const multiplier = getSizeMultiplier(unit);
-  const minBytes = minSize ? minSize * multiplier : 0;
-  const maxBytes = maxSize ? maxSize * multiplier : Number.MAX_SAFE_INTEGER;
-  return normalizedFileSize >= minBytes && normalizedFileSize <= maxBytes;
+  const normalizedFileSize = normalizeFileSize(fileSize)
+  const multiplier = getSizeMultiplier(unit)
+  const minBytes = minSize ? minSize * multiplier : 0
+  const maxBytes = maxSize ? maxSize * multiplier : Number.MAX_SAFE_INTEGER
+  return normalizedFileSize >= minBytes && normalizedFileSize <= maxBytes
 }
 
 export function getFileIconName(mimeType: string, fileName?: string): string {
@@ -66,17 +79,20 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'text/plain': 'FileText',
     'text/markdown': 'FileText',
     'application/msword': 'FileText',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'FileText',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+      'FileText',
     'application/rtf': 'FileText',
 
     // Spreadsheets
     'application/vnd.ms-excel': 'FileSpreadsheet',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'FileSpreadsheet',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+      'FileSpreadsheet',
     'text/csv': 'FileSpreadsheet',
 
     // Presentations
     'application/vnd.ms-powerpoint': 'Presentation',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'Presentation',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+      'Presentation',
 
     // Images
     'image/jpeg': 'FileImage',
@@ -310,198 +326,198 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'application/x-lha': 'Archive',
     'application/x-lzma': 'Archive',
     'application/x-xz': 'Archive',
-  };
+  }
 
   // Check by MIME type first
   if (iconMap[mimeType]) {
-    return iconMap[mimeType];
+    return iconMap[mimeType]
   }
 
   // Fallback: check by file extension if fileName is provided
   if (fileName) {
-    const extension = fileName.split('.').pop()?.toLowerCase();
+    const extension = fileName.split('.').pop()?.toLowerCase()
     const extensionMap: Record<string, string> = {
       // Code files
-      'js': 'FileCode',
-      'ts': 'FileCode',
-      'jsx': 'FileCode',
-      'tsx': 'FileCode',
-      'vue': 'FileCode',
-      'svelte': 'FileCode',
-      'py': 'FileCode',
-      'java': 'FileCode',
-      'kotlin': 'FileCode',
-      'kt': 'FileCode',
-      'scala': 'FileCode',
-      'cpp': 'FileCode',
-      'cc': 'FileCode',
-      'cxx': 'FileCode',
-      'c': 'FileCode',
-      'h': 'FileCode',
-      'hpp': 'FileCode',
-      'cs': 'FileCode',
-      'php': 'FileCode',
-      'rb': 'FileCode',
-      'go': 'FileCode',
-      'rs': 'FileCode',
-      'swift': 'FileCode',
-      'sh': 'FileCode',
-      'bash': 'FileCode',
-      'zsh': 'FileCode',
-      'fish': 'FileCode',
-      'bat': 'FileCode',
-      'cmd': 'FileCode',
-      'ps1': 'FileCode',
-      'pl': 'FileCode',
-      'perl': 'FileCode',
-      'r': 'FileCode',
-      'lua': 'FileCode',
-      'dart': 'FileCode',
-      'elm': 'FileCode',
-      'ex': 'FileCode',
-      'exs': 'FileCode',
-      'clj': 'FileCode',
-      'cljs': 'FileCode',
-      'hs': 'FileCode',
-      'ml': 'FileCode',
-      'fs': 'FileCode',
-      'nim': 'FileCode',
+      js: 'FileCode',
+      ts: 'FileCode',
+      jsx: 'FileCode',
+      tsx: 'FileCode',
+      vue: 'FileCode',
+      svelte: 'FileCode',
+      py: 'FileCode',
+      java: 'FileCode',
+      kotlin: 'FileCode',
+      kt: 'FileCode',
+      scala: 'FileCode',
+      cpp: 'FileCode',
+      cc: 'FileCode',
+      cxx: 'FileCode',
+      c: 'FileCode',
+      h: 'FileCode',
+      hpp: 'FileCode',
+      cs: 'FileCode',
+      php: 'FileCode',
+      rb: 'FileCode',
+      go: 'FileCode',
+      rs: 'FileCode',
+      swift: 'FileCode',
+      sh: 'FileCode',
+      bash: 'FileCode',
+      zsh: 'FileCode',
+      fish: 'FileCode',
+      bat: 'FileCode',
+      cmd: 'FileCode',
+      ps1: 'FileCode',
+      pl: 'FileCode',
+      perl: 'FileCode',
+      r: 'FileCode',
+      lua: 'FileCode',
+      dart: 'FileCode',
+      elm: 'FileCode',
+      ex: 'FileCode',
+      exs: 'FileCode',
+      clj: 'FileCode',
+      cljs: 'FileCode',
+      hs: 'FileCode',
+      ml: 'FileCode',
+      fs: 'FileCode',
+      nim: 'FileCode',
 
       // Config files
-      'json': 'FileCode',
-      'json5': 'FileCode',
-      'jsonc': 'FileCode',
-      'xml': 'FileCode',
-      'yaml': 'FileCode',
-      'yml': 'FileCode',
-      'toml': 'FileCode',
-      'ini': 'FileCode',
-      'conf': 'FileCode',
-      'config': 'FileCode',
-      'env': 'FileCode',
-      'properties': 'FileCode',
-      'gradle': 'FileCode',
-      'cmake': 'FileCode',
-      'makefile': 'FileCode',
-      'dockerfile': 'FileCode',
-      'gitignore': 'FileCode',
-      'editorconfig': 'FileCode',
-      'eslintrc': 'FileCode',
+      json: 'FileCode',
+      json5: 'FileCode',
+      jsonc: 'FileCode',
+      xml: 'FileCode',
+      yaml: 'FileCode',
+      yml: 'FileCode',
+      toml: 'FileCode',
+      ini: 'FileCode',
+      conf: 'FileCode',
+      config: 'FileCode',
+      env: 'FileCode',
+      properties: 'FileCode',
+      gradle: 'FileCode',
+      cmake: 'FileCode',
+      makefile: 'FileCode',
+      dockerfile: 'FileCode',
+      gitignore: 'FileCode',
+      editorconfig: 'FileCode',
+      eslintrc: 'FileCode',
 
       // Documentation
-      'md': 'FileText',
-      'markdown': 'FileText',
-      'mdown': 'FileText',
-      'mkd': 'FileText',
-      'readme': 'FileText',
-      'txt': 'FileText',
-      'doc': 'FileText',
-      'docx': 'FileText',
-      'rtf': 'FileText',
-      'odt': 'FileText',
+      md: 'FileText',
+      markdown: 'FileText',
+      mdown: 'FileText',
+      mkd: 'FileText',
+      readme: 'FileText',
+      txt: 'FileText',
+      doc: 'FileText',
+      docx: 'FileText',
+      rtf: 'FileText',
+      odt: 'FileText',
 
       // Archives by extension
-      'rar': 'Archive',
-      'zip': 'Archive',
+      rar: 'Archive',
+      zip: 'Archive',
       '7z': 'Archive',
-      'tar': 'Archive',
-      'gz': 'Archive',
-      'bz2': 'Archive',
-      'xz': 'Archive',
-      'dmg': 'Archive',
-      'iso': 'Archive',
-      'deb': 'Archive',
-      'rpm': 'Archive',
-      'pkg': 'Archive',
-      'msi': 'Archive',
+      tar: 'Archive',
+      gz: 'Archive',
+      bz2: 'Archive',
+      xz: 'Archive',
+      dmg: 'Archive',
+      iso: 'Archive',
+      deb: 'Archive',
+      rpm: 'Archive',
+      pkg: 'Archive',
+      msi: 'Archive',
 
       // Design
-      'psd': 'Palette',
-      'psb': 'Palette',
-      'ai': 'Palette',
-      'eps': 'Palette',
-      'sketch': 'Palette',
-      'fig': 'Palette',
-      'figma': 'Palette',
-      'xd': 'Palette',
-      'indd': 'Palette',
-      'idml': 'Palette',
-      'xcf': 'Palette',
+      psd: 'Palette',
+      psb: 'Palette',
+      ai: 'Palette',
+      eps: 'Palette',
+      sketch: 'Palette',
+      fig: 'Palette',
+      figma: 'Palette',
+      xd: 'Palette',
+      indd: 'Palette',
+      idml: 'Palette',
+      xcf: 'Palette',
 
       // Fonts
-      'ttf': 'FileText',
-      'otf': 'FileText',
-      'woff': 'FileText',
-      'woff2': 'FileText',
-      'eot': 'FileText',
+      ttf: 'FileText',
+      otf: 'FileText',
+      woff: 'FileText',
+      woff2: 'FileText',
+      eot: 'FileText',
 
       // E-books
-      'epub': 'BookOpen',
-      'mobi': 'BookOpen',
-      'azw': 'BookOpen',
-      'azw3': 'BookOpen',
-      'fb2': 'BookOpen',
+      epub: 'BookOpen',
+      mobi: 'BookOpen',
+      azw: 'BookOpen',
+      azw3: 'BookOpen',
+      fb2: 'BookOpen',
 
       // 3D and CAD
-      'stl': 'FileImage',
-      'obj': 'FileImage',
+      stl: 'FileImage',
+      obj: 'FileImage',
       '3mf': 'FileImage',
-      'dwg': 'FileImage',
-      'dxf': 'FileImage',
-      'step': 'FileImage',
-      'iges': 'FileImage',
+      dwg: 'FileImage',
+      dxf: 'FileImage',
+      step: 'FileImage',
+      iges: 'FileImage',
 
       // Raw image formats
-      'cr2': 'Camera',
-      'crw': 'Camera',
-      'nef': 'Camera',
-      'dng': 'Camera',
-      'arw': 'Camera',
-      'orf': 'Camera',
-      'rw2': 'Camera',
-      'raw': 'Camera',
-      'heic': 'FileImage',
-      'heif': 'FileImage',
-      'avif': 'FileImage',
-      'jxl': 'FileImage',
+      cr2: 'Camera',
+      crw: 'Camera',
+      nef: 'Camera',
+      dng: 'Camera',
+      arw: 'Camera',
+      orf: 'Camera',
+      rw2: 'Camera',
+      raw: 'Camera',
+      heic: 'FileImage',
+      heif: 'FileImage',
+      avif: 'FileImage',
+      jxl: 'FileImage',
 
       // Mobile app formats
-      'apk': 'Smartphone',
-      'ipa': 'Smartphone',
-      'app': 'Smartphone',
+      apk: 'Smartphone',
+      ipa: 'Smartphone',
+      app: 'Smartphone',
 
       // System files
-      'dll': 'HardDrive',
-      'so': 'HardDrive',
-      'dylib': 'HardDrive',
-      'exe': 'Monitor',
-      'com': 'Monitor',
-      'scr': 'Monitor',
+      dll: 'HardDrive',
+      so: 'HardDrive',
+      dylib: 'HardDrive',
+      exe: 'Monitor',
+      com: 'Monitor',
+      scr: 'Monitor',
 
       // Virtual machine formats
-      'vdi': 'HardDrive',
-      'vmdk': 'HardDrive',
-      'vhd': 'HardDrive',
-      'vhdx': 'HardDrive',
-      'qcow2': 'HardDrive',
+      vdi: 'HardDrive',
+      vmdk: 'HardDrive',
+      vhd: 'HardDrive',
+      vhdx: 'HardDrive',
+      qcow2: 'HardDrive',
 
       // Additional archives
-      'cab': 'Archive',
-      'lha': 'Archive',
-      'lzh': 'Archive',
-      'ace': 'Archive',
-      'arj': 'Archive',
+      cab: 'Archive',
+      lha: 'Archive',
+      lzh: 'Archive',
+      ace: 'Archive',
+      arj: 'Archive',
 
       // Torrent and download files
-      'torrent': 'Package',
-    };
+      torrent: 'Package',
+    }
 
     if (extension && extensionMap[extension]) {
-      return extensionMap[extension];
+      return extensionMap[extension]
     }
   }
 
-  return 'File';
+  return 'File'
 }
 
 export function getFileIconColor(mimeType: string, fileName?: string): string {
@@ -509,31 +525,37 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     // Google Workspace Files
     'application/vnd.google-apps.folder': 'text-blue-600 dark:text-blue-400',
     'application/vnd.google-apps.document': 'text-blue-500 dark:text-blue-400',
-    'application/vnd.google-apps.spreadsheet': 'text-green-600 dark:text-green-400',
-    'application/vnd.google-apps.presentation': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.google-apps.spreadsheet':
+      'text-green-600 dark:text-green-400',
+    'application/vnd.google-apps.presentation':
+      'text-orange-600 dark:text-orange-400',
     'application/vnd.google-apps.form': 'text-purple-600 dark:text-purple-400',
     'application/vnd.google-apps.drawing': 'text-pink-600 dark:text-pink-400',
     'application/vnd.google-apps.map': 'text-emerald-600 dark:text-emerald-400',
     'application/vnd.google-apps.site': 'text-cyan-600 dark:text-cyan-400',
     'application/vnd.google-apps.script': 'text-amber-600 dark:text-amber-400',
-    'application/vnd.google-apps.shortcut': 'text-slate-600 dark:text-slate-400',
+    'application/vnd.google-apps.shortcut':
+      'text-slate-600 dark:text-slate-400',
 
     // PDF and Documents
     'application/pdf': 'text-red-600 dark:text-red-400',
     'text/plain': 'text-gray-600 dark:text-gray-400',
     'text/markdown': 'text-slate-600 dark:text-slate-400',
     'application/msword': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'text-blue-600 dark:text-blue-400',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+      'text-blue-600 dark:text-blue-400',
     'application/rtf': 'text-blue-600 dark:text-blue-400',
 
     // Spreadsheets
     'application/vnd.ms-excel': 'text-green-600 dark:text-green-400',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'text-green-600 dark:text-green-400',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+      'text-green-600 dark:text-green-400',
     'text/csv': 'text-green-600 dark:text-green-400',
 
     // Presentations
     'application/vnd.ms-powerpoint': 'text-orange-600 dark:text-orange-400',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+      'text-orange-600 dark:text-orange-400',
 
     // Images
     'image/jpeg': 'text-purple-600 dark:text-purple-400',
@@ -686,12 +708,16 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'application/x-mach-binary': 'text-gray-600 dark:text-gray-400',
     'application/x-deb': 'text-yellow-600 dark:text-yellow-400',
     'application/x-rpm': 'text-yellow-600 dark:text-yellow-400',
-    'application/vnd.microsoft.portable-executable': 'text-gray-600 dark:text-gray-400',
+    'application/vnd.microsoft.portable-executable':
+      'text-gray-600 dark:text-gray-400',
 
     // Office formats (additional)
-    'application/vnd.oasis.opendocument.text': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.oasis.opendocument.spreadsheet': 'text-green-600 dark:text-green-400',
-    'application/vnd.oasis.opendocument.presentation': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.oasis.opendocument.text':
+      'text-blue-600 dark:text-blue-400',
+    'application/vnd.oasis.opendocument.spreadsheet':
+      'text-green-600 dark:text-green-400',
+    'application/vnd.oasis.opendocument.presentation':
+      'text-orange-600 dark:text-orange-400',
     'application/vnd.sun.xml.writer': 'text-blue-600 dark:text-blue-400',
     'application/vnd.sun.xml.calc': 'text-green-600 dark:text-green-400',
     'application/vnd.sun.xml.impress': 'text-orange-600 dark:text-orange-400',
@@ -709,7 +735,8 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'application/vnd.rn-realmedia': 'text-red-600 dark:text-red-400',
 
     // Mobile app formats
-    'application/vnd.android.package-archive': 'text-green-600 dark:text-green-400',
+    'application/vnd.android.package-archive':
+      'text-green-600 dark:text-green-400',
     'application/x-ios-app': 'text-blue-600 dark:text-blue-400',
     'application/vnd.apple.installer+xml': 'text-blue-600 dark:text-blue-400',
 
@@ -733,181 +760,181 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'application/x-lha': 'text-yellow-600 dark:text-yellow-400',
     'application/x-lzma': 'text-yellow-600 dark:text-yellow-400',
     'application/x-xz': 'text-yellow-600 dark:text-yellow-400',
-  };
+  }
 
   // Check by MIME type first
   if (colorMap[mimeType]) {
-    return colorMap[mimeType];
+    return colorMap[mimeType]
   }
 
   // Fallback: check by file extension if fileName is provided
   if (fileName) {
-    const extension = fileName.split('.').pop()?.toLowerCase();
+    const extension = fileName.split('.').pop()?.toLowerCase()
     const extensionColorMap: Record<string, string> = {
       // Programming languages with specific colors
-      'js': 'text-yellow-500 dark:text-yellow-400',
-      'ts': 'text-blue-500 dark:text-blue-400',
-      'jsx': 'text-cyan-500 dark:text-cyan-400',
-      'tsx': 'text-cyan-500 dark:text-cyan-400',
-      'vue': 'text-green-500 dark:text-green-400',
-      'svelte': 'text-orange-500 dark:text-orange-400',
-      'py': 'text-green-500 dark:text-green-400',
-      'java': 'text-red-500 dark:text-red-400',
-      'kotlin': 'text-purple-500 dark:text-purple-400',
-      'kt': 'text-purple-500 dark:text-purple-400',
-      'scala': 'text-red-500 dark:text-red-400',
-      'cpp': 'text-slate-500 dark:text-slate-400',
-      'cc': 'text-slate-500 dark:text-slate-400',
-      'cxx': 'text-slate-500 dark:text-slate-400',
-      'c': 'text-slate-500 dark:text-slate-400',
-      'h': 'text-slate-500 dark:text-slate-400',
-      'hpp': 'text-slate-500 dark:text-slate-400',
-      'cs': 'text-purple-500 dark:text-purple-400',
-      'php': 'text-violet-500 dark:text-violet-400',
-      'rb': 'text-red-500 dark:text-red-400',
-      'go': 'text-cyan-500 dark:text-cyan-400',
-      'rs': 'text-orange-500 dark:text-orange-400',
-      'swift': 'text-orange-500 dark:text-orange-400',
-      'sh': 'text-gray-500 dark:text-gray-400',
-      'bash': 'text-gray-500 dark:text-gray-400',
-      'zsh': 'text-gray-500 dark:text-gray-400',
-      'fish': 'text-blue-500 dark:text-blue-400',
-      'bat': 'text-gray-500 dark:text-gray-400',
-      'cmd': 'text-gray-500 dark:text-gray-400',
-      'ps1': 'text-blue-500 dark:text-blue-400',
-      'pl': 'text-blue-500 dark:text-blue-400',
-      'perl': 'text-blue-500 dark:text-blue-400',
-      'r': 'text-blue-500 dark:text-blue-400',
-      'lua': 'text-blue-500 dark:text-blue-400',
-      'dart': 'text-blue-500 dark:text-blue-400',
-      'elm': 'text-green-500 dark:text-green-400',
-      'ex': 'text-purple-500 dark:text-purple-400',
-      'exs': 'text-purple-500 dark:text-purple-400',
-      'clj': 'text-green-500 dark:text-green-400',
-      'cljs': 'text-green-500 dark:text-green-400',
-      'hs': 'text-purple-500 dark:text-purple-400',
-      'ml': 'text-orange-500 dark:text-orange-400',
-      'fs': 'text-blue-500 dark:text-blue-400',
-      'nim': 'text-yellow-500 dark:text-yellow-400',
+      js: 'text-yellow-500 dark:text-yellow-400',
+      ts: 'text-blue-500 dark:text-blue-400',
+      jsx: 'text-cyan-500 dark:text-cyan-400',
+      tsx: 'text-cyan-500 dark:text-cyan-400',
+      vue: 'text-green-500 dark:text-green-400',
+      svelte: 'text-orange-500 dark:text-orange-400',
+      py: 'text-green-500 dark:text-green-400',
+      java: 'text-red-500 dark:text-red-400',
+      kotlin: 'text-purple-500 dark:text-purple-400',
+      kt: 'text-purple-500 dark:text-purple-400',
+      scala: 'text-red-500 dark:text-red-400',
+      cpp: 'text-slate-500 dark:text-slate-400',
+      cc: 'text-slate-500 dark:text-slate-400',
+      cxx: 'text-slate-500 dark:text-slate-400',
+      c: 'text-slate-500 dark:text-slate-400',
+      h: 'text-slate-500 dark:text-slate-400',
+      hpp: 'text-slate-500 dark:text-slate-400',
+      cs: 'text-purple-500 dark:text-purple-400',
+      php: 'text-violet-500 dark:text-violet-400',
+      rb: 'text-red-500 dark:text-red-400',
+      go: 'text-cyan-500 dark:text-cyan-400',
+      rs: 'text-orange-500 dark:text-orange-400',
+      swift: 'text-orange-500 dark:text-orange-400',
+      sh: 'text-gray-500 dark:text-gray-400',
+      bash: 'text-gray-500 dark:text-gray-400',
+      zsh: 'text-gray-500 dark:text-gray-400',
+      fish: 'text-blue-500 dark:text-blue-400',
+      bat: 'text-gray-500 dark:text-gray-400',
+      cmd: 'text-gray-500 dark:text-gray-400',
+      ps1: 'text-blue-500 dark:text-blue-400',
+      pl: 'text-blue-500 dark:text-blue-400',
+      perl: 'text-blue-500 dark:text-blue-400',
+      r: 'text-blue-500 dark:text-blue-400',
+      lua: 'text-blue-500 dark:text-blue-400',
+      dart: 'text-blue-500 dark:text-blue-400',
+      elm: 'text-green-500 dark:text-green-400',
+      ex: 'text-purple-500 dark:text-purple-400',
+      exs: 'text-purple-500 dark:text-purple-400',
+      clj: 'text-green-500 dark:text-green-400',
+      cljs: 'text-green-500 dark:text-green-400',
+      hs: 'text-purple-500 dark:text-purple-400',
+      ml: 'text-orange-500 dark:text-orange-400',
+      fs: 'text-blue-500 dark:text-blue-400',
+      nim: 'text-yellow-500 dark:text-yellow-400',
 
       // Archives
-      'rar': 'text-yellow-600 dark:text-yellow-400',
-      'zip': 'text-yellow-600 dark:text-yellow-400',
+      rar: 'text-yellow-600 dark:text-yellow-400',
+      zip: 'text-yellow-600 dark:text-yellow-400',
       '7z': 'text-yellow-600 dark:text-yellow-400',
-      'tar': 'text-yellow-600 dark:text-yellow-400',
-      'gz': 'text-yellow-600 dark:text-yellow-400',
-      'bz2': 'text-yellow-600 dark:text-yellow-400',
-      'xz': 'text-yellow-600 dark:text-yellow-400',
-      'dmg': 'text-yellow-600 dark:text-yellow-400',
-      'iso': 'text-yellow-600 dark:text-yellow-400',
-      'deb': 'text-yellow-600 dark:text-yellow-400',
-      'rpm': 'text-yellow-600 dark:text-yellow-400',
-      'pkg': 'text-yellow-600 dark:text-yellow-400',
-      'msi': 'text-yellow-600 dark:text-yellow-400',
+      tar: 'text-yellow-600 dark:text-yellow-400',
+      gz: 'text-yellow-600 dark:text-yellow-400',
+      bz2: 'text-yellow-600 dark:text-yellow-400',
+      xz: 'text-yellow-600 dark:text-yellow-400',
+      dmg: 'text-yellow-600 dark:text-yellow-400',
+      iso: 'text-yellow-600 dark:text-yellow-400',
+      deb: 'text-yellow-600 dark:text-yellow-400',
+      rpm: 'text-yellow-600 dark:text-yellow-400',
+      pkg: 'text-yellow-600 dark:text-yellow-400',
+      msi: 'text-yellow-600 dark:text-yellow-400',
 
       // Design files
-      'psd': 'text-blue-600 dark:text-blue-400',
-      'psb': 'text-blue-600 dark:text-blue-400',
-      'ai': 'text-orange-600 dark:text-orange-400',
-      'eps': 'text-orange-600 dark:text-orange-400',
-      'sketch': 'text-pink-600 dark:text-pink-400',
-      'fig': 'text-violet-600 dark:text-violet-400',
-      'figma': 'text-violet-600 dark:text-violet-400',
-      'xd': 'text-purple-600 dark:text-purple-400',
-      'indd': 'text-purple-600 dark:text-purple-400',
-      'idml': 'text-purple-600 dark:text-purple-400',
-      'xcf': 'text-cyan-600 dark:text-cyan-400',
+      psd: 'text-blue-600 dark:text-blue-400',
+      psb: 'text-blue-600 dark:text-blue-400',
+      ai: 'text-orange-600 dark:text-orange-400',
+      eps: 'text-orange-600 dark:text-orange-400',
+      sketch: 'text-pink-600 dark:text-pink-400',
+      fig: 'text-violet-600 dark:text-violet-400',
+      figma: 'text-violet-600 dark:text-violet-400',
+      xd: 'text-purple-600 dark:text-purple-400',
+      indd: 'text-purple-600 dark:text-purple-400',
+      idml: 'text-purple-600 dark:text-purple-400',
+      xcf: 'text-cyan-600 dark:text-cyan-400',
 
       // Fonts
-      'ttf': 'text-slate-600 dark:text-slate-400',
-      'otf': 'text-slate-600 dark:text-slate-400',
-      'woff': 'text-slate-600 dark:text-slate-400',
-      'woff2': 'text-slate-600 dark:text-slate-400',
-      'eot': 'text-slate-600 dark:text-slate-400',
+      ttf: 'text-slate-600 dark:text-slate-400',
+      otf: 'text-slate-600 dark:text-slate-400',
+      woff: 'text-slate-600 dark:text-slate-400',
+      woff2: 'text-slate-600 dark:text-slate-400',
+      eot: 'text-slate-600 dark:text-slate-400',
 
       // E-books
-      'epub': 'text-purple-600 dark:text-purple-400',
-      'mobi': 'text-purple-600 dark:text-purple-400',
-      'azw': 'text-purple-600 dark:text-purple-400',
-      'azw3': 'text-purple-600 dark:text-purple-400',
-      'fb2': 'text-purple-600 dark:text-purple-400',
+      epub: 'text-purple-600 dark:text-purple-400',
+      mobi: 'text-purple-600 dark:text-purple-400',
+      azw: 'text-purple-600 dark:text-purple-400',
+      azw3: 'text-purple-600 dark:text-purple-400',
+      fb2: 'text-purple-600 dark:text-purple-400',
 
       // 3D and CAD
-      'stl': 'text-cyan-600 dark:text-cyan-400',
-      'obj': 'text-cyan-600 dark:text-cyan-400',
+      stl: 'text-cyan-600 dark:text-cyan-400',
+      obj: 'text-cyan-600 dark:text-cyan-400',
       '3mf': 'text-cyan-600 dark:text-cyan-400',
-      'dwg': 'text-cyan-600 dark:text-cyan-400',
-      'dxf': 'text-cyan-600 dark:text-cyan-400',
-      'step': 'text-cyan-600 dark:text-cyan-400',
-      'iges': 'text-cyan-600 dark:text-cyan-400',
+      dwg: 'text-cyan-600 dark:text-cyan-400',
+      dxf: 'text-cyan-600 dark:text-cyan-400',
+      step: 'text-cyan-600 dark:text-cyan-400',
+      iges: 'text-cyan-600 dark:text-cyan-400',
 
       // Raw image formats
-      'cr2': 'text-emerald-600 dark:text-emerald-400',
-      'crw': 'text-emerald-600 dark:text-emerald-400',
-      'nef': 'text-emerald-600 dark:text-emerald-400',
-      'dng': 'text-emerald-600 dark:text-emerald-400',
-      'arw': 'text-emerald-600 dark:text-emerald-400',
-      'orf': 'text-emerald-600 dark:text-emerald-400',
-      'rw2': 'text-emerald-600 dark:text-emerald-400',
-      'raw': 'text-emerald-600 dark:text-emerald-400',
-      'heic': 'text-purple-600 dark:text-purple-400',
-      'heif': 'text-purple-600 dark:text-purple-400',
-      'avif': 'text-purple-600 dark:text-purple-400',
-      'jxl': 'text-purple-600 dark:text-purple-400',
+      cr2: 'text-emerald-600 dark:text-emerald-400',
+      crw: 'text-emerald-600 dark:text-emerald-400',
+      nef: 'text-emerald-600 dark:text-emerald-400',
+      dng: 'text-emerald-600 dark:text-emerald-400',
+      arw: 'text-emerald-600 dark:text-emerald-400',
+      orf: 'text-emerald-600 dark:text-emerald-400',
+      rw2: 'text-emerald-600 dark:text-emerald-400',
+      raw: 'text-emerald-600 dark:text-emerald-400',
+      heic: 'text-purple-600 dark:text-purple-400',
+      heif: 'text-purple-600 dark:text-purple-400',
+      avif: 'text-purple-600 dark:text-purple-400',
+      jxl: 'text-purple-600 dark:text-purple-400',
 
       // Mobile app formats
-      'apk': 'text-green-600 dark:text-green-400',
-      'ipa': 'text-blue-600 dark:text-blue-400',
-      'app': 'text-blue-600 dark:text-blue-400',
+      apk: 'text-green-600 dark:text-green-400',
+      ipa: 'text-blue-600 dark:text-blue-400',
+      app: 'text-blue-600 dark:text-blue-400',
 
       // System files
-      'dll': 'text-gray-600 dark:text-gray-400',
-      'so': 'text-gray-600 dark:text-gray-400',
-      'dylib': 'text-gray-600 dark:text-gray-400',
-      'exe': 'text-gray-600 dark:text-gray-400',
-      'com': 'text-gray-600 dark:text-gray-400',
-      'scr': 'text-gray-600 dark:text-gray-400',
+      dll: 'text-gray-600 dark:text-gray-400',
+      so: 'text-gray-600 dark:text-gray-400',
+      dylib: 'text-gray-600 dark:text-gray-400',
+      exe: 'text-gray-600 dark:text-gray-400',
+      com: 'text-gray-600 dark:text-gray-400',
+      scr: 'text-gray-600 dark:text-gray-400',
 
       // Virtual machine formats
-      'vdi': 'text-slate-600 dark:text-slate-400',
-      'vmdk': 'text-slate-600 dark:text-slate-400',
-      'vhd': 'text-slate-600 dark:text-slate-400',
-      'vhdx': 'text-slate-600 dark:text-slate-400',
-      'qcow2': 'text-slate-600 dark:text-slate-400',
+      vdi: 'text-slate-600 dark:text-slate-400',
+      vmdk: 'text-slate-600 dark:text-slate-400',
+      vhd: 'text-slate-600 dark:text-slate-400',
+      vhdx: 'text-slate-600 dark:text-slate-400',
+      qcow2: 'text-slate-600 dark:text-slate-400',
 
       // Additional archives
-      'cab': 'text-yellow-600 dark:text-yellow-400',
-      'lha': 'text-yellow-600 dark:text-yellow-400',
-      'lzh': 'text-yellow-600 dark:text-yellow-400',
-      'ace': 'text-yellow-600 dark:text-yellow-400',
-      'arj': 'text-yellow-600 dark:text-yellow-400',
+      cab: 'text-yellow-600 dark:text-yellow-400',
+      lha: 'text-yellow-600 dark:text-yellow-400',
+      lzh: 'text-yellow-600 dark:text-yellow-400',
+      ace: 'text-yellow-600 dark:text-yellow-400',
+      arj: 'text-yellow-600 dark:text-yellow-400',
 
       // Torrent and download files
-      'torrent': 'text-red-600 dark:text-red-400',
+      torrent: 'text-red-600 dark:text-red-400',
 
       // Config and markup
-      'json': 'text-amber-500 dark:text-amber-400',
-      'xml': 'text-emerald-500 dark:text-emerald-400',
-      'yaml': 'text-red-500 dark:text-red-400',
-      'yml': 'text-red-500 dark:text-red-400',
-      'toml': 'text-orange-500 dark:text-orange-400',
-      'html': 'text-orange-500 dark:text-orange-400',
-      'css': 'text-sky-500 dark:text-sky-400',
-      'scss': 'text-pink-500 dark:text-pink-400',
-      'sass': 'text-pink-500 dark:text-pink-400',
-      'md': 'text-gray-600 dark:text-gray-400',
-    };
+      json: 'text-amber-500 dark:text-amber-400',
+      xml: 'text-emerald-500 dark:text-emerald-400',
+      yaml: 'text-red-500 dark:text-red-400',
+      yml: 'text-red-500 dark:text-red-400',
+      toml: 'text-orange-500 dark:text-orange-400',
+      html: 'text-orange-500 dark:text-orange-400',
+      css: 'text-sky-500 dark:text-sky-400',
+      scss: 'text-pink-500 dark:text-pink-400',
+      sass: 'text-pink-500 dark:text-pink-400',
+      md: 'text-gray-600 dark:text-gray-400',
+    }
 
     if (extension && extensionColorMap[extension]) {
-      return extensionColorMap[extension];
+      return extensionColorMap[extension]
     }
   }
 
-  return 'text-gray-500 dark:text-gray-400';
+  return 'text-gray-500 dark:text-gray-400'
 }
 
 export function isGoogleWorkspaceFile(mimeType: string): boolean {
-  return mimeType.startsWith('application/vnd.google-apps.');
+  return mimeType.startsWith('application/vnd.google-apps.')
 }
 
 /**
@@ -918,52 +945,52 @@ export function isGoogleWorkspaceFile(mimeType: string): boolean {
  * - Direct folder ID: 1h7S-ebE1A5sEREQhawwWLVrqTZe47fez
  */
 export function extractFolderIdFromUrl(input: string): string | null {
-  if (!input) return null;
+  if (!input) return null
 
   // Remove whitespace
-  const cleanInput = input.trim();
+  const cleanInput = input.trim()
 
   // If it's already a folder ID (no URL format), return it
   if (!cleanInput.includes('drive.google.com') && cleanInput.length > 10) {
-    return cleanInput;
+    return cleanInput
   }
 
   // Extract from various Google Drive URL formats
   const urlPatterns = [
-    /\/drive\/folders\/([a-zA-Z0-9_-]+)/,  // Standard folder URL
+    /\/drive\/folders\/([a-zA-Z0-9_-]+)/, // Standard folder URL
     /\/drive\/u\/\d+\/folders\/([a-zA-Z0-9_-]+)/, // User-specific folder URL
     /id=([a-zA-Z0-9_-]+)/, // Query parameter format
-  ];
+  ]
 
   for (const pattern of urlPatterns) {
-    const match = cleanInput.match(pattern);
+    const match = cleanInput.match(pattern)
     if (match && match[1]) {
-      return match[1];
+      return match[1]
     }
   }
 
-  return null;
+  return null
 }
 
 /**
  * Validate if a string is a valid Google Drive folder ID
  */
 export function isValidFolderId(id: string): boolean {
-  if (!id) return false;
+  if (!id) return false
   // Google Drive IDs are typically 28-44 characters long and contain letters, numbers, hyphens, and underscores
-  return /^[a-zA-Z0-9_-]{10,50}$/.test(id);
+  return /^[a-zA-Z0-9_-]{10,50}$/.test(id)
 }
 
 export function isImageFile(mimeType: string): boolean {
-  return mimeType.startsWith('image/');
+  return mimeType.startsWith('image/')
 }
 
 export function isVideoFile(mimeType: string): boolean {
-  return mimeType.startsWith('video/');
+  return mimeType.startsWith('video/')
 }
 
 export function isAudioFile(mimeType: string): boolean {
-  return mimeType.startsWith('audio/');
+  return mimeType.startsWith('audio/')
 }
 
 export function isDocumentFile(mimeType: string): boolean {
@@ -973,12 +1000,12 @@ export function isDocumentFile(mimeType: string): boolean {
     'application/msword',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.google-apps.document',
-  ];
-  return documentTypes.includes(mimeType);
+  ]
+  return documentTypes.includes(mimeType)
 }
 
 export function isShortcutFile(mimeType: string): boolean {
-  return mimeType === 'application/vnd.google-apps.shortcut';
+  return mimeType === 'application/vnd.google-apps.shortcut'
 }
 
 /**
@@ -987,29 +1014,35 @@ export function isShortcutFile(mimeType: string): boolean {
 export const isPreviewable = (mimeType: string): boolean => {
   // Shortcuts should not be previewable - they should be opened directly
   if (isShortcutFile(mimeType)) {
-    return false;
+    return false
   }
 
   // Use proper mimeType category checking instead of specific formats
-  return isImageFile(mimeType) ||
-         isVideoFile(mimeType) ||
-         isAudioFile(mimeType) ||
-         isDocumentFile(mimeType) ||
-         mimeType.startsWith('text/') ||
-         mimeType === 'application/pdf' ||
-         mimeType === 'application/json' ||
-         mimeType.includes('google-apps');
-};
+  return (
+    isImageFile(mimeType) ||
+    isVideoFile(mimeType) ||
+    isAudioFile(mimeType) ||
+    isDocumentFile(mimeType) ||
+    mimeType.startsWith('text/') ||
+    mimeType === 'application/pdf' ||
+    mimeType === 'application/json' ||
+    mimeType.includes('google-apps')
+  )
+}
 
 // Unused utility functions removed
 
 /**
  * Generate preview URL for different media types
  */
-export function getPreviewUrl(fileId: string, _mimeType: string, _webContentLink?: string): string {
+export function getPreviewUrl(
+  fileId: string,
+  _mimeType: string,
+  _webContentLink?: string
+): string {
   // Universal Google Drive preview - supports all file types
   // If Google Drive can't preview the file, it will show appropriate message
-  return `https://drive.google.com/file/d/${fileId}/preview`;
+  return `https://drive.google.com/file/d/${fileId}/preview`
 }
 
 export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
@@ -1024,36 +1057,43 @@ export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
     webContentLink: file.webContentLink ?? undefined,
     thumbnailLink: file.thumbnailLink ?? undefined,
     parents: file.parents ?? undefined,
-    owners: file.owners?.map(owner => ({
-      displayName: owner.displayName!,
-      emailAddress: owner.emailAddress!,
-      photoLink: owner.photoLink ?? undefined,
-    })) ?? undefined,
+    owners:
+      file.owners?.map((owner) => ({
+        displayName: owner.displayName!,
+        emailAddress: owner.emailAddress!,
+        photoLink: owner.photoLink ?? undefined,
+      })) ?? undefined,
     shared: file.shared ?? false,
     starred: file.starred ?? false,
     trashed: file.trashed ?? false,
     ownedByMe: file.ownedByMe ?? true,
     viewedByMeTime: file.viewedByMeTime ?? undefined,
     viewedByMe: file.viewedByMe ?? false,
-    capabilities: file.capabilities ? {
-      canCopy: file.capabilities.canCopy ?? false,
-      canDelete: file.capabilities.canDelete ?? false,
-      canDownload: file.capabilities.canDownload ?? false,
-      canEdit: file.capabilities.canEdit ?? false,
-      canRename: file.capabilities.canRename ?? false,
-      canShare: file.capabilities.canShare ?? false,
-      canTrash: file.capabilities.canTrash ?? false,
-      canUntrash: file.capabilities.canUntrash ?? false,
-      canMoveItemWithinDrive: file.capabilities.canMoveItemWithinDrive ?? false,
-      canMoveItemOutOfDrive: file.capabilities.canMoveItemOutOfDrive ?? false,
-      canAddChildren: file.capabilities.canAddChildren ?? false,
-      canListChildren: file.capabilities.canListChildren ?? false,
-      canRemoveChildren: file.capabilities.canRemoveChildren ?? false,
-    } : undefined,
-  };
+    capabilities: file.capabilities
+      ? {
+          canCopy: file.capabilities.canCopy ?? false,
+          canDelete: file.capabilities.canDelete ?? false,
+          canDownload: file.capabilities.canDownload ?? false,
+          canEdit: file.capabilities.canEdit ?? false,
+          canRename: file.capabilities.canRename ?? false,
+          canShare: file.capabilities.canShare ?? false,
+          canTrash: file.capabilities.canTrash ?? false,
+          canUntrash: file.capabilities.canUntrash ?? false,
+          canMoveItemWithinDrive:
+            file.capabilities.canMoveItemWithinDrive ?? false,
+          canMoveItemOutOfDrive:
+            file.capabilities.canMoveItemOutOfDrive ?? false,
+          canAddChildren: file.capabilities.canAddChildren ?? false,
+          canListChildren: file.capabilities.canListChildren ?? false,
+          canRemoveChildren: file.capabilities.canRemoveChildren ?? false,
+        }
+      : undefined,
+  }
 }
 
-export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFolder {
+export function convertGoogleDriveFolder(
+  folder: drive_v3.Schema$File
+): DriveFolder {
   return {
     id: folder.id!,
     name: folder.name!,
@@ -1065,144 +1105,155 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
     starred: folder.starred ?? false,
     trashed: folder.trashed ?? false,
     ownedByMe: folder.ownedByMe ?? true,
-    owners: folder.owners?.map(owner => ({
+    owners: folder.owners?.map((owner) => ({
       displayName: owner.displayName || '',
       emailAddress: owner.emailAddress || '',
-      photoLink: owner.photoLink || undefined
+      photoLink: owner.photoLink || undefined,
     })),
-    capabilities: folder.capabilities ? {
-      canCopy: folder.capabilities.canCopy ?? false,
-      canDelete: folder.capabilities.canDelete ?? false,
-      canDownload: folder.capabilities.canDownload ?? false,
-      canEdit: folder.capabilities.canEdit ?? false,
-      canRename: folder.capabilities.canRename ?? false,
-      canShare: folder.capabilities.canShare ?? false,
-      canTrash: folder.capabilities.canTrash ?? false,
-      canUntrash: folder.capabilities.canUntrash ?? false,
-      canMoveItemWithinDrive: folder.capabilities.canMoveItemWithinDrive ?? false,
-      canMoveItemOutOfDrive: folder.capabilities.canMoveItemOutOfDrive ?? false,
-      canAddChildren: folder.capabilities.canAddChildren ?? false,
-      canListChildren: folder.capabilities.canListChildren ?? false,
-      canRemoveChildren: folder.capabilities.canRemoveChildren ?? false,
-    } : undefined,
-  };
+    capabilities: folder.capabilities
+      ? {
+          canCopy: folder.capabilities.canCopy ?? false,
+          canDelete: folder.capabilities.canDelete ?? false,
+          canDownload: folder.capabilities.canDownload ?? false,
+          canEdit: folder.capabilities.canEdit ?? false,
+          canRename: folder.capabilities.canRename ?? false,
+          canShare: folder.capabilities.canShare ?? false,
+          canTrash: folder.capabilities.canTrash ?? false,
+          canUntrash: folder.capabilities.canUntrash ?? false,
+          canMoveItemWithinDrive:
+            folder.capabilities.canMoveItemWithinDrive ?? false,
+          canMoveItemOutOfDrive:
+            folder.capabilities.canMoveItemOutOfDrive ?? false,
+          canAddChildren: folder.capabilities.canAddChildren ?? false,
+          canListChildren: folder.capabilities.canListChildren ?? false,
+          canRemoveChildren: folder.capabilities.canRemoveChildren ?? false,
+        }
+      : undefined,
+  }
 }
 
 export function buildSearchQuery(options: {
-  name?: string;
-  mimeType?: string;
-  parentId?: string;
-  trashed?: boolean;
-  shared?: boolean;
+  name?: string
+  mimeType?: string
+  parentId?: string
+  trashed?: boolean
+  shared?: boolean
 }): string {
-  const conditions: string[] = [];
+  const conditions: string[] = []
 
   if (options.name) {
-    conditions.push(`name contains '${options.name.replace(/'/g, "\\'")}'`);
+    conditions.push(`name contains '${options.name.replace(/'/g, "\\'")}'`)
   }
 
   if (options.mimeType) {
-    conditions.push(`mimeType='${options.mimeType}'`);
+    conditions.push(`mimeType='${options.mimeType}'`)
   }
 
   if (options.parentId) {
-    conditions.push(`'${options.parentId}' in parents`);
+    conditions.push(`'${options.parentId}' in parents`)
   }
 
   if (options.trashed !== undefined) {
-    conditions.push(`trashed=${options.trashed}`);
+    conditions.push(`trashed=${options.trashed}`)
   }
 
   if (options.shared !== undefined) {
-    conditions.push(`sharedWithMe=${options.shared}`);
+    conditions.push(`sharedWithMe=${options.shared}`)
   }
 
-  return conditions.join(' and ');
+  return conditions.join(' and ')
 }
 
 export function formatDate(dateString: string): string {
   try {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffTime = Math.abs(now.getTime() - date.getTime())
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
     if (diffDays === 1) {
-      return 'Yesterday';
+      return 'Yesterday'
     } else if (diffDays < 7) {
-      return `${diffDays} days ago`;
+      return `${diffDays} days ago`
     } else if (diffDays < 30) {
-      const weeks = Math.floor(diffDays / 7);
-      return `${weeks} week${weeks > 1 ? 's' : ''} ago`;
+      const weeks = Math.floor(diffDays / 7)
+      return `${weeks} week${weeks > 1 ? 's' : ''} ago`
     } else if (diffDays < 365) {
-      const months = Math.floor(diffDays / 30);
-      return `${months} month${months > 1 ? 's' : ''} ago`;
+      const months = Math.floor(diffDays / 30)
+      return `${months} month${months > 1 ? 's' : ''} ago`
     } else {
       return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-        timeZone: userTimezone
-      });
+        timeZone: userTimezone,
+      })
     }
   } catch (error) {
-    return 'Invalid date';
+    return 'Invalid date'
   }
 }
 
 export function getMimeTypeFromFileName(fileName: string): string {
-  const extension = fileName.split('.').pop()?.toLowerCase();
+  const extension = fileName.split('.').pop()?.toLowerCase()
 
   const mimeTypes: Record<string, string> = {
-    'pdf': 'application/pdf',
-    'doc': 'application/msword',
-    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'xls': 'application/vnd.ms-excel',
-    'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'ppt': 'application/vnd.ms-powerpoint',
-    'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-    'txt': 'text/plain',
-    'jpg': 'image/jpeg',
-    'jpeg': 'image/jpeg',
-    'png': 'image/png',
-    'gif': 'image/gif',
-    'svg': 'image/svg+xml',
-    'mp4': 'video/mp4',
-    'avi': 'video/avi',
-    'mov': 'video/quicktime',
-    'mp3': 'audio/mpeg',
-    'wav': 'audio/wav',
-    'zip': 'application/zip',
-    'rar': 'application/x-rar-compressed',
-  };
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xls: 'application/vnd.ms-excel',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ppt: 'application/vnd.ms-powerpoint',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    txt: 'text/plain',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    svg: 'image/svg+xml',
+    mp4: 'video/mp4',
+    avi: 'video/avi',
+    mov: 'video/quicktime',
+    mp3: 'audio/mpeg',
+    wav: 'audio/wav',
+    zip: 'application/zip',
+    rar: 'application/x-rar-compressed',
+  }
 
-  return mimeTypes[extension || ''] || 'application/octet-stream';
+  return mimeTypes[extension || ''] || 'application/octet-stream'
 }
 
 /**
  * Get available actions for a file based on its capabilities and current view
  */
 export function getFileActions(
-  file: { capabilities?: DriveFileCapabilities; trashed?: boolean; mimeType?: string; itemType?: string }, 
+  file: {
+    capabilities?: DriveFileCapabilities
+    trashed?: boolean
+    mimeType?: string
+    itemType?: string
+  },
   activeView: string
 ): {
-  canPreview: boolean;
-  canDownload: boolean;
-  canRename: boolean;
-  canMove: boolean;
-  canCopy: boolean;
-  canShare: boolean;
-  canDetails: boolean;
-  canTrash: boolean;
-  canRestore: boolean;
-  canPermanentDelete: boolean;
+  canPreview: boolean
+  canDownload: boolean
+  canRename: boolean
+  canMove: boolean
+  canCopy: boolean
+  canShare: boolean
+  canDetails: boolean
+  canTrash: boolean
+  canRestore: boolean
+  canPermanentDelete: boolean
 } {
-  const _isTrashView = activeView === 'trash';
-  const _isSharedView = activeView === 'shared';
-  const isTrashed = file.trashed === true;
-  const isFolder = file.itemType === 'folder' || file.mimeType === 'application/vnd.google-apps.folder';
-  const capabilities = file.capabilities || {} as DriveFileCapabilities;
+  const _isTrashView = activeView === 'trash'
+  const _isSharedView = activeView === 'shared'
+  const isTrashed = file.trashed === true
+  const isFolder =
+    file.itemType === 'folder' ||
+    file.mimeType === 'application/vnd.google-apps.folder'
+  const capabilities = file.capabilities || ({} as DriveFileCapabilities)
 
   // If we don't have capabilities data, provide conservative defaults
   const defaultCapabilities = {
@@ -1215,9 +1266,10 @@ export function getFileActions(
     canTrash: false,
     canUntrash: false,
     canMoveItemWithinDrive: false,
-  };
+  }
 
-  const finalCapabilities: DriveFileCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities;
+  const finalCapabilities: DriveFileCapabilities =
+    Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities
 
   return {
     // Preview available for all files (not folders)
@@ -1226,7 +1278,7 @@ export function getFileActions(
     // Download - always available, API handles restrictions
     canDownload: Boolean(finalCapabilities.canDownload),
 
-    // Details - always available  
+    // Details - always available
     canDetails: true,
 
     // All other actions: use direct API capabilities without extra logic
@@ -1237,30 +1289,32 @@ export function getFileActions(
     canTrash: Boolean(finalCapabilities.canTrash),
     canRestore: Boolean(isTrashed && finalCapabilities.canUntrash),
     canPermanentDelete: Boolean(finalCapabilities.canDelete),
-  };
+  }
 }
 
 /**
  * Format Google Drive file dates with user timezone
  */
 export const formatDriveFileDate = (
-  dateString: string, 
+  dateString: string,
   timezone?: string,
   showRelative: boolean = true
 ): string => {
-  if (!dateString) return 'Unknown';
+  if (!dateString) return 'Unknown'
 
   try {
-    const date = new Date(dateString);
-    const userTimezone = timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const date = new Date(dateString)
+    const userTimezone =
+      timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
 
     if (showRelative) {
-      const now = new Date();
-      const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60);
+      const now = new Date()
+      const diffInHours =
+        Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60)
 
       // Show relative time for recent files (within 7 days)
       if (diffInHours < 168) {
-        return formatDate(dateString);
+        return formatDate(dateString)
       }
     }
 
@@ -1271,25 +1325,27 @@ export const formatDriveFileDate = (
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      timeZone: userTimezone
-    });
-
+      timeZone: userTimezone,
+    })
   } catch (error) {
-    return 'Invalid date format';
+    return 'Invalid date format'
   }
-};
+}
 
 /**
  * Get file icon properties (name and color) in a single call
  */
-export function getFileIconProps(mimeType: string, fileName?: string): {
-  iconName: string;
-  colorClass: string;
+export function getFileIconProps(
+  mimeType: string,
+  fileName?: string
+): {
+  iconName: string
+  colorClass: string
 } {
   return {
     iconName: getFileIconName(mimeType, fileName),
-    colorClass: getFileIconColor(mimeType, fileName)
-  };
+    colorClass: getFileIconColor(mimeType, fileName),
+  }
 }
 
 /**
@@ -1297,24 +1353,24 @@ export function getFileIconProps(mimeType: string, fileName?: string): {
  */
 export function getCategoryIcon(category: string): string {
   const categoryIconMap: Record<string, string> = {
-    'folder': 'Folder',
-    'document': 'FileText',
-    'spreadsheet': 'FileSpreadsheet', 
-    'presentation': 'Presentation',
-    'image': 'FileImage',
-    'video': 'FileVideo',
-    'audio': 'Music',
-    'archive': 'Archive',
-    'code': 'FileCode',
-    'pdf': 'BookOpen',
-    'text': 'FileText',
-    'design': 'Palette',
-    'database': 'Database',
-    'shortcut': 'Link',
-    'other': 'File'
-  };
+    folder: 'Folder',
+    document: 'FileText',
+    spreadsheet: 'FileSpreadsheet',
+    presentation: 'Presentation',
+    image: 'FileImage',
+    video: 'FileVideo',
+    audio: 'Music',
+    archive: 'Archive',
+    code: 'FileCode',
+    pdf: 'BookOpen',
+    text: 'FileText',
+    design: 'Palette',
+    database: 'Database',
+    shortcut: 'Link',
+    other: 'File',
+  }
 
-  return categoryIconMap[category] || 'File';
+  return categoryIconMap[category] || 'File'
 }
 
 /**
@@ -1322,43 +1378,58 @@ export function getCategoryIcon(category: string): string {
  */
 export function getCategoryColor(category: string): string {
   const categoryColorMap: Record<string, string> = {
-    'folder': 'text-blue-600 dark:text-blue-400',
-    'document': 'text-blue-500 dark:text-blue-400',
-    'spreadsheet': 'text-green-600 dark:text-green-400',
-    'presentation': 'text-orange-600 dark:text-orange-400',
-    'image': 'text-purple-600 dark:text-purple-400',
-    'video': 'text-red-600 dark:text-red-400',
-    'audio': 'text-indigo-600 dark:text-indigo-400',
-    'archive': 'text-yellow-600 dark:text-yellow-400',
-    'code': 'text-emerald-600 dark:text-emerald-400',
-    'pdf': 'text-red-600 dark:text-red-400',
-    'text': 'text-gray-600 dark:text-gray-400',
-    'design': 'text-pink-600 dark:text-pink-400',
-    'database': 'text-slate-600 dark:text-slate-400',
-    'other': 'text-gray-500 dark:text-gray-400'
-  };
+    folder: 'text-blue-600 dark:text-blue-400',
+    document: 'text-blue-500 dark:text-blue-400',
+    spreadsheet: 'text-green-600 dark:text-green-400',
+    presentation: 'text-orange-600 dark:text-orange-400',
+    image: 'text-purple-600 dark:text-purple-400',
+    video: 'text-red-600 dark:text-red-400',
+    audio: 'text-indigo-600 dark:text-indigo-400',
+    archive: 'text-yellow-600 dark:text-yellow-400',
+    code: 'text-emerald-600 dark:text-emerald-400',
+    pdf: 'text-red-600 dark:text-red-400',
+    text: 'text-gray-600 dark:text-gray-400',
+    design: 'text-pink-600 dark:text-pink-400',
+    database: 'text-slate-600 dark:text-slate-400',
+    other: 'text-gray-500 dark:text-gray-400',
+  }
 
-  return categoryColorMap[category] || 'text-gray-500 dark:text-gray-400';
+  return categoryColorMap[category] || 'text-gray-500 dark:text-gray-400'
 }
 
 /**
  * Determine file category from MIME type for consistent categorization
  */
 export function getFileCategory(mimeType: string): string {
-  if (mimeType === 'application/vnd.google-apps.folder') return 'folder';
-  if (mimeType.startsWith('image/')) return 'image';
-  if (mimeType.startsWith('video/')) return 'video';
-  if (mimeType.startsWith('audio/')) return 'audio';
-  if (mimeType === 'application/pdf') return 'pdf';
-  if (mimeType.includes('spreadsheet') || mimeType === 'text/csv') return 'spreadsheet';
-  if (mimeType.includes('presentation')) return 'presentation';
-  if (mimeType.includes('document') || mimeType.startsWith('text/')) return 'document';
-  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive')) return 'archive';
-  if (mimeType.includes('javascript') || mimeType.includes('json') || mimeType.includes('html') || mimeType.includes('css')) return 'code';
-  if (mimeType.includes('sql') || mimeType.includes('database')) return 'database';
-  if (mimeType.includes('photoshop') || mimeType.includes('illustrator')) return 'design';
+  if (mimeType === 'application/vnd.google-apps.folder') return 'folder'
+  if (mimeType.startsWith('image/')) return 'image'
+  if (mimeType.startsWith('video/')) return 'video'
+  if (mimeType.startsWith('audio/')) return 'audio'
+  if (mimeType === 'application/pdf') return 'pdf'
+  if (mimeType.includes('spreadsheet') || mimeType === 'text/csv')
+    return 'spreadsheet'
+  if (mimeType.includes('presentation')) return 'presentation'
+  if (mimeType.includes('document') || mimeType.startsWith('text/'))
+    return 'document'
+  if (
+    mimeType.includes('zip') ||
+    mimeType.includes('rar') ||
+    mimeType.includes('archive')
+  )
+    return 'archive'
+  if (
+    mimeType.includes('javascript') ||
+    mimeType.includes('json') ||
+    mimeType.includes('html') ||
+    mimeType.includes('css')
+  )
+    return 'code'
+  if (mimeType.includes('sql') || mimeType.includes('database'))
+    return 'database'
+  if (mimeType.includes('photoshop') || mimeType.includes('illustrator'))
+    return 'design'
 
-  return 'other';
+  return 'other'
 }
 
 /**
@@ -1369,28 +1440,28 @@ export function getFileCategory(mimeType: string): string {
  * Enhanced file icon rendering with consistent props
  */
 export function renderFileIcon(
-  mimeType: string, 
+  mimeType: string,
   fileName?: string,
   options: {
-    size?: 'sm' | 'md' | 'lg' | 'xl';
-    className?: string;
-    strokeWidth?: number;
+    size?: 'sm' | 'md' | 'lg' | 'xl'
+    className?: string
+    strokeWidth?: number
   } = {}
 ): { iconName: string; colorClass: string; sizeClass: string } {
-  const { iconName, colorClass } = getFileIconProps(mimeType, fileName);
+  const { iconName, colorClass } = getFileIconProps(mimeType, fileName)
 
   const sizeMap = {
-    'sm': 'h-3 w-3',
-    'md': 'h-4 w-4', 
-    'lg': 'h-5 w-5',
-    'xl': 'h-6 w-6'
-  };
+    sm: 'h-3 w-3',
+    md: 'h-4 w-4',
+    lg: 'h-5 w-5',
+    xl: 'h-6 w-6',
+  }
 
-  const sizeClass = options.className || sizeMap[options.size || 'md'];
+  const sizeClass = options.className || sizeMap[options.size || 'md']
 
   return {
     iconName,
     colorClass,
-    sizeClass
-  };
+    sizeClass,
+  }
 }

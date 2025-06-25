@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { auth } from '@/auth'
 import { GoogleDriveService } from '@/lib/google-drive/service'
 import { driveCache } from '@/lib/cache'
@@ -370,11 +371,10 @@ function getSortKey(sortBy: string) {
 export async function GET(request: NextRequest) {
   try {
     const session = await auth()
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.log('[DRIVE API] - Session:', session)
     }
-    
 
     if (!session?.accessToken) {
       return NextResponse.json(
@@ -403,7 +403,7 @@ export async function GET(request: NextRequest) {
       modifiedAfter: searchParams.get('modifiedAfter') || undefined,
       modifiedBefore: searchParams.get('modifiedBefore') || undefined,
       owner: searchParams.get('owner') || undefined,
-      size: searchParams.get('size') || undefined
+      size: searchParams.get('size') || undefined,
     }
 
     const query = buildDriveQuery(filters)
@@ -425,7 +425,6 @@ export async function GET(request: NextRequest) {
 
     const driveService = new GoogleDriveService(session.accessToken!)
 
-    
     const result = await driveService.listFiles({
       parentId: folderId,
       query,
@@ -439,7 +438,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result)
   } catch (error: any) {
     //console.error('Drive API Error:', error)
-    
+
     // Handle authentication errors
     if (error.name === 'AuthenticationError' || error.code === 401) {
       return NextResponse.json(

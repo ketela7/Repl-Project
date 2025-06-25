@@ -21,7 +21,7 @@ export function securityMiddleware(request: NextRequest) {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "upgrade-insecure-requests"
+    'upgrade-insecure-requests',
   ].join('; ')
 
   // Security Headers
@@ -29,23 +29,24 @@ export function securityMiddleware(request: NextRequest) {
   response.headers.set('X-Frame-Options', 'DENY')
   response.headers.set('X-Content-Type-Options', 'nosniff')
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
-  
+  response.headers.set(
+    'Permissions-Policy',
+    'camera=(), microphone=(), geolocation=()'
+  )
+
   // HSTS for production
   if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload'
+    )
   }
 
   return response
 }
 
 export function isProtectedRoute(pathname: string): boolean {
-  const protectedRoutes = [
-    '/dashboard',
-    '/api/drive',
-    '/api/user',
-    '/api/bulk'
-  ]
+  const protectedRoutes = ['/dashboard', '/api/drive', '/api/user', '/api/bulk']
 
-  return protectedRoutes.some(route => pathname.startsWith(route))
+  return protectedRoutes.some((route) => pathname.startsWith(route))
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { GoogleDriveService } from '@/lib/google-drive/service'
 import { auth } from '@/auth'
 import { driveCache } from '@/lib/cache'
@@ -47,7 +48,6 @@ export async function GET(
 
     return NextResponse.json(fileDetails)
   } catch (error) {
-
     if (error instanceof Error) {
       // Handle Google API specific errors
       if (
