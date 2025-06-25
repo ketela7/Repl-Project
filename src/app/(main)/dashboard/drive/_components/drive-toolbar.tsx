@@ -133,7 +133,7 @@ interface DriveToolbarProps {
   onBulkCopy: () => void
   onBulkShare: () => void
   onFiltersOpen: () => void
-  
+
   // Mobile Actions Dialog Props
   selectedItems: any[]
   onBulkDownload: () => void
@@ -173,20 +173,6 @@ interface DriveToolbarProps {
   // Client-side filtering
   onClientSideFilter?: (filteredItems: any[]) => void
   onClearClientSideFilter?: () => void
-
-  // Mobile Actions Dialog Props
-  isMobileActionsOpen: boolean
-  onMobileActionsOpen: (open: boolean) => void
-
-  // Bulk Operations Dialog Props
-  bulkDialogs: {
-    move: boolean
-    copy: boolean
-    delete: boolean
-    share: boolean
-  }
-  onBulkDialogChange: (type: 'move' | 'copy' | 'delete' | 'share', isOpen: boolean) => void
-  onBulkOperationComplete: () => void
 }
 
 // Enhanced client-side filtering function using comprehensive mimeType matching
@@ -501,50 +487,67 @@ export function DriveToolbar({
   setVisibleColumns,
   onClientSideFilter,
   onClearClientSideFilter,
-  
-  // From drive manager
-  isMobileActionsOpen,
-  onMobileActionsOpen,
-  bulkDialogs,
-  onBulkDialogChange,
-  onBulkOperationComplete,
 }: DriveToolbarProps) {
   const isMobile = useIsMobile()
 
-  // Optimized bulk operation handlers - now use props
+  // Optimized bulk operation handlers
   const handleBulkMove = () => {
-    onMobileActionsOpen(false)
-    onBulkDialogChange('move', true)
+    setIsMobileActionsOpen(false)
+    openBulkDialog('move')
   }
 
   const handleBulkCopy = () => {
-    onMobileActionsOpen(false)
-    onBulkDialogChange('copy', true)
+    setIsMobileActionsOpen(false)
+    openBulkDialog('copy')
   }
 
   const handleBulkDelete = () => {
-    onMobileActionsOpen(false)
-    onBulkDialogChange('delete', true)
+    setIsMobileActionsOpen(false)
+    openBulkDialog('delete')
   }
 
   const handleBulkShare = () => {
-    onMobileActionsOpen(false)
-    onBulkDialogChange('share', true)
+    setIsMobileActionsOpen(false)
+    openBulkDialog('share')
   }
 
   const handleBulkDownload = () => {
-    onMobileActionsOpen(false)
+    setIsMobileActionsOpen(false)
     onBulkDownload()
   }
 
   const handleBulkRename = () => {
-    onMobileActionsOpen(false)
+    setIsMobileActionsOpen(false)
     onBulkRename()
   }
 
   const handleBulkExport = () => {
-    onMobileActionsOpen(false)
+    setIsMobileActionsOpen(false)
     onBulkExport()
+  }
+
+  const handleBulkOperationComplete = () => {
+    onDeselectAll()
+    onRefreshAfterBulkOp()
+  }
+
+  // Mobile Actions Dialog State
+  const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false)
+
+  // Bulk Operations Dialog States
+  const [bulkDialogs, setBulkDialogs] = useState({
+    move: false,
+    copy: false,
+    delete: false,
+    share: false,
+  })
+
+  const openBulkDialog = (type: keyof typeof bulkDialogs) => {
+    setBulkDialogs((prev) => ({ ...prev, [type]: true }))
+  }
+
+  const closeBulkDialog = (type: keyof typeof bulkDialogs) => {
+    setBulkDialogs((prev) => ({ ...prev, [type]: false }))
   }
 
   // Extract necessary props from filters
@@ -716,7 +719,7 @@ export function DriveToolbar({
           </Button>
 
           {/* Bulk Operations */}
-          {selectedCount <= items.length && (
+          {selectedCount === 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -763,19 +766,25 @@ export function DriveToolbar({
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onSelectAll}>
-                  <CheckSquare className="mr-2 h-4 w-4" />
-                  Select All ({selectedCount}/{items.length})
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onSelectAll}>
-                  <Square className="mr-2 h-4 w-4" />
-                  Clear Selection
-                </DropdownMenuItem>
+                {isSelectMode && (
+                  <>
+                    <DropdownMenuItem onClick={onSelectAll}>
+                      <CheckSquare className="mr-2 h-4 w-4" />
+                      Select All ({selectedCount}/{items.length})
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={onSelectAll}>
+                      <Square className="mr-2 h-4 w-4" />
+                      Clear Selection
+                    </DropdownMenuItem>
+                  </>
+                )}
 
                 {selectedCount > 0 && (
                   <>
                     {isMobile ? (
-                      <DropdownMenuItem onClick={() => onMobileActionsOpen(true)}>
+                      <DropdownMenuItem
+                        onClick={() => setIsMobileActionsOpen(true)}
+                      >
                         <MoreVertical className="mr-2 h-4 w-4" />
                         More Actions
                       </DropdownMenuItem>
@@ -794,7 +803,6 @@ export function DriveToolbar({
                     )}
                   </>
                 )}
-                
               </DropdownMenuContent>
             </DropdownMenu>
           )}
@@ -2109,7 +2117,7 @@ export function DriveToolbar({
       {/* Mobile Actions Dialog */}
       <BulkOperationsDialogMobile
         open={isMobileActionsOpen}
-        onOpenChange={onMobileActionsOpen}
+        onOpenChange={setIsMobileActionsOpen}
         selectedItems={selectedItems}
         selectedCount={selectedCount}
         onBulkDelete={handleBulkDelete}
@@ -2120,7 +2128,7 @@ export function DriveToolbar({
         onBulkRename={handleBulkRename}
         onBulkExport={handleBulkExport}
         onDeselectAll={() => {
-          onMobileActionsOpen(false)
+          setIsMobileActionsOpen(false)
           onDeselectAll()
         }}
       />
@@ -2128,38 +2136,38 @@ export function DriveToolbar({
       {/* Consolidated Bulk Operations Dialogs */}
       <BulkMoveDialog
         isOpen={bulkDialogs.move}
-        onClose={() => onBulkDialogChange('move', false)}
+        onClose={() => closeBulkDialog('move')}
         selectedItems={selectedItems}
         onConfirm={(targetFolderId: string) => {
-          onBulkDialogChange('move', false)
-          onBulkOperationComplete()
+          closeBulkDialog('move')
+          handleBulkOperationComplete()
         }}
       />
 
       <BulkCopyDialog
         isOpen={bulkDialogs.copy}
-        onClose={() => onBulkDialogChange('copy', false)}
+        onClose={() => closeBulkDialog('copy')}
         selectedItems={selectedItems}
         onConfirm={(targetFolderId: string) => {
-          onBulkDialogChange('copy', false)
-          onBulkOperationComplete()
+          closeBulkDialog('copy')
+          handleBulkOperationComplete()
         }}
       />
 
       <BulkDeleteDialog
         isOpen={bulkDialogs.delete}
-        onClose={() => onBulkDialogChange('delete', false)}
+        onClose={() => closeBulkDialog('delete')}
         selectedItems={selectedItems}
         onConfirm={() => {
-          onBulkDialogChange('delete', false)
-          onBulkOperationComplete()
+          closeBulkDialog('delete')
+          handleBulkOperationComplete()
         }}
       />
 
       <BulkShareDialog
         open={bulkDialogs.share}
         onOpenChange={(open) => {
-          if (!open) onBulkDialogChange('share', false)
+          if (!open) closeBulkDialog('share')
         }}
         selectedItems={selectedItems}
       />

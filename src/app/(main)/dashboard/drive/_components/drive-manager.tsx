@@ -122,66 +122,6 @@ export function DriveManager() {
   const lastFiltersRef = useRef<string>('')
   const activeRequestsRef = useRef<Set<string>>(new Set())
 
-    // Mobile Actions Dialog State
-  const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false)
-
-  // Bulk Operations Dialog States
-  const [bulkDialogs, setBulkDialogs] = useState({
-    move: false,
-    copy: false,
-    delete: false,
-    share: false,
-  })
-
-  const openBulkDialog = (type: keyof typeof bulkDialogs) => {
-    setBulkDialogs(prev => ({ ...prev, [type]: true }))
-  }
-
-  const closeBulkDialog = (type: keyof typeof bulkDialogs) => {
-    setBulkDialogs(prev => ({ ...prev, [type]: false }))
-  }
-
-  // Optimized bulk operation handlers
-  const handleBulkMove = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('move')
-  }
-
-  const handleBulkCopy = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('copy')
-  }
-
-  const handleBulkDelete = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('delete')
-  }
-
-  const handleBulkShare = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('share')
-  }
-
-  const handleBulkDownload = () => {
-    setIsMobileActionsOpen(false)
-    // Implement bulk download logic here
-  }
-
-  const handleBulkRename = () => {
-    setIsMobileActionsOpen(false)
-    // Implement bulk rename logic here
-  }
-
-  const handleBulkExport = () => {
-    setIsMobileActionsOpen(false)
-    // Implement bulk export logic here
-  }
-
-  const handleBulkOperationComplete = () => {
-    setSelectedItems(new Set())
-    handleRefresh()
-  }
-
   // Helper functions
   const openDialog = (dialogName: keyof typeof dialogs) => {
     console.log('Opening dialog:', dialogName)
@@ -294,7 +234,7 @@ export function DriveManager() {
   }, [items, sortConfig])
 	// Sorting End
 
-
+  
   // Convert selected items for bulk operations
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
@@ -403,7 +343,7 @@ export function DriveManager() {
     fetchFiles()
   }, [])
 
-
+  
   {/*useEffect(() => {
     const timeoutId = setTimeout(() => {
       fetchFiles(currentFolderId || undefined, undefined)
@@ -576,28 +516,34 @@ export function DriveManager() {
             isSelectMode={isSelectMode}
             onSelectModeChange={setIsSelectMode}
             selectedCount={selectedItems.size}
-
+            
             onSelectAll={handleSelectAll}
             onRefresh={handleRefresh}
             refreshing={refreshing}
             onUpload={() => openDialog('upload')}
             onCreateFolder={() => openDialog('createFolder')}
-            onBulkDelete={handleBulkDelete}
-            onBulkMove={handleBulkMove}
-            onBulkCopy={handleBulkCopy}
-            onBulkShare={handleBulkShare}
+            onBulkDelete={() => {}}
+            onBulkMove={() => {}}
+            onBulkCopy={() => {}}
+            onBulkShare={() => {}}
             onFiltersOpen={() => openDialog('mobileFilters')}
-
-
+            
+            
             selectedItems={selectedItemsWithDetails}
-            onBulkDownload={handleBulkDownload}
-            onBulkRename={handleBulkRename}
-            onBulkExport={handleBulkExport}
+            onBulkDownload={() => {
+              // Handle bulk download
+            }}
+            onBulkRename={() => {
+              // Handle bulk rename
+            }}
+            onBulkExport={() => {
+              // Handle bulk export
+            }}
             onDeselectAll={() => {
               setSelectedItems(new Set())
             }}
             onRefreshAfterBulkOp={handleRefresh}
-
+            
             filters={filters}
             onFilterChange={handleFilter as any}
             onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
@@ -840,7 +786,7 @@ export function DriveManager() {
       )}
 
 
-
+      
 
       {/* Mobile Filters Dialog */}
       <FiltersDialog
@@ -866,7 +812,7 @@ export function DriveManager() {
             value={(bulkOperationProgress.current / bulkOperationProgress.total) * 100}
             className="mt-2 w-64"
           />
-          <<div className="text-muted-foreground mt-1 text-xs">
+          <div className="text-muted-foreground mt-1 text-xs">
             {bulkOperationProgress.current} of {bulkOperationProgress.total}
           </div>
         </div>
