@@ -8,7 +8,9 @@ export const preloadCriticalComponents = () => {
     window.requestIdleCallback(() => {
       // Preload most commonly used bulk dialogs
       import('@/app/(main)/dashboard/drive/_components/bulk-operations-dialog')
-        .then(() => console.log('Bulk dialogs preloaded'))
+        .then(() => {
+          // Preload completed successfully
+        })
         .catch(() => {})
     })
   }

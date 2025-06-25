@@ -315,10 +315,15 @@ export const loadingToast = {
  * Utility functions for common toast patterns
  */
 export const toastUtils = {
+  success: successToast,
+  error: errorToast,
+  loading: loadingToast,
+  info: infoToast,
+
   /**
    * Show clipboard copy feedback
    */
-  clipboard: (text: string, _label?: string) => {
+  clipboard: (text: string) => {
     navigator.clipboard
       .writeText(text)
       .then(() => {
@@ -330,7 +335,7 @@ export const toastUtils = {
   },
 
   /**
-   * Show download progress feedback
+   * Download utility with progress feedback
    */
   download: async (downloadFn: () => Promise<void>, fileName?: string) => {
     const loadingId = 'download'
@@ -363,8 +368,7 @@ export const toastUtils = {
       success: number
       total: number
       failed?: string[]
-    }>,
-    _onProgress?: (current: number, total: number) => void
+    }>
   ) => {
     const loadingId = 'bulk-operation'
     loadingToast.start(`Starting ${operation}...`, loadingId)

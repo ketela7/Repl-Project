@@ -8,8 +8,7 @@ export function useTimezone() {
     try {
       const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
       setTimezone(detectedTimezone)
-    } catch (error) {
-      console.warn('Failed to detect timezone, using UTC')
+    } catch {
       setTimezone('UTC')
     } finally {
       setIsLoading(false)

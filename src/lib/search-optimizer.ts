@@ -129,22 +129,15 @@ class SearchOptimizer {
     _userId: string,
     apiCall: () => Promise<any>
   ): Promise<SearchResult> {
-    const startTime = Date.now()
+    const result = await apiCall()
 
-    try {
-      const result = await apiCall()
-      const duration = Date.now() - startTime
-
-      return {
-        files: result.files || [],
-        totalCount: result.files?.length || 0,
-        hasMore: !!result.nextPageToken,
-        nextPageToken: result.nextPageToken,
-        searchQuery: query,
-        timestamp: Date.now(),
-      }
-    } catch (error) {
-      throw error
+    return {
+      files: result.files || [],
+      totalCount: result.files?.length || 0,
+      hasMore: !!result.nextPageToken,
+      nextPageToken: result.nextPageToken,
+      searchQuery: query,
+      timestamp: Date.now(),
     }
   }
 
@@ -225,7 +218,9 @@ class SearchOptimizer {
     const preloadPromises = commonQueries.map(async (query) => {
       try {
         await this.optimizedSearch(query, userId, () => apiCall(query))
-      } catch (error) {}
+      } catch {
+        // Silent fallback for preload failures
+      }
     })
 
     await Promise.allSettled(preloadPromises)

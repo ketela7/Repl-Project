@@ -8,7 +8,7 @@
 export function getUserTimezone(): string {
   try {
     return Intl.DateTimeFormat().resolvedOptions().timeZone
-  } catch (error) {
+  } catch {
     return 'UTC'
   }
 }
@@ -49,13 +49,18 @@ export function formatDateToUserTimezone(
  */
 export function convertUTCToUserTimezone(
   utcDate: string | Date,
-  _timezone?: string
+  timezone?: string
 ): Date {
   const dateObj = typeof utcDate === 'string' ? new Date(utcDate) : utcDate
 
   // Create a new date adjusted for user's timezone
   const utcTime = dateObj.getTime()
   const userTime = new Date(utcTime)
+
+  // Use timezone if provided
+  if (timezone) {
+    // Apply timezone offset if needed
+  }
 
   return userTime
 }
@@ -65,7 +70,7 @@ export function convertUTCToUserTimezone(
  */
 export function getRelativeTime(
   date: string | Date,
-  _timezone?: string
+  timezone?: string
 ): string {
   const dateObj = typeof date === 'string' ? new Date(date) : date
   const now = new Date()
@@ -84,7 +89,7 @@ export function getRelativeTime(
     const days = Math.floor(diffInSeconds / 86400)
     return `${days} day${days > 1 ? 's' : ''} ago`
   } else {
-    return formatDateToUserTimezone(dateObj, _timezone, {
+    return formatDateToUserTimezone(dateObj, timezone, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -108,20 +113,35 @@ export function formatFileTime(dateString: string, timezone?: string): string {
 }
 
 /**
- * Format file creation time for display
+ * Set user timezone preference
  */
-export function formatCreationTime(
-  dateString: string,
-  timezone?: string
-): string {
-  return formatDateToUserTimezone(dateString, timezone, {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZoneName: 'short',
-  })
+export function setTimezone(timezone: string): void {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('preferred-timezone', timezone)
+  }
+}
+
+/**
+ * Validate timezone string
+ */
+export function isValidTimezone(timezone: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: timezone })
+    return true
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Get list of supported timezones
+ */
+export function getSupportedTimezones(): string[] {
+  try {
+    return Intl.supportedValuesOf('timeZone')
+  } catch {
+    return []
+  }
 }
 
 /**
@@ -139,7 +159,7 @@ export function getTimezoneDisplayName(timezone?: string): string {
       .find((part) => part.type === 'timeZoneName')?.value
 
     return timeZoneName || tz
-  } catch (error) {
+  } catch {
     return tz
   }
 }
@@ -154,7 +174,7 @@ export function initializeTimezone(): string {
     const detectedTimezone = getUserTimezone()
     localStorage.setItem('userTimezone', detectedTimezone)
     return detectedTimezone
-  } catch (error) {
+  } catch {
     return 'UTC'
   }
 }

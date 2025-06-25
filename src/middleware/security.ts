@@ -3,9 +3,9 @@
  * Implements CSP, HSTS, and other security best practices
  */
 
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export function securityMiddleware(request: NextRequest) {
+export function securityMiddleware() {
   const response = NextResponse.next()
 
   // Content Security Policy

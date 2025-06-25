@@ -443,7 +443,7 @@ export function DriveDataView({
                           try {
                             await navigator.clipboard.writeText(email)
                             // Show toast notification
-                            const { successToast } = await import('@/lib/utils')
+                            const { successToast } = await import('@/lib/toast')
                             successToast.copied()
                           } catch (err) {
                             const { errorToast } = await import('@/lib/utils')

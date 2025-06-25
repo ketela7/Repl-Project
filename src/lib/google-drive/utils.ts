@@ -1247,8 +1247,9 @@ export function getFileActions(
   canRestore: boolean
   canPermanentDelete: boolean
 } {
-  const _isTrashView = activeView === 'trash'
-  const _isSharedView = activeView === 'shared'
+  // View state for future enhancements
+  const isTrashView = activeView === 'trash'
+  const isSharedView = activeView === 'shared'
   const isTrashed = file.trashed === true
   const isFolder =
     file.itemType === 'folder' ||
