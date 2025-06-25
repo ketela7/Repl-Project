@@ -345,10 +345,10 @@ export function DriveManager() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+      fetchFiles(currentFolderId || undefined, undefined)
     }, 300)
     return () => clearTimeout(timeoutId)
-  }, [filters, currentFolderId, searchQuery])
+  }, [filters, currentFolderId])
 
   // Navigation handlers
   const handleFolderClick = useCallback((folderId: string) => {
