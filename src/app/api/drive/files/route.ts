@@ -438,7 +438,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error: any) {
-    console.error('Drive API Error:', error)
+    //console.error('Drive API Error:', error)
     
     // Handle authentication errors
     if (error.name === 'AuthenticationError' || error.code === 401) {
