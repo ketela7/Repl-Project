@@ -485,6 +485,7 @@ export function DriveToolbar({
 
   // Mobile Actions Dialog State
   const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false)
+  const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
 
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters
@@ -733,12 +734,14 @@ export function DriveToolbar({
                         More Actions
                       </DropdownMenuItem>
                     ) : (
-                      <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
-                        <BulkOperationsDialog
-                          selectedItems={selectedItems}
-                          onRefreshAfterBulkOp={handleBulkOperationComplete}
-                        />
-                      </Suspense>
+                      <>
+                        <DropdownMenuItem
+                          onClick={() => setIsBulkOperationsOpen(true)}
+                        >
+                          <MoreVertical className="mr-2 h-4 w-4" />
+                          Bulk Operations
+                        </DropdownMenuItem>
+                      </>
                     )}
                   </>
                 )}
@@ -2058,6 +2061,17 @@ export function DriveToolbar({
         </Suspense>
       )}
 
+      {/* Desktop Bulk Operations Dialog */}
+      {isBulkOperationsOpen && (
+        <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
+          <BulkOperationsDialog
+            open={isBulkOperationsOpen}
+            onOpenChange={setIsBulkOperationsOpen}
+            selectedItems={selectedItems}
+            onRefreshAfterBulkOp={handleBulkOperationComplete}
+          />
+        </Suspense>
+      )}
 
     </div>
   )
