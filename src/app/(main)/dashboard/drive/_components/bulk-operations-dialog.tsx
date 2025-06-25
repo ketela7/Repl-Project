@@ -88,6 +88,8 @@ function BulkOperationsDialog({
   const dialogOpen = open ?? isOpen ?? false
   const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
   
+  console.log('BulkOperationsDialog open state:', { dialogOpen, open, isOpen })
+  
   // Debug dialog states
   console.log('Dialog states:', {
     isMoveDialogOpen,

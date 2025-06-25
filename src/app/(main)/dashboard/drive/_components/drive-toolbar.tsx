@@ -56,7 +56,7 @@ import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { successToast, infoToast } from '@/shared/utils'
 
-import { Suspense } from 'react'
+// Removed Suspense import - direct render untuk bulk operations
 import { BulkOperationsDialog } from './bulk-operations-dialog'
 
 // Types
@@ -483,6 +483,13 @@ export function DriveToolbar({
 
   // Actions Dialog State
   const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
+  
+  // Debug state changes
+  console.log('DriveToolbar render:', { 
+    isBulkOperationsOpen, 
+    selectedCount, 
+    selectedItemsLength: selectedItems.length 
+  })
 
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters
@@ -706,14 +713,28 @@ export function DriveToolbar({
                   <>
                     <DropdownMenuSeparator />
                     {selectedCount < items.length && (
-                      <DropdownMenuItem onClick={onSelectAll}>
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          console.log('Select All clicked')
+                          e.preventDefault()
+                          e.stopPropagation()
+                          onSelectAll()
+                        }}
+                      >
                         <CheckSquare className="mr-2 h-4 w-4" />
                         Select All ({selectedCount}/{items.length})
                       </DropdownMenuItem>
                     )}
 
                     {selectedCount > 0 && (
-                      <DropdownMenuItem onClick={onDeselectAll}>
+                      <DropdownMenuItem 
+                        onClick={(e) => {
+                          console.log('Clear Selection clicked')
+                          e.preventDefault()
+                          e.stopPropagation()
+                          onDeselectAll()
+                        }}
+                      >
                         <Square className="mr-2 h-4 w-4" />
                         Clear Selection
                       </DropdownMenuItem>
@@ -725,7 +746,12 @@ export function DriveToolbar({
                   <>
                     {isMobile ? (
                       <DropdownMenuItem
-                        onClick={() => setIsBulkOperationsOpen(true)}
+                        onClick={(e) => {
+                          console.log('Mobile More Actions clicked')
+                          e.preventDefault()
+                          e.stopPropagation()
+                          setIsBulkOperationsOpen(true)
+                        }}
                       >
                         <MoreVertical className="mr-2 h-4 w-4" />
                         More Actions
@@ -733,7 +759,12 @@ export function DriveToolbar({
                     ) : (
                       <>
                         <DropdownMenuItem
-                          onClick={() => setIsBulkOperationsOpen(true)}
+                          onClick={(e) => {
+                            console.log('Desktop Bulk Operations clicked')
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setIsBulkOperationsOpen(true)
+                          }}
                         >
                           <MoreVertical className="mr-2 h-4 w-4" />
                           Bulk Operations
@@ -2048,17 +2079,16 @@ export function DriveToolbar({
 
 
 
-      {/* Bulk Operations Dialog */}
-      {isBulkOperationsOpen && (
-        <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
-          <BulkOperationsDialog
-            open={isBulkOperationsOpen}
-            onOpenChange={setIsBulkOperationsOpen}
-            selectedItems={selectedItems}
-            onRefreshAfterBulkOp={handleBulkOperationComplete}
-          />
-        </Suspense>
-      )}
+      {/* Bulk Operations Dialog - Always render dengan debugging */}
+      <BulkOperationsDialog
+        isOpen={isBulkOperationsOpen}
+        onClose={() => {
+          console.log('CLOSING BULK OPERATIONS FROM TOOLBAR')
+          setIsBulkOperationsOpen(false)
+        }}
+        selectedItems={selectedItems}
+        onRefreshAfterBulkOp={handleBulkOperationComplete}
+      />
 
     </div>
   )
