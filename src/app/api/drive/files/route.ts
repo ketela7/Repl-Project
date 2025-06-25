@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { initDriveService } from '@/lib/api-utils'
 import { driveCache } from '@/lib/cache'
 
 interface FileFilter {
@@ -373,6 +374,8 @@ export async function GET(request: NextRequest) {
       return authResult.response!
     }
 
+    const { session, driveService } = authResult
+
     const { searchParams } = new URL(request.url)
     const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
     const pageToken = searchParams.get('pageToken') || undefined
@@ -409,7 +412,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    const driveService = authResult.driveService!
+    // Use driveService from destructuring
 
     const result = await driveService.listFiles({
       parentId: folderId,

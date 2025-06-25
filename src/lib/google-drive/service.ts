@@ -607,6 +607,19 @@ export class GoogleDriveService {
     await this.drive.files.delete({ fileId })
   }
 
+  async exportFile(fileId: string, mimeType: string): Promise<ArrayBuffer> {
+    const response = await this.drive.files.export(
+      {
+        fileId,
+        mimeType,
+      },
+      {
+        responseType: 'arraybuffer',
+      }
+    )
+    return response.data as ArrayBuffer
+  }
+
   // Alias for clarity - same operation works for both files and folders
   async deleteFolder(folderId: string): Promise<void> {
     return this.deleteFile(folderId)

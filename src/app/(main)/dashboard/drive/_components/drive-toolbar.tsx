@@ -54,7 +54,7 @@ import {
 } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { successToast, infoToast } from '@/lib/utils'
+import { successToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
 import { BulkOperationsDialog } from './bulk-operations-dialog'
@@ -586,7 +586,7 @@ export function DriveToolbar({
     if (onClearClientSideFilter) {
       onClearClientSideFilter()
       setActiveFilter(null)
-      infoToast.generic('Filter cleared', {
+      toastUtils.info.generic('Filter cleared', {
         description: `Showing all ${items.length} items`,
       })
     }
