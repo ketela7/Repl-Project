@@ -81,7 +81,6 @@ export function DriveManager() {
   const [dialogs, setDialogs] = useState({
     upload: false, createFolder: false, rename: false, move: false, copy: false,
     permanentDelete: false, details: false, preview: false, delete: false, share: false,
-    bulkDelete: false, bulkMove: false, bulkCopy: false, bulkShare: false,
     mobileFilters: false,
   })
 
@@ -523,10 +522,10 @@ export function DriveManager() {
             refreshing={refreshing}
             onUpload={() => openDialog('upload')}
             onCreateFolder={() => openDialog('createFolder')}
-            onBulkDelete={() => openDialog('bulkDelete')}
-            onBulkMove={() => openDialog('bulkMove')}
-            onBulkCopy={() => openDialog('bulkCopy')}
-            onBulkShare={() => openDialog('bulkShare')}
+            onBulkDelete={() => {}}
+            onBulkMove={() => {}}
+            onBulkCopy={() => {}}
+            onBulkShare={() => {}}
             onFiltersOpen={() => openDialog('mobileFilters')}
             
             
@@ -543,6 +542,7 @@ export function DriveManager() {
             onDeselectAll={() => {
               setSelectedItems(new Set())
             }}
+            onRefreshAfterBulkOp={handleRefresh}
             
             filters={filters}
             onFilterChange={handleFilter as any}
@@ -786,46 +786,7 @@ export function DriveManager() {
       )}
 
 
-      <BulkDeleteDialog
-        isOpen={dialogs.bulkDelete}
-        onClose={() => closeDialog('bulkDelete')}
-        selectedItems={selectedItemsWithDetails}
-        onConfirm={() => {
-          closeDialog('bulkDelete')
-          setSelectedItems(new Set())
-          handleRefresh()
-        }}
-      />
-
-      <BulkMoveDialog
-        isOpen={dialogs.bulkMove}
-        onClose={() => closeDialog('bulkMove')}
-        selectedItems={selectedItemsWithDetails}
-        onConfirm={(targetFolderId: string) => {
-          closeDialog('bulkMove')
-          setSelectedItems(new Set())
-          handleRefresh()
-        }}
-      />
-
-      <BulkCopyDialog
-        isOpen={dialogs.bulkCopy}
-        onClose={() => closeDialog('bulkCopy')}
-        selectedItems={selectedItemsWithDetails}
-        onConfirm={(targetFolderId: string) => {
-          closeDialog('bulkCopy')
-          setSelectedItems(new Set())
-          handleRefresh()
-        }}
-      />
-
-      <BulkShareDialog
-        open={dialogs.bulkShare}
-        onOpenChange={(open) => {
-          if (!open) closeDialog('bulkShare')
-        }}
-        selectedItems={selectedItemsWithDetails}
-      />
+      
 
       {/* Mobile Filters Dialog */}
       <FiltersDialog
