@@ -483,8 +483,7 @@ export function DriveToolbar({
     onRefreshAfterBulkOp()
   }
 
-  // Mobile Actions Dialog State
-  const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false)
+  // Actions Dialog State
   const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
 
   // Extract necessary props from filters
@@ -728,7 +727,7 @@ export function DriveToolbar({
                   <>
                     {isMobile ? (
                       <DropdownMenuItem
-                        onClick={() => setIsMobileActionsOpen(true)}
+                        onClick={() => setIsBulkOperationsOpen(true)}
                       >
                         <MoreVertical className="mr-2 h-4 w-4" />
                         More Actions
@@ -2049,19 +2048,9 @@ export function DriveToolbar({
         </div>
       </div>
 
-      {/* Mobile Actions Dialog */}
-      {isMobileActionsOpen && (
-        <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
-          <BulkOperationsDialog
-            open={isMobileActionsOpen}
-            onOpenChange={setIsMobileActionsOpen}
-            selectedItems={selectedItems}
-            onRefreshAfterBulkOp={handleBulkOperationComplete}
-          />
-        </Suspense>
-      )}
 
-      {/* Desktop Bulk Operations Dialog */}
+
+      {/* Bulk Operations Dialog */}
       {isBulkOperationsOpen && (
         <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
           <BulkOperationsDialog
