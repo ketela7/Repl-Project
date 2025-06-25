@@ -442,24 +442,24 @@ function BulkOperationsDialog({
         <BottomSheet open={dialogOpen} onOpenChange={onOpenChange || onClose}>
           <BottomSheetContent>
             <BottomSheetHeader>
-              <BottomSheetTitle>Bulk Operations</BottomSheetTitle>
-              <BottomSheetDescription>
-                Choose an action for the selected items
+              <BottomSheetTitle className="text-lg font-semibold">Bulk Operations</BottomSheetTitle>
+              <BottomSheetDescription className="text-sm text-muted-foreground">
+                Choose an action for {selectedItems.length} selected item{selectedItems.length > 1 ? 's' : ''} ({fileCount} file{fileCount !== 1 ? 's' : ''}, {folderCount} folder{folderCount !== 1 ? 's' : ''})
               </BottomSheetDescription>
             </BottomSheetHeader>
-            <div className="px-4 pb-4">{renderContent()}</div>
+            <div className="px-4 pb-6">{renderContent()}</div>
           </BottomSheetContent>
         </BottomSheet>
       ) : (
         <Dialog open={dialogOpen} onOpenChange={onOpenChange || onClose}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-lg">
             <DialogHeader>
-              <DialogTitle>Bulk Operations</DialogTitle>
-              <DialogDescription>
-                Choose an action for the selected items
+              <DialogTitle className="text-lg font-semibold">Bulk Operations</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                Choose an action for {selectedItems.length} selected item{selectedItems.length > 1 ? 's' : ''} ({fileCount} file{fileCount !== 1 ? 's' : ''}, {folderCount} folder{folderCount !== 1 ? 's' : ''})
               </DialogDescription>
             </DialogHeader>
-            <div className="py-4">{renderContent()}</div>
+            <div className="py-2">{renderContent()}</div>
           </DialogContent>
         </Dialog>
       )}
