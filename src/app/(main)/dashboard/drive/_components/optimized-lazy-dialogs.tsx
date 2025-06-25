@@ -25,11 +25,7 @@ export const BulkRenameDialog = lazy(() =>
   import('./bulk-rename-dialog').then(mod => ({ default: mod.BulkRenameDialog }))
 )
 
-export const BulkOperationsDialogMobile = lazy(() => 
-  import('./bulk-operations-dialog-mobile').then(mod => ({ default: mod.BulkOperationsDialogMobile }))
-)
-
-export const BulkOperationsDialogDekstop = lazy(() => 
-  import('./bulk-operations-dialog-dekstop').then(mod => ({ default: mod.BulkOperationsDialogDekstop }))
+export const BulkOperationsDialog = lazy(() => 
+  import('./bulk-operations-dialog').then(mod => ({ default: mod.BulkOperationsDialog }))
 )
 

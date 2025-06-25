@@ -58,8 +58,7 @@ import { successToast, infoToast } from '@/shared/utils'
 
 import { Suspense } from 'react'
 import { 
-  BulkOperationsDialogDekstop,
-  BulkOperationsDialogMobile
+  BulkOperationsDialog
 } from './optimized-lazy-dialogs'
 
 // Types
@@ -477,40 +476,7 @@ export function DriveToolbar({
   const isMobile = useIsMobile()
 
   // Optimized bulk operation handlers
-  const handleBulkMove = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('move')
-  }
 
-  const handleBulkCopy = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('copy')
-  }
-
-  const handleBulkDelete = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('delete')
-  }
-
-  const handleBulkShare = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('share')
-  }
-
-  const handleBulkDownload = () => {
-    setIsMobileActionsOpen(false)
-    onBulkDownload()
-  }
-
-  const handleBulkRename = () => {
-    setIsMobileActionsOpen(false)
-    openBulkDialog('rename')
-  }
-
-  const handleBulkExport = () => {
-    setIsMobileActionsOpen(false)
-    onBulkExport()
-  }
 
   const handleBulkOperationComplete = () => {
     onDeselectAll()
@@ -768,7 +734,7 @@ export function DriveToolbar({
                       </DropdownMenuItem>
                     ) : (
                       <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
-                        <BulkOperationsDialogDekstop
+                        <BulkOperationsDialog
                           selectedItems={selectedItems}
                           onRefreshAfterBulkOp={handleBulkOperationComplete}
                         />
@@ -2083,7 +2049,7 @@ export function DriveToolbar({
       {/* Mobile Actions Dialog */}
       {isMobileActionsOpen && (
         <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
-          <BulkOperationsDialogMobile
+          <BulkOperationsDialog
             open={isMobileActionsOpen}
             onOpenChange={setIsMobileActionsOpen}
             selectedItems={selectedItems}
