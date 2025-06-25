@@ -25,7 +25,6 @@ import { BulkMoveDialog } from './bulk-move-dialog'
 import { BulkCopyDialog } from './bulk-copy-dialog'
 import { FileShareDialog } from './file-share-dialog'
 import { BulkShareDialog } from './bulk-share-dialog'
-import { BulkOperationsDialogMobile } from './bulk-operations-dialog-mobile'
 import { FiltersDialog } from './filters-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
@@ -83,7 +82,7 @@ export function DriveManager() {
     upload: false, createFolder: false, rename: false, move: false, copy: false,
     permanentDelete: false, details: false, preview: false, delete: false, share: false,
     bulkDelete: false, bulkMove: false, bulkCopy: false, bulkShare: false,
-    mobileActions: false, mobileFilters: false,
+    mobileFilters: false,
   })
 
   // Sorting state
@@ -527,10 +526,22 @@ export function DriveManager() {
             onBulkCopy={() => openDialog('bulkCopy')}
             onBulkShare={() => openDialog('bulkShare')}
             onFiltersOpen={() => openDialog('mobileFilters')}
-            onMobileActionsOpen={() => {
-              
-              openDialog('mobileActions')
+            
+            // Mobile Actions Props
+            selectedItems={selectedItemsWithDetails}
+            onBulkDownload={() => {
+              // Handle bulk download
             }}
+            onBulkRename={() => {
+              // Handle bulk rename
+            }}
+            onBulkExport={() => {
+              // Handle bulk export
+            }}
+            onDeselectAll={() => {
+              setSelectedItems(new Set())
+            }}
+            
             filters={filters}
             onFilterChange={handleFilter as any}
             onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
@@ -813,45 +824,6 @@ export function DriveManager() {
         }}
         selectedItems={selectedItemsWithDetails}
       />
-
-      {/* Bulk Dialog Menu*/}
-      <BulkOperationsDialogMobile
-        open={dialogs.mobileActions}
-        onOpenChange={(open) => {
-          if (!open) closeDialog('mobileActions')
-        }}
-        selectedItems={selectedItemsWithDetails}
-        selectedCount={selectedItems.size}
-        onBulkDelete={() => {
-          closeDialog('mobileActions')
-          openDialog('bulkDelete')
-        }}
-        onBulkMove={() => {
-          closeDialog('mobileActions')
-          openDialog('bulkMove')
-        }}
-        onBulkCopy={() => {
-          closeDialog('mobileActions')
-          openDialog('bulkCopy')
-        }}
-        onBulkShare={() => {
-          closeDialog('mobileActions')
-          openDialog('bulkShare')
-        }}
-        onBulkDownload={() => {
-          closeDialog('mobileActions')
-        }}
-        onBulkRename={() => {
-          closeDialog('mobileActions')
-        }}
-        onBulkExport={() => {
-          closeDialog('mobileActions')
-        }}
-        onDeselectAll={() => {
-          setSelectedItems(new Set())
-          closeDialog('mobileActions')
-        }}
-      /> 
 
       {/* Mobile Filters Dialog */}
       <FiltersDialog

@@ -64,7 +64,8 @@ import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { FileCategoryBadges } from '@/components/file-category-badges'
 import { successToast, infoToast } from '@/shared/utils'
-import { BulkOperationsDialogDekstop } from './bulk-operations-menu-dekstop'
+import { BulkOperationsDialogDekstop } from './bulk-operations-dialog-dekstop'
+import { BulkOperationsDialogMobile } from './bulk-operations-dialog-mobile'
 
 // Types
 interface DriveFile {
@@ -128,7 +129,13 @@ interface DriveToolbarProps {
   onBulkCopy: () => void
   onBulkShare: () => void
   onFiltersOpen: () => void
-  onMobileActionsOpen?: () => void
+  
+  // Mobile Actions Dialog Props
+  selectedItems: any[]
+  onBulkDownload: () => void
+  onBulkRename: () => void
+  onBulkExport: () => void
+  onDeselectAll: () => void
   filters: {
     activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'
     fileTypeFilter: string[]
@@ -459,7 +466,11 @@ export function DriveToolbar({
   onBulkCopy,
   onBulkShare,
   onFiltersOpen,
-  onMobileActionsOpen,
+  selectedItems,
+  onBulkDownload,
+  onBulkRename,
+  onBulkExport,
+  onDeselectAll,
   filters,
   onFilterChange,
   onApplyFilters,
@@ -472,6 +483,9 @@ export function DriveToolbar({
   onClearClientSideFilter,
 }: DriveToolbarProps) {
   const isMobile = useIsMobile()
+
+  // Mobile Actions Dialog State
+  const [isMobileActionsOpen, setIsMobileActionsOpen] = useState(false)
 
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters
@@ -701,7 +715,7 @@ export function DriveToolbar({
                 {selectedCount > 0 && (
                   <>
                     {isMobile ? (
-                      <DropdownMenuItem onClick={onMobileActionsOpen}>
+                      <DropdownMenuItem onClick={() => setIsMobileActionsOpen(true)}>
                         <MoreVertical className="mr-2 h-4 w-4" />
                         More Actions
                       </DropdownMenuItem>
@@ -709,9 +723,9 @@ export function DriveToolbar({
                       <BulkOperationsDialogDekstop
                         selectedCount={selectedCount}
                         itemsLength={items.length}
-                        onBulkDownload={onBulkDelete}
-                        onBulkRename={onBulkMove}
-                        onBulkExport={onBulkCopy}
+                        onBulkDownload={onBulkDownload}
+                        onBulkRename={onBulkRename}
+                        onBulkExport={onBulkExport}
                         onBulkMove={onBulkMove}
                         onBulkCopy={onBulkCopy}
                         onBulkShare={onBulkShare}
@@ -2031,6 +2045,46 @@ export function DriveToolbar({
           </Button>
         </div>
       </div>
+
+      {/* Mobile Actions Dialog */}
+      <BulkOperationsDialogMobile
+        open={isMobileActionsOpen}
+        onOpenChange={setIsMobileActionsOpen}
+        selectedItems={selectedItems}
+        selectedCount={selectedCount}
+        onBulkDelete={() => {
+          setIsMobileActionsOpen(false)
+          onBulkDelete()
+        }}
+        onBulkMove={() => {
+          setIsMobileActionsOpen(false)
+          onBulkMove()
+        }}
+        onBulkCopy={() => {
+          setIsMobileActionsOpen(false)
+          onBulkCopy()
+        }}
+        onBulkShare={() => {
+          setIsMobileActionsOpen(false)
+          onBulkShare()
+        }}
+        onBulkDownload={() => {
+          setIsMobileActionsOpen(false)
+          onBulkDownload()
+        }}
+        onBulkRename={() => {
+          setIsMobileActionsOpen(false)
+          onBulkRename()
+        }}
+        onBulkExport={() => {
+          setIsMobileActionsOpen(false)
+          onBulkExport()
+        }}
+        onDeselectAll={() => {
+          setIsMobileActionsOpen(false)
+          onDeselectAll()
+        }}
+      />
     </div>
   )
 }
