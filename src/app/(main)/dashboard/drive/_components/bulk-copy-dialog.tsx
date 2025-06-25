@@ -34,7 +34,7 @@ interface BulkCopyDialogProps {
   }>
 }
 
-export function BulkCopyDialog({
+function BulkCopyDialog({
   isOpen,
   onClose,
   onConfirm,
@@ -346,3 +346,6 @@ export function BulkCopyDialog({
     </>
   )
 }
+
+export { BulkCopyDialog }
+export default BulkCopyDialog

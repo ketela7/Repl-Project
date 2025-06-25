@@ -40,7 +40,7 @@ interface BulkPermanentDeleteDialogProps {
   }>
 }
 
-export function BulkPermanentDeleteDialog({
+function BulkPermanentDeleteDialog({
   isOpen,
   onClose,
   onConfirm,
@@ -323,3 +323,6 @@ export function BulkPermanentDeleteDialog({
     </AlertDialog>
   )
 }
+
+export { BulkPermanentDeleteDialog }
+export default BulkPermanentDeleteDialog

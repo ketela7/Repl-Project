@@ -36,12 +36,13 @@ interface BulkMoveDialogProps {
   }>
 }
 
-export function BulkMoveDialog({
+function BulkMoveDialog({
   open,
   onOpenChange,
   onConfirm,
   selectedItems,
 }: BulkMoveDialogProps) {
+  console.log('BulkMoveDialog rendered:', { open, selectedItemsCount: selectedItems.length })
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 
@@ -298,3 +299,6 @@ export function BulkMoveDialog({
     </>
   )
 }
+
+export { BulkMoveDialog }
+export default BulkMoveDialog

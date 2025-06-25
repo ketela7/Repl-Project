@@ -85,7 +85,7 @@ const RENAME_TYPES = [
   },
 ]
 
-export function BulkRenameDialog({
+function BulkRenameDialog({
   isOpen,
   onClose,
   onConfirm,
@@ -584,3 +584,6 @@ export function BulkRenameDialog({
     </Dialog>
   )
 }
+
+export { BulkRenameDialog }
+export default BulkRenameDialog

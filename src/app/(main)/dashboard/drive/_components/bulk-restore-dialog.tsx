@@ -35,7 +35,7 @@ interface BulkRestoreDialogProps {
   }>
 }
 
-export function BulkRestoreDialog({
+function BulkRestoreDialog({
   isOpen,
   onClose,
   onConfirm,
@@ -203,3 +203,6 @@ export function BulkRestoreDialog({
     </AlertDialog>
   )
 }
+
+export { BulkRestoreDialog }
+export default BulkRestoreDialog

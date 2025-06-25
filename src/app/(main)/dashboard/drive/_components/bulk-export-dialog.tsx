@@ -109,7 +109,7 @@ const EXPORT_FORMATS = [
   },
 ]
 
-export function BulkExportDialog({
+function BulkExportDialog({
   isOpen,
   onClose,
   onConfirm,
@@ -457,3 +457,6 @@ export function BulkExportDialog({
     </Dialog>
   )
 }
+
+export { BulkExportDialog }
+export default BulkExportDialog

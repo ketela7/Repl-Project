@@ -79,7 +79,7 @@ interface ShareResult {
   error?: string
 }
 
-export function BulkShareDialog({
+function BulkShareDialog({
   open,
   onOpenChange,
   selectedItems,
@@ -904,3 +904,6 @@ export function BulkShareDialog({
     </Dialog>
   )
 }
+
+export { BulkShareDialog }
+export default BulkShareDialog
