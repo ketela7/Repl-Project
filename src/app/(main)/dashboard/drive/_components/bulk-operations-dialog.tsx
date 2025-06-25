@@ -466,103 +466,71 @@ export function BulkOperationsDialog({
         </Dialog>
       )}
 
-      {/* Individual Bulk Operation Dialogs */}
-      {isMoveDialogOpen && (
-        <Suspense fallback={<div>Loading move dialog...</div>}>
-          <BulkMoveDialog
-            open={isMoveDialogOpen}
-            onOpenChange={(open) => {
-              console.log('Move dialog state changed:', open)
-              setIsMoveDialogOpen(open)
-            }}
-            onConfirm={handleMoveComplete}
-            selectedItems={selectedItems}
-          />
-        </Suspense>
-      )}
+      {/* Individual Bulk Operation Dialogs - Direct rendering tanpa Suspense */}
+      <BulkMoveDialog
+        open={isMoveDialogOpen}
+        onOpenChange={(open) => {
+          console.log('Move dialog state changed:', open)
+          setIsMoveDialogOpen(open)
+        }}
+        onConfirm={handleMoveComplete}
+        selectedItems={selectedItems}
+      />
 
-      {isCopyDialogOpen && (
-        <Suspense fallback={<div>Loading copy dialog...</div>}>
-          <BulkCopyDialog
-            isOpen={isCopyDialogOpen}
-            onClose={() => {
-              console.log('Copy dialog closed')
-              setIsCopyDialogOpen(false)
-            }}
-            onConfirm={handleCopyComplete}
-            selectedItems={selectedItems}
-          />
-        </Suspense>
-      )}
+      <BulkCopyDialog
+        isOpen={isCopyDialogOpen}
+        onClose={() => {
+          console.log('Copy dialog closed')
+          setIsCopyDialogOpen(false)
+        }}
+        onConfirm={handleCopyComplete}
+        selectedItems={selectedItems}
+      />
 
-      {isDeleteDialogOpen && (
-        <Suspense fallback={<div>Loading delete dialog...</div>}>
-          <BulkDeleteDialog
-            isOpen={isDeleteDialogOpen}
-            onClose={() => {
-              console.log('Delete dialog closed')
-              setIsDeleteDialogOpen(false)
-            }}
-            onConfirm={handleDeleteComplete}
-            selectedItems={selectedItems}
-          />
-        </Suspense>
-      )}
+      <BulkDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => {
+          console.log('Delete dialog closed')
+          setIsDeleteDialogOpen(false)
+        }}
+        onConfirm={handleDeleteComplete}
+        selectedItems={selectedItems}
+      />
 
-      {isShareDialogOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <BulkShareDialog
-            open={isShareDialogOpen}
-            onOpenChange={() => setIsShareDialogOpen(false)}
-            onShare={handleShareComplete}
-            selectedItems={selectedItems}
-          />
-        </Suspense>
-      )}
+      <BulkShareDialog
+        open={isShareDialogOpen}
+        onOpenChange={() => setIsShareDialogOpen(false)}
+        onShare={handleShareComplete}
+        selectedItems={selectedItems}
+      />
 
-      {isRenameDialogOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <BulkRenameDialog
-            isOpen={isRenameDialogOpen}
-            onClose={() => setIsRenameDialogOpen(false)}
-            onConfirm={handleRenameComplete}
-            selectedItems={selectedItems}
-          />
-        </Suspense>
-      )}
+      <BulkRenameDialog
+        isOpen={isRenameDialogOpen}
+        onClose={() => setIsRenameDialogOpen(false)}
+        onConfirm={handleRenameComplete}
+        selectedItems={selectedItems}
+      />
 
-      {isExportDialogOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <BulkExportDialog
-            isOpen={isExportDialogOpen}
-            onClose={() => setIsExportDialogOpen(false)}
-            onConfirm={handleExportComplete}
-            selectedItems={selectedItems}
-          />
-        </Suspense>
-      )}
+      <BulkExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={() => setIsExportDialogOpen(false)}
+        onConfirm={handleExportComplete}
+        selectedItems={selectedItems}
+      />
 
-      {isPermanentDeleteDialogOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <BulkPermanentDeleteDialog
-            isOpen={isPermanentDeleteDialogOpen}
-            onClose={() => setIsPermanentDeleteDialogOpen(false)}
-            onConfirm={handlePermanentDeleteComplete}
-            selectedItems={selectedItems}
-          />
-        </Suspense>
-      )}
+      <BulkPermanentDeleteDialog
+        isOpen={isPermanentDeleteDialogOpen}
+        onClose={() => setIsPermanentDeleteDialogOpen(false)}
+        onConfirm={handlePermanentDeleteComplete}
+        selectedItems={selectedItems}
+      />
 
-      {isRestoreDialogOpen && (
-        <Suspense fallback={<div>Loading...</div>}>
-          <BulkRestoreDialog
-            isOpen={isRestoreDialogOpen}
-            onClose={() => setIsRestoreDialogOpen(false)}
-            onConfirm={handleRestoreComplete}
-            selectedItems={selectedItems}
-          />
-        </Suspense>
-      )}
+      <BulkRestoreDialog
+        isOpen={isRestoreDialogOpen}
+        onClose={() => setIsRestoreDialogOpen(false)}
+        onConfirm={handleRestoreComplete}
+        selectedItems={selectedItems}
+      />
     </>
   )
 }
