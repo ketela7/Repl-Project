@@ -62,6 +62,7 @@ import { BulkMoveDialog } from './bulk-move-dialog'
 import { BulkCopyDialog } from './bulk-copy-dialog'
 import { BulkDeleteDialog } from './bulk-delete-dialog'
 import { BulkShareDialog } from './bulk-share-dialog'
+import { BulkRenameDialog } from './bulk-rename-dialog'
 
 // Types
 interface DriveItem {
@@ -505,7 +506,7 @@ export function DriveToolbar({
 
   const handleBulkRename = () => {
     setIsMobileActionsOpen(false)
-    onBulkRename()
+    openBulkDialog('rename')
   }
 
   const handleBulkExport = () => {
@@ -527,6 +528,7 @@ export function DriveToolbar({
     copy: false,
     delete: false,
     share: false,
+    rename: false,
   })
 
   const openBulkDialog = (type: keyof typeof bulkDialogs) => {
@@ -706,7 +708,7 @@ export function DriveToolbar({
           </Button>
 
           {/* Bulk Operations */}
-          {selectedCount !== items.length && (
+          {selectedCount <= items.length && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -737,7 +739,10 @@ export function DriveToolbar({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="w-64">
                 <DropdownMenuItem
-                  onClick={() => onSelectModeChange(!isSelectMode)}
+                  onClick={() => {
+                    isSelectMode && onDeselectAll(),
+                      onSelectModeChange(!isSelectMode)
+                  }}
                 >
                   {isSelectMode ? (
                     <>
@@ -752,20 +757,22 @@ export function DriveToolbar({
                   )}
                 </DropdownMenuItem>
 
-                <DropdownMenuSeparator />
                 {isSelectMode && (
                   <>
-                    <DropdownMenuItem onClick={onSelectAll}>
-                      <CheckSquare className="mr-2 h-4 w-4" />
-                      Select All ({selectedCount}/{items.length})
-                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    {selectedCount < items.length && (
+                      <DropdownMenuItem onClick={onSelectAll}>
+                        <CheckSquare className="mr-2 h-4 w-4" />
+                        Select All ({selectedCount}/{items.length})
+                      </DropdownMenuItem>
+                    )}
+
                     {selectedCount > 0 && (
                       <DropdownMenuItem onClick={onDeselectAll}>
                         <Square className="mr-2 h-4 w-4" />
                         Clear Selection
                       </DropdownMenuItem>
                     )}
-                    
                   </>
                 )}
 
@@ -2151,6 +2158,17 @@ export function DriveToolbar({
         open={bulkDialogs.share}
         onOpenChange={(open) => {
           if (!open) closeBulkDialog('share')
+        }}
+        selectedItems={selectedItems}
+      />
+
+      {/* Additional Bulk Operations Dialogs */}
+      <BulkRenameDialog
+        isOpen={bulkDialogs.rename || false}
+        onClose={() => closeBulkDialog('rename' as keyof typeof bulkDialogs)}
+        onConfirm={(renamePattern: string, renameType: string) => {
+          closeBulkDialog('rename' as keyof typeof bulkDialogs)
+          handleBulkOperationComplete()
         }}
         selectedItems={selectedItems}
       />

@@ -243,7 +243,7 @@ export function DriveManager() {
         type: item && isFolder(item) ? ('folder' as const) : ('file' as const),
         mimeType: item?.mimeType || '',
         modifiedTime: item?.modifiedTime || '',
-        size: item?.size,
+        size: (item as any)?.size,
         createdTime: item?.createdTime,
         ownedByMe: item?.ownedByMe,
         shared: item?.shared,
@@ -534,15 +534,6 @@ export function DriveManager() {
             
             
             selectedItems={selectedItemsWithDetails}
-            onBulkDownload={() => {
-              // Handle bulk download
-            }}
-            onBulkRename={() => {
-              // Handle bulk rename
-            }}
-            onBulkExport={() => {
-              // Handle bulk export
-            }}
             onDeselectAll={() => {
               setSelectedItems(new Set())
             }}
