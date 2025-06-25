@@ -14,8 +14,6 @@ export async function POST(request: NextRequest) {
     const oauth2Client = new google.auth.OAuth2()
     oauth2Client.setCredentials({ access_token: session.accessToken })
     const drive = google.drive({ version: 'v3', auth: oauth2Client })
-    auth.setCredentials({ access_token: session.accessToken })
-    const drive = google.drive({ version: 'v3', auth })
 
     const results = []
 

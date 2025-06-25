@@ -29,17 +29,15 @@ import {
   FileOutput,
 } from 'lucide-react'
 import { cn } from '@/shared/utils'
-import { Suspense, useState } from 'react'
-import {
-  BulkMoveDialog,
-  BulkCopyDialog,
-  BulkDeleteDialog,
-  BulkShareDialog,
-  BulkRenameDialog,
-  BulkExportDialog,
-  BulkPermanentDeleteDialog,
-  BulkRestoreDialog,
-} from './optimized-lazy-dialogs'
+import { useState } from 'react'
+import { BulkMoveDialog } from './bulk-move-dialog'
+import { BulkCopyDialog } from './bulk-copy-dialog'
+import { BulkDeleteDialog } from './bulk-delete-dialog'
+import { BulkShareDialog } from './bulk-share-dialog'
+import { BulkRenameDialog } from './bulk-rename-dialog'
+import { BulkExportDialog } from './bulk-export-dialog'
+import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog'
+import { BulkRestoreDialog } from './bulk-restore-dialog'
 
 interface BulkOperationsDialogProps {
   isOpen?: boolean

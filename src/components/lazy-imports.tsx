@@ -27,15 +27,15 @@ export const BulkOperationsDialog = lazy(() =>
 );
 
 export const BulkMoveDialog = lazy(() => 
- import("@/app/(main)/dashboard/drive/_components/optimized-lazy-dialogs").then(mod => ({ default: mod.BulkMoveDialog }))
+ import("@/app/(main)/dashboard/drive/_components/bulk-move-dialog")
 );
 
 export const BulkCopyDialog = lazy(() => 
- import("@/app/(main)/dashboard/drive/_components/optimized-lazy-dialogs").then(mod => ({ default: mod.BulkCopyDialog }))
+ import("@/app/(main)/dashboard/drive/_components/bulk-copy-dialog")
 );
 
 export const BulkDeleteDialog = lazy(() => 
- import("@/app/(main)/dashboard/drive/_components/optimized-lazy-dialogs").then(mod => ({ default: mod.BulkDeleteDialog }))
+ import("@/app/(main)/dashboard/drive/_components/bulk-delete-dialog")
 );
 
 

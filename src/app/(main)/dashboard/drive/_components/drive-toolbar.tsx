@@ -57,9 +57,7 @@ import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { successToast, infoToast } from '@/shared/utils'
 
 import { Suspense } from 'react'
-import { 
-  BulkOperationsDialog
-} from './optimized-lazy-dialogs'
+import { BulkOperationsDialog } from './bulk-operations-dialog'
 
 // Types
 interface DriveItem {
