@@ -359,8 +359,8 @@ export function BulkOperationsDialog({
       {isMoveDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkMoveDialog
-            isOpen={isMoveDialogOpen}
-            onClose={() => setIsMoveDialogOpen(false)}
+            open={isMoveDialogOpen}
+            onOpenChange={() => setIsMoveDialogOpen(false)}
             onConfirm={handleMoveComplete}
             selectedItems={selectedItems}
           />
@@ -370,8 +370,8 @@ export function BulkOperationsDialog({
       {isCopyDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkCopyDialog
-            isOpen={isCopyDialogOpen}
-            onClose={() => setIsCopyDialogOpen(false)}
+            open={isCopyDialogOpen}
+            onOpenChange={() => setIsCopyDialogOpen(false)}
             onConfirm={handleCopyComplete}
             selectedItems={selectedItems}
           />
@@ -381,8 +381,8 @@ export function BulkOperationsDialog({
       {isDeleteDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkDeleteDialog
-            isOpen={isDeleteDialogOpen}
-            onClose={() => setIsDeleteDialogOpen(false)}
+            open={isDeleteDialogOpen}
+            onOpenChange={() => setIsDeleteDialogOpen(false)}
             onConfirm={handleDeleteComplete}
             selectedItems={selectedItems}
           />
@@ -394,6 +394,17 @@ export function BulkOperationsDialog({
           <BulkShareDialog
             open={isShareDialogOpen}
             onOpenChange={() => setIsShareDialogOpen(false)}
+            onShare={async (shareData) => {
+              // Mock implementation - replace with actual share logic
+              const results = selectedItems.map(item => ({
+                id: item.id,
+                name: item.name,
+                shareLink: `https://drive.google.com/file/d/${item.id}/view`,
+                success: true
+              }))
+              handleShareComplete()
+              return results
+            }}
             selectedItems={selectedItems}
           />
         </Suspense>
@@ -402,8 +413,8 @@ export function BulkOperationsDialog({
       {isRenameDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkRenameDialog
-            isOpen={isRenameDialogOpen}
-            onClose={() => setIsRenameDialogOpen(false)}
+            open={isRenameDialogOpen}
+            onOpenChange={() => setIsRenameDialogOpen(false)}
             onConfirm={handleRenameComplete}
             selectedItems={selectedItems}
           />
@@ -413,8 +424,8 @@ export function BulkOperationsDialog({
       {isExportDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkExportDialog
-            isOpen={isExportDialogOpen}
-            onClose={() => setIsExportDialogOpen(false)}
+            open={isExportDialogOpen}
+            onOpenChange={() => setIsExportDialogOpen(false)}
             onConfirm={handleExportComplete}
             selectedItems={selectedItems}
           />
@@ -424,8 +435,8 @@ export function BulkOperationsDialog({
       {isPermanentDeleteDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkPermanentDeleteDialog
-            isOpen={isPermanentDeleteDialogOpen}
-            onClose={() => setIsPermanentDeleteDialogOpen(false)}
+            open={isPermanentDeleteDialogOpen}
+            onOpenChange={() => setIsPermanentDeleteDialogOpen(false)}
             onConfirm={handlePermanentDeleteComplete}
             selectedItems={selectedItems}
           />
@@ -435,8 +446,8 @@ export function BulkOperationsDialog({
       {isRestoreDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkRestoreDialog
-            isOpen={isRestoreDialogOpen}
-            onClose={() => setIsRestoreDialogOpen(false)}
+            open={isRestoreDialogOpen}
+            onOpenChange={() => setIsRestoreDialogOpen(false)}
             onConfirm={handleRestoreComplete}
             selectedItems={selectedItems}
           />

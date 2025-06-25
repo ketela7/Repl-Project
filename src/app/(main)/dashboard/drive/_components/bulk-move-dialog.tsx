@@ -25,19 +25,20 @@ import { FileMoveDialog } from './file-move-dialog'
 import { cn } from '@/shared/utils'
 
 interface BulkMoveDialogProps {
-  isOpen: boolean
-  onClose: () => void
+  open: boolean
+  onOpenChange: (open: boolean) => void
   onConfirm: (targetFolderId: string) => void
   selectedItems: Array<{
     id: string
     name: string
     type: 'file' | 'folder'
+    mimeType?: string
   }>
 }
 
 export function BulkMoveDialog({
-  isOpen,
-  onClose,
+  open,
+  onOpenChange,
   onConfirm,
   selectedItems,
 }: BulkMoveDialogProps) {
@@ -120,7 +121,7 @@ export function BulkMoveDialog({
   if (isMobile) {
     return (
       <>
-        <BottomSheet open={isOpen} onOpenChange={onClose}>
+        <BottomSheet open={open} onOpenChange={onOpenChange}>
           <BottomSheetContent className="max-h-[90vh]">
             <BottomSheetHeader className="pb-4">
               <BottomSheetTitle className="flex items-center gap-3">
@@ -141,7 +142,7 @@ export function BulkMoveDialog({
             <BottomSheetFooter className={cn('grid gap-4')}>
               <Button
                 variant="outline"
-                onClick={onClose}
+                onClick={() => onOpenChange(false)}
                 className={cn('touch-target min-h-[44px] active:scale-95')}
               >
                 Cancel
@@ -172,7 +173,7 @@ export function BulkMoveDialog({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
@@ -270,7 +271,7 @@ export function BulkMoveDialog({
           <DialogFooter className="flex-col gap-2 sm:flex-row">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={() => onOpenChange(false)}
               className="w-full sm:w-auto"
             >
               Cancel
