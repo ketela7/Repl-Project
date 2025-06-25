@@ -59,7 +59,7 @@ interface BulkOperationsDialogProps {
   onRefreshAfterBulkOp?: () => void
 }
 
-export function BulkOperationsDialog({
+function BulkOperationsDialog({
   isOpen,
   open,
   onClose,
@@ -67,6 +67,7 @@ export function BulkOperationsDialog({
   selectedItems,
   onRefreshAfterBulkOp,
 }: BulkOperationsDialogProps) {
+  console.log('BulkOperationsDialog rendered with:', { isOpen, open, selectedItemsCount: selectedItems.length })
   const isMobile = useIsMobile()
   const fileCount = selectedItems.filter((item) => item.type === 'file').length
   const folderCount = selectedItems.filter(
@@ -96,21 +97,24 @@ export function BulkOperationsDialog({
     selectedItems: selectedItems.length
   })
 
-  // Individual dialog handlers
+  // Individual dialog handlers dengan debugging
   const handleMoveClick = () => {
-    console.log('Opening move dialog...')
+    console.log('MOVE BUTTON CLICKED!')
+    alert('Move button clicked - check console')
     setIsMoveDialogOpen(true)
     handleClose()
   }
 
   const handleCopyClick = () => {
-    console.log('Opening copy dialog...')
+    console.log('COPY BUTTON CLICKED!')
+    alert('Copy button clicked - check console')
     setIsCopyDialogOpen(true)
     handleClose()
   }
 
   const handleDeleteClick = () => {
-    console.log('Opening delete dialog...')
+    console.log('DELETE BUTTON CLICKED!')
+    alert('Delete button clicked - check console')
     setIsDeleteDialogOpen(true)
     handleClose()
   }
@@ -360,7 +364,12 @@ export function BulkOperationsDialog({
       <div className="grid grid-cols-2 gap-2">
         <Button
           variant="outline"
-          onClick={handleMoveClick}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            console.log('Move button clicked!')
+            handleMoveClick()
+          }}
           className="flex items-center gap-2"
         >
           <Move className="h-4 w-4" />
@@ -369,7 +378,12 @@ export function BulkOperationsDialog({
         
         <Button
           variant="outline"
-          onClick={handleCopyClick}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            console.log('Copy button clicked!')
+            handleCopyClick()
+          }}
           className="flex items-center gap-2"
           disabled={fileCount === 0}
         >
@@ -379,7 +393,12 @@ export function BulkOperationsDialog({
 
         <Button
           variant="outline"
-          onClick={handleDeleteClick}
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            console.log('Delete button clicked!')
+            handleDeleteClick()
+          }}
           className="flex items-center gap-2"
         >
           <Trash2 className="h-4 w-4" />
@@ -532,3 +551,6 @@ export function BulkOperationsDialog({
     </>
   )
 }
+
+export { BulkOperationsDialog }
+export default BulkOperationsDialog
