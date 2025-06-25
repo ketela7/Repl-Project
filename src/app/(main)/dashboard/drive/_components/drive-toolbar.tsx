@@ -789,17 +789,19 @@ export function DriveToolbar({
                         More Actions
                       </DropdownMenuItem>
                     ) : (
-                      <BulkOperationsDialogDekstop
-                        selectedCount={selectedCount}
-                        itemsLength={items.length}
-                        onBulkDownload={handleBulkDownload}
-                        onBulkRename={handleBulkRename}
-                        onBulkExport={handleBulkExport}
-                        onBulkMove={handleBulkMove}
-                        onBulkCopy={handleBulkCopy}
-                        onBulkShare={handleBulkShare}
-                        onBulkDelete={handleBulkDelete}
-                      />
+                      <Suspense fallback={<div className="animate-pulse h-4 w-4 bg-gray-200 rounded" />}>
+                        <BulkOperationsDialogDekstop
+                          selectedCount={selectedCount}
+                          itemsLength={items.length}
+                          onBulkDownload={handleBulkDownload}
+                          onBulkRename={handleBulkRename}
+                          onBulkExport={handleBulkExport}
+                          onBulkMove={handleBulkMove}
+                          onBulkCopy={handleBulkCopy}
+                          onBulkShare={handleBulkShare}
+                          onBulkDelete={handleBulkDelete}
+                        />
+                      </Suspense>
                     )}
                   </>
                 )}
@@ -2129,8 +2131,8 @@ export function DriveToolbar({
       </Suspense>
 
       {/* Consolidated Bulk Operations Dialogs - Lazy Loaded */}
-      <Suspense fallback={<div className="animate-pulse h-8 w-8 bg-gray-200 rounded" />}>
-        {bulkDialogs.move && (
+      {bulkDialogs.move && (
+        <Suspense fallback={<div className="animate-pulse h-8 w-8 bg-gray-200 rounded" />}>
           <BulkMoveDialog
             isOpen={bulkDialogs.move}
             onClose={() => closeBulkDialog('move')}
@@ -2140,9 +2142,11 @@ export function DriveToolbar({
               handleBulkOperationComplete()
             }}
           />
-        )}
+        </Suspense>
+      )}
 
-        {bulkDialogs.copy && (
+      {bulkDialogs.copy && (
+        <Suspense fallback={<div className="animate-pulse h-8 w-8 bg-gray-200 rounded" />}>
           <BulkCopyDialog
             isOpen={bulkDialogs.copy}
             onClose={() => closeBulkDialog('copy')}
@@ -2152,9 +2156,11 @@ export function DriveToolbar({
               handleBulkOperationComplete()
             }}
           />
-        )}
+        </Suspense>
+      )}
 
-        {bulkDialogs.delete && (
+      {bulkDialogs.delete && (
+        <Suspense fallback={<div className="animate-pulse h-8 w-8 bg-gray-200 rounded" />}>
           <BulkDeleteDialog
             isOpen={bulkDialogs.delete}
             onClose={() => closeBulkDialog('delete')}
@@ -2164,9 +2170,11 @@ export function DriveToolbar({
               handleBulkOperationComplete()
             }}
           />
-        )}
+        </Suspense>
+      )}
 
-        {bulkDialogs.share && (
+      {bulkDialogs.share && (
+        <Suspense fallback={<div className="animate-pulse h-8 w-8 bg-gray-200 rounded" />}>
           <BulkShareDialog
             open={bulkDialogs.share}
             onOpenChange={(open) => {
@@ -2174,9 +2182,11 @@ export function DriveToolbar({
             }}
             selectedItems={selectedItems}
           />
-        )}
+        </Suspense>
+      )}
 
-        {bulkDialogs.rename && (
+      {bulkDialogs.rename && (
+        <Suspense fallback={<div className="animate-pulse h-8 w-8 bg-gray-200 rounded" />}>
           <BulkRenameDialog
             isOpen={bulkDialogs.rename}
             onClose={() => closeBulkDialog('rename')}
@@ -2186,8 +2196,8 @@ export function DriveToolbar({
             }}
             selectedItems={selectedItems}
           />
-        )}
-      </Suspense>
+        </Suspense>
+      )}
     </div>
   )
 }

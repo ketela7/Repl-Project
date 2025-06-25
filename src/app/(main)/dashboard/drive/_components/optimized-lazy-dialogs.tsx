@@ -2,63 +2,37 @@
  * Optimized lazy loading for bulk operations dialogs
  * Reduces compilation time and improves loading performance
  */
-import { lazy, ComponentType } from 'react'
+import { lazy } from 'react'
 
-// Create optimized lazy loader with error boundaries
-const createLazyDialog = (
-  importFn: () => Promise<any>,
-  componentName: string
-) => {
-  return lazy(async () => {
-    try {
-      const module = await importFn()
-      return { default: module[componentName] }
-    } catch (error) {
-      console.warn(`Failed to load ${componentName}:`, error)
-      // Return null component as fallback
-      const NullComponent = () => null
-      return { default: NullComponent }
-    }
-  })
-}
-
-// Optimized bulk dialog exports
-export const BulkMoveDialog = createLazyDialog(
-  () => import('./bulk-move-dialog'),
-  'BulkMoveDialog'
+// Optimized bulk dialog exports with direct lazy loading
+export const BulkMoveDialog = lazy(() => 
+  import('./bulk-move-dialog').then(mod => ({ default: mod.BulkMoveDialog }))
 )
 
-export const BulkCopyDialog = createLazyDialog(
-  () => import('./bulk-copy-dialog'),
-  'BulkCopyDialog'
+export const BulkCopyDialog = lazy(() => 
+  import('./bulk-copy-dialog').then(mod => ({ default: mod.BulkCopyDialog }))
 )
 
-export const BulkDeleteDialog = createLazyDialog(
-  () => import('./bulk-delete-dialog'),
-  'BulkDeleteDialog'
+export const BulkDeleteDialog = lazy(() => 
+  import('./bulk-delete-dialog').then(mod => ({ default: mod.BulkDeleteDialog }))
 )
 
-export const BulkShareDialog = createLazyDialog(
-  () => import('./bulk-share-dialog'),
-  'BulkShareDialog'
+export const BulkShareDialog = lazy(() => 
+  import('./bulk-share-dialog').then(mod => ({ default: mod.BulkShareDialog }))
 )
 
-export const BulkRenameDialog = createLazyDialog(
-  () => import('./bulk-rename-dialog'),
-  'BulkRenameDialog'
+export const BulkRenameDialog = lazy(() => 
+  import('./bulk-rename-dialog').then(mod => ({ default: mod.BulkRenameDialog }))
 )
 
-export const BulkOperationsDialogMobile = createLazyDialog(
-  () => import('./bulk-operations-dialog-mobile'),
-  'BulkOperationsDialogMobile'
+export const BulkOperationsDialogMobile = lazy(() => 
+  import('./bulk-operations-dialog-mobile').then(mod => ({ default: mod.BulkOperationsDialogMobile }))
 )
 
-export const BulkOperationsDialogDekstop = createLazyDialog(
-  () => import('./bulk-operations-dialog-dekstop'),
-  'BulkOperationsDialogDekstop'
+export const BulkOperationsDialogDekstop = lazy(() => 
+  import('./bulk-operations-dialog-dekstop').then(mod => ({ default: mod.BulkOperationsDialogDekstop }))
 )
 
-export const BulkOperationsDialog = createLazyDialog(
-  () => import('./bulk-operations-dialog'),
-  'BulkOperationsDialog'
+export const BulkOperationsDialog = lazy(() => 
+  import('./bulk-operations-dialog').then(mod => ({ default: mod.BulkOperationsDialog }))
 )
