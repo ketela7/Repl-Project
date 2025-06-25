@@ -64,7 +64,7 @@ import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/shared/hooks/use-mobile'
 import { FileCategoryBadges } from '@/components/file-category-badges'
 import { successToast, infoToast } from '@/shared/utils'
-import { BulkOperationsMenu } from './bulk-operations-menu'
+import { BulkOperationsDialogDekstop } from './bulk-operations-menu-dekstop'
 
 // Types
 interface DriveFile {
@@ -706,7 +706,7 @@ export function DriveToolbar({
                         More Actions
                       </DropdownMenuItem>
                     ) : (
-                      <BulkOperationsMenu
+                      <BulkOperationsDialogDekstop
                         selectedCount={selectedCount}
                         itemsLength={items.length}
                         onBulkDownload={onBulkDelete}

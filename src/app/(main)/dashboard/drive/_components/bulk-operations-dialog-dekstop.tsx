@@ -17,7 +17,7 @@ import {
   Trash2,
 } from 'lucide-react'
 
-interface BulkOperationsMenuProps {
+interface BulkOperationsDialogDekstopProps {
   selectedCount: number
   itemsLength: number
   onBulkDownload: () => void
@@ -29,7 +29,7 @@ interface BulkOperationsMenuProps {
   onBulkDelete: () => void
 }
 
-export function BulkOperationsMenu({
+export function BulkOperationsDialogDekstop({
   selectedCount,
   itemsLength,
   onBulkDownload,
@@ -39,7 +39,7 @@ export function BulkOperationsMenu({
   onBulkCopy,
   onBulkShare,
   onBulkDelete,
-}: BulkOperationsMenuProps) {
+}: BulkOperationsDialogDekstopProps) {
   const bulkOperations = [
     {
       icon: Download,
