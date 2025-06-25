@@ -173,7 +173,7 @@ export function BulkOperationsDialog({
     onRefreshAfterBulkOp?.()
   }
 
-  const handleShareComplete = (permissions: any) => {
+  const handleShareComplete = () => {
     if (onBulkShare) {
       onBulkShare()
     }
@@ -394,7 +394,6 @@ export function BulkOperationsDialog({
           <BulkShareDialog
             open={isShareDialogOpen}
             onOpenChange={() => setIsShareDialogOpen(false)}
-            onConfirm={handleShareComplete}
             selectedItems={selectedItems}
           />
         </Suspense>
