@@ -324,113 +324,148 @@ function BulkOperationsDialog({
 
   const renderContent = () => (
     <>
-      <div className="mb-4">
-        <div className="mb-2 text-sm text-muted-foreground">
-          Selected {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {fileCount > 0 && (
-            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-              {fileCount} file{fileCount > 1 ? 's' : ''}
-            </Badge>
-          )}
-          {folderCount > 0 && (
-            <Badge variant="secondary" className="bg-amber-100 text-amber-800">
-              {folderCount} folder{folderCount > 1 ? 's' : ''}
-            </Badge>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
+      <div className="grid gap-3">
+        {/* Move Items */}
         <Button
           variant="outline"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            console.log('Move button clicked!')
-            handleMoveClick()
-          }}
-          className="flex items-center gap-2"
+          onClick={handleMoveClick}
+          className="w-full justify-start gap-3 h-12 text-left hover:bg-blue-50 hover:border-blue-200 dark:hover:bg-blue-950/30"
         >
-          <Move className="h-4 w-4" />
-          Move
-        </Button>
-        
-        <Button
-          variant="outline"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            console.log('Copy button clicked!')
-            handleCopyClick()
-          }}
-          className="flex items-center gap-2"
-          disabled={fileCount === 0}
-        >
-          <Copy className="h-4 w-4" />
-          Copy
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
+            <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-medium">Move Items</span>
+            <span className="text-xs text-muted-foreground">
+              Move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} to another location
+            </span>
+          </div>
         </Button>
 
+        {/* Copy Items */}
         <Button
           variant="outline"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            console.log('Delete button clicked!')
-            handleDeleteClick()
-          }}
-          className="flex items-center gap-2"
+          onClick={handleCopyClick}
+          className="w-full justify-start gap-3 h-12 text-left hover:bg-green-50 hover:border-green-200 dark:hover:bg-green-950/30"
         >
-          <Trash2 className="h-4 w-4" />
-          Delete
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
+            <Copy className="h-4 w-4 text-green-600 dark:text-green-400" />
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-medium">Copy Items</span>
+            <span className="text-xs text-muted-foreground">
+              Create copies in another location
+            </span>
+          </div>
         </Button>
 
+        {/* Share Items */}
         <Button
           variant="outline"
           onClick={handleShareClick}
-          className="flex items-center gap-2"
+          className="w-full justify-start gap-3 h-12 text-left hover:bg-purple-50 hover:border-purple-200 dark:hover:bg-purple-950/30"
         >
-          <Share className="h-4 w-4" />
-          Share
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
+            <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-medium">Share Items</span>
+            <span className="text-xs text-muted-foreground">
+              Generate shareable links for selected items
+            </span>
+          </div>
         </Button>
 
+        {/* Bulk Rename */}
         <Button
           variant="outline"
           onClick={handleRenameClick}
-          className="flex items-center gap-2"
+          className="w-full justify-start gap-3 h-12 text-left hover:bg-orange-50 hover:border-orange-200 dark:hover:bg-orange-950/30"
         >
-          <Edit className="h-4 w-4" />
-          Rename
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/50">
+            <Edit className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="font-medium">Bulk Rename</span>
+            <span className="text-xs text-muted-foreground">
+              Rename multiple items with patterns
+            </span>
+          </div>
         </Button>
 
-        <Button
-          variant="outline"
-          onClick={handleDownloadClick}
-          className="flex items-center gap-2"
-          disabled={fileCount === 0}
-        >
-          <Download className="h-4 w-4" />
-          Export
-        </Button>
+        {fileCount > 0 && (
+          <Button
+            variant="outline"
+            onClick={handleExportClick}
+            className="w-full justify-start gap-3 h-12 text-left hover:bg-indigo-50 hover:border-indigo-200 dark:hover:bg-indigo-950/30"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
+              <Download className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Export Files</span>
+              <span className="text-xs text-muted-foreground">
+                Download {fileCount} file{fileCount > 1 ? 's' : ''} in various formats
+              </span>
+            </div>
+          </Button>
+        )}
 
-        <Button
-          variant="outline"
-          onClick={handlePermanentDeleteClick}
-          className="flex items-center gap-2 text-red-600"
-        >
-          <FileOutput className="h-4 w-4" />
-          Permanent Delete
-        </Button>
+        {/* Separator for destructive actions */}
+        <div className="border-t pt-3 mt-3">
+          <p className="text-xs text-muted-foreground mb-3 font-medium">Destructive Actions</p>
+          
+          {/* Move to Trash */}
+          <Button
+            variant="outline"
+            onClick={handleDeleteClick}
+            className="w-full justify-start gap-3 h-12 text-left hover:bg-yellow-50 hover:border-yellow-200 dark:hover:bg-yellow-950/30 mb-3"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
+              <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Move to Trash</span>
+              <span className="text-xs text-muted-foreground">
+                Move items to trash (can be restored)
+              </span>
+            </div>
+          </Button>
 
-        <Button
-          variant="outline"
-          onClick={handleRestoreClick}
-          className="flex items-center gap-2"
-        >
-          <FolderOpen className="h-4 w-4" />
-          Restore
-        </Button>
+          {/* Permanent Delete */}
+          <Button
+            variant="outline"
+            onClick={handlePermanentDeleteClick}
+            className="w-full justify-start gap-3 h-12 text-left hover:bg-red-50 hover:border-red-200 dark:hover:bg-red-950/30 mb-3"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
+              <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Permanent Delete</span>
+              <span className="text-xs text-muted-foreground">
+                Delete permanently (cannot be undone)
+              </span>
+            </div>
+          </Button>
+
+          {/* Restore from Trash */}
+          <Button
+            variant="outline"
+            onClick={handleRestoreClick}
+            className="w-full justify-start gap-3 h-12 text-left hover:bg-emerald-50 hover:border-emerald-200 dark:hover:bg-emerald-950/30"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+              <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Restore from Trash</span>
+              <span className="text-xs text-muted-foreground">
+                Restore deleted items to original location
+              </span>
+            </div>
+          </Button>
+        </div>
       </div>
     </>
   )
@@ -447,19 +482,19 @@ function BulkOperationsDialog({
                 Choose an action for {selectedItems.length} selected item{selectedItems.length > 1 ? 's' : ''} ({fileCount} file{fileCount !== 1 ? 's' : ''}, {folderCount} folder{folderCount !== 1 ? 's' : ''})
               </BottomSheetDescription>
             </BottomSheetHeader>
-            <div className="px-4 pb-6">{renderContent()}</div>
+            <div className="px-4 pb-6 max-h-[60vh] overflow-y-auto">{renderContent()}</div>
           </BottomSheetContent>
         </BottomSheet>
       ) : (
         <Dialog open={dialogOpen} onOpenChange={onOpenChange || onClose}>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold">Bulk Operations</DialogTitle>
               <DialogDescription className="text-sm text-muted-foreground">
                 Choose an action for {selectedItems.length} selected item{selectedItems.length > 1 ? 's' : ''} ({fileCount} file{fileCount !== 1 ? 's' : ''}, {folderCount} folder{folderCount !== 1 ? 's' : ''})
               </DialogDescription>
             </DialogHeader>
-            <div className="py-2">{renderContent()}</div>
+            <div className="py-2 max-h-[70vh] overflow-y-auto">{renderContent()}</div>
           </DialogContent>
         </Dialog>
       )}
