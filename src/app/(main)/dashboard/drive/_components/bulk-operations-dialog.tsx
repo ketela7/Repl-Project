@@ -39,6 +39,8 @@ import {
   BulkShareDialog,
   BulkRenameDialog,
   BulkExportDialog,
+  BulkPermanentDeleteDialog,
+  BulkRestoreDialog,
 } from './optimized-lazy-dialogs'
 
 interface BulkOperationsDialogProps {
@@ -88,6 +90,8 @@ export function BulkOperationsDialog({
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
+  const [isPermanentDeleteDialogOpen, setIsPermanentDeleteDialogOpen] = useState(false)
+  const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
 
   // Determine dialog open state
   const dialogOpen = open ?? isOpen ?? false
@@ -121,6 +125,16 @@ export function BulkOperationsDialog({
 
   const handleExportClick = () => {
     setIsExportDialogOpen(true)
+    handleClose()
+  }
+
+  const handlePermanentDeleteClick = () => {
+    setIsPermanentDeleteDialogOpen(true)
+    handleClose()
+  }
+
+  const handleRestoreClick = () => {
+    setIsRestoreDialogOpen(true)
     handleClose()
   }
 
@@ -181,6 +195,21 @@ export function BulkOperationsDialog({
     onRefreshAfterBulkOp?.()
   }
 
+  const handlePermanentDeleteComplete = () => {
+    console.log('Bulk permanent delete:', selectedItems.length, 'items')
+    setIsPermanentDeleteDialogOpen(false)
+    onRefreshAfterBulkOp?.()
+  }
+
+  const handleRestoreComplete = () => {
+    console.log('Bulk restore:', selectedItems.length, 'items')
+    setIsRestoreDialogOpen(false)
+    onRefreshAfterBulkOp?.()
+  }
+
+  // Determine operations based on context (trash vs regular view)
+  const isTrashView = selectedItems.some(item => item.name?.includes('trashed')) // You may need to adjust this logic based on your data structure
+  
   const operations = [
     {
       icon: FileDown,
@@ -188,6 +217,7 @@ export function BulkOperationsDialog({
       description: 'Download selected items',
       action: handleDownloadClick,
       variant: 'default' as const,
+      show: !isTrashView,
     },
     {
       icon: FileOutput,
@@ -195,6 +225,7 @@ export function BulkOperationsDialog({
       description: 'Export in different formats',
       action: handleExportClick,
       variant: 'default' as const,
+      show: !isTrashView,
     },
     {
       icon: Share,
@@ -202,6 +233,7 @@ export function BulkOperationsDialog({
       description: 'Share selected items',
       action: handleShareClick,
       variant: 'default' as const,
+      show: !isTrashView,
     },
     {
       icon: Move,
@@ -209,6 +241,7 @@ export function BulkOperationsDialog({
       description: 'Move to another folder',
       action: handleMoveClick,
       variant: 'default' as const,
+      show: !isTrashView,
     },
     {
       icon: Copy,
@@ -216,6 +249,7 @@ export function BulkOperationsDialog({
       description: 'Create copies',
       action: handleCopyClick,
       variant: 'default' as const,
+      show: !isTrashView,
     },
     {
       icon: Edit,
@@ -223,6 +257,7 @@ export function BulkOperationsDialog({
       description: 'Bulk rename with patterns',
       action: handleRenameClick,
       variant: 'default' as const,
+      show: !isTrashView,
     },
     {
       icon: Trash2,
@@ -230,8 +265,25 @@ export function BulkOperationsDialog({
       description: 'Move to trash',
       action: handleDeleteClick,
       variant: 'destructive' as const,
+      show: !isTrashView,
     },
-  ]
+    {
+      icon: Trash2,
+      label: 'Permanently Delete',
+      description: 'Delete forever (cannot be undone)',
+      action: handlePermanentDeleteClick,
+      variant: 'destructive' as const,
+      show: isTrashView,
+    },
+    {
+      icon: FolderOpen,
+      label: 'Restore',
+      description: 'Restore from trash',
+      action: handleRestoreClick,
+      variant: 'default' as const,
+      show: isTrashView,
+    },
+  ].filter(op => op.show)
 
   const renderContent = () => (
     <>
@@ -340,8 +392,8 @@ export function BulkOperationsDialog({
       {isShareDialogOpen && (
         <Suspense fallback={<div>Loading...</div>}>
           <BulkShareDialog
-            isOpen={isShareDialogOpen}
-            onClose={() => setIsShareDialogOpen(false)}
+            open={isShareDialogOpen}
+            onOpenChange={() => setIsShareDialogOpen(false)}
             onConfirm={handleShareComplete}
             selectedItems={selectedItems}
           />
@@ -365,6 +417,28 @@ export function BulkOperationsDialog({
             isOpen={isExportDialogOpen}
             onClose={() => setIsExportDialogOpen(false)}
             onConfirm={handleExportComplete}
+            selectedItems={selectedItems}
+          />
+        </Suspense>
+      )}
+
+      {isPermanentDeleteDialogOpen && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <BulkPermanentDeleteDialog
+            isOpen={isPermanentDeleteDialogOpen}
+            onClose={() => setIsPermanentDeleteDialogOpen(false)}
+            onConfirm={handlePermanentDeleteComplete}
+            selectedItems={selectedItems}
+          />
+        </Suspense>
+      )}
+
+      {isRestoreDialogOpen && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <BulkRestoreDialog
+            isOpen={isRestoreDialogOpen}
+            onClose={() => setIsRestoreDialogOpen(false)}
+            onConfirm={handleRestoreComplete}
             selectedItems={selectedItems}
           />
         </Suspense>

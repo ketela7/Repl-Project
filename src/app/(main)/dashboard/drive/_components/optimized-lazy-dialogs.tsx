@@ -29,6 +29,14 @@ export const BulkExportDialog = lazy(() =>
   import('./bulk-export-dialog').then(mod => ({ default: mod.BulkExportDialog }))
 )
 
+export const BulkPermanentDeleteDialog = lazy(() => 
+  import('./bulk-permanent-delete-dialog').then(mod => ({ default: mod.BulkPermanentDeleteDialog }))
+)
+
+export const BulkRestoreDialog = lazy(() => 
+  import('./bulk-restore-dialog').then(mod => ({ default: mod.BulkRestoreDialog }))
+)
+
 export const BulkOperationsDialog = lazy(() => 
   import('./bulk-operations-dialog').then(mod => ({ default: mod.BulkOperationsDialog }))
 )
