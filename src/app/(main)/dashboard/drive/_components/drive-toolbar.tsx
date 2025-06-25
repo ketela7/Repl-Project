@@ -1990,7 +1990,7 @@ export function DriveToolbar({
               type="text"
               placeholder="Search files and folders..."
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
+              //onChange={(e) => onSearchChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit(e)}
               className="h-10 pr-20 pl-10"
               disabled={false}
