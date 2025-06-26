@@ -28,6 +28,7 @@ externalPort = 80
 [workflows]
 runButton = "Project"
 
+
 [[workflows.workflow]]
 name = "DB Reset"
 mode = "sequential"
@@ -44,7 +45,7 @@ args = "npx drizzle-kit push"
 [[workflows.workflow]]
 name = "Check Format"
 mode = "sequential"
-author = "agent"
+#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -53,7 +54,7 @@ args = "npm run format"
 [[workflows.workflow]]
 name = "Check Lint"
 mode = "sequential"
-author = "agent"
+#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -71,12 +72,11 @@ args = "npm run typecheck"
 [[workflows.workflow]]
 name = "Check Duplicate"
 mode = "sequential"
-author = "agent"
+#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx jscpd src"
-author = "agent"
 
 [[workflows.workflow]]
 name = "Check:Fix"
@@ -146,6 +146,6 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run dev -- -p 5000 -H 0.0.0.0"
+args = "npm run dev -- -p 5000 -H 0.0.0.0 --turbo"
 waitForPort = 5000
 

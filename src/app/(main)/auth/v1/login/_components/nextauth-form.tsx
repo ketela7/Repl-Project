@@ -35,6 +35,19 @@ export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
     }
   }
 
+  const handleGoogleSignIn = async () => {
+    // Store remember me preference before sign in
+    const rememberMe = form.getValues('remember')
+    setRememberMePreference(rememberMe)
+
+    // Update session with remember me preference if already authenticated
+    try {
+      await update({ rememberMe })
+    } catch (error) {
+      // Session update will happen after authentication completes
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* Show re-auth message if needed */}

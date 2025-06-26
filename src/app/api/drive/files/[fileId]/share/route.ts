@@ -58,10 +58,12 @@ export async function POST(
               permission: publicPermission,
             }
           } else {
-            const permissionData = { role: 'reader', type: 'anyone' }
             const permission = await authResult.driveService!.createPermission(
               fileId,
-              permissionData
+              'reader',
+              'anyone',
+              undefined,
+              authResult.session!.accessToken
             )
             const fileDetails =
               await authResult.driveService!.getFileDetails(fileId)
@@ -78,23 +80,23 @@ export async function POST(
 
       case 'share_with_user':
         try {
-          const permissionData = {
-            role: role || 'reader',
-            type: type || 'user',
-            emailAddress,
-            expirationTime,
-            allowFileDiscovery,
-          }
           const permission = await authResult.driveService!.createPermission(
             fileId,
-            permissionData
+            role || 'reader',
+            type || 'user',
+            emailAddress,
+            undefined,
+            expirationTime,
+            allowFileDiscovery,
+            authResult.session!.accessToken
           )
 
           if (message) {
             await authResult.driveService!.sendNotificationEmail(
               fileId,
               emailAddress,
-              message
+              message,
+              authResult.session!.accessToken
             )
           }
 
@@ -120,7 +122,8 @@ export async function POST(
         try {
           await authResult.driveService!.deletePermission(
             fileId,
-            options.permissionId
+            options.permissionId,
+            authResult.session!.accessToken
           )
           result = { success: true, message: 'Permission removed' }
         } catch (error) {

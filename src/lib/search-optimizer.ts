@@ -4,7 +4,7 @@
  */
 
 interface SearchResult {
-  files: unknown[]
+  files: any[]
   totalCount: number
   hasMore: boolean
   nextPageToken?: string
@@ -28,7 +28,7 @@ class SearchOptimizer {
   async optimizedSearch(
     searchQuery: string,
     userId: string,
-    apiCall: () => Promise<unknown>,
+    apiCall: () => Promise<any>,
     folderId?: string
   ): Promise<SearchResult> {
     // Clean search query
@@ -103,7 +103,7 @@ class SearchOptimizer {
       // If current query extends a cached query, filter the cached results
       if (query.startsWith(cachedQuery) && cachedQuery.length >= 2) {
         const filteredFiles = result.files.filter(
-          (file: any) =>
+          (file) =>
             file.name?.toLowerCase().includes(query) ||
             file.mimeType?.toLowerCase().includes(query)
         )
@@ -127,9 +127,9 @@ class SearchOptimizer {
   private async executeSearch(
     query: string,
     _userId: string,
-    apiCall: () => Promise<unknown>
+    apiCall: () => Promise<any>
   ): Promise<SearchResult> {
-    const result = (await apiCall()) as any
+    const result = await apiCall()
 
     return {
       files: result.files || [],
@@ -211,7 +211,7 @@ class SearchOptimizer {
    */
   async preloadCommonSearches(
     userId: string,
-    apiCall: (searchQuery: string) => Promise<unknown>
+    apiCall: (query: string) => Promise<any>
   ): Promise<void> {
     const commonQueries = ['doc', 'pdf', 'img', 'video', 'presentation']
 

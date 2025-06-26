@@ -133,14 +133,6 @@ export class GoogleDriveService {
       searchQuery = 'trashed=false'
     }
 
-    let fields: string
-    if (pageSize === 1) {
-      // For cek access to confirm session is valid
-      fields = 'files(id)'
-    } else {
-      fields =
-        'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, owners, shared, trashed, starred, webViewLink, thumbnailLink, parents, capabilities)'
-    }
     // Prepare API request parameters with proper validation
     const requestParams: any = {
       q: searchQuery,
@@ -151,7 +143,10 @@ export class GoogleDriveService {
       //  supportsTeamDrives: includeTeamDriveItems,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
-      fields: fields,
+      fields:
+        pageSize === 1
+          ? 'files(id)'
+          : 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, owners, shared, trashed, starred, webViewLink, thumbnailLink, parents, capabilities)',
     }
     // Log query for debugging in development only
     if (process.env.NODE_ENV === 'development') {
@@ -414,7 +409,7 @@ export class GoogleDriveService {
       writersCanShare: response.data.writersCanShare || true,
       hasAugmentedPermissions: response.data.hasAugmentedPermissions || false,
       ownedByMe: response.data.ownedByMe || false,
-      // driveId: response.data.driveId || undefined,
+      driveId: response.data.driveId || undefined,
       teamDriveId: response.data.teamDriveId || undefined,
       spaces: response.data.spaces || [],
       properties: response.data.properties || {},
@@ -940,13 +935,12 @@ export class GoogleDriveService {
     fileId: string,
     permissionId: string,
     _accessToken?: string
-  ): Promise<any> {
+  ): Promise<void> {
     try {
-      const response = await this.drive.permissions.delete({
+      await this.drive.permissions.delete({
         fileId,
         permissionId,
       })
-      return response.data
     } catch (error) {
       throw error
     }
@@ -955,14 +949,10 @@ export class GoogleDriveService {
   // Send notification email (for enhanced sharing)
   async sendNotificationEmail(
     fileId: string,
-    emailAddress: string,
-    message: string,
+    emailData: any,
     _accessToken?: string
-  ): Promise<any> {
-    // Simplified implementation - return success
-    return Promise.resolve({
-      success: true,
-      message: `Notification sent to ${emailAddress}`,
-    })
+  ): Promise<void> {
+    // Note: This would typically use the Gmail API or similar service
+    // For now, we'll just log the action
   }
 }

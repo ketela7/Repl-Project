@@ -69,13 +69,8 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
 
-  // Webpack optimizations for lazy loading (only when not using Turbopack)
+  // Webpack optimizations for lazy loading
   webpack: (config, { dev, isServer }) => {
-    // Skip webpack configuration when using Turbopack
-    if (process.env.TURBOPACK) {
-      return config
-    }
-
     if (dev) {
       // Enable filesystem caching
       config.cache = {

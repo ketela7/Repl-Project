@@ -45,8 +45,19 @@ interface BulkOperationsDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type: 'file' | 'folder'
     mimeType?: string
+    isFolder: boolean
+    isTrashed: boolean
+    canDelete: boolean
+    canShare: boolean
+    canTrash: boolean
+    canUntrash: boolean
+    canDownload: boolean
+    canRename: boolean
+    //canCopy: boolean
+    //canMove: boolean
+    canExport: boolean
+    
   }>
   onBulkDelete?: () => void
   onBulkDownload?: () => void
@@ -66,10 +77,8 @@ function BulkOperationsDialog({
   onRefreshAfterBulkOp,
 }: BulkOperationsDialogProps) {
   const isMobile = useIsMobile()
-  const fileCount = selectedItems.filter((item) => item.type === 'file').length
-  const folderCount = selectedItems.filter(
-    (item) => item.type === 'folder'
-  ).length
+  const folderCount = selectedItems.filter((item) => item.isFolder).length
+	const fileCount = selectedItems - folderCount
   const canDeleteCount = selectedItems.filter((item) => item.canDelete).length
   const canShareCount = selectedItems.filter((item) => item.canShare).length
   const canTrashCount = selectedItems.filter((item) => item.canTrash).length
@@ -82,12 +91,11 @@ function BulkOperationsDialog({
   // Individual dialog states
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isTrashDialogOpen, setisTrashDialogOpen] = useState(false)
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
-  const [isPermanentDeleteDialogOpen, setIsPermanentDeleteDialogOpen] =
-    useState(false)
+  const [isDeleteDialogOpen, setisDeleteDialogOpen] =useState(false)
   const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
 
   // Determine dialog open state
@@ -108,7 +116,7 @@ function BulkOperationsDialog({
   }
 
   const handleDeleteClick = () => {
-    setIsDeleteDialogOpen(true)
+    setisTrashDialogOpen(true)
     handleClose()
   }
 
@@ -128,7 +136,7 @@ function BulkOperationsDialog({
   }
 
   const handlePermanentDeleteClick = () => {
-    setIsPermanentDeleteDialogOpen(true)
+    setisDeleteDialogOpen(true)
     handleClose()
   }
 
@@ -209,7 +217,7 @@ function BulkOperationsDialog({
     } catch (error) {
       console.error('Delete failed:', error)
     }
-    setIsDeleteDialogOpen(false)
+    setisTrashDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
@@ -304,7 +312,7 @@ function BulkOperationsDialog({
     } catch (error) {
       console.error('Permanent delete failed:', error)
     }
-    setIsPermanentDeleteDialogOpen(false)
+    setisDeleteDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
@@ -381,7 +389,7 @@ function BulkOperationsDialog({
             <div className="flex flex-col items-start">
               <span className="font-medium">Share Items</span>
               <span className="text-muted-foreground text-xs">
-                Generate shareable links for selected items
+                Generate {canShareCount} shareable links
               </span>
             </div>
           </Button>
@@ -426,68 +434,73 @@ function BulkOperationsDialog({
         )}
 
         {/* Separator for destructive actions */}
-        <div className="mt-3 border-t pt-3">
-          <p className="text-muted-foreground mb-3 text-xs font-medium">
-            Destructive Actions
-          </p>
+        {canDeleteCount > 0 ||
+          canTrashCount > 0 ||
+          (canUntrashCount > 0 && (
+            <div className="mt-3 border-t pt-3">
+              <p className="text-muted-foreground mb-3 text-xs font-medium">
+                Destructive Actions
+              </p>
 
-          {/* Move to Trash */}
-          {canTrashCount > 0 && (
-            <Button
-              variant="outline"
-              onClick={handleDeleteClick}
-              className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
-                <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-              </div>
-              <div className="flex flex-col items-start">
-                <span className="font-medium">Move to Trash</span>
-                <span className="text-muted-foreground text-xs">
-                  Move {ownerMeCount} items to trash (can be restored)
-                </span>
-              </div>
-            </Button>
-          )}
+              {/* Move to Trash */}
+              {canTrashCount > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={handleDeleteClick}
+                  className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
+                    <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Move to Trash</span>
+                    <span className="text-muted-foreground text-xs">
+                      Move {canTrashCount} items to trash (can be restored)
+                    </span>
+                  </div>
+                </Button>
+              )}
 
-          {/* Permanent Delete */}
-          {canDeleteCount > 0 && (
-            <Button
-              variant="outline"
-              onClick={handlePermanentDeleteClick}
-              className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
-                <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
-              </div>
-              <div className="flex flex-col items-start">
-                <span className="font-medium">Permanent Delete</span>
-                <span className="text-muted-foreground text-xs">
-                  Delete permanently {canDeleteCount} items (cannot be undone)
-                </span>
-              </div>
-            </Button>
-          )}
+              {/* Permanent Delete */}
+              {canDeleteCount > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={handlePermanentDeleteClick}
+                  className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
+                    <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Permanent Delete</span>
+                    <span className="text-muted-foreground text-xs">
+                      Delete permanently {canDeleteCount} items (cannot be
+                      undone)
+                    </span>
+                  </div>
+                </Button>
+              )}
 
-          {/* Restore from Trash */}
-          {canUntrashCount > 0 && (
-            <Button
-              variant="outline"
-              onClick={handleRestoreClick}
-              className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-            >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-                <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div className="flex flex-col items-start">
-                <span className="font-medium">Restore from Trash</span>
-                <span className="text-muted-foreground text-xs">
-                  Restore {canUntrashCount} items to original location
-                </span>
-              </div>
-            </Button>
-          )}
-        </div>
+              {/* Restore from Trash */}
+              {canUntrashCount > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={handleRestoreClick}
+                  className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+                    <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div className="flex flex-col items-start">
+                    <span className="font-medium">Restore from Trash</span>
+                    <span className="text-muted-foreground text-xs">
+                      Restore {canUntrashCount} items to original location
+                    </span>
+                  </div>
+                </Button>
+              )}
+            </div>
+          ))}
       </div>
     </>
   )
@@ -551,8 +564,8 @@ function BulkOperationsDialog({
       />
 
       <BulkDeleteDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
+        isOpen={isTrashDialogOpen}
+        onClose={() => setisTrashDialogOpen(false)}
         onConfirm={handleDeleteComplete}
         selectedItems={selectedItems}
       />
@@ -579,8 +592,8 @@ function BulkOperationsDialog({
       />
 
       <BulkPermanentDeleteDialog
-        isOpen={isPermanentDeleteDialogOpen}
-        onClose={() => setIsPermanentDeleteDialogOpen(false)}
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setisDeleteDialogOpen(false)}
         onConfirm={handlePermanentDeleteComplete}
         selectedItems={selectedItems}
       />
