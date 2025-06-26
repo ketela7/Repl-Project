@@ -418,12 +418,13 @@ export function FiltersDialog({
                     </Badge>
                     <div className="flex-1">
                       <p className="font-medium">
-                        Size filtering applies to files only
+                        Size filtering: Hanya akan menghasilkan file bukan
+                        folder
                       </p>
                       <p className="mt-1 text-xs opacity-80">
-                        Google Drive API limitation: Size filters work only for
-                        files, not folders. Folder selection is disabled when
-                        size filters are active.
+                        Google Drive API limitation: Filter ukuran hanya bekerja
+                        untuk file, bukan folder. Pemilihan folder dinonaktifkan
+                        ketika filter ukuran aktif.
                       </p>
                     </div>
                   </div>

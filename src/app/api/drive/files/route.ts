@@ -350,10 +350,13 @@ function buildDriveQuery(filters: FileFilter): string {
 
   // Size filtering (Google Drive API specification: only works for files, not folders)
   // Google Drive API uses "size" parameter with exact syntax
+  let hasSizeFilter = false
+
   if (filters.sizeMin) {
     const minBytes = Number(filters.sizeMin)
     if (minBytes > 0) {
       conditions.push(`size >= ${minBytes}`)
+      hasSizeFilter = true
     }
   }
 
@@ -361,7 +364,13 @@ function buildDriveQuery(filters: FileFilter): string {
     const maxBytes = Number(filters.sizeMax)
     if (maxBytes > 0) {
       conditions.push(`size <= ${maxBytes}`)
+      hasSizeFilter = true
     }
+  }
+
+  // Exclude folders when size filter is applied (Google Drive API limitation)
+  if (hasSizeFilter) {
+    conditions.push("mimeType != 'application/vnd.google-apps.folder'")
   }
 
   return conditions.join(' and ')
