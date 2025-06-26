@@ -117,29 +117,15 @@ export function DriveManager() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [isSelectMode, setIsSelectMode] = useState(false)
 
-  // Selected items for actions
-  const [selectedFileForAction, setSelectedFileForAction] = useState<{
+  // Selected items for actions - standardized structure
+  const [selectedItemForAction, setSelectedItemForAction] = useState<{
     id: string
     name: string
+    isFolder: boolean
     parentId?: string
   } | null>(null)
   const [selectedFileForPreview, setSelectedFileForPreview] =
     useState<DriveFile | null>(null)
-  const [selectedItemForDelete, setSelectedItemForDelete] = useState<{
-    id: string
-    name: string
-    type: 'file' | 'folder'
-  } | null>(null)
-  const [selectedItemForDetails, setSelectedItemForDetails] = useState<{
-    id: string
-    name: string
-    type: 'file' | 'folder'
-  } | null>(null)
-  const [selectedItemForShare, setSelectedItemForShare] = useState<{
-    id: string
-    name: string
-    type: 'file' | 'folder'
-  } | null>(null)
 
   // Progress states
   const [bulkOperationProgress, setBulkOperationProgress] = useState<{
@@ -744,52 +730,22 @@ export function DriveManager() {
                   )
                   break
                 case 'share':
-                  setSelectedItemForShare({
-                    id: item.id,
-                    name: item.name,
-                    type: item.isFolder ? 'folder' : 'file',
-                  })
-                  openDialog('share')
-                  break
                 case 'rename':
-                  setSelectedFileForAction({
-                    id: item.id,
-                    name: item.name,
-                    parentId: item.parents?.[0],
-                  })
-                  openDialog('rename')
-                  break
                 case 'move':
-                  setSelectedFileForAction({
-                    id: item.id,
-                    name: item.name,
-                    parentId: item.parents?.[0],
-                  })
-                  openDialog('move')
-                  break
                 case 'copy':
-                  setSelectedFileForAction({
+                case 'delete':
+                case 'details':
+                  setSelectedItemForAction({
                     id: item.id,
                     name: item.name,
+                    isFolder: item.isFolder,
                     parentId: item.parents?.[0],
                   })
-                  openDialog('copy')
-                  break
-                case 'delete':
-                  setSelectedItemForDelete({
-                    id: item.id,
-                    name: item.name,
-                    type: item.isFolder ? 'folder' : 'file',
-                  })
-                  openDialog('trash')
-                  break
-                case 'details':
-                  setSelectedItemForDetails({
-                    id: item.id,
-                    name: item.name,
-                    type: item.isFolder ? 'folder' : 'file',
-                  })
-                  openDialog('details')
+                  if (action === 'delete') {
+                    openDialog('trash')
+                  } else {
+                    openDialog(action as keyof typeof dialogs)
+                  }
                   break
               }
             }}
@@ -829,21 +785,21 @@ export function DriveManager() {
         }}
       />
 
-      {selectedFileForAction && (
+      {selectedItemForAction && (
         <>
           <FileRenameDialog
             open={dialogs.rename}
             onOpenChange={(open) => {
               if (!open) {
                 closeDialog('rename')
-                setSelectedFileForAction(null)
+                setSelectedItemForAction(null)
               }
             }}
-            fileId={selectedFileForAction.id}
-            fileName={selectedFileForAction.name}
+            fileId={selectedItemForAction.id}
+            fileName={selectedItemForAction.name}
             onConfirm={async (newName: string) => {
               closeDialog('rename')
-              setSelectedFileForAction(null)
+              setSelectedItemForAction(null)
               handleRefresh()
             }}
           />
@@ -852,13 +808,13 @@ export function DriveManager() {
             isOpen={dialogs.move}
             onClose={() => {
               closeDialog('move')
-              setSelectedFileForAction(null)
+              setSelectedItemForAction(null)
             }}
-            fileName={selectedFileForAction.name}
-            currentParentId={selectedFileForAction.parentId || null}
+            fileName={selectedItemForAction.name}
+            currentParentId={selectedItemForAction.parentId || null}
             onMove={async (newParentId: string) => {
               closeDialog('move')
-              setSelectedFileForAction(null)
+              setSelectedItemForAction(null)
               handleRefresh()
             }}
           />
@@ -867,13 +823,13 @@ export function DriveManager() {
             isOpen={dialogs.copy}
             onClose={() => {
               closeDialog('copy')
-              setSelectedFileForAction(null)
+              setSelectedItemForAction(null)
             }}
-            fileName={selectedFileForAction.name}
-            currentParentId={selectedFileForAction.parentId || null}
+            fileName={selectedItemForAction.name}
+            currentParentId={selectedItemForAction.parentId || null}
             onCopy={async (newName: string, parentId: string) => {
               closeDialog('copy')
-              setSelectedFileForAction(null)
+              setSelectedItemForAction(null)
               handleRefresh()
             }}
           />
@@ -893,54 +849,52 @@ export function DriveManager() {
         />
       )}
 
-      {selectedItemForDelete && (
-        <FileDeleteDialog
-          open={dialogs.trash}
-          onOpenChange={(open) => {
-            if (!open) {
+      {selectedItemForAction && (
+        <>
+          <FileDeleteDialog
+            open={dialogs.trash}
+            onOpenChange={(open) => {
+              if (!open) {
+                closeDialog('trash')
+                setSelectedItemForAction(null)
+              }
+            }}
+            itemId={selectedItemForAction.id}
+            itemName={selectedItemForAction.name}
+            itemType={selectedItemForAction.isFolder ? 'folder' : 'file'}
+            onDeleted={() => {
               closeDialog('trash')
-              setSelectedItemForDelete(null)
-            }
-          }}
-          itemId={selectedItemForDelete.id}
-          itemName={selectedItemForDelete.name}
-          itemType={selectedItemForDelete.type}
-          onDeleted={() => {
-            closeDialog('trash')
-            setSelectedItemForDelete(null)
-            handleRefresh()
-          }}
-        />
-      )}
+              setSelectedItemForAction(null)
+              handleRefresh()
+            }}
+          />
 
-      {selectedItemForDetails && (
-        <FileDetailsDialog
-          isOpen={dialogs.details}
-          onClose={() => {
-            closeDialog('details')
-            setSelectedItemForDetails(null)
-          }}
-          fileId={selectedItemForDetails.id}
-          fileName={selectedItemForDetails.name}
-          fileType={selectedItemForDetails.type}
-        />
-      )}
+          <FileDetailsDialog
+            isOpen={dialogs.details}
+            onClose={() => {
+              closeDialog('details')
+              setSelectedItemForAction(null)
+            }}
+            fileId={selectedItemForAction.id}
+            fileName={selectedItemForAction.name}
+            fileType={selectedItemForAction.isFolder ? 'folder' : 'file'}
+          />
 
-      {selectedItemForShare && (
-        <FileShareDialog
-          open={dialogs.share}
-          onOpenChange={(open) => {
-            if (!open) {
-              closeDialog('share')
-              setSelectedItemForShare(null)
-            }
-          }}
-          items={[{
-            id: selectedItemForShare.id,
-            name: selectedItemForShare.name,
-            isFolder: selectedItemForShare.type === 'folder',
-          }]}
-        />
+          <FileShareDialog
+            open={dialogs.share}
+            onOpenChange={(open) => {
+              if (!open) {
+                closeDialog('share')
+                setSelectedItemForAction(null)
+              }
+            }}
+            items={[{
+              id: selectedItemForAction.id,
+              name: selectedItemForAction.name,
+              isFolder: selectedItemForAction.isFolder,
+            }]}
+          />
+        </>
       )}
 
       {/* Filters Dialog */}
