@@ -236,8 +236,8 @@ export function DriveManager() {
   const sortedItems = useMemo(() => {
     if (!sortConfig) {
       return [...items].sort((a, b) => {
-        const aIsFolder = isFolder(a)
-        const bIsFolder = isFolder(b)
+        const aIsFolder = a.mimeType === 'application/vnd.google-apps.folder'
+        const bIsFolder = b.mimeType === 'application/vnd.google-apps.folder'
         if (aIsFolder && !bIsFolder) return -1
         if (!aIsFolder && bIsFolder) return 1
         return 0
@@ -247,6 +247,8 @@ export function DriveManager() {
     return [...items].sort((a, b) => {
       const { key, direction } = sortConfig
       let aValue: any, bValue: any
+      const aIsFolder = a.mimeType === 'application/vnd.google-apps.folder'
+      const bIsFolder = b.mimeType === 'application/vnd.google-apps.folder'
 
       switch (key) {
         case 'name':
@@ -254,8 +256,8 @@ export function DriveManager() {
           bValue = (b.name || '').toLowerCase()
           break
         case 'size':
-          aValue = isFolder(a) ? 0 : normalizeFileSize((a as any).size)
-          bValue = isFolder(b) ? 0 : normalizeFileSize((b as any).size)
+          aValue = aIsFolder ? 0 : normalizeFileSize((a as any).size)
+          bValue = bIsFolder ? 0 : normalizeFileSize((b as any).size)
           break
         case 'modifiedTime':
           aValue = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0
@@ -266,8 +268,8 @@ export function DriveManager() {
           bValue = b.createdTime ? new Date(b.createdTime).getTime() : 0
           break
         case 'mimeType':
-          aValue = isFolder(a) ? 'folder' : (a.mimeType || '').toLowerCase()
-          bValue = isFolder(b) ? 'folder' : (b.mimeType || '').toLowerCase()
+          aValue = aIsFolder ? 'folder' : (a.mimeType || '').toLowerCase()
+          bValue = bIsFolder ? 'folder' : (b.mimeType || '').toLowerCase()
           break
         case 'owners':
           aValue = (a.owners?.[0]?.emailAddress || '').toLowerCase()
@@ -303,7 +305,8 @@ export function DriveManager() {
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
-      const isFolder = item.mimeType === 'application/vnd.google-apps.folder' 
+      const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
+      
       return {
         id: itemId,
         name: item?.name || 'Unknown',
@@ -315,10 +318,10 @@ export function DriveManager() {
         isTrashed: item?.trashed || false,
         isStarred: item?.starred || false,
         isShared: item?.shared || false,
-        isFolder: isFolder,
+        isFolder: itemIsFolder,
         canCopy: item?.capabilities?.canCopy || true,
         canDelete: item?.capabilities?.canDelete || false,
-        canDownload: !isFolder && (item?.capabilities?.canDownload || true),
+        canDownload: !itemIsFolder && (item?.capabilities?.canDownload || true),
         canTrash: item?.capabilities?.canTrash || false,
         canUntrash: item?.trashed && (item?.capabilities?.canUntrash || false),
         canRename: item?.capabilities?.canRename || false,
@@ -572,7 +575,7 @@ export function DriveManager() {
   const sortedDisplayItems = useMemo(() => {
     const itemsToSort = [...displayItems].map(item => ({
       ...item,
-      isFolder: isFolder(item)
+      isFolder: item.mimeType === 'application/vnd.google-apps.folder'
     }))
 
     if (sortConfig && sortConfig.key) {
@@ -597,8 +600,8 @@ export function DriveManager() {
             bValue = new Date((b as any).createdTime || 0).getTime()
             break
           case 'mimeType':
-            aValue = isFolder(a) ? 'folder' : (a.mimeType || '').toLowerCase()
-            bValue = isFolder(b) ? 'folder' : (b.mimeType || '').toLowerCase()
+            aValue = a.isFolder ? 'folder' : (a.mimeType || '').toLowerCase()
+            bValue = b.isFolder ? 'folder' : (b.mimeType || '').toLowerCase()
             break
           case 'owners':
             aValue = (
@@ -690,10 +693,7 @@ export function DriveManager() {
             }
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
-            items={items.map((item) => ({
-              ...item,
-              type: isFolder(item) ? ('folder' as const) : ('file' as const),
-            }))}
+            items={items}
             visibleColumns={visibleColumns}
             setVisibleColumns={setVisibleColumns}
             setIsUploadDialogOpen={() => openDialog('upload')}
@@ -747,7 +747,7 @@ export function DriveManager() {
                   setSelectedItemForShare({
                     id: item.id,
                     name: item.name,
-                    type: isFolder(item) ? 'folder' : 'file',
+                    type: item.isFolder ? 'folder' : 'file',
                   })
                   openDialog('share')
                   break
@@ -779,7 +779,7 @@ export function DriveManager() {
                   setSelectedItemForDelete({
                     id: item.id,
                     name: item.name,
-                    type: isFolder(item) ? 'folder' : 'file',
+                    type: item.isFolder ? 'folder' : 'file',
                   })
                   openDialog('trash')
                   break
@@ -787,7 +787,7 @@ export function DriveManager() {
                   setSelectedItemForDetails({
                     id: item.id,
                     name: item.name,
-                    type: isFolder(item) ? 'folder' : 'file',
+                    type: item.isFolder ? 'folder' : 'file',
                   })
                   openDialog('details')
                   break
@@ -935,14 +935,11 @@ export function DriveManager() {
               setSelectedItemForShare(null)
             }
           }}
-          file={{
+          items={[{
             id: selectedItemForShare.id,
             name: selectedItemForShare.name,
-            mimeType:
-              selectedItemForShare.type === 'folder'
-                ? 'application/vnd.google-apps.folder'
-                : 'application/octet-stream',
-          }}
+            isFolder: selectedItemForShare.type === 'folder',
+          }]}
         />
       )}
 

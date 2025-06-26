@@ -41,7 +41,7 @@ interface FileShareDialogProps {
   onOpenChange: (open: boolean) => void
   item?: { id: string; name: string; type: 'file' | 'folder' } | null
   file?: { id: string; name: string; mimeType: string } | null
-  items?: { id: string; name: string; type: 'file' | 'folder' }[]
+  items?: { id: string; name: string; type: 'file' | 'folder', isFolder: boolean }[]
   onShare?: (shareData: ShareData) => void
 }
 
@@ -277,7 +277,7 @@ export function FileShareDialog({
     }
   }
 
-  if (!item) return null
+  if (!item && !items) return null
 
   const renderContent = () => (
     <>
@@ -526,9 +526,9 @@ export function FileShareDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">
-                  {items && items.length > 1
+                  {items.length > 1
                     ? `Share ${items.length} Items`
-                    : `Share ${item.type}`}
+                    : `Share ${items[0].isFolder ? 'Folder' : 'File'}`}
                 </div>
                 <div className="text-muted-foreground text-sm font-normal">
                   Configure sharing settings
@@ -584,7 +584,11 @@ export function FileShareDialog({
               <Share2 className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <div className="text-lg font-semibold">Share {item.type}</div>
+              <div className="text-lg font-semibold">
+                 {items.length > 1
+                    ? `Share ${items.length} Items`
+                    : `Share ${item.isFolder ? 'Folder' : 'File'}`}
+              </div>
               <div className="text-muted-foreground text-sm font-normal">
                 Configure sharing settings
               </div>

@@ -77,7 +77,7 @@ function BulkOperationsDialog({
 }: BulkOperationsDialogProps) {
   const isMobile = useIsMobile()
   const folderCount = selectedItems.filter((item) => item.isFolder).length
-  const fileCount = selectedItems - folderCount
+  const fileCount = selectedItems.length - folderCount
   const canDeleteCount = selectedItems.filter((item) => item.canDelete).length
   const canShareCount = selectedItems.filter((item) => item.canShare).length
   const canTrashCount = selectedItems.filter((item) => item.canTrash).length
@@ -180,7 +180,7 @@ function BulkOperationsDialog({
         body: JSON.stringify({
           operation: 'copy',
           fileIds: selectedItems
-            .filter((item) => item.type === 'file')
+            .filter((item) => !item.isFolder)
             .map((item) => item.id),
           options: { targetFolderId },
         }),
@@ -276,7 +276,7 @@ function BulkOperationsDialog({
 
   const handleExportComplete = async () => {
     try {
-      for (const item of selectedItems.filter((item) => item.type === 'file')) {
+      for (const item of selectedItems.filter((item) => !item.isFolder)) {
         const link = document.createElement('a')
         link.href = `/api/drive/download/${item.id}`
         link.download = item.name
