@@ -336,6 +336,15 @@ GET /api/health/db     // Database connectivity
 GET /api/health/drive  // Google Drive API status
 ```
 
+### Development & Cache Management
+```typescript
+// Cache management endpoints (development/testing)
+POST /api/cache/clear  // Clear application cache
+                      // Purpose: Fixes pageSize filter issues during development
+                      // Usage: When pageSize returns cached results instead of requested amount
+                      // Returns: {"success": true, "message": "Cache cleared successfully"}
+```
+
 ## 🤝 Contributing
 
 ### Development Workflow
