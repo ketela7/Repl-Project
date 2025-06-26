@@ -349,22 +349,18 @@ function buildDriveQuery(filters: FileFilter): string {
   }
 
   // Size filtering (Google Drive API specification: only works for files, not folders)
-  // Note: Size filters automatically exclude folders from results
-  if (filters.sizeMin || filters.sizeMax) {
-    // Google Drive API expects size values in bytes
-
-    if (filters.sizeMin) {
-      const minBytes = Number(filters.sizeMin)
-      if (minBytes > 0) {
-        conditions.push(`size >= ${minBytes}`)
-      }
+  // Google Drive API uses "size" parameter with exact syntax
+  if (filters.sizeMin) {
+    const minBytes = Number(filters.sizeMin)
+    if (minBytes > 0) {
+      conditions.push(`size >= ${minBytes}`)
     }
+  }
 
-    if (filters.sizeMax) {
-      const maxBytes = Number(filters.sizeMax)
-      if (maxBytes > 0) {
-        conditions.push(`size <= ${maxBytes}`)
-      }
+  if (filters.sizeMax) {
+    const maxBytes = Number(filters.sizeMax)
+    if (maxBytes > 0) {
+      conditions.push(`size <= ${maxBytes}`)
     }
   }
 

@@ -133,6 +133,7 @@ export function FiltersDialog({
         owner: currentFilters?.advancedFilters?.owner,
         sortBy: currentFilters?.advancedFilters?.sortBy || 'modified',
         sortOrder: currentFilters?.advancedFilters?.sortOrder || 'desc',
+        pageSize: currentFilters?.advancedFilters?.pageSize || 50,
       })
     }
   }, [open, currentFilters])
@@ -326,12 +327,16 @@ export function FiltersDialog({
   const handleClearAll = () => {
     setTempActiveView('all')
     setTempFileTypeFilter([])
-    setTempAdvancedFilters({})
+    setTempAdvancedFilters({
+      pageSize: 50, // Reset to default
+    })
     // Apply the clear immediately to reset the data view
     onFilterChange({
       activeView: 'all',
       fileTypeFilter: [],
-      advancedFilters: {},
+      advancedFilters: {
+        pageSize: 50, // Reset to default
+      },
     })
     onClearFilters()
     onOpenChange(false)
