@@ -58,6 +58,16 @@ export function DriveManager({ className }: DriveManagerProps) {
   const [isSelectMode, setIsSelectMode] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set())
 
+  // Table column visibility state
+  const [visibleColumns, setVisibleColumns] = useState({
+    name: true,
+    size: true,
+    mimeType: false,
+    owners: false,
+    createdTime: false,
+    modifiedTime: true,
+  })
+
   // Dialog states
   const [createFolderOpen, setCreateFolderOpen] = useState(false)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
@@ -297,9 +307,7 @@ export function DriveManager({ className }: DriveManagerProps) {
 
       successToast.downloaded(file.name)
     } catch (error) {
-      errorToast('Download failed', {
-        description: `Failed to download ${file.name}`,
-      })
+      errorToast.downloadFailed(file.name)
     } finally {
       setSingleOperationProgress({ isVisible: false, operation: '' })
     }
@@ -362,7 +370,8 @@ export function DriveManager({ className }: DriveManagerProps) {
       <div className={`space-y-4 ${className || ''}`}>
         {/* Breadcrumb */}
         <FileBreadcrumb
-          path={breadcrumbPath}
+          breadcrumbPath={breadcrumbPath}
+          currentFolderId={currentFolder}
           onNavigate={handleBreadcrumbClick}
         />
 
@@ -383,10 +392,19 @@ export function DriveManager({ className }: DriveManagerProps) {
           onCreateFolder={handleCreateFolder}
           onBulkOperations={handleBulkOperations}
           onBulkDelete={() => setDeleteDialogOpen(true)}
+          onBulkMove={() => {}}
+          onBulkCopy={() => {}}
+          onBulkShare={() => {}}
           onClearSelection={handleClearSelection}
-          items={allItems}
+          items={allItems.map(item => ({
+            ...item,
+            type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+          }))}
           onFiltersOpen={() => setFiltersDialogOpen(true)}
-          selectedItems={selectedItems}
+          selectedItems={selectedItems.map(item => ({
+            ...item,
+            type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+          }))}
           onBulkDownload={() => {}}
           onBulkRename={() => {}}
           onBulkExport={() => {}}
@@ -395,7 +413,13 @@ export function DriveManager({ className }: DriveManagerProps) {
           filters={{
             activeView: 'all',
             fileTypeFilter: [],
-            advancedFilters: {}
+            advancedFilters: {
+              sizeRange: { unit: 'MB' as const },
+              createdDateRange: {},
+              modifiedDateRange: {},
+              sortBy: 'modified' as const,
+              sortOrder: 'desc' as const
+            }
           }}
           onFilterChange={() => {}}
           onApplyFilters={() => {}}
@@ -403,6 +427,11 @@ export function DriveManager({ className }: DriveManagerProps) {
           hasActiveFilters={false}
           setIsUploadDialogOpen={setUploadDialogOpen}
           setIsCreateFolderDialogOpen={setCreateFolderOpen}
+          visibleColumns={visibleColumns}
+          setVisibleColumns={setVisibleColumns}
+          loading={isLoading}
+          onClientSideFilter={() => {}}
+          onClearClientSideFilter={() => {}}
         />
 
         {/* Data View */}
@@ -413,7 +442,10 @@ export function DriveManager({ className }: DriveManagerProps) {
           isSelectMode={isSelectMode}
           selectedFiles={selectedFiles}
           onSelectFile={handleSelectFile}
-          onFolderClick={handleFolderClick}
+          onFolderClick={(folderId: string) => {
+            const folder = folders.find(f => f.id === folderId)
+            if (folder) handleFolderClick(folder)
+          }}
           onFileRename={handleFileRename}
           onFileDelete={handleFileDelete}
           onFileDetails={handleFileDetails}
@@ -426,96 +458,109 @@ export function DriveManager({ className }: DriveManagerProps) {
 
         {/* Dialogs */}
         <CreateFolderDialog
-          open={createFolderOpen}
-          onOpenChange={setCreateFolderOpen}
+          isOpen={createFolderOpen}
+          onClose={() => setCreateFolderOpen(false)}
           parentFolderId={currentFolder}
           onSuccess={handleOperationSuccess}
         />
 
         <FileUploadDialog
-          open={uploadDialogOpen}
-          onOpenChange={setUploadDialogOpen}
+          isOpen={uploadDialogOpen}
+          onClose={() => setUploadDialogOpen(false)}
           parentFolderId={currentFolder}
           onSuccess={handleOperationSuccess}
         />
 
         <BulkOperationsDialog
-          open={bulkOperationsOpen}
-          onOpenChange={setBulkOperationsOpen}
-          selectedFiles={selectedItems}
-          onSuccess={handleOperationSuccess}
+          isOpen={bulkOperationsOpen}
+          onClose={() => setBulkOperationsOpen(false)}
+          selectedItems={selectedItems.map(item => ({
+            ...item,
+            type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+          }))}
+          onRefreshAfterBulkOp={handleOperationSuccess}
         />
 
         <FileRenameDialog
-          open={renameDialogOpen}
-          onOpenChange={setRenameDialogOpen}
-          file={currentFile}
+          isOpen={renameDialogOpen}
+          onClose={() => setRenameDialogOpen(false)}
+          selectedItem={currentFile}
           onSuccess={handleOperationSuccess}
         />
 
         <FileDeleteDialog
-          open={deleteDialogOpen}
-          onOpenChange={setDeleteDialogOpen}
-          files={
+          isOpen={deleteDialogOpen}
+          onClose={() => setDeleteDialogOpen(false)}
+          selectedItems={
             selectedFiles.size > 0
-              ? selectedItems
+              ? selectedItems.map(item => ({
+                  ...item,
+                  type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+                }))
               : currentFile
-                ? [currentFile]
+                ? [{
+                    ...currentFile,
+                    type: currentFile.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+                  }]
                 : []
           }
-          onSuccess={handleOperationSuccess}
+          onRefreshAfterBulkOp={handleOperationSuccess}
         />
 
         <FileDetailsDialog
-          open={detailsDialogOpen}
-          onOpenChange={setDetailsDialogOpen}
-          file={currentFile}
+          isOpen={detailsDialogOpen}
+          onClose={() => setDetailsDialogOpen(false)}
+          selectedItem={currentFile}
         />
 
         <FileShareDialog
-          open={shareDialogOpen}
-          onOpenChange={setShareDialogOpen}
-          file={currentFile}
-          onSuccess={handleOperationSuccess}
+          isOpen={shareDialogOpen}
+          onClose={() => setShareDialogOpen(false)}
+          selectedItem={currentFile}
         />
 
         <FileCopyDialog
-          open={copyDialogOpen}
-          onOpenChange={setCopyDialogOpen}
-          file={currentFile}
-          onSuccess={handleOperationSuccess}
+          isOpen={copyDialogOpen}
+          onClose={() => setCopyDialogOpen(false)}
+          selectedItem={currentFile}
+          onRefreshAfterBulkOp={handleOperationSuccess}
         />
 
         <FileMoveDialog
-          open={moveDialogOpen}
-          onOpenChange={setMoveDialogOpen}
-          file={currentFile}
-          onSuccess={handleOperationSuccess}
+          isOpen={moveDialogOpen}
+          onClose={() => setMoveDialogOpen(false)}
+          selectedItem={currentFile}
+          onRefreshAfterBulkOp={handleOperationSuccess}
         />
 
         <FilePreviewDialog
-          open={previewDialogOpen}
-          onOpenChange={setPreviewDialogOpen}
-          file={currentFile}
+          isOpen={previewDialogOpen}
+          onClose={() => setPreviewDialogOpen(false)}
+          selectedItem={currentFile}
         />
 
         <PermanentDeleteDialog
-          open={permanentDeleteOpen}
-          onOpenChange={setPermanentDeleteOpen}
-          files={
+          isOpen={permanentDeleteOpen}
+          onClose={() => setPermanentDeleteOpen(false)}
+          selectedItems={
             selectedFiles.size > 0
-              ? selectedItems
+              ? selectedItems.map(item => ({
+                  ...item,
+                  type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+                }))
               : currentFile
-                ? [currentFile]
+                ? [{
+                    ...currentFile,
+                    type: currentFile.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+                  }]
                 : []
           }
-          onSuccess={handleOperationSuccess}
+          onRefreshAfterBulkOp={handleOperationSuccess}
         />
 
         <FiltersDialog
-          open={filtersDialogOpen}
-          onOpenChange={setFiltersDialogOpen}
-          onFiltersApply={() => {}}
+          isOpen={filtersDialogOpen}
+          onClose={() => setFiltersDialogOpen(false)}
         />
 
         {/* Single Operation Progress */}
