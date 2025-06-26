@@ -11,7 +11,7 @@ import {
   RefreshCw,
   Trash2,
   Triangle,
-  CopyIcon
+  CopyIcon,
 } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -93,99 +93,85 @@ export function DriveDataView({
   const { timezone: userTimezone } = useTimezone()
   const effectiveTimezone = timezone || userTimezone
 
-  
-
   if (loading) {
     return <DriveGridSkeleton />
   }
 
   const renderContent = (item: DriveItem) => (
-    <>
     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('preview', item)}
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          Preview
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('move', item)}
-                        >
-                          <Move className="mr-2 h-4 w-4" />
-                          Move
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('copy', item)}
-                        >
-                          <Copy className="mr-2 h-4 w-4" />
-                          Copy
-                        </DropdownMenuItem>
-                        {/* Conditionally render download option */}
-                        {item.canDownload && (
-                          <DropdownMenuItem
-                            onClick={() => onItemAction('download', item)}
-                          >
-                            <Download className="mr-2 h-4 w-4" />
-                            Download
-                          </DropdownMenuItem>
-                        )}
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="sm">
+          <MoreVertical className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onItemAction('move', item)}>
+          <Move className="mr-2 h-4 w-4" />
+          Move
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onItemAction('copy', item)}>
+          <Copy className="mr-2 h-4 w-4" />
+          Copy
+        </DropdownMenuItem>
+        {!item.isFolder && (
+          <DropdownMenuItem onClick={() => onItemAction('preview', item)}>
+            <Eye className="mr-2 h-4 w-4" />
+            Preview
+          </DropdownMenuItem>
+        )}
+        {/* Conditionally render download option */}
+        {item.canDownload && (
+          <DropdownMenuItem onClick={() => onItemAction('download', item)}>
+            <Download className="mr-2 h-4 w-4" />
+            Download
+          </DropdownMenuItem>
+        )}
 
-                        {/* Conditionally render rename option */}
-                        {item.canRename && (
-                          <DropdownMenuItem
-                            onClick={() => onItemAction('rename', item)}
-                          >
-                            <Edit className="mr-2 h-4 w-4" />
-                            Rename
-                          </DropdownMenuItem>
-                        )}
+        {/* Conditionally render rename option */}
+        {item.canRename && (
+          <DropdownMenuItem onClick={() => onItemAction('rename', item)}>
+            <Edit className="mr-2 h-4 w-4" />
+            Rename
+          </DropdownMenuItem>
+        )}
 
-                        {item.canShare && (
-                          <DropdownMenuItem
-                            onClick={() => onItemAction('share', item)}
-                          >
-                            <Share className="mr-2 h-4 w-4" />
-                            Share
-                          </DropdownMenuItem>
-                        )}
-                        {item.canTrash && (
-                          <DropdownMenuItem
-                            onClick={() => onItemAction('trash', item)}
-                            className="text-destructive"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Move to Trash
-                          </DropdownMenuItem>
-                        )}
-                        {item.canDelete && (
-                          <DropdownMenuItem
-                            onClick={() => onItemAction('delete', item)}
-                            className="text-destructive"
-                          >
-                            <Triangle className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        )}
-                        {item.canUntrash && (
-                          <DropdownMenuItem
-                            onClick={() => onItemAction('untrash', item)}
-                            className="text-destructive"
-                          >
-                            <RefreshCw className="mr-2 h-4 w-4" />
-                            Restore
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-      </>
+        {item.canShare && (
+          <DropdownMenuItem onClick={() => onItemAction('share', item)}>
+            <Share className="mr-2 h-4 w-4" />
+            Share
+          </DropdownMenuItem>
+        )}
+        {item.canTrash && (
+          <DropdownMenuItem
+            onClick={() => onItemAction('trash', item)}
+            className="text-destructive"
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Move to Trash
+          </DropdownMenuItem>
+        )}
+        {item.canDelete && (
+          <DropdownMenuItem
+            onClick={() => onItemAction('delete', item)}
+            className="text-destructive"
+          >
+            <Triangle className="mr-2 h-4 w-4" />
+            Delete
+          </DropdownMenuItem>
+        )}
+        {item.canUntrash && (
+          <DropdownMenuItem
+            onClick={() => onItemAction('untrash', item)}
+            className="text-destructive"
+          >
+            <RefreshCw className="mr-2 h-4 w-4" />
+            Restore
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
-    
+
   return (
     <Card>
       <CardContent className="p-0">
@@ -219,7 +205,7 @@ export function DriveDataView({
                   })
                   if (isSelectMode) {
                     onSelectItem(item.id)
-                  } else if item.isFolder {
+                  } else if (item.isFolder) {
                     onFolderClick(item.id)
                   } else {
                     onItemAction('preview', item)

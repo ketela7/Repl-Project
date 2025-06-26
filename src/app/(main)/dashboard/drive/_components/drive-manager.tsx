@@ -315,7 +315,7 @@ export function DriveManager() {
         isTrashed: item?.trashed || false,
         isStarred: item?.starred || false,
         isShared: item?.shared || false,
-        isFolder: isFolder(item),
+        isFolder: isFolder(item) || false,
         
         
         
