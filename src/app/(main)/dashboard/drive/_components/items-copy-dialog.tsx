@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 
 // FileCopyDialog removed - functionality integrated into bulk operations
 
-interface BulkCopyDialogProps {
+interface ItemsCopyDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: (targetFolderId: string) => void
@@ -36,12 +36,12 @@ interface BulkCopyDialogProps {
   }>
 }
 
-function BulkCopyDialog({
+function ItemsCopyDialog({
   isOpen,
   onClose,
   onConfirm,
   selectedItems,
-}: BulkCopyDialogProps) {
+}: ItemsCopyDialogProps) {
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 
@@ -329,5 +329,5 @@ function BulkCopyDialog({
   )
 }
 
-export { BulkCopyDialog }
-export default BulkCopyDialog
+export { ItemsCopyDialog }
+export default ItemsCopyDialog

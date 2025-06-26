@@ -28,7 +28,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
-interface BulkDeleteDialogProps {
+interface ItemsDeleteDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
@@ -40,12 +40,12 @@ interface BulkDeleteDialogProps {
   }>
 }
 
-function BulkDeleteDialog({
+function ItemsDeleteDialog({
   isOpen,
   onClose,
   onConfirm,
   selectedItems,
-}: BulkDeleteDialogProps) {
+}: ItemsDeleteDialogProps) {
   const [confirmationText, setConfirmationText] = useState('')
   const [acknowledgeWarning, setAcknowledgeWarning] = useState(false)
   const isMobile = useIsMobile()
@@ -264,5 +264,5 @@ function BulkDeleteDialog({
   )
 }
 
-export { BulkDeleteDialog }
-export default BulkDeleteDialog
+export { ItemsDeleteDialog }
+export default ItemsDeleteDialog

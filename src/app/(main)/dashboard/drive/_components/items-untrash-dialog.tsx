@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/bottom-sheet'
 import { cn } from '@/lib/utils'
 
-interface BulkRestoreDialogProps {
+interface ItemsUntrashDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
@@ -35,12 +35,12 @@ interface BulkRestoreDialogProps {
   }>
 }
 
-function BulkUntrashDialog({
+function ItemsUntrashDialog({
   isOpen,
   onClose,
   onConfirm,
   selectedItems,
-}: BulkRestoreDialogProps) {
+}: ItemsUntrashDialogProps) {
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
   const isMobile = useIsMobile()
@@ -200,5 +200,5 @@ function BulkUntrashDialog({
   )
 }
 
-export { BulkUntrashDialog }
-export default BulkUntrashDialog
+export { ItemsUntrashDialog }
+export default ItemsUntrashDialog

@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
-interface BulkTrashDialogProps {
+interface ItemsTrashDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: () => void
@@ -34,12 +34,12 @@ interface BulkTrashDialogProps {
   }>
 }
 
-function BulkTrashDialog({
+function ItemsTrashDialog({
   isOpen,
   onClose,
   onConfirm,
   selectedItems,
-}: BulkTrashDialogProps) {
+}: ItemsTrashDialogProps) {
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
   const isMobile = useIsMobile()
@@ -198,5 +198,5 @@ function BulkTrashDialog({
   )
 }
 
-export { BulkTrashDialog }
-export default BulkTrashDialog
+export { ItemsTrashDialog }
+export default ItemsTrashDialog

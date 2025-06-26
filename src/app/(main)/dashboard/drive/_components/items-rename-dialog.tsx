@@ -25,7 +25,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
-interface BulkRenameDialogProps {
+interface ItemsRenameDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: (renamePattern: string, renameType: string) => void
@@ -88,12 +88,12 @@ const RENAME_TYPES = [
   },
 ]
 
-function BulkRenameDialog({
+function ItemsRenameDialog({
   isOpen,
   onClose,
   onConfirm,
   selectedItems,
-}: BulkRenameDialogProps) {
+}: ItemsRenameDialogProps) {
   const [renameType, setRenameType] = useState('prefix')
   const [renamePattern, setRenamePattern] = useState('')
   const [regexPattern, setRegexPattern] = useState('')
@@ -354,5 +354,5 @@ function BulkRenameDialog({
   )
 }
 
-export { BulkRenameDialog }
-export default BulkRenameDialog
+export { ItemsRenameDialog }
+export default ItemsRenameDialog

@@ -25,16 +25,16 @@ export const BulkOperationsDialog = lazy(() =>
   ).then((mod) => ({ default: mod.BulkOperationsDialog }))
 )
 
-export const BulkMoveDialog = lazy(
-  () => import('@/app/(main)/dashboard/drive/_components/bulk-move-dialog')
+export const ItemsMoveDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-move-dialog')
 )
 
-export const BulkCopyDialog = lazy(
-  () => import('@/app/(main)/dashboard/drive/_components/bulk-copy-dialog')
+export const ItemsCopyDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-copy-dialog')
 )
 
-export const BulkDeleteDialog = lazy(
-  () => import('@/app/(main)/dashboard/drive/_components/bulk-delete-dialog')
+export const ItemsDeleteDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-delete-dialog')
 )
 
 export const DriveToolbar = lazy(() =>

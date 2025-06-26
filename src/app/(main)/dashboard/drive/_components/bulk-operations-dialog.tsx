@@ -28,14 +28,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 
-import { BulkMoveDialog } from './bulk-move-dialog'
-import { BulkCopyDialog } from './bulk-copy-dialog'
-import { BulkTrashDialog } from './bulk-trash-dialog'
-import { BulkShareDialog } from './bulk-share-dialog'
-import { BulkRenameDialog } from './bulk-rename-dialog'
-import { BulkExportDialog } from './bulk-export-dialog'
-import { BulkDeleteDialog } from './bulk-delete-dialog'
-import { BulkUntrashDialog } from './bulk-untrash-dialog'
 
 interface BulkOperationsDialogProps {
   isOpen?: boolean
@@ -532,57 +524,57 @@ function BulkOperationsDialog({
         </Dialog>
       )}
 
-      {/* Individual Bulk Operation Dialogs - Direct rendering tanpa Suspense */}
-      <BulkMoveDialog
+      {/* Individual Items Operation Dialogs - Direct rendering tanpa Suspense */}
+      <ItemsMoveDialog
         open={isMoveDialogOpen}
         onOpenChange={setIsMoveDialogOpen}
         onConfirm={handleMoveComplete}
         selectedItems={selectedItems}
       />
 
-      <BulkCopyDialog
+      <ItemsCopyDialog
         isOpen={isCopyDialogOpen}
         onClose={() => setIsCopyDialogOpen(false)}
         onConfirm={handleCopyComplete}
         selectedItems={selectedItems}
       />
 
-      <BulkTrashDialog
+      <ItemsTrashDialog
         isOpen={isTrashDialogOpen}
         onClose={() => setIsTrashDialogOpen(false)}
         onConfirm={handleDeleteComplete}
         selectedItems={selectedItems}
       />
 
-      <BulkShareDialog
+      <ItemsShareDialog
         open={isShareDialogOpen}
         onOpenChange={() => setIsShareDialogOpen(false)}
         onConfirm={handleShareComplete}
         selectedItems={selectedItems}
       />
 
-      <BulkRenameDialog
+      <ItemsRenameDialog
         isOpen={isRenameDialogOpen}
         onClose={() => setIsRenameDialogOpen(false)}
         onConfirm={handleRenameComplete}
         selectedItems={selectedItems}
       />
 
-      <BulkExportDialog
+      <ItemsExportDialog
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
         onConfirm={handleExportComplete}
         selectedItems={selectedItems}
       />
 
-      <BulkDeleteDialog
+      <ItemsDeleteDialog
         isOpen={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handlePermanentDeleteComplete}
         selectedItems={selectedItems}
       />
 
-      <BulkUntrashDialog
+      <ItemsUntrashDialog
         isOpen={isRestoreDialogOpen}
         onClose={() => setIsRestoreDialogOpen(false)}
         onConfirm={handleRestoreComplete}

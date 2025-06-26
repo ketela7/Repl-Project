@@ -25,7 +25,7 @@ import { cn } from '@/lib/utils'
 
 // FileMoveDialog removed - functionality integrated into bulk operations
 
-interface BulkMoveDialogProps {
+interface ItemsMoveDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: (targetFolderId: string) => void
@@ -37,12 +37,12 @@ interface BulkMoveDialogProps {
   }>
 }
 
-function BulkMoveDialog({
+function ItemsMoveDialog({
   open,
   onOpenChange,
   onConfirm,
   selectedItems,
-}: BulkMoveDialogProps) {
+}: ItemsMoveDialogProps) {
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 
@@ -296,5 +296,5 @@ function BulkMoveDialog({
   )
 }
 
-export { BulkMoveDialog }
-export default BulkMoveDialog
+export { ItemsMoveDialog }
+export default ItemsMoveDialog

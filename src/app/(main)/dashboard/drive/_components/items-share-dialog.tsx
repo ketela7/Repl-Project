@@ -31,7 +31,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 
-interface BulkShareDialogProps {
+interface ItemsShareDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onConfirm: (accessLevel: string, linkAccess: string) => void
@@ -50,12 +50,12 @@ interface ShareResult {
   error?: string
 }
 
-function BulkShareDialog({
+function ItemsShareDialog({
   open,
   onOpenChange,
   onConfirm,
   selectedItems,
-}: BulkShareDialogProps) {
+}: ItemsShareDialogProps) {
   const [accessLevel, setAccessLevel] = useState<
     'reader' | 'writer' | 'commenter'
   >('reader')
@@ -425,5 +425,5 @@ function BulkShareDialog({
   )
 }
 
-export { BulkShareDialog }
-export default BulkShareDialog
+export { ItemsShareDialog }
+export default ItemsShareDialog

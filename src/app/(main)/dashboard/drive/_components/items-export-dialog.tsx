@@ -34,7 +34,7 @@ import {
 import { cn } from '@/lib/utils'
 // Simple error handling without complex recovery
 
-interface BulkExportDialogProps {
+interface ItemsExportDialogProps {
   isOpen: boolean
   onClose: () => void
   onConfirm: (exportFormat: string) => void
@@ -109,12 +109,12 @@ const EXPORT_FORMATS = [
   },
 ]
 
-function BulkExportDialog({
+function ItemsExportDialog({
   isOpen,
   onClose,
   onConfirm,
   selectedItems,
-}: BulkExportDialogProps) {
+}: ItemsExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState('pdf')
   const [progress, setProgress] = useState<{
     current: number
@@ -469,5 +469,5 @@ function BulkExportDialog({
   )
 }
 
-export { BulkExportDialog }
-export default BulkExportDialog
+export { ItemsExportDialog }
+export default ItemsExportDialog
