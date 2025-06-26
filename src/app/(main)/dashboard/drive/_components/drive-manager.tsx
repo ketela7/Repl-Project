@@ -19,7 +19,7 @@ import { CreateFolderDialog } from './create-folder-dialog'
 import { FileRenameDialog } from './file-rename-dialog'
 import { FileMoveDialog } from './file-move-dialog'
 import { FileCopyDialog } from './file-copy-dialog'
-import { PermanentDeleteDialog } from './permanent-delete-dialog'
+import { FileDeleteDialog } from './file-delete-dialog'
 import { FileDetailsDialog } from './file-details-dialog'
 import { FilePreviewDialog } from './file-preview-dialog'
 import { FileShareDialog } from './file-share-dialog'
@@ -946,7 +946,7 @@ export function DriveManager() {
         />
       )}
 
-      {/* Mobile Filters Dialog */}
+      {/* Filters Dialog */}
       <FiltersDialog
         open={dialogs.filters}
         onOpenChange={(open) => {
@@ -1000,8 +1000,4 @@ export function DriveManager() {
       {/* <PerformanceMonitor /> */}
     </div>
   )
-}
-
-function isFolder(item: any): boolean {
-  return item?.mimeType === 'application/vnd.google-apps.folder'
 }
