@@ -21,6 +21,7 @@ interface BreadcrumbItemData {
 interface FileBreadcrumbProps {
   currentFolderId: string | null
   onNavigate: (folderId: string | null) => void
+  breadcrumbPath?: BreadcrumbItemData[]
   onBackToRoot?: () => void
   loading?: boolean
 }
@@ -28,6 +29,7 @@ interface FileBreadcrumbProps {
 export function FileBreadcrumb({
   currentFolderId,
   onNavigate,
+  breadcrumbPath,
   loading: externalLoading,
 }: FileBreadcrumbProps) {
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>(
@@ -85,13 +87,19 @@ export function FileBreadcrumb({
   }
 
   useEffect(() => {
-    if (currentFolderId) {
+    if (breadcrumbPath) {
+      // Use provided breadcrumbPath from drive-manager
+      setBreadcrumbItems(
+        breadcrumbPath.map((item) => ({ id: item.id, name: item.name }))
+      )
+      setError(null)
+    } else if (currentFolderId && currentFolderId !== 'root') {
       fetchFolderPath(currentFolderId)
     } else {
       setBreadcrumbItems([])
       setError(null)
     }
-  }, [currentFolderId])
+  }, [currentFolderId, breadcrumbPath])
 
   const isLoading = loading || externalLoading
 
