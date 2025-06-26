@@ -32,7 +32,7 @@ interface BulkRenameDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type?: 'file' | 'folder'
+    isFolder: boolean
     mimeType?: string
   }>
 }

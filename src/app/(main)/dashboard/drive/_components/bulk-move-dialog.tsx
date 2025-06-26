@@ -32,7 +32,7 @@ interface BulkMoveDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type?: 'file' | 'folder'
+    isFolder: boolean
     mimeType?: string
   }>
 }
@@ -46,10 +46,8 @@ function BulkMoveDialog({
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter((item) => item.type === 'file').length
-  const folderCount = selectedItems.filter(
-    (item) => item.type === 'folder'
-  ).length
+  const fileCount = selectedItems.filter((item) => !item.isFolder).length
+  const folderCount = selectedItems.filter((item) => item.isFolder).length
 
   const handleMoveConfirm = (targetFolderId: string) => {
     onConfirm(targetFolderId)
@@ -107,7 +105,7 @@ function BulkMoveDialog({
                 <div className="h-2 w-2 rounded-full bg-blue-500" />
                 <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
-                  {item.type}
+                  {item.isFolder ? 'folder' : 'file'}
                 </Badge>
               </div>
             ))}

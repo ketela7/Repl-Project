@@ -30,7 +30,7 @@ interface BulkRestoreDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type?: 'file' | 'folder'
+    isFolder: boolean
     mimeType?: string
   }>
 }
@@ -41,10 +41,8 @@ function BulkUntrashDialog({
   onConfirm,
   selectedItems,
 }: BulkRestoreDialogProps) {
-  const fileCount = selectedItems.filter((item) => item.type === 'file').length
-  const folderCount = selectedItems.filter(
-    (item) => item.type === 'folder'
-  ).length
+  const fileCount = selectedItems.filter((item) => !item.isFolder).length
+  const folderCount = selectedItems.filter((item) => item.isFolder).length
   const isMobile = useIsMobile()
 
   const renderContent = () => (
@@ -100,7 +98,7 @@ function BulkUntrashDialog({
                 <div className="h-2 w-2 rounded-full bg-emerald-500" />
                 <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
-                  {item.type}
+                  {item.isFolder ? 'folder' : 'file'}
                 </Badge>
               </div>
             ))}

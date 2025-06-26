@@ -32,7 +32,7 @@ interface BulkCopyDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type?: 'file' | 'folder'
+    isFolder: boolean
   }>
 }
 
@@ -45,8 +45,8 @@ function BulkCopyDialog({
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 
-  const files = selectedItems.filter((item) => item.type === 'file')
-  const folders = selectedItems.filter((item) => item.type === 'folder')
+  const files = selectedItems.filter((item) => !item.isFolder)
+  const folders = selectedItems.filter((item) => item.isFolder)
 
   const handleCopyConfirm = (targetFolderId: string) => {
     onConfirm(targetFolderId)

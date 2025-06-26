@@ -30,7 +30,7 @@ interface BulkTrashDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type?: 'file' | 'folder'
+    isFolder: boolean
   }>
 }
 
@@ -40,10 +40,8 @@ function BulkTrashDialog({
   onConfirm,
   selectedItems,
 }: BulkTrashDialogProps) {
-  const fileCount = selectedItems.filter((item) => item.type === 'file').length
-  const folderCount = selectedItems.filter(
-    (item) => item.type === 'folder'
-  ).length
+  const fileCount = selectedItems.filter((item) => !item.isFolder).length
+  const folderCount = selectedItems.filter((item) => item.isFolder).length
   const isMobile = useIsMobile()
 
   const renderContent = () => (
@@ -99,7 +97,7 @@ function BulkTrashDialog({
                 <div className="h-2 w-2 rounded-full bg-yellow-500" />
                 <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
-                  {item.type}
+                  {item.isFolder ? 'folder' : 'file'}
                 </Badge>
               </div>
             ))}

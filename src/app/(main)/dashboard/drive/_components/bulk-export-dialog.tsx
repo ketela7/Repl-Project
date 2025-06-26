@@ -41,7 +41,7 @@ interface BulkExportDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type?: 'file' | 'folder'
+    isFolder: boolean
     mimeType?: string
   }>
 }
@@ -125,7 +125,7 @@ function BulkExportDialog({
   // Filter exportable files (Google Workspace files only)
   const exportableFiles = selectedItems.filter(
     (item) =>
-      item.type === 'file' &&
+      !item.isFolder &&
       item.mimeType &&
       item.mimeType.startsWith('application/vnd.google-apps.') &&
       !item.mimeType.includes('folder') &&
@@ -134,7 +134,7 @@ function BulkExportDialog({
 
   const nonExportableFiles = selectedItems.filter(
     (item) =>
-      item.type === 'folder' ||
+      item.isFolder ||
       !item.mimeType ||
       !item.mimeType.startsWith('application/vnd.google-apps.') ||
       item.mimeType.includes('folder') ||

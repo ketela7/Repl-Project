@@ -38,7 +38,7 @@ interface BulkShareDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type?: 'file' | 'folder'
+    isFolder: boolean
   }>
 }
 
@@ -144,12 +144,8 @@ function BulkShareDialog({
     URL.revokeObjectURL(url)
   }
 
-  const fileCount = selectedItems.filter(
-    (item) => item.type === 'file' || (!item.type && !item.name.endsWith('/'))
-  ).length
-  const folderCount = selectedItems.filter(
-    (item) => item.type === 'folder' || (!item.type && item.name.endsWith('/'))
-  ).length
+  const fileCount = selectedItems.filter((item) => !item.isFolder).length
+  const folderCount = selectedItems.filter((item) => item.isFolder).length
 
   const renderContent = () => (
     <div className="space-y-6">
