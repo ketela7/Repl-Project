@@ -459,8 +459,6 @@ export function DriveManager() {
     fetchFiles()
   }, [])
 
-  {
-
   // Navigation handlers
   const handleFolderClick = useCallback(
     (folderId: string) => {
