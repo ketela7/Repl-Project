@@ -14,7 +14,9 @@ interface FileFilter {
   modifiedAfter?: string
   modifiedBefore?: string
   owner?: string
-  size?: string
+  sizeMin?: string
+  sizeMax?: string
+  sizeUnit?: string
 }
 
 function buildDriveQuery(filters: FileFilter): string {
@@ -347,9 +349,43 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  //size on front-end ,client side to best result
+  // Size filtering (Google Drive API specification: only works for files, not folders)
+  // Note: Size filters automatically exclude folders from results
+  if (filters.sizeMin || filters.sizeMax) {
+    const unit = filters.sizeUnit || 'MB'
+    const multiplier = getSizeMultiplier(unit)
+
+    if (filters.sizeMin) {
+      const minBytes = Math.floor(Number(filters.sizeMin) * multiplier)
+      if (minBytes > 0) {
+        conditions.push(`size >= ${minBytes}`)
+      }
+    }
+
+    if (filters.sizeMax) {
+      const maxBytes = Math.floor(Number(filters.sizeMax) * multiplier)
+      if (maxBytes > 0) {
+        conditions.push(`size <= ${maxBytes}`)
+      }
+    }
+  }
 
   return conditions.join(' and ')
+}
+
+function getSizeMultiplier(unit: string): number {
+  switch (unit) {
+    case 'B':
+      return 1
+    case 'KB':
+      return 1024
+    case 'MB':
+      return 1024 * 1024
+    case 'GB':
+      return 1024 * 1024 * 1024
+    default:
+      return 1024 * 1024 // Default to MB
+  }
 }
 
 function getSortKey(sortBy: string) {
@@ -392,7 +428,9 @@ export async function GET(request: NextRequest) {
       modifiedAfter: searchParams.get('modifiedAfter') || undefined,
       modifiedBefore: searchParams.get('modifiedBefore') || undefined,
       owner: searchParams.get('owner') || undefined,
-      size: searchParams.get('size') || undefined,
+      sizeMin: searchParams.get('sizeMin') || undefined,
+      sizeMax: searchParams.get('sizeMax') || undefined,
+      sizeUnit: searchParams.get('sizeUnit') || undefined,
     }
 
     const query = buildDriveQuery(filters)

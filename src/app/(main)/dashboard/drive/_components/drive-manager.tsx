@@ -42,6 +42,7 @@ const initialFilters = {
     createdDateRange: { from: undefined, to: undefined },
     modifiedDateRange: { from: undefined, to: undefined },
     owner: undefined,
+    pageSize: 50,
   },
 }
 
@@ -360,6 +361,36 @@ export function DriveManager() {
           )
         if (filters.advancedFilters.owner?.trim())
           params.append('owner', filters.advancedFilters.owner.trim())
+
+        // Add size filtering parameters (Google Drive API specification)
+        if (
+          filters.advancedFilters.sizeRange?.min &&
+          filters.advancedFilters.sizeRange.min > 0
+        ) {
+          params.append(
+            'sizeMin',
+            String(filters.advancedFilters.sizeRange.min)
+          )
+          params.append('sizeUnit', filters.advancedFilters.sizeRange.unit)
+        }
+        if (
+          filters.advancedFilters.sizeRange?.max &&
+          filters.advancedFilters.sizeRange.max > 0
+        ) {
+          params.append(
+            'sizeMax',
+            String(filters.advancedFilters.sizeRange.max)
+          )
+          params.append('sizeUnit', filters.advancedFilters.sizeRange.unit)
+        }
+
+        // Add pageSize parameter
+        if (
+          filters.advancedFilters.pageSize &&
+          filters.advancedFilters.pageSize !== 50
+        ) {
+          params.append('pageSize', String(filters.advancedFilters.pageSize))
+        }
 
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',

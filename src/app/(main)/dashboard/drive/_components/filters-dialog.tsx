@@ -73,6 +73,7 @@ interface AdvancedFilters {
   owner?: string
   sortBy?: 'name' | 'modified' | 'created' | 'size'
   sortOrder?: 'asc' | 'desc'
+  pageSize?: number
 }
 
 interface FiltersDialogProps {
@@ -115,32 +116,46 @@ export function FiltersDialog({
   useEffect(() => {
     if (open) {
       setTempActiveView(currentFilters?.activeView || 'all')
-      setTempFileTypeFilter(Array.isArray(currentFilters?.fileTypeFilter) ? currentFilters.fileTypeFilter : [])
+      setTempFileTypeFilter(
+        Array.isArray(currentFilters?.fileTypeFilter)
+          ? currentFilters.fileTypeFilter
+          : []
+      )
       setTempAdvancedFilters({
         sizeRange: {
           unit: 'MB',
-          ...currentFilters?.advancedFilters?.sizeRange
+          ...currentFilters?.advancedFilters?.sizeRange,
         },
-        createdDateRange: currentFilters?.advancedFilters?.createdDateRange || {},
-        modifiedDateRange: currentFilters?.advancedFilters?.modifiedDateRange || {},
+        createdDateRange:
+          currentFilters?.advancedFilters?.createdDateRange || {},
+        modifiedDateRange:
+          currentFilters?.advancedFilters?.modifiedDateRange || {},
         owner: currentFilters?.advancedFilters?.owner,
         sortBy: currentFilters?.advancedFilters?.sortBy || 'modified',
-        sortOrder: currentFilters?.advancedFilters?.sortOrder || 'desc'
+        sortOrder: currentFilters?.advancedFilters?.sortOrder || 'desc',
       })
     }
   }, [open, currentFilters])
+
+  // Check if size filters are applied (Google Drive API limitation: size filters only work for files)
+  const hasSizeFilter =
+    (tempAdvancedFilters.sizeRange?.min &&
+      tempAdvancedFilters.sizeRange.min > 0) ||
+    (tempAdvancedFilters.sizeRange?.max &&
+      tempAdvancedFilters.sizeRange.max > 0)
 
   // Calculate if there are active temp filters to show Clear All button
   const hasTempActiveFilters =
     tempActiveView !== 'all' ||
     (Array.isArray(tempFileTypeFilter) && tempFileTypeFilter.length > 0) ||
-    (tempAdvancedFilters.sizeRange?.min && tempAdvancedFilters.sizeRange.min > 0) ||
-    (tempAdvancedFilters.sizeRange?.max && tempAdvancedFilters.sizeRange.max > 0) ||
+    hasSizeFilter ||
     tempAdvancedFilters.createdDateRange?.from ||
     tempAdvancedFilters.createdDateRange?.to ||
     tempAdvancedFilters.modifiedDateRange?.from ||
     tempAdvancedFilters.modifiedDateRange?.to ||
-    (tempAdvancedFilters.owner && tempAdvancedFilters.owner.trim().length > 0)
+    (tempAdvancedFilters.owner &&
+      tempAdvancedFilters.owner.trim().length > 0) ||
+    (tempAdvancedFilters.pageSize && tempAdvancedFilters.pageSize !== 50)
 
   // Basic Menu Items
   const basicMenuItems = [
@@ -256,12 +271,19 @@ export function FiltersDialog({
 
   const handleFileTypeFilter = (typeId: string) => {
     // Ensure we always work with an array
-    const currentArray = Array.isArray(tempFileTypeFilter) ? tempFileTypeFilter : []
+    const currentArray = Array.isArray(tempFileTypeFilter)
+      ? tempFileTypeFilter
+      : []
 
     // Toggle behavior - add if not present, remove if present
-    const newFilter = currentArray.includes(typeId)
+    let newFilter = currentArray.includes(typeId)
       ? currentArray.filter((type: string) => type !== typeId)
       : [...currentArray, typeId]
+
+    // Remove folder from selection if size filters are active (Google Drive API limitation)
+    if (hasSizeFilter && newFilter.includes('folder')) {
+      newFilter = newFilter.filter((type: string) => type !== 'folder')
+    }
 
     setTempFileTypeFilter(newFilter)
     // Apply immediately for real-time sync
@@ -274,10 +296,29 @@ export function FiltersDialog({
 
   const handleAdvancedFiltersChange = (newFilters: AdvancedFilters) => {
     setTempAdvancedFilters(newFilters)
+
+    // Check if size filters are being applied
+    const newHasSizeFilter =
+      (newFilters.sizeRange?.min && newFilters.sizeRange.min > 0) ||
+      (newFilters.sizeRange?.max && newFilters.sizeRange.max > 0)
+
+    // Remove folder from file type filter if size filters are applied (Google Drive API limitation)
+    let updatedFileTypeFilter = tempFileTypeFilter
+    if (
+      newHasSizeFilter &&
+      Array.isArray(tempFileTypeFilter) &&
+      tempFileTypeFilter.includes('folder')
+    ) {
+      updatedFileTypeFilter = tempFileTypeFilter.filter(
+        (type: string) => type !== 'folder'
+      )
+      setTempFileTypeFilter(updatedFileTypeFilter)
+    }
+
     // Apply immediately for real-time sync
     onFilterChange({
       activeView: tempActiveView,
-      fileTypeFilter: tempFileTypeFilter,
+      fileTypeFilter: updatedFileTypeFilter,
       advancedFilters: newFilters,
     })
   }
@@ -363,42 +404,69 @@ export function FiltersDialog({
           </Button>
 
           {showFileTypes && (
-            <div className="grid grid-cols-2 gap-2 pt-2">
-              {fileTypeFilters.map((filter) => {
-                const Icon = filter.icon
-                const currentFilter = tempFileTypeFilter || []
-                const isArray = Array.isArray(currentFilter)
-                const currentArray = isArray
-                  ? currentFilter
-                  : currentFilter
-                    ? [currentFilter]
-                    : []
-                const isActive = currentArray.includes(filter.id)
+            <div className="space-y-2 pt-2">
+              {hasSizeFilter && (
+                <div className="rounded-md bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/20 dark:text-amber-200">
+                  <div className="flex items-start gap-2">
+                    <Badge variant="outline" className="text-xs">
+                      Notice
+                    </Badge>
+                    <div className="flex-1">
+                      <p className="font-medium">
+                        Size filtering applies to files only
+                      </p>
+                      <p className="mt-1 text-xs opacity-80">
+                        Google Drive API limitation: Size filters work only for
+                        files, not folders. Folder selection is disabled when
+                        size filters are active.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                {fileTypeFilters.map((filter) => {
+                  const Icon = filter.icon
+                  const currentFilter = tempFileTypeFilter || []
+                  const isArray = Array.isArray(currentFilter)
+                  const currentArray = isArray
+                    ? currentFilter
+                    : currentFilter
+                      ? [currentFilter]
+                      : []
+                  const isActive = currentArray.includes(filter.id)
 
-                return (
-                  <Button
-                    key={filter.id}
-                    variant={isActive ? 'default' : 'outline'}
-                    className={`h-12 justify-start ${isActive ? 'ring-primary/20 ring-2' : ''}`}
-                    onClick={() => {
-                      handleFileTypeFilter(filter.id)
-                      // Apply immediately like View Status
-                      // onFilterChange({
-                      //   activeView: tempActiveView,
-                      //   fileTypeFilter: tempFileTypeFilter.includes(filter.id)
-                      //     ? tempFileTypeFilter.filter(
-                      //         (t: string) => t !== filter.id
-                      //       )
-                      //     : [...tempFileTypeFilter, filter.id],
-                      //   advancedFilters: tempAdvancedFilters,
-                      // })
-                    }}
-                  >
-                    <Icon className={`mr-2 h-4 w-4 ${filter.color}`} />
-                    <span className="text-sm">{filter.label}</span>
-                  </Button>
-                )
-              })}
+                  // Disable folder selection when size filters are active
+                  const isDisabled = hasSizeFilter && filter.id === 'folder'
+
+                  return (
+                    <Button
+                      key={filter.id}
+                      variant={isActive ? 'default' : 'outline'}
+                      disabled={isDisabled}
+                      className={`h-12 justify-start ${
+                        isActive ? 'ring-primary/20 ring-2' : ''
+                      } ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
+                      onClick={() => {
+                        if (!isDisabled) {
+                          handleFileTypeFilter(filter.id)
+                        }
+                      }}
+                    >
+                      <Icon
+                        className={`mr-2 h-4 w-4 ${filter.color} ${
+                          isDisabled ? 'opacity-50' : ''
+                        }`}
+                      />
+                      <span
+                        className={`text-sm ${isDisabled ? 'opacity-50' : ''}`}
+                      >
+                        {filter.label}
+                      </span>
+                    </Button>
+                  )
+                })}
+              </div>
             </div>
           )}
         </div>
@@ -691,6 +759,39 @@ export function FiltersDialog({
                     })
                   }
                 />
+              </div>
+
+              {/* Page Size Filter */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1 text-xs font-medium">
+                  <HardDrive className="h-3 w-3" />
+                  Results Per Page
+                </Label>
+                <Select
+                  value={String(tempAdvancedFilters.pageSize || 50)}
+                  onValueChange={(value) =>
+                    handleAdvancedFiltersChange({
+                      ...tempAdvancedFilters,
+                      pageSize: Number(value),
+                    })
+                  }
+                >
+                  <SelectTrigger className="text-sm">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10 items</SelectItem>
+                    <SelectItem value="25">25 items</SelectItem>
+                    <SelectItem value="50">50 items (default)</SelectItem>
+                    <SelectItem value="100">100 items</SelectItem>
+                    <SelectItem value="200">200 items</SelectItem>
+                    <SelectItem value="500">500 items</SelectItem>
+                    <SelectItem value="1000">1000 items (max)</SelectItem>
+                  </SelectContent>
+                </Select>
+                <div className="text-muted-foreground text-xs">
+                  Higher values may increase loading time
+                </div>
               </div>
             </div>
           )}

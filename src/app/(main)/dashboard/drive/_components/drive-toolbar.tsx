@@ -91,6 +91,7 @@ interface AdvancedFilters {
   owner?: string
   sortBy: 'name' | 'modified' | 'created' | 'size'
   sortOrder: 'asc' | 'desc'
+  pageSize?: number
 }
 
 interface VisibleColumns {
@@ -117,7 +118,6 @@ interface DriveToolbarProps {
   refreshing: boolean
   onUpload: () => void
   onCreateFolder: () => void
-  
 
   // Mobile Actions Dialog Props
   selectedItems: DriveItem[]
@@ -2073,11 +2073,18 @@ export function DriveToolbar({
         hasActiveFilters={
           filters.activeView !== 'all' ||
           filters.fileTypeFilter.length > 0 ||
-          filters.advancedFilters.sizeRange?.min ||
-          filters.advancedFilters.sizeRange?.max ||
-          filters.advancedFilters.createdDateRange?.from ||
-          filters.advancedFilters.modifiedDateRange?.from ||
-          filters.advancedFilters.owner
+          (filters.advancedFilters.sizeRange?.min &&
+            filters.advancedFilters.sizeRange.min > 0) ||
+          (filters.advancedFilters.sizeRange?.max &&
+            filters.advancedFilters.sizeRange.max > 0) ||
+          !!filters.advancedFilters.createdDateRange?.from ||
+          !!filters.advancedFilters.modifiedDateRange?.from ||
+          !!(
+            filters.advancedFilters.owner &&
+            filters.advancedFilters.owner.trim()
+          ) ||
+          (filters.advancedFilters.pageSize &&
+            filters.advancedFilters.pageSize !== 50)
         }
         onClearFilters={onClearFilters}
       />
