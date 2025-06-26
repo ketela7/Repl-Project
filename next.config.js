@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable gzip compression for all responses
+  compress: true,
+  
   // Fast development optimizations
   reactStrictMode: false, // Disable for faster development
 
