@@ -27,9 +27,9 @@ export const FIELD_SELECTORS = {
   // Minimal fields for file listing
   LIST_MINIMAL: 'nextPageToken, files(id, name, mimeType)',
 
-  // Standard fields for main file view
+  // Standard fields for main file view - MUST include capabilities for bulk operations
   LIST_STANDARD:
-    'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, owners(displayName), shared, trashed, starred, webViewLink, parents)',
+    'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, owners(displayName), shared, trashed, starred, webViewLink, thumbnailLink, parents, capabilities(canEdit, canShare, canDelete, canDownload, canCopy, canTrash, canUntrash, canRename, canMoveItemWithinDrive))',
 
   // Detailed fields for file details dialog
   DETAILS_FULL:
