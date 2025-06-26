@@ -10,7 +10,8 @@ import {
   Share,
   RefreshCw,
   Trash2,
-  Copy as CopyIcon,
+  Triangle,
+  CopyIcon
 } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -92,14 +93,99 @@ export function DriveDataView({
   const { timezone: userTimezone } = useTimezone()
   const effectiveTimezone = timezone || userTimezone
 
-  const isFolder = (item: DriveItem): boolean => {
-    return item.mimeType === 'application/vnd.google-apps.folder'
-  }
+  
 
   if (loading) {
     return <DriveGridSkeleton />
   }
 
+  const renderContent = (item: DriveItem) => (
+    <>
+    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => onItemAction('preview', item)}
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          Preview
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => onItemAction('move', item)}
+                        >
+                          <Move className="mr-2 h-4 w-4" />
+                          Move
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => onItemAction('copy', item)}
+                        >
+                          <Copy className="mr-2 h-4 w-4" />
+                          Copy
+                        </DropdownMenuItem>
+                        {/* Conditionally render download option */}
+                        {item.canDownload && (
+                          <DropdownMenuItem
+                            onClick={() => onItemAction('download', item)}
+                          >
+                            <Download className="mr-2 h-4 w-4" />
+                            Download
+                          </DropdownMenuItem>
+                        )}
+
+                        {/* Conditionally render rename option */}
+                        {item.canRename && (
+                          <DropdownMenuItem
+                            onClick={() => onItemAction('rename', item)}
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Rename
+                          </DropdownMenuItem>
+                        )}
+
+                        {item.canShare && (
+                          <DropdownMenuItem
+                            onClick={() => onItemAction('share', item)}
+                          >
+                            <Share className="mr-2 h-4 w-4" />
+                            Share
+                          </DropdownMenuItem>
+                        )}
+                        {item.canTrash && (
+                          <DropdownMenuItem
+                            onClick={() => onItemAction('trash', item)}
+                            className="text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Move to Trash
+                          </DropdownMenuItem>
+                        )}
+                        {item.canDelete && (
+                          <DropdownMenuItem
+                            onClick={() => onItemAction('delete', item)}
+                            className="text-destructive"
+                          >
+                            <Triangle className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        )}
+                        {item.canUntrash && (
+                          <DropdownMenuItem
+                            onClick={() => onItemAction('untrash', item)}
+                            className="text-destructive"
+                          >
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                            Restore
+                          </DropdownMenuItem>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+      </>
+  )
+    
   return (
     <Card>
       <CardContent className="p-0">
@@ -133,7 +219,7 @@ export function DriveDataView({
                   })
                   if (isSelectMode) {
                     onSelectItem(item.id)
-                  } else if (isFolder(item)) {
+                  } else if item.isFolder {
                     onFolderClick(item.id)
                   } else {
                     onItemAction('preview', item)
@@ -190,70 +276,7 @@ export function DriveDataView({
                       />
                     </FileThumbnailPreview>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger
-                      asChild
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 w-6 p-0 sm:h-8 sm:w-8"
-                      >
-                        <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <DropdownMenuItem
-                        onClick={() => onItemAction('preview', item)}
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        Preview
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onItemAction('download', item)}
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Download
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => onItemAction('rename', item)}
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Rename
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onItemAction('move', item)}
-                      >
-                        <Move className="mr-2 h-4 w-4" />
-                        Move
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onItemAction('copy', item)}
-                      >
-                        <Copy className="mr-2 h-4 w-4" />
-                        Copy
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onItemAction('share', item)}
-                      >
-                        <Share className="mr-2 h-4 w-4" />
-                        Share
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => onItemAction('delete', item)}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {renderContent(item)}
                 </div>
                 <div className="flex min-h-0 flex-col">
                   <h3
@@ -393,7 +416,7 @@ export function DriveDataView({
                   onClick={() =>
                     isSelectMode
                       ? onSelectItem(item.id)
-                      : isFolder(item)
+                      : item.isFolder
                         ? onFolderClick(item.id)
                         : onItemAction('preview', item)
                   }
@@ -456,8 +479,7 @@ export function DriveDataView({
                     >
                       <div className="flex items-center gap-2">
                         <span>
-                          {item.owners?.[0]?.emailAddress ||
-                            'Unknown'}
+                          {item.owners?.[0]?.emailAddress || 'Unknown'}
                         </span>
                         {item.owners?.[0]?.emailAddress && (
                           <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -468,10 +490,7 @@ export function DriveDataView({
                   {visibleColumns.mimeType && (
                     <TableCell>
                       <span className="text-muted-foreground text-sm">
-                        {isFolder(item)
-                          ? 'Folder'
-                          : item.mimeType.split('/').pop()?.toUpperCase() ||
-                            'File'}
+                        {item.mimeType}
                       </span>
                     </TableCell>
                   )}
@@ -492,60 +511,7 @@ export function DriveDataView({
                     </TableCell>
                   )}
                   <TableCell onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('preview', item)}
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          Preview
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('download', item)}
-                        >
-                          <Download className="mr-2 h-4 w-4" />
-                          Download
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('rename', item)}
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          Rename
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('move', item)}
-                        >
-                          <Move className="mr-2 h-4 w-4" />
-                          Move
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('copy', item)}
-                        >
-                          <Copy className="mr-2 h-4 w-4" />
-                          Copy
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('share', item)}
-                        >
-                          <Share className="mr-2 h-4 w-4" />
-                          Share
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => onItemAction('delete', item)}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    {renderContent(item)}
                   </TableCell>
                 </TableRow>
               ))}

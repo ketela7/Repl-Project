@@ -312,9 +312,9 @@ export function DriveManager() {
         createdTime: item?.createdTime || '',
         size: (item as any)?.size,
         owners: item?.owners || [],
-        isTrashed: item?.isTrashed || false,
-        isStarred: item?.isStarred || false,
-        isShared: item?.isShared || false,
+        isTrashed: item?.trashed || false,
+        isStarred: item?.starred || false,
+        isShared: item?.shared || false,
         isFolder: isFolder(item),
         
         
@@ -323,7 +323,7 @@ export function DriveManager() {
         canDelete: item?.capabilities?.canDelete || false,
         canDownload: !isFolder(item) && item?.capabilities?.canDownload || false,
         canTrash: item?.capabilities?.canTrash || false,
-        canUntrash: item?.isTrashed &&item?.capabilities?.canUntrash || false,
+        canUntrash: item?.trashed && item?.capabilities?.canUntrash || false,
         canRename: item?.capabilities?.canRename || false,
         canShare: item?.capabilities?.canShare || false
         //canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || false, // force move
