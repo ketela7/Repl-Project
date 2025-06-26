@@ -59,8 +59,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
-              client_id: process.env.AUTH_GOOGLE_ID!,
-              client_secret: process.env.AUTH_GOOGLE_SECRET!,
+              client_id: process.env.GOOGLE_CLIENT_ID!,
+              client_secret: process.env.GOOGLE_CLIENT_SECRET!,
               grant_type: 'refresh_token',
               refresh_token: token.refreshToken as string,
             }),
