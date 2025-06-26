@@ -780,11 +780,9 @@ export function FiltersDialog({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="10">10 items</SelectItem>
-                    <SelectItem value="25">25 items</SelectItem>
                     <SelectItem value="50">50 items (default)</SelectItem>
                     <SelectItem value="100">100 items</SelectItem>
-                    <SelectItem value="200">200 items</SelectItem>
+                    <SelectItem value="250">250 items</SelectItem>
                     <SelectItem value="500">500 items</SelectItem>
                     <SelectItem value="1000">1000 items (max)</SelectItem>
                   </SelectContent>

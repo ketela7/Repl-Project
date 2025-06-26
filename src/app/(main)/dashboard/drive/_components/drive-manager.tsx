@@ -22,6 +22,22 @@ import { DriveDataView } from './drive-data-view'
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
 
+// Helper function to convert size units to bytes (Google Drive API requirement)
+function getSizeMultiplier(unit: string): number {
+  switch (unit) {
+    case 'B':
+      return 1
+    case 'KB':
+      return 1024
+    case 'MB':
+      return 1024 * 1024
+    case 'GB':
+      return 1024 * 1024 * 1024
+    default:
+      return 1024 * 1024 // Default to MB
+  }
+}
+
 const initialFilters = {
   activeView: 'all' as
     | 'all'
@@ -362,26 +378,30 @@ export function DriveManager() {
         if (filters.advancedFilters.owner?.trim())
           params.append('owner', filters.advancedFilters.owner.trim())
 
-        // Add size filtering parameters (Google Drive API specification)
+        // Add size filtering parameters (Google Drive API specification - values in bytes)
         if (
           filters.advancedFilters.sizeRange?.min &&
           filters.advancedFilters.sizeRange.min > 0
         ) {
-          params.append(
-            'sizeMin',
-            String(filters.advancedFilters.sizeRange.min)
+          const multiplier = getSizeMultiplier(
+            filters.advancedFilters.sizeRange.unit
           )
-          params.append('sizeUnit', filters.advancedFilters.sizeRange.unit)
+          const minBytes = Math.floor(
+            filters.advancedFilters.sizeRange.min * multiplier
+          )
+          params.append('sizeMin', String(minBytes))
         }
         if (
           filters.advancedFilters.sizeRange?.max &&
           filters.advancedFilters.sizeRange.max > 0
         ) {
-          params.append(
-            'sizeMax',
-            String(filters.advancedFilters.sizeRange.max)
+          const multiplier = getSizeMultiplier(
+            filters.advancedFilters.sizeRange.unit
           )
-          params.append('sizeUnit', filters.advancedFilters.sizeRange.unit)
+          const maxBytes = Math.floor(
+            filters.advancedFilters.sizeRange.max * multiplier
+          )
+          params.append('sizeMax', String(maxBytes))
         }
 
         // Add pageSize parameter

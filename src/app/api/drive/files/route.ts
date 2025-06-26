@@ -16,7 +16,6 @@ interface FileFilter {
   owner?: string
   sizeMin?: string
   sizeMax?: string
-  sizeUnit?: string
 }
 
 function buildDriveQuery(filters: FileFilter): string {
@@ -352,18 +351,17 @@ function buildDriveQuery(filters: FileFilter): string {
   // Size filtering (Google Drive API specification: only works for files, not folders)
   // Note: Size filters automatically exclude folders from results
   if (filters.sizeMin || filters.sizeMax) {
-    const unit = filters.sizeUnit || 'MB'
-    const multiplier = getSizeMultiplier(unit)
+    // Google Drive API expects size values in bytes
 
     if (filters.sizeMin) {
-      const minBytes = Math.floor(Number(filters.sizeMin) * multiplier)
+      const minBytes = Number(filters.sizeMin)
       if (minBytes > 0) {
         conditions.push(`size >= ${minBytes}`)
       }
     }
 
     if (filters.sizeMax) {
-      const maxBytes = Math.floor(Number(filters.sizeMax) * multiplier)
+      const maxBytes = Number(filters.sizeMax)
       if (maxBytes > 0) {
         conditions.push(`size <= ${maxBytes}`)
       }
@@ -371,21 +369,6 @@ function buildDriveQuery(filters: FileFilter): string {
   }
 
   return conditions.join(' and ')
-}
-
-function getSizeMultiplier(unit: string): number {
-  switch (unit) {
-    case 'B':
-      return 1
-    case 'KB':
-      return 1024
-    case 'MB':
-      return 1024 * 1024
-    case 'GB':
-      return 1024 * 1024 * 1024
-    default:
-      return 1024 * 1024 // Default to MB
-  }
 }
 
 function getSortKey(sortBy: string) {
@@ -430,7 +413,6 @@ export async function GET(request: NextRequest) {
       owner: searchParams.get('owner') || undefined,
       sizeMin: searchParams.get('sizeMin') || undefined,
       sizeMax: searchParams.get('sizeMax') || undefined,
-      sizeUnit: searchParams.get('sizeUnit') || undefined,
     }
 
     const query = buildDriveQuery(filters)
