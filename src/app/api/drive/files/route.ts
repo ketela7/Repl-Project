@@ -370,7 +370,7 @@ function buildDriveQuery(filters: FileFilter): string {
 
   // Exclude folders when size filter is applied (Google Drive API limitation)
   if (hasSizeFilter) {
-    conditions.push("mimeType != 'application/vnd.google-apps.folder'")
+    conditions.push("not mimeType = 'application/vnd.google-apps.folder'")
   }
 
   return conditions.join(' and ')
