@@ -436,24 +436,48 @@ export function DriveManager({ className }: DriveManagerProps) {
 
         {/* Data View */}
         <DriveDataView
-          files={files}
-          folders={folders}
+          items={allItems}
           viewMode={viewMode}
           isSelectMode={isSelectMode}
-          selectedFiles={selectedFiles}
-          onSelectFile={handleSelectFile}
+          selectedItems={selectedFiles}
+          visibleColumns={visibleColumns}
+          onSelectItem={handleSelectFile}
+          onSelectModeChange={setIsSelectMode}
           onFolderClick={(folderId: string) => {
             const folder = folders.find(f => f.id === folderId)
             if (folder) handleFolderClick(folder)
           }}
-          onFileRename={handleFileRename}
-          onFileDelete={handleFileDelete}
-          onFileDetails={handleFileDetails}
-          onFileShare={handleFileShare}
-          onFileCopy={handleFileCopy}
-          onFileMove={handleFileMove}
-          onFilePreview={handleFilePreview}
-          onFileDownload={handleFileDownload}
+          onColumnsChange={(config) => {
+            // Handle column configuration changes here if needed
+          }}
+          onItemAction={(action, item) => {
+            switch (action) {
+              case 'rename':
+                handleFileRename(item)
+                break
+              case 'delete':
+                handleFileDelete(item)
+                break
+              case 'details':
+                handleFileDetails(item)
+                break
+              case 'share':
+                handleFileShare(item)
+                break
+              case 'copy':
+                handleFileCopy(item)
+                break
+              case 'move':
+                handleFileMove(item)
+                break
+              case 'preview':
+                handleFilePreview(item)
+                break
+              case 'download':
+                handleFileDownload(item)
+                break
+            }
+          }}
         />
 
         {/* Dialogs */}
