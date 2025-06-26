@@ -115,22 +115,32 @@ export function FiltersDialog({
   useEffect(() => {
     if (open) {
       setTempActiveView(currentFilters?.activeView || 'all')
-      setTempFileTypeFilter(currentFilters?.fileTypeFilter || [])
-      setTempAdvancedFilters(currentFilters?.advancedFilters || {})
+      setTempFileTypeFilter(Array.isArray(currentFilters?.fileTypeFilter) ? currentFilters.fileTypeFilter : [])
+      setTempAdvancedFilters({
+        sizeRange: {
+          unit: 'MB',
+          ...currentFilters?.advancedFilters?.sizeRange
+        },
+        createdDateRange: currentFilters?.advancedFilters?.createdDateRange || {},
+        modifiedDateRange: currentFilters?.advancedFilters?.modifiedDateRange || {},
+        owner: currentFilters?.advancedFilters?.owner,
+        sortBy: currentFilters?.advancedFilters?.sortBy || 'modified',
+        sortOrder: currentFilters?.advancedFilters?.sortOrder || 'desc'
+      })
     }
   }, [open, currentFilters])
 
   // Calculate if there are active temp filters to show Clear All button
   const hasTempActiveFilters =
     tempActiveView !== 'all' ||
-    tempFileTypeFilter.length > 0 ||
-    tempAdvancedFilters.sizeRange?.min ||
-    tempAdvancedFilters.sizeRange?.max ||
+    (Array.isArray(tempFileTypeFilter) && tempFileTypeFilter.length > 0) ||
+    (tempAdvancedFilters.sizeRange?.min && tempAdvancedFilters.sizeRange.min > 0) ||
+    (tempAdvancedFilters.sizeRange?.max && tempAdvancedFilters.sizeRange.max > 0) ||
     tempAdvancedFilters.createdDateRange?.from ||
     tempAdvancedFilters.createdDateRange?.to ||
     tempAdvancedFilters.modifiedDateRange?.from ||
     tempAdvancedFilters.modifiedDateRange?.to ||
-    tempAdvancedFilters.owner?.trim()
+    (tempAdvancedFilters.owner && tempAdvancedFilters.owner.trim().length > 0)
 
   // Basic Menu Items
   const basicMenuItems = [
@@ -240,15 +250,8 @@ export function FiltersDialog({
   }
 
   const handleFileTypeFilter = (typeId: string) => {
-    // Always handle as array for consistency
-    const currentFilter = tempFileTypeFilter || []
-    const isArray = Array.isArray(currentFilter)
-
-    const currentArray = isArray
-      ? currentFilter
-      : currentFilter
-        ? [currentFilter]
-        : []
+    // Ensure we always work with an array
+    const currentArray = Array.isArray(tempFileTypeFilter) ? tempFileTypeFilter : []
 
     // Toggle behavior - add if not present, remove if present
     const newFilter = currentArray.includes(typeId)
