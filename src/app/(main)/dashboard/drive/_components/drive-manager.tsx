@@ -304,6 +304,7 @@ export function DriveManager() {
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
+      
       return {
         id: itemId,
         name: item?.name || 'Unknown',
@@ -315,13 +316,14 @@ export function DriveManager() {
         isTrashed: item?.trashed || false,
         isStarred: item?.starred || false,
         isShared: item?.shared || false,
-        isFolder: isFolder(item) || false,
+        isFolder: isFolder(item),
+        
         
         
         
         //canCopy: item?.capabilities?.canCopy || false, //force copy
         canDelete: item?.capabilities?.canDelete || false,
-        canDownload: !isFolder(item) && item?.capabilities?.canDownload || false,
+        canDownload: isFolder(item) !== true && item?.capabilities?.canDownload || false,
         canTrash: item?.capabilities?.canTrash || false,
         canUntrash: item?.trashed && item?.capabilities?.canUntrash || false,
         canRename: item?.capabilities?.canRename || false,
