@@ -42,22 +42,7 @@ interface BulkOperationsDialogProps {
   open?: boolean
   onClose?: () => void
   onOpenChange?: (open: boolean) => void
-  selectedItems: Array<{
-    id: string
-    name: string
-    mimeType?: string
-    isFolder: boolean
-    isTrashed: boolean
-    canDelete: boolean
-    canShare: boolean
-    canTrash: boolean
-    canUntrash: boolean
-    canDownload: boolean
-    canRename: boolean
-    //canCopy: boolean
-    //canMove: boolean
-    canExport: boolean
-  }>
+  selectedItems: any[]
   onBulkDelete?: () => void
   onBulkDownload?: () => void
   onBulkShare?: () => void

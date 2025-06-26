@@ -35,7 +35,7 @@ interface BulkDeleteDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type: 'file' | 'folder'
+    type?: 'file' | 'folder'
     mimeType?: string
   }>
 }

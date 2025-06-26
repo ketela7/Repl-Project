@@ -16,20 +16,11 @@ import { FileBreadcrumb } from './file-breadcrumb'
 import { DriveGridSkeleton } from './drive-skeleton'
 import { FileUploadDialog } from './file-upload-dialog'
 import { CreateFolderDialog } from './create-folder-dialog'
-import { FileRenameDialog } from './file-rename-dialog'
-import { FileMoveDialog } from './file-move-dialog'
-import { FileCopyDialog } from './file-copy-dialog'
-import { FileDeleteDialog } from './file-delete-dialog'
-import { FileDetailsDialog } from './file-details-dialog'
 import { FilePreviewDialog } from './file-preview-dialog'
-import { FileShareDialog } from './file-share-dialog'
-import { FiltersDialog } from './filters-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
-
-
 
 const initialFilters = {
   activeView: 'all' as
@@ -88,16 +79,9 @@ export function DriveManager() {
   const [dialogs, setDialogs] = useState({
     upload: false,
     createFolder: false,
-    rename: false,
-    move: false,
-    copy: false,
-    delete: false,
     details: false,
     preview: false,
-    trash: false,
-    untrash: false,
-    share: false,
-    filters: false,
+    mobileFilters: false,
   })
 
   // Sorting state
@@ -117,13 +101,6 @@ export function DriveManager() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [isSelectMode, setIsSelectMode] = useState(false)
 
-  // Selected items for actions - standardized structure
-  const [selectedItemForAction, setSelectedItemForAction] = useState<{
-    id: string
-    name: string
-    isFolder: boolean
-    parentId?: string
-  } | null>(null)
   const [selectedFileForPreview, setSelectedFileForPreview] =
     useState<DriveFile | null>(null)
 
@@ -291,8 +268,9 @@ export function DriveManager() {
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
-      const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
-      
+      const itemIsFolder =
+        item?.mimeType === 'application/vnd.google-apps.folder'
+
       return {
         id: itemId,
         name: item?.name || 'Unknown',
@@ -312,7 +290,8 @@ export function DriveManager() {
         canUntrash: item?.trashed && (item?.capabilities?.canUntrash || false),
         canRename: item?.capabilities?.canRename || false,
         canShare: item?.capabilities?.canShare || false,
-        canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || true,
+        canMoveItemWithinDrive:
+          item?.capabilities?.canMoveItemWithinDrive || true,
       }
     })
   }, [selectedItems, items])
@@ -510,7 +489,7 @@ export function DriveManager() {
     }
 
     return items.filter((item) => {
-      if (isFolder(item)) return true
+      if (item.mimeType === 'application/vnd.google-apps.folder') return true
 
       const sizeStr = (item as any).size
       let sizeBytes = 0
@@ -559,9 +538,9 @@ export function DriveManager() {
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
-    const itemsToSort = [...displayItems].map(item => ({
+    const itemsToSort = [...displayItems].map((item) => ({
       ...item,
-      isFolder: item.mimeType === 'application/vnd.google-apps.folder'
+      isFolder: item.mimeType === 'application/vnd.google-apps.folder',
     }))
 
     if (sortConfig && sortConfig.key) {
@@ -653,6 +632,13 @@ export function DriveManager() {
           <DriveToolbar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
+            onSearchSubmit={(e) => {
+              e.preventDefault()
+              fetchFiles(
+                currentFolderId || undefined,
+                searchQuery.trim() || undefined
+              )
+            }}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             isSelectMode={isSelectMode}
@@ -663,7 +649,7 @@ export function DriveManager() {
             refreshing={refreshing}
             onUpload={() => openDialog('upload')}
             onCreateFolder={() => openDialog('createFolder')}
-            onFiltersOpen={() => openDialog('filters')}
+            onFiltersOpen={() => {}} // Filters integrated into toolbar
             selectedItems={selectedItemsWithDetails}
             onDeselectAll={() => {
               setSelectedItems(new Set())
@@ -735,17 +721,8 @@ export function DriveManager() {
                 case 'copy':
                 case 'delete':
                 case 'details':
-                  setSelectedItemForAction({
-                    id: item.id,
-                    name: item.name,
-                    isFolder: item.isFolder,
-                    parentId: item.parents?.[0],
-                  })
-                  if (action === 'delete') {
-                    openDialog('trash')
-                  } else {
-                    openDialog(action as keyof typeof dialogs)
-                  }
+                  // Individual actions now handled through bulk operations
+                  setSelectedItems(new Set([item.id]))
                   break
               }
             }}
@@ -785,56 +762,7 @@ export function DriveManager() {
         }}
       />
 
-      {selectedItemForAction && (
-        <>
-          <FileRenameDialog
-            open={dialogs.rename}
-            onOpenChange={(open) => {
-              if (!open) {
-                closeDialog('rename')
-                setSelectedItemForAction(null)
-              }
-            }}
-            fileId={selectedItemForAction.id}
-            fileName={selectedItemForAction.name}
-            onConfirm={async (newName: string) => {
-              closeDialog('rename')
-              setSelectedItemForAction(null)
-              handleRefresh()
-            }}
-          />
-
-          <FileMoveDialog
-            isOpen={dialogs.move}
-            onClose={() => {
-              closeDialog('move')
-              setSelectedItemForAction(null)
-            }}
-            fileName={selectedItemForAction.name}
-            currentParentId={selectedItemForAction.parentId || null}
-            onMove={async (newParentId: string) => {
-              closeDialog('move')
-              setSelectedItemForAction(null)
-              handleRefresh()
-            }}
-          />
-
-          <FileCopyDialog
-            isOpen={dialogs.copy}
-            onClose={() => {
-              closeDialog('copy')
-              setSelectedItemForAction(null)
-            }}
-            fileName={selectedItemForAction.name}
-            currentParentId={selectedItemForAction.parentId || null}
-            onCopy={async (newName: string, parentId: string) => {
-              closeDialog('copy')
-              setSelectedItemForAction(null)
-              handleRefresh()
-            }}
-          />
-        </>
-      )}
+      {/* Individual dialog operations removed - using bulk operations instead */}
 
       {selectedFileForPreview && (
         <FilePreviewDialog
@@ -849,72 +777,9 @@ export function DriveManager() {
         />
       )}
 
-      {selectedItemForAction && (
-        <>
-          <FileDeleteDialog
-            open={dialogs.trash}
-            onOpenChange={(open) => {
-              if (!open) {
-                closeDialog('trash')
-                setSelectedItemForAction(null)
-              }
-            }}
-            itemId={selectedItemForAction.id}
-            itemName={selectedItemForAction.name}
-            itemType={selectedItemForAction.isFolder ? 'folder' : 'file'}
-            onDeleted={() => {
-              closeDialog('trash')
-              setSelectedItemForAction(null)
-              handleRefresh()
-            }}
-          />
+      {/* Individual item action dialogs removed - using bulk operations instead */}
 
-          <FileDetailsDialog
-            isOpen={dialogs.details}
-            onClose={() => {
-              closeDialog('details')
-              setSelectedItemForAction(null)
-            }}
-            fileId={selectedItemForAction.id}
-            fileName={selectedItemForAction.name}
-            fileType={selectedItemForAction.isFolder ? 'folder' : 'file'}
-          />
-
-          <FileShareDialog
-            open={dialogs.share}
-            onOpenChange={(open) => {
-              if (!open) {
-                closeDialog('share')
-                setSelectedItemForAction(null)
-              }
-            }}
-            items={[{
-              id: selectedItemForAction.id,
-              name: selectedItemForAction.name,
-              isFolder: selectedItemForAction.isFolder,
-            }]}
-          />
-        </>
-      )}
-
-      {/* Filters Dialog */}
-      <FiltersDialog
-        open={dialogs.filters}
-        onOpenChange={(open) => {
-          if (!open) closeDialog('filters')
-        }}
-        onFilterChange={handleFilter}
-        onApplyFilters={() =>
-          fetchFiles(
-            currentFolderId || undefined,
-            searchQuery.trim() || undefined
-          )
-        }
-        currentFilters={filters}
-        hasActiveFilters={hasActiveFilters}
-        onClearFilters={clearAllFilters}
-        isApplying={loading}
-      />
+      {/* Filters Dialog - functionality integrated into toolbar */}
 
       {/* Progress indicators */}
       {bulkOperationProgress.isRunning && (

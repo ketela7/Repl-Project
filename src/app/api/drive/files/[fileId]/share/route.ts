@@ -61,9 +61,7 @@ export async function POST(
             const permission = await authResult.driveService!.createPermission(
               fileId,
               'reader',
-              'anyone',
-              undefined,
-              authResult.session!.accessToken
+              'anyone'
             )
             const fileDetails =
               await authResult.driveService!.getFileDetails(fileId)
@@ -83,20 +81,14 @@ export async function POST(
           const permission = await authResult.driveService!.createPermission(
             fileId,
             role || 'reader',
-            type || 'user',
-            emailAddress,
-            undefined,
-            expirationTime,
-            allowFileDiscovery,
-            authResult.session!.accessToken
+            type || 'user'
           )
 
           if (message) {
             await authResult.driveService!.sendNotificationEmail(
               fileId,
               emailAddress,
-              message,
-              authResult.session!.accessToken
+              message
             )
           }
 

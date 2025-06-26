@@ -40,7 +40,7 @@ import type { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 
 import { DriveGridSkeleton } from './drive-skeleton'
 
-type DriveItem = (DriveFile | DriveFolder) & { 
+type DriveItem = (DriveFile | DriveFolder) & {
   itemType?: 'file' | 'folder'
   isFolder: boolean
   canDownload?: boolean

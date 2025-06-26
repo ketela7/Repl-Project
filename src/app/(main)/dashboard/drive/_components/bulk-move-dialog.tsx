@@ -23,7 +23,7 @@ import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
-import { FileMoveDialog } from './file-move-dialog'
+// FileMoveDialog removed - functionality integrated into bulk operations
 
 interface BulkMoveDialogProps {
   open: boolean
@@ -32,7 +32,7 @@ interface BulkMoveDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type: 'file' | 'folder'
+    type?: 'file' | 'folder'
     mimeType?: string
   }>
 }
@@ -173,15 +173,7 @@ function BulkMoveDialog({
           </BottomSheetContent>
         </BottomSheet>
 
-        <FileMoveDialog
-          isOpen={isMoveDialogOpen}
-          onClose={() => setIsMoveDialogOpen(false)}
-          fileName={`${selectedItems.length} items`}
-          currentParentId={null}
-          onMove={async (newParentId: string) => {
-            handleMoveConfirm(newParentId)
-          }}
-        />
+        {/* FileMoveDialog removed - functionality integrated into bulk operations */}
       </>
     )
   }
@@ -301,15 +293,7 @@ function BulkMoveDialog({
         </DialogContent>
       </Dialog>
 
-      <FileMoveDialog
-        isOpen={isMoveDialogOpen}
-        onClose={() => setIsMoveDialogOpen(false)}
-        onMove={async (newParentId: string) => {
-          handleMoveConfirm(newParentId)
-        }}
-        fileName={`${selectedItems.length} items`}
-        currentParentId={null}
-      />
+      {/* FileMoveDialog removed - functionality integrated into bulk operations */}
     </>
   )
 }

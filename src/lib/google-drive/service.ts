@@ -409,7 +409,7 @@ export class GoogleDriveService {
       writersCanShare: response.data.writersCanShare || true,
       hasAugmentedPermissions: response.data.hasAugmentedPermissions || false,
       ownedByMe: response.data.ownedByMe || false,
-      driveId: response.data.driveId || undefined,
+
       teamDriveId: response.data.teamDriveId || undefined,
       spaces: response.data.spaces || [],
       properties: response.data.properties || {},

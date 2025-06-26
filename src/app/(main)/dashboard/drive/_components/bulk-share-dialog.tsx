@@ -38,8 +38,7 @@ interface BulkShareDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type: 'file' | 'folder'
-    mimeType?: string
+    type?: 'file' | 'folder'
   }>
 }
 
@@ -145,9 +144,11 @@ function BulkShareDialog({
     URL.revokeObjectURL(url)
   }
 
-  const fileCount = selectedItems.filter((item) => item.type === 'file').length
+  const fileCount = selectedItems.filter(
+    (item) => item.type === 'file' || (!item.type && !item.name.endsWith('/'))
+  ).length
   const folderCount = selectedItems.filter(
-    (item) => item.type === 'folder'
+    (item) => item.type === 'folder' || (!item.type && item.name.endsWith('/'))
   ).length
 
   const renderContent = () => (

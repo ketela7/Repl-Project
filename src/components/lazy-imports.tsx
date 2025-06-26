@@ -16,18 +16,7 @@ export const DataTable = lazy(() =>
   }))
 )
 
-// Lazy load dialog components
-export const FileRenameDialog = lazy(() =>
-  import('@/app/(main)/dashboard/drive/_components/file-rename-dialog').then(
-    (mod) => ({ default: mod.FileRenameDialog })
-  )
-)
-
-export const FileDeleteDialog = lazy(() =>
-  import('@/app/(main)/dashboard/drive/_components/file-delete-dialog').then(
-    (mod) => ({ default: mod.FileDeleteDialog })
-  )
-)
+// Remaining dialog components are handled by bulk operations
 
 // Bulk operations dialogs - now in optimized lazy module
 export const BulkOperationsDialog = lazy(() =>

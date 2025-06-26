@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/bottom-sheet'
 import { cn } from '@/lib/utils'
 
-import { FileCopyDialog } from './file-copy-dialog'
+// FileCopyDialog removed - functionality integrated into bulk operations
 
 interface BulkCopyDialogProps {
   isOpen: boolean
@@ -32,7 +32,7 @@ interface BulkCopyDialogProps {
   selectedItems: Array<{
     id: string
     name: string
-    type: 'file' | 'folder'
+    type?: 'file' | 'folder'
   }>
 }
 
@@ -187,15 +187,7 @@ function BulkCopyDialog({
           </BottomSheetContent>
         </BottomSheet>
 
-        <FileCopyDialog
-          isOpen={isCopyDialogOpen}
-          onClose={() => setIsCopyDialogOpen(false)}
-          fileName={`${files.length} files`}
-          currentParentId={null}
-          onCopy={async (newName: string, parentId: string) => {
-            handleCopyConfirm(parentId)
-          }}
-        />
+        {/* FileCopyDialog removed - functionality integrated into bulk operations */}
       </>
     )
   }
@@ -332,15 +324,7 @@ function BulkCopyDialog({
         </DialogContent>
       </Dialog>
 
-      <FileCopyDialog
-        isOpen={isCopyDialogOpen}
-        onClose={() => setIsCopyDialogOpen(false)}
-        onCopy={async (newName: string, parentId: string) => {
-          handleCopyConfirm(parentId)
-        }}
-        fileName={`${files.length} files`}
-        currentParentId={null}
-      />
+      {/* FileCopyDialog removed - functionality integrated into bulk operations */}
     </>
   )
 }
