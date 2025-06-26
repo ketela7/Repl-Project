@@ -137,7 +137,7 @@ function BulkDeleteDialog({
               <div>
                 <div className="text-lg font-semibold">Move to Trash</div>
                 <div className="text-muted-foreground text-sm font-normal">
-                  Bulk delete operation
+                  Bulk Move to Trash Operation
                 </div>
               </div>
             </BottomSheetTitle>
@@ -146,18 +146,19 @@ function BulkDeleteDialog({
           <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
-              Cancel
-            </Button>
+
             <Button
               onClick={onConfirm}
               className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800`}
             >
               Move to Trash
+            </Button>
+                        <Button
+              variant="outline"
+              onClick={onClose}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
+            >
+              Cancel
             </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
@@ -176,7 +177,7 @@ function BulkDeleteDialog({
             <div>
               <div className="text-lg font-semibold">Move to Trash</div>
               <div className="text-muted-foreground text-sm font-normal">
-                Bulk delete operation
+                Bulk Move to Trash Operation
               </div>
             </div>
           </AlertDialogTitle>
@@ -185,15 +186,16 @@ function BulkDeleteDialog({
         <div className="space-y-4 px-1">{renderContent()}</div>
 
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-          <AlertDialogCancel className="w-full sm:w-auto">
-            Cancel
-          </AlertDialogCancel>
+          
           <AlertDialogAction
             onClick={onConfirm}
             className="w-full bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800"
           >
             Move to Trash
           </AlertDialogAction>
+          <AlertDialogCancel className="w-full sm:w-auto">
+            Cancel
+          </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

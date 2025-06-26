@@ -96,7 +96,7 @@ export function DriveDataView({
     return item.mimeType === 'application/vnd.google-apps.folder'
   }
 
-  if (loading && items.length === 0) {
+  if (loading) {
     return <DriveGridSkeleton />
   }
 
@@ -457,7 +457,6 @@ export function DriveDataView({
                       <div className="flex items-center gap-2">
                         <span>
                           {item.owners?.[0]?.emailAddress ||
-                            item.owners?.[0]?.displayName ||
                             'Unknown'}
                         </span>
                         {item.owners?.[0]?.emailAddress && (

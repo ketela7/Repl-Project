@@ -167,13 +167,6 @@ function BulkCopyDialog({
             <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
             <BottomSheetFooter className={cn('grid gap-4')}>
-              <Button
-                variant="outline"
-                onClick={onClose}
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
-                Cancel
-              </Button>
               {files.length > 0 && (
                 <Button
                   onClick={() => setIsCopyDialogOpen(true)}
@@ -183,6 +176,13 @@ function BulkCopyDialog({
                   Choose Destination
                 </Button>
               )}
+              <Button
+                variant="outline"
+                onClick={onClose}
+                className={cn('touch-target min-h-[44px] active:scale-95')}
+              >
+                Cancel
+              </Button>
             </BottomSheetFooter>
           </BottomSheetContent>
         </BottomSheet>
@@ -313,13 +313,6 @@ function BulkCopyDialog({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-2 sm:flex-row">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="w-full sm:w-auto"
-            >
-              Cancel
-            </Button>
             {files.length > 0 && (
               <Button
                 onClick={() => setIsCopyDialogOpen(true)}
@@ -328,6 +321,13 @@ function BulkCopyDialog({
                 Choose Destination
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="w-full sm:w-auto"
+            >
+              Cancel
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

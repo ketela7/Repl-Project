@@ -155,19 +155,20 @@ function BulkMoveDialog({
             <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
             <BottomSheetFooter className={cn('grid gap-4')}>
-              <Button
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
-                Cancel
-              </Button>
+              
               <Button
                 onClick={() => setIsMoveDialogOpen(true)}
                 className={cn('touch-target min-h-[44px] active:scale-95')}
               >
                 <Move className="mr-2 h-4 w-4" />
                 Choose Destination
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                className={cn('touch-target min-h-[44px] active:scale-95')}
+              >
+                Cancel
               </Button>
             </BottomSheetFooter>
           </BottomSheetContent>
@@ -284,18 +285,19 @@ function BulkMoveDialog({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-2 sm:flex-row">
+            
+            <Button
+              onClick={() => setIsMoveDialogOpen(true)}
+              className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
+            >
+              Choose Destination
+            </Button>
             <Button
               variant="outline"
               onClick={() => onOpenChange(false)}
               className="w-full sm:w-auto"
             >
               Cancel
-            </Button>
-            <Button
-              onClick={() => setIsMoveDialogOpen(true)}
-              className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
-            >
-              Choose Destination
             </Button>
           </DialogFooter>
         </DialogContent>

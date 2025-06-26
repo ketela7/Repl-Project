@@ -181,7 +181,7 @@ function BulkPermanentDeleteDialog({
                   Permanent Delete
                 </div>
                 <div className="text-muted-foreground text-sm font-normal">
-                  This action cannot be undone
+                  Bulk Permanent Delete Operation
                 </div>
               </div>
             </BottomSheetTitle>
@@ -192,13 +192,7 @@ function BulkPermanentDeleteDialog({
           </div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
-              Cancel
-            </Button>
+            
             <Button
               onClick={handleConfirm}
               disabled={!isConfirmationValid}
@@ -212,6 +206,13 @@ function BulkPermanentDeleteDialog({
               ) : (
                 'Complete Requirements Above'
               )}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleClose}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
+            >
+              Cancel
             </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
@@ -232,7 +233,7 @@ function BulkPermanentDeleteDialog({
                 Permanent Delete
               </div>
               <div className="text-muted-foreground text-sm font-normal">
-                This action cannot be undone
+                Bulk Permanent Delete Operation
               </div>
             </div>
           </AlertDialogTitle>
@@ -241,9 +242,7 @@ function BulkPermanentDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-          <AlertDialogCancel className="w-full sm:w-auto">
-            Cancel
-          </AlertDialogCancel>
+          
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={!isConfirmationValid}
@@ -258,6 +257,9 @@ function BulkPermanentDeleteDialog({
               'Complete Requirements Above'
             )}
           </AlertDialogAction>
+          <AlertDialogCancel className="w-full sm:w-auto">
+            Cancel
+          </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

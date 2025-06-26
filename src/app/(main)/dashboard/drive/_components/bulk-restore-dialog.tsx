@@ -147,19 +147,20 @@ function BulkRestoreDialog({
           <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
-              Cancel
-            </Button>
+            
             <Button
               onClick={onConfirm}
               className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-800`}
             >
               <RotateCcw className="mr-2 h-4 w-4" />
               Restore Items
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
+            >
+              Cancel
             </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
@@ -187,15 +188,16 @@ function BulkRestoreDialog({
         <div className="space-y-4 px-1">{renderContent()}</div>
 
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-          <AlertDialogCancel className="w-full sm:w-auto">
-            Cancel
-          </AlertDialogCancel>
+          
           <AlertDialogAction
             onClick={onConfirm}
             className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800"
           >
             Restore Items
           </AlertDialogAction>
+          <AlertDialogCancel className="w-full sm:w-auto">
+            Cancel
+          </AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

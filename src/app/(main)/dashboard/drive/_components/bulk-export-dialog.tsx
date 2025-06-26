@@ -404,13 +404,6 @@ function BulkExportDialog({
           </div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
-              Cancel
-            </Button>
             {compatibleFiles.length > 0 && (
               <Button
                 onClick={handleExport}
@@ -421,6 +414,13 @@ function BulkExportDialog({
                 {compatibleFiles.length > 1 ? 's' : ''}
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
+            >
+              Cancel
+            </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
@@ -447,13 +447,6 @@ function BulkExportDialog({
         <div className="space-y-4 px-1">{renderContent()}</div>
 
         <DialogFooter className="flex-col gap-2 sm:flex-row">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
           {compatibleFiles.length > 0 && (
             <Button
               onClick={handleExport}
@@ -463,6 +456,13 @@ function BulkExportDialog({
               {compatibleFiles.length > 1 ? 's' : ''}
             </Button>
           )}
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
+            Cancel
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

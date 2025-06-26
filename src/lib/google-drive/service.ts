@@ -67,7 +67,7 @@ export class GoogleDriveService {
       pageSize = 50,
       pageToken,
       orderBy = 'modifiedTime desc',
-      includeTeamDriveItems = false,
+      includeTeamDriveItems = true,
     } = options
 
     // Validate and sanitize pageSize
@@ -133,19 +133,28 @@ export class GoogleDriveService {
       searchQuery = 'trashed=false'
     }
 
+    if (pageSize === 1) {
+      // For cek access to confirm session is valid
+      fieldss = 'files(id)'
+    } else {
+      fieldss =
+        'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, owners, shared, trashed, starred, webViewLink, thumbnailLink, parents, capabilities)'
+    }
     // Prepare API request parameters with proper validation
     const requestParams: any = {
       q: searchQuery,
       pageSize: validPageSize,
       orderBy,
+      //  spaces: 'drive',
+      //  corpora: 'user',
+      //  supportsTeamDrives: includeTeamDriveItems,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
-      fields:
-        'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, thumbnailLink, parents, shared, trashed, starred, ownedByMe, viewedByMeTime, capabilities, owners, viewedByMe)',
+      fields: fieldss,
     }
     // Log query for debugging in development only
     if (process.env.NODE_ENV === 'development') {
-      console.log('Drive API Query:', searchQuery)
+      console.info('[Drive API] - Query:', searchQuery)
     }
 
     // Only add pageToken if it's valid
@@ -159,7 +168,7 @@ export class GoogleDriveService {
       const files = response.data.files?.map(convertGoogleDriveFile) || []
 
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Drive API Result: ${files.length} items`)
+        console.info(`[Drive API] - Result: ${files.length} items`)
       }
 
       return {
@@ -251,7 +260,7 @@ export class GoogleDriveService {
       writersCanShare?: boolean
       hasAugmentedPermissions?: boolean
       ownedByMe?: boolean
-      driveId?: string
+      id?: string
       teamDriveId?: string
       spaces?: string[]
       properties?: Record<string, string>

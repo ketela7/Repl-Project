@@ -67,9 +67,14 @@ function BulkOperationsDialog({
 }: BulkOperationsDialogProps) {
   const isMobile = useIsMobile()
   const fileCount = selectedItems.filter((item) => item.type === 'file').length
-  const folderCount = selectedItems.filter(
-    (item) => item.type === 'folder'
-  ).length
+  const folderCount = selectedItems.filter((item) => item.type === 'folder').length
+  const canDeleteCount = selectedItems.filter((item) => item.canDelete).length
+  const canShareCount = selectedItems.filter((item) => item.canShare).length
+  const canTrashCount = selectedItems.filter((item) => item.canTrash).length
+  const canUntrashCount = selectedItems.filter((item) => item.canUntrash).length
+  const canDownloadCount = selectedItems.filter((item) => item.canDownload).length
+  const canRenameCount = selectedItems.filter((item) => item.canRename).length
+
 
   // Individual dialog states
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
@@ -338,8 +343,7 @@ function BulkOperationsDialog({
           <div className="flex flex-col items-start">
             <span className="font-medium">Move Items</span>
             <span className="text-muted-foreground text-xs">
-              Move {selectedItems.length} item
-              {selectedItems.length > 1 ? 's' : ''} to another location
+              Move items to another location
             </span>
           </div>
         </Button>
@@ -362,6 +366,7 @@ function BulkOperationsDialog({
         </Button>
 
         {/* Share Items */}
+        {canShareCount>0&&(
         <Button
           variant="outline"
           onClick={handleShareClick}
@@ -377,8 +382,10 @@ function BulkOperationsDialog({
             </span>
           </div>
         </Button>
+      )}
 
         {/* Bulk Rename */}
+        {canRenameCount > 0 &&(
         <Button
           variant="outline"
           onClick={handleRenameClick}
@@ -390,10 +397,11 @@ function BulkOperationsDialog({
           <div className="flex flex-col items-start">
             <span className="font-medium">Bulk Rename</span>
             <span className="text-muted-foreground text-xs">
-              Rename multiple items with patterns
+              Rename {canRenameCount} items with patterns
             </span>
           </div>
         </Button>
+      )}
 
         {fileCount > 0 && (
           <Button
@@ -407,7 +415,7 @@ function BulkOperationsDialog({
             <div className="flex flex-col items-start">
               <span className="font-medium">Export Files</span>
               <span className="text-muted-foreground text-xs">
-                Download {fileCount} file{fileCount > 1 ? 's' : ''} in various
+                Export {fileCount} file{fileCount > 1 ? 's' : ''} in various
                 formats
               </span>
             </div>
@@ -421,23 +429,26 @@ function BulkOperationsDialog({
           </p>
 
           {/* Move to Trash */}
-          <Button
-            variant="outline"
-            onClick={handleDeleteClick}
-            className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
-              <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Move to Trash</span>
-              <span className="text-muted-foreground text-xs">
-                Move items to trash (can be restored)
-              </span>
-            </div>
-          </Button>
+          {canTrashCount > 0 && (
+            <Button
+              variant="outline"
+              onClick={handleDeleteClick}
+              className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
+                <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="font-medium">Move to Trash</span>
+                <span className="text-muted-foreground text-xs">
+                  Move {ownerMeCount} items to trash (can be restored)
+                </span>
+              </div>
+            </Button>
+          )}
 
           {/* Permanent Delete */}
+          {canDeleteCount > 0 && (
           <Button
             variant="outline"
             onClick={handlePermanentDeleteClick}
@@ -449,12 +460,14 @@ function BulkOperationsDialog({
             <div className="flex flex-col items-start">
               <span className="font-medium">Permanent Delete</span>
               <span className="text-muted-foreground text-xs">
-                Delete permanently (cannot be undone)
+                Delete permanently {canDeleteCount} items (cannot be undone)
               </span>
             </div>
           </Button>
+      )}
 
           {/* Restore from Trash */}
+					{canUntrashCount > 0 && (
           <Button
             variant="outline"
             onClick={handleRestoreClick}
@@ -466,10 +479,11 @@ function BulkOperationsDialog({
             <div className="flex flex-col items-start">
               <span className="font-medium">Restore from Trash</span>
               <span className="text-muted-foreground text-xs">
-                Restore deleted items to original location
+                Restore {canUntrashCount} items to original location
               </span>
             </div>
           </Button>
+      )}
         </div>
       </div>
     </>

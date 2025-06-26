@@ -310,11 +310,19 @@ export function DriveManager() {
         type: item && isFolder(item) ? ('folder' as const) : ('file' as const),
         mimeType: item?.mimeType || '',
         modifiedTime: item?.modifiedTime || '',
+        createdTime: item?.createdTime || '',
         size: (item as any)?.size,
-        createdTime: item?.createdTime,
-        ownedByMe: item?.ownedByMe,
-        shared: item?.shared,
-        trashed: item?.trashed,
+        owners: item?.owners || [],
+        //canCopy: item?.capabilities?.canCopy || false, //force copy
+        canDelete: item?.capabilities?.canDelete || false,
+        canDownload: !isFolder(item) && item?.capabilities?.canDownload || false,
+        canTrash: item?.capabilities?.canTrash || false,
+        canUntrash: item?.capabilities?.canUntrash || false,
+        canRename: item?.capabilities?.canRename || false,
+        canShare: item?.capabilities?.canShare || false
+        //canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || false, // force move
+        
+        
       }
     })
   }, [selectedItems, items])
@@ -452,13 +460,6 @@ export function DriveManager() {
   }, [])
 
   {
-    /*useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      fetchFiles(currentFolderId || undefined, undefined)
-    }, 300)
-    return () => clearTimeout(timeoutId)
-  }, [filters, currentFolderId])*/
-  }
 
   // Navigation handlers
   const handleFolderClick = useCallback(

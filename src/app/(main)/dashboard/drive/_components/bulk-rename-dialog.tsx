@@ -273,7 +273,7 @@ function BulkRenameDialog({
               <div>
                 <div className="text-lg font-semibold">Bulk Rename</div>
                 <div className="text-muted-foreground text-sm font-normal">
-                  Rename multiple items at once
+                  Bulk Rename Operation
                 </div>
               </div>
             </BottomSheetTitle>
@@ -285,13 +285,6 @@ function BulkRenameDialog({
 
           <BottomSheetFooter className={`${cn('grid gap-4')} px-4`}>
             <Button
-              variant="outline"
-              onClick={onClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
-              Cancel
-            </Button>
-            <Button
               onClick={handleRename}
               disabled={
                 renameType === 'regex'
@@ -302,6 +295,13 @@ function BulkRenameDialog({
             >
               <Edit3 className="mr-2 h-4 w-4" />
               Rename All
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
+            >
+              Cancel
             </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
@@ -320,7 +320,7 @@ function BulkRenameDialog({
             <div>
               <div className="text-lg font-semibold">Bulk Rename</div>
               <div className="text-muted-foreground text-sm font-normal">
-                Rename multiple items at once
+                Bulk Rename Operation
               </div>
             </div>
           </DialogTitle>
@@ -329,13 +329,6 @@ function BulkRenameDialog({
         <div className="flex-1 overflow-y-auto px-1">{renderContent()}</div>
 
         <DialogFooter className="flex-col gap-2 sm:flex-row">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
           <Button
             onClick={handleRename}
             disabled={
@@ -347,6 +340,13 @@ function BulkRenameDialog({
           >
             <Edit3 className="mr-2 h-4 w-4" />
             Rename All
+          </Button>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="w-full sm:w-auto"
+          >
+            Cancel
           </Button>
         </DialogFooter>
       </DialogContent>

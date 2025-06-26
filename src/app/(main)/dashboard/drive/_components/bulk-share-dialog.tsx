@@ -343,15 +343,7 @@ function BulkShareDialog({
           </div>
 
           <BottomSheetFooter className="bg-background flex-shrink-0 border-t p-4">
-            <div className="grid w-full grid-cols-2 gap-3">
-              <Button
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-                className="min-h-[48px] text-base font-medium"
-              >
-                Cancel
-              </Button>
+            <div className="grid w-full gap-4">
               <Button
                 onClick={handleBulkShare}
                 disabled={isLoading || selectedItems.length === 0}
@@ -368,6 +360,14 @@ function BulkShareDialog({
                     Generate {selectedItems.length} Share Links
                   </>
                 )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isLoading}
+                className="min-h-[48px] text-base font-medium"
+              >
+                Cancel
               </Button>
             </div>
           </BottomSheetFooter>
@@ -398,14 +398,6 @@ function BulkShareDialog({
 
         <DialogFooter className="flex-col gap-2 sm:flex-row">
           <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-            className="w-full sm:w-auto"
-          >
-            Cancel
-          </Button>
-          <Button
             onClick={handleBulkShare}
             disabled={isLoading || selectedItems.length === 0}
             className="w-full sm:w-auto"
@@ -421,6 +413,14 @@ function BulkShareDialog({
                 Generate Share Links
               </>
             )}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+            className="w-full sm:w-auto"
+          >
+            Cancel
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -250,14 +250,7 @@ export function FileMoveDialog({
           <div className="px-4 pb-4">{renderContent()}</div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              disabled={moving}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
-              Cancel
-            </Button>
+
             <Button
               onClick={handleMove}
               disabled={
@@ -279,6 +272,14 @@ export function FileMoveDialog({
                   Move File
                 </>
               )}
+            </Button>
+                        <Button
+              variant="outline"
+              onClick={handleClose}
+              disabled={moving}
+              className={cn('touch-target min-h-[44px] active:scale-95')}
+            >
+              Cancel
             </Button>
           </BottomSheetFooter>
         </BottomSheetContent>
