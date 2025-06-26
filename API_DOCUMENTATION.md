@@ -114,6 +114,27 @@
 - **Method**: GET
 - **Response**: Drive API connectivity status
 
+## Development & Cache Management Routes
+
+### POST `/api/cache/clear`
+
+- **Description**: Clear application cache (development/testing endpoint)
+- **Method**: POST
+- **Purpose**: Fixes pageSize filter issues during development when cached results interfere with new requests
+- **Usage**: When pageSize returns cached results instead of requested amount
+- **Authentication**: Required (protected route)
+- **Response**: 
+```json
+{
+  "success": true, 
+  "message": "Cache cleared successfully"
+}
+```
+- **Use Cases**:
+  - PageSize filter returning wrong item count due to cache
+  - Development testing with different filter parameters
+  - Debugging cache-related issues
+
 ## Response Formats
 
 ### Success Response
