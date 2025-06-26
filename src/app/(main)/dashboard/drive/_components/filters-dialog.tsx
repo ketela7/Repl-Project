@@ -246,7 +246,12 @@ export function FiltersDialog({
 
   const handleBasicFilter = (viewId: string) => {
     setTempActiveView(viewId)
-    // Don't apply immediately - wait for Apply Filter button
+    // Apply immediately for real-time sync
+    onFilterChange({
+      activeView: viewId,
+      fileTypeFilter: tempFileTypeFilter,
+      advancedFilters: tempAdvancedFilters,
+    })
   }
 
   const handleFileTypeFilter = (typeId: string) => {
@@ -259,12 +264,22 @@ export function FiltersDialog({
       : [...currentArray, typeId]
 
     setTempFileTypeFilter(newFilter)
-    // Don't apply immediately - wait for Apply Filter button
+    // Apply immediately for real-time sync
+    onFilterChange({
+      activeView: tempActiveView,
+      fileTypeFilter: newFilter,
+      advancedFilters: tempAdvancedFilters,
+    })
   }
 
   const handleAdvancedFiltersChange = (newFilters: AdvancedFilters) => {
     setTempAdvancedFilters(newFilters)
-    // Don't apply immediately - wait for Apply Filter button
+    // Apply immediately for real-time sync
+    onFilterChange({
+      activeView: tempActiveView,
+      fileTypeFilter: tempFileTypeFilter,
+      advancedFilters: newFilters,
+    })
   }
 
   const handleClearAll = () => {
