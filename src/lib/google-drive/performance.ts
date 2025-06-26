@@ -64,8 +64,8 @@ export function getOptimizedRequestParams(
     // Optimize for performance
     acknowledgeAbuse: false,
 
-    // Request smaller page sizes for faster initial load
-    pageSize: Math.min(baseParams.pageSize || 50, 100),
+    // Respect user's pageSize choice, with Google Drive API limit of 1000
+    pageSize: Math.min(baseParams.pageSize || 50, 1000),
   }
 
   return optimizedParams
