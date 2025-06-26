@@ -133,6 +133,7 @@ export class GoogleDriveService {
       searchQuery = 'trashed=false'
     }
 
+    let fields: string
     if (pageSize === 1) {
       // For cek access to confirm session is valid
       fields = 'files(id)'
