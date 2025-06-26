@@ -19,7 +19,7 @@ import { CreateFolderDialog } from './create-folder-dialog'
 import { FileRenameDialog } from './file-rename-dialog'
 import { FileMoveDialog } from './file-move-dialog'
 import { FileCopyDialog } from './file-copy-dialog'
-import { FileDeleteDialog } from './file-delete-dialog'
+import { PermanentDeleteDialog } from './permanent-delete-dialog'
 import { FileDetailsDialog } from './file-details-dialog'
 import { FilePreviewDialog } from './file-preview-dialog'
 import { FileShareDialog } from './file-share-dialog'
@@ -28,6 +28,8 @@ import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
+
+
 
 const initialFilters = {
   activeView: 'all' as
@@ -89,12 +91,13 @@ export function DriveManager() {
     rename: false,
     move: false,
     copy: false,
-    permanentDelete: false,
+    delete: false,
     details: false,
     preview: false,
-    delete: false,
+    trash: false,
+    untrash: false,
     share: false,
-    mobileFilters: false,
+    filters: false,
   })
 
   // Sorting state
@@ -300,7 +303,7 @@ export function DriveManager() {
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
-      const isFolder = item.mimeType === 'application/vnd.google-apps.folder'
+      const isFolder = item.mimeType === 'application/vnd.google-apps.folder' 
       return {
         id: itemId,
         name: item?.name || 'Unknown',
@@ -320,8 +323,7 @@ export function DriveManager() {
         canUntrash: item?.trashed && (item?.capabilities?.canUntrash || false),
         canRename: item?.capabilities?.canRename || false,
         canShare: item?.capabilities?.canShare || false,
-        canMoveItemWithinDrive:
-          item?.capabilities?.canMoveItemWithinDrive || true,
+        canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || true,
       }
     })
   }, [selectedItems, items])
@@ -568,9 +570,9 @@ export function DriveManager() {
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
-    const itemsToSort = [...displayItems].map((item) => ({
+    const itemsToSort = [...displayItems].map(item => ({
       ...item,
-      isFolder: isFolder(item),
+      isFolder: isFolder(item)
     }))
 
     if (sortConfig && sortConfig.key) {
@@ -672,7 +674,7 @@ export function DriveManager() {
             refreshing={refreshing}
             onUpload={() => openDialog('upload')}
             onCreateFolder={() => openDialog('createFolder')}
-            onFiltersOpen={() => openDialog('mobileFilters')}
+            onFiltersOpen={() => openDialog('filters')}
             selectedItems={selectedItemsWithDetails}
             onDeselectAll={() => {
               setSelectedItems(new Set())
@@ -779,7 +781,7 @@ export function DriveManager() {
                     name: item.name,
                     type: isFolder(item) ? 'folder' : 'file',
                   })
-                  openDialog('delete')
+                  openDialog('trash')
                   break
                 case 'details':
                   setSelectedItemForDetails({
@@ -893,10 +895,10 @@ export function DriveManager() {
 
       {selectedItemForDelete && (
         <FileDeleteDialog
-          open={dialogs.delete}
+          open={dialogs.trash}
           onOpenChange={(open) => {
             if (!open) {
-              closeDialog('delete')
+              closeDialog('trash')
               setSelectedItemForDelete(null)
             }
           }}
@@ -904,7 +906,7 @@ export function DriveManager() {
           itemName={selectedItemForDelete.name}
           itemType={selectedItemForDelete.type}
           onDeleted={() => {
-            closeDialog('delete')
+            closeDialog('trash')
             setSelectedItemForDelete(null)
             handleRefresh()
           }}
@@ -946,9 +948,9 @@ export function DriveManager() {
 
       {/* Mobile Filters Dialog */}
       <FiltersDialog
-        open={dialogs.mobileFilters}
+        open={dialogs.filters}
         onOpenChange={(open) => {
-          if (!open) closeDialog('mobileFilters')
+          if (!open) closeDialog('filters')
         }}
         onFilterChange={handleFilter}
         onApplyFilters={() =>

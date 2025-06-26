@@ -54,7 +54,7 @@ import {
 } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { successToast } from '@/lib/utils'
+import { successToast, errorToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
 import { BulkOperationsDialog } from './bulk-operations-dialog'
@@ -1991,8 +1991,7 @@ export function DriveToolbar({
         id="search-expanded"
         style={{ display: 'none' }}
         className="bg-muted/30 border-t p-3 md:p-4"
-      >
-        <div className="flex items-center gap-2 md:gap-4">
+      ><div className="flex items-center gap-2 md:gap-4">
           <div className="relative flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
             <Input
