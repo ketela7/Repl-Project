@@ -483,8 +483,8 @@ export function DriveToolbar({
   // Actions Dialog State
   const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
 
-  // Extract necessary props from filters
-  const { activeView, fileTypeFilter, advancedFilters } = filters
+  // Extract necessary props from filters with defaults
+  const { activeView = 'all', fileTypeFilter = [], advancedFilters = {} } = filters || {}
 
   // Track active filter state
   const [activeFilter, setActiveFilter] = useState<string | null>(null)

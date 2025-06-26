@@ -386,6 +386,23 @@ export function DriveManager({ className }: DriveManagerProps) {
           onClearSelection={handleClearSelection}
           items={allItems}
           onFiltersOpen={() => setFiltersDialogOpen(true)}
+          selectedItems={selectedItems}
+          onBulkDownload={() => {}}
+          onBulkRename={() => {}}
+          onBulkExport={() => {}}
+          onDeselectAll={handleClearSelection}
+          onRefreshAfterBulkOp={() => loadFiles(currentFolder, false)}
+          filters={{
+            activeView: 'all',
+            fileTypeFilter: [],
+            advancedFilters: {}
+          }}
+          onFilterChange={() => {}}
+          onApplyFilters={() => {}}
+          onClearFilters={() => {}}
+          hasActiveFilters={false}
+          setIsUploadDialogOpen={setUploadDialogOpen}
+          setIsCreateFolderDialogOpen={setCreateFolderOpen}
         />
 
         {/* Data View */}
