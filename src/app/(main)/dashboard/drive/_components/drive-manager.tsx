@@ -29,9 +29,7 @@ import { DriveDataView } from './drive-data-view'
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
 
-const isFolder = (item: DriveItem): boolean => {
-  return item.mimeType === 'application/vnd.google-apps.folder'
-}
+
 
 const initialFilters = {
   activeView: 'all' as
@@ -304,8 +302,7 @@ export function DriveManager() {
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
-      const itemIsFolder = item ? isFolder(item) : false
-      
+      const isFolder = item.mimeType === 'application/vnd.google-apps.folder' 
       return {
         id: itemId,
         name: item?.name || 'Unknown',
@@ -317,10 +314,10 @@ export function DriveManager() {
         isTrashed: item?.trashed || false,
         isStarred: item?.starred || false,
         isShared: item?.shared || false,
-        isFolder: itemIsFolder,
+        isFolder: isFolder,
         canCopy: item?.capabilities?.canCopy || true,
         canDelete: item?.capabilities?.canDelete || false,
-        canDownload: !itemIsFolder && (item?.capabilities?.canDownload || true),
+        canDownload: !isFolder && (item?.capabilities?.canDownload || true),
         canTrash: item?.capabilities?.canTrash || false,
         canUntrash: item?.trashed && (item?.capabilities?.canUntrash || false),
         canRename: item?.capabilities?.canRename || false,
