@@ -304,6 +304,7 @@ export function DriveManager() {
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
+      const itemIsFolder = item ? isFolder(item) : false
       
       return {
         id: itemId,
@@ -316,21 +317,15 @@ export function DriveManager() {
         isTrashed: item?.trashed || false,
         isStarred: item?.starred || false,
         isShared: item?.shared || false,
-        isFolder: isFolder(item),
-        
-        
-        
-        
-        //canCopy: item?.capabilities?.canCopy || false, //force copy
+        isFolder: itemIsFolder,
+        canCopy: item?.capabilities?.canCopy || true,
         canDelete: item?.capabilities?.canDelete || false,
-        canDownload: isFolder(item) !== true && item?.capabilities?.canDownload || false,
+        canDownload: !itemIsFolder && (item?.capabilities?.canDownload || true),
         canTrash: item?.capabilities?.canTrash || false,
-        canUntrash: item?.trashed && item?.capabilities?.canUntrash || false,
+        canUntrash: item?.trashed && (item?.capabilities?.canUntrash || false),
         canRename: item?.capabilities?.canRename || false,
-        canShare: item?.capabilities?.canShare || false
-        //canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || false, // force move
-        
-        
+        canShare: item?.capabilities?.canShare || false,
+        canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || true,
       }
     })
   }, [selectedItems, items])
@@ -579,7 +574,10 @@ export function DriveManager() {
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
-    const itemsToSort = [...displayItems]
+    const itemsToSort = [...displayItems].map(item => ({
+      ...item,
+      isFolder: isFolder(item)
+    }))
 
     if (sortConfig && sortConfig.key) {
       itemsToSort.sort((a, b) => {

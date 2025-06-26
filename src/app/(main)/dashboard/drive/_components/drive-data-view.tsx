@@ -437,7 +437,7 @@ export function DriveDataView({
                     <TableCell>
                       {'size' in item && item.size
                         ? formatFileSize(parseInt(item.size))
-                        : isFolder(item)
+                        : item.isFolder
                           ? '—'
                           : 'Unknown'}
                     </TableCell>
