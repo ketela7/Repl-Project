@@ -96,11 +96,25 @@ class MemoryCache {
     userId: string
     pageToken?: string
     query?: string
+    pageSize?: number
   }): string {
-    const { parentId = 'root', userId, pageToken = 'p1', query = '' } = params
+    const {
+      parentId = 'root',
+      userId,
+      pageToken = 'p1',
+      query = '',
+      pageSize = 50,
+    } = params
 
-    // Create a more comprehensive cache key with all filter parameters
-    const keyParts = ['drive', userId, parentId, pageToken, query]
+    // Create a more comprehensive cache key with all filter parameters including pageSize
+    const keyParts = [
+      'drive',
+      userId,
+      parentId,
+      pageToken,
+      query,
+      pageSize.toString(),
+    ]
 
     // Join with ':' and remove empty parts to avoid unnecessary cache misses
     return keyParts.map((part) => part || 'empty').join(':')

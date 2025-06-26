@@ -411,6 +411,7 @@ export async function GET(request: NextRequest) {
       userId: session.user?.email || '',
       pageToken,
       query: query,
+      pageSize,
     })
 
     const cachedData = driveCache.get(cacheKey)
