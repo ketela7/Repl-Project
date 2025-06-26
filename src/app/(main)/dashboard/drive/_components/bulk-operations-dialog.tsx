@@ -30,11 +30,11 @@ import { useIsMobile } from '@/lib/hooks/use-mobile'
 
 import { BulkMoveDialog } from './bulk-move-dialog'
 import { BulkCopyDialog } from './bulk-copy-dialog'
-import { BulkDeleteDialog } from './bulk-delete-dialog'
+import { BulkTrashDialog } from './bulk-trash-dialog'
 import { BulkShareDialog } from './bulk-share-dialog'
 import { BulkRenameDialog } from './bulk-rename-dialog'
 import { BulkExportDialog } from './bulk-export-dialog'
-import { BulkPermanentDeleteDialog } from './bulk-permanent-delete-dialog'
+import { BulkDeleteDialog } from './bulk-delete-dialog'
 import { BulkRestoreDialog } from './bulk-restore-dialog'
 
 interface BulkOperationsDialogProps {
@@ -57,7 +57,7 @@ interface BulkOperationsDialogProps {
     //canCopy: boolean
     //canMove: boolean
     canExport: boolean
-    
+
   }>
   onBulkDelete?: () => void
   onBulkDownload?: () => void
@@ -91,11 +91,11 @@ function BulkOperationsDialog({
   // Individual dialog states
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
-  const [isTrashDialogOpen, setisTrashDialogOpen] = useState(false)
+  const [isTrashDialogOpen, setIsTrashDialogOpen] = useState(false)
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setisDeleteDialogOpen] =useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] =useState(false)
   const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
 
   // Determine dialog open state
@@ -116,7 +116,7 @@ function BulkOperationsDialog({
   }
 
   const handleDeleteClick = () => {
-    setisTrashDialogOpen(true)
+    setIsTrashDialogOpen(true)
     handleClose()
   }
 
@@ -136,7 +136,7 @@ function BulkOperationsDialog({
   }
 
   const handlePermanentDeleteClick = () => {
-    setisDeleteDialogOpen(true)
+    setIsDeleteDialogOpen(true)
     handleClose()
   }
 
@@ -217,7 +217,7 @@ function BulkOperationsDialog({
     } catch (error) {
       console.error('Delete failed:', error)
     }
-    setisTrashDialogOpen(false)
+    setIsTrashDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
@@ -312,7 +312,7 @@ function BulkOperationsDialog({
     } catch (error) {
       console.error('Permanent delete failed:', error)
     }
-    setisDeleteDialogOpen(false)
+    setIsDeleteDialogOpen(false)
     onRefreshAfterBulkOp?.()
   }
 
@@ -563,9 +563,9 @@ function BulkOperationsDialog({
         selectedItems={selectedItems}
       />
 
-      <BulkDeleteDialog
+      <BulkTrashDialog
         isOpen={isTrashDialogOpen}
-        onClose={() => setisTrashDialogOpen(false)}
+        onClose={() => setIsTrashDialogOpen(false)}
         onConfirm={handleDeleteComplete}
         selectedItems={selectedItems}
       />
@@ -591,9 +591,9 @@ function BulkOperationsDialog({
         selectedItems={selectedItems}
       />
 
-      <BulkPermanentDeleteDialog
+      <BulkDeleteDialog
         isOpen={isDeleteDialogOpen}
-        onClose={() => setisDeleteDialogOpen(false)}
+        onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handlePermanentDeleteComplete}
         selectedItems={selectedItems}
       />
