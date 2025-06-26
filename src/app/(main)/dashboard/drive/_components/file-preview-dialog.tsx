@@ -12,7 +12,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { DriveFile } from '@/lib/google-drive/types'
 import { getPreviewUrl, formatFileSize } from '@/lib/google-drive/utils'
-import { errorToast } from '@/lib/utils'
+import { successToast, errorToast } from '@/lib/toast'
 
 interface FilePreviewDialogProps {
   open: boolean
@@ -71,7 +71,9 @@ export function FilePreviewDialog({
       document.body.removeChild(link)
       successToast.downloaded(file.name)
     } catch (error) {
-      errorToast.downloadFailed(file.name)
+      errorToast.generic('Download failed', {
+        description: `Failed to download ${file.name}`,
+      })
     }
   }
 

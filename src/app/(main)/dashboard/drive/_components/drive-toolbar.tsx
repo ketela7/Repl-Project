@@ -586,7 +586,7 @@ export function DriveToolbar({
     if (onClearClientSideFilter) {
       onClearClientSideFilter()
       setActiveFilter(null)
-      toastUtils.info.generic('Filter cleared', {
+      successToast.generic('Filter cleared', {
         description: `Showing all ${items.length} items`,
       })
     }

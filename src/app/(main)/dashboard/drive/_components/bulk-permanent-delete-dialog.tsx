@@ -192,7 +192,6 @@ function BulkPermanentDeleteDialog({
           </div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
-            
             <Button
               onClick={handleConfirm}
               disabled={!isConfirmationValid}
@@ -242,7 +241,6 @@ function BulkPermanentDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-          
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={!isConfirmationValid}

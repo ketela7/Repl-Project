@@ -67,14 +67,17 @@ function BulkOperationsDialog({
 }: BulkOperationsDialogProps) {
   const isMobile = useIsMobile()
   const fileCount = selectedItems.filter((item) => item.type === 'file').length
-  const folderCount = selectedItems.filter((item) => item.type === 'folder').length
+  const folderCount = selectedItems.filter(
+    (item) => item.type === 'folder'
+  ).length
   const canDeleteCount = selectedItems.filter((item) => item.canDelete).length
   const canShareCount = selectedItems.filter((item) => item.canShare).length
   const canTrashCount = selectedItems.filter((item) => item.canTrash).length
   const canUntrashCount = selectedItems.filter((item) => item.canUntrash).length
-  const canDownloadCount = selectedItems.filter((item) => item.canDownload).length
+  const canDownloadCount = selectedItems.filter(
+    (item) => item.canDownload
+  ).length
   const canRenameCount = selectedItems.filter((item) => item.canRename).length
-
 
   // Individual dialog states
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
@@ -366,42 +369,42 @@ function BulkOperationsDialog({
         </Button>
 
         {/* Share Items */}
-        {canShareCount>0&&(
-        <Button
-          variant="outline"
-          onClick={handleShareClick}
-          className="h-12 w-full justify-start gap-3 text-left hover:border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-950/30"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
-            <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-          </div>
-          <div className="flex flex-col items-start">
-            <span className="font-medium">Share Items</span>
-            <span className="text-muted-foreground text-xs">
-              Generate shareable links for selected items
-            </span>
-          </div>
-        </Button>
-      )}
+        {canShareCount > 0 && (
+          <Button
+            variant="outline"
+            onClick={handleShareClick}
+            className="h-12 w-full justify-start gap-3 text-left hover:border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-950/30"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
+              <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Share Items</span>
+              <span className="text-muted-foreground text-xs">
+                Generate shareable links for selected items
+              </span>
+            </div>
+          </Button>
+        )}
 
         {/* Bulk Rename */}
-        {canRenameCount > 0 &&(
-        <Button
-          variant="outline"
-          onClick={handleRenameClick}
-          className="h-12 w-full justify-start gap-3 text-left hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-950/30"
-        >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/50">
-            <Edit className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-          </div>
-          <div className="flex flex-col items-start">
-            <span className="font-medium">Bulk Rename</span>
-            <span className="text-muted-foreground text-xs">
-              Rename {canRenameCount} items with patterns
-            </span>
-          </div>
-        </Button>
-      )}
+        {canRenameCount > 0 && (
+          <Button
+            variant="outline"
+            onClick={handleRenameClick}
+            className="h-12 w-full justify-start gap-3 text-left hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-950/30"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/50">
+              <Edit className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Bulk Rename</span>
+              <span className="text-muted-foreground text-xs">
+                Rename {canRenameCount} items with patterns
+              </span>
+            </div>
+          </Button>
+        )}
 
         {fileCount > 0 && (
           <Button
@@ -449,41 +452,41 @@ function BulkOperationsDialog({
 
           {/* Permanent Delete */}
           {canDeleteCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handlePermanentDeleteClick}
-            className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
-              <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Permanent Delete</span>
-              <span className="text-muted-foreground text-xs">
-                Delete permanently {canDeleteCount} items (cannot be undone)
-              </span>
-            </div>
-          </Button>
-      )}
+            <Button
+              variant="outline"
+              onClick={handlePermanentDeleteClick}
+              className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
+                <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="font-medium">Permanent Delete</span>
+                <span className="text-muted-foreground text-xs">
+                  Delete permanently {canDeleteCount} items (cannot be undone)
+                </span>
+              </div>
+            </Button>
+          )}
 
           {/* Restore from Trash */}
-					{canUntrashCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleRestoreClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-              <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Restore from Trash</span>
-              <span className="text-muted-foreground text-xs">
-                Restore {canUntrashCount} items to original location
-              </span>
-            </div>
-          </Button>
-      )}
+          {canUntrashCount > 0 && (
+            <Button
+              variant="outline"
+              onClick={handleRestoreClick}
+              className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+                <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div className="flex flex-col items-start">
+                <span className="font-medium">Restore from Trash</span>
+                <span className="text-muted-foreground text-xs">
+                  Restore {canUntrashCount} items to original location
+                </span>
+              </div>
+            </Button>
+          )}
         </div>
       </div>
     </>

@@ -146,14 +146,13 @@ function BulkDeleteDialog({
           <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
-
             <Button
               onClick={onConfirm}
               className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800`}
             >
               Move to Trash
             </Button>
-                        <Button
+            <Button
               variant="outline"
               onClick={onClose}
               className={cn('touch-target min-h-[44px] active:scale-95')}
@@ -186,7 +185,6 @@ function BulkDeleteDialog({
         <div className="space-y-4 px-1">{renderContent()}</div>
 
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-          
           <AlertDialogAction
             onClick={onConfirm}
             className="w-full bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800"

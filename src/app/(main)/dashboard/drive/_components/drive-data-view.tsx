@@ -456,8 +456,7 @@ export function DriveDataView({
                     >
                       <div className="flex items-center gap-2">
                         <span>
-                          {item.owners?.[0]?.emailAddress ||
-                            'Unknown'}
+                          {item.owners?.[0]?.emailAddress || 'Unknown'}
                         </span>
                         {item.owners?.[0]?.emailAddress && (
                           <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
