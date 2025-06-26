@@ -35,7 +35,7 @@ import { BulkShareDialog } from './bulk-share-dialog'
 import { BulkRenameDialog } from './bulk-rename-dialog'
 import { BulkExportDialog } from './bulk-export-dialog'
 import { BulkDeleteDialog } from './bulk-delete-dialog'
-import { BulkRestoreDialog } from './bulk-restore-dialog'
+import { BulkUntrashDialog } from './bulk-untrash-dialog'
 
 interface BulkOperationsDialogProps {
   isOpen?: boolean
@@ -598,7 +598,7 @@ function BulkOperationsDialog({
         selectedItems={selectedItems}
       />
 
-      <BulkRestoreDialog
+      <BulkUntrashDialog
         isOpen={isRestoreDialogOpen}
         onClose={() => setIsRestoreDialogOpen(false)}
         onConfirm={handleRestoreComplete}

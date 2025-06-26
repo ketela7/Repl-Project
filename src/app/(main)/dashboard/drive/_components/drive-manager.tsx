@@ -900,7 +900,7 @@ export function DriveManager() {
       )}
 
       {selectedItemForDelete && (
-        <PermanentDeleteDialog
+        <FileDeleteDialog
           open={dialogs.delete}
           onOpenChange={(open) => {
             if (!open) {
