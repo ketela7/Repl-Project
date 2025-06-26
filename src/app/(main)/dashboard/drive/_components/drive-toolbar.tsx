@@ -57,7 +57,7 @@ import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { successToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
-import { BulkOperationsDialog } from './bulk-operations-dialog'
+import { OperationsDialog } from './operations-dialog'
 import { FiltersDialog } from './filters-dialog'
 
 // Types
@@ -122,7 +122,7 @@ interface DriveToolbarProps {
   // Mobile Actions Dialog Props
   selectedItems: DriveItem[]
   onDeselectAll: () => void
-  onRefreshAfterBulkOp: () => void
+  onRefreshAfterOp: () => void
   filters: {
     activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'
     fileTypeFilter: string[]
@@ -449,7 +449,7 @@ export function DriveToolbar({
   onCreateFolder,
   selectedItems,
   onDeselectAll,
-  onRefreshAfterBulkOp,
+  onRefreshAfterOp,
   filters,
   onFilterChange,
   onApplyFilters,
@@ -464,13 +464,13 @@ export function DriveToolbar({
 
   // Optimized bulk operation handlers
 
-  const handleBulkOperationComplete = () => {
+  const handleOperationComplete = () => {
     onDeselectAll()
-    onRefreshAfterBulkOp()
+    onRefreshAfterOp()
   }
 
   // Actions Dialog State
-  const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
+  const [isOperationsOpen, setIsOperationsOpen] = useState(false)
   const [isFiltersDialogOpen, setIsFiltersDialogOpen] = useState(false)
 
   // Extract necessary props from filters
@@ -641,7 +641,7 @@ export function DriveToolbar({
             )}
           </Button>
 
-          {/* Bulk Operations */}
+          {/* Operations */}
           {selectedCount <= items.length && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -729,7 +729,7 @@ export function DriveToolbar({
                         onClick={(e) => {
                           e.preventDefault()
                           e.stopPropagation()
-                          setIsBulkOperationsOpen(true)
+                          setIsOperationsOpen(true)
                         }}
                       >
                         <MoreVertical className="mr-2 h-4 w-4" />
@@ -741,11 +741,11 @@ export function DriveToolbar({
                           onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
-                            setIsBulkOperationsOpen(true)
+                            setIsOperationsOpen(true)
                           }}
                         >
                           <MoreVertical className="mr-2 h-4 w-4" />
-                          Bulk Operations
+                          Operations
                         </DropdownMenuItem>
                       </>
                     )}
@@ -2055,12 +2055,12 @@ export function DriveToolbar({
         </div>
       </div>
 
-      {/* Bulk Operations Dialog */}
-      <BulkOperationsDialog
-        isOpen={isBulkOperationsOpen}
-        onClose={() => setIsBulkOperationsOpen(false)}
+      {/* Operations Dialog */}
+      <OperationsDialog
+        isOpen={isOperationsOpen}
+        onClose={() => setIsOperationsOpen(false)}
         selectedItems={selectedItems}
-        onRefreshAfterBulkOp={handleBulkOperationComplete}
+        onRefreshAfterOp={handleOperationComplete}
       />
 
       {/* Filters Dialog */}

@@ -7,7 +7,7 @@ export const preloadCriticalComponents = () => {
   if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
     window.requestIdleCallback(() => {
       // Preload most commonly used bulk dialogs
-      import('@/app/(main)/dashboard/drive/_components/bulk-operations-dialog')
+      import('@/app/(main)/dashboard/drive/_components/operations-dialog')
         .then(() => {
           // Preload completed successfully
         })

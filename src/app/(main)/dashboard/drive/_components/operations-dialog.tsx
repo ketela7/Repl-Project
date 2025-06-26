@@ -38,29 +38,29 @@ import {
   ItemsUntrashDialog,
 } from '@/components/lazy-imports'
 
-interface BulkOperationsDialogProps {
+interface OperationsDialogProps {
   isOpen?: boolean
   open?: boolean
   onClose?: () => void
   onOpenChange?: (open: boolean) => void
   selectedItems: any[]
-  onBulkDelete?: () => void
-  onBulkDownload?: () => void
-  onBulkShare?: () => void
-  onBulkMove?: () => void
-  onBulkCopy?: () => void
-  onBulkRename?: () => void
-  onRefreshAfterBulkOp?: () => void
+  onDelete?: () => void
+  onDownload?: () => void
+  onShare?: () => void
+  onMove?: () => void
+  onCopy?: () => void
+  onRename?: () => void
+  onRefreshAfterOp?: () => void
 }
 
-function BulkOperationsDialog({
+function OperationsDialog({
   isOpen,
   open,
   onClose,
   onOpenChange,
   selectedItems,
-  onRefreshAfterBulkOp,
-}: BulkOperationsDialogProps) {
+  onRefreshAfterOp,
+}: OperationsDialogProps) {
   const isMobile = useIsMobile()
   const folderCount = selectedItems.filter((item) => item.isFolder).length
   const fileCount = selectedItems.length - folderCount
@@ -154,7 +154,7 @@ function BulkOperationsDialog({
       console.error('Move failed:', error)
     }
     setIsMoveDialogOpen(false)
-    onRefreshAfterBulkOp?.()
+    onRefreshAfterOp?.()
   }
 
   const handleCopyComplete = async (targetFolderId: string) => {
@@ -178,7 +178,7 @@ function BulkOperationsDialog({
       console.error('Copy failed:', error)
     }
     setIsCopyDialogOpen(false)
-    onRefreshAfterBulkOp?.()
+    onRefreshAfterOp?.()
   }
 
   const handleDeleteComplete = async () => {
@@ -199,7 +199,7 @@ function BulkOperationsDialog({
       console.error('Delete failed:', error)
     }
     setIsTrashDialogOpen(false)
-    onRefreshAfterBulkOp?.()
+    onRefreshAfterOp?.()
   }
 
   const handleShareComplete = async (shareOptions: any) => {
@@ -224,7 +224,7 @@ function BulkOperationsDialog({
       return []
     } finally {
       setIsShareDialogOpen(false)
-      onRefreshAfterBulkOp?.()
+      onRefreshAfterOp?.()
     }
   }
 
@@ -248,7 +248,7 @@ function BulkOperationsDialog({
       console.error('Rename failed:', error)
     }
     setIsRenameDialogOpen(false)
-    onRefreshAfterBulkOp?.()
+    onRefreshAfterOp?.()
   }
 
   const handleExportComplete = async () => {
@@ -266,7 +266,7 @@ function BulkOperationsDialog({
       console.error('Export failed:', error)
     }
     setIsExportDialogOpen(false)
-    onRefreshAfterBulkOp?.()
+    onRefreshAfterOp?.()
   }
 
   const handlePermanentDeleteComplete = async () => {
@@ -287,7 +287,7 @@ function BulkOperationsDialog({
       console.error('Permanent delete failed:', error)
     }
     setIsDeleteDialogOpen(false)
-    onRefreshAfterBulkOp?.()
+    onRefreshAfterOp?.()
   }
 
   const handleRestoreComplete = async () => {
@@ -308,7 +308,7 @@ function BulkOperationsDialog({
       console.error('Restore failed:', error)
     }
     setIsRestoreDialogOpen(false)
-    onRefreshAfterBulkOp?.()
+    onRefreshAfterOp?.()
   }
 
   const renderContent = () => (
@@ -367,7 +367,7 @@ function BulkOperationsDialog({
           </Button>
         )}
 
-        {/* Bulk Rename */}
+        {/* Rename */}
         {canRenameCount > 0 && (
           <Button
             variant="outline"
@@ -378,7 +378,7 @@ function BulkOperationsDialog({
               <Edit className="h-4 w-4 text-orange-600 dark:text-orange-400" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="font-medium">Bulk Rename</span>
+              <span className="font-medium">Rename</span>
               <span className="text-muted-foreground text-xs">
                 Rename {canRenameCount} items with patterns
               </span>
@@ -479,13 +479,13 @@ function BulkOperationsDialog({
 
   return (
     <>
-      {/* Main Bulk Operations Dialog */}
+      {/* Main Operations Dialog */}
       {isMobile ? (
         <BottomSheet open={dialogOpen} onOpenChange={onOpenChange || onClose}>
           <BottomSheetContent>
             <BottomSheetHeader>
               <BottomSheetTitle className="text-lg font-semibold">
-                Bulk Operations
+                Operations
               </BottomSheetTitle>
               <BottomSheetDescription className="text-muted-foreground text-sm">
                 Choose an action for {selectedItems.length} selected item
@@ -504,7 +504,7 @@ function BulkOperationsDialog({
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold">
-                Bulk Operations
+                Operations
               </DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm">
                 Choose an action for {selectedItems.length} selected item
@@ -580,5 +580,5 @@ function BulkOperationsDialog({
   )
 }
 
-export { BulkOperationsDialog }
-export default BulkOperationsDialog
+export { OperationsDialog }
+export default OperationsDialog

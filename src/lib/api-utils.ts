@@ -122,7 +122,7 @@ export function validateShareRequest(body: any): boolean {
   return requiredFields.every((field) => field in body)
 }
 
-export function validateBulkRequest(body: any): boolean {
+export function validateOperationsRequest(body: any): boolean {
   const { operation, fileIds } = body
   return operation && Array.isArray(fileIds) && fileIds.length > 0
 }

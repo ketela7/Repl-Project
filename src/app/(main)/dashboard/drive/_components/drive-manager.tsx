@@ -122,17 +122,13 @@ export function DriveManager() {
     useState<DriveFile | null>(null)
 
   // Progress states
-  const [bulkOperationProgress, setBulkOperationProgress] = useState<{
+  const [operationsProgress, setOperationsProgress] = useState<{
     isRunning: boolean
     current: number
     total: number
     operation: string
-  }>({ isRunning: false, current: 0, total: 0, operation: '' })
-
-  const [singleOperationProgress, setSingleOperationProgress] = useState<{
-    isRunning: boolean
-    operation: string
-  }>({ isRunning: false, operation: '' })
+    type: 'bulk' | 'single'
+  }>({ isRunning: false, current: 0, total: 0, operation: '', type: 'single' })
 
   // Refs for optimization
   const lastFiltersRef = useRef<string>('')
@@ -704,7 +700,7 @@ export function DriveManager() {
             onDeselectAll={() => {
               setSelectedItems(new Set())
             }}
-            onRefreshAfterBulkOp={handleRefresh}
+            onRefreshAfterOp={handleRefresh}
             filters={filters}
             onFilterChange={handleFilter as any}
             onApplyFilters={() =>
@@ -832,34 +828,31 @@ export function DriveManager() {
       {/* Filters Dialog - functionality integrated into toolbar */}
 
       {/* Progress indicators */}
-      {bulkOperationProgress.isRunning && (
+      {operationsProgress.isRunning && (
         <div className="bg-background fixed right-4 bottom-4 rounded-lg border p-4 shadow-lg">
           <div className="flex items-center space-x-2">
+            {operationsProgress.type === 'single' && (
+              <RefreshCw className="h-4 w-4 animate-spin" />
+            )}
             <div className="text-sm font-medium">
-              {bulkOperationProgress.operation}
+              {operationsProgress.operation}
             </div>
           </div>
-          <Progress
-            value={
-              (bulkOperationProgress.current / bulkOperationProgress.total) *
-              100
-            }
-            className="mt-2 w-64"
-          />
-          <div className="text-muted-foreground mt-1 text-xs">
-            {bulkOperationProgress.current} of {bulkOperationProgress.total}
-          </div>
-        </div>
-      )}
-
-      {singleOperationProgress.isRunning && (
-        <div className="bg-background fixed right-4 bottom-4 rounded-lg border p-4 shadow-lg">
-          <div className="flex items-center space-x-2">
-            <RefreshCw className="h-4 w-4 animate-spin" />
-            <div className="text-sm font-medium">
-              {singleOperationProgress.operation}
-            </div>
-          </div>
+          {operationsProgress.type === 'bulk' &&
+            operationsProgress.total > 0 && (
+              <>
+                <Progress
+                  value={
+                    (operationsProgress.current / operationsProgress.total) *
+                    100
+                  }
+                  className="mt-2 w-64"
+                />
+                <div className="text-muted-foreground mt-1 text-xs">
+                  {operationsProgress.current} of {operationsProgress.total}
+                </div>
+              </>
+            )}
         </div>
       )}
 

@@ -18,11 +18,11 @@ export const DataTable = lazy(() =>
 
 // Remaining dialog components are handled by bulk operations
 
-// Bulk operations dialogs - now in optimized lazy module
-export const BulkOperationsDialog = lazy(() =>
-  import(
-    '@/app/(main)/dashboard/drive/_components/bulk-operations-dialog'
-  ).then((mod) => ({ default: mod.BulkOperationsDialog }))
+// Operations dialogs - now in optimized lazy module
+export const OperationsDialog = lazy(() =>
+  import('@/app/(main)/dashboard/drive/_components/operations-dialog').then(
+    (mod) => ({ default: mod.OperationsDialog })
+  )
 )
 
 export const ItemsMoveDialog = lazy(

@@ -360,9 +360,9 @@ export const toastUtils = {
   },
 
   /**
-   * Show bulk operation progress
+   * Show operation progress
    */
-  bulkOperation: async (
+  operation: async (
     operation: string,
     operationFn: () => Promise<{
       success: number
@@ -370,7 +370,7 @@ export const toastUtils = {
       failed?: string[]
     }>
   ) => {
-    const loadingId = 'bulk-operation'
+    const loadingId = 'operation'
     loadingToast.start(`Starting ${operation}...`, loadingId)
 
     try {
