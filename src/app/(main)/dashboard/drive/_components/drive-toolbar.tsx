@@ -117,7 +117,7 @@ interface DriveToolbarProps {
   refreshing: boolean
   onUpload: () => void
   onCreateFolder: () => void
-  onFiltersOpen: () => void
+  
 
   // Mobile Actions Dialog Props
   selectedItems: DriveItem[]
@@ -447,7 +447,6 @@ export function DriveToolbar({
   refreshing,
   onUpload,
   onCreateFolder,
-  onFiltersOpen,
   selectedItems,
   onDeselectAll,
   onRefreshAfterBulkOp,

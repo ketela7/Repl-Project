@@ -649,7 +649,6 @@ export function DriveManager() {
             refreshing={refreshing}
             onUpload={() => openDialog('upload')}
             onCreateFolder={() => openDialog('createFolder')}
-            onFiltersOpen={() => {}} // Filters integrated into toolbar
             selectedItems={selectedItemsWithDetails}
             onDeselectAll={() => {
               setSelectedItems(new Set())

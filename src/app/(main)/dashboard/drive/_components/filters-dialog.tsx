@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Archive,
   Calendar,
@@ -112,7 +112,7 @@ export function FiltersDialog({
   const isMobile = useIsMobile()
 
   // Update temp states when current filters change
-  React.useEffect(() => {
+  useEffect(() => {
     if (open) {
       setTempActiveView(currentFilters?.activeView || 'all')
       setTempFileTypeFilter(currentFilters?.fileTypeFilter || [])
