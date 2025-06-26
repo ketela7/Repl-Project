@@ -904,7 +904,6 @@ export function DriveToolbar({
                           }
                           size="sm"
                           onClick={() => {
-                            console.log('Filter Debug - Toolbar click: Trash')
                             onFilterChange({ activeView: 'trash' })
                           }}
                           className="justify-start text-xs"
@@ -919,7 +918,6 @@ export function DriveToolbar({
                           }
                           size="sm"
                           onClick={() => {
-                            console.log('Filter Debug - Toolbar click: Starred')
                             onFilterChange({ activeView: 'starred' })
                           }}
                           className="justify-start text-xs"
@@ -1040,12 +1038,7 @@ export function DriveToolbar({
                                         (t) => t !== filter.type
                                       )
                                     : [...filters.fileTypeFilter, filter.type]
-                                console.log(
-                                  'Filter Debug - File type click:',
-                                  filter.type,
-                                  'New types:',
-                                  newTypes
-                                )
+
                                 onFilterChange({ fileTypeFilter: newTypes })
                               }}
                               className="justify-center p-2 text-xs"

@@ -207,10 +207,6 @@ export function DriveDataView({
                     : ''
                 }`}
                 onClick={() => {
-                  console.log('Grid item clicked:', {
-                    isSelectMode,
-                    itemId: item.id,
-                  })
                   if (isSelectMode) {
                     onSelectItem(item.id)
                   } else if (item.isFolder) {
@@ -223,12 +219,7 @@ export function DriveDataView({
                   const touch = e.touches[0]
                   const startTime = Date.now()
                   const timer = setTimeout(() => {
-                    console.log(
-                      'Long press detected on mobile for item:',
-                      item.id
-                    )
                     if (!isSelectMode) {
-                      console.log('Enabling select mode via long press')
                       onSelectModeChange(true)
                     }
                     onSelectItem(item.id)

@@ -416,7 +416,6 @@ export async function GET(request: NextRequest) {
 
     const cachedData = driveCache.get(cacheKey)
     if (cachedData) {
-      console.log('[USING CACHE] - Key:', cacheKey)
       return NextResponse.json(cachedData)
     }
 

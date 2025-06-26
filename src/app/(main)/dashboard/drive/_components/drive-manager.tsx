@@ -493,22 +493,13 @@ export function DriveManager() {
 
   // Selection handlers
   const handleSelectItem = useCallback((itemId: string) => {
-    console.log('handleSelectItem called with:', itemId)
     setSelectedItems((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(itemId)) {
         newSet.delete(itemId)
-        console.log('Deselected item:', itemId)
       } else {
         newSet.add(itemId)
-        console.log('Selected item:', itemId)
       }
-      console.log(
-        'New selection set size:',
-        newSet.size,
-        'items:',
-        Array.from(newSet)
-      )
       return newSet
     })
   }, [])

@@ -148,7 +148,6 @@ function OperationsDialog({
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Move completed:', result.summary)
       }
     } catch (error) {
       console.error('Move failed:', error)
@@ -172,7 +171,6 @@ function OperationsDialog({
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Copy completed:', result.summary)
       }
     } catch (error) {
       console.error('Copy failed:', error)
@@ -193,7 +191,6 @@ function OperationsDialog({
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Delete completed:', result.summary)
       }
     } catch (error) {
       console.error('Delete failed:', error)
@@ -215,7 +212,7 @@ function OperationsDialog({
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Share completed:', result.summary)
+
         return result.results
       }
       return []
@@ -242,7 +239,6 @@ function OperationsDialog({
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Rename completed:', result.summary)
       }
     } catch (error) {
       console.error('Rename failed:', error)
@@ -281,7 +277,6 @@ function OperationsDialog({
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Permanent delete completed:', result.summary)
       }
     } catch (error) {
       console.error('Permanent delete failed:', error)
@@ -302,7 +297,6 @@ function OperationsDialog({
 
       if (response.ok) {
         const result = await response.json()
-        console.log('Restore completed:', result.summary)
       }
     } catch (error) {
       console.error('Restore failed:', error)

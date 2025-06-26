@@ -848,12 +848,6 @@ export function FiltersDialog({
               variant="outline"
               disabled={isApplying}
               onClick={() => {
-                console.log('📱 MOBILE FILTER APPLY - Complete Parameters:', {
-                  activeView: tempActiveView,
-                  fileTypeFilter: tempFileTypeFilter,
-                  advancedFilters: tempAdvancedFilters,
-                  timestamp: new Date().toISOString(),
-                })
                 onFilterChange({
                   activeView: tempActiveView,
                   fileTypeFilter: tempFileTypeFilter,
