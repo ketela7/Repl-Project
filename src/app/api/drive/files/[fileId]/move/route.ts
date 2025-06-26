@@ -13,12 +13,16 @@ export async function POST(
     }
 
     const { driveService } = authResult
-    const fileId = params.fileId
+    const fileId = (await params).fileId
     const body = await request.json()
 
-    // Handle both single and bulk operations
-    const fileIds = fileId === 'bulk' ? body.fileIds : [fileId]
-    const { targetFolderId } = body
+    // Global operations approach: Handle both single and bulk with items.length logic
+    const { targetFolderId, items } = body
+
+    // Determine operation type based on items array
+    const fileIds =
+      items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
+    const isBulkOperation = items && items.length > 1
 
     if (!targetFolderId) {
       return NextResponse.json(
@@ -54,6 +58,8 @@ export async function POST(
       success: errors.length === 0,
       processed: results.length,
       failed: errors.length,
+      type: isBulkOperation ? 'bulk' : 'single',
+      operation: 'move',
       results,
       errors: errors.length > 0 ? errors : undefined,
     }

@@ -13,15 +13,17 @@ export async function DELETE(
     }
 
     const { driveService } = authResult
-    const fileId = params.fileId
+    const fileId = (await params).fileId
 
-    // For bulk operations, get fileIds from request body
-    let fileIds = [fileId]
+    const body = await request.json()
 
-    if (fileId === 'bulk') {
-      const body = await request.json()
-      fileIds = body.fileIds || []
-    }
+    // Global operations approach: Handle both single and bulk with items.length logic
+    const { items } = body
+
+    // Determine operation type based on items array
+    const fileIds =
+      items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
+    const isBulkOperation = items && items.length > 1
 
     if (!fileIds || fileIds.length === 0) {
       return NextResponse.json(
@@ -50,6 +52,8 @@ export async function DELETE(
       success: errors.length === 0,
       processed: results.length,
       failed: errors.length,
+      type: isBulkOperation ? 'bulk' : 'single',
+      operation: 'delete',
       results,
       errors: errors.length > 0 ? errors : undefined,
     }

@@ -13,12 +13,16 @@ export async function POST(
     }
 
     const { driveService } = authResult
-    const fileId = params.fileId
+    const fileId = (await params).fileId
     const body = await request.json()
 
-    // Handle both single and bulk operations
-    const fileIds = fileId === 'bulk' ? body.fileIds : [fileId]
-    const { namePrefix, newName } = body
+    // Global operations approach: Handle both single and bulk with items.length logic
+    const { namePrefix, newName, items } = body
+
+    // Determine operation type based on items array
+    const fileIds =
+      items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
+    const isBulkOperation = items && items.length > 1
 
     if (!fileIds || fileIds.length === 0) {
       return NextResponse.json(
@@ -35,9 +39,9 @@ export async function POST(
         let finalName = newName
 
         // For bulk operations, use prefix with original name
-        if (fileIds.length > 1 && namePrefix) {
-          const fileDetails = await driveService.getFile(id)
-          finalName = `${namePrefix} ${fileDetails.name}`
+        if (isBulkOperation && namePrefix) {
+          const originalItem = items.find((item: any) => item.id === id)
+          finalName = `${namePrefix} ${originalItem?.name || 'Unknown'}`
         }
 
         if (!finalName) {
@@ -64,6 +68,8 @@ export async function POST(
       success: errors.length === 0,
       processed: results.length,
       failed: errors.length,
+      type: isBulkOperation ? 'bulk' : 'single',
+      operation: 'rename',
       results,
       errors: errors.length > 0 ? errors : undefined,
     }
