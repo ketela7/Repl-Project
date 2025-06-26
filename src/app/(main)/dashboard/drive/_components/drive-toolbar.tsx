@@ -54,7 +54,7 @@ import {
 } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { successToast } from '@/lib/utils'
+import { successToast, errorToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
 import { BulkOperationsDialog } from './bulk-operations-dialog'
@@ -117,17 +117,10 @@ interface DriveToolbarProps {
   refreshing: boolean
   onUpload: () => void
   onCreateFolder: () => void
-  onBulkDelete: () => void
-  onBulkMove: () => void
-  onBulkCopy: () => void
-  onBulkShare: () => void
   onFiltersOpen: () => void
 
   // Mobile Actions Dialog Props
   selectedItems: DriveItem[]
-  onBulkDownload: () => void
-  onBulkRename: () => void
-  onBulkExport: () => void
   onDeselectAll: () => void
   onRefreshAfterBulkOp: () => void
   filters: {
@@ -456,9 +449,6 @@ export function DriveToolbar({
   onCreateFolder,
   onFiltersOpen,
   selectedItems,
-  onBulkDownload,
-  onBulkRename,
-  onBulkExport,
   onDeselectAll,
   onRefreshAfterBulkOp,
   filters,
@@ -586,7 +576,7 @@ export function DriveToolbar({
     if (onClearClientSideFilter) {
       onClearClientSideFilter()
       setActiveFilter(null)
-      toastUtils.info.generic('Filter cleared', {
+      successToast.generic('Filter cleared', {
         description: `Showing all ${items.length} items`,
       })
     }

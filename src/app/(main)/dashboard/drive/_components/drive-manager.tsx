@@ -634,6 +634,12 @@ export function DriveManager() {
     }
   }, [sortedDisplayItems, selectedItems.size])
 
+  // Bulk operation completion handler
+  const handleBulkOperationComplete = () => {
+    setSelectedItems(new Set())
+    handleRefresh()
+  }
+
   if (loading) {
     return <DriveGridSkeleton />
   }
@@ -659,7 +665,6 @@ export function DriveManager() {
           <DriveToolbar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            onSearchSubmit={handleSearchSubmit}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             isSelectMode={isSelectMode}
@@ -670,13 +675,6 @@ export function DriveManager() {
             refreshing={refreshing}
             onUpload={() => openDialog('upload')}
             onCreateFolder={() => openDialog('createFolder')}
-            onBulkDelete={() => {}}
-            onBulkMove={() => {}}
-            onBulkCopy={() => {}}
-            onBulkShare={() => {}}
-            onBulkDownload={() => {}}
-            onBulkRename={() => {}}
-            onBulkExport={() => {}}
             onFiltersOpen={() => openDialog('mobileFilters')}
             selectedItems={selectedItemsWithDetails}
             onDeselectAll={() => {
@@ -1003,4 +1001,8 @@ export function DriveManager() {
       {/* <PerformanceMonitor /> */}
     </div>
   )
+}
+
+function isFolder(item: any): boolean {
+  return item?.mimeType === 'application/vnd.google-apps.folder'
 }
