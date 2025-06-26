@@ -58,6 +58,7 @@ import { successToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
 import { BulkOperationsDialog } from './bulk-operations-dialog'
+import { FiltersDialog } from './filters-dialog'
 
 // Types
 interface DriveItem {
@@ -471,6 +472,7 @@ export function DriveToolbar({
 
   // Actions Dialog State
   const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
+  const [isFiltersDialogOpen, setIsFiltersDialogOpen] = useState(false)
 
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters
@@ -760,7 +762,7 @@ export function DriveToolbar({
               variant="ghost"
               size="sm"
               onClick={() => {
-                onFiltersOpen()
+                setIsFiltersDialogOpen(true)
               }}
               className={`h-8 px-2 md:px-3 ${
                 filters.activeView !== 'all' ||
@@ -2060,6 +2062,25 @@ export function DriveToolbar({
         onClose={() => setIsBulkOperationsOpen(false)}
         selectedItems={selectedItems}
         onRefreshAfterBulkOp={handleBulkOperationComplete}
+      />
+
+      {/* Filters Dialog */}
+      <FiltersDialog
+        open={isFiltersDialogOpen}
+        onOpenChange={setIsFiltersDialogOpen}
+        onFilterChange={onFilterChange}
+        onApplyFilters={onApplyFilters}
+        currentFilters={filters}
+        hasActiveFilters={
+          filters.activeView !== 'all' ||
+          filters.fileTypeFilter.length > 0 ||
+          filters.advancedFilters.sizeRange?.min ||
+          filters.advancedFilters.sizeRange?.max ||
+          filters.advancedFilters.createdDateRange?.from ||
+          filters.advancedFilters.modifiedDateRange?.from ||
+          filters.advancedFilters.owner
+        }
+        onClearFilters={onClearFilters}
       />
     </div>
   )
