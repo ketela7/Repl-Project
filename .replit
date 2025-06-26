@@ -1,4 +1,4 @@
-modules = ["web", "bash", "nodejs-22"]
+modules = ["web", "bash", "nodejs-20"]
 hidden = [".config", "package-lock.json"]
 
 [gitHubImport]

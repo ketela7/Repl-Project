@@ -348,29 +348,11 @@ function buildDriveQuery(filters: FileFilter): string {
     conditions.push(`'${filters.owner}' in owners`)
   }
 
-  // Size filtering (Google Drive API specification: only works for files, not folders)
-  // Google Drive API uses "size" parameter with exact syntax
-  let hasSizeFilter = false
-
-  if (filters.sizeMin) {
-    const minBytes = Number(filters.sizeMin)
-    if (minBytes > 0) {
-      conditions.push(`size >= ${minBytes}`)
-      hasSizeFilter = true
-    }
-  }
-
-  if (filters.sizeMax) {
-    const maxBytes = Number(filters.sizeMax)
-    if (maxBytes > 0) {
-      conditions.push(`size <= ${maxBytes}`)
-      hasSizeFilter = true
-    }
-  }
-
-  // Exclude folders when size filter is applied (Google Drive API limitation)
-  if (hasSizeFilter) {
-    conditions.push("not mimeType = 'application/vnd.google-apps.folder'")
+  // Size filtering - Google Drive API doesn't support size operators in query
+  // We'll handle size filtering on the client side after fetching results
+  // Only exclude folders when size filters are specified since they don't have meaningful sizes
+  if (filters.sizeMin || filters.sizeMax) {
+    conditions.push("mimeType != 'application/vnd.google-apps.folder'")
   }
 
   return conditions.join(' and ')
@@ -446,6 +428,19 @@ export async function GET(request: NextRequest) {
       pageSize,
       orderBy,
     })
+
+    // Apply client-side size filtering since Google Drive API doesn't support size operators
+    if (filters.sizeMin || filters.sizeMax) {
+      const sizeMin = filters.sizeMin ? Number(filters.sizeMin) : 0
+      const sizeMax = filters.sizeMax
+        ? Number(filters.sizeMax)
+        : Number.MAX_SAFE_INTEGER
+
+      result.files = result.files.filter((file: any) => {
+        const fileSize = file.size ? Number(file.size) : 0
+        return fileSize >= sizeMin && fileSize <= sizeMax
+      })
+    }
 
     driveCache.set(cacheKey, result, 15)
 
