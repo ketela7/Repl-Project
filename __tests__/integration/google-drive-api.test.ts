@@ -96,7 +96,7 @@ describe('Google Drive API Integration', () => {
 
     mockFetch(bulkResponse)
 
-    const response = await fetch('/api/drive/bulk/delete', {
+    const response = await fetch('/api/drive/files/bulk/trash', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

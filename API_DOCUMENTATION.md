@@ -264,15 +264,15 @@ POST /api/drive/bulk/share
 Mengganti nama multiple files dengan pattern tertentu.
 
 ```http
-POST /api/drive/bulk/rename
+POST /api/drive/files/bulk/rename
 ```
 
 **Request Body:**
 ```json
 {
   "fileIds": ["1abc123", "2def456"],
-  "pattern": "prefix_{original_name}",
-  "replaceSpaces": true
+  "namePrefix": "prefix_",
+  "newName": "custom_name"
 }
 ```
 
@@ -436,7 +436,7 @@ for (let i = 0; i < fileIds.length; i += batchSize) {
 }
 
 for (const batch of batches) {
-  await fetch('/api/drive/bulk/move', {
+  await fetch('/api/drive/files/bulk/move', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({

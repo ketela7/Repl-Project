@@ -37,6 +37,26 @@ export const ItemsDeleteDialog = lazy(
   () => import('@/app/(main)/dashboard/drive/_components/items-delete-dialog')
 )
 
+export const ItemsTrashDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-trash-dialog')
+)
+
+export const ItemsShareDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-share-dialog')
+)
+
+export const ItemsRenameDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-rename-dialog')
+)
+
+export const ItemsExportDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-export-dialog')
+)
+
+export const ItemsUntrashDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-untrash-dialog')
+)
+
 export const DriveToolbar = lazy(() =>
   import('@/app/(main)/dashboard/drive/_components/drive-toolbar').then(
     (mod) => ({ default: mod.DriveToolbar })

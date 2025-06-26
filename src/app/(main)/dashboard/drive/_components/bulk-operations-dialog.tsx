@@ -27,7 +27,16 @@ import {
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-
+import {
+  ItemsMoveDialog,
+  ItemsCopyDialog,
+  ItemsTrashDialog,
+  ItemsShareDialog,
+  ItemsRenameDialog,
+  ItemsExportDialog,
+  ItemsDeleteDialog,
+  ItemsUntrashDialog,
+} from '@/components/lazy-imports'
 
 interface BulkOperationsDialogProps {
   isOpen?: boolean
@@ -128,13 +137,12 @@ function BulkOperationsDialog({
   // Bulk operation completion handlers with actual API calls
   const handleMoveComplete = async (targetFolderId: string) => {
     try {
-      const response = await fetch('/api/drive/bulk', {
+      const response = await fetch('/api/drive/files/bulk/move', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation: 'move',
           fileIds: selectedItems.map((item) => item.id),
-          options: { targetFolderId },
+          targetFolderId,
         }),
       })
 
@@ -151,15 +159,14 @@ function BulkOperationsDialog({
 
   const handleCopyComplete = async (targetFolderId: string) => {
     try {
-      const response = await fetch('/api/drive/bulk', {
+      const response = await fetch('/api/drive/files/bulk/copy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation: 'copy',
           fileIds: selectedItems
             .filter((item) => !item.isFolder)
             .map((item) => item.id),
-          options: { targetFolderId },
+          targetFolderId,
         }),
       })
 
@@ -176,13 +183,11 @@ function BulkOperationsDialog({
 
   const handleDeleteComplete = async () => {
     try {
-      const response = await fetch('/api/drive/bulk', {
+      const response = await fetch('/api/drive/files/bulk/trash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation: 'delete',
           fileIds: selectedItems.map((item) => item.id),
-          options: {},
         }),
       })
 
@@ -199,13 +204,12 @@ function BulkOperationsDialog({
 
   const handleShareComplete = async (shareOptions: any) => {
     try {
-      const response = await fetch('/api/drive/bulk', {
+      const response = await fetch('/api/drive/files/bulk/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation: 'share',
           fileIds: selectedItems.map((item) => item.id),
-          options: shareOptions,
+          ...shareOptions,
         }),
       })
 
@@ -224,19 +228,15 @@ function BulkOperationsDialog({
     }
   }
 
-  const handleRenameComplete = async (pattern: string, type: string) => {
+  const handleRenameComplete = async (namePrefix: string, newName?: string) => {
     try {
-      const response = await fetch('/api/drive/bulk', {
+      const response = await fetch('/api/drive/files/bulk/rename', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation: 'rename',
           fileIds: selectedItems.map((item) => item.id),
-          options: {
-            pattern,
-            type,
-            originalNames: selectedItems.map((item) => item.name),
-          },
+          namePrefix,
+          newName,
         }),
       })
 
@@ -271,13 +271,11 @@ function BulkOperationsDialog({
 
   const handlePermanentDeleteComplete = async () => {
     try {
-      const response = await fetch('/api/drive/bulk', {
-        method: 'POST',
+      const response = await fetch('/api/drive/files/bulk/delete', {
+        method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation: 'permanently_delete',
           fileIds: selectedItems.map((item) => item.id),
-          options: {},
         }),
       })
 
@@ -294,13 +292,11 @@ function BulkOperationsDialog({
 
   const handleRestoreComplete = async () => {
     try {
-      const response = await fetch('/api/drive/bulk', {
+      const response = await fetch('/api/drive/files/bulk/untrash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          operation: 'restore',
           fileIds: selectedItems.map((item) => item.id),
-          options: {},
         }),
       })
 
