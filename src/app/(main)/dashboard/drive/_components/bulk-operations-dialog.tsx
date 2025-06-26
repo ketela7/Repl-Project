@@ -57,7 +57,6 @@ interface BulkOperationsDialogProps {
     //canCopy: boolean
     //canMove: boolean
     canExport: boolean
-
   }>
   onBulkDelete?: () => void
   onBulkDownload?: () => void
@@ -78,7 +77,7 @@ function BulkOperationsDialog({
 }: BulkOperationsDialogProps) {
   const isMobile = useIsMobile()
   const folderCount = selectedItems.filter((item) => item.isFolder).length
-	const fileCount = selectedItems - folderCount
+  const fileCount = selectedItems - folderCount
   const canDeleteCount = selectedItems.filter((item) => item.canDelete).length
   const canShareCount = selectedItems.filter((item) => item.canShare).length
   const canTrashCount = selectedItems.filter((item) => item.canTrash).length
@@ -95,7 +94,7 @@ function BulkOperationsDialog({
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] =useState(false)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
 
   // Determine dialog open state

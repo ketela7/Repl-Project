@@ -19,7 +19,7 @@ import { CreateFolderDialog } from './create-folder-dialog'
 import { FileRenameDialog } from './file-rename-dialog'
 import { FileMoveDialog } from './file-move-dialog'
 import { FileCopyDialog } from './file-copy-dialog'
-import { PermanentDeleteDialog } from './permanent-delete-dialog'
+import { FileDeleteDialog } from './file-delete-dialog'
 import { FileDetailsDialog } from './file-details-dialog'
 import { FilePreviewDialog } from './file-preview-dialog'
 import { FileShareDialog } from './file-share-dialog'
@@ -28,8 +28,6 @@ import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
 
 type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
-
-
 
 const initialFilters = {
   activeView: 'all' as
@@ -302,7 +300,7 @@ export function DriveManager() {
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
-      const isFolder = item.mimeType === 'application/vnd.google-apps.folder' 
+      const isFolder = item.mimeType === 'application/vnd.google-apps.folder'
       return {
         id: itemId,
         name: item?.name || 'Unknown',
@@ -322,7 +320,8 @@ export function DriveManager() {
         canUntrash: item?.trashed && (item?.capabilities?.canUntrash || false),
         canRename: item?.capabilities?.canRename || false,
         canShare: item?.capabilities?.canShare || false,
-        canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || true,
+        canMoveItemWithinDrive:
+          item?.capabilities?.canMoveItemWithinDrive || true,
       }
     })
   }, [selectedItems, items])
@@ -569,9 +568,9 @@ export function DriveManager() {
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
-    const itemsToSort = [...displayItems].map(item => ({
+    const itemsToSort = [...displayItems].map((item) => ({
       ...item,
-      isFolder: isFolder(item)
+      isFolder: isFolder(item),
     }))
 
     if (sortConfig && sortConfig.key) {
