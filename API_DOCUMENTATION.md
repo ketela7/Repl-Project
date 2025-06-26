@@ -135,6 +135,48 @@
   - Development testing with different filter parameters
   - Debugging cache-related issues
 
+### GET `/api/drive/performance`
+
+- **Description**: Get Google Drive API performance metrics
+- **Method**: GET
+- **Purpose**: Monitor API performance, response times, and error rates
+- **Authentication**: Required (protected route)
+- **Response**: 
+```json
+{
+  "success": true,
+  "data": {
+    "performance": {
+      "listFiles": {
+        "avgTime": 1250,
+        "count": 45,
+        "errorRate": 2.2
+      }
+    },
+    "timestamp": "2025-06-26T14:10:00.000Z",
+    "summary": {
+      "totalOperations": 45,
+      "avgResponseTime": 1250,
+      "overallErrorRate": 2.2
+    }
+  }
+}
+```
+
+### DELETE `/api/drive/performance`
+
+- **Description**: Reset performance metrics (development endpoint)
+- **Method**: DELETE
+- **Purpose**: Clear performance statistics for fresh monitoring
+- **Authentication**: Required (protected route)
+- **Response**: 
+```json
+{
+  "success": true,
+  "message": "Performance metrics reset successfully"
+}
+```
+
 ## Response Formats
 
 ### Success Response

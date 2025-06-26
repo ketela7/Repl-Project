@@ -19,12 +19,20 @@ import {
   buildSearchQuery,
   getMimeTypeFromFileName,
 } from './utils'
+import {
+  getOptimizedRequestParams,
+  DriveApiBatcher,
+  performanceMonitor,
+  requestDeduplicator,
+} from './performance'
 
 export class GoogleDriveService {
   private drive: drive_v3.Drive
+  private batcher: DriveApiBatcher
 
   constructor(accessToken: string) {
     this.drive = createDriveClient(accessToken)
+    this.batcher = new DriveApiBatcher(this.drive)
   }
 
   async getUserInfo(): Promise<DriveUserInfo> {
@@ -133,21 +141,17 @@ export class GoogleDriveService {
       searchQuery = 'trashed=false'
     }
 
-    // Prepare API request parameters with proper validation
-    const requestParams: any = {
+    // Use optimized request parameters based on operation type
+    const operation = pageSize === 1 ? 'EXISTS_CHECK' : 'LIST_STANDARD'
+    const baseParams = {
       q: searchQuery,
       pageSize: validPageSize,
       orderBy,
-      //  spaces: 'drive',
-      //  corpora: 'user',
-      //  supportsTeamDrives: includeTeamDriveItems,
       includeItemsFromAllDrives: includeTeamDriveItems,
       supportsAllDrives: includeTeamDriveItems,
-      fields:
-        pageSize === 1
-          ? 'files(id)'
-          : 'nextPageToken, incompleteSearch, files(id, name, mimeType, size, createdTime, modifiedTime, owners, shared, trashed, starred, webViewLink, thumbnailLink, parents, capabilities)',
     }
+
+    const requestParams = getOptimizedRequestParams(operation, baseParams)
     // Log query for debugging in development only
     if (process.env.NODE_ENV === 'development') {
       console.info('[Drive API] - Query:', searchQuery)
@@ -159,7 +163,21 @@ export class GoogleDriveService {
     }
 
     try {
-      const response = await this.drive.files.list(requestParams)
+      // Generate deduplication key for identical requests
+      const dedupKey = requestDeduplicator.generateKey(
+        'listFiles',
+        requestParams
+      )
+
+      // Use performance monitoring and request deduplication
+      const response = await performanceMonitor.trackRequest(
+        'listFiles',
+        async () => {
+          return await requestDeduplicator.deduplicate(dedupKey, async () => {
+            return await this.drive.files.list(requestParams)
+          })
+        }
+      )
 
       const files = response.data.files?.map(convertGoogleDriveFile) || []
 
