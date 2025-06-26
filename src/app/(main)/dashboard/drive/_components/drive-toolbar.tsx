@@ -484,7 +484,11 @@ export function DriveToolbar({
   const [isBulkOperationsOpen, setIsBulkOperationsOpen] = useState(false)
 
   // Extract necessary props from filters with defaults
-  const { activeView = 'all', fileTypeFilter = [], advancedFilters = {} } = filters || {}
+  const {
+    activeView = 'all',
+    fileTypeFilter = [],
+    advancedFilters = {},
+  } = filters || {}
 
   // Track active filter state
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
@@ -789,11 +793,11 @@ export function DriveToolbar({
               <span className="hidden md:inline">Filter</span>
               {(activeView !== 'all' ||
                 fileTypeFilter.length > 0 ||
-                advancedFilters.sizeRange?.min ||
-                advancedFilters.sizeRange?.max ||
-                advancedFilters.createdDateRange?.from ||
-                advancedFilters.modifiedDateRange?.from ||
-                advancedFilters.owner) && (
+                (advancedFilters as any).sizeRange?.min ||
+                (advancedFilters as any).sizeRange?.max ||
+                (advancedFilters as any).createdDateRange?.from ||
+                (advancedFilters as any).modifiedDateRange?.from ||
+                (advancedFilters as any).owner) && (
                 <Badge
                   variant="secondary"
                   className="ml-1 h-4 px-1 text-xs md:ml-2"
@@ -824,11 +828,11 @@ export function DriveToolbar({
                   <Calendar className="h-4 w-4" />
                   {(activeView !== 'all' ||
                     fileTypeFilter.length > 0 ||
-                    advancedFilters.sizeRange?.min ||
-                    advancedFilters.sizeRange?.max ||
-                    advancedFilters.createdDateRange?.from ||
-                    advancedFilters.modifiedDateRange?.from ||
-                    advancedFilters.owner) && (
+                    (advancedFilters as any).sizeRange?.min ||
+                    (advancedFilters as any).sizeRange?.max ||
+                    (advancedFilters as any).createdDateRange?.from ||
+                    (advancedFilters as any).modifiedDateRange?.from ||
+                    (advancedFilters as any).owner) && (
                     <Badge
                       variant="secondary"
                       className="ml-1 h-4 px-1 text-xs"
@@ -847,11 +851,11 @@ export function DriveToolbar({
                     </h4>
                     {(activeView !== 'all' ||
                       fileTypeFilter.length > 0 ||
-                      advancedFilters.sizeRange?.min ||
-                      advancedFilters.sizeRange?.max ||
-                      advancedFilters.createdDateRange?.from ||
-                      advancedFilters.modifiedDateRange?.from ||
-                      advancedFilters.owner) && (
+                      (advancedFilters as any).sizeRange?.min ||
+                      (advancedFilters as any).sizeRange?.max ||
+                      (advancedFilters as any).createdDateRange?.from ||
+                      (advancedFilters as any).modifiedDateRange?.from ||
+                      (advancedFilters as any).owner) && (
                       <Badge variant="secondary" className="ml-2 text-xs">
                         Active
                       </Badge>

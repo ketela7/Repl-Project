@@ -396,14 +396,20 @@ export function DriveManager({ className }: DriveManagerProps) {
           onBulkCopy={() => {}}
           onBulkShare={() => {}}
           onClearSelection={handleClearSelection}
-          items={allItems.map(item => ({
+          items={allItems.map((item) => ({
             ...item,
-            type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+            type:
+              item.mimeType === 'application/vnd.google-apps.folder'
+                ? ('folder' as const)
+                : ('file' as const),
           }))}
           onFiltersOpen={() => setFiltersDialogOpen(true)}
-          selectedItems={selectedItems.map(item => ({
+          selectedItems={selectedItems.map((item) => ({
             ...item,
-            type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+            type:
+              item.mimeType === 'application/vnd.google-apps.folder'
+                ? ('folder' as const)
+                : ('file' as const),
           }))}
           onBulkDownload={() => {}}
           onBulkRename={() => {}}
@@ -418,8 +424,8 @@ export function DriveManager({ className }: DriveManagerProps) {
               createdDateRange: {},
               modifiedDateRange: {},
               sortBy: 'modified' as const,
-              sortOrder: 'desc' as const
-            }
+              sortOrder: 'desc' as const,
+            },
           }}
           onFilterChange={() => {}}
           onApplyFilters={() => {}}
@@ -444,7 +450,7 @@ export function DriveManager({ className }: DriveManagerProps) {
           onSelectItem={handleSelectFile}
           onSelectModeChange={setIsSelectMode}
           onFolderClick={(folderId: string) => {
-            const folder = folders.find(f => f.id === folderId)
+            const folder = folders.find((f) => f.id === folderId)
             if (folder) handleFolderClick(folder)
           }}
           onColumnsChange={(config) => {
@@ -498,34 +504,46 @@ export function DriveManager({ className }: DriveManagerProps) {
         <BulkOperationsDialog
           isOpen={bulkOperationsOpen}
           onClose={() => setBulkOperationsOpen(false)}
-          selectedItems={selectedItems.map(item => ({
+          selectedItems={selectedItems.map((item) => ({
             ...item,
-            type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+            type:
+              item.mimeType === 'application/vnd.google-apps.folder'
+                ? ('folder' as const)
+                : ('file' as const),
           }))}
           onRefreshAfterBulkOp={handleOperationSuccess}
         />
 
         <FileRenameDialog
-          isOpen={renameDialogOpen}
+          open={renameDialogOpen}
           onClose={() => setRenameDialogOpen(false)}
           selectedItem={currentFile}
           onSuccess={handleOperationSuccess}
         />
 
         <FileDeleteDialog
-          isOpen={deleteDialogOpen}
-          onClose={() => setDeleteDialogOpen(false)}
+          open={deleteDialogOpen}
+          onOpenChange={(open) => setDeleteDialogOpen(open)}
           selectedItems={
             selectedFiles.size > 0
-              ? selectedItems.map(item => ({
+              ? selectedItems.map((item) => ({
                   ...item,
-                  type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+                  type:
+                    item.mimeType === 'application/vnd.google-apps.folder'
+                      ? ('folder' as const)
+                      : ('file' as const),
                 }))
               : currentFile
-                ? [{
-                    ...currentFile,
-                    type: currentFile.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
-                  }]
+                ? [
+                    {
+                      ...currentFile,
+                      type:
+                        currentFile.mimeType ===
+                        'application/vnd.google-apps.folder'
+                          ? ('folder' as const)
+                          : ('file' as const),
+                    },
+                  ]
                 : []
           }
           onRefreshAfterBulkOp={handleOperationSuccess}
@@ -538,7 +556,7 @@ export function DriveManager({ className }: DriveManagerProps) {
         />
 
         <FileShareDialog
-          isOpen={shareDialogOpen}
+          open={shareDialogOpen}
           onClose={() => setShareDialogOpen(false)}
           selectedItem={currentFile}
         />
@@ -558,32 +576,41 @@ export function DriveManager({ className }: DriveManagerProps) {
         />
 
         <FilePreviewDialog
-          isOpen={previewDialogOpen}
+          open={previewDialogOpen}
           onClose={() => setPreviewDialogOpen(false)}
           selectedItem={currentFile}
         />
 
         <PermanentDeleteDialog
-          isOpen={permanentDeleteOpen}
+          open={permanentDeleteOpen}
           onClose={() => setPermanentDeleteOpen(false)}
           selectedItems={
             selectedFiles.size > 0
-              ? selectedItems.map(item => ({
+              ? selectedItems.map((item) => ({
                   ...item,
-                  type: item.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
+                  type:
+                    item.mimeType === 'application/vnd.google-apps.folder'
+                      ? ('folder' as const)
+                      : ('file' as const),
                 }))
               : currentFile
-                ? [{
-                    ...currentFile,
-                    type: currentFile.mimeType === 'application/vnd.google-apps.folder' ? 'folder' as const : 'file' as const
-                  }]
+                ? [
+                    {
+                      ...currentFile,
+                      type:
+                        currentFile.mimeType ===
+                        'application/vnd.google-apps.folder'
+                          ? ('folder' as const)
+                          : ('file' as const),
+                    },
+                  ]
                 : []
           }
           onRefreshAfterBulkOp={handleOperationSuccess}
         />
 
         <FiltersDialog
-          isOpen={filtersDialogOpen}
+          open={filtersDialogOpen}
           onClose={() => setFiltersDialogOpen(false)}
         />
 

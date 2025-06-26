@@ -77,7 +77,7 @@ export const mockDriveResponse = {
 }
 
 // Mock fetch for API calls
-export const mockFetch = (response: any, status = 200) => {
+export const mockFetch = (response: unknown, status = 200) => {
   global.fetch = jest.fn(() =>
     Promise.resolve({
       ok: status < 400,
@@ -85,5 +85,5 @@ export const mockFetch = (response: any, status = 200) => {
       json: () => Promise.resolve(response),
       text: () => Promise.resolve(JSON.stringify(response)),
     })
-  ) as jest.Mock
+  ) as jest.MockedFunction<typeof fetch>
 }

@@ -43,7 +43,7 @@ loadingToast.dismiss = (id?: string) => {
   toast.dismiss(id)
 }
 
-successToast.generic = (message: string, options?: any) => {
+successToast.generic = (message: string, options?: object) => {
   toast.success(message, options)
 }
 
@@ -51,7 +51,7 @@ successToast.shared = (count: number) => {
   toast.success(`Successfully shared ${count} item${count > 1 ? 's' : ''}`)
 }
 
-errorToast.generic = (message: string, options?: any) => {
+errorToast.generic = (message: string, options?: object) => {
   toast.error(message, options)
 }
 
