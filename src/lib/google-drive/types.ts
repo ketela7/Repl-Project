@@ -96,9 +96,20 @@ export interface DriveFolder {
 
 export interface DriveFileMetadata {
   name: string
+  mimeType: string
+  createdTime: string
+  modifiedTime: string
   parents?: string[]
+  shared?: boolean
+  trashed?: boolean
+  webViewLink?: string
+  webContentLink?: string
+  thumbnailLink?: string
+  iconLink?: string
   description?: string
-  mimeType?: string
+  starred?: boolean
+  explicitlyTrashed?: boolean
+  exportLinks?: Record<string, string>
 }
 
 export interface DriveUploadOptions {
