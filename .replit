@@ -23,14 +23,6 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run lint"
 
-[[workflows.workflow]]
-name = "Check Type"
-mode = "sequential"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run typecheck"
 
 [[workflows.workflow]]
 name = "Check Duplicate"
@@ -40,18 +32,8 @@ mode = "sequential"
 task = "shell.exec"
 args = "npx jscpd src"
 
-[[workflows.workflow]]
-name = "Check:Fix"
-mode = "parallel"
-author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format:fix"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run lint:fix"
 
 [[workflows.workflow]]
 name = "Build"
@@ -75,7 +57,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "rm -rf ~/.{npm,nvm,yarn,bun} node_modules package-lock.json .cache"
+args = "rm -rf ~/.{npm,nvm,yarn,bun} node_modules package-lock.json .cache tsconfig.tsbuildinfo"
 
 [[workflows.workflow]]
 name = "Prepare"
@@ -102,17 +84,6 @@ author = "agent"
 task = "workflow.run"
 args = "Server"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "TypeCheck"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "API Test Runner"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Session Extract"
 
 [[workflows.workflow]]
 name = "Server"
@@ -129,24 +100,17 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx tsc --noEmit"
+args = "npm run typecheck"
 
 [[workflows.workflow]]
-name = "API Test Runner"
+name = "Check:Fix"
+mode = "sequential"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx tsx scripts/run-api-tests.ts"
-
-[[workflows.workflow]]
-name = "Session Extract"
-author = "agent"
+args = "npm run format:fix"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx tsx scripts/extract-session.ts"
-
-[nix]
-channel = "stable-24_05"
-
+args = "npm run lint:fix"

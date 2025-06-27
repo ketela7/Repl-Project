@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/bottom-sheet'
 import { cn } from '@/lib/utils'
 
-// FileCopyDialog removed - functionality integrated into bulk operations
 
 interface ItemsCopyDialogProps {
   isOpen: boolean

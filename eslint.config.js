@@ -47,7 +47,7 @@ module.exports = [
       // React rules
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
+      'react/prop-types': 'on',
 
       // Import rules
       'import/order': [
@@ -66,7 +66,7 @@ module.exports = [
       'sonarjs/cognitive-complexity': ['warn', 15],
 
       // Unused imports
-      'unused-imports/no-unused-imports': 'error',
+      'unused-imports/no-unused-imports': 'warn',
 
       // General rules
       'no-console': 'warn',

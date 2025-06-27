@@ -23,7 +23,7 @@ const nextConfig = {
     // optimizeCss: true, // Disabled to avoid critters dependency
   },
 
-  serverExternalPackages: ['postgres', 'googleapis'],
+  serverExternalPackages: ['googleapis'],
 
   // Fast TypeScript compilation
   typescript: {
@@ -36,7 +36,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  allowedDevOrigins: ['*.pike.replit.dev', '*.sisko.replit.dev'],
+  allowedDevOrigins: [127.0.0.1','localhost','*.pike.replit.dev', '*.sisko.replit.dev'],
 
   // Performance optimizations
   compiler: {
@@ -100,12 +100,7 @@ const nextConfig = {
               priority: -10,
               chunks: 'all',
             },
-            bulkDialogs: {
-              test: /[\\/](bulk-.*-dialog|optimized-lazy-dialogs)[\\/]/,
-              name: 'bulk-dialogs',
-              priority: 10,
-              chunks: 'async',
-            },
+            
           },
         },
       }
