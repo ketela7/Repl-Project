@@ -1,10 +1,5 @@
 modules = ["web", "bash", "nodejs-23", "postgresql-17", "nix"]
 
-
-
-
-
-
 [[ports]]
 localPort = 5000
 externalPort = 80
@@ -128,6 +123,14 @@ args = "Server"
 task = "workflow.run"
 args = "TypeCheck"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "API Test Runner"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Session Extract"
+
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -144,4 +147,20 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx tsc --noEmit"
+
+[[workflows.workflow]]
+name = "API Test Runner"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx scripts/run-api-tests.ts"
+
+[[workflows.workflow]]
+name = "Session Extract"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsx scripts/extract-session.ts"
 
