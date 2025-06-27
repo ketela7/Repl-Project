@@ -60,8 +60,6 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
-    "drizzle-kit": "^0.31.2",
-    "drizzle-orm": "^0.44.2",
     "embla-carousel-react": "^8.6.0",
     "eslint-plugin-unicorn": "^59.0.1",
     "googleapis": "^150.0.1",

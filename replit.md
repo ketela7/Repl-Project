@@ -19,7 +19,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 
 - **API Routes**: Next.js API routes for server-side logic
 - **Authentication**: NextAuth.js with Google OAuth 2.0
-- **Database**: PostgreSQL with Drizzle ORM (configured but database schema not yet implemented)
+- **Database**: Not required for authentication (NextAuth uses JWT only)
 - **Session Management**: JWT-based sessions with server-side caching
 - **File Operations**: Direct Google Drive API integration
 
@@ -163,6 +163,7 @@ Google Drive Pro is a comprehensive, enterprise-grade Google Drive management ap
 - June 27, 2025: DOWNLOAD STREAMING IMPLEMENTATION - Fixed critical download issues by implementing proper file streaming from Google Drive API through server to browser for One by One mode, using Google Drive direct URLs `https://drive.google.com/uc?export=download&id={fileId}` for Batch mode, proper CSV file download for Export Links mode with correct Content-Disposition headers, eliminated JSON responses that prevented actual file downloads, frontend now handles both streaming responses and fallback URLs correctly.
 - June 27, 2025: DOWNLOAD OPERATION FIXES COMPLETED - Fixed all three major download issues: (1) Progress tracking now updates in real-time during operations with proper callback implementation, (2) Batch mode works correctly with simultaneous downloads using Google Drive direct URLs, (3) Export Links mode generates and downloads actual CSV files instead of JSON responses, created dedicated bulk download endpoint at /api/drive/files/bulk/download with proper Content-Type headers, enhanced streaming with Web ReadableStream conversion for modern browser compatibility, added comprehensive error handling and fallback mechanisms.
 - June 27, 2025: UNIFIED API ROUTE REFACTORING COMPLETED - Successfully consolidated download operations into single endpoint `/api/drive/files/[fileId]/download/route.ts` supporting both single (fileId) and bulk (fileId='bulk') operations using items.length > 1 logic, eliminated redundant `/bulk/download` route, implemented chunked processing for bulk operations with 5-item batches for optimal performance, unified progress tracking and error handling, reduced code duplication by ~50% while maintaining backward compatibility, CSV export mode generates proper Content-Disposition headers for file downloads, comprehensive documentation with JSDoc comments for all functions.
+- June 27, 2025: COMPREHENSIVE DATABASE CLEANUP - Removed all database dependencies as project uses NextAuth JWT-only authentication: deleted drizzle/ folder, drizzle.config.js, src/lib/schema.ts, src/lib/db.ts, scripts/reset-db.ts, uninstalled drizzle-kit and drizzle-orm packages, removed DB Reset workflow, project now fully simplified with only NEXTAUTH_SECRET requirement for session management, eliminated DATABASE_URL dependency completely, faster builds and deployment without PostgreSQL requirement.
 
 ## Changelog
 

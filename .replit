@@ -8,19 +8,6 @@ externalPort = 80
 runButton = "Project"
 
 [[workflows.workflow]]
-name = "DB Reset"
-mode = "sequential"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx tsx scripts/reset-db.ts"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx drizzle-kit push"
-
-[[workflows.workflow]]
 name = "Check Format"
 mode = "sequential"
 
