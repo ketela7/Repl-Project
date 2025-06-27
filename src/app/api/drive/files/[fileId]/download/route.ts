@@ -136,7 +136,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       })
 
       // Return streaming response
-      return new NextResponse(fileResponse, {
+      return new NextResponse(fileResponse as any, {
         status: 200,
         headers,
       })
