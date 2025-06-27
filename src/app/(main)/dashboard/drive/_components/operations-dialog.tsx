@@ -123,7 +123,7 @@ function OperationsDialog({
   // Bulk operation completion handlers with actual API calls
   const handleMoveComplete = async (targetFolderId: string) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/move', {
+      const response = await fetch('/api/drive/files/move', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -165,7 +165,7 @@ function OperationsDialog({
 
   const handleDeleteComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/bulk/trash', {
+      const response = await fetch('/api/drive/files/trash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -185,7 +185,7 @@ function OperationsDialog({
 
   const handleShareComplete = async (shareOptions: any) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/share', {
+      const response = await fetch('/api/drive/files/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -211,7 +211,7 @@ function OperationsDialog({
 
   const handleRenameComplete = async (namePrefix: string, newName?: string) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/rename', {
+      const response = await fetch('/api/drive/files/rename', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -251,7 +251,7 @@ function OperationsDialog({
 
   const handlePermanentDeleteComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/bulk/delete', {
+      const response = await fetch('/api/drive/files/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -271,7 +271,7 @@ function OperationsDialog({
 
   const handleRestoreComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/bulk/untrash', {
+      const response = await fetch('/api/drive/files/untrash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -308,10 +308,10 @@ function OperationsDialog({
             })
           }
 
-          const fileResponse = await fetch(`/api/drive/files/${item.id}/download`, {
+          const fileResponse = await fetch('/api/drive/files/download', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ downloadMode: 'oneByOne' }),
+            body: JSON.stringify({ fileId: item.id, downloadMode: 'oneByOne' }),
           })
 
           if (fileResponse.ok) {
@@ -353,10 +353,10 @@ function OperationsDialog({
             })
           }
 
-          const response = await fetch(`/api/drive/files/${item.id}/download`, {
+          const response = await fetch('/api/drive/files/download', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ downloadMode: 'batch' }),
+            body: JSON.stringify({ fileId: item.id, downloadMode: 'batch' }),
           })
 
           if (response.ok) {
@@ -370,7 +370,7 @@ function OperationsDialog({
         await Promise.all(downloadPromises)
       } else if (downloadMode === 'exportLinks') {
         // For CSV export, use unified endpoint - fileId='bulk' triggers bulk processing
-        const response = await fetch('/api/drive/files/bulk/download', {
+        const response = await fetch('/api/drive/files/download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
