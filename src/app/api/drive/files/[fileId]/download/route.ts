@@ -4,9 +4,9 @@ import { initDriveService, handleApiError, validateOperationsRequest } from '@/l
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
 
-export async function POST(request: NextRequest, { params }: { params: { fileId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
-    const { fileId } = params
+    const { fileId } = await params
     const body = await request.json()
 
     // Initialize Drive service with authentication

@@ -302,7 +302,7 @@ function OperationsDialog({
 
       if (response.ok) {
         // For CSV export, handle as file download
-        if (downloadMode === 'exportLinks') {
+        if (mode === 'exportLinks') {
           const blob = await response.blob()
           const url = window.URL.createObjectURL(blob)
           const a = document.createElement('a')
