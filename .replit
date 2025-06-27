@@ -1,25 +1,9 @@
-modules = ["web", "bash", "nodejs-20", "postgresql-16"]
-hidden = [".config", "package-lock.json"]
-
-[gitHubImport]
-requiredFiles = [".replit", "package.json"]
-
-[nix]
-channel = "stable-24_05"
-packages = ["vim", "nodejs_22"]
-
-#[interpreter]
-#command = ["npm", "run", "format"]
+modules = ["web", "bash", "nodejs-23", "postgresql-17", "nix"]
 
 
-[deployment]
-run = ["npm", "start"]
-deploymentTarget = "autoscale"
-ignorePorts = false
 
-[[ports]]
-localPort = 3000
-externalPort = 3000
+
+
 
 [[ports]]
 localPort = 5000
