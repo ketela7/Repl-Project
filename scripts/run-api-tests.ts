@@ -11,7 +11,7 @@ import ComprehensiveAPITester from '../__tests__/api/comprehensive-api-test'
 function extractSessionCookie(): string {
   // In production, this would extract from browser DevTools or environment
   // For now, we'll use a placeholder that needs to be updated
-  const cookie = process.env.TEST_SESSION_COOKIE || ''
+  const cookie = process.env.SESSION_COOKIE || ''
   
   if (!cookie) {
     console.error('❌ No session cookie found!')
@@ -19,7 +19,7 @@ function extractSessionCookie(): string {
     console.log('   1. Open browser DevTools (F12)')
     console.log('   2. Go to Application > Cookies > localhost:5000')
     console.log('   3. Copy "next-auth.session-token" value')
-    console.log('   4. Set TEST_SESSION_COOKIE environment variable')
+    console.log('   4. Set SESSION_COOKIE environment variable')
     console.log('   5. Or update this script with the cookie value')
     process.exit(1)
   }
