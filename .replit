@@ -1,4 +1,4 @@
-modules = ["web", "bash", "nodejs-23", "postgresql-17", "nix"]
+modules = ["web", "bash", "nodejs-23"]
 
 [[ports]]
 localPort = 5000
