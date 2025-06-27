@@ -289,11 +289,25 @@ function OperationsDialog({
     onRefreshAfterOp?.()
   }
 
-  const handleDownloadComplete = async (downloadMode: string) => {
+  const handleDownloadComplete = async (downloadMode: string, progressCallback?: (progress: any) => void) => {
     try {
+      const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
+
       if (downloadMode === 'oneByOne') {
-        // For one by one downloads, download each file individually through streaming
-        for (const item of selectedItems.filter((item) => !item.isFolder)) {
+        // For one by one downloads with progress tracking
+        for (let i = 0; i < downloadableFiles.length; i++) {
+          const item = downloadableFiles[i]
+
+          // Update progress through callback if available
+          if (progressCallback) {
+            progressCallback({
+              current: i + 1,
+              total: downloadableFiles.length,
+              type: 'download',
+              currentOperation: `Downloading ${item.name}`,
+            })
+          }
+
           const fileResponse = await fetch(`/api/drive/files/${item.id}/download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -323,21 +337,53 @@ function OperationsDialog({
               window.URL.revokeObjectURL(url)
             }
           }
+
+          // Small delay between downloads to prevent browser blocking
+          await new Promise((resolve) => setTimeout(resolve, 1000))
         }
-      } else {
-        // For batch and exportLinks, use bulk endpoint
+      } else if (downloadMode === 'batch') {
+        // For batch downloads, download files simultaneously
+        const downloadPromises = downloadableFiles.map(async (item, index) => {
+          if (progressCallback) {
+            progressCallback({
+              current: index + 1,
+              total: downloadableFiles.length,
+              type: 'download',
+              currentOperation: `Batch downloading ${item.name}`,
+            })
+          }
+
+          const response = await fetch(`/api/drive/files/${item.id}/download`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ downloadMode: 'batch' }),
+          })
+
+          if (response.ok) {
+            const result = await response.json()
+            if (result.downloadUrl) {
+              window.open(result.downloadUrl, '_blank')
+            }
+          }
+        })
+
+        await Promise.all(downloadPromises)
+      } else if (downloadMode === 'exportLinks') {
+        // For CSV export, use bulk endpoint and ensure CSV download
         const response = await fetch('/api/drive/files/bulk/download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             items: selectedItems,
-            downloadMode,
+            downloadMode: 'exportLinks',
           }),
         })
 
         if (response.ok) {
-          // For CSV export, handle as file download
-          if (downloadMode === 'exportLinks') {
+          const contentType = response.headers.get('content-type')
+
+          if (contentType?.includes('text/csv')) {
+            // Direct CSV download
             const blob = await response.blob()
             const url = window.URL.createObjectURL(blob)
             const a = document.createElement('a')
@@ -348,15 +394,19 @@ function OperationsDialog({
             document.body.removeChild(a)
             window.URL.revokeObjectURL(url)
           } else {
-            // Handle batch downloads with Google Drive direct URLs
+            // Fallback: if response is JSON, generate CSV manually
             const result = await response.json()
             if (result.success && result.success.length > 0) {
-              // Use Google Drive direct download URLs
-              result.success.forEach((file: any) => {
-                if (file.downloadUrl) {
-                  window.open(file.downloadUrl, '_blank')
-                }
-              })
+              const csvContent = generateCSV(result.success)
+              const blob = new Blob([csvContent], { type: 'text/csv' })
+              const url = window.URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `download-links-${new Date().toISOString().split('T')[0]}.csv`
+              document.body.appendChild(a)
+              a.click()
+              document.body.removeChild(a)
+              window.URL.revokeObjectURL(url)
             }
           }
         }
@@ -366,6 +416,17 @@ function OperationsDialog({
     }
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()
+  }
+
+  // Helper function to generate CSV content
+  const generateCSV = (successfulDownloads: Array<{ id: string; name: string; downloadUrl?: string }>) => {
+    const headers = 'File Name,Download Link\n'
+    const rows = successfulDownloads
+      .filter((item) => item.downloadUrl)
+      .map((item) => `"${item.name}","${item.downloadUrl}"`)
+      .join('\n')
+
+    return headers + rows
   }
 
   const renderContent = () => (

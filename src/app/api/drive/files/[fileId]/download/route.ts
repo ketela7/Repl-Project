@@ -126,7 +126,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       if (isGoogleWorkspaceFile(mimeType)) {
         const exportMimeType = getExportFormat(mimeType)
         const exportExtension = getFileExtension(exportMimeType)
-        
+
         // Export Google Workspace file
         const exportBuffer = await throttledDriveRequest(async () => {
           return await retryDriveApiCall(async () => {

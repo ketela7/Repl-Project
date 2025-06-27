@@ -23,7 +23,7 @@ import { cn } from '@/lib/utils'
 interface ItemsDownloadDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (downloadMode: string) => void
+  onConfirm: (downloadMode: string, progressCallback?: (progress: any) => void) => void
   selectedItems: Array<{
     id: string
     name: string
@@ -96,8 +96,30 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
       errors: [],
     })
 
+    // Progress callback to update UI
+    const progressCallback = (progressData: any) => {
+      setProgress((prev) => ({
+        ...prev,
+        current: progressData.current || prev.current,
+        total: progressData.total || prev.total,
+        currentFile: progressData.currentOperation || prev.currentFile,
+        success: progressData.success || prev.success,
+        failed: progressData.failed || prev.failed,
+      }))
+    }
+
     try {
-      await onConfirm(selectedMode)
+      await onConfirm(selectedMode, progressCallback)
+
+      // Update final progress
+      setProgress((prev) => ({
+        ...prev,
+        current: prev.total,
+        success: downloadableFiles.length,
+        currentFile: undefined,
+      }))
+
+      toast.success(`Downloaded ${downloadableFiles.length} files successfully`)
     } catch (error) {
       toast.error('Download operation failed')
     } finally {
