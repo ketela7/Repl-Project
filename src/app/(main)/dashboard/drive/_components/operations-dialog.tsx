@@ -291,60 +291,78 @@ function OperationsDialog({
 
   const handleDownloadComplete = async (downloadMode: string) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems,
-          downloadMode,
-        }),
-      })
+      if (downloadMode === 'oneByOne') {
+        // For one by one downloads, download each file individually through streaming
+        for (const item of selectedItemsWithDetails.filter((item) => !item.isFolder)) {
+          const fileResponse = await fetch(`/api/drive/files/${item.id}/download`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ downloadMode: 'oneByOne' }),
+          })
 
-      if (response.ok) {
-        // For CSV export, handle as file download
-        if (mode === 'exportLinks') {
-          const blob = await response.blob()
-          const url = window.URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = `download-${new Date().toISOString().split('T')[0]}.csv`
-          document.body.appendChild(a)
-          a.click()
-          window.URL.revokeObjectURL(url)
-          document.body.removeChild(a)
-          // Success message handled by download completion
-        } else {
-          const result = await response.json()
-          // Handle other download modes (oneByOne, batch)
-          if (result.success && result.success.length > 0) {
-            // Trigger downloads for successful files
-            result.success.forEach((file: any) => {
-              if (file.downloadUrl) {
-                const a = document.createElement('a')
-                a.href = file.downloadUrl
-                a.download = file.name
-                document.body.appendChild(a)
-                a.click()
-                document.body.removeChild(a)
+          if (fileResponse.ok) {
+            // Check if response is file content (streaming) or JSON (fallback)
+            const contentType = fileResponse.headers.get('content-type')
+
+            if (contentType?.includes('application/json')) {
+              // Fallback: use returned download URL
+              const result = await fileResponse.json()
+              if (result.downloadUrl) {
+                window.open(result.downloadUrl, '_blank')
               }
-            })
-            // Download success feedback handled by browser
-          }
-
-          // Show summary if there were skipped or failed items
-          if (result.skipped?.length > 0 || result.failed?.length > 0) {
-            const summary = []
-            if (result.success?.length > 0) summary.push(`${result.success.length} successful`)
-            if (result.skipped?.length > 0) summary.push(`${result.skipped.length} skipped`)
-            if (result.failed?.length > 0) summary.push(`${result.failed.length} failed`)
-            // Summary feedback for completed operations
+            } else {
+              // Direct file download from our server
+              const blob = await fileResponse.blob()
+              const url = window.URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = item.name
+              document.body.appendChild(a)
+              a.click()
+              document.body.removeChild(a)
+              window.URL.revokeObjectURL(url)
+            }
           }
         }
       } else {
-        // Handle error response
+        // For batch and exportLinks, use bulk endpoint
+        const response = await fetch('/api/drive/files/bulk/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: selectedItemsWithDetails,
+            downloadMode,
+          }),
+        })
+
+        if (response.ok) {
+          // For CSV export, handle as file download
+          if (downloadMode === 'exportLinks') {
+            const blob = await response.blob()
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `download-links-${new Date().toISOString().split('T')[0]}.csv`
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+            window.URL.revokeObjectURL(url)
+          } else {
+            // Handle batch downloads with Google Drive direct URLs
+            const result = await response.json()
+            if (result.success && result.success.length > 0) {
+              // Use Google Drive direct download URLs
+              result.success.forEach((file: any) => {
+                if (file.downloadUrl) {
+                  window.open(file.downloadUrl, '_blank')
+                }
+              })
+            }
+          }
+        }
       }
     } catch (error) {
-      // Handle network or other errors
+      // Handle errors
     }
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()

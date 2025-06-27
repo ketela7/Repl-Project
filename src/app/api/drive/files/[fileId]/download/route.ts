@@ -97,24 +97,73 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json(results)
     }
 
-    // Handle single file download
-    const downloadResult = await processFileDownload(driveService, { id: fileId }, body.downloadMode || 'oneByOne')
+    // Handle single file download - stream directly to browser
+    const downloadMode = body.downloadMode || 'oneByOne'
 
-    if (downloadResult.success) {
+    if (downloadMode === 'exportLinks') {
+      // Return Google Drive direct download URL as JSON for CSV generation
+      const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
       return NextResponse.json({
         success: true,
-        downloadUrl: downloadResult.downloadUrl,
-        fileName: downloadResult.fileName,
+        downloadUrl,
+        fileName: `file-${fileId}`,
       })
-    } else {
-      return NextResponse.json({ error: downloadResult.error }, { status: 400 })
+    }
+
+    // For direct downloads, stream file from Google Drive through our server
+    try {
+      const fileResponse = await throttledDriveRequest(async () => {
+        return await retryDriveApiCall(async () => {
+          return await driveService.files.get(
+            {
+              fileId,
+              alt: 'media',
+            },
+            { responseType: 'stream' }
+          )
+        })
+      })
+
+      // Get file metadata for proper filename
+      const metadata = await throttledDriveRequest(async () => {
+        return await retryDriveApiCall(async () => {
+          return await driveService.files.get({
+            fileId,
+            fields: 'name,mimeType,size',
+          })
+        })
+      })
+
+      const fileName = metadata.data.name
+      const mimeType = metadata.data.mimeType || 'application/octet-stream'
+
+      // Stream file directly to browser
+      const headers = new Headers({
+        'Content-Type': mimeType,
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+      })
+
+      // Return streaming response
+      return new NextResponse(fileResponse.data, {
+        status: 200,
+        headers,
+      })
+    } catch (error: any) {
+      // Fallback to Google Drive direct URL if streaming fails
+      const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
+      return NextResponse.json({
+        success: true,
+        downloadUrl,
+        fileName: `file-${fileId}`,
+        fallback: true,
+      })
     }
   } catch (error) {
     return handleApiError(error)
   }
 }
 
-// Process individual file download
+// Process individual file download - return direct Google Drive URLs
 async function processFileDownload(driveService: any, file: any, downloadMode: string) {
   try {
     // Get file metadata first
@@ -122,28 +171,15 @@ async function processFileDownload(driveService: any, file: any, downloadMode: s
       return await retryDriveApiCall(async () => {
         return await driveService.files.get({
           fileId: file.id,
-          fields: 'id,name,mimeType,size,webContentLink',
+          fields: 'id,name,mimeType,size,webViewLink',
         })
       })
     })
 
     const fileData = fileMetadata.data
 
-    // Check if file is downloadable
-    if (!fileData.webContentLink && !isGoogleWorkspaceFile(fileData.mimeType)) {
-      throw new Error('File is not downloadable')
-    }
-
-    let downloadUrl: string
-
-    if (isGoogleWorkspaceFile(fileData.mimeType)) {
-      // For Google Workspace files, use export endpoint
-      const exportFormat = getExportFormat(fileData.mimeType)
-      downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}/export?mimeType=${exportFormat}`
-    } else {
-      // For regular files, use direct download
-      downloadUrl = `https://www.googleapis.com/drive/v3/files/${file.id}?alt=media`
-    }
+    // Use Google Drive direct download URL for all files
+    const downloadUrl = `https://drive.google.com/uc?export=download&id=${file.id}`
 
     return {
       success: true,
