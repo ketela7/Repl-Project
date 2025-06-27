@@ -34,7 +34,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         skipped: skippedFolders.map((folder: any) => ({
           id: folder.id,
           name: folder.name,
-          reason: 'Folder cannot be downloaded',
+          reason: 'Not Support',
         })),
         failed: [] as Array<{ id: string; name: string; error: string }>,
         downloadMode,
