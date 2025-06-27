@@ -112,30 +112,22 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     // For direct downloads, stream file from Google Drive through our server
     try {
-      const fileResponse = await throttledDriveRequest(async () => {
-        return await retryDriveApiCall(async () => {
-          return await driveService.files.get(
-            {
-              fileId,
-              alt: 'media',
-            },
-            { responseType: 'stream' }
-          )
-        })
-      })
-
-      // Get file metadata for proper filename
+      // Get file metadata first for proper filename
       const metadata = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
-          return await driveService.files.get({
-            fileId,
-            fields: 'name,mimeType,size',
-          })
+          return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size'])
         })
       })
 
-      const fileName = metadata.data.name
-      const mimeType = metadata.data.mimeType || 'application/octet-stream'
+      // Stream file content
+      const fileResponse = await throttledDriveRequest(async () => {
+        return await retryDriveApiCall(async () => {
+          return await driveService.downloadFile(fileId)
+        })
+      })
+
+      const fileName = metadata.name
+      const mimeType = metadata.mimeType || 'application/octet-stream'
 
       // Stream file directly to browser
       const headers = new Headers({
@@ -144,7 +136,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       })
 
       // Return streaming response
-      return new NextResponse(fileResponse.data, {
+      return new NextResponse(fileResponse, {
         status: 200,
         headers,
       })

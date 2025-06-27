@@ -293,7 +293,7 @@ function OperationsDialog({
     try {
       if (downloadMode === 'oneByOne') {
         // For one by one downloads, download each file individually through streaming
-        for (const item of selectedItemsWithDetails.filter((item) => !item.isFolder)) {
+        for (const item of selectedItems.filter((item) => !item.isFolder)) {
           const fileResponse = await fetch(`/api/drive/files/${item.id}/download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -330,7 +330,7 @@ function OperationsDialog({
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            items: selectedItemsWithDetails,
+            items: selectedItems,
             downloadMode,
           }),
         })

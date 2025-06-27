@@ -551,19 +551,7 @@ export class GoogleDriveService {
     return convertGoogleDriveFile(response.data)
   }
 
-  async downloadFile(fileId: string): Promise<ArrayBuffer> {
-    const response = await this.drive.files.get(
-      {
-        fileId,
-        alt: 'media',
-      },
-      { responseType: 'arraybuffer' }
-    )
-
-    return response.data as ArrayBuffer
-  }
-
-  async downloadFileStream(fileId: string): Promise<ReadableStream> {
+  async downloadFile(fileId: string): Promise<Readable> {
     const response = await this.drive.files.get(
       {
         fileId,
@@ -572,24 +560,38 @@ export class GoogleDriveService {
       { responseType: 'stream' }
     )
 
-    // Convert Node.js readable stream to Web ReadableStream
-    const nodeStream = response.data as any
+    return response.data as Readable
+  }
 
-    return new ReadableStream({
-      start(controller) {
-        nodeStream.on('data', (chunk: any) => {
-          controller.enqueue(chunk)
-        })
-
-        nodeStream.on('end', () => {
-          controller.close()
-        })
-
-        nodeStream.on('error', (error: any) => {
-          controller.error(error)
-        })
-      },
+  /**
+   * Get file metadata with specific fields
+   */
+  async getFileMetadata(fileId: string, fields: string[]): Promise<DriveFileMetadata> {
+    const response = await this.drive.files.get({
+      fileId,
+      fields: fields.join(','),
     })
+
+    return {
+      id: response.data.id!,
+      name: response.data.name!,
+      mimeType: response.data.mimeType!,
+      size: response.data.size,
+      createdTime: response.data.createdTime!,
+      modifiedTime: response.data.modifiedTime!,
+      parents: response.data.parents || [],
+      shared: response.data.shared || false,
+      trashed: response.data.trashed || false,
+      webViewLink: response.data.webViewLink,
+      webContentLink: response.data.webContentLink,
+      thumbnailLink: response.data.thumbnailLink,
+      iconLink: response.data.iconLink,
+      description: response.data.description,
+      starred: response.data.starred || false,
+      explicitlyTrashed: response.data.explicitlyTrashed || false,
+      exportLinks: response.data.exportLinks || {},
+      capabilities: response.data.capabilities || {},
+    }
   }
 
   // Unified permanent delete operation for both files and folders
