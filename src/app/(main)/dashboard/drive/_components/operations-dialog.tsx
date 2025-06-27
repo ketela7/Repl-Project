@@ -144,7 +144,7 @@ function OperationsDialog({
 
   const handleCopyComplete = async (targetFolderId: string) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/copy', {
+      const response = await fetch('/api/drive/files/copy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
