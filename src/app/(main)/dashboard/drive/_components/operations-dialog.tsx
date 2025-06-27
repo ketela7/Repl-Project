@@ -127,7 +127,7 @@ function OperationsDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
           targetFolderId,
         }),
       })
@@ -148,7 +148,7 @@ function OperationsDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.filter((item) => !item.isFolder).map((item) => item.id),
+          items: selectedItems.filter((item) => !item.isFolder),
           targetFolderId,
         }),
       })
@@ -169,7 +169,7 @@ function OperationsDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
         }),
       })
 
@@ -189,7 +189,7 @@ function OperationsDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
           ...shareOptions,
         }),
       })
@@ -215,7 +215,7 @@ function OperationsDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
           namePrefix,
           newName,
         }),
@@ -255,7 +255,7 @@ function OperationsDialog({
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
         }),
       })
 
@@ -275,7 +275,7 @@ function OperationsDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
         }),
       })
 
