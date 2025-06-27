@@ -164,3 +164,6 @@ author = "agent"
 task = "shell.exec"
 args = "npx tsx scripts/extract-session.ts"
 
+[nix]
+channel = "stable-24_05"
+
