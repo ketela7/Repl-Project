@@ -119,26 +119,52 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         })
       })
 
-      // Stream file content
-      const fileResponse = await throttledDriveRequest(async () => {
+      const fileName = metadata.name
+      const mimeType = metadata.mimeType || 'application/octet-stream'
+
+      // Check if it's a Google Workspace file that needs export
+      if (isGoogleWorkspaceFile(mimeType)) {
+        const exportMimeType = getExportFormat(mimeType)
+        const exportExtension = getFileExtension(exportMimeType)
+        
+        // Export Google Workspace file
+        const exportBuffer = await throttledDriveRequest(async () => {
+          return await retryDriveApiCall(async () => {
+            return await driveService.exportFile(fileId, exportMimeType)
+          })
+        })
+
+        const uint8Array = new Uint8Array(exportBuffer)
+        const exportFileName = `${fileName}.${exportExtension}`
+
+        return new NextResponse(uint8Array, {
+          status: 200,
+          headers: {
+            'Content-Type': exportMimeType,
+            'Content-Disposition': `attachment; filename="${exportFileName}"`,
+            'Content-Length': uint8Array.length.toString(),
+          },
+        })
+      }
+
+      // For regular files, stream directly
+      const fileStream = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
           return await driveService.downloadFile(fileId)
         })
       })
 
-      const fileName = metadata.name
-      const mimeType = metadata.mimeType || 'application/octet-stream'
+      // Convert Node.js Readable to Web ReadableStream
+      const { Readable } = await import('stream')
+      const webStream = Readable.toWeb(fileStream)
 
       // Stream file directly to browser
-      const headers = new Headers({
-        'Content-Type': mimeType,
-        'Content-Disposition': `attachment; filename="${fileName}"`,
-      })
-
-      // Return streaming response
-      return new NextResponse(fileResponse as any, {
+      return new NextResponse(webStream, {
         status: 200,
-        headers,
+        headers: {
+          'Content-Type': mimeType,
+          'Content-Disposition': `attachment; filename="${fileName}"`,
+        },
       })
     } catch (error: any) {
       // Fallback to Google Drive direct URL if streaming fails
@@ -213,6 +239,22 @@ function getExportFormat(mimeType: string): string {
   }
 
   return exportMap[mimeType] || 'application/pdf'
+}
+
+// Get file extension from mime type
+function getFileExtension(mimeType: string): string {
+  const extensionMap: { [key: string]: string } = {
+    'application/pdf': 'pdf',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+    'image/png': 'png',
+    'image/jpeg': 'jpg',
+    'text/plain': 'txt',
+    'text/csv': 'csv',
+  }
+
+  return extensionMap[mimeType] || 'pdf'
 }
 
 // Extract user-friendly error message

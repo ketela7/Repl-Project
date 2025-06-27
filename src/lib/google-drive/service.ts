@@ -505,6 +505,8 @@ export class GoogleDriveService {
     const metadata: DriveFileMetadata = {
       name,
       mimeType: 'application/vnd.google-apps.folder',
+      createdTime: new Date().toISOString(),
+      modifiedTime: new Date().toISOString(),
     }
 
     if (parentId) {
@@ -588,7 +590,6 @@ export class GoogleDriveService {
       starred: response.data.starred || false,
       explicitlyTrashed: response.data.explicitlyTrashed || false,
       exportLinks: response.data.exportLinks || {},
-      capabilities: response.data.capabilities || {},
     }
   }
 
