@@ -49,7 +49,7 @@ const DOWNLOAD_MODES = [
   {
     id: 'exportLinks',
     label: 'Export Download Links',
-    description: 'Generate CSV file with download links (download-DATE.csv)',
+    description: 'Generate CSV file with download links',
     icon: FileText,
   },
 ]
