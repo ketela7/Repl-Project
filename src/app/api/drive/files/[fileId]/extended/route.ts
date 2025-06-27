@@ -1,28 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import {
-  initDriveService,
-  handleApiError,
-  getFileIdFromParams,
-} from '@/lib/api-utils'
+import { initDriveService, handleApiError, getFileIdFromParams } from '@/lib/api-utils'
 import { driveCache } from '@/lib/cache'
-import {
-  generateProgressiveKey,
-  LoadingStage,
-} from '@/lib/google-drive/progressive-fields'
+import { generateProgressiveKey, LoadingStage } from '@/lib/google-drive/progressive-fields'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const fileId = await getFileIdFromParams(params)
 
     if (!fileId) {
-      return NextResponse.json(
-        { error: 'File ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'File ID is required' }, { status: 400 })
     }
 
     const authResult = await initDriveService()
@@ -30,15 +17,10 @@ export async function GET(
       return authResult.response!
     }
 
-    const userId =
-      authResult.session!.user.email || authResult.session!.user.id || ''
+    const userId = authResult.session!.user.email || authResult.session!.user.id || ''
 
     // Check cache first (longer TTL for extended metadata)
-    const cacheKey = generateProgressiveKey(
-      fileId,
-      userId,
-      LoadingStage.EXTENDED
-    )
+    const cacheKey = generateProgressiveKey(fileId, userId, LoadingStage.EXTENDED)
     const cachedDetails = driveCache.get(cacheKey)
     if (cachedDetails) {
       return NextResponse.json({

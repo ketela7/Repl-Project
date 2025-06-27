@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { initDriveService } from '@/lib/api-utils'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { fileId: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { fileId: string } }) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -20,15 +17,11 @@ export async function POST(
     const { namePrefix, newName, items } = body
 
     // Determine operation type based on items array
-    const fileIds =
-      items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
+    const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
     const isBulkOperation = items && items.length > 1
 
     if (!fileIds || fileIds.length === 0) {
-      return NextResponse.json(
-        { error: 'File IDs are required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'File IDs are required' }, { status: 400 })
     }
 
     const results = []
@@ -78,9 +71,6 @@ export async function POST(
       status: errors.length === 0 ? 200 : 207,
     })
   } catch (error: any) {
-    return NextResponse.json(
-      { error: 'Failed to rename files' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to rename files' }, { status: 500 })
   }
 }

@@ -40,18 +40,12 @@ interface ItemsDeleteDialogProps {
   }>
 }
 
-function ItemsDeleteDialog({
-  isOpen,
-  onClose,
-  onConfirm,
-  selectedItems,
-}: ItemsDeleteDialogProps) {
+function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsDeleteDialogProps) {
   const [confirmationText, setConfirmationText] = useState('')
   const [acknowledgeWarning, setAcknowledgeWarning] = useState(false)
   const isMobile = useIsMobile()
 
-  const isConfirmationValid =
-    confirmationText.trim() === 'CONFIRM DELETE' && acknowledgeWarning
+  const isConfirmationValid = confirmationText.trim() === 'CONFIRM DELETE' && acknowledgeWarning
 
   const handleConfirm = () => {
     if (isConfirmationValid) {
@@ -76,28 +70,21 @@ function ItemsDeleteDialog({
           </div>
         </div>
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">
-            Permanent Delete
-          </h3>
-          <p className="text-muted-foreground text-sm">
-            DANGER: This action cannot be undone
-          </p>
+          <h3 className="text-lg font-semibold text-red-600 dark:text-red-400">Permanent Delete</h3>
+          <p className="text-muted-foreground text-sm">DANGER: This action cannot be undone</p>
         </div>
       </div>
 
       {/* File Count Badge */}
       <div className="text-center">
         <Badge variant="destructive" className="px-3 py-1">
-          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}{' '}
-          selected
+          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
         </Badge>
       </div>
 
       {/* Selected Files Preview */}
       <div className="space-y-3">
-        <Label className="text-sm font-medium text-red-600 dark:text-red-400">
-          Items to be permanently deleted
-        </Label>
+        <Label className="text-sm font-medium text-red-600 dark:text-red-400">Items to be permanently deleted</Label>
         <div className="max-h-32 space-y-1 overflow-y-auto rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
           {selectedItems.slice(0, 5).map((item) => (
             <div key={item.id} className="flex items-center gap-2 text-sm">
@@ -119,8 +106,7 @@ function ItemsDeleteDialog({
       <div className="space-y-4">
         <div className="space-y-3">
           <Label className="text-sm font-medium">
-            Type <span className="font-mono text-red-600">CONFIRM DELETE</span>{' '}
-            to proceed
+            Type <span className="font-mono text-red-600">CONFIRM DELETE</span> to proceed
           </Label>
           <Input
             type="text"
@@ -135,21 +121,13 @@ function ItemsDeleteDialog({
           <Checkbox
             id="acknowledge-warning"
             checked={acknowledgeWarning}
-            onCheckedChange={(checked) =>
-              setAcknowledgeWarning(checked === true)
-            }
+            onCheckedChange={(checked) => setAcknowledgeWarning(checked === true)}
             className="mt-1"
           />
-          <Label
-            htmlFor="acknowledge-warning"
-            className="cursor-pointer text-sm leading-relaxed"
-          >
+          <Label htmlFor="acknowledge-warning" className="cursor-pointer text-sm leading-relaxed">
             I understand that this action will{' '}
-            <span className="font-semibold text-red-600 dark:text-red-400">
-              permanently delete
-            </span>{' '}
-            all selected items and{' '}
-            <span className="font-semibold">cannot be reversed</span>.
+            <span className="font-semibold text-red-600 dark:text-red-400">permanently delete</span> all selected items
+            and <span className="font-semibold">cannot be reversed</span>.
           </Label>
         </div>
       </div>
@@ -160,8 +138,8 @@ function ItemsDeleteDialog({
           <div className="h-1.5 w-1.5 rounded-full bg-white" />
         </div>
         <div className="text-sm text-red-800 dark:text-red-200">
-          <span className="font-semibold">Final warning:</span> This action will
-          permanently delete all selected items and cannot be reversed.
+          <span className="font-semibold">Final warning:</span> This action will permanently delete all selected items
+          and cannot be reversed.
         </div>
       </div>
     </div>
@@ -177,19 +155,13 @@ function ItemsDeleteDialog({
                 <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <div className="text-lg font-semibold text-red-600 dark:text-red-400">
-                  Permanent Delete
-                </div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Bulk Permanent Delete Operation
-                </div>
+                <div className="text-lg font-semibold text-red-600 dark:text-red-400">Permanent Delete</div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk Permanent Delete Operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="flex-1 overflow-y-auto px-4 pb-4">
-            {renderContent()}
-          </div>
+          <div className="flex-1 overflow-y-auto px-4 pb-4">{renderContent()}</div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
             <Button
@@ -206,11 +178,7 @@ function ItemsDeleteDialog({
                 'Complete Requirements Above'
               )}
             </Button>
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
+            <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
               Cancel
             </Button>
           </BottomSheetFooter>
@@ -228,17 +196,11 @@ function ItemsDeleteDialog({
               <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <div className="text-lg font-semibold text-red-600 dark:text-red-400">
-                Permanent Delete
-              </div>
-              <div className="text-muted-foreground text-sm font-normal">
-                Bulk Permanent Delete Operation
-              </div>
+              <div className="text-lg font-semibold text-red-600 dark:text-red-400">Permanent Delete</div>
+              <div className="text-muted-foreground text-sm font-normal">Bulk Permanent Delete Operation</div>
             </div>
           </AlertDialogTitle>
-          <AlertDialogDescription className="space-y-4 pt-2">
-            {renderContent()}
-          </AlertDialogDescription>
+          <AlertDialogDescription className="space-y-4 pt-2">{renderContent()}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
           <AlertDialogAction
@@ -255,9 +217,7 @@ function ItemsDeleteDialog({
               'Complete Requirements Above'
             )}
           </AlertDialogAction>
-          <AlertDialogCancel className="w-full sm:w-auto">
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

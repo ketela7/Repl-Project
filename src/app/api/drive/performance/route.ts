@@ -18,26 +18,16 @@ export async function GET() {
         performance: stats,
         timestamp: new Date().toISOString(),
         summary: {
-          totalOperations: Object.values(stats).reduce(
-            (sum, stat) => sum + stat.count,
-            0
-          ),
+          totalOperations: Object.values(stats).reduce((sum, stat) => sum + stat.count, 0),
           avgResponseTime:
-            Object.values(stats).reduce((sum, stat) => sum + stat.avgTime, 0) /
-              Object.keys(stats).length || 0,
+            Object.values(stats).reduce((sum, stat) => sum + stat.avgTime, 0) / Object.keys(stats).length || 0,
           overallErrorRate:
-            Object.values(stats).reduce(
-              (sum, stat) => sum + stat.errorRate,
-              0
-            ) / Object.keys(stats).length || 0,
+            Object.values(stats).reduce((sum, stat) => sum + stat.errorRate, 0) / Object.keys(stats).length || 0,
         },
       },
     })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch performance metrics' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch performance metrics' }, { status: 500 })
   }
 }
 
@@ -55,9 +45,6 @@ export async function DELETE() {
       message: 'Performance metrics reset successfully',
     })
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to reset performance metrics' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to reset performance metrics' }, { status: 500 })
   }
 }

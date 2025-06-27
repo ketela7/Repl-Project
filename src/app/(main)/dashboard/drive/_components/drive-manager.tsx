@@ -39,13 +39,7 @@ function getSizeMultiplier(unit: string): number {
 }
 
 const initialFilters = {
-  activeView: 'all' as
-    | 'all'
-    | 'my-drive'
-    | 'shared'
-    | 'starred'
-    | 'recent'
-    | 'trash',
+  activeView: 'all' as 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash',
   fileTypeFilter: [] as string[],
   advancedFilters: {
     sizeRange: {
@@ -103,14 +97,7 @@ export function DriveManager() {
 
   // Sorting state
   const [sortConfig, setSortConfig] = useState<{
-    key:
-      | 'name'
-      | 'id'
-      | 'size'
-      | 'modifiedTime'
-      | 'createdTime'
-      | 'mimeType'
-      | 'owners'
+    key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners'
     direction: 'asc' | 'desc'
   } | null>(null)
 
@@ -118,8 +105,7 @@ export function DriveManager() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [isSelectMode, setIsSelectMode] = useState(false)
 
-  const [selectedFileForPreview, setSelectedFileForPreview] =
-    useState<DriveFile | null>(null)
+  const [selectedFileForPreview, setSelectedFileForPreview] = useState<DriveFile | null>(null)
 
   // Progress states
   const [operationsProgress, setOperationsProgress] = useState<{
@@ -171,28 +157,12 @@ export function DriveManager() {
     !!filters.advancedFilters.createdDateRange.to ||
     !!filters.advancedFilters.modifiedDateRange.from ||
     !!filters.advancedFilters.modifiedDateRange.to ||
-    !!(
-      filters.advancedFilters.owner &&
-      String(filters.advancedFilters.owner).trim()
-    )
+    !!(filters.advancedFilters.owner && String(filters.advancedFilters.owner).trim())
 
   // Sorting Start
-  const handleSort = (
-    key:
-      | 'name'
-      | 'id'
-      | 'size'
-      | 'modifiedTime'
-      | 'createdTime'
-      | 'mimeType'
-      | 'owners'
-  ) => {
+  const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
     let direction: 'asc' | 'desc' = 'asc'
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === 'asc'
-    ) {
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc'
     }
     setSortConfig({ key, direction })
@@ -202,11 +172,7 @@ export function DriveManager() {
     if (!sortConfig || sortConfig.key !== columnKey) {
       return <ChevronsUpDown className="h-4 w-4" />
     }
-    return sortConfig.direction === 'asc' ? (
-      <ChevronUp className="h-4 w-4" />
-    ) : (
-      <ChevronDown className="h-4 w-4" />
-    )
+    return sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
   }
 
   const sortedItems = useMemo(() => {
@@ -255,20 +221,8 @@ export function DriveManager() {
           return 0
       }
 
-      if (
-        aValue === null ||
-        aValue === undefined ||
-        aValue === '' ||
-        aValue === '-'
-      )
-        aValue = key === 'size' ? 0 : ''
-      if (
-        bValue === null ||
-        bValue === undefined ||
-        bValue === '' ||
-        bValue === '-'
-      )
-        bValue = key === 'size' ? 0 : ''
+      if (aValue === null || aValue === undefined || aValue === '' || aValue === '-') aValue = key === 'size' ? 0 : ''
+      if (bValue === null || bValue === undefined || bValue === '' || bValue === '-') bValue = key === 'size' ? 0 : ''
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1
       if (aValue > bValue) return direction === 'asc' ? 1 : -1
@@ -281,8 +235,7 @@ export function DriveManager() {
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
-      const itemIsFolder =
-        item?.mimeType === 'application/vnd.google-apps.folder'
+      const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
 
       return {
         id: itemId,
@@ -303,8 +256,7 @@ export function DriveManager() {
         canUntrash: item?.trashed && (item?.capabilities?.canUntrash || false),
         canRename: item?.capabilities?.canRename || false,
         canShare: item?.capabilities?.canShare || false,
-        canMoveItemWithinDrive:
-          item?.capabilities?.canMoveItemWithinDrive || true,
+        canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || true,
       }
     })
   }, [selectedItems, items])
@@ -314,8 +266,7 @@ export function DriveManager() {
     async (folderId?: string, searchQuery?: string, pageToken?: string) => {
       let callId = ''
       try {
-        if (!folderId && folderId !== '')
-          folderId = currentFolderId || undefined
+        if (!folderId && folderId !== '') folderId = currentFolderId || undefined
 
         const filterKey = JSON.stringify({
           view: filters.activeView,
@@ -347,64 +298,32 @@ export function DriveManager() {
         if (folderId) params.append('folderId', folderId)
         if (searchQuery) params.append('search', searchQuery)
         if (pageToken) params.append('pageToken', pageToken)
-        if (filters.activeView && filters.activeView !== 'all')
-          params.append('viewStatus', filters.activeView)
-        if (filters.fileTypeFilter?.length > 0)
-          params.append('fileType', filters.fileTypeFilter.join(','))
+        if (filters.activeView && filters.activeView !== 'all') params.append('viewStatus', filters.activeView)
+        if (filters.fileTypeFilter?.length > 0) params.append('fileType', filters.fileTypeFilter.join(','))
         if (filters.advancedFilters.createdDateRange?.from)
-          params.append(
-            'createdAfter',
-            filters.advancedFilters.createdDateRange.from.toISOString()
-          )
+          params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
         if (filters.advancedFilters.createdDateRange?.to)
-          params.append(
-            'createdBefore',
-            filters.advancedFilters.createdDateRange.to.toISOString()
-          )
+          params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
         if (filters.advancedFilters.modifiedDateRange?.from)
-          params.append(
-            'modifiedAfter',
-            filters.advancedFilters.modifiedDateRange.from.toISOString()
-          )
+          params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
         if (filters.advancedFilters.modifiedDateRange?.to)
-          params.append(
-            'modifiedBefore',
-            filters.advancedFilters.modifiedDateRange.to.toISOString()
-          )
-        if (filters.advancedFilters.owner?.trim())
-          params.append('owner', filters.advancedFilters.owner.trim())
+          params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
+        if (filters.advancedFilters.owner?.trim()) params.append('owner', filters.advancedFilters.owner.trim())
 
         // Add size filtering parameters (Google Drive API specification - values in bytes)
-        if (
-          filters.advancedFilters.sizeRange?.min &&
-          filters.advancedFilters.sizeRange.min > 0
-        ) {
-          const multiplier = getSizeMultiplier(
-            filters.advancedFilters.sizeRange.unit
-          )
-          const minBytes = Math.floor(
-            filters.advancedFilters.sizeRange.min * multiplier
-          )
+        if (filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) {
+          const multiplier = getSizeMultiplier(filters.advancedFilters.sizeRange.unit)
+          const minBytes = Math.floor(filters.advancedFilters.sizeRange.min * multiplier)
           params.append('sizeMin', String(minBytes))
         }
-        if (
-          filters.advancedFilters.sizeRange?.max &&
-          filters.advancedFilters.sizeRange.max > 0
-        ) {
-          const multiplier = getSizeMultiplier(
-            filters.advancedFilters.sizeRange.unit
-          )
-          const maxBytes = Math.floor(
-            filters.advancedFilters.sizeRange.max * multiplier
-          )
+        if (filters.advancedFilters.sizeRange?.max && filters.advancedFilters.sizeRange.max > 0) {
+          const multiplier = getSizeMultiplier(filters.advancedFilters.sizeRange.unit)
+          const maxBytes = Math.floor(filters.advancedFilters.sizeRange.max * multiplier)
           params.append('sizeMax', String(maxBytes))
         }
 
         // Add pageSize parameter
-        if (
-          filters.advancedFilters.pageSize &&
-          filters.advancedFilters.pageSize !== 50
-        ) {
+        if (filters.advancedFilters.pageSize && filters.advancedFilters.pageSize !== 50) {
           params.append('pageSize', String(filters.advancedFilters.pageSize))
         }
 
@@ -426,10 +345,7 @@ export function DriveManager() {
 
         const newItems = (data.files || data || []).map((item: any) => ({
           ...item,
-          itemType:
-            item.mimeType === 'application/vnd.google-apps.folder'
-              ? ('folder' as const)
-              : ('file' as const),
+          itemType: item.mimeType === 'application/vnd.google-apps.folder' ? ('folder' as const) : ('file' as const),
         }))
 
         setItems((prev) => (pageToken ? [...prev, ...newItems] : newItems))
@@ -438,11 +354,7 @@ export function DriveManager() {
         setHasAccess(true)
         setDriveAccessError(null)
       } catch (error: any) {
-        if (
-          error.message?.includes('Authentication') ||
-          error.message?.includes('401') ||
-          error.status === 401
-        ) {
+        if (error.message?.includes('Authentication') || error.message?.includes('401') || error.status === 401) {
           setNeedsReauth(true)
           setDriveAccessError(error)
           window.location.href = '/auth/v1/login'
@@ -519,10 +431,7 @@ export function DriveManager() {
 
   // Apply client-side size filtering
   const sizeFilteredItems = useMemo(() => {
-    if (
-      !filters.advancedFilters.sizeRange?.min &&
-      !filters.advancedFilters.sizeRange?.max
-    ) {
+    if (!filters.advancedFilters.sizeRange?.min && !filters.advancedFilters.sizeRange?.max) {
       return items
     }
 
@@ -531,13 +440,7 @@ export function DriveManager() {
 
       const sizeStr = (item as any).size
       let sizeBytes = 0
-      if (
-        sizeStr &&
-        sizeStr !== '-' &&
-        sizeStr !== 'undefined' &&
-        sizeStr !== 'null' &&
-        sizeStr.trim() !== ''
-      ) {
+      if (sizeStr && sizeStr !== '-' && sizeStr !== 'undefined' && sizeStr !== 'null' && sizeStr.trim() !== '') {
         const parsed = parseInt(sizeStr, 10)
         if (!isNaN(parsed)) {
           sizeBytes = parsed
@@ -563,10 +466,8 @@ export function DriveManager() {
         }
       }
 
-      if (minSize !== undefined && sizeBytes < getBytes(minSize, sizeUnit))
-        return false
-      if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit))
-        return false
+      if (minSize !== undefined && sizeBytes < getBytes(minSize, sizeUnit)) return false
+      if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit)) return false
       return true
     })
   }, [items, filters.advancedFilters.sizeRange])
@@ -607,16 +508,8 @@ export function DriveManager() {
             bValue = b.isFolder ? 'folder' : (b.mimeType || '').toLowerCase()
             break
           case 'owners':
-            aValue = (
-              (a as any).owners?.[0]?.displayName ||
-              (a as any).owners?.[0]?.emailAddress ||
-              ''
-            ).toLowerCase()
-            bValue = (
-              (b as any).owners?.[0]?.displayName ||
-              (b as any).owners?.[0]?.emailAddress ||
-              ''
-            ).toLowerCase()
+            aValue = ((a as any).owners?.[0]?.displayName || (a as any).owners?.[0]?.emailAddress || '').toLowerCase()
+            bValue = ((b as any).owners?.[0]?.displayName || (b as any).owners?.[0]?.emailAddress || '').toLowerCase()
             break
           default:
             return 0
@@ -651,16 +544,9 @@ export function DriveManager() {
 
   if (hasAccess === false && driveAccessError) {
     if (needsReauth) {
-      return (
-        <DrivePermissionRequired
-          error={driveAccessError}
-          onRetry={handleRefresh}
-        />
-      )
+      return <DrivePermissionRequired error={driveAccessError} onRetry={handleRefresh} />
     }
-    return (
-      <DriveErrorDisplay error={driveAccessError} onRetry={handleRefresh} />
-    )
+    return <DriveErrorDisplay error={driveAccessError} onRetry={handleRefresh} />
   }
 
   return (
@@ -672,10 +558,7 @@ export function DriveManager() {
             onSearchChange={setSearchQuery}
             onSearchSubmit={(e) => {
               e.preventDefault()
-              fetchFiles(
-                currentFolderId || undefined,
-                searchQuery.trim() || undefined
-              )
+              fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
             }}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
@@ -694,12 +577,7 @@ export function DriveManager() {
             onRefreshAfterOp={handleRefresh}
             filters={filters}
             onFilterChange={handleFilter as any}
-            onApplyFilters={() =>
-              fetchFiles(
-                currentFolderId || undefined,
-                searchQuery.trim() || undefined
-              )
-            }
+            onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
             items={items}
@@ -716,9 +594,7 @@ export function DriveManager() {
           {currentFolderId && (
             <FileBreadcrumb
               currentFolderId={currentFolderId}
-              onNavigate={(folderId) =>
-                folderId ? handleFolderClick(folderId) : handleBackToParent()
-              }
+              onNavigate={(folderId) => (folderId ? handleFolderClick(folderId) : handleBackToParent())}
               onBackToRoot={handleBackToParent}
             />
           )}
@@ -747,10 +623,7 @@ export function DriveManager() {
                   openDialog('preview')
                   break
                 case 'download':
-                  window.open(
-                    `https://drive.google.com/uc?export=download&id=${item.id}`,
-                    '_blank'
-                  )
+                  window.open(`https://drive.google.com/uc?export=download&id=${item.id}`, '_blank')
                   break
                 case 'share':
                 case 'rename':
@@ -768,11 +641,7 @@ export function DriveManager() {
             loadingMore={loadingMore}
             hasMore={!!nextPageToken}
             onLoadMore={() =>
-              fetchFiles(
-                currentFolderId || undefined,
-                searchQuery.trim() || undefined,
-                nextPageToken || undefined
-              )
+              fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined, nextPageToken || undefined)
             }
           />
         </div>
@@ -822,28 +691,17 @@ export function DriveManager() {
       {operationsProgress.isRunning && (
         <div className="bg-background fixed right-4 bottom-4 rounded-lg border p-4 shadow-lg">
           <div className="flex items-center space-x-2">
-            {operationsProgress.type === 'single' && (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            )}
-            <div className="text-sm font-medium">
-              {operationsProgress.operation}
-            </div>
+            {operationsProgress.type === 'single' && <RefreshCw className="h-4 w-4 animate-spin" />}
+            <div className="text-sm font-medium">{operationsProgress.operation}</div>
           </div>
-          {operationsProgress.type === 'bulk' &&
-            operationsProgress.total > 0 && (
-              <>
-                <Progress
-                  value={
-                    (operationsProgress.current / operationsProgress.total) *
-                    100
-                  }
-                  className="mt-2 w-64"
-                />
-                <div className="text-muted-foreground mt-1 text-xs">
-                  {operationsProgress.current} of {operationsProgress.total}
-                </div>
-              </>
-            )}
+          {operationsProgress.type === 'bulk' && operationsProgress.total > 0 && (
+            <>
+              <Progress value={(operationsProgress.current / operationsProgress.total) * 100} className="mt-2 w-64" />
+              <div className="text-muted-foreground mt-1 text-xs">
+                {operationsProgress.current} of {operationsProgress.total}
+              </div>
+            </>
+          )}
         </div>
       )}
 

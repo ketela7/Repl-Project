@@ -15,11 +15,7 @@ const TimezoneContext = createContext<TimezoneContextType | null>(null)
 export function TimezoneProvider({ children }: { children: ReactNode }) {
   const timezoneData = useTimezone()
 
-  return (
-    <TimezoneContext.Provider value={timezoneData}>
-      {children}
-    </TimezoneContext.Provider>
-  )
+  return <TimezoneContext.Provider value={timezoneData}>{children}</TimezoneContext.Provider>
 }
 
 export function useTimezoneContext() {

@@ -4,12 +4,9 @@
 
 // Dynamic imports for heavy components
 export const loadHeavyComponents = {
-  DriveManager: () =>
-    import('@/app/(main)/dashboard/drive/_components/drive-manager'),
-  FilePreviewDialog: () =>
-    import('@/app/(main)/dashboard/drive/_components/file-preview-dialog'),
-  DriveDataView: () =>
-    import('@/app/(main)/dashboard/drive/_components/drive-data-view'),
+  DriveManager: () => import('@/app/(main)/dashboard/drive/_components/drive-manager'),
+  FilePreviewDialog: () => import('@/app/(main)/dashboard/drive/_components/file-preview-dialog'),
+  DriveDataView: () => import('@/app/(main)/dashboard/drive/_components/drive-data-view'),
 }
 
 // Preload critical components

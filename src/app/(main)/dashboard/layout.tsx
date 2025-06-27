@@ -5,28 +5,18 @@ import { ReactNode } from 'react'
 import { AuthWrapper } from '@/components/auth/auth-wrapper'
 import { AppSidebar } from '@/app/(main)/dashboard/_components/sidebar/app-sidebar'
 import { Separator } from '@/components/ui/separator'
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from '@/components/ui/sidebar'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 
 import { ThemeSwitcher } from './_components/sidebar/theme-switcher'
 
-export default function Layout({
-  children,
-}: Readonly<{ children: ReactNode }>) {
+export default function Layout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <AuthWrapper
       fallback={
         <div className="flex h-screen items-center justify-center">
           <div className="text-center">
-            <h1 className="mb-4 text-2xl font-semibold">
-              Authentication Required
-            </h1>
-            <p className="text-muted-foreground mb-4">
-              Please sign in to access the dashboard
-            </p>
+            <h1 className="mb-4 text-2xl font-semibold">Authentication Required</h1>
+            <p className="text-muted-foreground mb-4">Please sign in to access the dashboard</p>
             <a href="/auth/v1/login" className="text-primary hover:underline">
               Go to Login
             </a>
@@ -42,9 +32,7 @@ export default function Layout({
               <div className="flex items-center gap-2">
                 <SidebarTrigger className="-ml-1" />
                 <Separator orientation="vertical" className="mx-2 h-4" />
-                <h1 className="text-foreground text-lg font-semibold">
-                  Google Drive Manager
-                </h1>
+                <h1 className="text-foreground text-lg font-semibold">Google Drive Manager</h1>
               </div>
               <div className="flex items-center gap-2">
                 <ThemeSwitcher />

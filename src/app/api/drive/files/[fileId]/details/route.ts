@@ -1,24 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import {
-  initDriveService,
-  handleApiError,
-  getFileIdFromParams,
-} from '@/lib/api-utils'
+import { initDriveService, handleApiError, getFileIdFromParams } from '@/lib/api-utils'
 import { driveCache } from '@/lib/cache'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const fileId = await getFileIdFromParams(params)
 
     if (!fileId) {
-      return NextResponse.json(
-        { error: 'File ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'File ID is required' }, { status: 400 })
     }
 
     const authResult = await initDriveService()

@@ -9,12 +9,7 @@ interface ThemeProviderProps {
 
 export function CustomThemeProvider({ children }: ThemeProviderProps) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-    >
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
       {children}
     </ThemeProvider>
   )

@@ -25,14 +25,8 @@ interface FileBreadcrumbProps {
   loading?: boolean
 }
 
-export function FileBreadcrumb({
-  currentFolderId,
-  onNavigate,
-  loading: externalLoading,
-}: FileBreadcrumbProps) {
-  const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>(
-    []
-  )
+export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalLoading }: FileBreadcrumbProps) {
+  const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -56,9 +50,7 @@ export function FileBreadcrumb({
 
       while (currentParent && currentParent !== 'root' && depth < maxDepth) {
         try {
-          const parentResponse = await fetch(
-            `/api/drive/files/${currentParent}`
-          )
+          const parentResponse = await fetch(`/api/drive/files/${currentParent}`)
           if (!parentResponse.ok) break
 
           const parentFolder = await parentResponse.json()
@@ -127,9 +119,7 @@ export function FileBreadcrumb({
                 {index === breadcrumbItems.length - 1 ? (
                   <BreadcrumbPage className="flex max-w-[120px] items-center gap-2 whitespace-nowrap sm:max-w-[200px] md:max-w-none">
                     <Folder className="text-primary h-4 w-4 flex-shrink-0" />
-                    <span className="text-primary truncate font-medium">
-                      {folder.name}
-                    </span>
+                    <span className="text-primary truncate font-medium">{folder.name}</span>
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink

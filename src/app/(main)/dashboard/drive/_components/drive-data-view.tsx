@@ -17,24 +17,12 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { FileIcon } from '@/components/file-icon'
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
 import { useTimezone } from '@/lib/hooks/use-timezone'
 import { formatFileTime } from '@/lib/utils'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import type { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 
@@ -150,28 +138,19 @@ export function DriveDataView({
           </DropdownMenuItem>
         )}
         {item.canTrash && (
-          <DropdownMenuItem
-            onClick={() => onItemAction('trash', item)}
-            className="text-destructive"
-          >
+          <DropdownMenuItem onClick={() => onItemAction('trash', item)} className="text-destructive">
             <Trash2 className="mr-2 h-4 w-4" />
             Move to Trash
           </DropdownMenuItem>
         )}
         {item.canDelete && (
-          <DropdownMenuItem
-            onClick={() => onItemAction('delete', item)}
-            className="text-destructive"
-          >
+          <DropdownMenuItem onClick={() => onItemAction('delete', item)} className="text-destructive">
             <Triangle className="mr-2 h-4 w-4" />
             Delete
           </DropdownMenuItem>
         )}
         {item.canUntrash && (
-          <DropdownMenuItem
-            onClick={() => onItemAction('untrash', item)}
-            className="text-destructive"
-          >
+          <DropdownMenuItem onClick={() => onItemAction('untrash', item)} className="text-destructive">
             <RefreshCw className="mr-2 h-4 w-4" />
             Restore
           </DropdownMenuItem>
@@ -186,15 +165,10 @@ export function DriveDataView({
         {items.length === 0 ? (
           <div className="text-muted-foreground py-12 text-center">
             <div className="mb-4 flex justify-center">
-              <FileIcon
-                mimeType="application/vnd.google-apps.folder"
-                className="h-16 w-16"
-              />
+              <FileIcon mimeType="application/vnd.google-apps.folder" className="h-16 w-16" />
             </div>
             <h3 className="mb-2 text-lg font-medium">No files found</h3>
-            <p className="text-sm">
-              Try adjusting your search terms or filters
-            </p>
+            <p className="text-sm">Try adjusting your search terms or filters</p>
           </div>
         ) : viewMode === 'grid' ? (
           <div className="xs:grid-cols-2 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
@@ -202,9 +176,7 @@ export function DriveDataView({
               <div
                 key={item.id}
                 className={`hover:bg-accent relative cursor-pointer rounded-lg border p-2 transition-colors sm:p-3 md:p-4 ${
-                  selectedItems.has(item.id)
-                    ? 'ring-primary bg-primary/5 ring-2'
-                    : ''
+                  selectedItems.has(item.id) ? 'ring-primary bg-primary/5 ring-2' : ''
                 }`}
                 onClick={() => {
                   if (isSelectMode) {
@@ -234,10 +206,7 @@ export function DriveDataView({
                 }}
               >
                 {isSelectMode && (
-                  <div
-                    className="absolute top-2 left-2 z-10"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={selectedItems.has(item.id)}
                       onCheckedChange={() => onSelectItem(item.id)}
@@ -246,28 +215,20 @@ export function DriveDataView({
                   </div>
                 )}
                 <div className="mb-2 flex items-start justify-between">
-                  <div
-                    className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}
-                  >
+                  <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
                     <FileThumbnailPreview
                       thumbnailLink={item.thumbnailLink}
                       fileName={item.name}
                       mimeType={item.mimeType}
                       modifiedTime={item.modifiedTime}
                     >
-                      <FileIcon
-                        mimeType={item.mimeType}
-                        className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
-                      />
+                      <FileIcon mimeType={item.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
                     </FileThumbnailPreview>
                   </div>
                   {renderContent(item)}
                 </div>
                 <div className="flex min-h-0 flex-col">
-                  <h3
-                    className="mb-1 truncate text-sm font-medium sm:text-base"
-                    title={item.name}
-                  >
+                  <h3 className="mb-1 truncate text-sm font-medium sm:text-base" title={item.name}>
                     {item.name}
                   </h3>
                   <p className="text-muted-foreground text-xs sm:text-sm">
@@ -284,10 +245,7 @@ export function DriveDataView({
                 {isSelectMode && (
                   <TableHead className="w-12">
                     <Checkbox
-                      checked={
-                        items.length > 0 &&
-                        items.every((item) => selectedItems.has(item.id))
-                      }
+                      checked={items.length > 0 && items.every((item) => selectedItems.has(item.id))}
                       onCheckedChange={(checked) => {
                         items.forEach((item) => {
                           if (checked) {
@@ -308,9 +266,7 @@ export function DriveDataView({
                     <div className="flex items-center space-x-1">
                       <span>Name</span>
                       {sortConfig?.key === 'name' && (
-                        <span className="text-xs">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
+                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </div>
                   </TableHead>
@@ -323,9 +279,7 @@ export function DriveDataView({
                     <div className="flex items-center space-x-1">
                       <span>Size</span>
                       {sortConfig?.key === 'size' && (
-                        <span className="text-xs">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
+                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </div>
                   </TableHead>
@@ -338,9 +292,7 @@ export function DriveDataView({
                     <div className="flex items-center space-x-1">
                       <span>Owner</span>
                       {sortConfig?.key === 'owners' && (
-                        <span className="text-xs">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
+                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </div>
                   </TableHead>
@@ -353,9 +305,7 @@ export function DriveDataView({
                     <div className="flex items-center space-x-1">
                       <span>Type</span>
                       {sortConfig?.key === 'mimeType' && (
-                        <span className="text-xs">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
+                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </div>
                   </TableHead>
@@ -368,9 +318,7 @@ export function DriveDataView({
                     <div className="flex items-center space-x-1">
                       <span>Modified</span>
                       {sortConfig?.key === 'modifiedTime' && (
-                        <span className="text-xs">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
+                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </div>
                   </TableHead>
@@ -383,9 +331,7 @@ export function DriveDataView({
                     <div className="flex items-center space-x-1">
                       <span>Created</span>
                       {sortConfig?.key === 'createdTime' && (
-                        <span className="text-xs">
-                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                        </span>
+                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                       )}
                     </div>
                   </TableHead>
@@ -408,10 +354,7 @@ export function DriveDataView({
                 >
                   {isSelectMode && (
                     <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox
-                        checked={selectedItems.has(item.id)}
-                        onCheckedChange={() => onSelectItem(item.id)}
-                      />
+                      <Checkbox checked={selectedItems.has(item.id)} onCheckedChange={() => onSelectItem(item.id)} />
                     </TableCell>
                   )}
                   {visibleColumns.name && (
@@ -423,10 +366,7 @@ export function DriveDataView({
                           mimeType={item.mimeType}
                           modifiedTime={item.modifiedTime}
                         >
-                          <FileIcon
-                            mimeType={item.mimeType}
-                            className="h-6 w-6"
-                          />
+                          <FileIcon mimeType={item.mimeType} className="h-6 w-6" />
                         </FileThumbnailPreview>
                         <span className="font-medium">{item.name}</span>
                       </div>
@@ -463,9 +403,7 @@ export function DriveDataView({
                       title={`Click to copy: ${item.owners?.[0]?.emailAddress || 'No email available'}`}
                     >
                       <div className="flex items-center gap-2">
-                        <span>
-                          {item.owners?.[0]?.emailAddress || 'Unknown'}
-                        </span>
+                        <span>{item.owners?.[0]?.emailAddress || 'Unknown'}</span>
                         {item.owners?.[0]?.emailAddress && (
                           <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
                         )}
@@ -474,9 +412,7 @@ export function DriveDataView({
                   )}
                   {visibleColumns.mimeType && (
                     <TableCell>
-                      <span className="text-muted-foreground text-sm">
-                        {item.mimeType}
-                      </span>
+                      <span className="text-muted-foreground text-sm">{item.mimeType}</span>
                     </TableCell>
                   )}
                   {visibleColumns.modifiedTime && (
@@ -489,15 +425,11 @@ export function DriveDataView({
                   {visibleColumns.createdTime && (
                     <TableCell>
                       <span className="text-muted-foreground text-sm">
-                        {item.createdTime
-                          ? formatFileTime(item.createdTime, effectiveTimezone)
-                          : '—'}
+                        {item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}
                       </span>
                     </TableCell>
                   )}
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    {renderContent(item)}
-                  </TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>{renderContent(item)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { initDriveService, handleApiError } from '@/lib/api-utils'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -19,15 +16,11 @@ export async function POST(
     const { name, parentId, items } = body
 
     // Determine operation type based on items array
-    const fileIds =
-      items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
+    const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
     const isBulkOperation = items && items.length > 1
 
     if (!name && !isBulkOperation) {
-      return NextResponse.json(
-        { error: 'Item name is required for single copy' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Item name is required for single copy' }, { status: 400 })
     }
 
     const results = []

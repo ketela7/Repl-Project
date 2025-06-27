@@ -11,10 +11,7 @@ export async function GET(request: NextRequest) {
     if (!session?.user) {
       if (process.env.NODE_ENV === 'development') {
       }
-      return NextResponse.json(
-        { hasAccess: false, error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ hasAccess: false, error: 'Unauthorized' }, { status: 401 })
     }
 
     const accessToken = session.accessToken

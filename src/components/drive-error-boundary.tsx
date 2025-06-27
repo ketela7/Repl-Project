@@ -67,14 +67,11 @@ export class DriveErrorBoundary extends Component<Props, State> {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
               {this.getErrorIcon(error?.code)}
             </div>
-            <CardTitle className="text-lg text-red-700">
-              {this.getErrorTitle(error?.code)}
-            </CardTitle>
+            <CardTitle className="text-lg text-red-700">{this.getErrorTitle(error?.code)}</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-muted-foreground mb-6 text-sm">
-              {error?.userMessage ||
-                'Something went wrong while loading your files.'}
+              {error?.userMessage || 'Something went wrong while loading your files.'}
             </p>
 
             <div className="flex flex-col gap-2">
@@ -99,11 +96,7 @@ export class DriveErrorBoundary extends Component<Props, State> {
                 </Button>
               )}
 
-              <Button
-                variant="outline"
-                onClick={this.handleGoHome}
-                className="w-full"
-              >
+              <Button variant="outline" onClick={this.handleGoHome} className="w-full">
                 <Home className="mr-2 h-4 w-4" />
                 Go to Dashboard
               </Button>
@@ -111,9 +104,7 @@ export class DriveErrorBoundary extends Component<Props, State> {
 
             {process.env.NODE_ENV === 'development' && error && (
               <details className="mt-4 text-left">
-                <summary className="cursor-pointer text-sm text-gray-500">
-                  Technical Details
-                </summary>
+                <summary className="cursor-pointer text-sm text-gray-500">Technical Details</summary>
                 <pre className="mt-2 max-h-32 overflow-auto rounded bg-gray-100 p-2 text-xs">
                   {JSON.stringify(
                     {

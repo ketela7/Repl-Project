@@ -1,15 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import {
-  initDriveService,
-  handleApiError,
-  getFileIdFromParams,
-} from '@/lib/api-utils'
+import { initDriveService, handleApiError, getFileIdFromParams } from '@/lib/api-utils'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -25,10 +18,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -46,11 +36,7 @@ export async function PATCH(
         result = await authResult.driveService!.renameFile(fileId, name)
         break
       case 'move':
-        result = await authResult.driveService!.moveFile(
-          fileId,
-          parentId,
-          currentParentId
-        )
+        result = await authResult.driveService!.moveFile(fileId, parentId, currentParentId)
         break
       case 'trash':
         result = await authResult.driveService!.moveToTrash(fileId)
@@ -68,10 +54,7 @@ export async function PATCH(
   }
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {

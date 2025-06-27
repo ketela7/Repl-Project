@@ -37,12 +37,7 @@ interface ItemsMoveDialogProps {
   }>
 }
 
-function ItemsMoveDialog({
-  open,
-  onOpenChange,
-  onConfirm,
-  selectedItems,
-}: ItemsMoveDialogProps) {
+function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: ItemsMoveDialogProps) {
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 
@@ -75,18 +70,12 @@ function ItemsMoveDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {fileCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-          >
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-          >
+          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
@@ -98,10 +87,7 @@ function ItemsMoveDialog({
         <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
           <div className="space-y-2">
             {selectedItems.slice(0, 5).map((item) => (
-              <div
-                key={item.id}
-                className="bg-background/50 flex items-center gap-3 rounded-md p-2"
-              >
+              <div key={item.id} className="bg-background/50 flex items-center gap-3 rounded-md p-2">
                 <div className="h-2 w-2 rounded-full bg-blue-500" />
                 <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
@@ -124,8 +110,7 @@ function ItemsMoveDialog({
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
         <div className="text-sm text-blue-800 dark:text-blue-200">
-          Click "Choose Destination" to select where you want to move these
-          items.
+          Click "Choose Destination" to select where you want to move these items.
         </div>
       </div>
     </div>
@@ -143,9 +128,7 @@ function ItemsMoveDialog({
                 </div>
                 <div>
                   <div className="text-lg font-semibold">Move Items</div>
-                  <div className="text-muted-foreground text-sm font-normal">
-                    Bulk move operation
-                  </div>
+                  <div className="text-muted-foreground text-sm font-normal">Bulk move operation</div>
                 </div>
               </BottomSheetTitle>
             </BottomSheetHeader>
@@ -187,24 +170,18 @@ function ItemsMoveDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Move Items</div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Bulk move operation
-                </div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk move operation</div>
               </div>
             </DialogTitle>
             <DialogDescription className="space-y-4 pt-2">
               <div className="text-base">
-                You are about to move{' '}
-                <span className="font-semibold">{selectedItems.length}</span>{' '}
-                item{selectedItems.length > 1 ? 's' : ''} to a new location.
+                You are about to move <span className="font-semibold">{selectedItems.length}</span> item
+                {selectedItems.length > 1 ? 's' : ''} to a new location.
               </div>
 
               <div className="flex flex-wrap gap-2">
                 {fileCount > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-                  >
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
                     {fileCount} file{fileCount > 1 ? 's' : ''}
                   </Badge>
                 )}
@@ -220,16 +197,11 @@ function ItemsMoveDialog({
 
               {selectedItems.length <= 5 ? (
                 <div className="space-y-2">
-                  <div className="text-sm font-semibold">
-                    Items to be moved:
-                  </div>
+                  <div className="text-sm font-semibold">Items to be moved:</div>
                   <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
                     <ul className="space-y-1 text-sm">
                       {selectedItems.map((item) => (
-                        <li
-                          key={item.id}
-                          className="flex items-center gap-2 truncate"
-                        >
+                        <li key={item.id} className="flex items-center gap-2 truncate">
                           <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                           <span className="truncate">{item.name}</span>
                         </li>
@@ -239,16 +211,11 @@ function ItemsMoveDialog({
                 </div>
               ) : (
                 <div className="space-y-2">
-                  <div className="text-sm font-semibold">
-                    Preview (first 3 items):
-                  </div>
+                  <div className="text-sm font-semibold">Preview (first 3 items):</div>
                   <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
                     <ul className="space-y-1 text-sm">
                       {selectedItems.slice(0, 3).map((item) => (
-                        <li
-                          key={item.id}
-                          className="flex items-center gap-2 truncate"
-                        >
+                        <li key={item.id} className="flex items-center gap-2 truncate">
                           <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                           <span className="truncate">{item.name}</span>
                         </li>
@@ -267,8 +234,7 @@ function ItemsMoveDialog({
                   <div className="h-1.5 w-1.5 rounded-full bg-white" />
                 </div>
                 <div className="text-sm text-blue-800 dark:text-blue-200">
-                  Click "Choose Destination" to select where you want to move
-                  these items.
+                  Click "Choose Destination" to select where you want to move these items.
                 </div>
               </div>
             </DialogDescription>
@@ -280,11 +246,7 @@ function ItemsMoveDialog({
             >
               Choose Destination
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="w-full sm:w-auto"
-            >
+            <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
               Cancel
             </Button>
           </DialogFooter>

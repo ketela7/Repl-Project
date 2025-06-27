@@ -70,16 +70,9 @@ class RequestDeduplicator {
     // Create more specific keys for folder navigation
     const contextKey = params.folderId ? `folder:${params.folderId}` : 'root'
     const searchKey = params.search ? `search:${params.search}` : 'browse'
-    const paginationKey = params.pageToken
-      ? `page:${params.pageToken.substring(0, 10)}`
-      : 'p1'
+    const paginationKey = params.pageToken ? `page:${params.pageToken.substring(0, 10)}` : 'p1'
     const dateFiltersKey =
-      [
-        params.createdAfter || '',
-        params.createdBefore || '',
-        params.modifiedAfter || '',
-        params.modifiedBefore || '',
-      ]
+      [params.createdAfter || '', params.createdBefore || '', params.modifiedAfter || '', params.modifiedBefore || '']
         .filter(Boolean)
         .join(',') || 'no-date-filter'
     const ownerKey = params.owner ? `owner:${params.owner}` : 'any-owner'

@@ -2,9 +2,7 @@
 
 import { cookies } from 'next/headers'
 
-export async function getValueFromCookie(
-  key: string
-): Promise<string | undefined> {
+export async function getValueFromCookie(key: string): Promise<string | undefined> {
   const cookieStore = await cookies()
   return cookieStore.get(key)?.value
 }

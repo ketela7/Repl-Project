@@ -33,15 +33,10 @@ export interface ToastOptions {
 export const successToast = {
   // File operations
   copied: (count?: number) =>
-    toast.success(
-      count && count > 1
-        ? `${count} items copied to clipboard`
-        : 'Copied to clipboard',
-      {
-        icon: React.createElement(Copy, { className: 'h-4 w-4' }),
-        duration: 2000,
-      }
-    ),
+    toast.success(count && count > 1 ? `${count} items copied to clipboard` : 'Copied to clipboard', {
+      icon: React.createElement(Copy, { className: 'h-4 w-4' }),
+      duration: 2000,
+    }),
 
   downloaded: (fileName?: string) =>
     toast.success(fileName ? `Downloaded: ${fileName}` : 'Download started', {
@@ -50,24 +45,16 @@ export const successToast = {
     }),
 
   uploaded: (count: number = 1) =>
-    toast.success(
-      count > 1
-        ? `${count} files uploaded successfully`
-        : 'File uploaded successfully',
-      {
-        icon: React.createElement(Upload, { className: 'h-4 w-4' }),
-        duration: 3000,
-      }
-    ),
+    toast.success(count > 1 ? `${count} files uploaded successfully` : 'File uploaded successfully', {
+      icon: React.createElement(Upload, { className: 'h-4 w-4' }),
+      duration: 3000,
+    }),
 
   deleted: (count: number = 1) =>
-    toast.success(
-      count > 1 ? `${count} items moved to trash` : 'Item moved to trash',
-      {
-        icon: React.createElement(Trash2, { className: 'h-4 w-4' }),
-        duration: 3000,
-      }
-    ),
+    toast.success(count > 1 ? `${count} items moved to trash` : 'Item moved to trash', {
+      icon: React.createElement(Trash2, { className: 'h-4 w-4' }),
+      duration: 3000,
+    }),
 
   folderCreated: (name: string) =>
     toast.success(`Folder "${name}" created`, {
@@ -76,29 +63,17 @@ export const successToast = {
     }),
 
   shared: (count: number = 1) =>
-    toast.success(
-      count > 1
-        ? `${count} items shared successfully`
-        : 'Item shared successfully',
-      {
-        icon: React.createElement(Share2, { className: 'h-4 w-4' }),
-        duration: 3000,
-      }
-    ),
+    toast.success(count > 1 ? `${count} items shared successfully` : 'Item shared successfully', {
+      icon: React.createElement(Share2, { className: 'h-4 w-4' }),
+      duration: 3000,
+    }),
 
   // Bulk operations
-  bulkOperation: (
-    operation: string,
-    successCount: number,
-    totalCount: number
-  ) =>
-    toast.success(
-      `${operation} completed: ${successCount}/${totalCount} items processed`,
-      {
-        icon: React.createElement(CheckCircle, { className: 'h-4 w-4' }),
-        duration: 4000,
-      }
-    ),
+  bulkOperation: (operation: string, successCount: number, totalCount: number) =>
+    toast.success(`${operation} completed: ${successCount}/${totalCount} items processed`, {
+      icon: React.createElement(CheckCircle, { className: 'h-4 w-4' }),
+      duration: 4000,
+    }),
 
   // Authentication
   signedIn: () =>
@@ -135,22 +110,16 @@ export const errorToast = {
     }),
 
   downloadFailed: (fileName?: string) =>
-    toast.error(
-      fileName ? `Failed to download: ${fileName}` : 'Download failed',
-      {
-        icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
-        duration: 5000,
-      }
-    ),
+    toast.error(fileName ? `Failed to download: ${fileName}` : 'Download failed', {
+      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+      duration: 5000,
+    }),
 
   deleteFailed: (count: number = 1) =>
-    toast.error(
-      count > 1 ? `Failed to delete ${count} items` : 'Failed to delete item',
-      {
-        icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
-        duration: 5000,
-      }
-    ),
+    toast.error(count > 1 ? `Failed to delete ${count} items` : 'Failed to delete item', {
+      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+      duration: 5000,
+    }),
 
   // Authentication & permissions
   authRequired: () =>
@@ -204,11 +173,7 @@ export const errorToast = {
  */
 export const warningToast = {
   // File operations
-  partialSuccess: (
-    successCount: number,
-    totalCount: number,
-    operation: string
-  ) =>
+  partialSuccess: (successCount: number, totalCount: number, operation: string) =>
     toast.warning(`${operation} partially completed`, {
       icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
       description: `${successCount} of ${totalCount} items processed`,
@@ -245,15 +210,10 @@ export const warningToast = {
 export const infoToast = {
   // File operations
   processing: (operation: string, count?: number) =>
-    toast.info(
-      count && count > 1
-        ? `Processing ${count} items...`
-        : `${operation} in progress...`,
-      {
-        icon: React.createElement(Info, { className: 'h-4 w-4' }),
-        duration: 2000,
-      }
-    ),
+    toast.info(count && count > 1 ? `Processing ${count} items...` : `${operation} in progress...`, {
+      icon: React.createElement(Info, { className: 'h-4 w-4' }),
+      duration: 2000,
+    }),
 
   syncStarted: () =>
     toast.info('Syncing with Google Drive...', {
@@ -339,22 +299,13 @@ export const toastUtils = {
    */
   download: async (downloadFn: () => Promise<void>, fileName?: string) => {
     const loadingId = 'download'
-    loadingToast.start(
-      `Downloading${fileName ? ` ${fileName}` : ''}...`,
-      loadingId
-    )
+    loadingToast.start(`Downloading${fileName ? ` ${fileName}` : ''}...`, loadingId)
 
     try {
       await downloadFn()
-      loadingToast.success(
-        `Download completed${fileName ? `: ${fileName}` : ''}`,
-        loadingId
-      )
+      loadingToast.success(`Download completed${fileName ? `: ${fileName}` : ''}`, loadingId)
     } catch (error) {
-      loadingToast.error(
-        `Download failed${fileName ? `: ${fileName}` : ''}`,
-        loadingId
-      )
+      loadingToast.error(`Download failed${fileName ? `: ${fileName}` : ''}`, loadingId)
       throw error
     }
   },
@@ -377,10 +328,7 @@ export const toastUtils = {
       const result = await operationFn()
 
       if (result.success === result.total) {
-        loadingToast.success(
-          `${operation} completed successfully (${result.success}/${result.total})`,
-          loadingId
-        )
+        loadingToast.success(`${operation} completed successfully (${result.success}/${result.total})`, loadingId)
       } else if (result.success > 0) {
         toast.warning(`${operation} partially completed`, {
           id: loadingId,

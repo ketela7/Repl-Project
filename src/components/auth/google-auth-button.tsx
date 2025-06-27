@@ -12,10 +12,7 @@ interface GoogleAuthButtonProps {
   onClick?: () => void
 }
 
-export function GoogleAuthButton({
-  className,
-  onClick,
-}: GoogleAuthButtonProps) {
+export function GoogleAuthButton({ className, onClick }: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false)
 
   const handleGoogleSignIn = async () => {
@@ -48,12 +45,7 @@ export function GoogleAuthButton({
   }
 
   return (
-    <Button
-      onClick={handleGoogleSignIn}
-      disabled={loading}
-      variant="outline"
-      className={cn('relative', className)}
-    >
+    <Button onClick={handleGoogleSignIn} disabled={loading} variant="outline" className={cn('relative', className)}>
       <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
         <path
           fill="currentColor"

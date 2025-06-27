@@ -96,10 +96,7 @@ export function formatFileTime(dateString: string, timezone?: string): string {
   }
 }
 
-export function formatCreationTime(
-  dateString: string,
-  timezone?: string
-): string {
+export function formatCreationTime(dateString: string, timezone?: string): string {
   return formatFileTime(dateString, timezone)
 }
 

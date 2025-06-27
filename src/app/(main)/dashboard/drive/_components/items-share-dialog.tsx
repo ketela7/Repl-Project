@@ -21,13 +21,7 @@ import {
   BottomSheetTitle,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 
@@ -50,18 +44,9 @@ interface ShareResult {
   error?: string
 }
 
-function ItemsShareDialog({
-  open,
-  onOpenChange,
-  onConfirm,
-  selectedItems,
-}: ItemsShareDialogProps) {
-  const [accessLevel, setAccessLevel] = useState<
-    'reader' | 'writer' | 'commenter'
-  >('reader')
-  const [linkAccess, setLinkAccess] = useState<
-    'anyone' | 'anyoneWithLink' | 'domain'
-  >('anyoneWithLink')
+function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: ItemsShareDialogProps) {
+  const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
+  const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>('anyoneWithLink')
   const [isLoading, setIsLoading] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [shareResults, setShareResults] = useState<ShareResult[]>([])
@@ -102,9 +87,7 @@ function ItemsShareDialog({
   }
 
   const exportToTxt = () => {
-    const content = shareResults
-      .map((r) => `${r.name}: ${r.success ? r.shareLink : 'Failed'}`)
-      .join('\n')
+    const content = shareResults.map((r) => `${r.name}: ${r.success ? r.shareLink : 'Failed'}`).join('\n')
 
     const blob = new Blob([content], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
@@ -118,10 +101,7 @@ function ItemsShareDialog({
   const exportToCsv = () => {
     const headers = 'Name,Share Link,Status\n'
     const content = shareResults
-      .map(
-        (r) =>
-          `"${r.name}","${r.shareLink || ''}","${r.success ? 'Success' : 'Failed'}"`
-      )
+      .map((r) => `"${r.name}","${r.shareLink || ''}","${r.success ? 'Success' : 'Failed'}"`)
       .join('\n')
 
     const blob = new Blob([headers + content], { type: 'text/csv' })
@@ -160,8 +140,7 @@ function ItemsShareDialog({
           <h3 className="text-lg font-semibold">Share Items</h3>
           <p className="text-muted-foreground text-sm">
             Generate share links for {selectedItems.length} item
-            {selectedItems.length > 1 ? 's' : ''} with customizable privacy
-            settings
+            {selectedItems.length > 1 ? 's' : ''} with customizable privacy settings
           </p>
         </div>
       </div>
@@ -209,9 +188,7 @@ function ItemsShareDialog({
           <Label className="text-sm font-medium">Access level</Label>
           <Select
             value={accessLevel}
-            onValueChange={(value: 'reader' | 'writer' | 'commenter') =>
-              setAccessLevel(value)
-            }
+            onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}
           >
             <SelectTrigger>
               <SelectValue />
@@ -222,9 +199,7 @@ function ItemsShareDialog({
                   <Eye className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Viewer</p>
-                    <p className="text-muted-foreground text-xs">
-                      Can view only
-                    </p>
+                    <p className="text-muted-foreground text-xs">Can view only</p>
                   </div>
                 </div>
               </SelectItem>
@@ -233,9 +208,7 @@ function ItemsShareDialog({
                   <Edit className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Commenter</p>
-                    <p className="text-muted-foreground text-xs">
-                      Can view and comment
-                    </p>
+                    <p className="text-muted-foreground text-xs">Can view and comment</p>
                   </div>
                 </div>
               </SelectItem>
@@ -244,9 +217,7 @@ function ItemsShareDialog({
                   <Edit className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Editor</p>
-                    <p className="text-muted-foreground text-xs">
-                      Can view, comment, and edit
-                    </p>
+                    <p className="text-muted-foreground text-xs">Can view, comment, and edit</p>
                   </div>
                 </div>
               </SelectItem>
@@ -258,9 +229,7 @@ function ItemsShareDialog({
           <Label className="text-sm font-medium">Who has access</Label>
           <Select
             value={linkAccess}
-            onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
-              setLinkAccess(value)
-            }
+            onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') => setLinkAccess(value)}
           >
             <SelectTrigger>
               <SelectValue />
@@ -271,9 +240,7 @@ function ItemsShareDialog({
                   <Users className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Anyone with the link</p>
-                    <p className="text-muted-foreground text-xs">
-                      Anyone who has the link can access
-                    </p>
+                    <p className="text-muted-foreground text-xs">Anyone who has the link can access</p>
                   </div>
                 </div>
               </SelectItem>
@@ -282,9 +249,7 @@ function ItemsShareDialog({
                   <Globe className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Anyone on the internet</p>
-                    <p className="text-muted-foreground text-xs">
-                      Public on the web
-                    </p>
+                    <p className="text-muted-foreground text-xs">Public on the web</p>
                   </div>
                 </div>
               </SelectItem>
@@ -293,9 +258,7 @@ function ItemsShareDialog({
                   <Lock className="h-4 w-4" />
                   <div>
                     <p className="font-medium">Anyone in your organization</p>
-                    <p className="text-muted-foreground text-xs">
-                      People in your organization can find and access
-                    </p>
+                    <p className="text-muted-foreground text-xs">People in your organization can find and access</p>
                   </div>
                 </div>
               </SelectItem>
@@ -310,8 +273,7 @@ function ItemsShareDialog({
           <div className="h-1.5 w-1.5 rounded-full bg-white" />
         </div>
         <div className="text-sm text-green-800 dark:text-green-200">
-          Share links will be generated for all selected items with the chosen
-          access settings.
+          Share links will be generated for all selected items with the chosen access settings.
         </div>
       </div>
     </div>
@@ -328,16 +290,12 @@ function ItemsShareDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Share Items</div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Bulk share operation
-                </div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk share operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
-            {renderContent()}
-          </div>
+          <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">{renderContent()}</div>
 
           <BottomSheetFooter className="bg-background flex-shrink-0 border-t p-4">
             <div className="grid w-full gap-4">
@@ -383,14 +341,10 @@ function ItemsShareDialog({
             </div>
             <div>
               <div className="text-lg font-semibold">Share Items</div>
-              <div className="text-muted-foreground text-sm font-normal">
-                Bulk share operation
-              </div>
+              <div className="text-muted-foreground text-sm font-normal">Bulk share operation</div>
             </div>
           </DialogTitle>
-          <DialogDescription className="space-y-4 pt-2">
-            {renderContent()}
-          </DialogDescription>
+          <DialogDescription className="space-y-4 pt-2">{renderContent()}</DialogDescription>
         </DialogHeader>
 
         <DialogFooter className="flex-col gap-2 sm:flex-row">

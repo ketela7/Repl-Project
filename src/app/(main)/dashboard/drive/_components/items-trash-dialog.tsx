@@ -34,12 +34,7 @@ interface ItemsTrashDialogProps {
   }>
 }
 
-function ItemsTrashDialog({
-  isOpen,
-  onClose,
-  onConfirm,
-  selectedItems,
-}: ItemsTrashDialogProps) {
+function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTrashDialogProps) {
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
   const isMobile = useIsMobile()
@@ -65,18 +60,12 @@ function ItemsTrashDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {fileCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-          >
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-          >
+          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
@@ -84,16 +73,11 @@ function ItemsTrashDialog({
 
       {/* Items Preview */}
       <div className="space-y-3">
-        <h4 className="text-center text-sm font-medium">
-          Items to be moved to trash:
-        </h4>
+        <h4 className="text-center text-sm font-medium">Items to be moved to trash:</h4>
         <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
           <div className="space-y-2">
             {selectedItems.slice(0, 5).map((item) => (
-              <div
-                key={item.id}
-                className="bg-background/50 flex items-center gap-3 rounded-md p-2"
-              >
+              <div key={item.id} className="bg-background/50 flex items-center gap-3 rounded-md p-2">
                 <div className="h-2 w-2 rounded-full bg-yellow-500" />
                 <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
@@ -116,8 +100,7 @@ function ItemsTrashDialog({
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
         <div className="text-sm text-amber-800 dark:text-amber-200">
-          These items will be moved to your Google Drive trash and can be
-          restored later.
+          These items will be moved to your Google Drive trash and can be restored later.
         </div>
       </div>
     </div>
@@ -134,9 +117,7 @@ function ItemsTrashDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Move to Trash</div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Bulk Move to Trash Operation
-                </div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk Move to Trash Operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -150,11 +131,7 @@ function ItemsTrashDialog({
             >
               Move to Trash
             </Button>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
+            <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
               Cancel
             </Button>
           </BottomSheetFooter>
@@ -173,9 +150,7 @@ function ItemsTrashDialog({
             </div>
             <div>
               <div className="text-lg font-semibold">Move to Trash</div>
-              <div className="text-muted-foreground text-sm font-normal">
-                Bulk Move to Trash Operation
-              </div>
+              <div className="text-muted-foreground text-sm font-normal">Bulk Move to Trash Operation</div>
             </div>
           </AlertDialogTitle>
         </AlertDialogHeader>
@@ -189,9 +164,7 @@ function ItemsTrashDialog({
           >
             Move to Trash
           </AlertDialogAction>
-          <AlertDialogCancel className="w-full sm:w-auto">
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

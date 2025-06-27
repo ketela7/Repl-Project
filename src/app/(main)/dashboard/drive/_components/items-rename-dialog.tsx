@@ -3,13 +3,7 @@
 import { useState } from 'react'
 import { Edit3, Hash, Calendar, AlignLeft, Code2 } from 'lucide-react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -88,12 +82,7 @@ const RENAME_TYPES = [
   },
 ]
 
-function ItemsRenameDialog({
-  isOpen,
-  onClose,
-  onConfirm,
-  selectedItems,
-}: ItemsRenameDialogProps) {
+function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsRenameDialogProps) {
   const [renameType, setRenameType] = useState('prefix')
   const [renamePattern, setRenamePattern] = useState('')
   const [regexPattern, setRegexPattern] = useState('')
@@ -133,35 +122,25 @@ function ItemsRenameDialog({
       {/* File Count Badge */}
       <div className="text-center">
         <Badge variant="secondary" className="px-3 py-1">
-          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}{' '}
-          selected
+          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
         </Badge>
       </div>
 
       {/* Rename Type Selection */}
       <div className="space-y-4">
         <Label className="text-sm font-medium">Rename method</Label>
-        <RadioGroup
-          value={renameType}
-          onValueChange={setRenameType}
-          className="space-y-3"
-        >
+        <RadioGroup value={renameType} onValueChange={setRenameType} className="space-y-3">
           {RENAME_TYPES.map((type) => {
             const IconComponent = type.icon
             return (
               <div key={type.id} className="flex items-start space-x-3">
                 <RadioGroupItem value={type.id} id={type.id} className="mt-1" />
-                <Label
-                  htmlFor={type.id}
-                  className="flex-1 cursor-pointer space-y-1"
-                >
+                <Label htmlFor={type.id} className="flex-1 cursor-pointer space-y-1">
                   <div className="flex items-center gap-2">
                     <IconComponent className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                     <span className="font-medium">{type.name}</span>
                   </div>
-                  <div className="text-muted-foreground text-sm">
-                    {type.description}
-                  </div>
+                  <div className="text-muted-foreground text-sm">{type.description}</div>
                   <div className="text-muted-foreground bg-muted rounded px-2 py-1 font-mono text-xs">
                     Example: {type.example}
                   </div>
@@ -176,19 +155,13 @@ function ItemsRenameDialog({
       {selectedRenameType && selectedRenameType.id !== 'timestamp' && (
         <div className="space-y-3">
           <Label className="text-sm font-medium">
-            {selectedRenameType.id === 'regex'
-              ? 'Regular Expression'
-              : 'Pattern'}
+            {selectedRenameType.id === 'regex' ? 'Regular Expression' : 'Pattern'}
           </Label>
           <Input
             type="text"
-            value={
-              selectedRenameType.id === 'regex' ? regexPattern : renamePattern
-            }
+            value={selectedRenameType.id === 'regex' ? regexPattern : renamePattern}
             onChange={(e) =>
-              selectedRenameType.id === 'regex'
-                ? setRegexPattern(e.target.value)
-                : setRenamePattern(e.target.value)
+              selectedRenameType.id === 'regex' ? setRegexPattern(e.target.value) : setRenamePattern(e.target.value)
             }
             placeholder={selectedRenameType.placeholder}
             className={selectedRenameType.id === 'regex' ? 'font-mono' : ''}
@@ -200,8 +173,7 @@ function ItemsRenameDialog({
           )}
           {selectedRenameType.id === 'regex' && (
             <div className="text-muted-foreground text-xs">
-              Advanced users only. Use JavaScript regex syntax:
-              /pattern/replacement/flags
+              Advanced users only. Use JavaScript regex syntax: /pattern/replacement/flags
             </div>
           )}
         </div>
@@ -211,15 +183,8 @@ function ItemsRenameDialog({
       {selectedItems.length > 0 && (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-medium">
-              Preview (first 3 items)
-            </Label>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowPreview(!showPreview)}
-              className="h-8 px-2"
-            >
+            <Label className="text-sm font-medium">Preview (first 3 items)</Label>
+            <Button variant="ghost" size="sm" onClick={() => setShowPreview(!showPreview)} className="h-8 px-2">
               {showPreview ? 'Hide' : 'Show'} Preview
             </Button>
           </div>
@@ -227,19 +192,13 @@ function ItemsRenameDialog({
             <div className="space-y-2">
               <ul className="space-y-2">
                 {selectedItems.slice(0, 3).map((item) => (
-                  <li
-                    key={item.id}
-                    className="bg-muted/50 rounded-lg border p-3 text-sm"
-                  >
+                  <li key={item.id} className="bg-muted/50 rounded-lg border p-3 text-sm">
                     <div className="space-y-1">
                       <div className="text-muted-foreground">
-                        <span className="font-medium">Original:</span>{' '}
-                        {item.name}
+                        <span className="font-medium">Original:</span> {item.name}
                       </div>
                       <div className="text-foreground">
-                        <span className="font-medium text-orange-600 dark:text-orange-400">
-                          New:
-                        </span>{' '}
+                        <span className="font-medium text-orange-600 dark:text-orange-400">New:</span>{' '}
                         <span className="rounded bg-orange-50 px-1 font-mono dark:bg-orange-950/20">
                           {item.name} {/* Preview logic would go here */}
                         </span>
@@ -272,35 +231,25 @@ function ItemsRenameDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Bulk Rename</div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Bulk Rename Operation
-                </div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk Rename Operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="flex-1 overflow-y-auto px-4 pb-4">
-            {renderContent()}
-          </div>
+          <div className="flex-1 overflow-y-auto px-4 pb-4">{renderContent()}</div>
 
           <BottomSheetFooter className={`${cn('grid gap-4')} px-4`}>
             <Button
               onClick={handleRename}
               disabled={
-                renameType === 'regex'
-                  ? !regexPattern.trim()
-                  : !renamePattern.trim() && renameType !== 'timestamp'
+                renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp'
               }
               className={cn('touch-target min-h-[44px] active:scale-95')}
             >
               <Edit3 className="mr-2 h-4 w-4" />
               Rename All
             </Button>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
+            <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
               Cancel
             </Button>
           </BottomSheetFooter>
@@ -319,9 +268,7 @@ function ItemsRenameDialog({
             </div>
             <div>
               <div className="text-lg font-semibold">Bulk Rename</div>
-              <div className="text-muted-foreground text-sm font-normal">
-                Bulk Rename Operation
-              </div>
+              <div className="text-muted-foreground text-sm font-normal">Bulk Rename Operation</div>
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -332,20 +279,14 @@ function ItemsRenameDialog({
           <Button
             onClick={handleRename}
             disabled={
-              renameType === 'regex'
-                ? !regexPattern.trim()
-                : !renamePattern.trim() && renameType !== 'timestamp'
+              renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp'
             }
             className="w-full sm:w-auto"
           >
             <Edit3 className="mr-2 h-4 w-4" />
             Rename All
           </Button>
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="w-full sm:w-auto"
-          >
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
             Cancel
           </Button>
         </DialogFooter>

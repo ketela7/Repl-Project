@@ -51,8 +51,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Handle token refresh on every request if needed
       if (
         token.refreshToken &&
-        (!token.accessToken ||
-          (account?.expires_at && Date.now() >= account.expires_at * 1000))
+        (!token.accessToken || (account?.expires_at && Date.now() >= account.expires_at * 1000))
       ) {
         try {
           const response = await fetch('https://oauth2.googleapis.com/token', {
@@ -72,9 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (refreshedTokens.refresh_token) {
               token.refreshToken = refreshedTokens.refresh_token
             }
-            token.exp =
-              Math.floor(Date.now() / 1000) +
-              (refreshedTokens.expires_in || 3600)
+            token.exp = Math.floor(Date.now() / 1000) + (refreshedTokens.expires_in || 3600)
           } else {
             console.error('Token refresh failed:', response.status)
             token.accessToken = undefined
@@ -90,9 +87,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.rememberMe = session.rememberMe
 
         // Update token expiration based on remember me preference
-        const sessionDuration = session.rememberMe
-          ? 30 * 24 * 60 * 60
-          : 24 * 60 * 60
+        const sessionDuration = session.rememberMe ? 30 * 24 * 60 * 60 : 24 * 60 * 60
         token.exp = Math.floor(Date.now() / 1000) + sessionDuration
       }
 
@@ -116,11 +111,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async redirect({ url, baseUrl }) {
       // Always redirect to dashboard after successful authentication
-      if (
-        url === baseUrl ||
-        url === `${baseUrl}/` ||
-        url === `${baseUrl}/auth/v1/login`
-      ) {
+      if (url === baseUrl || url === `${baseUrl}/` || url === `${baseUrl}/auth/v1/login`) {
         return `${baseUrl}/dashboard/drive`
       }
       // If it's a valid internal URL, use it
@@ -144,10 +135,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   cookies: {
     sessionToken: {
-      name:
-        process.env.NODE_ENV === 'production'
-          ? '__Secure-next-auth.session-token'
-          : 'next-auth.session-token',
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
       options: {
         httpOnly: true,
         sameSite: 'lax',
@@ -157,10 +145,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
     state: {
-      name:
-        process.env.NODE_ENV === 'production'
-          ? '__Secure-authjs.state'
-          : 'authjs.state',
+      name: process.env.NODE_ENV === 'production' ? '__Secure-authjs.state' : 'authjs.state',
       options: {
         httpOnly: true,
         sameSite: 'lax',
@@ -170,10 +155,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
     pkceCodeVerifier: {
-      name:
-        process.env.NODE_ENV === 'production'
-          ? '__Secure-authjs.pkce.code_verifier'
-          : 'authjs.pkce.code_verifier',
+      name: process.env.NODE_ENV === 'production' ? '__Secure-authjs.pkce.code_verifier' : 'authjs.pkce.code_verifier',
       options: {
         httpOnly: true,
         sameSite: 'lax',

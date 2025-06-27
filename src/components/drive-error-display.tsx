@@ -1,16 +1,7 @@
 'use client'
 
 import React from 'react'
-import {
-  AlertTriangle,
-  RefreshCw,
-  Settings,
-  Wifi,
-  Lock,
-  HardDrive,
-  FileX,
-  Clock,
-} from 'lucide-react'
+import { AlertTriangle, RefreshCw, Settings, Wifi, Lock, HardDrive, FileX, Clock } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -48,8 +39,7 @@ export function DriveErrorDisplay({
         type: 'network',
         icon: <Wifi className="h-4 w-4" />,
         title: 'Connection Issue',
-        description:
-          'Unable to connect to Google Drive. Check your internet connection.',
+        description: 'Unable to connect to Google Drive. Check your internet connection.',
         color: 'border-orange-200 bg-orange-50',
         actions: ['Check internet connection', 'Try again in a moment'],
         retryable: true,
@@ -75,11 +65,7 @@ export function DriveErrorDisplay({
     }
 
     // Permission errors
-    if (
-      message.includes('permission') ||
-      message.includes('forbidden') ||
-      code === 403
-    ) {
+    if (message.includes('permission') || message.includes('forbidden') || code === 403) {
       return {
         type: 'permission',
         icon: <Settings className="h-4 w-4" />,
@@ -105,11 +91,7 @@ export function DriveErrorDisplay({
     }
 
     // Quota errors
-    if (
-      message.includes('quota') ||
-      message.includes('storage') ||
-      message.includes('limit')
-    ) {
+    if (message.includes('quota') || message.includes('storage') || message.includes('limit')) {
       return {
         type: 'quota',
         icon: <HardDrive className="h-4 w-4" />,
@@ -122,11 +104,7 @@ export function DriveErrorDisplay({
     }
 
     // Rate limit errors
-    if (
-      message.includes('rate') ||
-      message.includes('too many') ||
-      code === 429
-    ) {
+    if (message.includes('rate') || message.includes('too many') || code === 429) {
       return {
         type: 'rate_limit',
         icon: <Clock className="h-4 w-4" />,
@@ -158,8 +136,7 @@ export function DriveErrorDisplay({
         <div className="flex items-center gap-2">
           {errorDetails.icon}
           <AlertDescription className="flex-1 text-sm">
-            <span className="font-medium">{errorDetails.title}:</span>{' '}
-            {errorDetails.description}
+            <span className="font-medium">{errorDetails.title}:</span> {errorDetails.description}
           </AlertDescription>
           {errorDetails.retryable && onRetry && (
             <Button size="sm" variant="outline" onClick={onRetry}>
@@ -185,22 +162,15 @@ export function DriveErrorDisplay({
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2">
               <h4 className="text-sm font-medium">{errorDetails.title}</h4>
-              <Badge
-                variant={errorDetails.retryable ? 'secondary' : 'destructive'}
-                className="text-xs"
-              >
+              <Badge variant={errorDetails.retryable ? 'secondary' : 'destructive'} className="text-xs">
                 {errorDetails.retryable ? 'Retryable' : 'Manual Fix Required'}
               </Badge>
             </div>
 
-            <AlertDescription className="text-sm">
-              {errorDetails.description}
-            </AlertDescription>
+            <AlertDescription className="text-sm">{errorDetails.description}</AlertDescription>
 
             <div className="space-y-2">
-              <div className="text-muted-foreground text-xs font-medium">
-                Suggested actions:
-              </div>
+              <div className="text-muted-foreground text-xs font-medium">Suggested actions:</div>
               <ul className="text-muted-foreground space-y-1 text-xs">
                 {errorDetails.actions.map((action, index) => (
                   <li key={index} className="flex items-start gap-1">

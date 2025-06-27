@@ -24,10 +24,7 @@ export async function initDriveService(): Promise<AuthResult> {
     if (!session?.user) {
       return {
         success: false,
-        response: NextResponse.json(
-          { error: 'Authentication required' },
-          { status: 401 }
-        ),
+        response: NextResponse.json({ error: 'Authentication required' }, { status: 401 }),
       }
     }
 
@@ -38,8 +35,7 @@ export async function initDriveService(): Promise<AuthResult> {
         success: false,
         response: NextResponse.json(
           {
-            error:
-              'Google Drive access token not found. Please reconnect your Google account.',
+            error: 'Google Drive access token not found. Please reconnect your Google account.',
             needsReauth: true,
           },
           { status: 401 }
@@ -57,10 +53,7 @@ export async function initDriveService(): Promise<AuthResult> {
   } catch (error) {
     return {
       success: false,
-      response: NextResponse.json(
-        { error: 'Authentication failed' },
-        { status: 500 }
-      ),
+      response: NextResponse.json({ error: 'Authentication failed' }, { status: 500 }),
     }
   }
 }
@@ -71,10 +64,7 @@ export async function initDriveService(): Promise<AuthResult> {
 export function handleApiError(error: unknown): NextResponse {
   if (error instanceof Error) {
     // Handle Google API specific errors
-    if (
-      error.message.includes('Invalid Credentials') ||
-      error.message.includes('unauthorized')
-    ) {
+    if (error.message.includes('Invalid Credentials') || error.message.includes('unauthorized')) {
       return NextResponse.json(
         {
           error: 'Google Drive access expired. Please reconnect your account.',
@@ -89,27 +79,19 @@ export function handleApiError(error: unknown): NextResponse {
     }
 
     if (error.message.includes('quota')) {
-      return NextResponse.json(
-        { error: 'Google Drive quota exceeded. Please try again later.' },
-        { status: 429 }
-      )
+      return NextResponse.json({ error: 'Google Drive quota exceeded. Please try again later.' }, { status: 429 })
     }
 
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
 
-  return NextResponse.json(
-    { error: 'An unexpected error occurred' },
-    { status: 500 }
-  )
+  return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 })
 }
 
 /**
  * Extract file ID from params safely
  */
-export async function getFileIdFromParams(
-  params: Promise<{ fileId: string }>
-): Promise<string> {
+export async function getFileIdFromParams(params: Promise<{ fileId: string }>): Promise<string> {
   const { fileId } = await params
   return fileId
 }
@@ -123,6 +105,15 @@ export function validateShareRequest(body: any): boolean {
 }
 
 export function validateOperationsRequest(body: any): boolean {
-  const { operation, fileIds } = body
-  return operation && Array.isArray(fileIds) && fileIds.length > 0
+  // Support both old format (operation, fileIds) and new format (items)
+  if (body.operation && Array.isArray(body.fileIds) && body.fileIds.length > 0) {
+    return true
+  }
+
+  // New format for download and other operations
+  if (Array.isArray(body.items) && body.items.length > 0) {
+    return true
+  }
+
+  return false
 }

@@ -30,10 +30,7 @@ export function PerformanceMonitor() {
       setStats({
         apiQueue: apiStats.queueSize,
         cacheSize: cacheStats.size,
-        errorCount: Object.values(errorStats).reduce(
-          (sum, count) => sum + count,
-          0
-        ),
+        errorCount: Object.values(errorStats).reduce((sum, count) => sum + count, 0),
         lastUpdate: Date.now(),
       })
     }

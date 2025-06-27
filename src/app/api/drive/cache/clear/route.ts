@@ -12,9 +12,6 @@ export async function POST(request: NextRequest) {
       message: 'Cache cleared successfully',
     })
   } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Failed to clear cache' },
-      { status: 500 }
-    )
+    return NextResponse.json({ success: false, error: 'Failed to clear cache' }, { status: 500 })
   }
 }

@@ -1,23 +1,9 @@
 'use client'
 
-import {
-  Trash2,
-  Download,
-  Share2,
-  RotateCcw,
-  Copy,
-  Edit,
-  FolderOpen,
-} from 'lucide-react'
+import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen } from 'lucide-react'
 import { useState } from 'react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -37,6 +23,8 @@ import {
   ItemsDeleteDialog,
   ItemsUntrashDialog,
 } from '@/components/lazy-imports'
+
+import ItemsDownloadDialog from './items-download-dialog'
 
 interface OperationsDialogProps {
   isOpen?: boolean
@@ -68,9 +56,7 @@ function OperationsDialog({
   const canShareCount = selectedItems.filter((item) => item.canShare).length
   const canTrashCount = selectedItems.filter((item) => item.canTrash).length
   const canUntrashCount = selectedItems.filter((item) => item.canUntrash).length
-  const canDownloadCount = selectedItems.filter(
-    (item) => item.canDownload
-  ).length
+  const canDownloadCount = selectedItems.filter((item) => item.canDownload).length
   const canRenameCount = selectedItems.filter((item) => item.canRename).length
 
   // Individual dialog states
@@ -80,14 +66,13 @@ function OperationsDialog({
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
+  const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
 
   // Determine dialog open state
   const dialogOpen = open ?? isOpen ?? false
-  const handleClose = onOpenChange
-    ? () => onOpenChange(false)
-    : onClose || (() => {})
+  const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
 
   // Individual dialog handlers
   const handleMoveClick = () => {
@@ -131,7 +116,8 @@ function OperationsDialog({
   }
 
   const handleDownloadClick = () => {
-    handleExportClick()
+    setIsDownloadDialogOpen(true)
+    handleClose()
   }
 
   // Bulk operation completion handlers with actual API calls
@@ -162,9 +148,7 @@ function OperationsDialog({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems
-            .filter((item) => !item.isFolder)
-            .map((item) => item.id),
+          fileIds: selectedItems.filter((item) => !item.isFolder).map((item) => item.id),
           targetFolderId,
         }),
       })
@@ -305,6 +289,67 @@ function OperationsDialog({
     onRefreshAfterOp?.()
   }
 
+  const handleDownloadComplete = async (downloadMode: string) => {
+    try {
+      const response = await fetch('/api/drive/files/bulk/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedItems,
+          downloadMode,
+        }),
+      })
+
+      if (response.ok) {
+        // For CSV export, handle as file download
+        if (downloadMode === 'exportLinks') {
+          const blob = await response.blob()
+          const url = window.URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `download-${new Date().toISOString().split('T')[0]}.csv`
+          document.body.appendChild(a)
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+          // Success message handled by download completion
+        } else {
+          const result = await response.json()
+          // Handle other download modes (oneByOne, batch)
+          if (result.success && result.success.length > 0) {
+            // Trigger downloads for successful files
+            result.success.forEach((file: any) => {
+              if (file.downloadUrl) {
+                const a = document.createElement('a')
+                a.href = file.downloadUrl
+                a.download = file.name
+                document.body.appendChild(a)
+                a.click()
+                document.body.removeChild(a)
+              }
+            })
+            // Download success feedback handled by browser
+          }
+
+          // Show summary if there were skipped or failed items
+          if (result.skipped?.length > 0 || result.failed?.length > 0) {
+            const summary = []
+            if (result.success?.length > 0) summary.push(`${result.success.length} successful`)
+            if (result.skipped?.length > 0) summary.push(`${result.skipped.length} skipped`)
+            if (result.failed?.length > 0) summary.push(`${result.failed.length} failed`)
+            // Summary feedback for completed operations
+          }
+        }
+      } else {
+        // Handle error response
+      }
+    } catch (error) {
+      // Handle network or other errors
+    }
+    setIsDownloadDialogOpen(false)
+    onRefreshAfterOp?.()
+  }
+
   const renderContent = () => (
     <>
       <div className="grid gap-3">
@@ -319,9 +364,7 @@ function OperationsDialog({
           </div>
           <div className="flex flex-col items-start">
             <span className="font-medium">Move Items</span>
-            <span className="text-muted-foreground text-xs">
-              Move items to another location
-            </span>
+            <span className="text-muted-foreground text-xs">Move items to another location</span>
           </div>
         </Button>
 
@@ -336,9 +379,7 @@ function OperationsDialog({
           </div>
           <div className="flex flex-col items-start">
             <span className="font-medium">Copy Items</span>
-            <span className="text-muted-foreground text-xs">
-              Create copies in another location
-            </span>
+            <span className="text-muted-foreground text-xs">Create copies in another location</span>
           </div>
         </Button>
 
@@ -354,9 +395,7 @@ function OperationsDialog({
             </div>
             <div className="flex flex-col items-start">
               <span className="font-medium">Share Items</span>
-              <span className="text-muted-foreground text-xs">
-                Generate {canShareCount} shareable links
-              </span>
+              <span className="text-muted-foreground text-xs">Generate {canShareCount} shareable links</span>
             </div>
           </Button>
         )}
@@ -373,8 +412,25 @@ function OperationsDialog({
             </div>
             <div className="flex flex-col items-start">
               <span className="font-medium">Rename</span>
+              <span className="text-muted-foreground text-xs">Rename {canRenameCount} items with patterns</span>
+            </div>
+          </Button>
+        )}
+
+        {/* Download Files */}
+        {fileCount > 0 && (
+          <Button
+            variant="outline"
+            onClick={handleDownloadClick}
+            className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+              <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Download Files</span>
               <span className="text-muted-foreground text-xs">
-                Rename {canRenameCount} items with patterns
+                Download {fileCount} file{fileCount > 1 ? 's' : ''} directly
               </span>
             </div>
           </Button>
@@ -392,8 +448,7 @@ function OperationsDialog({
             <div className="flex flex-col items-start">
               <span className="font-medium">Export Files</span>
               <span className="text-muted-foreground text-xs">
-                Export {fileCount} file{fileCount > 1 ? 's' : ''} in various
-                formats
+                Export {fileCount} file{fileCount > 1 ? 's' : ''} in various formats
               </span>
             </div>
           </Button>
@@ -404,9 +459,7 @@ function OperationsDialog({
           canTrashCount > 0 ||
           (canUntrashCount > 0 && (
             <div className="mt-3 border-t pt-3">
-              <p className="text-muted-foreground mb-3 text-xs font-medium">
-                Destructive Actions
-              </p>
+              <p className="text-muted-foreground mb-3 text-xs font-medium">Destructive Actions</p>
 
               {/* Move to Trash */}
               {canTrashCount > 0 && (
@@ -440,8 +493,7 @@ function OperationsDialog({
                   <div className="flex flex-col items-start">
                     <span className="font-medium">Permanent Delete</span>
                     <span className="text-muted-foreground text-xs">
-                      Delete permanently {canDeleteCount} items (cannot be
-                      undone)
+                      Delete permanently {canDeleteCount} items (cannot be undone)
                     </span>
                   </div>
                 </Button>
@@ -478,9 +530,7 @@ function OperationsDialog({
         <BottomSheet open={dialogOpen} onOpenChange={onOpenChange || onClose}>
           <BottomSheetContent>
             <BottomSheetHeader>
-              <BottomSheetTitle className="text-lg font-semibold">
-                Operations
-              </BottomSheetTitle>
+              <BottomSheetTitle className="text-lg font-semibold">Operations</BottomSheetTitle>
               <BottomSheetDescription className="text-muted-foreground text-sm">
                 Choose an action for {selectedItems.length} selected item
                 {selectedItems.length > 1 ? 's' : ''} ({fileCount} file
@@ -488,18 +538,14 @@ function OperationsDialog({
                 {folderCount !== 1 ? 's' : ''})
               </BottomSheetDescription>
             </BottomSheetHeader>
-            <div className="max-h-[60vh] overflow-y-auto px-4 pb-6">
-              {renderContent()}
-            </div>
+            <div className="max-h-[60vh] overflow-y-auto px-4 pb-6">{renderContent()}</div>
           </BottomSheetContent>
         </BottomSheet>
       ) : (
         <Dialog open={dialogOpen} onOpenChange={onOpenChange || onClose}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle className="text-lg font-semibold">
-                Operations
-              </DialogTitle>
+              <DialogTitle className="text-lg font-semibold">Operations</DialogTitle>
               <DialogDescription className="text-muted-foreground text-sm">
                 Choose an action for {selectedItems.length} selected item
                 {selectedItems.length > 1 ? 's' : ''} ({fileCount} file
@@ -507,9 +553,7 @@ function OperationsDialog({
                 {folderCount !== 1 ? 's' : ''})
               </DialogDescription>
             </DialogHeader>
-            <div className="max-h-[70vh] overflow-y-auto py-2">
-              {renderContent()}
-            </div>
+            <div className="max-h-[70vh] overflow-y-auto py-2">{renderContent()}</div>
           </DialogContent>
         </Dialog>
       )}
@@ -554,6 +598,13 @@ function OperationsDialog({
         isOpen={isExportDialogOpen}
         onClose={() => setIsExportDialogOpen(false)}
         onConfirm={handleExportComplete}
+        selectedItems={selectedItems}
+      />
+
+      <ItemsDownloadDialog
+        isOpen={isDownloadDialogOpen}
+        onClose={() => setIsDownloadDialogOpen(false)}
+        onConfirm={handleDownloadComplete}
         selectedItems={selectedItems}
       />
 

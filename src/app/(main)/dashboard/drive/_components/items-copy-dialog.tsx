@@ -36,12 +36,7 @@ interface ItemsCopyDialogProps {
   }>
 }
 
-function ItemsCopyDialog({
-  isOpen,
-  onClose,
-  onConfirm,
-  selectedItems,
-}: ItemsCopyDialogProps) {
+function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCopyDialogProps) {
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
   const isMobile = useIsMobile()
 
@@ -74,18 +69,12 @@ function ItemsCopyDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {files.length > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-          >
+          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
             {files.length} file{files.length > 1 ? 's' : ''}
           </Badge>
         )}
         {folders.length > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-          >
+          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">
             {folders.length} folder{folders.length > 1 ? 's' : ''} (cannot copy)
           </Badge>
         )}
@@ -96,8 +85,7 @@ function ItemsCopyDialog({
         <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/20">
           <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
           <div className="text-sm text-amber-800 dark:text-amber-200">
-            <strong>Note:</strong> Folders cannot be copied through the Google
-            Drive API. Only files will be copied.
+            <strong>Note:</strong> Folders cannot be copied through the Google Drive API. Only files will be copied.
           </div>
         </div>
       )}
@@ -105,16 +93,11 @@ function ItemsCopyDialog({
       {/* Files Preview */}
       {files.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-center text-sm font-medium">
-            Files to be copied:
-          </h4>
+          <h4 className="text-center text-sm font-medium">Files to be copied:</h4>
           <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
             <div className="space-y-2">
               {files.slice(0, 5).map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-background/50 flex items-center gap-3 rounded-md p-2"
-                >
+                <div key={item.id} className="bg-background/50 flex items-center gap-3 rounded-md p-2">
                   <div className="h-2 w-2 rounded-full bg-green-500" />
                   <span className="flex-1 truncate text-sm">{item.name}</span>
                   <Badge variant="outline" className="text-xs">
@@ -138,8 +121,7 @@ function ItemsCopyDialog({
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
         <div className="text-sm text-green-800 dark:text-green-200">
-          Click "Choose Destination" to select where you want to copy these
-          files.
+          Click "Choose Destination" to select where you want to copy these files.
         </div>
       </div>
     </div>
@@ -157,9 +139,7 @@ function ItemsCopyDialog({
                 </div>
                 <div>
                   <div className="text-lg font-semibold">Copy Items</div>
-                  <div className="text-muted-foreground text-sm font-normal">
-                    Bulk copy operation
-                  </div>
+                  <div className="text-muted-foreground text-sm font-normal">Bulk copy operation</div>
                 </div>
               </BottomSheetTitle>
             </BottomSheetHeader>
@@ -176,11 +156,7 @@ function ItemsCopyDialog({
                   Choose Destination
                 </Button>
               )}
-              <Button
-                variant="outline"
-                onClick={onClose}
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
+              <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
                 Cancel
               </Button>
             </BottomSheetFooter>
@@ -203,15 +179,12 @@ function ItemsCopyDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Copy Items</div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Bulk copy operation
-                </div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk copy operation</div>
               </div>
             </DialogTitle>
             <DialogDescription className="space-y-4 pt-2">
               <div className="text-base">
-                You are about to copy{' '}
-                <span className="font-semibold">{files.length}</span> file
+                You are about to copy <span className="font-semibold">{files.length}</span> file
                 {files.length > 1 ? 's' : ''} to a new location.
               </div>
 
@@ -225,12 +198,8 @@ function ItemsCopyDialog({
                   </Badge>
                 )}
                 {folders.length > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-                  >
-                    {folders.length} folder{folders.length > 1 ? 's' : ''}{' '}
-                    (cannot copy)
+                  <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">
+                    {folders.length} folder{folders.length > 1 ? 's' : ''} (cannot copy)
                   </Badge>
                 )}
               </div>
@@ -239,8 +208,7 @@ function ItemsCopyDialog({
                 <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20">
                   <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                   <div className="text-sm text-amber-800 dark:text-amber-200">
-                    Folders cannot be copied through the Google Drive API. Only
-                    files will be copied.
+                    Folders cannot be copied through the Google Drive API. Only files will be copied.
                   </div>
                 </div>
               )}
@@ -249,16 +217,11 @@ function ItemsCopyDialog({
                 <>
                   {files.length <= 5 ? (
                     <div className="space-y-2">
-                      <div className="text-sm font-semibold">
-                        Files to be copied:
-                      </div>
+                      <div className="text-sm font-semibold">Files to be copied:</div>
                       <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
                         <ul className="space-y-1 text-sm">
                           {files.map((item) => (
-                            <li
-                              key={item.id}
-                              className="flex items-center gap-2 truncate"
-                            >
+                            <li key={item.id} className="flex items-center gap-2 truncate">
                               <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                               <span className="truncate">{item.name}</span>
                             </li>
@@ -268,16 +231,11 @@ function ItemsCopyDialog({
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="text-sm font-semibold">
-                        Preview (first 3 files):
-                      </div>
+                      <div className="text-sm font-semibold">Preview (first 3 files):</div>
                       <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
                         <ul className="space-y-1 text-sm">
                           {files.slice(0, 3).map((item) => (
-                            <li
-                              key={item.id}
-                              className="flex items-center gap-2 truncate"
-                            >
+                            <li key={item.id} className="flex items-center gap-2 truncate">
                               <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                               <span className="truncate">{item.name}</span>
                             </li>
@@ -296,8 +254,7 @@ function ItemsCopyDialog({
                       <div className="h-1.5 w-1.5 rounded-full bg-white" />
                     </div>
                     <div className="text-sm text-purple-800 dark:text-purple-200">
-                      Click "Choose Destination" to select where you want to
-                      copy these files.
+                      Click "Choose Destination" to select where you want to copy these files.
                     </div>
                   </div>
                 </>
@@ -313,11 +270,7 @@ function ItemsCopyDialog({
                 Choose Destination
               </Button>
             )}
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className="w-full sm:w-auto"
-            >
+            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
               Cancel
             </Button>
           </DialogFooter>

@@ -103,8 +103,6 @@ export const apiThrottle = new APIThrottle()
 /**
  * Convenience wrapper for Google Drive API calls
  */
-export async function throttledDriveRequest<T>(
-  requestFn: () => Promise<T>
-): Promise<T> {
+export async function throttledDriveRequest<T>(requestFn: () => Promise<T>): Promise<T> {
   return apiThrottle.throttleRequest(requestFn)
 }

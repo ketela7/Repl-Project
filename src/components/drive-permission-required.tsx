@@ -4,13 +4,7 @@ import { useState } from 'react'
 import { HardDrive, Shield, AlertTriangle, RefreshCw } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface DrivePermissionRequiredProps {
@@ -19,11 +13,7 @@ interface DrivePermissionRequiredProps {
   compact?: boolean
 }
 
-export function DrivePermissionRequired({
-  error,
-  onRetry,
-  compact = false,
-}: DrivePermissionRequiredProps) {
+export function DrivePermissionRequired({ error, onRetry, compact = false }: DrivePermissionRequiredProps) {
   const [connecting, setConnecting] = useState(false)
 
   const handleReconnect = async () => {
@@ -37,12 +27,10 @@ export function DrivePermissionRequired({
       })
 
       // Redirect to login with reauth parameter
-      window.location.href =
-        '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive'
+      window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive'
     } catch (error) {
       // Fallback: direct redirect to login
-      window.location.href =
-        '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive'
+      window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive'
     }
   }
 
@@ -82,20 +70,14 @@ export function DrivePermissionRequired({
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-100">
             <AlertTriangle className="h-8 w-8 text-orange-600" />
           </div>
-          <CardTitle className="text-xl">
-            Google Drive Access Required
-          </CardTitle>
-          <CardDescription>
-            We need permission to access your Google Drive to manage your files
-          </CardDescription>
+          <CardTitle className="text-xl">Google Drive Access Required</CardTitle>
+          <CardDescription>We need permission to access your Google Drive to manage your files</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
             <Alert className="border-red-200 bg-red-50">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription className="text-sm">
-                {error.message || error.toString()}
-              </AlertDescription>
+              <AlertDescription className="text-sm">{error.message || error.toString()}</AlertDescription>
             </Alert>
           )}
 
@@ -112,20 +94,12 @@ export function DrivePermissionRequired({
 
           <div className="flex gap-2 pt-2">
             {onRetry && (
-              <Button
-                variant="outline"
-                onClick={handleRetry}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={handleRetry} className="flex-1">
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Try Again
               </Button>
             )}
-            <Button
-              onClick={handleReconnect}
-              disabled={connecting}
-              className="flex-1"
-            >
+            <Button onClick={handleReconnect} disabled={connecting} className="flex-1">
               {connecting ? (
                 <>
                   <HardDrive className="mr-2 h-4 w-4 animate-pulse" />

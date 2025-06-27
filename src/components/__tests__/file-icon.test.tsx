@@ -7,70 +7,54 @@ describe('FileIcon', () => {
   it('renders correct icon for document mime type', () => {
     render(<FileIcon mimeType="application/vnd.google-apps.document" />)
 
-    const icon =
-      screen.getByTestId('file-icon') ||
-      screen.getByRole('img', { hidden: true })
+    const icon = screen.getByTestId('file-icon') || screen.getByRole('img', { hidden: true })
     expect(icon).toBeInTheDocument()
   })
 
   it('renders correct icon for spreadsheet mime type', () => {
     render(<FileIcon mimeType="application/vnd.google-apps.spreadsheet" />)
 
-    const icon =
-      screen.getByTestId('file-icon') ||
-      screen.getByRole('img', { hidden: true })
+    const icon = screen.getByTestId('file-icon') || screen.getByRole('img', { hidden: true })
     expect(icon).toBeInTheDocument()
   })
 
   it('renders correct icon for folder mime type', () => {
     render(<FileIcon mimeType="application/vnd.google-apps.folder" />)
 
-    const icon =
-      screen.getByTestId('file-icon') ||
-      screen.getByRole('img', { hidden: true })
+    const icon = screen.getByTestId('file-icon') || screen.getByRole('img', { hidden: true })
     expect(icon).toBeInTheDocument()
   })
 
   it('renders correct icon for image mime type', () => {
     render(<FileIcon mimeType="image/jpeg" />)
 
-    const icon =
-      screen.getByTestId('file-icon') ||
-      screen.getByRole('img', { hidden: true })
+    const icon = screen.getByTestId('file-icon') || screen.getByRole('img', { hidden: true })
     expect(icon).toBeInTheDocument()
   })
 
   it('renders correct icon for video mime type', () => {
     render(<FileIcon mimeType="video/mp4" />)
 
-    const icon =
-      screen.getByTestId('file-icon') ||
-      screen.getByRole('img', { hidden: true })
+    const icon = screen.getByTestId('file-icon') || screen.getByRole('img', { hidden: true })
     expect(icon).toBeInTheDocument()
   })
 
   it('renders correct icon for audio mime type', () => {
     render(<FileIcon mimeType="audio/mpeg" />)
 
-    const icon =
-      screen.getByTestId('file-icon') ||
-      screen.getByRole('img', { hidden: true })
+    const icon = screen.getByTestId('file-icon') || screen.getByRole('img', { hidden: true })
     expect(icon).toBeInTheDocument()
   })
 
   it('renders default file icon for unknown mime type', () => {
     render(<FileIcon mimeType="unknown/type" />)
 
-    const icon =
-      screen.getByTestId('file-icon') ||
-      screen.getByRole('img', { hidden: true })
+    const icon = screen.getByTestId('file-icon') || screen.getByRole('img', { hidden: true })
     expect(icon).toBeInTheDocument()
   })
 
   it('applies custom className', () => {
-    const { container } = render(
-      <FileIcon mimeType="text/plain" className="custom-class" />
-    )
+    const { container } = render(<FileIcon mimeType="text/plain" className="custom-class" />)
 
     const icon = container.querySelector('svg[data-testid="file-icon"]')
     expect(icon).toHaveClass('custom-class')
@@ -86,9 +70,7 @@ describe('FileIcon', () => {
   it('uses fileName for additional context when provided', () => {
     render(<FileIcon mimeType="text/plain" fileName="test.txt" />)
 
-    const icon =
-      screen.getByTestId('file-icon') ||
-      screen.getByRole('img', { hidden: true })
+    const icon = screen.getByTestId('file-icon') || screen.getByRole('img', { hidden: true })
     expect(icon).toBeInTheDocument()
   })
 })

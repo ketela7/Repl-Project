@@ -1,23 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import {
-  WifiOff,
-  RefreshCw,
-  AlertTriangle,
-  Router,
-  CheckCircle,
-} from 'lucide-react'
+import { WifiOff, RefreshCw, AlertTriangle, Router, CheckCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 export default function ServerOfflinePage() {
@@ -49,9 +37,7 @@ export default function ServerOfflinePage() {
             <WifiOff className="text-destructive h-8 w-8" />
           </div>
           <CardTitle className="text-2xl">Server Offline</CardTitle>
-          <CardDescription>
-            We're unable to connect to the server right now.
-          </CardDescription>
+          <CardDescription>We're unable to connect to the server right now.</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">
@@ -59,8 +45,8 @@ export default function ServerOfflinePage() {
             <Alert className="border-green-200 bg-green-50">
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Anda masih login.</strong> Session tersimpan dan akan
-                otomatis tersambung kembali ketika server online.
+                <strong>Anda masih login.</strong> Session tersimpan dan akan otomatis tersambung kembali ketika server
+                online.
               </AlertDescription>
             </Alert>
           )}
@@ -69,8 +55,7 @@ export default function ServerOfflinePage() {
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
               Server sementara tidak tersedia atau sedang dalam maintenance.
-              {!hasStoredSession &&
-                ' Anda perlu login kembali setelah server online.'}
+              {!hasStoredSession && ' Anda perlu login kembali setelah server online.'}
             </AlertDescription>
           </Alert>
 
@@ -102,11 +87,7 @@ export default function ServerOfflinePage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button
-              onClick={handleRefresh}
-              className="flex-1"
-              variant="outline"
-            >
+            <Button onClick={handleRefresh} className="flex-1" variant="outline">
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh Page
             </Button>
@@ -116,10 +97,7 @@ export default function ServerOfflinePage() {
           </div>
 
           <div className="text-center">
-            <Link
-              href="/dashboard"
-              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-            >
+            <Link href="/dashboard" className="text-muted-foreground hover:text-foreground text-sm transition-colors">
               Return to Dashboard
             </Link>
           </div>

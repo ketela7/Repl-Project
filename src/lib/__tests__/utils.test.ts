@@ -7,9 +7,7 @@ describe('Utils Library', () => {
     })
 
     it('handles conditional classes', () => {
-      expect(cn('base', true && 'conditional', false && 'ignored')).toBe(
-        'base conditional'
-      )
+      expect(cn('base', true && 'conditional', false && 'ignored')).toBe('base conditional')
     })
 
     it('handles undefined and null values', () => {

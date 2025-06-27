@@ -25,15 +25,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <a href="/dashboard/drive">
                 <HardDrive className="h-5 w-5" />
-                <span className="truncate text-base font-semibold">
-                  {APP_CONFIG.name}
-                </span>
+                <span className="truncate text-base font-semibold">{APP_CONFIG.name}</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>

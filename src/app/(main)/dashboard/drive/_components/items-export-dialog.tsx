@@ -1,24 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import {
-  FileDown,
-  AlertTriangle,
-  FileText,
-  FileSpreadsheet,
-  Presentation,
-  Image,
-  Info,
-} from 'lucide-react'
+import { FileDown, AlertTriangle, FileText, FileSpreadsheet, Presentation, Image, Info } from 'lucide-react'
 import { toast } from 'sonner'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
@@ -109,12 +95,7 @@ const EXPORT_FORMATS = [
   },
 ]
 
-function ItemsExportDialog({
-  isOpen,
-  onClose,
-  onConfirm,
-  selectedItems,
-}: ItemsExportDialogProps) {
+function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState('pdf')
   const [progress, setProgress] = useState<{
     current: number
@@ -177,10 +158,7 @@ function ItemsExportDialog({
         })
 
         // Attempt to export the file
-        const response = await fetch(
-          `/api/drive/files/${file.id}/export?format=${format}`,
-          { method: 'GET' }
-        )
+        const response = await fetch(`/api/drive/files/${file.id}/export?format=${format}`, { method: 'GET' })
 
         if (!response.ok) {
           const error = new Error(`Export failed: ${response.statusText}`)
@@ -239,19 +217,13 @@ function ItemsExportDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {exportableFiles.length > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
-          >
+          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
             {exportableFiles.length} exportable file
             {exportableFiles.length > 1 ? 's' : ''}
           </Badge>
         )}
         {nonExportableFiles.length > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
-          >
+          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">
             {nonExportableFiles.length} non-exportable item
             {nonExportableFiles.length > 1 ? 's' : ''}
           </Badge>
@@ -262,8 +234,8 @@ function ItemsExportDialog({
         <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20">
           <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
           <div className="text-sm text-amber-800 dark:text-amber-200">
-            Only Google Workspace files (Docs, Sheets, Slides, Drawings) can be
-            exported. Other files and folders will be skipped.
+            Only Google Workspace files (Docs, Sheets, Slides, Drawings) can be exported. Other files and folders will
+            be skipped.
           </div>
         </div>
       )}
@@ -272,31 +244,18 @@ function ItemsExportDialog({
         <>
           <div className="space-y-3">
             <Label className="text-sm font-semibold">Export Format:</Label>
-            <RadioGroup
-              value={selectedFormat}
-              onValueChange={setSelectedFormat}
-              className="space-y-3"
-            >
+            <RadioGroup value={selectedFormat} onValueChange={setSelectedFormat} className="space-y-3">
               {EXPORT_FORMATS.map((format) => {
                 const Icon = format.icon
                 return (
                   <div key={format.id} className="flex items-start space-x-3">
-                    <RadioGroupItem
-                      value={format.id}
-                      id={format.id}
-                      className="mt-1"
-                    />
+                    <RadioGroupItem value={format.id} id={format.id} className="mt-1" />
                     <div className="flex-1">
-                      <Label
-                        htmlFor={format.id}
-                        className="flex cursor-pointer items-center gap-2 text-sm font-medium"
-                      >
+                      <Label htmlFor={format.id} className="flex cursor-pointer items-center gap-2 text-sm font-medium">
                         <Icon className="h-4 w-4" />
                         {format.label}
                       </Label>
-                      <div className="text-muted-foreground mt-1 text-xs">
-                        {format.description}
-                      </div>
+                      <div className="text-muted-foreground mt-1 text-xs">{format.description}</div>
                     </div>
                   </div>
                 )
@@ -309,16 +268,14 @@ function ItemsExportDialog({
               <Info className="h-4 w-4 text-blue-500" />
               <span className="text-sm font-semibold">
                 {compatibleFiles.length} file
-                {compatibleFiles.length > 1 ? 's' : ''} compatible with{' '}
-                {selectedFormatData?.label}
+                {compatibleFiles.length > 1 ? 's' : ''} compatible with {selectedFormatData?.label}
               </span>
             </div>
 
             {incompatibleFiles.length > 0 && (
               <div className="text-muted-foreground text-sm">
                 {incompatibleFiles.length} file
-                {incompatibleFiles.length > 1 ? 's' : ''} will be skipped
-                (incompatible format)
+                {incompatibleFiles.length > 1 ? 's' : ''} will be skipped (incompatible format)
               </div>
             )}
           </div>
@@ -329,10 +286,7 @@ function ItemsExportDialog({
               <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
                 <ul className="space-y-1 text-sm">
                   {compatibleFiles.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex items-center gap-2 truncate"
-                    >
+                    <li key={item.id} className="flex items-center gap-2 truncate">
                       <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                       <span className="truncate">{item.name}</span>
                     </li>
@@ -342,16 +296,11 @@ function ItemsExportDialog({
             </div>
           ) : (
             <div className="space-y-2">
-              <div className="text-sm font-semibold">
-                Preview (first 3 files):
-              </div>
+              <div className="text-sm font-semibold">Preview (first 3 files):</div>
               <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
                 <ul className="space-y-1 text-sm">
                   {compatibleFiles.slice(0, 3).map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex items-center gap-2 truncate"
-                    >
+                    <li key={item.id} className="flex items-center gap-2 truncate">
                       <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                       <span className="truncate">{item.name}</span>
                     </li>
@@ -370,8 +319,7 @@ function ItemsExportDialog({
               <div className="h-1.5 w-1.5 rounded-full bg-white" />
             </div>
             <div className="text-sm text-green-800 dark:text-green-200">
-              Files will be downloaded automatically after export processing
-              completes.
+              Files will be downloaded automatically after export processing completes.
             </div>
           </div>
         </>
@@ -392,33 +340,22 @@ function ItemsExportDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Export Files</div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Bulk export operation
-                </div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk export operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="space-y-4 overflow-y-auto px-4 pb-4">
-            {renderContent()}
-          </div>
+          <div className="space-y-4 overflow-y-auto px-4 pb-4">{renderContent()}</div>
 
           <BottomSheetFooter className={cn('grid gap-4')}>
             {compatibleFiles.length > 0 && (
-              <Button
-                onClick={handleExport}
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
+              <Button onClick={handleExport} className={cn('touch-target min-h-[44px] active:scale-95')}>
                 <FileDown className="mr-2 h-4 w-4" />
                 Export {compatibleFiles.length} File
                 {compatibleFiles.length > 1 ? 's' : ''}
               </Button>
             )}
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
+            <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
               Cancel
             </Button>
           </BottomSheetFooter>
@@ -437,9 +374,7 @@ function ItemsExportDialog({
             </div>
             <div>
               <div className="text-lg font-semibold">Export Files</div>
-              <div className="text-muted-foreground text-sm font-normal">
-                Bulk export operation
-              </div>
+              <div className="text-muted-foreground text-sm font-normal">Bulk export operation</div>
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -456,11 +391,7 @@ function ItemsExportDialog({
               {compatibleFiles.length > 1 ? 's' : ''}
             </Button>
           )}
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="w-full sm:w-auto"
-          >
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
             Cancel
           </Button>
         </DialogFooter>

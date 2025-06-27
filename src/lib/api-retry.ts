@@ -55,10 +55,7 @@ function isRetryableError(error: any): boolean {
  * Calculate delay with exponential backoff and jitter
  */
 function calculateDelay(attempt: number, config: RetryConfig): number {
-  const exponentialDelay = Math.min(
-    config.baseDelay * Math.pow(config.backoffMultiplier, attempt),
-    config.maxDelay
-  )
+  const exponentialDelay = Math.min(config.baseDelay * Math.pow(config.backoffMultiplier, attempt), config.maxDelay)
 
   // Add jitter to prevent thundering herd
   const jitter = exponentialDelay * config.jitterFactor * Math.random()

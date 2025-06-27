@@ -134,13 +134,7 @@ export interface DriveSearchResult {
 
 export interface DrivePermission {
   type: 'user' | 'group' | 'domain' | 'anyone'
-  role:
-    | 'owner'
-    | 'organizer'
-    | 'fileOrganizer'
-    | 'writer'
-    | 'commenter'
-    | 'reader'
+  role: 'owner' | 'organizer' | 'fileOrganizer' | 'writer' | 'commenter' | 'reader'
   emailAddress?: string
   domain?: string
   allowFileDiscovery?: boolean

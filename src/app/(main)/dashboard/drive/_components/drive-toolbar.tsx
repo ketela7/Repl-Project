@@ -47,11 +47,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { successToast } from '@/lib/utils'
@@ -144,9 +140,7 @@ interface DriveToolbarProps {
 
   // Table columns
   visibleColumns: VisibleColumns
-  setVisibleColumns: (
-    _columns: VisibleColumns | ((_prev: VisibleColumns) => VisibleColumns)
-  ) => void
+  setVisibleColumns: (_columns: VisibleColumns | ((_prev: VisibleColumns) => VisibleColumns)) => void
 
   // Loading states
   loading: boolean
@@ -485,22 +479,13 @@ export function DriveToolbar({
       images: items.filter((f) => f.mimeType?.includes('image')).length,
       videos: items.filter((f) => f.mimeType?.includes('video')).length,
       documents: items.filter(
-        (f) =>
-          f.mimeType?.includes('document') ||
-          f.mimeType?.includes('text') ||
-          f.mimeType?.includes('pdf')
+        (f) => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')
       ).length,
       spreadsheets: items.filter(
-        (f) =>
-          f.mimeType?.includes('spreadsheet') ||
-          f.mimeType?.includes('excel') ||
-          f.mimeType?.includes('csv')
+        (f) => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')
       ).length,
-      presentations: items.filter(
-        (f) =>
-          f.mimeType?.includes('presentation') ||
-          f.mimeType?.includes('powerpoint')
-      ).length,
+      presentations: items.filter((f) => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint'))
+        .length,
       audio: items.filter((f) => f.mimeType?.startsWith('audio/')).length,
       archives: items.filter(
         (f) =>
@@ -526,16 +511,10 @@ export function DriveToolbar({
           f.mimeType?.includes('figma')
       ).length,
       database: items.filter(
-        (f) =>
-          f.mimeType?.includes('database') ||
-          f.mimeType?.includes('sql') ||
-          f.mimeType?.includes('sqlite')
+        (f) => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')
       ).length,
       ebooks: items.filter(
-        (f) =>
-          f.mimeType?.includes('epub') ||
-          f.mimeType?.includes('mobi') ||
-          f.mimeType?.includes('kindle')
+        (f) => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')
       ).length,
       fonts: items.filter(
         (f) =>
@@ -544,12 +523,8 @@ export function DriveToolbar({
           f.mimeType?.includes('otf') ||
           f.mimeType?.includes('woff')
       ).length,
-      shortcuts: items.filter(
-        (f) => f.mimeType === 'application/vnd.google-apps.shortcut'
-      ).length,
-      folders: items.filter(
-        (f) => f.mimeType === 'application/vnd.google-apps.folder'
-      ).length,
+      shortcuts: items.filter((f) => f.mimeType === 'application/vnd.google-apps.shortcut').length,
+      folders: items.filter((f) => f.mimeType === 'application/vnd.google-apps.folder').length,
     }
   }, [items])
 
@@ -560,12 +535,9 @@ export function DriveToolbar({
         const filteredItems = filterByMimeType(items, category)
         onClientSideFilter(filteredItems)
         setActiveFilter(category)
-        successToast.generic(
-          `Filtered to ${filteredItems.length} ${category.toLowerCase()}`,
-          {
-            description: `Showing only ${category.toLowerCase()} from ${items.length} total items`,
-          }
-        )
+        successToast.generic(`Filtered to ${filteredItems.length} ${category.toLowerCase()}`, {
+          description: `Showing only ${category.toLowerCase()} from ${items.length} total items`,
+        })
       }
     },
     [items, onClientSideFilter]
@@ -598,17 +570,12 @@ export function DriveToolbar({
             variant={searchQuery ? 'default' : 'ghost'}
             size="sm"
             onClick={() => {
-              const searchExpanded = document.querySelector(
-                '#search-expanded'
-              ) as HTMLElement
+              const searchExpanded = document.querySelector('#search-expanded') as HTMLElement
               if (searchExpanded) {
-                searchExpanded.style.display =
-                  searchExpanded.style.display === 'none' ? 'block' : 'none'
+                searchExpanded.style.display = searchExpanded.style.display === 'none' ? 'block' : 'none'
                 if (searchExpanded.style.display === 'block') {
                   setTimeout(() => {
-                    const input = searchExpanded.querySelector(
-                      'input'
-                    ) as HTMLInputElement
+                    const input = searchExpanded.querySelector('input') as HTMLInputElement
                     if (input) input.focus()
                   }, 100)
                 }
@@ -628,17 +595,11 @@ export function DriveToolbar({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() =>
-              onViewModeChange(viewMode === 'grid' ? 'table' : 'grid')
-            }
+            onClick={() => onViewModeChange(viewMode === 'grid' ? 'table' : 'grid')}
             className="h-8 px-2"
             title={`Switch to ${viewMode === 'grid' ? 'table' : 'grid'} view`}
           >
-            {viewMode === 'grid' ? (
-              <List className="h-4 w-4" />
-            ) : (
-              <Grid3X3 className="h-4 w-4" />
-            )}
+            {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid3X3 className="h-4 w-4" />}
           </Button>
 
           {/* Operations */}
@@ -653,19 +614,12 @@ export function DriveToolbar({
                 >
                   <Square className="h-4 w-4" />
                   {selectedCount > 0 && (
-                    <Badge
-                      variant="secondary"
-                      className="ml-1 h-4 px-1 text-xs"
-                    >
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
                       {selectedCount}
                     </Badge>
                   )}
-                  {(filters.activeView === 'trash' ||
-                    searchQuery.includes('trashed:true')) && (
-                    <Badge
-                      variant="destructive"
-                      className="ml-1 h-4 px-1 text-xs"
-                    >
+                  {(filters.activeView === 'trash' || searchQuery.includes('trashed:true')) && (
+                    <Badge variant="destructive" className="ml-1 h-4 px-1 text-xs">
                       T
                     </Badge>
                   )}
@@ -674,8 +628,7 @@ export function DriveToolbar({
               <DropdownMenuContent align="start" className="w-64">
                 <DropdownMenuItem
                   onClick={() => {
-                    ;(isSelectMode && onDeselectAll(),
-                      onSelectModeChange(!isSelectMode))
+                    ;(isSelectMode && onDeselectAll(), onSelectModeChange(!isSelectMode))
                   }}
                 >
                   {isSelectMode ? (
@@ -784,10 +737,7 @@ export function DriveToolbar({
                 advancedFilters.createdDateRange?.from ||
                 advancedFilters.modifiedDateRange?.from ||
                 advancedFilters.owner) && (
-                <Badge
-                  variant="secondary"
-                  className="ml-1 h-4 px-1 text-xs md:ml-2"
-                >
+                <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs md:ml-2">
                   <span className="hidden md:inline">Active</span>
                   <span className="md:hidden">•</span>
                 </Badge>
@@ -819,10 +769,7 @@ export function DriveToolbar({
                     advancedFilters.createdDateRange?.from ||
                     advancedFilters.modifiedDateRange?.from ||
                     advancedFilters.owner) && (
-                    <Badge
-                      variant="secondary"
-                      className="ml-1 h-4 px-1 text-xs"
-                    >
+                    <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
                       •
                     </Badge>
                   )}
@@ -832,9 +779,7 @@ export function DriveToolbar({
                 <div className="p-4">
                   <div className="mb-4 flex items-center gap-2">
                     <Settings className="text-primary h-4 w-4" />
-                    <h4 className="text-foreground text-sm font-semibold">
-                      Filters
-                    </h4>
+                    <h4 className="text-foreground text-sm font-semibold">Filters</h4>
                     {(activeView !== 'all' ||
                       fileTypeFilter.length > 0 ||
                       advancedFilters.sizeRange?.min ||
@@ -857,9 +802,7 @@ export function DriveToolbar({
                     <CollapsibleContent className="mt-2 ml-2 space-y-2">
                       <div className="grid grid-cols-2 gap-2">
                         <Button
-                          variant={
-                            filters.activeView === 'all' ? 'default' : 'outline'
-                          }
+                          variant={filters.activeView === 'all' ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => {
                             onFilterChange({ activeView: 'all' })
@@ -869,11 +812,7 @@ export function DriveToolbar({
                           All Files
                         </Button>
                         <Button
-                          variant={
-                            filters.activeView === 'my-drive'
-                              ? 'default'
-                              : 'outline'
-                          }
+                          variant={filters.activeView === 'my-drive' ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => {
                             onFilterChange({ activeView: 'my-drive' })
@@ -883,11 +822,7 @@ export function DriveToolbar({
                           My Drive
                         </Button>
                         <Button
-                          variant={
-                            filters.activeView === 'recent'
-                              ? 'default'
-                              : 'outline'
-                          }
+                          variant={filters.activeView === 'recent' ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => {
                             onFilterChange({ activeView: 'recent' })
@@ -897,11 +832,7 @@ export function DriveToolbar({
                           Recent
                         </Button>
                         <Button
-                          variant={
-                            filters.activeView === 'trash'
-                              ? 'default'
-                              : 'outline'
-                          }
+                          variant={filters.activeView === 'trash' ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => {
                             onFilterChange({ activeView: 'trash' })
@@ -911,11 +842,7 @@ export function DriveToolbar({
                           Trash
                         </Button>
                         <Button
-                          variant={
-                            filters.activeView === 'starred'
-                              ? 'default'
-                              : 'outline'
-                          }
+                          variant={filters.activeView === 'starred' ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => {
                             onFilterChange({ activeView: 'starred' })
@@ -925,15 +852,9 @@ export function DriveToolbar({
                           Starred
                         </Button>
                         <Button
-                          variant={
-                            filters.activeView === 'shared'
-                              ? 'default'
-                              : 'outline'
-                          }
+                          variant={filters.activeView === 'shared' ? 'default' : 'outline'}
                           size="sm"
-                          onClick={() =>
-                            onFilterChange({ activeView: 'shared' })
-                          }
+                          onClick={() => onFilterChange({ activeView: 'shared' })}
                           className="justify-start text-xs"
                         >
                           Shared
@@ -953,19 +874,11 @@ export function DriveToolbar({
                     <CollapsibleContent className="mt-2 ml-2 space-y-2">
                       <div className="grid grid-cols-3 gap-2">
                         <Button
-                          variant={
-                            filters.fileTypeFilter.includes('folder')
-                              ? 'default'
-                              : 'outline'
-                          }
+                          variant={filters.fileTypeFilter.includes('folder') ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => {
-                            const newTypes = filters.fileTypeFilter.includes(
-                              'folder'
-                            )
-                              ? filters.fileTypeFilter.filter(
-                                  (t) => t !== 'folder'
-                                )
+                            const newTypes = filters.fileTypeFilter.includes('folder')
+                              ? filters.fileTypeFilter.filter((t) => t !== 'folder')
                               : [...filters.fileTypeFilter, 'folder']
                             onFilterChange({ fileTypeFilter: newTypes })
                           }}
@@ -987,8 +900,7 @@ export function DriveToolbar({
                           },
                           {
                             type: 'presentation',
-                            mimeType:
-                              'application/vnd.google-apps.presentation',
+                            mimeType: 'application/vnd.google-apps.presentation',
                             title: 'Presentations',
                           },
                           {
@@ -1025,29 +937,19 @@ export function DriveToolbar({
                           return (
                             <Button
                               key={filter.type}
-                              variant={
-                                filters.fileTypeFilter.includes(filter.type)
-                                  ? 'default'
-                                  : 'outline'
-                              }
+                              variant={filters.fileTypeFilter.includes(filter.type) ? 'default' : 'outline'}
                               size="sm"
                               onClick={() => {
-                                const newTypes =
-                                  filters.fileTypeFilter.includes(filter.type)
-                                    ? filters.fileTypeFilter.filter(
-                                        (t) => t !== filter.type
-                                      )
-                                    : [...filters.fileTypeFilter, filter.type]
+                                const newTypes = filters.fileTypeFilter.includes(filter.type)
+                                  ? filters.fileTypeFilter.filter((t) => t !== filter.type)
+                                  : [...filters.fileTypeFilter, filter.type]
 
                                 onFilterChange({ fileTypeFilter: newTypes })
                               }}
                               className="justify-center p-2 text-xs"
                               title={filter.title}
                             >
-                              <FileIcon
-                                mimeType={filter.mimeType}
-                                className="h-4 w-4"
-                              />
+                              <FileIcon mimeType={filter.mimeType} className="h-4 w-4" />
                             </Button>
                           )
                         })}
@@ -1060,23 +962,15 @@ export function DriveToolbar({
                   {/* Sort Options */}
                   <Collapsible>
                     <CollapsibleTrigger className="hover:bg-accent flex w-full items-center justify-between rounded-md p-2">
-                      <span className="text-sm font-semibold">
-                        Sort Options
-                      </span>
+                      <span className="text-sm font-semibold">Sort Options</span>
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-2 ml-2 space-y-2">
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">
-                          Sort By
-                        </label>
+                        <label className="text-muted-foreground text-xs font-medium">Sort By</label>
                         <div className="grid grid-cols-2 gap-2">
                           <Button
-                            variant={
-                              filters.advancedFilters.sortBy === 'name'
-                                ? 'default'
-                                : 'outline'
-                            }
+                            variant={filters.advancedFilters.sortBy === 'name' ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1091,11 +985,7 @@ export function DriveToolbar({
                             Name
                           </Button>
                           <Button
-                            variant={
-                              filters.advancedFilters.sortBy === 'modified'
-                                ? 'default'
-                                : 'outline'
-                            }
+                            variant={filters.advancedFilters.sortBy === 'modified' ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1110,11 +1000,7 @@ export function DriveToolbar({
                             Modified
                           </Button>
                           <Button
-                            variant={
-                              filters.advancedFilters.sortBy === 'created'
-                                ? 'default'
-                                : 'outline'
-                            }
+                            variant={filters.advancedFilters.sortBy === 'created' ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1129,11 +1015,7 @@ export function DriveToolbar({
                             Created
                           </Button>
                           <Button
-                            variant={
-                              filters.advancedFilters.sortBy === 'size'
-                                ? 'default'
-                                : 'outline'
-                            }
+                            variant={filters.advancedFilters.sortBy === 'size' ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1151,16 +1033,10 @@ export function DriveToolbar({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">
-                          Sort Order
-                        </label>
+                        <label className="text-muted-foreground text-xs font-medium">Sort Order</label>
                         <div className="grid grid-cols-2 gap-2">
                           <Button
-                            variant={
-                              filters.advancedFilters.sortOrder === 'asc'
-                                ? 'default'
-                                : 'outline'
-                            }
+                            variant={filters.advancedFilters.sortOrder === 'asc' ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1175,11 +1051,7 @@ export function DriveToolbar({
                             Ascending
                           </Button>
                           <Button
-                            variant={
-                              filters.advancedFilters.sortOrder === 'desc'
-                                ? 'default'
-                                : 'outline'
-                            }
+                            variant={filters.advancedFilters.sortOrder === 'desc' ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1203,17 +1075,13 @@ export function DriveToolbar({
                   {/* Advanced Filters */}
                   <Collapsible>
                     <CollapsibleTrigger className="hover:bg-accent flex w-full items-center justify-between rounded-md p-2">
-                      <span className="text-sm font-semibold">
-                        Advanced Filters
-                      </span>
+                      <span className="text-sm font-semibold">Advanced Filters</span>
                       <ChevronDown className="h-4 w-4" />
                     </CollapsibleTrigger>
                     <CollapsibleContent className="mt-3 ml-2 space-y-4">
                       {/* Size Range */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">
-                          File Size Range
-                        </label>
+                        <label className="text-muted-foreground text-xs font-medium">File Size Range</label>
                         <div className="grid grid-cols-3 gap-2">
                           <Input
                             type="number"
@@ -1226,9 +1094,7 @@ export function DriveToolbar({
                                   sizeRange: {
                                     ...filters.advancedFilters.sizeRange,
                                     min: parseInt(e.target.value) || undefined,
-                                    unit:
-                                      filters.advancedFilters.sizeRange?.unit ||
-                                      'MB',
+                                    unit: filters.advancedFilters.sizeRange?.unit || 'MB',
                                   },
                                 },
                               })
@@ -1246,9 +1112,7 @@ export function DriveToolbar({
                                   sizeRange: {
                                     ...filters.advancedFilters.sizeRange,
                                     max: parseInt(e.target.value) || undefined,
-                                    unit:
-                                      filters.advancedFilters.sizeRange?.unit ||
-                                      'MB',
+                                    unit: filters.advancedFilters.sizeRange?.unit || 'MB',
                                   },
                                 },
                               })
@@ -1256,20 +1120,14 @@ export function DriveToolbar({
                             className="h-8 text-xs"
                           />
                           <select
-                            value={
-                              filters.advancedFilters.sizeRange?.unit || 'MB'
-                            }
+                            value={filters.advancedFilters.sizeRange?.unit || 'MB'}
                             onChange={(e) =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
                                   sizeRange: {
                                     ...filters.advancedFilters.sizeRange,
-                                    unit: e.target.value as
-                                      | 'B'
-                                      | 'KB'
-                                      | 'MB'
-                                      | 'GB',
+                                    unit: e.target.value as 'B' | 'KB' | 'MB' | 'GB',
                                   },
                                 },
                               })
@@ -1286,26 +1144,18 @@ export function DriveToolbar({
 
                       {/* Date Ranges */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">
-                          Created Date Range
-                        </label>
+                        <label className="text-muted-foreground text-xs font-medium">Created Date Range</label>
                         <div className="grid grid-cols-2 gap-2">
                           <Input
                             type="date"
-                            value={
-                              filters.advancedFilters.createdDateRange?.from
-                                ?.toISOString()
-                                .split('T')[0] || ''
-                            }
+                            value={filters.advancedFilters.createdDateRange?.from?.toISOString().split('T')[0] || ''}
                             onChange={(e) =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
                                   createdDateRange: {
                                     ...filters.advancedFilters.createdDateRange,
-                                    from: e.target.value
-                                      ? new Date(e.target.value)
-                                      : undefined,
+                                    from: e.target.value ? new Date(e.target.value) : undefined,
                                   },
                                 },
                               })
@@ -1314,20 +1164,14 @@ export function DriveToolbar({
                           />
                           <Input
                             type="date"
-                            value={
-                              filters.advancedFilters.createdDateRange?.to
-                                ?.toISOString()
-                                .split('T')[0] || ''
-                            }
+                            value={filters.advancedFilters.createdDateRange?.to?.toISOString().split('T')[0] || ''}
                             onChange={(e) =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
                                   createdDateRange: {
                                     ...filters.advancedFilters.createdDateRange,
-                                    to: e.target.value
-                                      ? new Date(e.target.value)
-                                      : undefined,
+                                    to: e.target.value ? new Date(e.target.value) : undefined,
                                   },
                                 },
                               })
@@ -1338,27 +1182,18 @@ export function DriveToolbar({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">
-                          Modified Date Range
-                        </label>
+                        <label className="text-muted-foreground text-xs font-medium">Modified Date Range</label>
                         <div className="grid grid-cols-2 gap-2">
                           <Input
                             type="date"
-                            value={
-                              filters.advancedFilters.modifiedDateRange?.from
-                                ?.toISOString()
-                                .split('T')[0] || ''
-                            }
+                            value={filters.advancedFilters.modifiedDateRange?.from?.toISOString().split('T')[0] || ''}
                             onChange={(e) =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
                                   modifiedDateRange: {
-                                    ...filters.advancedFilters
-                                      .modifiedDateRange,
-                                    from: e.target.value
-                                      ? new Date(e.target.value)
-                                      : undefined,
+                                    ...filters.advancedFilters.modifiedDateRange,
+                                    from: e.target.value ? new Date(e.target.value) : undefined,
                                   },
                                 },
                               })
@@ -1367,21 +1202,14 @@ export function DriveToolbar({
                           />
                           <Input
                             type="date"
-                            value={
-                              filters.advancedFilters.modifiedDateRange?.to
-                                ?.toISOString()
-                                .split('T')[0] || ''
-                            }
+                            value={filters.advancedFilters.modifiedDateRange?.to?.toISOString().split('T')[0] || ''}
                             onChange={(e) =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
                                   modifiedDateRange: {
-                                    ...filters.advancedFilters
-                                      .modifiedDateRange,
-                                    to: e.target.value
-                                      ? new Date(e.target.value)
-                                      : undefined,
+                                    ...filters.advancedFilters.modifiedDateRange,
+                                    to: e.target.value ? new Date(e.target.value) : undefined,
                                   },
                                 },
                               })
@@ -1393,9 +1221,7 @@ export function DriveToolbar({
 
                       {/* Owner */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">
-                          Owner Email
-                        </label>
+                        <label className="text-muted-foreground text-xs font-medium">Owner Email</label>
                         <Input
                           type="email"
                           placeholder="Enter owner email"
@@ -1414,20 +1240,10 @@ export function DriveToolbar({
 
                       {/* Apply and Clear Filters */}
                       <div className="flex gap-2">
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={onApplyFilters}
-                          className="flex-1 text-xs"
-                        >
+                        <Button variant="default" size="sm" onClick={onApplyFilters} className="flex-1 text-xs">
                           Apply Filters
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={onClearFilters}
-                          className="flex-1 text-xs"
-                        >
+                        <Button variant="outline" size="sm" onClick={onClearFilters} className="flex-1 text-xs">
                           Clear All
                         </Button>
                       </div>
@@ -1482,9 +1298,7 @@ export function DriveToolbar({
                       <span className="text-sm">Images</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Images' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Images' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Images'
                           ? 'border-green-500 bg-green-500 text-white'
@@ -1505,9 +1319,7 @@ export function DriveToolbar({
                       <span className="text-sm">Videos</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Videos' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Videos' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Videos'
                           ? 'border-red-500 bg-red-500 text-white'
@@ -1528,9 +1340,7 @@ export function DriveToolbar({
                       <span className="text-sm">Documents</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Documents' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Documents' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Documents'
                           ? 'border-orange-500 bg-orange-500 text-white'
@@ -1551,9 +1361,7 @@ export function DriveToolbar({
                       <span className="text-sm">Spreadsheets</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Spreadsheets' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Spreadsheets' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Spreadsheets'
                           ? 'border-emerald-500 bg-emerald-500 text-white'
@@ -1574,9 +1382,7 @@ export function DriveToolbar({
                       <span className="text-sm">Presentations</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Presentations' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Presentations' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Presentations'
                           ? 'border-amber-500 bg-amber-500 text-white'
@@ -1618,9 +1424,7 @@ export function DriveToolbar({
                       <span className="text-sm">Archives</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Archives' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Archives' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Archives'
                           ? 'border-gray-500 bg-gray-500 text-white'
@@ -1662,9 +1466,7 @@ export function DriveToolbar({
                       <span className="text-sm">Design Files</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Design' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Design' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Design'
                           ? 'border-purple-500 bg-purple-500 text-white'
@@ -1685,9 +1487,7 @@ export function DriveToolbar({
                       <span className="text-sm">Database Files</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Database' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Database' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Database'
                           ? 'border-teal-500 bg-teal-500 text-white'
@@ -1708,9 +1508,7 @@ export function DriveToolbar({
                       <span className="text-sm">E-books</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Ebooks' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Ebooks' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Ebooks'
                           ? 'border-rose-500 bg-rose-500 text-white'
@@ -1752,9 +1550,7 @@ export function DriveToolbar({
                       <span className="text-sm">Shortcuts</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Shortcuts' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Shortcuts' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Shortcuts'
                           ? 'border-sky-500 bg-sky-500 text-white'
@@ -1775,9 +1571,7 @@ export function DriveToolbar({
                       <span className="text-sm">Folders</span>
                     </div>
                     <Badge
-                      variant={
-                        activeFilter === 'Folders' ? 'default' : 'outline'
-                      }
+                      variant={activeFilter === 'Folders' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
                         activeFilter === 'Folders'
                           ? 'border-blue-500 bg-blue-500 text-white'
@@ -1797,12 +1591,7 @@ export function DriveToolbar({
         {/* More (Settings) - Fixed position on the right */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 flex-shrink-0 px-2"
-              onClick={() => {}}
-            >
+            <Button variant="ghost" size="sm" className="h-8 flex-shrink-0 px-2" onClick={() => {}}>
               <EllipsisVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
@@ -1970,9 +1759,7 @@ export function DriveToolbar({
 
             {/* Additional Actions */}
             <DropdownMenuItem onClick={onRefresh} disabled={refreshing}>
-              <RefreshCw
-                className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
-              />
+              <RefreshCw className={`mr-2 h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
               Refresh Drive
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -1980,11 +1767,7 @@ export function DriveToolbar({
       </div>
 
       {/* Search Expanded - Hidden by default */}
-      <div
-        id="search-expanded"
-        style={{ display: 'none' }}
-        className="bg-muted/30 border-t p-3 md:p-4"
-      >
+      <div id="search-expanded" style={{ display: 'none' }} className="bg-muted/30 border-t p-3 md:p-4">
         <div className="flex items-center gap-2 md:gap-4">
           <div className="relative flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
@@ -2017,9 +1800,7 @@ export function DriveToolbar({
                 size="sm"
                 className="hover:bg-muted h-8 w-8 p-0"
                 onClick={() => {
-                  const searchExpanded = document.querySelector(
-                    '#search-expanded'
-                  ) as HTMLElement
+                  const searchExpanded = document.querySelector('#search-expanded') as HTMLElement
                   if (searchExpanded) {
                     searchExpanded.style.display = 'none'
                   }
@@ -2066,18 +1847,12 @@ export function DriveToolbar({
         hasActiveFilters={
           filters.activeView !== 'all' ||
           filters.fileTypeFilter.length > 0 ||
-          (filters.advancedFilters.sizeRange?.min &&
-            filters.advancedFilters.sizeRange.min > 0) ||
-          (filters.advancedFilters.sizeRange?.max &&
-            filters.advancedFilters.sizeRange.max > 0) ||
+          (filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) ||
+          (filters.advancedFilters.sizeRange?.max && filters.advancedFilters.sizeRange.max > 0) ||
           !!filters.advancedFilters.createdDateRange?.from ||
           !!filters.advancedFilters.modifiedDateRange?.from ||
-          !!(
-            filters.advancedFilters.owner &&
-            filters.advancedFilters.owner.trim()
-          ) ||
-          (filters.advancedFilters.pageSize &&
-            filters.advancedFilters.pageSize !== 50)
+          !!(filters.advancedFilters.owner && filters.advancedFilters.owner.trim()) ||
+          (filters.advancedFilters.pageSize && filters.advancedFilters.pageSize !== 50)
         }
         onClearFilters={onClearFilters}
       />

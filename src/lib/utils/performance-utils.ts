@@ -35,9 +35,7 @@ export const lazyWithRetry = (componentImport: () => Promise<any>) => {
 }
 
 // Optimized loading states for different component sizes
-export const getLoaderClassName = (
-  size: 'small' | 'default' | 'large' = 'default'
-) => {
+export const getLoaderClassName = (size: 'small' | 'default' | 'large' = 'default') => {
   const sizeClasses = {
     small: 'h-4 w-4',
     default: 'h-8 w-8',

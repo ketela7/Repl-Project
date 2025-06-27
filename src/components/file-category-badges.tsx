@@ -266,12 +266,9 @@ const getCategoryFromMimeType = (mimeType: string): string => {
   if (mime.includes('vnd.google-apps.shortcut')) return 'Shortcuts'
 
   // Microsoft Office mime types
-  if (mime.includes('vnd.openxmlformats-officedocument.wordprocessingml'))
-    return 'Documents'
-  if (mime.includes('vnd.openxmlformats-officedocument.spreadsheetml'))
-    return 'Spreadsheets'
-  if (mime.includes('vnd.openxmlformats-officedocument.presentationml'))
-    return 'Presentations'
+  if (mime.includes('vnd.openxmlformats-officedocument.wordprocessingml')) return 'Documents'
+  if (mime.includes('vnd.openxmlformats-officedocument.spreadsheetml')) return 'Spreadsheets'
+  if (mime.includes('vnd.openxmlformats-officedocument.presentationml')) return 'Presentations'
   if (mime.includes('vnd.ms-excel')) return 'Spreadsheets'
   if (mime.includes('vnd.ms-powerpoint')) return 'Presentations'
   if (mime.includes('vnd.ms-word')) return 'Documents'
@@ -280,9 +277,7 @@ const getCategoryFromMimeType = (mimeType: string): string => {
   return 'Others'
 }
 
-const getCategoryConfig = (
-  categoryName: string
-): Omit<FileCategory, 'count' | 'mimeTypes'> => {
+const getCategoryConfig = (categoryName: string): Omit<FileCategory, 'count' | 'mimeTypes'> => {
   const configs = {
     Videos: {
       name: 'Videos',
@@ -415,12 +410,7 @@ const getCategoryConfig = (
   return configs[categoryName as keyof typeof configs] || configs['Others']
 }
 
-export function FileCategoryBadges({
-  files,
-  folders,
-  onCategoryClick,
-  className = '',
-}: FileCategoryBadgesProps) {
+export function FileCategoryBadges({ files, folders, onCategoryClick, className = '' }: FileCategoryBadgesProps) {
   const categories = React.useMemo(() => {
     // Count files by category
     const fileCounts = files.reduce(
@@ -476,10 +466,7 @@ export function FileCategoryBadges({
           </Badge>
         ))}
         {categories.length > 6 && (
-          <Badge
-            variant="outline"
-            className="text-muted-foreground border-dashed px-3 py-2 text-xs"
-          >
+          <Badge variant="outline" className="text-muted-foreground border-dashed px-3 py-2 text-xs">
             +{categories.length - 6} more
           </Badge>
         )}

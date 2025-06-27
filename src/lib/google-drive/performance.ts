@@ -42,17 +42,13 @@ export const FIELD_SELECTORS = {
   FOLDER_STRUCTURE: 'files(id, name, parents, mimeType)',
 
   // Fields for search results
-  SEARCH_RESULTS:
-    'nextPageToken, files(id, name, mimeType, size, modifiedTime, parents, webViewLink)',
+  SEARCH_RESULTS: 'nextPageToken, files(id, name, mimeType, size, modifiedTime, parents, webViewLink)',
 } as const
 
 /**
  * Performance-optimized request parameters
  */
-export function getOptimizedRequestParams(
-  operation: keyof typeof FIELD_SELECTORS,
-  baseParams: any = {}
-): any {
+export function getOptimizedRequestParams(operation: keyof typeof FIELD_SELECTORS, baseParams: any = {}): any {
   const optimizedParams = {
     ...baseParams,
     fields: FIELD_SELECTORS[operation],
@@ -102,10 +98,7 @@ export class DriveApiBatcher {
       if (this.requests.length >= this.MAX_BATCH_SIZE) {
         this.processBatch()
       } else if (!this.batchTimeout) {
-        this.batchTimeout = setTimeout(
-          () => this.processBatch(),
-          this.BATCH_DELAY
-        )
+        this.batchTimeout = setTimeout(() => this.processBatch(), this.BATCH_DELAY)
       }
     })
   }
@@ -203,10 +196,7 @@ export class RequestDeduplicator {
 /**
  * Exponential backoff with jitter for retry logic
  */
-export function calculateBackoffDelay(
-  attempt: number,
-  baseDelay: number = 1000
-): number {
+export function calculateBackoffDelay(attempt: number, baseDelay: number = 1000): number {
   const exponentialDelay = baseDelay * Math.pow(2, attempt - 1)
   const jitter = Math.random() * 0.1 * exponentialDelay
   const maxDelay = 32000 // 32 seconds max
@@ -218,18 +208,12 @@ export function calculateBackoffDelay(
  * Performance monitoring utilities
  */
 export class PerformanceMonitor {
-  private metrics = new Map<
-    string,
-    { count: number; totalTime: number; errors: number }
-  >()
+  private metrics = new Map<string, { count: number; totalTime: number; errors: number }>()
 
   /**
    * Track request performance
    */
-  async trackRequest<T>(
-    operation: string,
-    requestFn: () => Promise<T>
-  ): Promise<T> {
+  async trackRequest<T>(operation: string, requestFn: () => Promise<T>): Promise<T> {
     const startTime = Date.now()
     const metric = this.metrics.get(operation) || {
       count: 0,
@@ -261,16 +245,12 @@ export class PerformanceMonitor {
   /**
    * Get performance statistics
    */
-  getStats(): Record<
-    string,
-    { avgTime: number; count: number; errorRate: number }
-  > {
+  getStats(): Record<string, { avgTime: number; count: number; errorRate: number }> {
     const stats: Record<string, any> = {}
 
     for (const [operation, metric] of this.metrics) {
       stats[operation] = {
-        avgTime:
-          metric.count > 0 ? Math.round(metric.totalTime / metric.count) : 0,
+        avgTime: metric.count > 0 ? Math.round(metric.totalTime / metric.count) : 0,
         count: metric.count,
         errorRate: metric.count > 0 ? (metric.errors / metric.count) * 100 : 0,
       }

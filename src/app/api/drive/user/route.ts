@@ -13,10 +13,7 @@ export async function GET(request: NextRequest) {
 
     const accessToken = session.accessToken
     if (!accessToken) {
-      return NextResponse.json(
-        { error: 'Google Drive access not found' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Google Drive access not found' }, { status: 400 })
     }
 
     const driveService = new GoogleDriveService(accessToken)
@@ -24,9 +21,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(userInfo)
   } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to fetch user info' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch user info' }, { status: 500 })
   }
 }

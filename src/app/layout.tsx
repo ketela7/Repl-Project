@@ -15,8 +15,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Google Drive Pro - Professional Drive Management',
-  description:
-    'Advanced Google Drive management application with enterprise features',
+  description: 'Advanced Google Drive management application with enterprise features',
   keywords: [
     'Professional Google Drive',
     'Enterprise File Management',
@@ -64,23 +63,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{ children: ReactNode }>) {
+export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang="en" className="light" suppressHydrationWarning>
       <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
-        />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
-      <body
-        className={`${inter.className} min-h-screen overflow-x-hidden antialiased`}
-      >
+      <body className={`${inter.className} min-h-screen overflow-x-hidden antialiased`}>
         <ErrorBoundary>
           <AuthProvider>
             <CustomThemeProvider>

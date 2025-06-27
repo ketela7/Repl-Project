@@ -52,9 +52,7 @@ function buildDriveQuery(filters: FileFilter): string {
   // File type filters - handle both single and multiple types
   if (filters.fileType && filters.fileType !== 'all') {
     // Handle comma-separated file types from frontend
-    const fileTypes = filters.fileType
-      .split(',')
-      .filter((type) => type && type !== 'all')
+    const fileTypes = filters.fileType.split(',').filter((type) => type && type !== 'all')
 
     if (fileTypes.length > 0) {
       const typeConditions: string[] = []
@@ -62,15 +60,11 @@ function buildDriveQuery(filters: FileFilter): string {
       fileTypes.forEach((type) => {
         switch (type.trim()) {
           case 'folder':
-            typeConditions.push(
-              "mimeType = 'application/vnd.google-apps.folder'"
-            )
+            typeConditions.push("mimeType = 'application/vnd.google-apps.folder'")
             break
 
           case 'shortcut':
-            typeConditions.push(
-              "mimeType = 'application/vnd.google-apps.shortcut'"
-            )
+            typeConditions.push("mimeType = 'application/vnd.google-apps.shortcut'")
             break
 
           case 'document':
@@ -163,9 +157,7 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'drawing':
-            typeConditions.push(
-              "mimeType = 'application/vnd.google-apps.drawing'"
-            )
+            typeConditions.push("mimeType = 'application/vnd.google-apps.drawing'")
             break
 
           case 'form':
@@ -177,9 +169,7 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'script':
-            typeConditions.push(
-              "mimeType = 'application/vnd.google-apps.script'"
-            )
+            typeConditions.push("mimeType = 'application/vnd.google-apps.script'")
             break
 
           case 'site':
@@ -191,15 +181,11 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'photo':
-            typeConditions.push(
-              "mimeType = 'application/vnd.google-apps.photo'"
-            )
+            typeConditions.push("mimeType = 'application/vnd.google-apps.photo'")
             break
 
           case 'google-native':
-            typeConditions.push(
-              "mimeType contains 'application/vnd.google-apps'"
-            )
+            typeConditions.push("mimeType contains 'application/vnd.google-apps'")
             break
 
           case 'pdf':
@@ -273,24 +259,11 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'calendar':
-            typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'text/calendar'",
-                  "mimeType = 'application/ics'",
-                ].join(' or ') +
-                ')'
-            )
+            typeConditions.push('(' + ["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ') + ')')
             break
 
           case 'contact':
-            typeConditions.push(
-              '(' +
-                ["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(
-                  ' or '
-                ) +
-                ')'
-            )
+            typeConditions.push('(' + ["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ') + ')')
             break
 
           case 'other':
@@ -432,9 +405,7 @@ export async function GET(request: NextRequest) {
     // Apply client-side size filtering since Google Drive API doesn't support size operators
     if (filters.sizeMin || filters.sizeMax) {
       const sizeMin = filters.sizeMin ? Number(filters.sizeMin) : 0
-      const sizeMax = filters.sizeMax
-        ? Number(filters.sizeMax)
-        : Number.MAX_SAFE_INTEGER
+      const sizeMax = filters.sizeMax ? Number(filters.sizeMax) : Number.MAX_SAFE_INTEGER
 
       result.files = result.files.filter((file: any) => {
         const fileSize = file.size ? Number(file.size) : 0
@@ -472,9 +443,6 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(
-      { error: 'Failed to fetch files' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to fetch files' }, { status: 500 })
   }
 }

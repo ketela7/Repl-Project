@@ -15,18 +15,11 @@ export function formatFileSize(bytes: string | number): string {
 
 // File size utilities
 export function normalizeFileSize(size: any): number {
-  if (size === null || size === undefined || size === '' || size === '-')
-    return 0
+  if (size === null || size === undefined || size === '' || size === '-') return 0
   if (!size && size !== 0) return 0
 
   const sizeStr = size.toString().trim()
-  if (
-    sizeStr === '-' ||
-    sizeStr === '' ||
-    sizeStr === 'undefined' ||
-    sizeStr === 'null'
-  )
-    return 0
+  if (sizeStr === '-' || sizeStr === '' || sizeStr === 'undefined' || sizeStr === 'null') return 0
 
   const parsedSize = parseInt(sizeStr)
   return isNaN(parsedSize) || parsedSize < 0 ? 0 : parsedSize
@@ -79,20 +72,17 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'text/plain': 'FileText',
     'text/markdown': 'FileText',
     'application/msword': 'FileText',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      'FileText',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'FileText',
     'application/rtf': 'FileText',
 
     // Spreadsheets
     'application/vnd.ms-excel': 'FileSpreadsheet',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-      'FileSpreadsheet',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'FileSpreadsheet',
     'text/csv': 'FileSpreadsheet',
 
     // Presentations
     'application/vnd.ms-powerpoint': 'Presentation',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-      'Presentation',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'Presentation',
 
     // Images
     'image/jpeg': 'FileImage',
@@ -525,37 +515,31 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     // Google Workspace Files
     'application/vnd.google-apps.folder': 'text-blue-600 dark:text-blue-400',
     'application/vnd.google-apps.document': 'text-blue-500 dark:text-blue-400',
-    'application/vnd.google-apps.spreadsheet':
-      'text-green-600 dark:text-green-400',
-    'application/vnd.google-apps.presentation':
-      'text-orange-600 dark:text-orange-400',
+    'application/vnd.google-apps.spreadsheet': 'text-green-600 dark:text-green-400',
+    'application/vnd.google-apps.presentation': 'text-orange-600 dark:text-orange-400',
     'application/vnd.google-apps.form': 'text-purple-600 dark:text-purple-400',
     'application/vnd.google-apps.drawing': 'text-pink-600 dark:text-pink-400',
     'application/vnd.google-apps.map': 'text-emerald-600 dark:text-emerald-400',
     'application/vnd.google-apps.site': 'text-cyan-600 dark:text-cyan-400',
     'application/vnd.google-apps.script': 'text-amber-600 dark:text-amber-400',
-    'application/vnd.google-apps.shortcut':
-      'text-slate-600 dark:text-slate-400',
+    'application/vnd.google-apps.shortcut': 'text-slate-600 dark:text-slate-400',
 
     // PDF and Documents
     'application/pdf': 'text-red-600 dark:text-red-400',
     'text/plain': 'text-gray-600 dark:text-gray-400',
     'text/markdown': 'text-slate-600 dark:text-slate-400',
     'application/msword': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      'text-blue-600 dark:text-blue-400',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'text-blue-600 dark:text-blue-400',
     'application/rtf': 'text-blue-600 dark:text-blue-400',
 
     // Spreadsheets
     'application/vnd.ms-excel': 'text-green-600 dark:text-green-400',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-      'text-green-600 dark:text-green-400',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'text-green-600 dark:text-green-400',
     'text/csv': 'text-green-600 dark:text-green-400',
 
     // Presentations
     'application/vnd.ms-powerpoint': 'text-orange-600 dark:text-orange-400',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-      'text-orange-600 dark:text-orange-400',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'text-orange-600 dark:text-orange-400',
 
     // Images
     'image/jpeg': 'text-purple-600 dark:text-purple-400',
@@ -708,16 +692,12 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'application/x-mach-binary': 'text-gray-600 dark:text-gray-400',
     'application/x-deb': 'text-yellow-600 dark:text-yellow-400',
     'application/x-rpm': 'text-yellow-600 dark:text-yellow-400',
-    'application/vnd.microsoft.portable-executable':
-      'text-gray-600 dark:text-gray-400',
+    'application/vnd.microsoft.portable-executable': 'text-gray-600 dark:text-gray-400',
 
     // Office formats (additional)
-    'application/vnd.oasis.opendocument.text':
-      'text-blue-600 dark:text-blue-400',
-    'application/vnd.oasis.opendocument.spreadsheet':
-      'text-green-600 dark:text-green-400',
-    'application/vnd.oasis.opendocument.presentation':
-      'text-orange-600 dark:text-orange-400',
+    'application/vnd.oasis.opendocument.text': 'text-blue-600 dark:text-blue-400',
+    'application/vnd.oasis.opendocument.spreadsheet': 'text-green-600 dark:text-green-400',
+    'application/vnd.oasis.opendocument.presentation': 'text-orange-600 dark:text-orange-400',
     'application/vnd.sun.xml.writer': 'text-blue-600 dark:text-blue-400',
     'application/vnd.sun.xml.calc': 'text-green-600 dark:text-green-400',
     'application/vnd.sun.xml.impress': 'text-orange-600 dark:text-orange-400',
@@ -735,8 +715,7 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'application/vnd.rn-realmedia': 'text-red-600 dark:text-red-400',
 
     // Mobile app formats
-    'application/vnd.android.package-archive':
-      'text-green-600 dark:text-green-400',
+    'application/vnd.android.package-archive': 'text-green-600 dark:text-green-400',
     'application/x-ios-app': 'text-blue-600 dark:text-blue-400',
     'application/vnd.apple.installer+xml': 'text-blue-600 dark:text-blue-400',
 
@@ -1035,11 +1014,7 @@ export const isPreviewable = (mimeType: string): boolean => {
 /**
  * Generate preview URL for different media types
  */
-export function getPreviewUrl(
-  fileId: string,
-  _mimeType: string,
-  _webContentLink?: string
-): string {
+export function getPreviewUrl(fileId: string, _mimeType: string, _webContentLink?: string): string {
   // Universal Google Drive preview - supports all file types
   // If Google Drive can't preview the file, it will show appropriate message
   return `https://drive.google.com/file/d/${fileId}/preview`
@@ -1079,10 +1054,8 @@ export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
           canShare: file.capabilities.canShare ?? false,
           canTrash: file.capabilities.canTrash ?? false,
           canUntrash: file.capabilities.canUntrash ?? false,
-          canMoveItemWithinDrive:
-            file.capabilities.canMoveItemWithinDrive ?? false,
-          canMoveItemOutOfDrive:
-            file.capabilities.canMoveItemOutOfDrive ?? false,
+          canMoveItemWithinDrive: file.capabilities.canMoveItemWithinDrive ?? false,
+          canMoveItemOutOfDrive: file.capabilities.canMoveItemOutOfDrive ?? false,
           canAddChildren: file.capabilities.canAddChildren ?? false,
           canListChildren: file.capabilities.canListChildren ?? false,
           canRemoveChildren: file.capabilities.canRemoveChildren ?? false,
@@ -1091,9 +1064,7 @@ export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
   }
 }
 
-export function convertGoogleDriveFolder(
-  folder: drive_v3.Schema$File
-): DriveFolder {
+export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFolder {
   return {
     id: folder.id!,
     name: folder.name!,
@@ -1120,10 +1091,8 @@ export function convertGoogleDriveFolder(
           canShare: folder.capabilities.canShare ?? false,
           canTrash: folder.capabilities.canTrash ?? false,
           canUntrash: folder.capabilities.canUntrash ?? false,
-          canMoveItemWithinDrive:
-            folder.capabilities.canMoveItemWithinDrive ?? false,
-          canMoveItemOutOfDrive:
-            folder.capabilities.canMoveItemOutOfDrive ?? false,
+          canMoveItemWithinDrive: folder.capabilities.canMoveItemWithinDrive ?? false,
+          canMoveItemOutOfDrive: folder.capabilities.canMoveItemOutOfDrive ?? false,
           canAddChildren: folder.capabilities.canAddChildren ?? false,
           canListChildren: folder.capabilities.canListChildren ?? false,
           canRemoveChildren: folder.capabilities.canRemoveChildren ?? false,
@@ -1251,9 +1220,7 @@ export function getFileActions(
   const isTrashView = activeView === 'trash'
   const isSharedView = activeView === 'shared'
   const isTrashed = file.trashed === true
-  const isFolder =
-    file.itemType === 'folder' ||
-    file.mimeType === 'application/vnd.google-apps.folder'
+  const isFolder = file.itemType === 'folder' || file.mimeType === 'application/vnd.google-apps.folder'
   const capabilities = file.capabilities || ({} as DriveFileCapabilities)
 
   // If we don't have capabilities data, provide conservative defaults
@@ -1296,22 +1263,16 @@ export function getFileActions(
 /**
  * Format Google Drive file dates with user timezone
  */
-export const formatDriveFileDate = (
-  dateString: string,
-  timezone?: string,
-  showRelative: boolean = true
-): string => {
+export const formatDriveFileDate = (dateString: string, timezone?: string, showRelative: boolean = true): string => {
   if (!dateString) return 'Unknown'
 
   try {
     const date = new Date(dateString)
-    const userTimezone =
-      timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
+    const userTimezone = timezone || Intl.DateTimeFormat().resolvedOptions().timeZone
 
     if (showRelative) {
       const now = new Date()
-      const diffInHours =
-        Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60)
+      const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60)
 
       // Show relative time for recent files (within 7 days)
       if (diffInHours < 168) {
@@ -1407,17 +1368,10 @@ export function getFileCategory(mimeType: string): string {
   if (mimeType.startsWith('video/')) return 'video'
   if (mimeType.startsWith('audio/')) return 'audio'
   if (mimeType === 'application/pdf') return 'pdf'
-  if (mimeType.includes('spreadsheet') || mimeType === 'text/csv')
-    return 'spreadsheet'
+  if (mimeType.includes('spreadsheet') || mimeType === 'text/csv') return 'spreadsheet'
   if (mimeType.includes('presentation')) return 'presentation'
-  if (mimeType.includes('document') || mimeType.startsWith('text/'))
-    return 'document'
-  if (
-    mimeType.includes('zip') ||
-    mimeType.includes('rar') ||
-    mimeType.includes('archive')
-  )
-    return 'archive'
+  if (mimeType.includes('document') || mimeType.startsWith('text/')) return 'document'
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive')) return 'archive'
   if (
     mimeType.includes('javascript') ||
     mimeType.includes('json') ||
@@ -1425,10 +1379,8 @@ export function getFileCategory(mimeType: string): string {
     mimeType.includes('css')
   )
     return 'code'
-  if (mimeType.includes('sql') || mimeType.includes('database'))
-    return 'database'
-  if (mimeType.includes('photoshop') || mimeType.includes('illustrator'))
-    return 'design'
+  if (mimeType.includes('sql') || mimeType.includes('database')) return 'database'
+  if (mimeType.includes('photoshop') || mimeType.includes('illustrator')) return 'design'
 
   return 'other'
 }

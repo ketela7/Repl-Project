@@ -65,9 +65,7 @@ describe('GoogleAuthButton', () => {
   })
 
   it('handles sign in error gracefully', async () => {
-    const consoleError = jest
-      .spyOn(console, 'error')
-      .mockImplementation(() => {})
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {})
     mockSignIn.mockRejectedValue(new Error('Sign in failed'))
 
     render(<GoogleAuthButton />)

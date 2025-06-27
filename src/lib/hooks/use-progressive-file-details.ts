@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 
-import {
-  LoadingStage,
-  ProgressiveLoadingMetrics,
-} from '@/lib/google-drive/progressive-fields'
+import { LoadingStage, ProgressiveLoadingMetrics } from '@/lib/google-drive/progressive-fields'
 
 interface ProgressiveFileData {
   basic?: any
@@ -53,9 +50,7 @@ export function useProgressiveFileDetails({
     essential?: string
     extended?: string
   }>({})
-  const [currentStage, setCurrentStage] = useState<LoadingStage>(
-    LoadingStage.BASIC
-  )
+  const [currentStage, setCurrentStage] = useState<LoadingStage>(LoadingStage.BASIC)
   const [metrics, setMetrics] = useState<ProgressiveLoadingMetrics>({
     basicLoadTime: 0,
     essentialLoadTime: 0,
@@ -128,8 +123,7 @@ export function useProgressiveFileDetails({
           }
         }
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : `Failed to load ${stage} details`
+        const errorMessage = err instanceof Error ? err.message : `Failed to load ${stage} details`
         setError((prev) => ({ ...prev, [stageKey]: errorMessage }))
         onError?.(stage, err instanceof Error ? err : new Error(errorMessage))
       } finally {
@@ -145,10 +139,7 @@ export function useProgressiveFileDetails({
         fetchStage(stage)
       } else {
         // Retry current stage or restart from basic
-        const retryStage =
-          currentStage === LoadingStage.COMPLETE
-            ? LoadingStage.BASIC
-            : currentStage
+        const retryStage = currentStage === LoadingStage.COMPLETE ? LoadingStage.BASIC : currentStage
         fetchStage(retryStage)
       }
     },
@@ -178,19 +169,9 @@ export function useProgressiveFileDetails({
 
   // Auto-load next stages
   useEffect(() => {
-    if (
-      currentStage === LoadingStage.ESSENTIAL &&
-      !loading.essential &&
-      !data.essential &&
-      !error.essential
-    ) {
+    if (currentStage === LoadingStage.ESSENTIAL && !loading.essential && !data.essential && !error.essential) {
       fetchStage(LoadingStage.ESSENTIAL)
-    } else if (
-      currentStage === LoadingStage.EXTENDED &&
-      !loading.extended &&
-      !data.extended &&
-      !error.extended
-    ) {
+    } else if (currentStage === LoadingStage.EXTENDED && !loading.extended && !data.extended && !error.extended) {
       // Load extended in background with small delay
       const timer = setTimeout(() => {
         fetchStage(LoadingStage.EXTENDED)

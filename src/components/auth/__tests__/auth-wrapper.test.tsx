@@ -29,9 +29,7 @@ describe('AuthWrapper', () => {
     )
 
     expect(screen.getByText('Authenticating')).toBeInTheDocument()
-    expect(
-      screen.getByText('Verifying your Google Drive access...')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Verifying your Google Drive access...')).toBeInTheDocument()
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument()
     expect(screen.queryByText('Please sign in')).not.toBeInTheDocument()
   })
@@ -88,9 +86,7 @@ describe('AuthWrapper', () => {
       </AuthWrapper>
     )
 
-    expect(
-      screen.getByText('Access denied. Please sign in.')
-    ).toBeInTheDocument()
+    expect(screen.getByText('Access denied. Please sign in.')).toBeInTheDocument()
     expect(screen.queryByText('Protected Content')).not.toBeInTheDocument()
   })
 })

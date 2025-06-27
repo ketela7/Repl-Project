@@ -36,30 +36,19 @@ class ErrorHandler {
       this.errorCounts.delete(errorKey)
     }, this.ERROR_RESET_TIME)
 
-    return this.classifyError(
-      errorCode,
-      status,
-      error,
-      currentCount < this.MAX_RETRY_COUNT
-    )
+    return this.classifyError(errorCode, status, error, currentCount < this.MAX_RETRY_COUNT)
   }
 
   private extractErrorCode(error: any): string {
     if (error?.code) return error.code
-    if (error?.response?.data?.error?.code)
-      return error.response.data.error.code
+    if (error?.response?.data?.error?.code) return error.response.data.error.code
     if (error?.message?.includes('timeout')) return 'TIMEOUT'
     if (error?.message?.includes('network')) return 'NETWORK_ERROR'
     if (error?.name === 'TypeError') return 'NETWORK_ERROR'
     return 'UNKNOWN_ERROR'
   }
 
-  private classifyError(
-    code: string,
-    status: number,
-    originalError: any,
-    retryable: boolean
-  ): DriveError {
+  private classifyError(code: string, status: number, originalError: any, retryable: boolean): DriveError {
     switch (code) {
       case 'rateLimitExceeded':
       case '429':
@@ -122,9 +111,7 @@ class ErrorHandler {
           message: 'Request timeout',
           status: 408,
           retryable,
-          userMessage: retryable
-            ? 'Connection slow. Retrying...'
-            : 'Connection timeout. Please check your internet.',
+          userMessage: retryable ? 'Connection slow. Retrying...' : 'Connection timeout. Please check your internet.',
           action: retryable ? 'retry' : 'refresh',
         }
 
@@ -134,9 +121,7 @@ class ErrorHandler {
           message: 'Network error',
           status: 0,
           retryable,
-          userMessage: retryable
-            ? 'Network issue. Retrying...'
-            : 'Connection lost. Please check your internet.',
+          userMessage: retryable ? 'Network issue. Retrying...' : 'Connection lost. Please check your internet.',
           action: retryable ? 'retry' : 'refresh',
         }
 
@@ -161,9 +146,7 @@ class ErrorHandler {
           message: originalError?.message || 'Unknown error',
           status,
           retryable,
-          userMessage: retryable
-            ? 'Something went wrong. Retrying...'
-            : 'An unexpected error occurred.',
+          userMessage: retryable ? 'Something went wrong. Retrying...' : 'An unexpected error occurred.',
           action: retryable ? 'retry' : 'refresh',
         }
     }
@@ -214,11 +197,7 @@ export const errorHandler = new ErrorHandler()
 /**
  * Wrapper for API calls with error handling
  */
-export async function withErrorHandling<T>(
-  apiCall: () => Promise<T>,
-  context?: string,
-  showToast = true
-): Promise<T> {
+export async function withErrorHandling<T>(apiCall: () => Promise<T>, context?: string, showToast = true): Promise<T> {
   try {
     return await apiCall()
   } catch (error) {

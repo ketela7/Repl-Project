@@ -13,18 +13,8 @@ import {
   DriveUserInfo,
   DriveFileMetadata,
 } from './types'
-import {
-  convertGoogleDriveFile,
-  convertGoogleDriveFolder,
-  buildSearchQuery,
-  getMimeTypeFromFileName,
-} from './utils'
-import {
-  getOptimizedRequestParams,
-  DriveApiBatcher,
-  performanceMonitor,
-  requestDeduplicator,
-} from './performance'
+import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
+import { getOptimizedRequestParams, DriveApiBatcher, performanceMonitor, requestDeduplicator } from './performance'
 
 export class GoogleDriveService {
   private drive: drive_v3.Drive
@@ -65,9 +55,7 @@ export class GoogleDriveService {
     }
   }
 
-  async listFiles(
-    options: DriveSearchOptions = {}
-  ): Promise<DriveSearchResult> {
+  async listFiles(options: DriveSearchOptions = {}): Promise<DriveSearchResult> {
     const {
       query,
       parentId,
@@ -91,11 +79,7 @@ export class GoogleDriveService {
         }
 
         // Basic validation for pageToken format
-        if (
-          typeof validPageToken !== 'string' ||
-          validPageToken.length === 0 ||
-          validPageToken.length > 2048
-        ) {
+        if (typeof validPageToken !== 'string' || validPageToken.length === 0 || validPageToken.length > 2048) {
           validPageToken = undefined
         } else {
           // Additional validation: pageToken should not contain certain invalid characters
@@ -114,12 +98,7 @@ export class GoogleDriveService {
 
     if (query) {
       // If query is already formatted (contains operators), use it directly
-      if (
-        query.includes('=') ||
-        query.includes('and') ||
-        query.includes('or') ||
-        query.includes('in')
-      ) {
+      if (query.includes('=') || query.includes('and') || query.includes('or') || query.includes('in')) {
         searchQuery = query
       } else {
         // Otherwise treat it as a search term and build proper query
@@ -164,20 +143,14 @@ export class GoogleDriveService {
 
     try {
       // Generate deduplication key for identical requests
-      const dedupKey = requestDeduplicator.generateKey(
-        'listFiles',
-        requestParams
-      )
+      const dedupKey = requestDeduplicator.generateKey('listFiles', requestParams)
 
       // Use performance monitoring and request deduplication
-      const response = await performanceMonitor.trackRequest(
-        'listFiles',
-        async () => {
-          return await requestDeduplicator.deduplicate(dedupKey, async () => {
-            return await this.drive.files.list(requestParams)
-          })
-        }
-      )
+      const response = await performanceMonitor.trackRequest('listFiles', async () => {
+        return await requestDeduplicator.deduplicate(dedupKey, async () => {
+          return await this.drive.files.list(requestParams)
+        })
+      })
 
       const files = response.data.files?.map(convertGoogleDriveFile) || []
 
@@ -217,8 +190,7 @@ export class GoogleDriveService {
           delete retryParams.pageToken
 
           const retryResponse = await this.drive.files.list(retryParams)
-          const retryFiles =
-            retryResponse.data.files?.map(convertGoogleDriveFile) || []
+          const retryFiles = retryResponse.data.files?.map(convertGoogleDriveFile) || []
 
           return {
             files: retryFiles,
@@ -422,8 +394,7 @@ export class GoogleDriveService {
       originalFilename: response.data.originalFilename || undefined,
       headRevisionId: response.data.headRevisionId || undefined,
       isAppAuthorized: response.data.isAppAuthorized || false,
-      copyRequiresWriterPermission:
-        response.data.copyRequiresWriterPermission || false,
+      copyRequiresWriterPermission: response.data.copyRequiresWriterPermission || false,
       writersCanShare: response.data.writersCanShare || true,
       hasAugmentedPermissions: response.data.hasAugmentedPermissions || false,
       ownedByMe: response.data.ownedByMe || false,
@@ -440,8 +411,7 @@ export class GoogleDriveService {
             location: response.data.imageMediaMetadata.location
               ? {
                   latitude: response.data.imageMediaMetadata.location.latitude,
-                  longitude:
-                    response.data.imageMediaMetadata.location.longitude,
+                  longitude: response.data.imageMediaMetadata.location.longitude,
                   altitude: response.data.imageMediaMetadata.location.altitude,
                 }
               : undefined,
@@ -496,10 +466,8 @@ export class GoogleDriveService {
       resourceKey: response.data.resourceKey || undefined,
       linkShareMetadata: response.data.linkShareMetadata
         ? {
-            securityUpdateEligible:
-              response.data.linkShareMetadata.securityUpdateEligible,
-            securityUpdateEnabled:
-              response.data.linkShareMetadata.securityUpdateEnabled,
+            securityUpdateEligible: response.data.linkShareMetadata.securityUpdateEligible,
+            securityUpdateEnabled: response.data.linkShareMetadata.securityUpdateEnabled,
           }
         : undefined,
       labelInfo: response.data.labelInfo
@@ -527,8 +495,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.list({
       q: query,
       orderBy: 'name',
-      fields:
-        'files(id, name, createdTime, modifiedTime, parents, shared, trashed)',
+      fields: 'files(id, name, createdTime, modifiedTime, parents, shared, trashed)',
     })
 
     return response.data.files?.map(convertGoogleDriveFolder) || []
@@ -700,11 +667,7 @@ export class GoogleDriveService {
   }
 
   // Unified move operation for both files and folders with error recovery
-  async moveFile(
-    fileId: string,
-    newParentId: string,
-    currentParentId?: string
-  ): Promise<DriveFile> {
+  async moveFile(fileId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
     try {
       // According to Drive API docs, we should get current parents if not provided
       if (!currentParentId) {
@@ -739,19 +702,12 @@ export class GoogleDriveService {
   }
 
   // Alias for clarity - same operation works for both files and folders
-  async moveFolder(
-    folderId: string,
-    newParentId: string,
-    currentParentId?: string
-  ): Promise<DriveFile> {
+  async moveFolder(folderId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
     return this.moveFile(folderId, newParentId, currentParentId)
   }
 
   // Copy operation - works for files, folders require special handling
-  async copyFile(
-    fileId: string,
-    metadata: Partial<DriveFileMetadata>
-  ): Promise<DriveFile> {
+  async copyFile(fileId: string, metadata: Partial<DriveFileMetadata>): Promise<DriveFile> {
     // First check if this is a folder
     const originalFile = await this.getFile(fileId)
 
@@ -771,17 +727,11 @@ export class GoogleDriveService {
   }
 
   // Special handling for folder copying
-  async copyFolder(
-    folderId: string,
-    metadata: Partial<DriveFileMetadata>
-  ): Promise<DriveFile> {
+  async copyFolder(folderId: string, metadata: Partial<DriveFileMetadata>): Promise<DriveFile> {
     const originalFolder = await this.getFile(folderId)
 
     // Create new folder with the specified metadata
-    const newFolder = await this.createFolder(
-      metadata.name || `${originalFolder.name} - Copy`,
-      metadata.parents?.[0]
-    )
+    const newFolder = await this.createFolder(metadata.name || `${originalFolder.name} - Copy`, metadata.parents?.[0])
 
     // Note: For full folder copying with contents, we would need recursive copying
     // This creates an empty copy of the folder structure
@@ -798,17 +748,11 @@ export class GoogleDriveService {
   }
 
   // Alias for clarity - same operation works for both files and folders
-  async removeFolderPermission(
-    folderId: string,
-    permissionId: string
-  ): Promise<void> {
+  async removeFolderPermission(folderId: string, permissionId: string): Promise<void> {
     return this.removeFilePermission(folderId, permissionId)
   }
 
-  async searchFiles(
-    searchQuery: string,
-    options: Partial<DriveSearchOptions> = {}
-  ): Promise<DriveSearchResult> {
+  async searchFiles(searchQuery: string, options: Partial<DriveSearchOptions> = {}): Promise<DriveSearchResult> {
     return this.listFiles({
       ...options,
       query: searchQuery,
@@ -865,8 +809,7 @@ export class GoogleDriveService {
 
       // Set allowFileDiscovery for domain/anyone permissions as per API docs
       if (permission.type === 'domain' || permission.type === 'anyone') {
-        permissionRequest.allowFileDiscovery =
-          permission.allowFileDiscovery ?? false
+        permissionRequest.allowFileDiscovery = permission.allowFileDiscovery ?? false
       }
 
       await this.drive.permissions.create({
@@ -893,10 +836,7 @@ export class GoogleDriveService {
   }
 
   // Alias for clarity - same operation works for both files and folders
-  async shareFolder(
-    folderId: string,
-    permission: DrivePermission
-  ): Promise<void> {
+  async shareFolder(folderId: string, permission: DrivePermission): Promise<void> {
     return this.shareFile(folderId, permission)
   }
 
@@ -905,8 +845,7 @@ export class GoogleDriveService {
     try {
       const response = await this.drive.permissions.list({
         fileId,
-        fields:
-          'permissions(id, type, role, emailAddress, domain, displayName)',
+        fields: 'permissions(id, type, role, emailAddress, domain, displayName)',
       })
 
       return response.data.permissions || []
@@ -916,10 +855,7 @@ export class GoogleDriveService {
   }
 
   // Remove file permission
-  async removeFilePermission(
-    fileId: string,
-    permissionId: string
-  ): Promise<void> {
+  async removeFilePermission(fileId: string, permissionId: string): Promise<void> {
     try {
       await this.drive.permissions.delete({
         fileId,
@@ -931,11 +867,7 @@ export class GoogleDriveService {
   }
 
   // Create permission (for enhanced sharing)
-  async createPermission(
-    fileId: string,
-    permissionData: any,
-    _accessToken?: string
-  ): Promise<any> {
+  async createPermission(fileId: string, permissionData: any, _accessToken?: string): Promise<any> {
     try {
       const response = await this.drive.permissions.create({
         fileId,
@@ -949,11 +881,7 @@ export class GoogleDriveService {
   }
 
   // Delete permission (for enhanced sharing)
-  async deletePermission(
-    fileId: string,
-    permissionId: string,
-    _accessToken?: string
-  ): Promise<void> {
+  async deletePermission(fileId: string, permissionId: string, _accessToken?: string): Promise<void> {
     try {
       await this.drive.permissions.delete({
         fileId,
@@ -965,11 +893,7 @@ export class GoogleDriveService {
   }
 
   // Send notification email (for enhanced sharing)
-  async sendNotificationEmail(
-    fileId: string,
-    emailData: any,
-    _accessToken?: string
-  ): Promise<void> {
+  async sendNotificationEmail(fileId: string, emailData: any, _accessToken?: string): Promise<void> {
     // Note: This would typically use the Gmail API or similar service
     // For now, we'll just log the action
   }

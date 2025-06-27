@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import {
-  initDriveService,
-  handleApiError,
-  getFileIdFromParams,
-} from '@/lib/api-utils'
+import { initDriveService, handleApiError, getFileIdFromParams } from '@/lib/api-utils'
 
 // MIME type mappings for Google Workspace exports
 const EXPORT_MIME_TYPES = {
@@ -66,10 +62,7 @@ const FILE_EXTENSIONS = {
   jpeg: 'jpg',
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -98,8 +91,7 @@ export async function GET(
     }
 
     // Get the available export formats for this file type
-    const availableFormats =
-      EXPORT_MIME_TYPES[fileDetails.mimeType as keyof typeof EXPORT_MIME_TYPES]
+    const availableFormats = EXPORT_MIME_TYPES[fileDetails.mimeType as keyof typeof EXPORT_MIME_TYPES]
 
     if (!availableFormats) {
       return NextResponse.json(
@@ -121,25 +113,17 @@ export async function GET(
     }
 
     // Get the target MIME type
-    const targetMimeType =
-      availableFormats[format as keyof typeof availableFormats]
+    const targetMimeType = availableFormats[format as keyof typeof availableFormats]
 
     // Export the file
-    const exportedData = await authResult.driveService!.exportFile(
-      fileId,
-      targetMimeType
-    )
+    const exportedData = await authResult.driveService!.exportFile(fileId, targetMimeType)
 
     if (!exportedData) {
-      return NextResponse.json(
-        { error: 'Failed to export file' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Failed to export file' }, { status: 500 })
     }
 
     // Generate filename with appropriate extension
-    const extension =
-      FILE_EXTENSIONS[format as keyof typeof FILE_EXTENSIONS] || format
+    const extension = FILE_EXTENSIONS[format as keyof typeof FILE_EXTENSIONS] || format
     const filename = `${fileDetails.name}.${extension}`
 
     // Return the exported file

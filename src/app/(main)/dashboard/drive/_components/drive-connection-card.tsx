@@ -4,13 +4,7 @@ import { useState } from 'react'
 import { HardDrive, Shield, Upload, Search, Folder } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function DriveConnectionCard() {
   const [connecting, setConnecting] = useState(false)
@@ -43,38 +37,27 @@ export function DriveConnectionCard() {
             <div className="space-y-2 text-center">
               <Folder className="text-muted-foreground mx-auto h-8 w-8" />
               <p className="text-sm font-medium">Organize Folders</p>
-              <p className="text-muted-foreground text-xs">
-                Create and manage folder structure
-              </p>
+              <p className="text-muted-foreground text-xs">Create and manage folder structure</p>
             </div>
             <div className="space-y-2 text-center">
               <Search className="text-muted-foreground mx-auto h-8 w-8" />
               <p className="text-sm font-medium">Search Files</p>
-              <p className="text-muted-foreground text-xs">
-                Find files quickly with search
-              </p>
+              <p className="text-muted-foreground text-xs">Find files quickly with search</p>
             </div>
             <div className="space-y-2 text-center">
               <Shield className="text-muted-foreground mx-auto h-8 w-8" />
               <p className="text-sm font-medium">Secure Access</p>
-              <p className="text-muted-foreground text-xs">
-                Protected with OAuth 2.0
-              </p>
+              <p className="text-muted-foreground text-xs">Protected with OAuth 2.0</p>
             </div>
           </div>
 
           <div className="space-y-4 text-center">
             <p className="text-muted-foreground text-sm">
-              Click the button below to grant Google Drive access. You'll be
-              redirected to Google to authorize permissions.
+              Click the button below to grant Google Drive access. You'll be redirected to Google to authorize
+              permissions.
             </p>
 
-            <Button
-              onClick={handleConnect}
-              disabled={connecting}
-              size="lg"
-              className="w-full"
-            >
+            <Button onClick={handleConnect} disabled={connecting} size="lg" className="w-full">
               {connecting ? (
                 <>
                   <HardDrive className="mr-2 h-4 w-4 animate-pulse" />

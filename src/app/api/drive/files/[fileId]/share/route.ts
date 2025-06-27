@@ -1,16 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import {
-  initDriveService,
-  handleApiError,
-  getFileIdFromParams,
-  validateShareRequest,
-} from '@/lib/api-utils'
+import { initDriveService, handleApiError, getFileIdFromParams, validateShareRequest } from '@/lib/api-utils'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -21,28 +13,14 @@ export async function POST(
     const body = await request.json()
 
     // Global operations approach: Handle both single and bulk with items.length logic
-    const {
-      action,
-      role,
-      type,
-      emailAddress,
-      message,
-      allowFileDiscovery,
-      expirationTime,
-      options,
-      items,
-    } = body
+    const { action, role, type, emailAddress, message, allowFileDiscovery, expirationTime, options, items } = body
 
     // Determine operation type based on items array
-    const fileIds =
-      items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
+    const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
     const isBulkOperation = items && items.length > 1
 
     if (!validateShareRequest(body)) {
-      return NextResponse.json(
-        { error: 'Invalid request body' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
     }
 
     const results = []
@@ -54,29 +32,19 @@ export async function POST(
 
         switch (action) {
           case 'get_share_link': {
-            const permissions =
-              await authResult.driveService!.getFilePermissions(id)
-            const publicPermission = permissions.find(
-              (p: any) => p.type === 'anyone'
-            )
+            const permissions = await authResult.driveService!.getFilePermissions(id)
+            const publicPermission = permissions.find((p: any) => p.type === 'anyone')
 
             if (publicPermission) {
-              const fileDetails =
-                await authResult.driveService!.getFileDetails(id)
+              const fileDetails = await authResult.driveService!.getFileDetails(id)
               fileResult = {
                 shareLink: fileDetails.webViewLink,
                 isPublic: true,
                 permission: publicPermission,
               }
             } else {
-              const permission =
-                await authResult.driveService!.createPermission(
-                  id,
-                  'reader',
-                  'anyone'
-                )
-              const fileDetails =
-                await authResult.driveService!.getFileDetails(id)
+              const permission = await authResult.driveService!.createPermission(id, 'reader', 'anyone')
+              const fileDetails = await authResult.driveService!.getFileDetails(id)
               fileResult = {
                 shareLink: fileDetails.webViewLink,
                 isPublic: true,
@@ -87,18 +55,10 @@ export async function POST(
           }
 
           case 'share_with_user': {
-            const permission = await authResult.driveService!.createPermission(
-              id,
-              role || 'reader',
-              type || 'user'
-            )
+            const permission = await authResult.driveService!.createPermission(id, role || 'reader', type || 'user')
 
             if (message) {
-              await authResult.driveService!.sendNotificationEmail(
-                id,
-                emailAddress,
-                message
-              )
+              await authResult.driveService!.sendNotificationEmail(id, emailAddress, message)
             }
 
             fileResult = {
@@ -147,10 +107,7 @@ export async function POST(
   }
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ fileId: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -158,8 +115,7 @@ export async function GET(
     }
 
     const fileId = await getFileIdFromParams(params)
-    const permissions =
-      await authResult.driveService!.getFilePermissions(fileId)
+    const permissions = await authResult.driveService!.getFilePermissions(fileId)
     const fileDetails = await authResult.driveService!.getFileDetails(fileId)
 
     return NextResponse.json({

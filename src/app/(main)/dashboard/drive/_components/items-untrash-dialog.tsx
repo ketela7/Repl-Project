@@ -35,12 +35,7 @@ interface ItemsUntrashDialogProps {
   }>
 }
 
-function ItemsUntrashDialog({
-  isOpen,
-  onClose,
-  onConfirm,
-  selectedItems,
-}: ItemsUntrashDialogProps) {
+function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsUntrashDialogProps) {
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
   const isMobile = useIsMobile()
@@ -66,18 +61,12 @@ function ItemsUntrashDialog({
       {/* Stats */}
       <div className="flex justify-center gap-2">
         {fileCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-          >
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge
-            variant="secondary"
-            className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-          >
+          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
@@ -85,16 +74,11 @@ function ItemsUntrashDialog({
 
       {/* Items Preview */}
       <div className="space-y-3">
-        <h4 className="text-center text-sm font-medium">
-          Items to be restored:
-        </h4>
+        <h4 className="text-center text-sm font-medium">Items to be restored:</h4>
         <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
           <div className="space-y-2">
             {selectedItems.slice(0, 5).map((item) => (
-              <div
-                key={item.id}
-                className="bg-background/50 flex items-center gap-3 rounded-md p-2"
-              >
+              <div key={item.id} className="bg-background/50 flex items-center gap-3 rounded-md p-2">
                 <div className="h-2 w-2 rounded-full bg-emerald-500" />
                 <span className="flex-1 truncate text-sm">{item.name}</span>
                 <Badge variant="outline" className="text-xs">
@@ -117,8 +101,7 @@ function ItemsUntrashDialog({
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
         <div className="text-sm text-emerald-800 dark:text-emerald-200">
-          If the original parent folder was also deleted, items will be restored
-          to the root of your Drive.
+          If the original parent folder was also deleted, items will be restored to the root of your Drive.
         </div>
       </div>
     </div>
@@ -135,9 +118,7 @@ function ItemsUntrashDialog({
               </div>
               <div>
                 <div className="text-lg font-semibold">Restore from Trash</div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Bulk restore operation
-                </div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk restore operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -152,11 +133,7 @@ function ItemsUntrashDialog({
               <RotateCcw className="mr-2 h-4 w-4" />
               Restore Items
             </Button>
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className={cn('touch-target min-h-[44px] active:scale-95')}
-            >
+            <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
               Cancel
             </Button>
           </BottomSheetFooter>
@@ -175,9 +152,7 @@ function ItemsUntrashDialog({
             </div>
             <div>
               <div className="text-lg font-semibold">Restore from Trash</div>
-              <div className="text-muted-foreground text-sm font-normal">
-                Bulk restore operation
-              </div>
+              <div className="text-muted-foreground text-sm font-normal">Bulk restore operation</div>
             </div>
           </AlertDialogTitle>
         </AlertDialogHeader>
@@ -191,9 +166,7 @@ function ItemsUntrashDialog({
           >
             Restore Items
           </AlertDialogAction>
-          <AlertDialogCancel className="w-full sm:w-auto">
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

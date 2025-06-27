@@ -44,11 +44,7 @@ class SearchOptimizer {
     }
 
     // Check for incremental search optimization
-    const incrementalResult = this.checkIncrementalSearch(
-      cleanQuery,
-      userId,
-      folderId
-    )
+    const incrementalResult = this.checkIncrementalSearch(cleanQuery, userId, folderId)
     if (incrementalResult) {
       return incrementalResult
     }
@@ -84,11 +80,7 @@ class SearchOptimizer {
   /**
    * Check if we can use incremental search (extending previous results)
    */
-  private checkIncrementalSearch(
-    query: string,
-    _userId: string,
-    folderId?: string
-  ): SearchResult | null {
+  private checkIncrementalSearch(query: string, _userId: string, folderId?: string): SearchResult | null {
     // Find cached results that this query extends (same folder context)
     const folderSuffix = folderId ? `:folder:${folderId}` : ''
 
@@ -103,9 +95,7 @@ class SearchOptimizer {
       // If current query extends a cached query, filter the cached results
       if (query.startsWith(cachedQuery) && cachedQuery.length >= 2) {
         const filteredFiles = result.files.filter(
-          (file) =>
-            file.name?.toLowerCase().includes(query) ||
-            file.mimeType?.toLowerCase().includes(query)
+          (file) => file.name?.toLowerCase().includes(query) || file.mimeType?.toLowerCase().includes(query)
         )
 
         return {
@@ -124,11 +114,7 @@ class SearchOptimizer {
   /**
    * Execute the actual search with performance optimizations
    */
-  private async executeSearch(
-    query: string,
-    _userId: string,
-    apiCall: () => Promise<any>
-  ): Promise<SearchResult> {
+  private async executeSearch(query: string, _userId: string, apiCall: () => Promise<any>): Promise<SearchResult> {
     const result = await apiCall()
 
     return {
@@ -175,11 +161,7 @@ class SearchOptimizer {
   /**
    * Generate cache key for search
    */
-  private generateSearchKey(
-    query: string,
-    userId: string,
-    folderId?: string
-  ): string {
+  private generateSearchKey(query: string, userId: string, folderId?: string): string {
     const folderPart = folderId ? `:folder:${folderId}` : ''
     return `search:${userId}:${query}${folderPart}`
   }
@@ -209,10 +191,7 @@ class SearchOptimizer {
   /**
    * Preload common search patterns
    */
-  async preloadCommonSearches(
-    userId: string,
-    apiCall: (query: string) => Promise<any>
-  ): Promise<void> {
+  async preloadCommonSearches(userId: string, apiCall: (query: string) => Promise<any>): Promise<void> {
     const commonQueries = ['doc', 'pdf', 'img', 'video', 'presentation']
 
     const preloadPromises = commonQueries.map(async (query) => {
