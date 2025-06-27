@@ -369,7 +369,7 @@ function OperationsDialog({
 
         await Promise.all(downloadPromises)
       } else if (downloadMode === 'exportLinks') {
-        // For CSV export, use bulk endpoint and ensure CSV download
+        // For CSV export, use unified endpoint - fileId='bulk' triggers bulk processing
         const response = await fetch('/api/drive/files/bulk/download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
