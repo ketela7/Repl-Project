@@ -624,7 +624,7 @@ export class GoogleDriveService {
   }
 
   // Unified restore from trash operation for both files and folders
-  async restoreFromTrash(fileId: string): Promise<DriveFile> {
+  async untrashFile(fileId: string): Promise<DriveFile> {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: false },
@@ -636,7 +636,7 @@ export class GoogleDriveService {
 
   // Alias for clarity - same operation works for both files and folders
   async restoreFolderFromTrash(folderId: string): Promise<DriveFile> {
-    return this.restoreFromTrash(folderId)
+    return this.untrashFile(folderId)
   }
 
   // Unified rename operation for both files and folders
