@@ -56,15 +56,7 @@ export class GoogleDriveService {
   }
 
   async listFiles(options: DriveSearchOptions = {}): Promise<DriveSearchResult> {
-    const {
-      query,
-      parentId,
-      mimeType,
-      pageSize = 50,
-      pageToken,
-      orderBy = 'modifiedTime desc',
-      includeTeamDriveItems = true,
-    } = options
+    const { query, parentId, mimeType, pageSize = 50, pageToken, orderBy = 'modifiedTime desc', includeTeamDriveItems = true } = options
 
     // Validate and sanitize pageSize
     const validPageSize = Math.min(Math.max(pageSize, 1), 1000)
@@ -546,8 +538,7 @@ export class GoogleDriveService {
       requestBody: fileMetadata,
       media,
       uploadType: 'multipart',
-      fields:
-        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
     return convertGoogleDriveFile(response.data)
@@ -621,8 +612,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: true },
-      fields:
-        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
     return convertGoogleDriveFile(response.data)
@@ -638,8 +628,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: false },
-      fields:
-        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
     return convertGoogleDriveFile(response.data)
@@ -655,8 +644,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { name: newName },
-      fields:
-        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
     return convertGoogleDriveFile(response.data)
@@ -680,8 +668,7 @@ export class GoogleDriveService {
         fileId,
         addParents: newParentId,
         removeParents: currentParentId,
-        fields:
-          'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+        fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
       })
 
       return convertGoogleDriveFile(response.data)
@@ -720,8 +707,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.copy({
       fileId,
       requestBody: metadata,
-      fields:
-        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
     return convertGoogleDriveFile(response.data)

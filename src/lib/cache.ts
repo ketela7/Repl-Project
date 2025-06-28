@@ -91,13 +91,7 @@ class MemoryCache {
   }
 
   // Generate cache key for Drive API requests
-  generateDriveKey(params: {
-    parentId?: string
-    userId: string
-    pageToken?: string
-    query?: string
-    pageSize?: number
-  }): string {
+  generateDriveKey(params: { parentId?: string; userId: string; pageToken?: string; query?: string; pageSize?: number }): string {
     const { parentId = 'root', userId, pageToken = 'p1', query = '', pageSize = 50 } = params
 
     // Create a more comprehensive cache key with all filter parameters including pageSize

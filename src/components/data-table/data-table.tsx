@@ -71,13 +71,7 @@ export function DataTable<TData, TValue>({
 
   if (dndEnabled) {
     return (
-      <DndContext
-        collisionDetection={closestCenter}
-        modifiers={[restrictToVerticalAxis]}
-        onDragEnd={handleDragEnd}
-        sensors={sensors}
-        id={sortableId}
-      >
+      <DndContext collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd} sensors={sensors} id={sortableId}>
         {tableContent}
       </DndContext>
     )

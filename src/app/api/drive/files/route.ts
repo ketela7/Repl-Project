@@ -195,12 +195,9 @@ function buildDriveQuery(filters: FileFilter): string {
           case 'text':
             typeConditions.push(
               '(' +
-                [
-                  "mimeType = 'text/plain'",
-                  "mimeType = 'text/markdown'",
-                  "mimeType = 'text/csv'",
-                  "mimeType = 'text/tab-separated-values'",
-                ].join(' or ') +
+                ["mimeType = 'text/plain'", "mimeType = 'text/markdown'", "mimeType = 'text/csv'", "mimeType = 'text/tab-separated-values'"].join(
+                  ' or '
+                ) +
                 ')'
             )
             break

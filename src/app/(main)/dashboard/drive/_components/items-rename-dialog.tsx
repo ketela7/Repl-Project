@@ -4,13 +4,7 @@ import { useState } from 'react'
 import { Edit3, Hash, Calendar, AlignLeft, Code2 } from 'lucide-react'
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -141,9 +135,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
                     <span className="font-medium">{type.name}</span>
                   </div>
                   <div className="text-muted-foreground text-sm">{type.description}</div>
-                  <div className="text-muted-foreground bg-muted rounded px-2 py-1 font-mono text-xs">
-                    Example: {type.example}
-                  </div>
+                  <div className="text-muted-foreground bg-muted rounded px-2 py-1 font-mono text-xs">Example: {type.example}</div>
                 </Label>
               </div>
             )
@@ -154,27 +146,19 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
       {/* Input Field */}
       {selectedRenameType && selectedRenameType.id !== 'timestamp' && (
         <div className="space-y-3">
-          <Label className="text-sm font-medium">
-            {selectedRenameType.id === 'regex' ? 'Regular Expression' : 'Pattern'}
-          </Label>
+          <Label className="text-sm font-medium">{selectedRenameType.id === 'regex' ? 'Regular Expression' : 'Pattern'}</Label>
           <Input
             type="text"
             value={selectedRenameType.id === 'regex' ? regexPattern : renamePattern}
-            onChange={(e) =>
-              selectedRenameType.id === 'regex' ? setRegexPattern(e.target.value) : setRenamePattern(e.target.value)
-            }
+            onChange={(e) => (selectedRenameType.id === 'regex' ? setRegexPattern(e.target.value) : setRenamePattern(e.target.value))}
             placeholder={selectedRenameType.placeholder}
             className={selectedRenameType.id === 'regex' ? 'font-mono' : ''}
           />
           {selectedRenameType.id === 'replace' && (
-            <div className="text-muted-foreground text-xs">
-              Format: old_text|new_text (use | to separate old and new text)
-            </div>
+            <div className="text-muted-foreground text-xs">Format: old_text|new_text (use | to separate old and new text)</div>
           )}
           {selectedRenameType.id === 'regex' && (
-            <div className="text-muted-foreground text-xs">
-              Advanced users only. Use JavaScript regex syntax: /pattern/replacement/flags
-            </div>
+            <div className="text-muted-foreground text-xs">Advanced users only. Use JavaScript regex syntax: /pattern/replacement/flags</div>
           )}
         </div>
       )}
@@ -241,9 +225,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
           <BottomSheetFooter className={`${cn('grid gap-4')} px-4`}>
             <Button
               onClick={handleRename}
-              disabled={
-                renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp'
-              }
+              disabled={renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp'}
               className={cn('touch-target min-h-[44px] active:scale-95')}
             >
               <Edit3 className="mr-2 h-4 w-4" />
@@ -278,9 +260,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         <DialogFooter className="flex-col gap-2 sm:flex-row">
           <Button
             onClick={handleRename}
-            disabled={
-              renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp'
-            }
+            disabled={renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp'}
             className="w-full sm:w-auto"
           >
             <Edit3 className="mr-2 h-4 w-4" />

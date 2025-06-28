@@ -14,13 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { cn } from '@/lib/utils'
 
 interface ItemsUntrashDialogProps {
@@ -87,9 +81,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
               </div>
             ))}
             {selectedItems.length > 5 && (
-              <div className="text-muted-foreground py-2 text-center text-sm">
-                ... and {selectedItems.length - 5} more items
-              </div>
+              <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>
             )}
           </div>
         </div>

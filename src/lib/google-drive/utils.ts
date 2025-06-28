@@ -40,12 +40,7 @@ export function getSizeMultiplier(unit: 'B' | 'KB' | 'MB' | 'GB'): number {
   }
 }
 
-export function isFileSizeInRange(
-  fileSize: any,
-  minSize?: number,
-  maxSize?: number,
-  unit: 'B' | 'KB' | 'MB' | 'GB' = 'MB'
-): boolean {
+export function isFileSizeInRange(fileSize: any, minSize?: number, maxSize?: number, unit: 'B' | 'KB' | 'MB' | 'GB' = 'MB'): boolean {
   const normalizedFileSize = normalizeFileSize(fileSize)
   const multiplier = getSizeMultiplier(unit)
   const minBytes = minSize ? minSize * multiplier : 0
@@ -1101,13 +1096,7 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
   }
 }
 
-export function buildSearchQuery(options: {
-  name?: string
-  mimeType?: string
-  parentId?: string
-  trashed?: boolean
-  shared?: boolean
-}): string {
+export function buildSearchQuery(options: { name?: string; mimeType?: string; parentId?: string; trashed?: boolean; shared?: boolean }): string {
   const conditions: string[] = []
 
   if (options.name) {
@@ -1236,8 +1225,7 @@ export function getFileActions(
     canMoveItemWithinDrive: false,
   }
 
-  const finalCapabilities: DriveFileCapabilities =
-    Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities
+  const finalCapabilities: DriveFileCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities
 
   return {
     // Preview available for all files (not folders)
@@ -1372,13 +1360,7 @@ export function getFileCategory(mimeType: string): string {
   if (mimeType.includes('presentation')) return 'presentation'
   if (mimeType.includes('document') || mimeType.startsWith('text/')) return 'document'
   if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive')) return 'archive'
-  if (
-    mimeType.includes('javascript') ||
-    mimeType.includes('json') ||
-    mimeType.includes('html') ||
-    mimeType.includes('css')
-  )
-    return 'code'
+  if (mimeType.includes('javascript') || mimeType.includes('json') || mimeType.includes('html') || mimeType.includes('css')) return 'code'
   if (mimeType.includes('sql') || mimeType.includes('database')) return 'database'
   if (mimeType.includes('photoshop') || mimeType.includes('illustrator')) return 'design'
 

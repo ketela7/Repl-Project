@@ -64,15 +64,11 @@ export class DriveErrorBoundary extends Component<Props, State> {
       return (
         <Card className="mx-auto mt-8 w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-              {this.getErrorIcon(error?.code)}
-            </div>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">{this.getErrorIcon(error?.code)}</div>
             <CardTitle className="text-lg text-red-700">{this.getErrorTitle(error?.code)}</CardTitle>
           </CardHeader>
           <CardContent className="text-center">
-            <p className="text-muted-foreground mb-6 text-sm">
-              {error?.userMessage || 'Something went wrong while loading your files.'}
-            </p>
+            <p className="text-muted-foreground mb-6 text-sm">{error?.userMessage || 'Something went wrong while loading your files.'}</p>
 
             <div className="flex flex-col gap-2">
               {error?.action === 'retry' && (

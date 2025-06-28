@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService } from '@/lib/api-utils'
+import { initDriveService, handleApiError } from '@/lib/api-utils'
 
-export async function POST(request: NextRequest, { params }: { params: { fileId: string } }) {
+export async function POST(request: NextRequest) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -10,19 +10,14 @@ export async function POST(request: NextRequest, { params }: { params: { fileId:
     }
 
     const { driveService } = authResult
-    const fileId = (await params).fileId
     const body = await request.json()
 
-    // Global operations approach: Handle both single and bulk with items.length logic
-    const { targetFolderId, items } = body
+    // Handle both single and bulk operations
+    const { fileId, namePrefix, newName, items } = body
 
-    // Determine operation type based on items array
+    // Determine operation type based on items array or single fileId
     const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
     const isBulkOperation = items && items.length > 1
-
-    if (!targetFolderId) {
-      return NextResponse.json({ error: 'Target folder ID is required' }, { status: 400 })
-    }
 
     if (!fileIds || fileIds.length === 0) {
       return NextResponse.json({ error: 'File IDs are required' }, { status: 400 })
@@ -33,13 +28,30 @@ export async function POST(request: NextRequest, { params }: { params: { fileId:
 
     for (const id of fileIds) {
       try {
-        const result = await driveService.moveFile(id, targetFolderId)
+        let finalName = newName
+
+        // For bulk operations, use prefix with original name
+        if (isBulkOperation && namePrefix) {
+          const originalItem = items.find((item: any) => item.id === id)
+          finalName = `${namePrefix} ${originalItem?.name || 'Unknown'}`
+        }
+
+        if (!finalName) {
+          errors.push({
+            fileId: id,
+            success: false,
+            error: 'New name is required',
+          })
+          continue
+        }
+
+        const result = await driveService.renameFile(id, finalName)
         results.push({ fileId: id, success: true, result })
       } catch (error: any) {
         errors.push({
           fileId: id,
           success: false,
-          error: error.message || 'Move failed',
+          error: error.message || 'Rename failed',
         })
       }
     }
@@ -49,15 +61,15 @@ export async function POST(request: NextRequest, { params }: { params: { fileId:
       processed: results.length,
       failed: errors.length,
       type: isBulkOperation ? 'bulk' : 'single',
-      operation: 'move',
+      operation: 'rename',
       results,
       errors: errors.length > 0 ? errors : undefined,
     }
 
     return NextResponse.json(response, {
-      status: errors.length === 0 ? 200 : 207, // 207 Multi-Status for partial success
+      status: errors.length === 0 ? 200 : 207,
     })
   } catch (error: any) {
-    return NextResponse.json({ error: 'Failed to move files' }, { status: 500 })
+    return handleApiError(error)
   }
 }

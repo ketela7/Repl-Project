@@ -114,9 +114,7 @@ export function DrivePermissionRequired({ error, onRetry, compact = false }: Dri
             </Button>
           </div>
 
-          <p className="text-muted-foreground text-center text-xs">
-            You'll be redirected to Google to authorize Drive permissions
-          </p>
+          <p className="text-muted-foreground text-center text-xs">You'll be redirected to Google to authorize Drive permissions</p>
         </CardContent>
       </Card>
     </div>

@@ -16,11 +16,7 @@ export function getUserTimezone(): string {
 /**
  * Format date to user's timezone
  */
-export function formatDateToUserTimezone(
-  date: string | Date,
-  timezone?: string,
-  options?: Intl.DateTimeFormatOptions
-): string {
+export function formatDateToUserTimezone(date: string | Date, timezone?: string, options?: Intl.DateTimeFormatOptions): string {
   const userTimezone = timezone || getUserTimezone()
   const dateObj = typeof date === 'string' ? new Date(date) : date
 

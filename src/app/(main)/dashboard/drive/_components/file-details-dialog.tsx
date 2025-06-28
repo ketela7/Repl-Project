@@ -211,7 +211,11 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
       activeFileDetailRequests.add(fileId)
 
       const fetchPromise = (async (): Promise<DetailedFileInfo> => {
-        const response = await fetch(`/api/drive/files/${fileId}/details`)
+        const response = await fetch('/api/drive/files/details', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileId }),
+        })
 
         if (!response.ok) {
           const errorData = await response.json()
@@ -272,9 +276,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
         <div className="flex items-center gap-1">
           {hasPublicAccess ? <Globe className="h-4 w-4" /> : <Users className="h-4 w-4" />}
           <span className="text-sm">
-            {hasPublicAccess
-              ? 'Public'
-              : `Shared with ${permissionCount} ${permissionCount === 1 ? 'person' : 'people'}`}
+            {hasPublicAccess ? 'Public' : `Shared with ${permissionCount} ${permissionCount === 1 ? 'person' : 'people'}`}
           </span>
         </div>
         {fileDetails.shared && (
@@ -320,9 +322,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
 
         {deniedCapabilities.length > 0 && (
           <div>
-            <h4 className="mb-2 text-sm font-medium text-red-600">
-              Restricted Capabilities ({deniedCapabilities.length})
-            </h4>
+            <h4 className="mb-2 text-sm font-medium text-red-600">Restricted Capabilities ({deniedCapabilities.length})</h4>
             <div className="flex flex-wrap gap-1">
               {deniedCapabilities.slice(0, 10).map(([key, value]) => (
                 <Badge key={key} variant="outline" className="border-red-200 text-xs text-red-700">
@@ -739,12 +739,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                 <Download className="mr-2 h-4 w-4" />
                 Export as {format.split('/').pop()?.toUpperCase()}
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(link, `${format} Export Link`)}
-                className="h-9 w-9 p-0"
-              >
+              <Button variant="ghost" size="sm" onClick={() => copyToClipboard(link, `${format} Export Link`)} className="h-9 w-9 p-0">
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
@@ -796,21 +791,14 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                     <span className="font-medium">Name:</span>
                     <div className="flex items-center gap-2">
                       <span className="max-w-48 truncate text-sm">{fileDetails.name}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(fileDetails.name, 'File name')}
-                        className="h-6 w-6 p-0"
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(fileDetails.name, 'File name')} className="h-6 w-6 p-0">
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Type:</span>
-                    <Badge variant="secondary">
-                      {fileDetails.mimeType.split('/').pop()?.toUpperCase() || 'Unknown'}
-                    </Badge>
+                    <Badge variant="secondary">{fileDetails.mimeType.split('/').pop()?.toUpperCase() || 'Unknown'}</Badge>
                   </div>
                   {fileDetails.size && (
                     <div className="flex items-center justify-between">
@@ -831,12 +819,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                     <span className="font-medium">ID:</span>
                     <div className="flex items-center gap-2">
                       <span className="max-w-32 truncate font-mono text-xs">{fileDetails.id}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(fileDetails.id, 'File ID')}
-                        className="h-6 w-6 p-0"
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(fileDetails.id, 'File ID')} className="h-6 w-6 p-0">
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
@@ -867,9 +850,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
               {fileDetails.description && (
                 <div className="mt-4">
                   <span className="font-medium">Description:</span>
-                  <p className="text-muted-foreground bg-muted mt-1 rounded-lg p-3 text-sm">
-                    {fileDetails.description}
-                  </p>
+                  <p className="text-muted-foreground bg-muted mt-1 rounded-lg p-3 text-sm">{fileDetails.description}</p>
                 </div>
               )}
             </section>
@@ -900,15 +881,11 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                     <div className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
                         <AvatarImage src={fileDetails.lastModifyingUser.photoLink} />
-                        <AvatarFallback className="text-xs">
-                          {getInitials(fileDetails.lastModifyingUser.displayName)}
-                        </AvatarFallback>
+                        <AvatarFallback className="text-xs">{getInitials(fileDetails.lastModifyingUser.displayName)}</AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">{fileDetails.lastModifyingUser.displayName}</span>
-                        <span className="text-muted-foreground text-xs">
-                          {fileDetails.lastModifyingUser.emailAddress}
-                        </span>
+                        <span className="text-muted-foreground text-xs">{fileDetails.lastModifyingUser.emailAddress}</span>
                       </div>
                     </div>
                   </div>
@@ -989,21 +966,11 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
               <div className="space-y-3">
                 {fileDetails.webViewLink && (
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(fileDetails.webViewLink, '_blank')}
-                      className="flex-1"
-                    >
+                    <Button variant="outline" size="sm" onClick={() => window.open(fileDetails.webViewLink, '_blank')} className="flex-1">
                       <Eye className="mr-2 h-4 w-4" />
                       Open in Google Drive
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(fileDetails.webViewLink!, 'View Link')}
-                      className="h-9 w-9 p-0"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(fileDetails.webViewLink!, 'View Link')} className="h-9 w-9 p-0">
                       <Copy className="h-4 w-4" />
                     </Button>
                   </div>
@@ -1011,12 +978,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
 
                 {fileDetails.webContentLink && (
                   <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => window.open(fileDetails.webContentLink, '_blank')}
-                      className="flex-1"
-                    >
+                    <Button variant="outline" size="sm" onClick={() => window.open(fileDetails.webContentLink, '_blank')} className="flex-1">
                       <Download className="mr-2 h-4 w-4" />
                       Download Direct Link
                     </Button>
@@ -1134,11 +1096,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                     {fileDetails.writersCanShare !== undefined && (
                       <Badge
                         variant="outline"
-                        className={
-                          fileDetails.writersCanShare
-                            ? 'border-green-200 text-green-700'
-                            : 'border-red-200 text-red-700'
-                        }
+                        className={fileDetails.writersCanShare ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'}
                       >
                         <Share2 className="mr-1 h-3 w-3" />
                         Writers {fileDetails.writersCanShare ? 'Can' : 'Cannot'} Share
@@ -1198,15 +1156,11 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                             <div className="flex items-center gap-2">
                               <Avatar className="h-6 w-6">
                                 <AvatarImage src={restriction.restrictingUser.photoLink} />
-                                <AvatarFallback className="text-xs">
-                                  {getInitials(restriction.restrictingUser.displayName)}
-                                </AvatarFallback>
+                                <AvatarFallback className="text-xs">{getInitials(restriction.restrictingUser.displayName)}</AvatarFallback>
                               </Avatar>
                               <div>
                                 <span className="text-sm font-medium">{restriction.restrictingUser.displayName}</span>
-                                <span className="text-muted-foreground ml-2 text-xs">
-                                  {restriction.restrictingUser.emailAddress}
-                                </span>
+                                <span className="text-muted-foreground ml-2 text-xs">{restriction.restrictingUser.emailAddress}</span>
                               </div>
                             </div>
                           )}
@@ -1248,9 +1202,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                       {fileDetails.linkShareMetadata.securityUpdateEligible !== undefined && (
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Security Update Eligible:</span>
-                          <Badge
-                            variant={fileDetails.linkShareMetadata.securityUpdateEligible ? 'default' : 'secondary'}
-                          >
+                          <Badge variant={fileDetails.linkShareMetadata.securityUpdateEligible ? 'default' : 'secondary'}>
                             {fileDetails.linkShareMetadata.securityUpdateEligible ? 'Yes' : 'No'}
                           </Badge>
                         </div>
@@ -1258,9 +1210,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                       {fileDetails.linkShareMetadata.securityUpdateEnabled !== undefined && (
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Security Update Enabled:</span>
-                          <Badge
-                            variant={fileDetails.linkShareMetadata.securityUpdateEnabled ? 'default' : 'secondary'}
-                          >
+                          <Badge variant={fileDetails.linkShareMetadata.securityUpdateEnabled ? 'default' : 'secondary'}>
                             {fileDetails.linkShareMetadata.securityUpdateEnabled ? 'Yes' : 'No'}
                           </Badge>
                         </div>

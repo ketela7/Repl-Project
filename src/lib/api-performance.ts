@@ -25,11 +25,7 @@ class APIOptimizer {
   /**
    * Add request to batch queue with priority
    */
-  async batchRequest<T>(
-    requestId: string,
-    requestFn: () => Promise<T>,
-    priority: 'high' | 'medium' | 'low' = 'medium'
-  ): Promise<T> {
+  async batchRequest<T>(requestId: string, requestFn: () => Promise<T>, priority: 'high' | 'medium' | 'low' = 'medium'): Promise<T> {
     return new Promise((resolve, reject) => {
       const batchItem: BatchRequest = {
         id: requestId,
@@ -155,10 +151,6 @@ export const apiOptimizer = new APIOptimizer()
 /**
  * API call wrapper
  */
-export async function apiCall<T>(
-  requestId: string,
-  requestFn: () => Promise<T>,
-  priority: 'high' | 'medium' | 'low' = 'medium'
-): Promise<T> {
+export async function apiCall<T>(requestId: string, requestFn: () => Promise<T>, priority: 'high' | 'medium' | 'low' = 'medium'): Promise<T> {
   return apiOptimizer.batchRequest(requestId, requestFn, priority)
 }

@@ -1,18 +1,6 @@
 'use client'
 
-import {
-  MoreVertical,
-  Eye,
-  Download,
-  Edit,
-  Move,
-  Copy,
-  Share,
-  RefreshCw,
-  Trash2,
-  Triangle,
-  CopyIcon,
-} from 'lucide-react'
+import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, Triangle, CopyIcon } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -231,9 +219,7 @@ export function DriveDataView({
                   <h3 className="mb-1 truncate text-sm font-medium sm:text-base" title={item.name}>
                     {item.name}
                   </h3>
-                  <p className="text-muted-foreground text-xs sm:text-sm">
-                    {formatFileTime(item.modifiedTime, effectiveTimezone)}
-                  </p>
+                  <p className="text-muted-foreground text-xs sm:text-sm">{formatFileTime(item.modifiedTime, effectiveTimezone)}</p>
                 </div>
               </div>
             ))}
@@ -259,80 +245,50 @@ export function DriveDataView({
                   </TableHead>
                 )}
                 {visibleColumns.name && (
-                  <TableHead
-                    className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => onColumnsChange({ sortBy: 'name' })}
-                  >
+                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'name' })}>
                     <div className="flex items-center space-x-1">
                       <span>Name</span>
-                      {sortConfig?.key === 'name' && (
-                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
+                      {sortConfig?.key === 'name' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
                     </div>
                   </TableHead>
                 )}
                 {visibleColumns.size && (
-                  <TableHead
-                    className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => onColumnsChange({ sortBy: 'size' })}
-                  >
+                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'size' })}>
                     <div className="flex items-center space-x-1">
                       <span>Size</span>
-                      {sortConfig?.key === 'size' && (
-                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
+                      {sortConfig?.key === 'size' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
                     </div>
                   </TableHead>
                 )}
                 {visibleColumns.owners && (
-                  <TableHead
-                    className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => onColumnsChange({ sortBy: 'owners' })}
-                  >
+                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'owners' })}>
                     <div className="flex items-center space-x-1">
                       <span>Owner</span>
-                      {sortConfig?.key === 'owners' && (
-                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
+                      {sortConfig?.key === 'owners' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
                     </div>
                   </TableHead>
                 )}
                 {visibleColumns.mimeType && (
-                  <TableHead
-                    className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => onColumnsChange({ sortBy: 'mimeType' })}
-                  >
+                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'mimeType' })}>
                     <div className="flex items-center space-x-1">
                       <span>Type</span>
-                      {sortConfig?.key === 'mimeType' && (
-                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
+                      {sortConfig?.key === 'mimeType' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
                     </div>
                   </TableHead>
                 )}
                 {visibleColumns.modifiedTime && (
-                  <TableHead
-                    className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => onColumnsChange({ sortBy: 'modifiedTime' })}
-                  >
+                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'modifiedTime' })}>
                     <div className="flex items-center space-x-1">
                       <span>Modified</span>
-                      {sortConfig?.key === 'modifiedTime' && (
-                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
+                      {sortConfig?.key === 'modifiedTime' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
                     </div>
                   </TableHead>
                 )}
                 {visibleColumns.createdTime && (
-                  <TableHead
-                    className="hover:bg-muted/50 cursor-pointer"
-                    onClick={() => onColumnsChange({ sortBy: 'createdTime' })}
-                  >
+                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'createdTime' })}>
                     <div className="flex items-center space-x-1">
                       <span>Created</span>
-                      {sortConfig?.key === 'createdTime' && (
-                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                      )}
+                      {sortConfig?.key === 'createdTime' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
                     </div>
                   </TableHead>
                 )}
@@ -344,13 +300,7 @@ export function DriveDataView({
                 <TableRow
                   key={item.id}
                   className={`cursor-pointer ${selectedItems.has(item.id) ? 'bg-primary/5' : ''}`}
-                  onClick={() =>
-                    isSelectMode
-                      ? onSelectItem(item.id)
-                      : item.isFolder
-                        ? onFolderClick(item.id)
-                        : onItemAction('preview', item)
-                  }
+                  onClick={() => (isSelectMode ? onSelectItem(item.id) : item.isFolder ? onFolderClick(item.id) : onItemAction('preview', item))}
                 >
                   {isSelectMode && (
                     <TableCell onClick={(e) => e.stopPropagation()}>
@@ -373,13 +323,7 @@ export function DriveDataView({
                     </TableCell>
                   )}
                   {visibleColumns.size && (
-                    <TableCell>
-                      {'size' in item && item.size
-                        ? formatFileSize(parseInt(item.size))
-                        : item.isFolder
-                          ? '—'
-                          : 'Unknown'}
-                    </TableCell>
+                    <TableCell>{'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'}</TableCell>
                   )}
                   {visibleColumns.owners && (
                     <TableCell
@@ -417,9 +361,7 @@ export function DriveDataView({
                   )}
                   {visibleColumns.modifiedTime && (
                     <TableCell>
-                      <span className="text-muted-foreground text-sm">
-                        {formatFileTime(item.modifiedTime, effectiveTimezone)}
-                      </span>
+                      <span className="text-muted-foreground text-sm">{formatFileTime(item.modifiedTime, effectiveTimezone)}</span>
                     </TableCell>
                   )}
                   {visibleColumns.createdTime && (

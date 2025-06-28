@@ -7,11 +7,7 @@ export async function getValueFromCookie(key: string): Promise<string | undefine
   return cookieStore.get(key)?.value
 }
 
-export async function setValueToCookie(
-  key: string,
-  value: string,
-  options: { path?: string; maxAge?: number } = {}
-): Promise<void> {
+export async function setValueToCookie(key: string, value: string, options: { path?: string; maxAge?: number } = {}): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.set(key, value, {
     path: options.path ?? '/',

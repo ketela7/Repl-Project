@@ -2,20 +2,7 @@
  * Type definitions and data for sidebar navigation items
  */
 import { LucideIcon } from 'lucide-react'
-import {
-  Home,
-  FolderOpen,
-  Search,
-  Upload,
-  Share2,
-  Trash2,
-  Settings,
-  BarChart3,
-  Users,
-  Archive,
-  Cloud,
-  Download,
-} from 'lucide-react'
+import { Home, FolderOpen, Search, Upload, Share2, Trash2, Settings, BarChart3, Users, Archive, Cloud, Download } from 'lucide-react'
 
 export interface NavMainItem {
   title: string

@@ -23,9 +23,7 @@ export function DriveConnectionCard() {
             <HardDrive className="text-primary h-8 w-8" />
           </div>
           <CardTitle className="text-2xl">Grant Google Drive Access</CardTitle>
-          <CardDescription className="text-base">
-            Grant permission to access your Google Drive files and folders
-          </CardDescription>
+          <CardDescription className="text-base">Grant permission to access your Google Drive files and folders</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
@@ -53,8 +51,7 @@ export function DriveConnectionCard() {
 
           <div className="space-y-4 text-center">
             <p className="text-muted-foreground text-sm">
-              Click the button below to grant Google Drive access. You'll be redirected to Google to authorize
-              permissions.
+              Click the button below to grant Google Drive access. You'll be redirected to Google to authorize permissions.
             </p>
 
             <Button onClick={handleConnect} disabled={connecting} size="lg" className="w-full">

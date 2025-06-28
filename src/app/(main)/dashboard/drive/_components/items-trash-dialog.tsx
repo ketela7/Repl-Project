@@ -11,13 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
@@ -86,9 +80,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
               </div>
             ))}
             {selectedItems.length > 5 && (
-              <div className="text-muted-foreground py-2 text-center text-sm">
-                ... and {selectedItems.length - 5} more items
-              </div>
+              <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>
             )}
           </div>
         </div>

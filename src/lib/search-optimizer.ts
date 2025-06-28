@@ -25,12 +25,7 @@ class SearchOptimizer {
   /**
    * Optimized search that uses incremental results
    */
-  async optimizedSearch(
-    searchQuery: string,
-    userId: string,
-    apiCall: () => Promise<any>,
-    folderId?: string
-  ): Promise<SearchResult> {
+  async optimizedSearch(searchQuery: string, userId: string, apiCall: () => Promise<any>, folderId?: string): Promise<SearchResult> {
     // Clean search query
     const cleanQuery = searchQuery.trim().toLowerCase()
     if (!cleanQuery) {
@@ -94,9 +89,7 @@ class SearchOptimizer {
 
       // If current query extends a cached query, filter the cached results
       if (query.startsWith(cachedQuery) && cachedQuery.length >= 2) {
-        const filteredFiles = result.files.filter(
-          (file) => file.name?.toLowerCase().includes(query) || file.mimeType?.toLowerCase().includes(query)
-        )
+        const filteredFiles = result.files.filter((file) => file.name?.toLowerCase().includes(query) || file.mimeType?.toLowerCase().includes(query))
 
         return {
           files: filteredFiles,

@@ -45,8 +45,7 @@ export default function ServerOfflinePage() {
             <Alert className="border-green-200 bg-green-50">
               <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                <strong>Anda masih login.</strong> Session tersimpan dan akan otomatis tersambung kembali ketika server
-                online.
+                <strong>Anda masih login.</strong> Session tersimpan dan akan otomatis tersambung kembali ketika server online.
               </AlertDescription>
             </Alert>
           )}

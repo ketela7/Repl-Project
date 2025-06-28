@@ -2,25 +2,29 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { initDriveService, handleApiError } from '@/lib/api-utils'
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
+export async function POST(request: NextRequest) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
       return authResult.response!
     }
 
-    const fileId = (await params).fileId
+    const { driveService } = authResult
     const body = await request.json()
 
-    // Global operations approach: Handle both single and bulk with items.length logic
-    const { name, parentId, items } = body
+    // Handle both single and bulk operations
+    const { fileId, targetFolderId, items } = body
 
-    // Determine operation type based on items array
+    if (!targetFolderId) {
+      return NextResponse.json({ error: 'Target folder ID is required' }, { status: 400 })
+    }
+
+    // Determine operation type based on items array or single fileId
     const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
     const isBulkOperation = items && items.length > 1
 
-    if (!name && !isBulkOperation) {
-      return NextResponse.json({ error: 'Item name is required for single copy' }, { status: 400 })
+    if (!fileIds || fileIds.length === 0) {
+      return NextResponse.json({ error: 'File IDs are required' }, { status: 400 })
     }
 
     const results = []
@@ -28,21 +32,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     for (const id of fileIds) {
       try {
-        const copyName = isBulkOperation
-          ? `Copy of ${items.find((item: any) => item.id === id)?.name || 'Unknown'}`
-          : name
-
-        const copiedFile = await authResult.driveService!.copyFile(id, {
-          name: copyName,
-          parents: parentId ? [parentId] : undefined,
-        })
-
-        results.push({ fileId: id, success: true, result: copiedFile })
+        const result = await driveService.moveFile(id, targetFolderId)
+        results.push({ fileId: id, success: true, result })
       } catch (error: any) {
         errors.push({
           fileId: id,
           success: false,
-          error: error.message || 'Copy failed',
+          error: error.message || 'Move failed',
         })
       }
     }
@@ -52,7 +48,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       processed: results.length,
       failed: errors.length,
       type: isBulkOperation ? 'bulk' : 'single',
-      operation: 'copy',
+      operation: 'move',
+      targetFolderId,
       results,
       errors: errors.length > 0 ? errors : undefined,
     }
@@ -60,7 +57,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json(response, {
       status: errors.length === 0 ? 200 : 207,
     })
-  } catch (error) {
+  } catch (error: any) {
     return handleApiError(error)
   }
 }

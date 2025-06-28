@@ -131,21 +131,11 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
                 <ExternalLink className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Open in Drive</span>
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setIsFullscreen(false)}
-                className="text-white hover:bg-white/10"
-              >
+              <Button variant="ghost" size="sm" onClick={() => setIsFullscreen(false)} className="text-white hover:bg-white/10">
                 <Minimize2 className="mr-2 h-4 w-4" />
                 <span className="hidden sm:inline">Exit Fullscreen</span>
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onOpenChange(false)}
-                className="text-white hover:bg-white/10"
-              >
+              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="text-white hover:bg-white/10">
                 <X className="h-4 w-4" />
               </Button>
             </div>
@@ -163,21 +153,14 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
       <DialogContent className="h-auto max-h-[95vh] w-[95vw] max-w-6xl overflow-hidden p-3 sm:p-4 md:p-6">
         <DialogHeader className="pb-2 sm:pb-3">
           <div className="flex items-start justify-between gap-2">
-            <DialogTitle className="flex-1 truncate pr-2 text-sm font-medium sm:text-base md:text-lg">
-              {file.name}
-            </DialogTitle>
+            <DialogTitle className="flex-1 truncate pr-2 text-sm font-medium sm:text-base md:text-lg">{file.name}</DialogTitle>
             <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2">
               {/* Fullscreen toggle */}
               <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="hidden sm:flex">
                 <Maximize2 className="mr-2 h-4 w-4" />
                 Fullscreen
               </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsFullscreen(true)}
-                className="h-8 w-8 p-0 sm:hidden"
-              >
+              <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)} className="h-8 w-8 p-0 sm:hidden">
                 <Maximize2 className="h-4 w-4" />
               </Button>
               {/* Download button */}

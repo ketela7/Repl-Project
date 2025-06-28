@@ -3,18 +3,7 @@
  */
 import { toast } from 'sonner'
 import React from 'react'
-import {
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Info,
-  Copy,
-  Download,
-  Trash2,
-  FolderPlus,
-  Share2,
-  Upload,
-} from 'lucide-react'
+import { CheckCircle, XCircle, AlertTriangle, Info, Copy, Download, Trash2, FolderPlus, Share2, Upload } from 'lucide-react'
 
 export interface ToastAction {
   label: string

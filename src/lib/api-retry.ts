@@ -40,11 +40,7 @@ function isRetryableError(error: any): boolean {
   }
 
   // Google API specific errors
-  if (
-    error.message?.includes('Rate Limit Exceeded') ||
-    error.message?.includes('Backend Error') ||
-    error.message?.includes('Internal error')
-  ) {
+  if (error.message?.includes('Rate Limit Exceeded') || error.message?.includes('Backend Error') || error.message?.includes('Internal error')) {
     return true
   }
 
@@ -72,11 +68,7 @@ function sleep(ms: number): Promise<void> {
 /**
  * Retry an async operation with exponential backoff
  */
-export async function retryOperation<T>(
-  operation: () => Promise<T>,
-  config: Partial<RetryConfig> = {},
-  context: string = 'operation'
-): Promise<T> {
+export async function retryOperation<T>(operation: () => Promise<T>, config: Partial<RetryConfig> = {}, context: string = 'operation'): Promise<T> {
   const finalConfig = { ...DEFAULT_CONFIG, ...config }
   let lastError: any
 
@@ -120,10 +112,7 @@ export async function retryOperation<T>(
 /**
  * Specialized retry for Google Drive API calls
  */
-export async function retryDriveApiCall<T>(
-  operation: () => Promise<T>,
-  context: string = 'Drive API call'
-): Promise<T> {
+export async function retryDriveApiCall<T>(operation: () => Promise<T>, context: string = 'Drive API call'): Promise<T> {
   return retryOperation(
     operation,
     {

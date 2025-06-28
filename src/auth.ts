@@ -49,10 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       // Handle token refresh on every request if needed
-      if (
-        token.refreshToken &&
-        (!token.accessToken || (account?.expires_at && Date.now() >= account.expires_at * 1000))
-      ) {
+      if (token.refreshToken && (!token.accessToken || (account?.expires_at && Date.now() >= account.expires_at * 1000))) {
         try {
           const response = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',

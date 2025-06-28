@@ -60,11 +60,7 @@ export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
 
       {/* Remember Me Checkbox */}
       <div className="bg-muted/30 flex items-center space-x-2 rounded-md border p-3">
-        <Checkbox
-          id="remember-me-nextauth"
-          checked={form.watch('remember')}
-          onCheckedChange={(checked) => form.setValue('remember', !!checked)}
-        />
+        <Checkbox id="remember-me-nextauth" checked={form.watch('remember')} onCheckedChange={(checked) => form.setValue('remember', !!checked)} />
         <div className="space-y-1">
           <label htmlFor="remember-me-nextauth" className="cursor-pointer text-sm font-medium select-none">
             Keep me signed in for 30 days

@@ -40,13 +40,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
@@ -478,14 +472,9 @@ export function DriveToolbar({
     return {
       images: items.filter((f) => f.mimeType?.includes('image')).length,
       videos: items.filter((f) => f.mimeType?.includes('video')).length,
-      documents: items.filter(
-        (f) => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')
-      ).length,
-      spreadsheets: items.filter(
-        (f) => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')
-      ).length,
-      presentations: items.filter((f) => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint'))
-        .length,
+      documents: items.filter((f) => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length,
+      spreadsheets: items.filter((f) => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length,
+      presentations: items.filter((f) => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length,
       audio: items.filter((f) => f.mimeType?.startsWith('audio/')).length,
       archives: items.filter(
         (f) =>
@@ -505,23 +494,12 @@ export function DriveToolbar({
       ).length,
       design: items.filter(
         (f) =>
-          f.mimeType?.includes('photoshop') ||
-          f.mimeType?.includes('illustrator') ||
-          f.mimeType?.includes('sketch') ||
-          f.mimeType?.includes('figma')
+          f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')
       ).length,
-      database: items.filter(
-        (f) => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')
-      ).length,
-      ebooks: items.filter(
-        (f) => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')
-      ).length,
+      database: items.filter((f) => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length,
+      ebooks: items.filter((f) => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length,
       fonts: items.filter(
-        (f) =>
-          f.mimeType?.includes('font') ||
-          f.mimeType?.includes('ttf') ||
-          f.mimeType?.includes('otf') ||
-          f.mimeType?.includes('woff')
+        (f) => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')
       ).length,
       shortcuts: items.filter((f) => f.mimeType === 'application/vnd.google-apps.shortcut').length,
       folders: items.filter((f) => f.mimeType === 'application/vnd.google-apps.folder').length,
@@ -606,12 +584,7 @@ export function DriveToolbar({
           {selectedCount <= items.length && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant={isSelectMode ? 'default' : 'ghost'}
-                  size="sm"
-                  disabled={items.length === 0}
-                  className="h-8 px-2"
-                >
+                <Button variant={isSelectMode ? 'default' : 'ghost'} size="sm" disabled={items.length === 0} className="h-8 px-2">
                   <Square className="h-4 w-4" />
                   {selectedCount > 0 && (
                     <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
@@ -1811,13 +1784,7 @@ export function DriveToolbar({
               </Button>
             </div>
           </div>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={(e) => onSearchSubmit(e)}
-            disabled={!searchQuery.trim()}
-            className="h-10 px-4"
-          >
+          <Button variant="default" size="sm" onClick={(e) => onSearchSubmit(e)} disabled={!searchQuery.trim()} className="h-10 px-4">
             {refreshing ? (
               <RefreshCw className="h-4 w-4 animate-spin" />
             ) : (

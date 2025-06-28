@@ -4,13 +4,7 @@ import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen } from 'luc
 import { useState } from 'react'
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetDescription,
-} from '@/components/ui/bottom-sheet'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetDescription } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
@@ -41,14 +35,7 @@ interface OperationsDialogProps {
   onRefreshAfterOp?: () => void
 }
 
-function OperationsDialog({
-  isOpen,
-  open,
-  onClose,
-  onOpenChange,
-  selectedItems,
-  onRefreshAfterOp,
-}: OperationsDialogProps) {
+function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, onRefreshAfterOp }: OperationsDialogProps) {
   const isMobile = useIsMobile()
   const folderCount = selectedItems.filter((item) => item.isFolder).length
   const fileCount = selectedItems.length - folderCount
@@ -123,11 +110,11 @@ function OperationsDialog({
   // Bulk operation completion handlers with actual API calls
   const handleMoveComplete = async (targetFolderId: string) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/move', {
+      const response = await fetch('/api/drive/files/move', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
           targetFolderId,
         }),
       })
@@ -144,11 +131,11 @@ function OperationsDialog({
 
   const handleCopyComplete = async (targetFolderId: string) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/copy', {
+      const response = await fetch('/api/drive/files/copy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.filter((item) => !item.isFolder).map((item) => item.id),
+          items: selectedItems.filter((item) => !item.isFolder),
           targetFolderId,
         }),
       })
@@ -165,11 +152,11 @@ function OperationsDialog({
 
   const handleDeleteComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/bulk/trash', {
+      const response = await fetch('/api/drive/files/trash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
         }),
       })
 
@@ -185,11 +172,11 @@ function OperationsDialog({
 
   const handleShareComplete = async (shareOptions: any) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/share', {
+      const response = await fetch('/api/drive/files/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
           ...shareOptions,
         }),
       })
@@ -211,11 +198,11 @@ function OperationsDialog({
 
   const handleRenameComplete = async (namePrefix: string, newName?: string) => {
     try {
-      const response = await fetch('/api/drive/files/bulk/rename', {
+      const response = await fetch('/api/drive/files/rename', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
           namePrefix,
           newName,
         }),
@@ -251,11 +238,11 @@ function OperationsDialog({
 
   const handlePermanentDeleteComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/bulk/delete', {
-        method: 'DELETE',
+      const response = await fetch('/api/drive/files/delete', {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
         }),
       })
 
@@ -271,11 +258,11 @@ function OperationsDialog({
 
   const handleRestoreComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/bulk/untrash', {
+      const response = await fetch('/api/drive/files/untrash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fileIds: selectedItems.map((item) => item.id),
+          items: selectedItems,
         }),
       })
 
@@ -308,10 +295,13 @@ function OperationsDialog({
             })
           }
 
-          const fileResponse = await fetch(`/api/drive/files/${item.id}/download`, {
+          const fileResponse = await fetch('/api/drive/files/download', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ downloadMode: 'oneByOne' }),
+            body: JSON.stringify({
+              fileId: item.id,
+              downloadMode: 'oneByOne',
+            }),
           })
 
           if (fileResponse.ok) {
@@ -552,9 +542,7 @@ function OperationsDialog({
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="font-medium">Move to Trash</span>
-                    <span className="text-muted-foreground text-xs">
-                      Move {canTrashCount} items to trash (can be restored)
-                    </span>
+                    <span className="text-muted-foreground text-xs">Move {canTrashCount} items to trash (can be restored)</span>
                   </div>
                 </Button>
               )}
@@ -571,9 +559,7 @@ function OperationsDialog({
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="font-medium">Permanent Delete</span>
-                    <span className="text-muted-foreground text-xs">
-                      Delete permanently {canDeleteCount} items (cannot be undone)
-                    </span>
+                    <span className="text-muted-foreground text-xs">Delete permanently {canDeleteCount} items (cannot be undone)</span>
                   </div>
                 </Button>
               )}
@@ -590,9 +576,7 @@ function OperationsDialog({
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="font-medium">Restore from Trash</span>
-                    <span className="text-muted-foreground text-xs">
-                      Restore {canUntrashCount} items to original location
-                    </span>
+                    <span className="text-muted-foreground text-xs">Restore {canUntrashCount} items to original location</span>
                   </div>
                 </Button>
               )}
@@ -638,12 +622,7 @@ function OperationsDialog({
       )}
 
       {/* Individual Items Operation Dialogs - Direct rendering tanpa Suspense */}
-      <ItemsMoveDialog
-        open={isMoveDialogOpen}
-        onOpenChange={setIsMoveDialogOpen}
-        onConfirm={handleMoveComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsMoveDialog open={isMoveDialogOpen} onOpenChange={setIsMoveDialogOpen} onConfirm={handleMoveComplete} selectedItems={selectedItems} />
 
       <ItemsCopyDialog
         isOpen={isCopyDialogOpen}

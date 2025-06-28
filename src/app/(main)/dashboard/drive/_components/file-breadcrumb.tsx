@@ -3,14 +3,7 @@
 import { useState, useEffect, Fragment } from 'react'
 import { Home, Folder, ChevronRight, Loader2 } from 'lucide-react'
 
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
 
 interface BreadcrumbItemData {
@@ -35,7 +28,11 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/drive/files/${folderId}`)
+      const response = await fetch('/api/drive/files/essential', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ fileId: folderId }),
+      })
       if (!response.ok) {
         throw new Error(`Failed to fetch folder: ${response.status}`)
       }
@@ -50,7 +47,11 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
       while (currentParent && currentParent !== 'root' && depth < maxDepth) {
         try {
-          const parentResponse = await fetch(`/api/drive/files/${currentParent}`)
+          const parentResponse = await fetch('/api/drive/files/essential', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileId: currentParent }),
+          })
           if (!parentResponse.ok) break
 
           const parentFolder = await parentResponse.json()
@@ -152,12 +153,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       {error && (
         <div className="text-destructive ml-2 flex items-center gap-1">
           <span className="text-xs">{error}</span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => currentFolderId && fetchFolderPath(currentFolderId)}
-            className="h-6 px-2 text-xs"
-          >
+          <Button variant="ghost" size="sm" onClick={() => currentFolderId && fetchFolderPath(currentFolderId)} className="h-6 px-2 text-xs">
             Retry
           </Button>
         </div>

@@ -10,13 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { cn } from '@/lib/utils'
 // Simple error handling without complex recovery
 
@@ -38,11 +32,7 @@ const EXPORT_FORMATS = [
     label: 'PDF Document',
     icon: FileText,
     description: 'For Docs, Sheets, and Slides',
-    supportedTypes: [
-      'application/vnd.google-apps.document',
-      'application/vnd.google-apps.spreadsheet',
-      'application/vnd.google-apps.presentation',
-    ],
+    supportedTypes: ['application/vnd.google-apps.document', 'application/vnd.google-apps.spreadsheet', 'application/vnd.google-apps.presentation'],
   },
   {
     id: 'docx',
@@ -124,12 +114,8 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
   // Get compatible files for selected format
   const selectedFormatData = EXPORT_FORMATS.find((f) => f.id === selectedFormat)
-  const compatibleFiles = exportableFiles.filter((file) =>
-    selectedFormatData?.supportedTypes.includes(file.mimeType || '')
-  )
-  const incompatibleFiles = exportableFiles.filter(
-    (file) => !selectedFormatData?.supportedTypes.includes(file.mimeType || '')
-  )
+  const compatibleFiles = exportableFiles.filter((file) => selectedFormatData?.supportedTypes.includes(file.mimeType || ''))
+  const incompatibleFiles = exportableFiles.filter((file) => !selectedFormatData?.supportedTypes.includes(file.mimeType || ''))
 
   const handleExport = async () => {
     if (compatibleFiles.length === 0) return
@@ -158,7 +144,14 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
         })
 
         // Attempt to export the file
-        const response = await fetch(`/api/drive/files/${file.id}/export?format=${format}`, { method: 'GET' })
+        const response = await fetch('/api/drive/files/export', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileId: file.id,
+            exportFormat: format,
+          }),
+        })
 
         if (!response.ok) {
           const error = new Error(`Export failed: ${response.statusText}`)
@@ -234,8 +227,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
         <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20">
           <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
           <div className="text-sm text-amber-800 dark:text-amber-200">
-            Only Google Workspace files (Docs, Sheets, Slides, Drawings) can be exported. Other files and folders will
-            be skipped.
+            Only Google Workspace files (Docs, Sheets, Slides, Drawings) can be exported. Other files and folders will be skipped.
           </div>
         </div>
       )}

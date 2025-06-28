@@ -4,9 +4,8 @@ import { initDriveService, handleApiError, validateOperationsRequest } from '@/l
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ fileId: string }> }) {
+export async function POST(request: NextRequest) {
   try {
-    const { fileId } = await params
     const body = await request.json()
 
     // Initialize Drive service with authentication
@@ -17,9 +16,9 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 
     const { driveService } = authResult
 
-    // Detect operation type: bulk (fileId='bulk' or items array) vs single
-    const { items, downloadMode = 'oneByOne' } = body
-    const isBulkOperation = fileId === 'bulk' || (items && items.length > 1)
+    // Get fileId from body and determine operation type
+    const { fileId, items, downloadMode = 'oneByOne' } = body
+    const isBulkOperation = items && items.length > 1
 
     if (isBulkOperation) {
       // Bulk operations handling
@@ -31,6 +30,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Single file download handling
+    if (!fileId) {
+      return NextResponse.json({ error: 'fileId is required for single file download' }, { status: 400 })
+    }
+
     return await processSingleDownload(driveService, fileId, downloadMode)
   } catch (error) {
     return handleApiError(error)
@@ -285,8 +288,7 @@ function getExportFormat(mimeType: string): string {
   const exportMap: { [key: string]: string } = {
     'application/vnd.google-apps.document': 'application/pdf',
     'application/vnd.google-apps.spreadsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.google-apps.presentation':
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.google-apps.presentation': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     'application/vnd.google-apps.drawing': 'image/png',
   }
 
@@ -351,9 +353,7 @@ function isSkippableError(error: any): boolean {
 
   return (
     (errorCode === 403 &&
-      (errorMessage.includes('rateLimitExceeded') ||
-        errorMessage.includes('quotaExceeded') ||
-        errorMessage.includes('storageQuotaExceeded'))) ||
+      (errorMessage.includes('rateLimitExceeded') || errorMessage.includes('quotaExceeded') || errorMessage.includes('storageQuotaExceeded'))) ||
     errorCode === 429
   )
 }

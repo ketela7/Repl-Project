@@ -3,21 +3,8 @@
 import { useState } from 'react'
 import { Move } from 'lucide-react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
@@ -96,9 +83,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
               </div>
             ))}
             {selectedItems.length > 5 && (
-              <div className="text-muted-foreground py-2 text-center text-sm">
-                ... and {selectedItems.length - 5} more items
-              </div>
+              <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>
             )}
           </div>
         </div>
@@ -109,9 +94,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
         <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-blue-800 dark:text-blue-200">
-          Click "Choose Destination" to select where you want to move these items.
-        </div>
+        <div className="text-sm text-blue-800 dark:text-blue-200">Click "Choose Destination" to select where you want to move these items.</div>
       </div>
     </div>
   )
@@ -136,18 +119,11 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
             <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
             <BottomSheetFooter className={cn('grid gap-4')}>
-              <Button
-                onClick={() => setIsMoveDialogOpen(true)}
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
+              <Button onClick={() => setIsMoveDialogOpen(true)} className={cn('touch-target min-h-[44px] active:scale-95')}>
                 <Move className="mr-2 h-4 w-4" />
                 Choose Destination
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
+              <Button variant="outline" onClick={() => onOpenChange(false)} className={cn('touch-target min-h-[44px] active:scale-95')}>
                 Cancel
               </Button>
             </BottomSheetFooter>
@@ -186,10 +162,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
                   </Badge>
                 )}
                 {folderCount > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-                  >
+                  <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
                     {folderCount} folder{folderCount > 1 ? 's' : ''}
                   </Badge>
                 )}

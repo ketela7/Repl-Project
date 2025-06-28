@@ -13,13 +13,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
@@ -95,9 +89,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             </div>
           ))}
           {selectedItems.length > 5 && (
-            <div className="text-center text-xs text-red-700 italic dark:text-red-300">
-              and {selectedItems.length - 5} more items...
-            </div>
+            <div className="text-center text-xs text-red-700 italic dark:text-red-300">and {selectedItems.length - 5} more items...</div>
           )}
         </div>
       </div>
@@ -125,9 +117,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             className="mt-1"
           />
           <Label htmlFor="acknowledge-warning" className="cursor-pointer text-sm leading-relaxed">
-            I understand that this action will{' '}
-            <span className="font-semibold text-red-600 dark:text-red-400">permanently delete</span> all selected items
-            and <span className="font-semibold">cannot be reversed</span>.
+            I understand that this action will <span className="font-semibold text-red-600 dark:text-red-400">permanently delete</span> all selected
+            items and <span className="font-semibold">cannot be reversed</span>.
           </Label>
         </div>
       </div>
@@ -138,8 +129,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           <div className="h-1.5 w-1.5 rounded-full bg-white" />
         </div>
         <div className="text-sm text-red-800 dark:text-red-200">
-          <span className="font-semibold">Final warning:</span> This action will permanently delete all selected items
-          and cannot be reversed.
+          <span className="font-semibold">Final warning:</span> This action will permanently delete all selected items and cannot be reversed.
         </div>
       </div>
     </div>

@@ -11,13 +11,7 @@ import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Progress } from '@/components/ui/progress'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { cn } from '@/lib/utils'
 
 interface ItemsDownloadDialogProps {
@@ -221,8 +215,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
                 <div className="space-y-1">
                   <div className="font-medium text-orange-800 dark:text-orange-200">Folders will be skipped</div>
                   <div className="text-sm text-orange-700 dark:text-orange-300">
-                    {skippedFolders.length} folder{skippedFolders.length > 1 ? 's' : ''} cannot be downloaded and will
-                    be automatically skipped
+                    {skippedFolders.length} folder{skippedFolders.length > 1 ? 's' : ''} cannot be downloaded and will be automatically skipped
                   </div>
                 </div>
               </div>
@@ -240,9 +233,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
                   </span>
                 </div>
                 <Progress value={(progress.current / progress.total) * 100} className="h-2" />
-                {progress.currentFile && (
-                  <div className="text-muted-foreground text-xs">Processing: {progress.currentFile}</div>
-                )}
+                {progress.currentFile && <div className="text-muted-foreground text-xs">Processing: {progress.currentFile}</div>}
               </div>
 
               {/* Progress Summary */}

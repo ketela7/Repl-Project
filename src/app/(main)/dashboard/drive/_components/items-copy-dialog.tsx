@@ -3,26 +3,12 @@
 import { useState } from 'react'
 import { Copy, AlertTriangle } from 'lucide-react'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { cn } from '@/lib/utils'
-
 
 interface ItemsCopyDialogProps {
   isOpen: boolean
@@ -104,11 +90,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
                   </Badge>
                 </div>
               ))}
-              {files.length > 5 && (
-                <div className="text-muted-foreground py-2 text-center text-sm">
-                  ... and {files.length - 5} more files
-                </div>
-              )}
+              {files.length > 5 && <div className="text-muted-foreground py-2 text-center text-sm">... and {files.length - 5} more files</div>}
             </div>
           </div>
         </div>
@@ -119,9 +101,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-green-800 dark:text-green-200">
-          Click "Choose Destination" to select where you want to copy these files.
-        </div>
+        <div className="text-sm text-green-800 dark:text-green-200">Click "Choose Destination" to select where you want to copy these files.</div>
       </div>
     </div>
   )
@@ -147,10 +127,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
             <BottomSheetFooter className={cn('grid gap-4')}>
               {files.length > 0 && (
-                <Button
-                  onClick={() => setIsCopyDialogOpen(true)}
-                  className={cn('touch-target min-h-[44px] active:scale-95')}
-                >
+                <Button onClick={() => setIsCopyDialogOpen(true)} className={cn('touch-target min-h-[44px] active:scale-95')}>
                   <Copy className="mr-2 h-4 w-4" />
                   Choose Destination
                 </Button>
@@ -189,10 +166,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
               <div className="flex flex-wrap gap-2">
                 {files.length > 0 && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100"
-                  >
+                  <Badge variant="secondary" className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100">
                     {files.length} file{files.length > 1 ? 's' : ''}
                   </Badge>
                 )}

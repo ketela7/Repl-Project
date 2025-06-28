@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService } from '@/lib/api-utils'
+import { initDriveService, handleApiError } from '@/lib/api-utils'
 
-export async function POST(request: NextRequest, { params }: { params: { fileId: string } }) {
+export async function POST(request: NextRequest) {
   try {
     const authResult = await initDriveService()
     if (!authResult.success) {
@@ -10,13 +10,12 @@ export async function POST(request: NextRequest, { params }: { params: { fileId:
     }
 
     const { driveService } = authResult
-    const fileId = (await params).fileId
     const body = await request.json()
 
-    // Global operations approach: Handle both single and bulk with items.length logic
-    const { items } = body
+    // Handle both single and bulk operations
+    const { fileId, items } = body
 
-    // Determine operation type based on items array
+    // Determine operation type based on items array or single fileId
     const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
     const isBulkOperation = items && items.length > 1
 
@@ -29,13 +28,13 @@ export async function POST(request: NextRequest, { params }: { params: { fileId:
 
     for (const id of fileIds) {
       try {
-        const result = await driveService.moveToTrash(id)
+        const result = await driveService.deleteFile(id)
         results.push({ fileId: id, success: true, result })
       } catch (error: any) {
         errors.push({
           fileId: id,
           success: false,
-          error: error.message || 'Trash failed',
+          error: error.message || 'Delete operation failed',
         })
       }
     }
@@ -45,7 +44,7 @@ export async function POST(request: NextRequest, { params }: { params: { fileId:
       processed: results.length,
       failed: errors.length,
       type: isBulkOperation ? 'bulk' : 'single',
-      operation: 'trash',
+      operation: 'delete',
       results,
       errors: errors.length > 0 ? errors : undefined,
     }
@@ -54,6 +53,6 @@ export async function POST(request: NextRequest, { params }: { params: { fileId:
       status: errors.length === 0 ? 200 : 207,
     })
   } catch (error: any) {
-    return NextResponse.json({ error: 'Failed to trash files' }, { status: 500 })
+    return handleApiError(error)
   }
 }

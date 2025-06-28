@@ -30,21 +30,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { SimpleDatePicker } from '@/components/ui/simple-date-picker'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
@@ -255,9 +242,7 @@ export function FiltersDialog({
     const currentArray = Array.isArray(tempFileTypeFilter) ? tempFileTypeFilter : []
 
     // Toggle behavior - add if not present, remove if present
-    let newFilter = currentArray.includes(typeId)
-      ? currentArray.filter((type: string) => type !== typeId)
-      : [...currentArray, typeId]
+    let newFilter = currentArray.includes(typeId) ? currentArray.filter((type: string) => type !== typeId) : [...currentArray, typeId]
 
     // Remove folder from selection if size filters are active (Google Drive API limitation)
     if (hasSizeFilter && newFilter.includes('folder')) {
@@ -278,8 +263,7 @@ export function FiltersDialog({
 
     // Check if size filters are being applied
     const newHasSizeFilter =
-      (newFilters.sizeRange?.min && newFilters.sizeRange.min > 0) ||
-      (newFilters.sizeRange?.max && newFilters.sizeRange.max > 0)
+      (newFilters.sizeRange?.min && newFilters.sizeRange.min > 0) || (newFilters.sizeRange?.max && newFilters.sizeRange.max > 0)
 
     // Remove folder from file type filter if size filters are applied (Google Drive API limitation)
     let updatedFileTypeFilter = tempFileTypeFilter
@@ -319,11 +303,7 @@ export function FiltersDialog({
       <div className="space-y-6 pt-2">
         {/* View Status Section */}
         <div className="space-y-3">
-          <Button
-            variant="ghost"
-            onClick={() => setShowViewStatus(!showViewStatus)}
-            className="h-auto w-full justify-between p-0"
-          >
+          <Button variant="ghost" onClick={() => setShowViewStatus(!showViewStatus)} className="h-auto w-full justify-between p-0">
             <h3 className="text-sm font-semibold">View Status</h3>
             {showViewStatus ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
@@ -359,11 +339,7 @@ export function FiltersDialog({
 
         {/* File Types Section */}
         <div className="space-y-3">
-          <Button
-            variant="ghost"
-            onClick={() => setShowFileTypes(!showFileTypes)}
-            className="h-auto w-full justify-between p-0"
-          >
+          <Button variant="ghost" onClick={() => setShowFileTypes(!showFileTypes)} className="h-auto w-full justify-between p-0">
             <h3 className="text-sm font-semibold">File Types</h3>
             {showFileTypes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
@@ -379,8 +355,8 @@ export function FiltersDialog({
                     <div className="flex-1">
                       <p className="font-medium">Size filtering: Hanya akan menghasilkan file bukan folder</p>
                       <p className="mt-1 text-xs opacity-80">
-                        Google Drive API limitation: Filter ukuran hanya bekerja untuk file, bukan folder. Pemilihan
-                        folder dinonaktifkan ketika filter ukuran aktif.
+                        Google Drive API limitation: Filter ukuran hanya bekerja untuk file, bukan folder. Pemilihan folder dinonaktifkan ketika
+                        filter ukuran aktif.
                       </p>
                     </div>
                   </div>
@@ -425,11 +401,7 @@ export function FiltersDialog({
 
         {/* Advanced Filters Section */}
         <div className="space-y-3">
-          <Button
-            variant="ghost"
-            onClick={() => setShowAdvanced(!showAdvanced)}
-            className="h-auto w-full justify-between p-0"
-          >
+          <Button variant="ghost" onClick={() => setShowAdvanced(!showAdvanced)} className="h-auto w-full justify-between p-0">
             <h3 className="text-sm font-semibold">Advanced Filters</h3>
             {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>

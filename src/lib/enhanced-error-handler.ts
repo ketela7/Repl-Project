@@ -134,9 +134,7 @@ class ErrorHandler {
           message: 'Server error',
           status: status || 500,
           retryable,
-          userMessage: retryable
-            ? 'Server temporarily unavailable. Retrying...'
-            : 'Server error. Please try again later.',
+          userMessage: retryable ? 'Server temporarily unavailable. Retrying...' : 'Server error. Please try again later.',
           action: retryable ? 'retry' : 'refresh',
         }
 

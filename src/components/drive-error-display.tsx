@@ -16,25 +16,13 @@ interface DriveErrorDisplayProps {
   className?: string
 }
 
-export function DriveErrorDisplay({
-  error,
-  onRetry,
-  onReconnect,
-  compact = false,
-  className = '',
-}: DriveErrorDisplayProps) {
+export function DriveErrorDisplay({ error, onRetry, onReconnect, compact = false, className = '' }: DriveErrorDisplayProps) {
   const getErrorDetails = (error: any) => {
     const message = error?.message || error?.toString() || 'Unknown error'
     const code = error?.code || error?.status
 
     // Network errors
-    if (
-      message.includes('network') ||
-      message.includes('fetch') ||
-      message.includes('connection') ||
-      message.includes('timeout') ||
-      code === 0
-    ) {
+    if (message.includes('network') || message.includes('fetch') || message.includes('connection') || message.includes('timeout') || code === 0) {
       return {
         type: 'network',
         icon: <Wifi className="h-4 w-4" />,
@@ -47,12 +35,7 @@ export function DriveErrorDisplay({
     }
 
     // Authentication errors
-    if (
-      message.includes('unauthorized') ||
-      message.includes('invalid') ||
-      message.includes('authentication') ||
-      code === 401
-    ) {
+    if (message.includes('unauthorized') || message.includes('invalid') || message.includes('authentication') || code === 401) {
       return {
         type: 'auth',
         icon: <Lock className="h-4 w-4" />,

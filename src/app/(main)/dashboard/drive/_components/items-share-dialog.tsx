@@ -6,21 +6,8 @@ import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import {
-  BottomSheet,
-  BottomSheetContent,
-  BottomSheetHeader,
-  BottomSheetTitle,
-  BottomSheetFooter,
-} from '@/components/ui/bottom-sheet'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
@@ -100,9 +87,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
 
   const exportToCsv = () => {
     const headers = 'Name,Share Link,Status\n'
-    const content = shareResults
-      .map((r) => `"${r.name}","${r.shareLink || ''}","${r.success ? 'Success' : 'Failed'}"`)
-      .join('\n')
+    const content = shareResults.map((r) => `"${r.name}","${r.shareLink || ''}","${r.success ? 'Success' : 'Failed'}"`).join('\n')
 
     const blob = new Blob([headers + content], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
@@ -175,9 +160,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
             </div>
           ))}
           {selectedItems.length > 5 && (
-            <div className="text-muted-foreground text-center text-xs italic">
-              and {selectedItems.length - 5} more items...
-            </div>
+            <div className="text-muted-foreground text-center text-xs italic">and {selectedItems.length - 5} more items...</div>
           )}
         </div>
       </div>
@@ -186,10 +169,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
       <div className="space-y-4">
         <div className="space-y-3">
           <Label className="text-sm font-medium">Access level</Label>
-          <Select
-            value={accessLevel}
-            onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}
-          >
+          <Select value={accessLevel} onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -227,10 +207,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
 
         <div className="space-y-3">
           <Label className="text-sm font-medium">Who has access</Label>
-          <Select
-            value={linkAccess}
-            onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') => setLinkAccess(value)}
-          >
+          <Select value={linkAccess} onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') => setLinkAccess(value)}>
             <SelectTrigger>
               <SelectValue />
             </SelectTrigger>
@@ -299,11 +276,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
 
           <BottomSheetFooter className="bg-background flex-shrink-0 border-t p-4">
             <div className="grid w-full gap-4">
-              <Button
-                onClick={handleBulkShare}
-                disabled={isLoading || selectedItems.length === 0}
-                className="min-h-[48px] text-base font-medium"
-              >
+              <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="min-h-[48px] text-base font-medium">
                 {isLoading ? (
                   <>
                     <Share2 className="mr-2 h-4 w-4 animate-pulse" />
@@ -316,12 +289,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
                   </>
                 )}
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-                disabled={isLoading}
-                className="min-h-[48px] text-base font-medium"
-              >
+              <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="min-h-[48px] text-base font-medium">
                 Cancel
               </Button>
             </div>
@@ -348,11 +316,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
         </DialogHeader>
 
         <DialogFooter className="flex-col gap-2 sm:flex-row">
-          <Button
-            onClick={handleBulkShare}
-            disabled={isLoading || selectedItems.length === 0}
-            className="w-full sm:w-auto"
-          >
+          <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="w-full sm:w-auto">
             {isLoading ? (
               <>
                 <Share2 className="mr-2 h-4 w-4 animate-pulse" />
@@ -365,12 +329,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
               </>
             )}
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isLoading}
-            className="w-full sm:w-auto"
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="w-full sm:w-auto">
             Cancel
           </Button>
         </DialogFooter>
