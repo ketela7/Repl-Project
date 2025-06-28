@@ -23,7 +23,6 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run lint"
 
-
 [[workflows.workflow]]
 name = "Check Duplicate"
 mode = "sequential"
@@ -31,9 +30,6 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx jscpd src"
-
-
-
 
 [[workflows.workflow]]
 name = "Build"
@@ -84,7 +80,6 @@ author = "agent"
 task = "workflow.run"
 args = "Server"
 
-
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -114,3 +109,51 @@ args = "npm run format:fix"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run lint:fix"
+
+[[workflows.workflow]]
+name = "Test"
+author = 44348013
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm test"
+
+[[workflows.workflow]]
+name = "Test Watch"
+author = 44348013
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run test:watch"
+
+[[workflows.workflow]]
+name = "Test Coverage"
+author = 44348013
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run test:coverage"
+
+[[workflows.workflow]]
+name = "Full Test Suite"
+author = 44348013
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run typecheck --noWatch"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run test:coverage"
