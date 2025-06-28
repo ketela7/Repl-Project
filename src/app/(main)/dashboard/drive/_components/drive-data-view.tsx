@@ -197,23 +197,6 @@ export function DriveDataView({
                     onItemAction('preview', item)
                   }
                 }}
-                {/* onTouchStart={(e) => {
-                  const touch = e.touches[0]
-                  const startTime = Date.now()
-                  const timer = setTimeout(() => {
-                    if (!isSelectMode) {
-                      onSelectModeChange(true)
-                    }
-                    onSelectItem(item.id)
-                  }, 500) // 500ms for long press
-
-                  const handleTouchEnd = () => {
-                    clearTimeout(timer)
-                    document.removeEventListener('touchend', handleTouchEnd)
-                  }
-
-                  document.addEventListener('touchend', handleTouchEnd)
-                }} */}
               >
                 {isSelectMode && (
                   <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
