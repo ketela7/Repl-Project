@@ -73,9 +73,9 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
   }
 
   const renderContent = () => (
-    <div className="flex flex-col space-y-4 max-h-[60vh]">
+    <div className="flex max-h-[60vh] flex-col space-y-4">
       {/* Header Info - Compact */}
-      <div className="space-y-2 text-center flex-shrink-0">
+      <div className="flex-shrink-0 space-y-2 text-center">
         <div className="flex justify-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
             <Copy className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -90,14 +90,14 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
       </div>
 
       {/* Stats - Compact */}
-      <div className="flex justify-center gap-1 flex-shrink-0">
+      <div className="flex flex-shrink-0 justify-center gap-1">
         {files.length > 0 && (
-          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 text-xs">
+          <Badge variant="secondary" className="bg-green-100 text-xs text-green-800 dark:bg-green-900 dark:text-green-100">
             {files.length} file{files.length > 1 ? 's' : ''}
           </Badge>
         )}
         {folders.length > 0 && (
-          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 text-xs">
+          <Badge variant="secondary" className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100">
             {folders.length} folder{folders.length > 1 ? 's' : ''}
           </Badge>
         )}
@@ -105,48 +105,36 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
       {/* Folder Warning - Compact */}
       {folders.length > 0 && (
-        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20 flex-shrink-0">
+        <div className="flex flex-shrink-0 items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20">
           <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
-          <div className="text-xs text-amber-800 dark:text-amber-200">
-            Folders cannot be copied via API
-          </div>
+          <div className="text-xs text-amber-800 dark:text-amber-200">Folders cannot be copied via API</div>
         </div>
       )}
 
       {/* Files Preview - Scrollable */}
       {files.length > 0 && (
-        <div className="space-y-2 flex-1 min-h-0">
-          <h4 className="text-xs font-medium text-center">Files to copy:</h4>
+        <div className="min-h-0 flex-1 space-y-2">
+          <h4 className="text-center text-xs font-medium">Files to copy:</h4>
           <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
-            <div className="p-2 space-y-1">
-              {files.slice(0, 20).map((item) => (
-                <div key={item.id} className="bg-background/50 flex items-center gap-2 rounded-md p-2 min-w-0">
-                  <div className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
-                  <span className="flex-1 truncate text-xs font-mono" title={item.name}>
+            <div className="space-y-1 p-2">
+              {files.slice(0, 5).map((item) => (
+                <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                  <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
+                  <span className="flex-1 truncate font-mono text-xs" title={item.name}>
                     {item.name}
                   </span>
-                  <Badge variant="outline" className="text-[10px] px-1 py-0 flex-shrink-0">
+                  <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
                     file
                   </Badge>
                 </div>
               ))}
-              {files.length > 20 && (
-                <div className="text-muted-foreground py-1 text-center text-xs">
-                  ... and {files.length - 20} more files
-                </div>
-              )}
+              {files.length > 5 && <div className="text-muted-foreground py-1 text-center text-xs">... and {files.length - 5} more files</div>}
             </div>
           </div>
         </div>
       )}
 
-      {/* Info - Compact */}
-      <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20 flex-shrink-0">
-        <div className="mt-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-green-500 flex-shrink-0">
-          <div className="h-1.5 w-1.5 rounded-full bg-white" />
-        </div>
-        <div className="text-xs text-green-800 dark:text-green-200">Select destination folder</div>
-      </div>
+
     </div>
   )
 

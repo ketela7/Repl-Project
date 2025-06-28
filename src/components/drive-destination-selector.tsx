@@ -188,11 +188,11 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
 
         <TabsContent value="browse" className="space-y-4">
           {/* Breadcrumb Navigation */}
-          <div className="text-muted-foreground flex items-center gap-1 text-sm">
+          <div className="text-muted-foreground flex items-center gap-1 text-xs">
             {currentPath.map((folder, index) => (
               <div key={folder.id} className="flex items-center gap-1">
                 {index > 0 && <span>/</span>}
-                <button onClick={() => navigateBack(index)} className="hover:text-foreground transition-colors">
+                <button onClick={() => navigateBack(index)} className="hover:text-foreground transition-colors truncate max-w-24" title={folder.name}>
                   {folder.name}
                 </button>
               </div>
@@ -201,46 +201,46 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
 
           {/* Search */}
           <div className="relative">
-            <Search className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />
-            <Input placeholder="Search folders..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-9" />
+            <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-3 w-3" />
+            <Input placeholder="Search folders..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-7 h-8 text-xs" />
           </div>
 
           {/* Folder List */}
           <ScrollArea className="h-64 rounded-md border">
-            <div className="space-y-2 p-4">
+            <div className="space-y-1 p-2">
               {isLoadingFolders ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+                  <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
                 </div>
               ) : filteredFolders.length === 0 ? (
-                <div className="text-muted-foreground py-8 text-center">{searchQuery ? 'No folders found matching your search' : 'No folders found'}</div>
+                <div className="text-muted-foreground py-8 text-center text-xs">{searchQuery ? 'No folders found matching your search' : 'No folders found'}</div>
               ) : (
-                filteredFolders.map((folder) => (
+                filteredFolders.slice(0, 20).map((folder) => (
                   <div
                     key={folder.id}
                     className={cn(
-                      'flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors',
+                      'flex cursor-pointer items-center gap-2 rounded-md border p-2 transition-colors min-w-0',
                       selectedFolderId === folder.id ? 'bg-primary/10 border-primary' : 'hover:bg-muted/50'
                     )}
                   >
-                    <Folder className="h-5 w-5 flex-shrink-0 text-blue-500" />
+                    <Folder className="h-4 w-4 flex-shrink-0 text-blue-500" />
                     <div className="min-w-0 flex-1">
-                      <div className="truncate font-medium">{folder.name}</div>
-                      {folder.path && <div className="text-muted-foreground truncate text-xs">{folder.path}</div>}
+                      <div className="truncate text-xs font-mono" title={folder.name}>{folder.name}</div>
+                      {folder.path && <div className="text-muted-foreground truncate text-[10px]">{folder.path}</div>}
                     </div>
                     {folder.isShared && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-[10px] px-1 py-0 flex-shrink-0">
                         Shared
                       </Badge>
                     )}
-                    <div className="flex gap-1">
-                      <Button size="sm" variant="ghost" onClick={() => navigateToFolder(folder)}>
+                    <div className="flex gap-1 flex-shrink-0">
+                      <Button size="sm" variant="ghost" onClick={() => navigateToFolder(folder)} className="h-6 px-2 text-[10px]">
                         Open
                       </Button>
-                      <Button size="sm" onClick={() => handleFolderSelect(folder)} className={cn(selectedFolderId === folder.id ? 'bg-primary text-primary-foreground' : '')}>
+                      <Button size="sm" onClick={() => handleFolderSelect(folder)} className={cn('h-6 px-2 text-[10px]', selectedFolderId === folder.id ? 'bg-primary text-primary-foreground' : '')}>
                         {selectedFolderId === folder.id ? (
                           <>
-                            <Check className="mr-1 h-4 w-4" />
+                            <Check className="mr-1 h-3 w-3" />
                             Selected
                           </>
                         ) : (
@@ -250,6 +250,11 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
                     </div>
                   </div>
                 ))
+              )}
+              {filteredFolders.length > 20 && (
+                <div className="text-muted-foreground py-1 text-center text-xs">
+                  ... and {filteredFolders.length - 20} more folders
+                </div>
               )}
             </div>
           </ScrollArea>

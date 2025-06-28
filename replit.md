@@ -116,6 +116,8 @@ Google Drive Pro is a professional-grade Google Drive management application bui
 ```
 Changelog:
 - June 28, 2025. Initial setup
+- June 28, 2025. Fixed operation dialog UI layout issues with many files - improved Copy/Move/Trash/Untrash dialogs with compact design, scrollable previews, and better text truncation
+- June 28, 2025. Enhanced DriveDestinationSelector with mobile-friendly compact layout
 ```
 
 ## User Preferences
