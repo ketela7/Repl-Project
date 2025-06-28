@@ -8,10 +8,10 @@
     "start": "next start",
     "redundant": "npx jscpd src",
     "typecheck": "tsc --noEmit --watch --preserveWatchOutput",
-    "lint": "eslint src --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
-    "format": "prettier --check src",
-    "format:fix": "prettier --write src"
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
   },
   "dependencies": {
     "@auth/core": "^0.40.0",
