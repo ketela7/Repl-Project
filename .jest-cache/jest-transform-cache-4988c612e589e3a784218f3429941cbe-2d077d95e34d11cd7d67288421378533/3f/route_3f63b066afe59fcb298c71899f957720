@@ -1,0 +1,54 @@
+16c77d1c3cd05b37e256992de75e4de8
+"use strict";
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+Object.defineProperty(exports, "POST", {
+    enumerable: true,
+    get: function() {
+        return POST;
+    }
+});
+const _server = require("next/server");
+const _apiutils = require("../../../../../lib/api-utils");
+async function POST(request) {
+    try {
+        const authResult = await (0, _apiutils.initDriveService)();
+        if (!authResult.success) {
+            return authResult.response;
+        }
+        const { driveService } = authResult;
+        const body = await request.json();
+        // Get fileId from body
+        const { fileId } = body;
+        if (!fileId) {
+            return _server.NextResponse.json({
+                error: 'File ID is required'
+            }, {
+                status: 400
+            });
+        }
+        // Get essential file metadata for quick loading
+        const essentialFields = [
+            'id',
+            'name',
+            'mimeType',
+            'size',
+            'createdTime',
+            'modifiedTime',
+            'parents',
+            'trashed',
+            'capabilities'
+        ];
+        const fileMetadata = await driveService.getFileMetadata(fileId, essentialFields);
+        return _server.NextResponse.json({
+            success: true,
+            fileMetadata,
+            operation: 'essential'
+        });
+    } catch (error) {
+        return (0, _apiutils.handleApiError)(error);
+    }
+}
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi9ob21lL3J1bm5lci93b3Jrc3BhY2Uvc3JjL2FwcC9hcGkvZHJpdmUvZmlsZXMvZXNzZW50aWFsL3JvdXRlLnRzIl0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IE5leHRSZXF1ZXN0LCBOZXh0UmVzcG9uc2UgfSBmcm9tICduZXh0L3NlcnZlcidcblxuaW1wb3J0IHsgaW5pdERyaXZlU2VydmljZSwgaGFuZGxlQXBpRXJyb3IgfSBmcm9tICdAL2xpYi9hcGktdXRpbHMnXG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBQT1NUKHJlcXVlc3Q6IE5leHRSZXF1ZXN0KSB7XG4gIHRyeSB7XG4gICAgY29uc3QgYXV0aFJlc3VsdCA9IGF3YWl0IGluaXREcml2ZVNlcnZpY2UoKVxuICAgIGlmICghYXV0aFJlc3VsdC5zdWNjZXNzKSB7XG4gICAgICByZXR1cm4gYXV0aFJlc3VsdC5yZXNwb25zZSFcbiAgICB9XG5cbiAgICBjb25zdCB7IGRyaXZlU2VydmljZSB9ID0gYXV0aFJlc3VsdFxuICAgIGNvbnN0IGJvZHkgPSBhd2FpdCByZXF1ZXN0Lmpzb24oKVxuXG4gICAgLy8gR2V0IGZpbGVJZCBmcm9tIGJvZHlcbiAgICBjb25zdCB7IGZpbGVJZCB9ID0gYm9keVxuXG4gICAgaWYgKCFmaWxlSWQpIHtcbiAgICAgIHJldHVybiBOZXh0UmVzcG9uc2UuanNvbih7IGVycm9yOiAnRmlsZSBJRCBpcyByZXF1aXJlZCcgfSwgeyBzdGF0dXM6IDQwMCB9KVxuICAgIH1cblxuICAgIC8vIEdldCBlc3NlbnRpYWwgZmlsZSBtZXRhZGF0YSBmb3IgcXVpY2sgbG9hZGluZ1xuICAgIGNvbnN0IGVzc2VudGlhbEZpZWxkcyA9IFsnaWQnLCAnbmFtZScsICdtaW1lVHlwZScsICdzaXplJywgJ2NyZWF0ZWRUaW1lJywgJ21vZGlmaWVkVGltZScsICdwYXJlbnRzJywgJ3RyYXNoZWQnLCAnY2FwYWJpbGl0aWVzJ11cblxuICAgIGNvbnN0IGZpbGVNZXRhZGF0YSA9IGF3YWl0IGRyaXZlU2VydmljZS5nZXRGaWxlTWV0YWRhdGEoZmlsZUlkLCBlc3NlbnRpYWxGaWVsZHMpXG5cbiAgICByZXR1cm4gTmV4dFJlc3BvbnNlLmpzb24oe1xuICAgICAgc3VjY2VzczogdHJ1ZSxcbiAgICAgIGZpbGVNZXRhZGF0YSxcbiAgICAgIG9wZXJhdGlvbjogJ2Vzc2VudGlhbCcsXG4gICAgfSlcbiAgfSBjYXRjaCAoZXJyb3I6IGFueSkge1xuICAgIHJldHVybiBoYW5kbGVBcGlFcnJvcihlcnJvcilcbiAgfVxufVxuIl0sIm5hbWVzIjpbIlBPU1QiLCJyZXF1ZXN0IiwiYXV0aFJlc3VsdCIsImluaXREcml2ZVNlcnZpY2UiLCJzdWNjZXNzIiwicmVzcG9uc2UiLCJkcml2ZVNlcnZpY2UiLCJib2R5IiwianNvbiIsImZpbGVJZCIsIk5leHRSZXNwb25zZSIsImVycm9yIiwic3RhdHVzIiwiZXNzZW50aWFsRmllbGRzIiwiZmlsZU1ldGFkYXRhIiwiZ2V0RmlsZU1ldGFkYXRhIiwib3BlcmF0aW9uIiwiaGFuZGxlQXBpRXJyb3IiXSwibWFwcGluZ3MiOiI7Ozs7K0JBSXNCQTs7O2VBQUFBOzs7d0JBSm9COzBCQUVPO0FBRTFDLGVBQWVBLEtBQUtDLE9BQW9CO0lBQzdDLElBQUk7UUFDRixNQUFNQyxhQUFhLE1BQU1DLElBQUFBLDBCQUFnQjtRQUN6QyxJQUFJLENBQUNELFdBQVdFLE9BQU8sRUFBRTtZQUN2QixPQUFPRixXQUFXRyxRQUFRO1FBQzVCO1FBRUEsTUFBTSxFQUFFQyxZQUFZLEVBQUUsR0FBR0o7UUFDekIsTUFBTUssT0FBTyxNQUFNTixRQUFRTyxJQUFJO1FBRS9CLHVCQUF1QjtRQUN2QixNQUFNLEVBQUVDLE1BQU0sRUFBRSxHQUFHRjtRQUVuQixJQUFJLENBQUNFLFFBQVE7WUFDWCxPQUFPQyxvQkFBWSxDQUFDRixJQUFJLENBQUM7Z0JBQUVHLE9BQU87WUFBc0IsR0FBRztnQkFBRUMsUUFBUTtZQUFJO1FBQzNFO1FBRUEsZ0RBQWdEO1FBQ2hELE1BQU1DLGtCQUFrQjtZQUFDO1lBQU07WUFBUTtZQUFZO1lBQVE7WUFBZTtZQUFnQjtZQUFXO1lBQVc7U0FBZTtRQUUvSCxNQUFNQyxlQUFlLE1BQU1SLGFBQWFTLGVBQWUsQ0FBQ04sUUFBUUk7UUFFaEUsT0FBT0gsb0JBQVksQ0FBQ0YsSUFBSSxDQUFDO1lBQ3ZCSixTQUFTO1lBQ1RVO1lBQ0FFLFdBQVc7UUFDYjtJQUNGLEVBQUUsT0FBT0wsT0FBWTtRQUNuQixPQUFPTSxJQUFBQSx3QkFBYyxFQUFDTjtJQUN4QjtBQUNGIn0=

@@ -8,14 +8,14 @@ global.TextDecoder = TextDecoder
 // Mock Request and Response globals for API testing
 global.Request = global.Request || class MockRequest {
   constructor(url, options = {}) {
-    this.url = url
+    Object.defineProperty(this, 'url', { value: url, writable: false })
     this.method = options.method || 'GET'
     this.headers = new Map(Object.entries(options.headers || {}))
     this.body = options.body || null
   }
   
   async json() {
-    return JSON.parse(this.body)
+    return JSON.parse(this.body || '{}')
   }
 }
 
@@ -27,7 +27,7 @@ global.Response = global.Response || class MockResponse {
   }
   
   async json() {
-    return JSON.parse(this.body)
+    return JSON.parse(this.body || '{}')
   }
 }
 

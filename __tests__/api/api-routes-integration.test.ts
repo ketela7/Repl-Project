@@ -54,7 +54,7 @@ describe('API Routes - Static Endpoint Structure', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    
+
     // Reset default mock implementations
     mockDriveService.getFileDetails.mockResolvedValue({
       id: 'test-file-id',
@@ -90,10 +90,10 @@ describe('API Routes - Static Endpoint Structure', () => {
         'rename',
         'share',
         'trash',
-        'untrash'
+        'untrash',
       ]
 
-      expectedEndpoints.forEach(endpoint => {
+      expectedEndpoints.forEach((endpoint) => {
         expect(() => {
           require(`@/app/api/drive/files/${endpoint}/route`)
         }).not.toThrow()
@@ -101,12 +101,9 @@ describe('API Routes - Static Endpoint Structure', () => {
     })
 
     it('should export POST method for all endpoints', () => {
-      const endpoints = [
-        'copy', 'delete', 'details', 'download', 'essential',
-        'export', 'extended', 'move', 'rename', 'share', 'trash', 'untrash'
-      ]
+      const endpoints = ['copy', 'delete', 'details', 'download', 'essential', 'export', 'extended', 'move', 'rename', 'share', 'trash', 'untrash']
 
-      endpoints.forEach(endpoint => {
+      endpoints.forEach((endpoint) => {
         const route = require(`@/app/api/drive/files/${endpoint}/route`)
         expect(typeof route.POST).toBe('function')
       })
@@ -116,7 +113,7 @@ describe('API Routes - Static Endpoint Structure', () => {
   describe('Request Body Validation', () => {
     it('should validate single file operation request structure', () => {
       const singleFileRequest = {
-        fileId: 'test-file-id'
+        fileId: 'test-file-id',
       }
 
       expect(singleFileRequest.fileId).toBeDefined()
@@ -127,8 +124,8 @@ describe('API Routes - Static Endpoint Structure', () => {
       const bulkRequest = {
         items: [
           { id: 'file1', name: 'file1.txt', isFolder: false },
-          { id: 'file2', name: 'file2.txt', isFolder: false }
-        ]
+          { id: 'file2', name: 'file2.txt', isFolder: false },
+        ],
       }
 
       expect(Array.isArray(bulkRequest.items)).toBe(true)
@@ -141,19 +138,17 @@ describe('API Routes - Static Endpoint Structure', () => {
     it('should validate operation-specific parameters', () => {
       const moveRequest = {
         fileId: 'test-file-id',
-        targetFolderId: 'target-folder-id'
+        targetFolderId: 'target-folder-id',
       }
 
       const renameRequest = {
         fileId: 'test-file-id',
-        newName: 'new-name.txt'
+        newName: 'new-name.txt',
       }
 
       const shareRequest = {
         fileId: 'test-file-id',
-        permissions: [
-          { type: 'user', role: 'reader', emailAddress: 'test@example.com' }
-        ]
+        permissions: [{ type: 'user', role: 'reader', emailAddress: 'test@example.com' }],
       }
 
       expect(moveRequest.targetFolderId).toBeDefined()
@@ -168,7 +163,7 @@ describe('API Routes - Static Endpoint Structure', () => {
         success: true,
         operation: 'move',
         type: 'single',
-        fileId: 'test-file-id'
+        fileId: 'test-file-id',
       }
 
       expect(expectedSingleResponse.success).toBe(true)
@@ -184,7 +179,7 @@ describe('API Routes - Static Endpoint Structure', () => {
         type: 'bulk',
         processed: 2,
         failed: 0,
-        results: []
+        results: [],
       }
 
       expect(expectedBulkResponse.success).toBe(true)
@@ -199,11 +194,11 @@ describe('API Routes - Static Endpoint Structure', () => {
   describe('Authentication Integration', () => {
     it('should handle authentication success', () => {
       expect(mockInitDriveService).toBeDefined()
-      
+
       // Simulate successful authentication
       mockInitDriveService.mockResolvedValueOnce({
         success: true,
-        driveService: mockDriveService
+        driveService: mockDriveService,
       })
 
       // Authentication should return driveService
@@ -213,7 +208,7 @@ describe('API Routes - Static Endpoint Structure', () => {
     it('should handle authentication failure', () => {
       mockInitDriveService.mockResolvedValueOnce({
         success: false,
-        response: { status: 401 }
+        response: { status: 401 },
       })
 
       // Should return proper error response
@@ -249,7 +244,7 @@ describe('API Routes - Static Endpoint Structure', () => {
   describe('Error Handling', () => {
     it('should handle service errors gracefully', async () => {
       mockDriveService.getFileDetails.mockRejectedValueOnce(new Error('Service error'))
-      
+
       try {
         await mockDriveService.getFileDetails('test-id')
       } catch (error) {
@@ -260,9 +255,9 @@ describe('API Routes - Static Endpoint Structure', () => {
     it('should validate request parameters', () => {
       // Test missing required parameters
       const invalidRequest = {}
-      
-      expect(invalidRequest.fileId).toBeUndefined()
-      expect(invalidRequest.items).toBeUndefined()
+
+      expect((invalidRequest as any).fileId).toBeUndefined()
+      expect((invalidRequest as any).items).toBeUndefined()
     })
   })
 
@@ -281,11 +276,21 @@ describe('API Routes - Static Endpoint Structure', () => {
   describe('Type Safety and Validation', () => {
     it('should validate operation types', () => {
       const validOperations = [
-        'move', 'copy', 'rename', 'delete', 'trash', 'untrash',
-        'share', 'export', 'download', 'details', 'essential', 'extended'
+        'move',
+        'copy',
+        'rename',
+        'delete',
+        'trash',
+        'untrash',
+        'share',
+        'export',
+        'download',
+        'details',
+        'essential',
+        'extended',
       ]
 
-      validOperations.forEach(operation => {
+      validOperations.forEach((operation) => {
         expect(typeof operation).toBe('string')
         expect(operation.length).toBeGreaterThan(0)
       })
@@ -312,11 +317,21 @@ describe('API Migration Verification', () => {
   it('should confirm new static routing works', () => {
     // Verify all new static endpoints exist
     const staticEndpoints = [
-      'details', 'move', 'copy', 'rename', 'delete', 'trash',
-      'untrash', 'share', 'export', 'download', 'essential', 'extended'
+      'details',
+      'move',
+      'copy',
+      'rename',
+      'delete',
+      'trash',
+      'untrash',
+      'share',
+      'export',
+      'download',
+      'essential',
+      'extended',
     ]
 
-    staticEndpoints.forEach(endpoint => {
+    staticEndpoints.forEach((endpoint) => {
       expect(() => {
         require(`@/app/api/drive/files/${endpoint}/route`)
       }).not.toThrow()
@@ -325,8 +340,8 @@ describe('API Migration Verification', () => {
 
   it('should verify unified request/response patterns', () => {
     const singleRequest = { fileId: 'test-id' }
-    const bulkRequest = { 
-      items: [{ id: 'test-id', name: 'test.txt', isFolder: false }] 
+    const bulkRequest = {
+      items: [{ id: 'test-id', name: 'test.txt', isFolder: false }],
     }
 
     // Both should be valid request formats
@@ -345,7 +360,7 @@ describe('Refactoring Summary', () => {
       'Method name consistency': true,
       'Error handling centralized': true,
       'TypeScript compilation clean': true,
-      'Documentation updated': true
+      'Documentation updated': true,
     }
 
     Object.entries(refactoringChecklist).forEach(([check, status]) => {

@@ -17,7 +17,6 @@ const testConfig: TestConfig = {
  * Extended API Tester with comprehensive endpoint coverage
  */
 class ComprehensiveAPITester extends APITester {
-  
   /**
    * Test all authentication endpoints
    */
@@ -95,7 +94,7 @@ class ComprehensiveAPITester extends APITester {
     for (const fileId of testFiles) {
       // Full file details
       detailTests.push(await this.apiRequest(`/api/drive/files/${fileId}`, 'GET'))
-      
+
       // Progressive loading endpoints
       detailTests.push(await this.apiRequest(`/api/drive/files/${fileId}/essential`, 'GET'))
       detailTests.push(await this.apiRequest(`/api/drive/files/${fileId}/extended`, 'GET'))
@@ -117,10 +116,12 @@ class ComprehensiveAPITester extends APITester {
     ]
 
     // Download operations (safe, read-only)
-    bulkTests.push(await this.apiRequest('/api/drive/files/bulk/download', 'POST', {
-      items: testItems,
-      mode: 'export-links'
-    }))
+    bulkTests.push(
+      await this.apiRequest('/api/drive/files/bulk/download', 'POST', {
+        items: testItems,
+        mode: 'export-links',
+      })
+    )
 
     // Test individual operation endpoints (without actually performing destructive operations)
     const fileId = testItems[0].id
@@ -145,7 +146,7 @@ class ComprehensiveAPITester extends APITester {
 
     perfTests.push(await this.apiRequest('/api/health', 'GET'))
     perfTests.push(await this.apiRequest('/api/drive/performance', 'GET'))
-    
+
     // Cache management endpoints
     perfTests.push(await this.apiRequest('/api/cache/clear', 'POST'))
 
@@ -162,7 +163,7 @@ class ComprehensiveAPITester extends APITester {
     // Test with invalid file IDs
     errorTests.push(await this.apiRequest('/api/drive/files/invalid-file-id', 'GET'))
     errorTests.push(await this.apiRequest('/api/drive/files/invalid-file-id/essential', 'GET'))
-    
+
     // Test with invalid parameters
     errorTests.push(await this.apiRequest('/api/drive/files?pageSize=invalid', 'GET'))
     errorTests.push(await this.apiRequest('/api/drive/files?sortBy=invalid', 'GET'))
@@ -200,7 +201,7 @@ class ComprehensiveAPITester extends APITester {
     console.log('🧪 Starting Comprehensive API Testing Suite...')
     console.log('🎯 Target: All Google Drive Pro API endpoints')
     console.log('📧 Using real session with Drive access')
-    
+
     const startTime = Date.now()
 
     try {
@@ -226,21 +227,17 @@ class ComprehensiveAPITester extends APITester {
       const totalTime = Date.now() - startTime
 
       // Calculate comprehensive statistics
-      const passed = allTests.filter(t => t.success).length
+      const passed = allTests.filter((t) => t.success).length
       const failed = allTests.length - passed
-      const responseTimes = allTests.map(t => t.responseTime)
+      const responseTimes = allTests.map((t) => t.responseTime)
       const averageResponseTime = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
 
       // Group results by endpoint category
       const categoryStats = this.categorizeResults(allTests)
 
       // Performance analysis
-      const slowest = allTests.reduce((prev, curr) => 
-        prev.responseTime > curr.responseTime ? prev : curr
-      )
-      const fastest = allTests.reduce((prev, curr) => 
-        prev.responseTime < curr.responseTime ? prev : curr
-      )
+      const slowest = allTests.reduce((prev, curr) => (prev.responseTime > curr.responseTime ? prev : curr))
+      const fastest = allTests.reduce((prev, curr) => (prev.responseTime < curr.responseTime ? prev : curr))
 
       const summary = {
         totalTests: allTests.length,
@@ -259,7 +256,6 @@ class ComprehensiveAPITester extends APITester {
 
       this.printComprehensiveSummary(summary)
       return summary
-
     } catch (error) {
       console.error('❌ Comprehensive testing failed:', error)
       throw error
@@ -279,15 +275,20 @@ class ComprehensiveAPITester extends APITester {
       errors: { total: 0, passed: 0, avgTime: 0 },
     }
 
-    results.forEach(result => {
+    results.forEach((result) => {
       let category = 'files' // default
-      
+
       if (result.endpoint.includes('/auth/')) category = 'auth'
-      else if (result.endpoint.includes('/bulk/') || result.endpoint.includes('/move') || 
-               result.endpoint.includes('/copy') || result.endpoint.includes('/trash')) category = 'bulk'
+      else if (
+        result.endpoint.includes('/bulk/') ||
+        result.endpoint.includes('/move') ||
+        result.endpoint.includes('/copy') ||
+        result.endpoint.includes('/trash')
+      )
+        category = 'bulk'
       else if (result.endpoint.includes('/essential') || result.endpoint.includes('/extended')) category = 'details'
-      else if (result.endpoint.includes('/health') || result.endpoint.includes('/performance') || 
-               result.endpoint.includes('/cache')) category = 'performance'
+      else if (result.endpoint.includes('/health') || result.endpoint.includes('/performance') || result.endpoint.includes('/cache'))
+        category = 'performance'
       else if (result.endpoint.includes('invalid')) category = 'errors'
 
       categories[category].total++
@@ -296,7 +297,7 @@ class ComprehensiveAPITester extends APITester {
     })
 
     // Calculate averages
-    Object.keys(categories).forEach(cat => {
+    Object.keys(categories).forEach((cat) => {
       const category = categories[cat]
       if (category.total > 0) {
         category.avgTime = Math.round(category.avgTime / category.total)
@@ -314,13 +315,13 @@ class ComprehensiveAPITester extends APITester {
     console.log('\n' + '='.repeat(60))
     console.log('📊 COMPREHENSIVE API TEST SUMMARY')
     console.log('='.repeat(60))
-    
+
     console.log(`🧪 Total Tests: ${summary.totalTests}`)
     console.log(`✅ Passed: ${summary.passed}`)
     console.log(`❌ Failed: ${summary.failed}`)
     console.log(`📈 Success Rate: ${summary.successRate}%`)
     console.log(`⏱️  Total Time: ${summary.totalTime}s`)
-    
+
     console.log('\n📈 Performance Metrics:')
     console.log(`   Average Response Time: ${summary.performance.averageResponseTime}ms`)
     console.log(`   Slowest: ${summary.performance.slowestEndpoint}`)
@@ -336,5 +337,12 @@ class ComprehensiveAPITester extends APITester {
     console.log('\n' + '='.repeat(60))
   }
 }
+
+// Add dummy test to prevent "no tests" error
+describe('Comprehensive API Test', () => {
+  it('exports ComprehensiveAPITester class', () => {
+    expect(ComprehensiveAPITester).toBeDefined()
+  })
+})
 
 export default ComprehensiveAPITester

@@ -36,7 +36,7 @@ const customJestConfig = {
       statements: 0,
     },
   },
-  testTimeout: 10000,
+  testTimeout: 5000,
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
   },
@@ -47,18 +47,29 @@ const customJestConfig = {
     '<rootDir>/coverage/',
     '<rootDir>/dist/',
   ],
-  // Performance optimizations
-  maxWorkers: '50%',
+  // Performance optimizations for fast development
+  maxWorkers: 4,
+  cache: true,
+  cacheDirectory: '<rootDir>/.jest-cache',
   watchPathIgnorePatterns: [
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/coverage/',
+    '<rootDir>/.git/',
   ],
   // Prevent hanging in watch mode
   watchman: false,
   clearMocks: true,
   resetMocks: true,
   restoreMocks: true,
+  // Fast bailout on first failure in CI
+  bail: process.env.CI ? 1 : false,
+  // Parallel execution - removed deprecated runInBand option
+  // Speed up test discovery
+  haste: {
+    computeSha1: true,
+    throwOnModuleCollision: false,
+  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

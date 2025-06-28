@@ -49,27 +49,27 @@ export class APITester {
    */
   async validateSession(): Promise<TestSession | null> {
     const startTime = Date.now()
-    
+
     try {
       const response = await fetch(`${this.config.baseUrl}/api/auth/session`, {
         method: 'GET',
         headers: {
-          'Cookie': this.config.sessionCookie,
+          Cookie: this.config.sessionCookie,
           'Content-Type': 'application/json',
         },
       })
 
       const responseTime = Date.now() - startTime
-      
+
       if (response.ok) {
         const sessionData = await response.json()
-        
+
         this.session = {
           cookie: this.config.sessionCookie,
           userId: sessionData.user?.id || '',
           email: sessionData.user?.email || '',
           accessToken: sessionData.accessToken,
-          expiresAt: Date.now() + (60 * 60 * 1000), // 1 hour default
+          expiresAt: Date.now() + 60 * 60 * 1000, // 1 hour default
         }
 
         this.logResult({
@@ -109,17 +109,12 @@ export class APITester {
   /**
    * Generic API request method with session cookie
    */
-  async apiRequest(
-    endpoint: string,
-    method: string = 'GET',
-    body?: any,
-    customHeaders?: Record<string, string>
-  ): Promise<TestResult> {
+  async apiRequest(endpoint: string, method: string = 'GET', body?: any, customHeaders?: Record<string, string>): Promise<TestResult> {
     const startTime = Date.now()
-    
+
     try {
       const headers: Record<string, string> = {
-        'Cookie': this.config.sessionCookie,
+        Cookie: this.config.sessionCookie,
         'Content-Type': 'application/json',
         ...customHeaders,
       }
@@ -135,7 +130,7 @@ export class APITester {
 
       const response = await fetch(`${this.config.baseUrl}${endpoint}`, requestConfig)
       const responseTime = Date.now() - startTime
-      
+
       let responseData
       try {
         responseData = await response.json()
@@ -158,7 +153,6 @@ export class APITester {
 
       this.logResult(result)
       return result
-
     } catch (error) {
       const result: TestResult = {
         endpoint,
@@ -182,7 +176,7 @@ export class APITester {
 
     // Test basic file listing
     filesTests.push(await this.apiRequest('/api/drive/files', 'GET'))
-    
+
     // Test with various parameters
     filesTests.push(await this.apiRequest('/api/drive/files?pageSize=10&sortBy=name', 'GET'))
     filesTests.push(await this.apiRequest('/api/drive/files?sortBy=modified&sortOrder=desc', 'GET'))
@@ -202,7 +196,7 @@ export class APITester {
 
     // Get file details (using real file ID from Drive)
     const fileId = '1q5xt1XgsroFmbYL1HWO1q3DzVvynDU0B' // Video file from your Drive
-    
+
     operationsTests.push(await this.apiRequest(`/api/drive/files/${fileId}`, 'GET'))
     operationsTests.push(await this.apiRequest(`/api/drive/files/${fileId}/essential`, 'GET'))
     operationsTests.push(await this.apiRequest(`/api/drive/files/${fileId}/extended`, 'GET'))
@@ -215,7 +209,7 @@ export class APITester {
    */
   async testBulkOperations(): Promise<TestResult[]> {
     const bulkTests: TestResult[] = []
-    
+
     // Test bulk operations with real file IDs (read-only operations)
     const testFileIds = [
       '1q5xt1XgsroFmbYL1HWO1q3DzVvynDU0B', // Video file
@@ -223,10 +217,12 @@ export class APITester {
     ]
 
     // Test download operations (safe)
-    bulkTests.push(await this.apiRequest('/api/drive/files/bulk/download', 'POST', {
-      items: testFileIds.map(id => ({ id, name: `test-${id}`, isFolder: false })),
-      mode: 'export-links'
-    }))
+    bulkTests.push(
+      await this.apiRequest('/api/drive/files/bulk/download', 'POST', {
+        items: testFileIds.map((id) => ({ id, name: `test-${id}`, isFolder: false })),
+        mode: 'export-links',
+      })
+    )
 
     return bulkTests
   }
@@ -262,12 +258,12 @@ export class APITester {
    */
   private logResult(result: TestResult): void {
     this.results.push(result)
-    
+
     const status = result.success ? '✅' : '❌'
     const timing = `${result.responseTime}ms`
-    
+
     console.log(`${status} ${result.method} ${result.endpoint} - ${result.status} (${timing})`)
-    
+
     if (result.error) {
       console.log(`   Error: ${result.error}`)
     }
@@ -288,7 +284,7 @@ export class APITester {
     }
   }> {
     console.log('🧪 Starting comprehensive API testing...')
-    
+
     // Validate session first
     const session = await this.validateSession()
     if (!session) {
@@ -307,17 +303,13 @@ export class APITester {
     ]
 
     // Calculate statistics
-    const passed = allTests.filter(t => t.success).length
+    const passed = allTests.filter((t) => t.success).length
     const failed = allTests.length - passed
-    const responseTimes = allTests.map(t => t.responseTime)
+    const responseTimes = allTests.map((t) => t.responseTime)
     const averageResponseTime = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
 
-    const slowest = allTests.reduce((prev, curr) => 
-      prev.responseTime > curr.responseTime ? prev : curr
-    )
-    const fastest = allTests.reduce((prev, curr) => 
-      prev.responseTime < curr.responseTime ? prev : curr
-    )
+    const slowest = allTests.reduce((prev, curr) => (prev.responseTime > curr.responseTime ? prev : curr))
+    const fastest = allTests.reduce((prev, curr) => (prev.responseTime < curr.responseTime ? prev : curr))
 
     const summary = {
       total: allTests.length,
@@ -328,7 +320,7 @@ export class APITester {
         averageResponseTime: Math.round(averageResponseTime),
         slowestEndpoint: `${slowest.endpoint} (${slowest.responseTime}ms)`,
         fastestEndpoint: `${fastest.endpoint} (${fastest.responseTime}ms)`,
-      }
+      },
     }
 
     console.log('\n📊 Test Summary:')
@@ -356,5 +348,12 @@ export class APITester {
     this.results = []
   }
 }
+
+// Add dummy test to prevent "no tests" error
+describe('API Test Setup', () => {
+  it('exports APITester class', () => {
+    expect(APITester).toBeDefined()
+  })
+})
 
 export default APITester

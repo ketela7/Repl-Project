@@ -112,7 +112,7 @@ describe('API Endpoints - New Static Routing', () => {
   describe('/api/drive/files/details', () => {
     it('should handle single file details request', async () => {
       mockRequest = createMockRequest({ fileId: 'test-file-id' })
-      
+
       const response = await POST(mockRequest)
       const data = await response.json()
 
@@ -124,7 +124,7 @@ describe('API Endpoints - New Static Routing', () => {
 
     it('should return 400 for missing fileId', async () => {
       mockRequest = createMockRequest({})
-      
+
       const response = await POST(mockRequest)
       const data = await response.json()
 
@@ -136,7 +136,7 @@ describe('API Endpoints - New Static Routing', () => {
   describe('/api/drive/files/essential', () => {
     it('should return essential metadata', async () => {
       mockRequest = createMockRequest({ fileId: 'test-file-id' })
-      
+
       const response = await EssentialPOST(mockRequest)
       const data = await response.json()
 
@@ -150,7 +150,7 @@ describe('API Endpoints - New Static Routing', () => {
   describe('/api/drive/files/extended', () => {
     it('should return extended metadata', async () => {
       mockRequest = createMockRequest({ fileId: 'test-file-id' })
-      
+
       const response = await ExtendedPOST(mockRequest)
       const data = await response.json()
 
@@ -167,7 +167,7 @@ describe('API Endpoints - New Static Routing', () => {
         fileId: 'test-file-id',
         targetFolderId: 'target-folder-id',
       })
-      
+
       const response = await MovePOST(mockRequest)
       const data = await response.json()
 
@@ -185,7 +185,7 @@ describe('API Endpoints - New Static Routing', () => {
         ],
         targetFolderId: 'target-folder-id',
       })
-      
+
       const response = await MovePOST(mockRequest)
       const data = await response.json()
 
@@ -198,7 +198,7 @@ describe('API Endpoints - New Static Routing', () => {
 
     it('should return 400 for missing targetFolderId', async () => {
       mockRequest = createMockRequest({ fileId: 'test-file-id' })
-      
+
       const response = await MovePOST(mockRequest)
       const data = await response.json()
 
@@ -213,7 +213,7 @@ describe('API Endpoints - New Static Routing', () => {
         fileId: 'test-file-id',
         targetFolderId: 'target-folder-id',
       })
-      
+
       const response = await CopyPOST(mockRequest)
       const data = await response.json()
 
@@ -225,13 +225,11 @@ describe('API Endpoints - New Static Routing', () => {
 
     it('should handle bulk copy with name prefix', async () => {
       mockRequest = createMockRequest({
-        items: [
-          { id: 'file1', name: 'file1.txt', isFolder: false },
-        ],
+        items: [{ id: 'file1', name: 'file1.txt', isFolder: false }],
         targetFolderId: 'target-folder-id',
         namePrefix: 'Copy_',
       })
-      
+
       const response = await CopyPOST(mockRequest)
       const data = await response.json()
 
@@ -246,7 +244,7 @@ describe('API Endpoints - New Static Routing', () => {
         fileId: 'test-file-id',
         newName: 'new-file-name.txt',
       })
-      
+
       const response = await RenamePOST(mockRequest)
       const data = await response.json()
 
@@ -263,7 +261,7 @@ describe('API Endpoints - New Static Routing', () => {
         ],
         namePrefix: 'Bulk_',
       })
-      
+
       const response = await RenamePOST(mockRequest)
       const data = await response.json()
 
@@ -277,7 +275,7 @@ describe('API Endpoints - New Static Routing', () => {
       mockRequest = createMockRequest({
         fileId: 'test-file-id',
       })
-      
+
       const response = await TrashPOST(mockRequest)
       const data = await response.json()
 
@@ -292,7 +290,7 @@ describe('API Endpoints - New Static Routing', () => {
       mockRequest = createMockRequest({
         fileId: 'test-file-id',
       })
-      
+
       const response = await UntrashPOST(mockRequest)
       const data = await response.json()
 
@@ -307,7 +305,7 @@ describe('API Endpoints - New Static Routing', () => {
       mockRequest = createMockRequest({
         fileId: 'test-file-id',
       })
-      
+
       const response = await DeletePOST(mockRequest)
       const data = await response.json()
 
@@ -321,12 +319,10 @@ describe('API Endpoints - New Static Routing', () => {
     it('should handle share operation', async () => {
       mockRequest = createMockRequest({
         fileId: 'test-file-id',
-        permissions: [
-          { type: 'user', role: 'reader', emailAddress: 'test@example.com' },
-        ],
+        permissions: [{ type: 'user', role: 'reader', emailAddress: 'test@example.com' }],
         notifyUsers: false,
       })
-      
+
       const response = await SharePOST(mockRequest)
       const data = await response.json()
 
@@ -342,7 +338,7 @@ describe('API Endpoints - New Static Routing', () => {
         fileId: 'test-file-id',
         exportFormat: 'pdf',
       })
-      
+
       const response = await ExportPOST(mockRequest)
       const data = await response.json()
 
@@ -359,7 +355,7 @@ describe('API Endpoints - New Static Routing', () => {
         fileId: 'test-file-id',
         downloadMode: 'exportLinks',
       })
-      
+
       const response = await DownloadPOST(mockRequest)
       const data = await response.json()
 
@@ -369,12 +365,10 @@ describe('API Endpoints - New Static Routing', () => {
 
     it('should handle bulk download', async () => {
       mockRequest = createMockRequest({
-        items: [
-          { id: 'file1', name: 'file1.txt', isFolder: false },
-        ],
+        items: [{ id: 'file1', name: 'file1.txt', isFolder: false }],
         downloadMode: 'exportLinks',
       })
-      
+
       const response = await DownloadPOST(mockRequest)
       const data = await response.json()
 
@@ -385,7 +379,7 @@ describe('API Endpoints - New Static Routing', () => {
       mockRequest = createMockRequest({
         downloadMode: 'oneByOne',
       })
-      
+
       const response = await DownloadPOST(mockRequest)
       const data = await response.json()
 
