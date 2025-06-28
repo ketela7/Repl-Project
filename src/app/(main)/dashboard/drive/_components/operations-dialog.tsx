@@ -307,7 +307,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
           // Create direct download link to our streaming endpoint
           const downloadUrl = `/api/drive/files/download?fileId=${item.id}&mode=stream&fileName=${encodeURIComponent(item.name)}`
-          
+
           // Open in new tab for direct browser download
           const link = document.createElement('a')
           link.href = downloadUrl
@@ -336,7 +336,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
           // Create direct download link to our streaming endpoint
           const downloadUrl = `/api/drive/files/download?fileId=${item.id}&mode=stream&fileName=${encodeURIComponent(item.name)}`
-          
+
           // Open in new tab for direct browser download
           const link = document.createElement('a')
           link.href = downloadUrl
