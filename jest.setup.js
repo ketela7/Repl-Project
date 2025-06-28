@@ -1,5 +1,36 @@
 import '@testing-library/jest-dom'
 
+// Mock Web APIs for Next.js API routes testing
+import { TextEncoder, TextDecoder } from 'util'
+global.TextEncoder = TextEncoder
+global.TextDecoder = TextDecoder
+
+// Mock Request and Response globals for API testing
+global.Request = global.Request || class MockRequest {
+  constructor(url, options = {}) {
+    this.url = url
+    this.method = options.method || 'GET'
+    this.headers = new Map(Object.entries(options.headers || {}))
+    this.body = options.body || null
+  }
+  
+  async json() {
+    return JSON.parse(this.body)
+  }
+}
+
+global.Response = global.Response || class MockResponse {
+  constructor(body, options = {}) {
+    this.body = body
+    this.status = options.status || 200
+    this.headers = new Map(Object.entries(options.headers || {}))
+  }
+  
+  async json() {
+    return JSON.parse(this.body)
+  }
+}
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter() {
