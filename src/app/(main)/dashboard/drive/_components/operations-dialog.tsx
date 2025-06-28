@@ -291,7 +291,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
 
       if (downloadMode === 'oneByOne') {
-        // For one by one downloads with progress tracking
+        // For one by one downloads with direct streaming
         for (let i = 0; i < downloadableFiles.length; i++) {
           const item = downloadableFiles[i]
 
@@ -305,74 +305,49 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
             })
           }
 
-          // Get download URL from API using POST request
-          const response = await fetch('/api/drive/files/download', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fileId: item.id,
-              downloadMode: 'oneByOne',
-            }),
-          })
-
-          if (response.ok) {
-            const result = await response.json()
-            if (result.success && result.downloadUrl) {
-              // Create temporary link and trigger direct browser download
-              const link = document.createElement('a')
-              link.href = result.downloadUrl
-              link.download = item.name
-              link.target = '_blank'
-              document.body.appendChild(link)
-              link.click()
-              document.body.removeChild(link)
-            }
-          }
+          // Create direct download link to our streaming endpoint
+          const downloadUrl = `/api/drive/files/download?fileId=${item.id}&mode=stream&fileName=${encodeURIComponent(item.name)}`
+          
+          // Open in new tab for direct browser download
+          const link = document.createElement('a')
+          link.href = downloadUrl
+          link.download = item.name
+          link.target = '_blank'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
 
           // Small delay between downloads to prevent browser blocking
           await new Promise((resolve) => setTimeout(resolve, 1000))
         }
       } else if (downloadMode === 'batch') {
-        // For batch downloads, get all download URLs at once
-        const response = await fetch('/api/drive/files/download', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: downloadableFiles,
-            downloadMode: 'batch',
-          }),
-        })
+        // For batch downloads, trigger multiple streaming downloads
+        for (let i = 0; i < downloadableFiles.length; i++) {
+          const item = downloadableFiles[i]
 
-        if (response.ok) {
-          const result = await response.json()
-
-          // Trigger downloads for successful results
-          if (result.success && result.success.length > 0) {
-            for (let i = 0; i < result.success.length; i++) {
-              const successItem = result.success[i]
-
-              if (progressCallback) {
-                progressCallback({
-                  current: i + 1,
-                  total: result.success.length,
-                  type: 'download',
-                  currentOperation: `Batch downloading ${successItem.name}`,
-                })
-              }
-
-              // Create temporary link and trigger direct browser download
-              const link = document.createElement('a')
-              link.href = successItem.downloadUrl
-              link.download = successItem.name
-              link.target = '_blank'
-              document.body.appendChild(link)
-              link.click()
-              document.body.removeChild(link)
-
-              // Small delay between downloads to prevent browser blocking
-              await new Promise((resolve) => setTimeout(resolve, 500))
-            }
+          if (progressCallback) {
+            progressCallback({
+              current: i + 1,
+              total: downloadableFiles.length,
+              type: 'download',
+              currentOperation: `Batch downloading ${item.name}`,
+            })
           }
+
+          // Create direct download link to our streaming endpoint
+          const downloadUrl = `/api/drive/files/download?fileId=${item.id}&mode=stream&fileName=${encodeURIComponent(item.name)}`
+          
+          // Open in new tab for direct browser download
+          const link = document.createElement('a')
+          link.href = downloadUrl
+          link.download = item.name
+          link.target = '_blank'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+
+          // Small delay between downloads to prevent browser blocking
+          await new Promise((resolve) => setTimeout(resolve, 500))
         }
       } else if (downloadMode === 'exportLinks') {
         // For CSV export of download links

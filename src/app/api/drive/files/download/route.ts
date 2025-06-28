@@ -4,6 +4,94 @@ import { initDriveService, handleApiError, validateOperationsRequest } from '@/l
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
 
+export async function GET(request: NextRequest) {
+  try {
+    const url = new URL(request.url)
+    const fileId = url.searchParams.get('fileId')
+    const mode = url.searchParams.get('mode')
+    const fileName = url.searchParams.get('fileName')
+
+    if (!fileId) {
+      return NextResponse.json({ error: 'fileId is required' }, { status: 400 })
+    }
+
+    // For direct streaming mode
+    if (mode === 'stream') {
+      // Initialize Drive service with authentication
+      const authResult = await initDriveService()
+      if (!authResult.success) {
+        return authResult.response!
+      }
+
+      const { driveService } = authResult
+
+      try {
+        // Get file metadata first for proper filename and content type
+        const metadata = await throttledDriveRequest(async () => {
+          return await retryDriveApiCall(async () => {
+            return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size'])
+          })
+        })
+
+        const actualFileName = fileName || metadata.name
+        const mimeType = metadata.mimeType || 'application/octet-stream'
+
+        // Check if it's a Google Workspace file that needs export
+        if (isGoogleWorkspaceFile(mimeType)) {
+          const exportMimeType = getExportFormat(mimeType)
+          const exportExtension = getFileExtension(exportMimeType)
+
+          // Export Google Workspace file
+          const exportBuffer = await throttledDriveRequest(async () => {
+            return await retryDriveApiCall(async () => {
+              return await driveService.exportFile(fileId, exportMimeType)
+            })
+          })
+
+          const uint8Array = new Uint8Array(exportBuffer)
+          const exportFileName = `${actualFileName}.${exportExtension}`
+
+          return new NextResponse(uint8Array, {
+            status: 200,
+            headers: {
+              'Content-Type': 'application/octet-stream',
+              'Content-Disposition': `attachment; filename="${exportFileName}"`,
+              'Content-Length': uint8Array.length.toString(),
+            },
+          })
+        }
+
+        // For regular files, stream directly
+        const fileStream = await throttledDriveRequest(async () => {
+          return await retryDriveApiCall(async () => {
+            return await driveService.downloadFile(fileId)
+          })
+        })
+
+        // Convert Node.js Readable to Web ReadableStream
+        const { Readable } = await import('stream')
+        const webStream = Readable.toWeb(fileStream)
+
+        // Stream file directly to browser with octet-stream content type
+        return new NextResponse(webStream, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/octet-stream',
+            'Content-Disposition': `attachment; filename="${actualFileName}"`,
+          },
+        })
+      } catch (error: any) {
+        console.error('Direct download failed:', error)
+        return NextResponse.json({ error: 'Download failed' }, { status: 500 })
+      }
+    }
+
+    return NextResponse.json({ error: 'Invalid mode' }, { status: 400 })
+  } catch (error) {
+    return handleApiError(error)
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
