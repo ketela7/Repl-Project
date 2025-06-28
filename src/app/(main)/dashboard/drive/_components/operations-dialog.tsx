@@ -102,7 +102,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
   }
 
   const handleRestoreClick = () => {
-    setIsRestoreDialogOpen(true)
+    setIsUntrashDialogOpen(true)
     handleClose()
   }
 
@@ -224,14 +224,30 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
   const handleExportComplete = async () => {
     try {
-      for (const item of selectedItems.filter((item) => !item.isFolder)) {
-        const link = document.createElement('a')
-        link.href = `/api/drive/download/${item.id}`
-        link.download = item.name
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        await new Promise((resolve) => setTimeout(resolve, 500))
+      // Get download URLs from API first
+      const response = await fetch('/api/drive/files/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedItems.filter((item) => !item.isFolder),
+          downloadMode: 'batch',
+        }),
+      })
+
+      if (response.ok) {
+        const result = await response.json()
+
+        // Trigger downloads for successful results
+        for (const successItem of result.success || []) {
+          const link = document.createElement('a')
+          link.href = successItem.downloadUrl
+          link.download = successItem.name
+          link.target = '_blank'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          await new Promise((resolve) => setTimeout(resolve, 500))
+        }
       }
     } catch (error) {
       console.error('Export failed:', error)
