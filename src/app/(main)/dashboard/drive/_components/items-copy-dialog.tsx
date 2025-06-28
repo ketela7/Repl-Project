@@ -176,7 +176,54 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
           </BottomSheetContent>
         </BottomSheet>
 
-        {/* FileCopyDialog removed - functionality integrated into bulk operations */}
+        {/* Destination Selector Dialog for Mobile */}
+        <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
+          <DialogContent className="max-h-[80vh] max-w-2xl">
+            <DialogHeader>
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div>
+                  <DialogTitle>Choose Copy Destination</DialogTitle>
+                  <DialogDescription>
+                    Select where to copy {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+
+            <DriveDestinationSelector onSelect={handleDestinationSelect} selectedFolderId={selectedFolderId} className="py-4" />
+
+            <DialogFooter className="flex-col gap-2 sm:flex-row">
+              <div className="flex-1 text-left">
+                <div className="text-muted-foreground text-sm">
+                  Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
+                </div>
+              </div>
+              <Button
+                onClick={handleCopy}
+                disabled={isLoading || !selectedFolderId}
+                className="w-full bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500 sm:w-auto dark:bg-purple-700 dark:hover:bg-purple-800"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Copying...
+                  </>
+                ) : (
+                  <>
+                    <Copy className="mr-2 h-4 w-4" />
+                    Copy {files.length} Item{files.length > 1 ? 's' : ''}
+                  </>
+                )}
+              </Button>
+              <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
+                Back
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </>
     )
   }
