@@ -4,7 +4,7 @@
  */
 
 interface SearchResult {
-  files: any[]
+  files: unknown[]
   totalCount: number
   hasMore: boolean
   nextPageToken?: string
@@ -25,7 +25,7 @@ class SearchOptimizer {
   /**
    * Optimized search that uses incremental results
    */
-  async optimizedSearch(searchQuery: string, userId: string, apiCall: () => Promise<any>, folderId?: string): Promise<SearchResult> {
+  async optimizedSearch(searchQuery: string, userId: string, apiCall: () => Promise<unknown>, folderId?: string): Promise<SearchResult> {
     // Clean search query
     const cleanQuery = searchQuery.trim().toLowerCase()
     if (!cleanQuery) {
@@ -89,7 +89,9 @@ class SearchOptimizer {
 
       // If current query extends a cached query, filter the cached results
       if (query.startsWith(cachedQuery) && cachedQuery.length >= 2) {
-        const filteredFiles = result.files.filter((file) => file.name?.toLowerCase().includes(query) || file.mimeType?.toLowerCase().includes(query))
+        const filteredFiles = result.files.filter(
+          (file: any) => file.name?.toLowerCase().includes(query) || file.mimeType?.toLowerCase().includes(query)
+        )
 
         return {
           files: filteredFiles,
@@ -107,8 +109,8 @@ class SearchOptimizer {
   /**
    * Execute the actual search with performance optimizations
    */
-  private async executeSearch(query: string, _userId: string, apiCall: () => Promise<any>): Promise<SearchResult> {
-    const result = await apiCall()
+  private async executeSearch(query: string, _userId: string, apiCall: () => Promise<unknown>): Promise<SearchResult> {
+    const result = (await apiCall()) as any
 
     return {
       files: result.files || [],
@@ -184,12 +186,12 @@ class SearchOptimizer {
   /**
    * Preload common search patterns
    */
-  async preloadCommonSearches(userId: string, apiCall: (query: string) => Promise<any>): Promise<void> {
+  async preloadCommonSearches(_userId: string, apiCall: (query: string) => Promise<unknown>): Promise<void> {
     const commonQueries = ['doc', 'pdf', 'img', 'video', 'presentation']
 
     const preloadPromises = commonQueries.map(async (query) => {
       try {
-        await this.optimizedSearch(query, userId, () => apiCall(query))
+        await this.optimizedSearch(query, _userId, () => apiCall(query))
       } catch {
         // Silent fallback for preload failures
       }

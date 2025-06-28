@@ -123,7 +123,7 @@ args = "npm run typecheck"
 
 [[workflows.workflow]]
 name = "Check:Fix"
-mode = "sequential"
+mode = "parallel"
 author = "agent"
 
 [[workflows.workflow.tasks]]
@@ -148,7 +148,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "tsc --noEmit && npx jest --passWithNoTests --silent --maxWorkers=4 --cache && npm run lint"
+args = "tsc --noEmit"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx jest --passWithNoTests --silent --maxWorkers=4 --cache"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint"
 
 [[workflows.workflow]]
 name = "Test:Fast"
@@ -164,7 +172,11 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run lint:fix && npm run redundant"
+args = "npm run lint:fix"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run redundant"
 
 [[workflows.workflow]]
 name = "DevFast"
@@ -172,7 +184,15 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run format:fix && npm run lint:fix && npx tsc --noEmit"
+args = "npm run format:fix"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint:fix"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx tsc --noEmit"
 
 [[workflows.workflow]]
 name = "Test:RealTime"
