@@ -36,6 +36,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
   const canUntrashCount = selectedItems.filter((item) => item.canUntrash).length
   const canDownloadCount = selectedItems.filter((item) => item.canDownload).length
   const canRenameCount = selectedItems.filter((item) => item.canRename).length
+  const canExportCount = selectedItems.filter((item) => item.canExport).length
+  const canMoveCount = selectedItems.filter((item) => item.canMove).length
+  const canCopyCount = selectedItems.filter((item) => item.canCopy).length
 
   // Individual dialog states
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
@@ -414,26 +417,30 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     <>
       <div className="grid gap-3">
         {/* Move Items */}
-        <Button variant="outline" onClick={handleMoveClick} className="h-12 w-full justify-start gap-3 text-left hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/30">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
-            <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          </div>
-          <div className="flex flex-col items-start">
-            <span className="font-medium">Move Items</span>
-            <span className="text-muted-foreground text-xs">Move items to another location</span>
-          </div>
-        </Button>
+        {canMoveCount > 0 && (
+          <Button variant="outline" onClick={handleMoveClick} className="h-12 w-full justify-start gap-3 text-left hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/30">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
+              <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Move Items</span>
+              <span className="text-muted-foreground text-xs">Move items to another location</span>
+            </div>
+          </Button>
+        )}
 
         {/* Copy Items */}
-        <Button variant="outline" onClick={handleCopyClick} className="h-12 w-full justify-start gap-3 text-left hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-950/30">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
-            <Copy className="h-4 w-4 text-green-600 dark:text-green-400" />
-          </div>
-          <div className="flex flex-col items-start">
-            <span className="font-medium">Copy Items</span>
-            <span className="text-muted-foreground text-xs">Create copies in another location</span>
-          </div>
-        </Button>
+        {canCopyCount > 0 && (
+          <Button variant="outline" onClick={handleCopyClick} className="h-12 w-full justify-start gap-3 text-left hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-950/30">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
+              <Copy className="h-4 w-4 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Copy Items</span>
+              <span className="text-muted-foreground text-xs">Create copies in another location</span>
+            </div>
+          </Button>
+        )}
 
         {/* Share Items */}
         {canShareCount > 0 && (
@@ -462,7 +469,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         )}
 
         {/* Download Files */}
-        {fileCount > 0 && (
+        {canDownloadCount > 0 && (
           <Button variant="outline" onClick={handleDownloadClick} className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
               <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
@@ -476,7 +483,8 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
           </Button>
         )}
 
-        {fileCount > 0 && (
+        {/* Export Files */}
+        {canExportCount > 0 && (
           <Button variant="outline" onClick={handleExportClick} className="h-12 w-full justify-start gap-3 text-left hover:border-indigo-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
               <Download className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
@@ -490,10 +498,22 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
           </Button>
         )}
 
+        {/* Restore from Trash */}
+        {canUntrashCount > 0 && (
+          <Button variant="outline" onClick={handleRestoreClick} className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
+              <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div className="flex flex-col items-start">
+              <span className="font-medium">Restore from Trash</span>
+              <span className="text-muted-foreground text-xs">Restore {canUntrashCount} items to original location</span>
+            </div>
+          </Button>
+        )}
+
         {/* Separator for destructive actions */}
         {canDeleteCount > 0 ||
-          canTrashCount > 0 ||
-          (canUntrashCount > 0 && (
+          (canTrashCount > 0 && (
             <div className="mt-3 border-t pt-3">
               <p className="text-muted-foreground mb-3 text-xs font-medium">Destructive Actions</p>
 
@@ -519,19 +539,6 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
                   <div className="flex flex-col items-start">
                     <span className="font-medium">Permanent Delete</span>
                     <span className="text-muted-foreground text-xs">Delete permanently {canDeleteCount} items (cannot be undone)</span>
-                  </div>
-                </Button>
-              )}
-
-              {/* Restore from Trash */}
-              {canUntrashCount > 0 && (
-                <Button variant="outline" onClick={handleRestoreClick} className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-                    <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">Restore from Trash</span>
-                    <span className="text-muted-foreground text-xs">Restore {canUntrashCount} items to original location</span>
                   </div>
                 </Button>
               )}

@@ -192,7 +192,7 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
             {currentPath.map((folder, index) => (
               <div key={folder.id} className="flex items-center gap-1">
                 {index > 0 && <span>/</span>}
-                <button onClick={() => navigateBack(index)} className="hover:text-foreground transition-colors truncate max-w-24" title={folder.name}>
+                <button onClick={() => navigateBack(index)} className="hover:text-foreground max-w-24 truncate transition-colors" title={folder.name}>
                   {folder.name}
                 </button>
               </div>
@@ -202,7 +202,7 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
           {/* Search */}
           <div className="relative">
             <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-3 w-3" />
-            <Input placeholder="Search folders..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-7 h-8 text-xs" />
+            <Input placeholder="Search folders..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="h-8 pl-7 text-xs" />
           </div>
 
           {/* Folder List */}
@@ -219,21 +219,23 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
                   <div
                     key={folder.id}
                     className={cn(
-                      'flex cursor-pointer items-center gap-2 rounded-md border p-2 transition-colors min-w-0',
+                      'flex min-w-0 cursor-pointer items-center gap-2 rounded-md border p-2 transition-colors',
                       selectedFolderId === folder.id ? 'bg-primary/10 border-primary' : 'hover:bg-muted/50'
                     )}
                   >
                     <Folder className="h-4 w-4 flex-shrink-0 text-blue-500" />
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-xs font-mono" title={folder.name}>{folder.name}</div>
+                      <div className="truncate font-mono text-xs" title={folder.name}>
+                        {folder.name}
+                      </div>
                       {folder.path && <div className="text-muted-foreground truncate text-[10px]">{folder.path}</div>}
                     </div>
                     {folder.isShared && (
-                      <Badge variant="secondary" className="text-[10px] px-1 py-0 flex-shrink-0">
+                      <Badge variant="secondary" className="flex-shrink-0 px-1 py-0 text-[10px]">
                         Shared
                       </Badge>
                     )}
-                    <div className="flex gap-1 flex-shrink-0">
+                    <div className="flex flex-shrink-0 gap-1">
                       <Button size="sm" variant="ghost" onClick={() => navigateToFolder(folder)} className="h-6 px-2 text-[10px]">
                         Open
                       </Button>
@@ -251,11 +253,7 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
                   </div>
                 ))
               )}
-              {filteredFolders.length > 20 && (
-                <div className="text-muted-foreground py-1 text-center text-xs">
-                  ... and {filteredFolders.length - 20} more folders
-                </div>
-              )}
+              {filteredFolders.length > 20 && <div className="text-muted-foreground py-1 text-center text-xs">... and {filteredFolders.length - 20} more folders</div>}
             </div>
           </ScrollArea>
         </TabsContent>

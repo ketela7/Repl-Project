@@ -133,8 +133,6 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
           </div>
         </div>
       )}
-
-
     </div>
   )
 

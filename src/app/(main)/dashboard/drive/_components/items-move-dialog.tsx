@@ -126,8 +126,6 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
           </div>
         </div>
       </div>
-
-      
     </div>
   )
 

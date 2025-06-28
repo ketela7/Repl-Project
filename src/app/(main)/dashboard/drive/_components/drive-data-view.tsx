@@ -1,6 +1,6 @@
 'use client'
 
-import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, Triangle, CopyIcon } from 'lucide-react'
+import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, Triangle, CopyIcon, Info } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -89,20 +89,37 @@ export function DriveDataView({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+
+        {/* Conditionally render details option */}
+        <DropdownMenuItem onClick={() => onItemAction('details', item)}>
+          <Info className="mr-2 h-4 w-4" />
+          Details
+        </DropdownMenuItem>
+
+        {/* Conditionally render move option */}
+        {item.canMove && (
         <DropdownMenuItem onClick={() => onItemAction('move', item)}>
           <Move className="mr-2 h-4 w-4" />
           Move
         </DropdownMenuItem>
+      )}
+
+        {/* Conditionally render copy option */}
+        {item.canCopy && (
         <DropdownMenuItem onClick={() => onItemAction('copy', item)}>
           <Copy className="mr-2 h-4 w-4" />
           Copy
         </DropdownMenuItem>
+      )}
+
+        {/* Conditionally render preview option */}
         {!item.isFolder && (
           <DropdownMenuItem onClick={() => onItemAction('preview', item)}>
             <Eye className="mr-2 h-4 w-4" />
             Preview
           </DropdownMenuItem>
         )}
+        
         {/* Conditionally render download option */}
         {item.canDownload && (
           <DropdownMenuItem onClick={() => onItemAction('download', item)}>
@@ -119,28 +136,35 @@ export function DriveDataView({
           </DropdownMenuItem>
         )}
 
+        {/* Conditionally render share option */}
         {item.canShare && (
           <DropdownMenuItem onClick={() => onItemAction('share', item)}>
             <Share className="mr-2 h-4 w-4" />
             Share
           </DropdownMenuItem>
         )}
+
+        {/* Conditionally render trash option */}
         {item.canTrash && (
           <DropdownMenuItem onClick={() => onItemAction('trash', item)} className="text-destructive">
             <Trash2 className="mr-2 h-4 w-4" />
             Move to Trash
           </DropdownMenuItem>
         )}
+
+        {/* Conditionally render delete option */}
         {item.canDelete && (
           <DropdownMenuItem onClick={() => onItemAction('delete', item)} className="text-destructive">
             <Triangle className="mr-2 h-4 w-4" />
             Delete
           </DropdownMenuItem>
         )}
+      
+        {/* Conditionally render untrash option */}
         {item.canUntrash && (
           <DropdownMenuItem onClick={() => onItemAction('untrash', item)} className="text-destructive">
             <RefreshCw className="mr-2 h-4 w-4" />
-            Restore
+            Untrash
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
@@ -173,7 +197,7 @@ export function DriveDataView({
                     onItemAction('preview', item)
                   }
                 }}
-                onTouchStart={(e) => {
+                {/* onTouchStart={(e) => {
                   const touch = e.touches[0]
                   const startTime = Date.now()
                   const timer = setTimeout(() => {
@@ -189,7 +213,7 @@ export function DriveDataView({
                   }
 
                   document.addEventListener('touchend', handleTouchEnd)
-                }}
+                }} */}
               >
                 {isSelectMode && (
                   <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>

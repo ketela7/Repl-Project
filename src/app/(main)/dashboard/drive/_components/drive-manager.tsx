@@ -231,7 +231,7 @@ export function DriveManager() {
   }, [items, sortConfig])
   // Sorting End
 
-  // Convert selected items for bulk operations
+  // Selected items with details for operations
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
@@ -249,14 +249,15 @@ export function DriveManager() {
         isStarred: item?.starred || false,
         isShared: item?.shared || false,
         isFolder: itemIsFolder,
-        canCopy: item?.capabilities?.canCopy || true,
-        canDelete: item?.capabilities?.canDelete || false,
-        canDownload: !itemIsFolder && (item?.capabilities?.canDownload || true),
-        canTrash: item?.capabilities?.canTrash || false,
-        canUntrash: item?.trashed && (item?.capabilities?.canUntrash || false),
-        canRename: item?.capabilities?.canRename || false,
-        canShare: item?.capabilities?.canShare || false,
-        canMoveItemWithinDrive: item?.capabilities?.canMoveItemWithinDrive || true,
+        canCopy: !item?.trashed && item?.capabilities?.canCopy,
+        canDelete: item?.capabilities?.canDelete,
+        canDownload: !item?.trashed && !itemIsFolder && item?.capabilities?.canDownload,
+        canTrash: !item?.trashed && item?.capabilities?.canTrash,
+        canUntrash: item?.trashed && item?.capabilities?.canUntrash,
+        canRename: !item?.trashed && item?.capabilities?.canRename,
+        canShare: !item?.trashed,
+        canMove: !item?.trashed && item?.capabilities?.canMoveItemWithinDrive,
+        canExport: !item?.trashed && !itemIsFolder,
       }
     })
   }, [selectedItems, items])
