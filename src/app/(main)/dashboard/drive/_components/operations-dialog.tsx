@@ -101,15 +101,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     handleClose()
   }
 
-  const handleRestoreClick = () => {
-    setIsUntrashDialogOpen(true)
-    handleClose()
-  }
 
-  const handlePermanentDeleteClick = () => {
-    setIsDeleteDialogOpen(true)
-    handleClose()
-  }
 
   // Bulk operation completion handlers with actual API calls
   const handleMoveComplete = async (targetFolderId: string) => {
@@ -490,7 +482,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
         {/* Restore from Trash */}
         {canUntrashCount > 0 && (
-          <Button variant="outline" onClick={handleRestoreClick} className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
+          <Button variant="outline" onClick={handleUntrashClick} className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
               <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
@@ -522,7 +514,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
               {/* Permanent Delete */}
               {canDeleteCount > 0 && (
-                <Button variant="outline" onClick={handlePermanentDeleteClick} className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30">
+                <Button variant="outline" onClick={handleDeleteClick} className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
                     <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                   </div>

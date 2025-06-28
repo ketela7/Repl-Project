@@ -120,6 +120,7 @@ Changelog:
 - June 28, 2025. Enhanced DriveDestinationSelector with mobile-friendly compact layout
 - June 28, 2025. Enhanced all operation dialogs with comprehensive user feedback - added loading states, success/error messages, and partial completion warnings for Move, Copy, Trash, Share, Rename, Export, Delete, Restore, and Download operations
 - June 28, 2025. Updated download operations to use direct browser downloads instead of blob mechanism - simplified download process for better browser compatibility and reduced memory usage
+- June 28, 2025. Updated operation button labels and function names for consistency - "Restore from Trash" → "Untrash", "Permanent Delete" → "Delete", updated corresponding function names
 ```
 
 ## User Preferences
