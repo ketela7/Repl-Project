@@ -1009,7 +1009,7 @@ export const isPreviewable = (mimeType: string): boolean => {
 /**
  * Generate preview URL for different media types
  */
-export function getPreviewUrl(fileId: string, _mimeType: string, _webContentLink?: string): string {
+export function getPreviewUrl(fileId: string): string {
   // Universal Google Drive preview - supports all file types
   // If Google Drive can't preview the file, it will show appropriate message
   return `https://drive.google.com/file/d/${fileId}/preview`
@@ -1148,7 +1148,7 @@ export function formatDate(dateString: string): string {
         timeZone: userTimezone,
       })
     }
-  } catch (error) {
+  } catch {
     return 'Invalid date'
   }
 }
@@ -1205,9 +1205,6 @@ export function getFileActions(
   canRestore: boolean
   canPermanentDelete: boolean
 } {
-  // View state for future enhancements
-  const isTrashView = activeView === 'trash'
-  const isSharedView = activeView === 'shared'
   const isTrashed = file.trashed === true
   const isFolder = file.itemType === 'folder' || file.mimeType === 'application/vnd.google-apps.folder'
   const capabilities = file.capabilities || ({} as DriveFileCapabilities)
@@ -1277,7 +1274,7 @@ export const formatDriveFileDate = (dateString: string, timezone?: string, showR
       minute: '2-digit',
       timeZone: userTimezone,
     })
-  } catch (error) {
+  } catch {
     return 'Invalid date format'
   }
 }

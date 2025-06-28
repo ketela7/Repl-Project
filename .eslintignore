@@ -1,0 +1,13 @@
+node_modules/
+.next/
+.jest-cache/
+.swc/
+coverage/
+media/
+public/
+__tests__/
+scripts/
+.eslint-cache
+*.config.js
+*.config.ts
+.tsbuildinfo

@@ -49,7 +49,7 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
 
   if (!file) return null
 
-  const previewUrl = getPreviewUrl(file.id, file.mimeType, file.webContentLink)
+  const previewUrl = getPreviewUrl(file.id)
 
   const handleDownload = async () => {
     try {

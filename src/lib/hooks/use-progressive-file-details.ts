@@ -11,8 +11,8 @@ interface ProgressiveFileData {
 interface UseProgressiveFileDetailsOptions {
   fileId: string
   isOpen: boolean
-  onStageComplete?: (_stage: LoadingStage, _data: unknown) => void
-  onError?: (_stage: LoadingStage, _error: Error) => void
+  onStageComplete?: (stage: LoadingStage, data: unknown) => void
+  onError?: (stage: LoadingStage, error: Error) => void
 }
 
 interface UseProgressiveFileDetailsReturn {
@@ -30,7 +30,7 @@ interface UseProgressiveFileDetailsReturn {
   metrics: ProgressiveLoadingMetrics
   currentStage: LoadingStage
   progress: number
-  retry: (_stage?: LoadingStage) => void
+  retry: (stage?: LoadingStage) => void
 }
 
 export function useProgressiveFileDetails({

@@ -854,7 +854,7 @@ export class GoogleDriveService {
   }
 
   // Create permission (for enhanced sharing)
-  async createPermission(fileId: string, permissionData: any, _accessToken?: string): Promise<any> {
+  async createPermission(fileId: string, permissionData: any): Promise<any> {
     try {
       const response = await this.drive.permissions.create({
         fileId,
@@ -868,7 +868,7 @@ export class GoogleDriveService {
   }
 
   // Delete permission (for enhanced sharing)
-  async deletePermission(fileId: string, permissionId: string, _accessToken?: string): Promise<void> {
+  async deletePermission(fileId: string, permissionId: string): Promise<void> {
     try {
       await this.drive.permissions.delete({
         fileId,
@@ -880,7 +880,7 @@ export class GoogleDriveService {
   }
 
   // Send notification email (for enhanced sharing)
-  async sendNotificationEmail(fileId: string, emailData: any, _accessToken?: string): Promise<void> {
+  async sendNotificationEmail(fileId: string, emailData: any): Promise<void> {
     // Note: This would typically use the Gmail API or similar service
     // For now, we'll just log the action
   }

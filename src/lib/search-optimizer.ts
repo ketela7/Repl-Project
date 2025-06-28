@@ -186,12 +186,12 @@ class SearchOptimizer {
   /**
    * Preload common search patterns
    */
-  async preloadCommonSearches(_userId: string, apiCall: (query: string) => Promise<unknown>): Promise<void> {
+  async preloadCommonSearches(userId: string, apiCall: (query: string) => Promise<unknown>): Promise<void> {
     const commonQueries = ['doc', 'pdf', 'img', 'video', 'presentation']
 
     const preloadPromises = commonQueries.map(async (query) => {
       try {
-        await this.optimizedSearch(query, _userId, () => apiCall(query))
+        await this.optimizedSearch(query, userId, () => apiCall(query))
       } catch {
         // Silent fallback for preload failures
       }
