@@ -148,4 +148,4 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run format:fix"
+args = "npm run format:fix && echo \"✅ Format Completed successfully\""
