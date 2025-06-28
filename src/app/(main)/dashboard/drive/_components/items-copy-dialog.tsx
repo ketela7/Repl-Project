@@ -73,74 +73,79 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
   }
 
   const renderContent = () => (
-    <div className="space-y-6">
-      {/* Header Info */}
-      <div className="space-y-3 text-center">
+    <div className="flex flex-col space-y-4 max-h-[60vh]">
+      {/* Header Info - Compact */}
+      <div className="space-y-2 text-center flex-shrink-0">
         <div className="flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-            <Copy className="h-8 w-8 text-green-600 dark:text-green-400" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+            <Copy className="h-6 w-6 text-green-600 dark:text-green-400" />
           </div>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Copy Items</h3>
-          <p className="text-muted-foreground text-sm">
-            You are about to copy {files.length} file
-            {files.length > 1 ? 's' : ''} to a new location
+        <div className="space-y-1">
+          <h3 className="text-base font-semibold">Copy Items</h3>
+          <p className="text-muted-foreground text-xs">
+            {files.length} file{files.length > 1 ? 's' : ''} selected
           </p>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="flex justify-center gap-2">
+      {/* Stats - Compact */}
+      <div className="flex justify-center gap-1 flex-shrink-0">
         {files.length > 0 && (
-          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+          <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100 text-xs">
             {files.length} file{files.length > 1 ? 's' : ''}
           </Badge>
         )}
         {folders.length > 0 && (
-          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100">
-            {folders.length} folder{folders.length > 1 ? 's' : ''} (cannot copy)
+          <Badge variant="secondary" className="bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100 text-xs">
+            {folders.length} folder{folders.length > 1 ? 's' : ''}
           </Badge>
         )}
       </div>
 
-      {/* Folder Warning */}
+      {/* Folder Warning - Compact */}
       {folders.length > 0 && (
-        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/20">
-          <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
-          <div className="text-sm text-amber-800 dark:text-amber-200">
-            <strong>Note:</strong> Folders cannot be copied through the Google Drive API. Only files will be copied.
+        <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20 flex-shrink-0">
+          <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
+          <div className="text-xs text-amber-800 dark:text-amber-200">
+            Folders cannot be copied via API
           </div>
         </div>
       )}
 
-      {/* Files Preview */}
+      {/* Files Preview - Scrollable */}
       {files.length > 0 && (
-        <div className="space-y-3">
-          <h4 className="text-center text-sm font-medium">Files to be copied:</h4>
-          <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
-            <div className="space-y-2">
-              {files.slice(0, 5).map((item) => (
-                <div key={item.id} className="bg-background/50 flex items-center gap-3 rounded-md p-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="flex-1 truncate text-sm">{item.name}</span>
-                  <Badge variant="outline" className="text-xs">
+        <div className="space-y-2 flex-1 min-h-0">
+          <h4 className="text-xs font-medium text-center">Files to copy:</h4>
+          <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
+            <div className="p-2 space-y-1">
+              {files.slice(0, 20).map((item) => (
+                <div key={item.id} className="bg-background/50 flex items-center gap-2 rounded-md p-2 min-w-0">
+                  <div className="h-1.5 w-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                  <span className="flex-1 truncate text-xs font-mono" title={item.name}>
+                    {item.name}
+                  </span>
+                  <Badge variant="outline" className="text-[10px] px-1 py-0 flex-shrink-0">
                     file
                   </Badge>
                 </div>
               ))}
-              {files.length > 5 && <div className="text-muted-foreground py-2 text-center text-sm">... and {files.length - 5} more files</div>}
+              {files.length > 20 && (
+                <div className="text-muted-foreground py-1 text-center text-xs">
+                  ... and {files.length - 20} more files
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Info */}
-      <div className="flex items-start gap-3 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-950/20">
-        <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
-          <div className="h-2 w-2 rounded-full bg-white" />
+      {/* Info - Compact */}
+      <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20 flex-shrink-0">
+        <div className="mt-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-green-500 flex-shrink-0">
+          <div className="h-1.5 w-1.5 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-green-800 dark:text-green-200">Select a destination folder to copy these files.</div>
+        <div className="text-xs text-green-800 dark:text-green-200">Select destination folder</div>
       </div>
     </div>
   )

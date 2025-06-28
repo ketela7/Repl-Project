@@ -76,62 +76,67 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
   }
 
   const renderContent = () => (
-    <div className="space-y-6">
-      {/* Header Info */}
-      <div className="space-y-3 text-center">
+    <div className="flex flex-col space-y-4 max-h-[60vh]">
+      {/* Header Info - Compact */}
+      <div className="space-y-2 text-center flex-shrink-0">
         <div className="flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-            <Move className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+            <Move className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Move Items</h3>
-          <p className="text-muted-foreground text-sm">
-            You are about to move {selectedItems.length} item
-            {selectedItems.length > 1 ? 's' : ''} to a new location
+        <div className="space-y-1">
+          <h3 className="text-base font-semibold">Move Items</h3>
+          <p className="text-muted-foreground text-xs">
+            {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
           </p>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="flex justify-center gap-2">
+      {/* Stats - Compact */}
+      <div className="flex justify-center gap-1 flex-shrink-0">
         {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 text-xs">
             {fileCount} file{fileCount > 1 ? 's' : ''}
           </Badge>
         )}
         {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+          <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100 text-xs">
             {folderCount} folder{folderCount > 1 ? 's' : ''}
           </Badge>
         )}
       </div>
 
-      {/* Items Preview */}
-      <div className="space-y-3">
-        <h4 className="text-center text-sm font-medium">Items to be moved:</h4>
-        <div className="bg-muted/50 max-h-48 overflow-y-auto rounded-lg border p-4">
-          <div className="space-y-2">
-            {selectedItems.slice(0, 5).map((item) => (
-              <div key={item.id} className="bg-background/50 flex items-center gap-3 rounded-md p-2">
-                <div className="h-2 w-2 rounded-full bg-blue-500" />
-                <span className="flex-1 truncate text-sm">{item.name}</span>
-                <Badge variant="outline" className="text-xs">
+      {/* Items Preview - Scrollable */}
+      <div className="space-y-2 flex-1 min-h-0">
+        <h4 className="text-xs font-medium text-center">Items to move:</h4>
+        <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
+          <div className="p-2 space-y-1">
+            {selectedItems.slice(0, 20).map((item) => (
+              <div key={item.id} className="bg-background/50 flex items-center gap-2 rounded-md p-2 min-w-0">
+                <div className="h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+                <span className="flex-1 truncate text-xs font-mono" title={item.name}>
+                  {item.name}
+                </span>
+                <Badge variant="outline" className="text-[10px] px-1 py-0 flex-shrink-0">
                   {item.isFolder ? 'folder' : 'file'}
                 </Badge>
               </div>
             ))}
-            {selectedItems.length > 5 && <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>}
+            {selectedItems.length > 20 && (
+              <div className="text-muted-foreground py-1 text-center text-xs">
+                ... and {selectedItems.length - 20} more items
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Info */}
-      <div className="flex items-start gap-3 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950/20">
-        <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
-          <div className="h-2 w-2 rounded-full bg-white" />
+      {/* Info - Compact */}
+      <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20 flex-shrink-0">
+        <div className="mt-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 flex-shrink-0">
+          <div className="h-1.5 w-1.5 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-blue-800 dark:text-blue-200">Click &ldquo;Choose Destination&rdquo; to select where you want to move these items.</div>
+        <div className="text-xs text-blue-800 dark:text-blue-200">Select destination folder</div>
       </div>
     </div>
   )
