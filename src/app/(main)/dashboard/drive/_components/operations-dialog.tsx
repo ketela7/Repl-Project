@@ -1,16 +1,13 @@
 'use client'
 
-import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen, AlertTriangle } from 'lucide-react'
+import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen } from 'lucide-react'
 import { useState } from 'react'
-import React from 'react'
-import { toast } from 'sonner'
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetDescription } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { ItemsMoveDialog, ItemsCopyDialog, ItemsTrashDialog, ItemsShareDialog, ItemsRenameDialog, ItemsExportDialog, ItemsDeleteDialog, ItemsUntrashDialog } from '@/components/lazy-imports'
-import { loadingToast } from '@/lib/toast'
 
 import ItemsDownloadDialog from './items-download-dialog'
 
@@ -52,7 +49,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
   const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false)
+  const [isUntrashDialogOpen, setIsUntrashDialogOpen] = useState(false)
 
   // Determine dialog open state
   const dialogOpen = open ?? isOpen ?? false
@@ -69,7 +66,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     handleClose()
   }
 
-  const handleDeleteClick = () => {
+  const handleTrashClick = () => {
     setIsTrashDialogOpen(true)
     handleClose()
   }
@@ -89,13 +86,13 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     handleClose()
   }
 
-  const handlePermanentDeleteClick = () => {
+  const handleDeleteClick = () => {
     setIsDeleteDialogOpen(true)
     handleClose()
   }
 
-  const handleRestoreClick = () => {
-    setIsRestoreDialogOpen(true)
+  const handleUntrashClick = () => {
+    setIsUntrashDialogOpen(true)
     handleClose()
   }
 
@@ -104,14 +101,19 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     handleClose()
   }
 
-  // Bulk operation completion handlers with actual API calls and user feedback
+  const handleRestoreClick = () => {
+    setIsRestoreDialogOpen(true)
+    handleClose()
+  }
+
+  const handlePermanentDeleteClick = () => {
+    setIsDeleteDialogOpen(true)
+    handleClose()
+  }
+
+  // Bulk operation completion handlers with actual API calls
   const handleMoveComplete = async (targetFolderId: string) => {
-    const loadingId = 'move-operation'
-    const itemCount = selectedItems.length
-
     try {
-      loadingToast.start(`Moving ${itemCount} item${itemCount > 1 ? 's' : ''}...`, loadingId)
-
       const response = await fetch('/api/drive/files/move', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -121,86 +123,39 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         }),
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        const { success = 0, failed = 0, total = itemCount } = result
-
-        if (failed === 0) {
-          loadingToast.success(`Successfully moved ${success} item${success > 1 ? 's' : ''}`, loadingId)
-        } else if (success > 0) {
-          toast.warning('Move partially completed', {
-            id: loadingId,
-            icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-            description: `${success} moved, ${failed} failed`,
-            duration: 4000,
-          })
-        } else {
-          loadingToast.error('Failed to move items', loadingId)
-        }
-      } else {
-        loadingToast.error(result.error || 'Failed to move items', loadingId)
+        const result = await response.json()
       }
     } catch (error) {
       console.error('Move failed:', error)
-      loadingToast.error('Network error occurred while moving items', loadingId)
     }
     setIsMoveDialogOpen(false)
     onRefreshAfterOp?.()
   }
 
   const handleCopyComplete = async (targetFolderId: string) => {
-    const loadingId = 'copy-operation'
-    const copyableItems = selectedItems.filter((item) => !item.isFolder)
-    const itemCount = copyableItems.length
-
     try {
-      loadingToast.start(`Copying ${itemCount} item${itemCount > 1 ? 's' : ''}...`, loadingId)
-
       const response = await fetch('/api/drive/files/copy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: copyableItems,
+          items: selectedItems.filter((item) => !item.isFolder),
           targetFolderId,
         }),
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        const { success = 0, failed = 0, total = itemCount } = result
-
-        if (failed === 0) {
-          loadingToast.success(`Successfully copied ${success} item${success > 1 ? 's' : ''}`, loadingId)
-        } else if (success > 0) {
-          toast.warning('Copy partially completed', {
-            id: loadingId,
-            icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-            description: `${success} copied, ${failed} failed`,
-            duration: 4000,
-          })
-        } else {
-          loadingToast.error('Failed to copy items', loadingId)
-        }
-      } else {
-        loadingToast.error(result.error || 'Failed to copy items', loadingId)
+        const result = await response.json()
       }
     } catch (error) {
       console.error('Copy failed:', error)
-      loadingToast.error('Network error occurred while copying items', loadingId)
     }
     setIsCopyDialogOpen(false)
     onRefreshAfterOp?.()
   }
 
-  const handleDeleteComplete = async () => {
-    const loadingId = 'trash-operation'
-    const itemCount = selectedItems.length
-
+  const handleTrashComplete = async () => {
     try {
-      loadingToast.start(`Moving ${itemCount} item${itemCount > 1 ? 's' : ''} to trash...`, loadingId)
-
       const response = await fetch('/api/drive/files/trash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -209,41 +164,18 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         }),
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        const { success = 0, failed = 0, total = itemCount } = result
-
-        if (failed === 0) {
-          loadingToast.success(`Successfully moved ${success} item${success > 1 ? 's' : ''} to trash`, loadingId)
-        } else if (success > 0) {
-          toast.warning('Trash operation partially completed', {
-            id: loadingId,
-            icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-            description: `${success} moved to trash, ${failed} failed`,
-            duration: 4000,
-          })
-        } else {
-          loadingToast.error('Failed to move items to trash', loadingId)
-        }
-      } else {
-        loadingToast.error(result.error || 'Failed to move items to trash', loadingId)
+        const result = await response.json()
       }
     } catch (error) {
       console.error('Delete failed:', error)
-      loadingToast.error('Network error occurred while moving items to trash', loadingId)
     }
     setIsTrashDialogOpen(false)
     onRefreshAfterOp?.()
   }
 
   const handleShareComplete = async (shareOptions: any) => {
-    const loadingId = 'share-operation'
-    const itemCount = selectedItems.length
-
     try {
-      loadingToast.start(`Sharing ${itemCount} item${itemCount > 1 ? 's' : ''}...`, loadingId)
-
       const response = await fetch('/api/drive/files/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -253,32 +185,14 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         }),
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        const { success = 0, failed = 0, total = itemCount, results = [] } = result
+        const result = await response.json()
 
-        if (failed === 0) {
-          loadingToast.success(`Successfully shared ${success} item${success > 1 ? 's' : ''}`, loadingId)
-        } else if (success > 0) {
-          toast.warning('Share operation partially completed', {
-            id: loadingId,
-            icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-            description: `${success} shared, ${failed} failed`,
-            duration: 4000,
-          })
-        } else {
-          loadingToast.error('Failed to share items', loadingId)
-        }
-
-        return results
-      } else {
-        loadingToast.error(result.error || 'Failed to share items', loadingId)
-        return []
+        return result.results
       }
+      return []
     } catch (error) {
       console.error('Share failed:', error)
-      loadingToast.error('Network error occurred while sharing items', loadingId)
       return []
     } finally {
       setIsShareDialogOpen(false)
@@ -287,12 +201,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
   }
 
   const handleRenameComplete = async (namePrefix: string, newName?: string) => {
-    const loadingId = 'rename-operation'
-    const itemCount = selectedItems.length
-
     try {
-      loadingToast.start(`Renaming ${itemCount} item${itemCount > 1 ? 's' : ''}...`, loadingId)
-
       const response = await fetch('/api/drive/files/rename', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -303,88 +212,36 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         }),
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        const { success = 0, failed = 0, total = itemCount } = result
-
-        if (failed === 0) {
-          loadingToast.success(`Successfully renamed ${success} item${success > 1 ? 's' : ''}`, loadingId)
-        } else if (success > 0) {
-          toast.warning('Rename operation partially completed', {
-            id: loadingId,
-            icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-            description: `${success} renamed, ${failed} failed`,
-            duration: 4000,
-          })
-        } else {
-          loadingToast.error('Failed to rename items', loadingId)
-        }
-      } else {
-        loadingToast.error(result.error || 'Failed to rename items', loadingId)
+        const result = await response.json()
       }
     } catch (error) {
       console.error('Rename failed:', error)
-      loadingToast.error('Network error occurred while renaming items', loadingId)
     }
     setIsRenameDialogOpen(false)
     onRefreshAfterOp?.()
   }
 
   const handleExportComplete = async () => {
-    const loadingId = 'export-operation'
-    const exportableItems = selectedItems.filter((item) => !item.isFolder)
-    const itemCount = exportableItems.length
-
     try {
-      loadingToast.start(`Exporting ${itemCount} item${itemCount > 1 ? 's' : ''}...`, loadingId)
-
-      let successCount = 0
-      let failedCount = 0
-
-      for (const item of exportableItems) {
-        try {
-          const link = document.createElement('a')
-          link.href = `/api/drive/download/${item.id}`
-          link.download = item.name
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          successCount++
-          await new Promise((resolve) => setTimeout(resolve, 500))
-        } catch (error) {
-          console.error(`Failed to export ${item.name}:`, error)
-          failedCount++
-        }
-      }
-
-      if (failedCount === 0) {
-        loadingToast.success(`Successfully exported ${successCount} item${successCount > 1 ? 's' : ''}`, loadingId)
-      } else if (successCount > 0) {
-        toast.warning('Export partially completed', {
-          id: loadingId,
-          icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-          description: `${successCount} exported, ${failedCount} failed`,
-          duration: 4000,
-        })
-      } else {
-        loadingToast.error('Failed to export items', loadingId)
+      for (const item of selectedItems.filter((item) => !item.isFolder)) {
+        const link = document.createElement('a')
+        link.href = `/api/drive/download/${item.id}`
+        link.download = item.name
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        await new Promise((resolve) => setTimeout(resolve, 500))
       }
     } catch (error) {
       console.error('Export failed:', error)
-      loadingToast.error('An error occurred while exporting items', loadingId)
     }
     setIsExportDialogOpen(false)
     onRefreshAfterOp?.()
   }
 
-  const handlePermanentDeleteComplete = async () => {
-    const loadingId = 'delete-operation'
-    const itemCount = selectedItems.length
-
+  const handleDeleteComplete = async () => {
     try {
-      loadingToast.start(`Permanently deleting ${itemCount} item${itemCount > 1 ? 's' : ''}...`, loadingId)
-
       const response = await fetch('/api/drive/files/delete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -393,41 +250,18 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         }),
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        const { success = 0, failed = 0, total = itemCount } = result
-
-        if (failed === 0) {
-          loadingToast.success(`Successfully deleted ${success} item${success > 1 ? 's' : ''} permanently`, loadingId)
-        } else if (success > 0) {
-          toast.warning('Delete operation partially completed', {
-            id: loadingId,
-            icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-            description: `${success} deleted, ${failed} failed`,
-            duration: 4000,
-          })
-        } else {
-          loadingToast.error('Failed to delete items permanently', loadingId)
-        }
-      } else {
-        loadingToast.error(result.error || 'Failed to delete items permanently', loadingId)
+        const result = await response.json()
       }
     } catch (error) {
-      console.error('Permanent delete failed:', error)
-      loadingToast.error('Network error occurred while deleting items', loadingId)
+      console.error('delete failed:', error)
     }
     setIsDeleteDialogOpen(false)
     onRefreshAfterOp?.()
   }
 
-  const handleRestoreComplete = async () => {
-    const loadingId = 'restore-operation'
-    const itemCount = selectedItems.length
-
+  const handleUntrashComplete = async () => {
     try {
-      loadingToast.start(`Restoring ${itemCount} item${itemCount > 1 ? 's' : ''}...`, loadingId)
-
       const response = await fetch('/api/drive/files/untrash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -436,41 +270,19 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         }),
       })
 
-      const result = await response.json()
-
       if (response.ok) {
-        const { success = 0, failed = 0, total = itemCount } = result
-
-        if (failed === 0) {
-          loadingToast.success(`Successfully restored ${success} item${success > 1 ? 's' : ''}`, loadingId)
-        } else if (success > 0) {
-          toast.warning('Restore operation partially completed', {
-            id: loadingId,
-            icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-            description: `${success} restored, ${failed} failed`,
-            duration: 4000,
-          })
-        } else {
-          loadingToast.error('Failed to restore items', loadingId)
-        }
-      } else {
-        loadingToast.error(result.error || 'Failed to restore items', loadingId)
+        const result = await response.json()
       }
     } catch (error) {
       console.error('Restore failed:', error)
-      loadingToast.error('Network error occurred while restoring items', loadingId)
     }
-    setIsRestoreDialogOpen(false)
+    setIsUntrashDialogOpen(false)
     onRefreshAfterOp?.()
   }
 
   const handleDownloadComplete = async (downloadMode: string, progressCallback?: (progress: any) => void) => {
-    const loadingId = 'download-operation'
-    const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
-    const itemCount = downloadableFiles.length
-
     try {
-      loadingToast.start(`Downloading ${itemCount} item${itemCount > 1 ? 's' : ''}...`, loadingId)
+      const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
 
       if (downloadMode === 'oneByOne') {
         // For one by one downloads with progress tracking
@@ -487,118 +299,78 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
             })
           }
 
-          const fileResponse = await fetch('/api/drive/files/download', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              fileId: item.id,
-              downloadMode: 'oneByOne',
-            }),
-          })
+          // Direct browser download using GET request - no blob mechanism
+          const downloadUrl = `/api/drive/files/download?fileId=${encodeURIComponent(item.id)}&fileName=${encodeURIComponent(item.name)}`
 
-          if (fileResponse.ok) {
-            // Check if response is file content (streaming) or JSON (fallback)
-            const contentType = fileResponse.headers.get('content-type')
-
-            if (contentType?.includes('application/json')) {
-              // Fallback: use returned download URL
-              const result = await fileResponse.json()
-              if (result.downloadUrl) {
-                window.open(result.downloadUrl, '_blank')
-              }
-            } else {
-              // Direct file download from our server
-              const blob = await fileResponse.blob()
-              const url = window.URL.createObjectURL(blob)
-              const a = document.createElement('a')
-              a.href = url
-              a.download = item.name
-              document.body.appendChild(a)
-              a.click()
-              document.body.removeChild(a)
-              window.URL.revokeObjectURL(url)
-            }
-          }
+          // Create temporary link and trigger direct browser download
+          const link = document.createElement('a')
+          link.href = downloadUrl
+          link.download = item.name
+          link.target = '_blank'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
 
           // Small delay between downloads to prevent browser blocking
           await new Promise((resolve) => setTimeout(resolve, 1000))
         }
       } else if (downloadMode === 'batch') {
-        // For batch downloads, download files simultaneously
-        const downloadPromises = downloadableFiles.map(async (item, index) => {
+        // For batch downloads, trigger direct browser downloads with delay
+        for (let i = 0; i < downloadableFiles.length; i++) {
+          const item = downloadableFiles[i]
+
           if (progressCallback) {
             progressCallback({
-              current: index + 1,
+              current: i + 1,
               total: downloadableFiles.length,
               type: 'download',
               currentOperation: `Batch downloading ${item.name}`,
             })
           }
 
-          const response = await fetch(`/api/drive/files/${item.id}/download`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ downloadMode: 'batch' }),
-          })
+          // Direct browser download using GET request - no blob mechanism
+          const downloadUrl = `/api/drive/files/download?fileId=${encodeURIComponent(item.id)}&fileName=${encodeURIComponent(item.name)}`
 
-          if (response.ok) {
-            const result = await response.json()
-            if (result.downloadUrl) {
-              window.open(result.downloadUrl, '_blank')
-            }
-          }
-        })
+          // Create temporary link and trigger direct browser download
+          const link = document.createElement('a')
+          link.href = downloadUrl
+          link.download = item.name
+          link.target = '_blank'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
 
-        await Promise.all(downloadPromises)
+          // Small delay between downloads to prevent browser blocking
+          await new Promise((resolve) => setTimeout(resolve, 500))
+        }
       } else if (downloadMode === 'exportLinks') {
-        // For CSV export, use unified endpoint - fileId='bulk' triggers bulk processing
-        const response = await fetch('/api/drive/files/bulk/download', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: selectedItems,
-            downloadMode: 'exportLinks',
-          }),
-        })
+        // For CSV export of download links, use direct URL approach when possible
+        try {
+          const csvFileName = `download-links-${new Date().toISOString().split('T')[0]}.csv`
+          const exportUrl = `/api/drive/files/export?format=csv&type=downloadLinks&fileName=${encodeURIComponent(csvFileName)}`
 
-        if (response.ok) {
-          const contentType = response.headers.get('content-type')
+          // Create form data for POST request as URL parameters might be too long
+          const form = document.createElement('form')
+          form.method = 'POST'
+          form.action = exportUrl
+          form.style.display = 'none'
 
-          if (contentType?.includes('text/csv')) {
-            // Direct CSV download
-            const blob = await response.blob()
-            const url = window.URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-            a.download = `download-links-${new Date().toISOString().split('T')[0]}.csv`
-            document.body.appendChild(a)
-            a.click()
-            document.body.removeChild(a)
-            window.URL.revokeObjectURL(url)
-          } else {
-            // Fallback: if response is JSON, generate CSV manually
-            const result = await response.json()
-            if (result.success && result.success.length > 0) {
-              const csvContent = generateCSV(result.success)
-              const blob = new Blob([csvContent], { type: 'text/csv' })
-              const url = window.URL.createObjectURL(blob)
-              const a = document.createElement('a')
-              a.href = url
-              a.download = `download-links-${new Date().toISOString().split('T')[0]}.csv`
-              document.body.appendChild(a)
-              a.click()
-              document.body.removeChild(a)
-              window.URL.revokeObjectURL(url)
-            }
-          }
+          // Add selected items as form data
+          const itemsInput = document.createElement('input')
+          itemsInput.type = 'hidden'
+          itemsInput.name = 'items'
+          itemsInput.value = JSON.stringify(selectedItems)
+          form.appendChild(itemsInput)
+
+          document.body.appendChild(form)
+          form.submit()
+          document.body.removeChild(form)
+        } catch (error) {
+          console.error('Export links failed:', error)
         }
       }
-
-      // Success feedback
-      loadingToast.success(`Successfully initiated download for ${itemCount} item${itemCount > 1 ? 's' : ''}`, loadingId)
     } catch (error) {
-      console.error('Download failed:', error)
-      loadingToast.error('An error occurred while downloading items', loadingId)
+      // Handle errors
     }
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()
@@ -800,9 +572,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
       <ItemsDownloadDialog isOpen={isDownloadDialogOpen} onClose={() => setIsDownloadDialogOpen(false)} onConfirm={handleDownloadComplete} selectedItems={selectedItems} />
 
-      <ItemsDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={handlePermanentDeleteComplete} selectedItems={selectedItems} />
+      <ItemsDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={handleDeleteComplete} selectedItems={selectedItems} />
 
-      <ItemsUntrashDialog isOpen={isRestoreDialogOpen} onClose={() => setIsRestoreDialogOpen(false)} onConfirm={handleRestoreComplete} selectedItems={selectedItems} />
+      <ItemsUntrashDialog isOpen={isUntrashDialogOpen} onClose={() => setIsUntrashDialogOpen(false)} onConfirm={handleUntrashComplete} selectedItems={selectedItems} />
     </>
   )
 }
