@@ -192,7 +192,7 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
             {currentPath.map((folder, index) => (
               <div key={folder.id} className="flex items-center gap-1">
                 {index > 0 && <span>/</span>}
-                <button onClick={() => navigateBack(index)} className="hover:text-foreground transition-colors truncate max-w-24" title={folder.name}>
+                <button onClick={() => navigateBack(index)} className="hover:text-foreground max-w-24 truncate transition-colors" title={folder.name}>
                   {folder.name}
                 </button>
               </div>
