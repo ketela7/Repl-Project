@@ -140,7 +140,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-green-800 dark:text-green-200">Click &ldquo;Choose Destination&rdquo; to select where you want to copy these files.</div>
+        <div className="text-sm text-green-800 dark:text-green-200">Select a destination folder to copy these files.</div>
       </div>
     </div>
   )
@@ -165,16 +165,10 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
             <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
             <BottomSheetFooter className={cn('grid gap-4')}>
-              <Button onClick={handleCopy} disabled={isLoading || files.length === 0} className={cn('touch-target min-h-[44px] active:scale-95')}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Copy className="mr-2 h-4 w-4" />}
-                {isLoading ? 'Copying...' : 'Copy to Root'}
+              <Button onClick={() => setShowDestinationSelector(true)} disabled={isLoading || files.length === 0} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <Folder className="mr-2 h-4 w-4" />
+                Choose Destination
               </Button>
-              {files.length > 0 && (
-                <Button onClick={() => setShowDestinationSelector(true)} disabled={isLoading} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
-                  <Folder className="mr-2 h-4 w-4" />
-                  Choose Destination
-                </Button>
-              )}
               <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
                 Cancel
               </Button>
@@ -267,22 +261,21 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
                     <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-purple-500">
                       <div className="h-1.5 w-1.5 rounded-full bg-white" />
                     </div>
-                    <div className="text-sm text-purple-800 dark:text-purple-200">Click &ldquo;Choose Destination&rdquo; to select where you want to copy these files.</div>
+                    <div className="text-sm text-purple-800 dark:text-purple-200">Select a destination folder to copy these files.</div>
                   </div>
                 </>
               )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-2 sm:flex-row">
-            {files.length > 0 && (
-              <Button
-                onClick={() => setShowDestinationSelector(true)}
-                className="w-full bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500 sm:w-auto dark:bg-purple-700 dark:hover:bg-purple-800"
-              >
-                <Folder className="mr-2 h-4 w-4" />
-                Choose Destination
-              </Button>
-            )}
+            <Button
+              onClick={() => setShowDestinationSelector(true)}
+              disabled={files.length === 0}
+              className="w-full bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500 sm:w-auto dark:bg-purple-700 dark:hover:bg-purple-800"
+            >
+              <Folder className="mr-2 h-4 w-4" />
+              Choose Destination
+            </Button>
             <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
               Cancel
             </Button>
