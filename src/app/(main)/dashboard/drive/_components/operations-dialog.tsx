@@ -495,7 +495,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
               <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="font-medium">Restore from Trash</span>
+              <span className="font-medium">Untrash</span>
               <span className="text-muted-foreground text-xs">Restore {canUntrashCount} items to original location</span>
             </div>
           </Button>
@@ -527,7 +527,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
                     <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="font-medium">Permanent Delete</span>
+                    <span className="font-medium">Delete</span>
                     <span className="text-muted-foreground text-xs">Delete permanently {canDeleteCount} items (cannot be undone)</span>
                   </div>
                 </Button>
