@@ -34,7 +34,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
         credentials: 'include',
         body: JSON.stringify({ fileId: folderId }),
       })
-      
+
       if (!response.ok) {
         if (response.status === 401) {
           setError('Authentication required')
@@ -44,7 +44,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       }
 
       const folder = await response.json()
-      
+
       if (!folder || !folder.id) {
         throw new Error('Invalid folder data received')
       }
@@ -64,14 +64,14 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
             credentials: 'include',
             body: JSON.stringify({ fileId: currentParent }),
           })
-          
+
           if (!parentResponse.ok) {
             console.warn(`Failed to fetch parent folder ${currentParent}: ${parentResponse.status}`)
             break
           }
 
           const parentFolder = await parentResponse.json()
-          
+
           if (!parentFolder || !parentFolder.id) {
             console.warn(`Invalid parent folder data for ${currentParent}`)
             break
@@ -117,6 +117,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
               href="#"
               onClick={(e) => {
                 e.preventDefault()
+                console.log('Breadcrumb: Clicking root/home')
                 onNavigate(null)
               }}
               className={`hover:text-primary flex items-center gap-2 whitespace-nowrap transition-colors ${!currentFolderId ? 'text-primary font-medium' : ''}`}
@@ -144,6 +145,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
+                      console.log('Breadcrumb: Clicking folder:', folder.name, 'id:', folder.id)
                       onNavigate(folder.id)
                     }}
                     className="hover:text-primary flex max-w-[120px] items-center gap-2 whitespace-nowrap transition-colors sm:max-w-[200px] md:max-w-none"
