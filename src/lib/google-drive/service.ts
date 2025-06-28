@@ -556,6 +556,7 @@ export class GoogleDriveService {
     })
 
     return {
+      id: response.data.id!,
       name: response.data.name!,
       mimeType: response.data.mimeType!,
       createdTime: response.data.createdTime!,

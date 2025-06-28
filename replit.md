@@ -121,6 +121,8 @@ Changelog:
 - June 28, 2025. Fixed breadcrumb navigation - corrected backend API parameter handling from incorrect folderId to proper 'parentId' in parents syntax
 - June 28, 2025. Fixed View Status filter logic - "All Files" and "Recent" now show all files (owned + shared), "My Drive" shows only owned files
 - June 28, 2025. Fixed breadcrumb error "Drive Failed to load folder path" by correcting API response parsing in file-breadcrumb component
+- June 28, 2025. Added "all" filter for global file view - shows ALL files from entire drive without parent constraints
+- June 28, 2025. Fixed essential API navigation issue - added missing 'id' field to DriveFileMetadata and getFileMetadata response for proper breadcrumb functionality
 ```
 
 ## User Preferences
