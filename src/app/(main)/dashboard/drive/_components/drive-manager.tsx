@@ -20,7 +20,18 @@ import { FilePreviewDialog } from './file-preview-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
 
-type DriveItem = (DriveFile | DriveFolder) & { itemType?: 'file' | 'folder' }
+type DriveItem = (DriveFile | DriveFolder) & {
+  itemType?: 'file' | 'folder'
+  isFolder?: boolean
+  canDownload?: boolean
+  canRename?: boolean
+  canShare?: boolean
+  canTrash?: boolean
+  canDelete?: boolean
+  canUntrash?: boolean
+  canMove?: boolean
+  canCopy?: boolean
+}
 
 // Helper function to convert size units to bytes (Google Drive API requirement)
 function getSizeMultiplier(unit: string): number {

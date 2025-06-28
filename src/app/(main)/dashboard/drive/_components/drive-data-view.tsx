@@ -25,6 +25,8 @@ type DriveItem = (DriveFile | DriveFolder) & {
   canTrash?: boolean
   canDelete?: boolean
   canUntrash?: boolean
+  canMove?: boolean
+  canCopy?: boolean
 }
 
 interface DriveDataViewProps {

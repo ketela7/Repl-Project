@@ -339,7 +339,25 @@ export async function GET(request: NextRequest) {
       sizeMax: searchParams.get('sizeMax') || undefined,
     }
 
-    const query = buildDriveQuery(filters)
+    // Build the query with proper parent folder handling
+    let baseQuery = buildDriveQuery(filters)
+
+    // Add parent folder constraint to the query
+    if (folderId && folderId !== 'root') {
+      if (baseQuery) {
+        baseQuery = `(${baseQuery}) and '${folderId}' in parents`
+      } else {
+        baseQuery = `'${folderId}' in parents`
+      }
+    } else if (folderId === 'root') {
+      // For root folder, explicitly check for files in root
+      if (baseQuery) {
+        baseQuery = `(${baseQuery}) and 'root' in parents`
+      } else {
+        baseQuery = `'root' in parents`
+      }
+    }
+
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
 
@@ -347,7 +365,7 @@ export async function GET(request: NextRequest) {
       parentId: folderId,
       userId: session.user?.email || '',
       pageToken,
-      query: query,
+      query: baseQuery,
       pageSize,
     })
 
@@ -356,11 +374,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    // Use driveService from destructuring
-
+    // Use the complete query instead of parentId parameter
     const result = await driveService.listFiles({
-      parentId: folderId,
-      query,
+      query: baseQuery,
       pageToken,
       pageSize,
       orderBy,
