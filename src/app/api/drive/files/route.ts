@@ -51,8 +51,14 @@ function buildDriveQuery(filters: FileFilter): string {
       conditions.push("'me' in owners")
       break
 
+    case 'all':
+      // All files view - ALL non-trashed files (owned + shared) everywhere
+      conditions.push('trashed=false')
+      // Note: No ownership filter, no parent filter - shows ALL files from entire drive
+      break
+
     default:
-      // All files view - ALL non-trashed files (owned + shared)
+      // Default case - ALL non-trashed files (owned + shared)
       conditions.push('trashed=false')
       // Note: No ownership filter - shows both owned and shared files
       break
@@ -353,23 +359,23 @@ export async function GET(request: NextRequest) {
 
     // Handle parent folder constraint based on context:
     // 1. Folder navigation (folderId specified without viewStatus) - add parent constraint
-    // 2. View status filters - only "my-drive" needs parent constraint, others are global
-    if (folderId && folderId !== 'root' && (!filters.viewStatus || filters.viewStatus === 'all')) {
-      // Folder navigation - show files in specific folder
+    // 2. View status filters - only "my-drive" needs parent constraint, "all" is global everywhere
+    if (folderId && folderId !== 'root' && !filters.viewStatus) {
+      // Pure folder navigation (no view filter) - show files in specific folder
       if (baseQuery) {
         baseQuery = `(${baseQuery}) and '${folderId}' in parents`
       } else {
         baseQuery = `'${folderId}' in parents`
       }
-    } else if (folderId === 'root' && (!filters.viewStatus || filters.viewStatus === 'all' || filters.viewStatus === 'my-drive')) {
-      // Root folder navigation OR My Drive view - show files in root
+    } else if (folderId === 'root' && (!filters.viewStatus || filters.viewStatus === 'my-drive')) {
+      // Root folder navigation OR My Drive view - show files in root only
       if (baseQuery) {
         baseQuery = `(${baseQuery}) and 'root' in parents`
       } else {
         baseQuery = `'root' in parents`
       }
     }
-    // For other view status filters (recent, shared, starred, trash), no parent constraint
+    // For "all", "recent", "shared", "starred", "trash" - no parent constraint (global search)
 
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`

@@ -44,9 +44,22 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       }
 
       const data = await response.json()
-      const folder = data.fileMetadata || data
+
+      // Handle different response structures from the essential API
+      let folder = null
+      if (data.success && data.fileMetadata) {
+        folder = data.fileMetadata
+      } else if (data.fileMetadata) {
+        folder = data.fileMetadata
+      } else if (data.id) {
+        folder = data
+      } else {
+        console.error('Invalid API response structure:', data)
+        throw new Error('Invalid folder data received from API')
+      }
 
       if (!folder || !folder.id) {
+        console.error('Folder object missing required fields:', folder)
         throw new Error('Invalid folder data received')
       }
 
@@ -72,7 +85,19 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           }
 
           const parentData = await parentResponse.json()
-          const parentFolder = parentData.fileMetadata || parentData
+
+          // Handle different response structures from the essential API
+          let parentFolder = null
+          if (parentData.success && parentData.fileMetadata) {
+            parentFolder = parentData.fileMetadata
+          } else if (parentData.fileMetadata) {
+            parentFolder = parentData.fileMetadata
+          } else if (parentData.id) {
+            parentFolder = parentData
+          } else {
+            console.warn(`Invalid parent API response structure for ${currentParent}:`, parentData)
+            break
+          }
 
           if (!parentFolder || !parentFolder.id) {
             console.warn(`Invalid parent folder data for ${currentParent}`)
