@@ -351,21 +351,25 @@ export async function GET(request: NextRequest) {
     // Build the query with proper parent folder handling
     let baseQuery = buildDriveQuery(filters)
 
-    // Add parent folder constraint to the query
-    if (folderId && folderId !== 'root') {
+    // Handle parent folder constraint based on context:
+    // 1. Folder navigation (folderId specified without viewStatus) - add parent constraint
+    // 2. View status filters - only "my-drive" needs parent constraint, others are global
+    if (folderId && folderId !== 'root' && (!filters.viewStatus || filters.viewStatus === 'all')) {
+      // Folder navigation - show files in specific folder
       if (baseQuery) {
         baseQuery = `(${baseQuery}) and '${folderId}' in parents`
       } else {
         baseQuery = `'${folderId}' in parents`
       }
-    } else if (folderId === 'root') {
-      // For root folder, explicitly check for files in root
+    } else if (folderId === 'root' && (!filters.viewStatus || filters.viewStatus === 'all' || filters.viewStatus === 'my-drive')) {
+      // Root folder navigation OR My Drive view - show files in root
       if (baseQuery) {
         baseQuery = `(${baseQuery}) and 'root' in parents`
       } else {
         baseQuery = `'root' in parents`
       }
     }
+    // For other view status filters (recent, shared, starred, trash), no parent constraint
 
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
