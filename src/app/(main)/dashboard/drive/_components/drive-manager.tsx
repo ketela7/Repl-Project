@@ -589,7 +589,18 @@ export function DriveManager() {
           />
 
           {currentFolderId && (
-            <FileBreadcrumb currentFolderId={currentFolderId} onNavigate={(folderId) => (folderId ? handleFolderClick(folderId) : handleBackToParent())} onBackToRoot={handleBackToParent} />
+            <FileBreadcrumb 
+              currentFolderId={currentFolderId} 
+              onNavigate={(folderId) => {
+                if (folderId) {
+                  handleFolderClick(folderId)
+                } else {
+                  handleBackToParent()
+                }
+              }} 
+              onBackToRoot={handleBackToParent}
+              loading={loading}
+            />
           )}
 
           <DriveDataView

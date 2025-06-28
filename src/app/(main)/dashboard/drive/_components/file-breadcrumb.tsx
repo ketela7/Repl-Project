@@ -31,14 +31,25 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       const response = await fetch('/api/drive/files/essential', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ fileId: folderId }),
       })
+      
       if (!response.ok) {
-        throw new Error(`Failed to fetch folder: ${response.status}`)
+        if (response.status === 401) {
+          setError('Authentication required')
+          return
+        }
+        throw new Error(`Failed to fetch folder: ${response.status} ${response.statusText}`)
       }
 
       const folder = await response.json()
-      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }]
+      
+      if (!folder || !folder.id) {
+        throw new Error('Invalid folder data received')
+      }
+
+      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name || 'Untitled Folder' }]
 
       // Build path by traversing parent folders
       let currentParent = folder.parents?.[0]
@@ -50,26 +61,34 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           const parentResponse = await fetch('/api/drive/files/essential', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ fileId: currentParent }),
           })
-          if (!parentResponse.ok) break
+          
+          if (!parentResponse.ok) {
+            console.warn(`Failed to fetch parent folder ${currentParent}: ${parentResponse.status}`)
+            break
+          }
 
           const parentFolder = await parentResponse.json()
-          items.unshift({ id: parentFolder.id, name: parentFolder.name })
+          
+          if (!parentFolder || !parentFolder.id) {
+            console.warn(`Invalid parent folder data for ${currentParent}`)
+            break
+          }
+
+          items.unshift({ id: parentFolder.id, name: parentFolder.name || 'Untitled Folder' })
           currentParent = parentFolder.parents?.[0]
           depth++
         } catch (err) {
-          if (process.env.NODE_ENV === 'development') {
-          }
+          console.warn('Error fetching parent folder:', err)
           break
         }
       }
 
       setBreadcrumbItems(items)
     } catch (error) {
-      // Log error for debugging in development only
-      if (process.env.NODE_ENV === 'development') {
-      }
+      console.error('Error fetching folder path:', error)
       setError('Failed to load folder path')
       setBreadcrumbItems([])
     } finally {
