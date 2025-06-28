@@ -38,21 +38,23 @@ function buildDriveQuery(filters: FileFilter): string {
       conditions.push('starred=true')
       break
     case 'recent':
-      // Recent view - files modified in the last 30 days
+      // Recent view - ALL files (owned + shared) modified in the last 30 days
       conditions.push('trashed=false')
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
       conditions.push(`modifiedTime >= '${thirtyDaysAgo.toISOString()}'`)
+      // Note: No ownership filter - shows both owned and shared files
       break
     case 'my-drive':
-      // My Drive view - files owned by me
+      // My Drive view - files owned by me only
       conditions.push('trashed=false')
       conditions.push("'me' in owners")
       break
 
     default:
-      // All files view - show non-trashed files by default
+      // All files view - ALL non-trashed files (owned + shared)
       conditions.push('trashed=false')
+      // Note: No ownership filter - shows both owned and shared files
       break
   }
 

@@ -118,6 +118,9 @@ Changelog:
 - June 28, 2025. Initial setup
 - June 28, 2025. Fixed operation dialog UI layout issues with many files - improved Copy/Move/Trash/Untrash dialogs with compact design, scrollable previews, and better text truncation
 - June 28, 2025. Enhanced DriveDestinationSelector with mobile-friendly compact layout
+- June 28, 2025. Fixed breadcrumb navigation - corrected backend API parameter handling from incorrect folderId to proper 'parentId' in parents syntax
+- June 28, 2025. Fixed View Status filter logic - "All Files" and "Recent" now show all files (owned + shared), "My Drive" shows only owned files
+- June 28, 2025. Fixed breadcrumb error "Drive Failed to load folder path" by correcting API response parsing in file-breadcrumb component
 ```
 
 ## User Preferences

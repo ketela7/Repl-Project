@@ -43,7 +43,8 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
         throw new Error(`Failed to fetch folder: ${response.status} ${response.statusText}`)
       }
 
-      const folder = await response.json()
+      const data = await response.json()
+      const folder = data.fileMetadata || data
 
       if (!folder || !folder.id) {
         throw new Error('Invalid folder data received')
@@ -70,7 +71,8 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
             break
           }
 
-          const parentFolder = await parentResponse.json()
+          const parentData = await parentResponse.json()
+          const parentFolder = parentData.fileMetadata || parentData
 
           if (!parentFolder || !parentFolder.id) {
             console.warn(`Invalid parent folder data for ${currentParent}`)
