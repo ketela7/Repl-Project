@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
 
         const actualFileName = fileName || metadata.name
         const mimeType = metadata.mimeType || 'application/octet-stream'
+        const fileSize = metadata.size ? parseInt(metadata.size) : undefined
 
         // Check if it's a Google Workspace file that needs export
         if (isGoogleWorkspaceFile(mimeType)) {
@@ -57,6 +58,7 @@ export async function GET(request: NextRequest) {
               'Content-Type': 'application/octet-stream',
               'Content-Disposition': `attachment; filename="${exportFileName}"`,
               'Content-Length': uint8Array.length.toString(),
+              'Accept-Ranges': 'bytes',
             },
           })
         }
@@ -73,12 +75,20 @@ export async function GET(request: NextRequest) {
         const webStream = Readable.toWeb(fileStream)
 
         // Stream file directly to browser with octet-stream content type
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/octet-stream',
+          'Content-Disposition': `attachment; filename="${actualFileName}"`,
+          'Accept-Ranges': 'bytes',
+        }
+
+        // Add Content-Length if file size is known
+        if (fileSize) {
+          headers['Content-Length'] = fileSize.toString()
+        }
+
         return new NextResponse(webStream, {
           status: 200,
-          headers: {
-            'Content-Type': 'application/octet-stream',
-            'Content-Disposition': `attachment; filename="${actualFileName}"`,
-          },
+          headers,
         })
       } catch (error: any) {
         console.error('Direct download failed:', error)
@@ -240,6 +250,7 @@ async function processSingleDownload(driveService: any, fileId: string, download
 
     const fileName = metadata.name
     const mimeType = metadata.mimeType || 'application/octet-stream'
+    const fileSize = metadata.size ? parseInt(metadata.size) : undefined
 
     // Check if it's a Google Workspace file that needs export
     if (isGoogleWorkspaceFile(mimeType)) {
@@ -262,6 +273,7 @@ async function processSingleDownload(driveService: any, fileId: string, download
           'Content-Type': exportMimeType,
           'Content-Disposition': `attachment; filename="${exportFileName}"`,
           'Content-Length': uint8Array.length.toString(),
+          'Accept-Ranges': 'bytes',
         },
       })
     }
@@ -278,12 +290,20 @@ async function processSingleDownload(driveService: any, fileId: string, download
     const webStream = Readable.toWeb(fileStream)
 
     // Stream file directly to browser
+    const headers: Record<string, string> = {
+      'Content-Type': mimeType,
+      'Content-Disposition': `attachment; filename="${fileName}"`,
+      'Accept-Ranges': 'bytes',
+    }
+
+    // Add Content-Length if file size is known
+    if (fileSize) {
+      headers['Content-Length'] = fileSize.toString()
+    }
+
     return new NextResponse(webStream, {
       status: 200,
-      headers: {
-        'Content-Type': mimeType,
-        'Content-Disposition': `attachment; filename="${fileName}"`,
-      },
+      headers,
     })
   } catch (error: any) {
     // Fallback to Google Drive direct URL if streaming fails
