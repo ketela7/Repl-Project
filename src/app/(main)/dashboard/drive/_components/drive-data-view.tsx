@@ -89,7 +89,6 @@ export function DriveDataView({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-
         {/* Conditionally render details option */}
         <DropdownMenuItem onClick={() => onItemAction('details', item)}>
           <Info className="mr-2 h-4 w-4" />
@@ -98,19 +97,19 @@ export function DriveDataView({
 
         {/* Conditionally render move option */}
         {item.canMove && (
-        <DropdownMenuItem onClick={() => onItemAction('move', item)}>
-          <Move className="mr-2 h-4 w-4" />
-          Move
-        </DropdownMenuItem>
-      )}
+          <DropdownMenuItem onClick={() => onItemAction('move', item)}>
+            <Move className="mr-2 h-4 w-4" />
+            Move
+          </DropdownMenuItem>
+        )}
 
         {/* Conditionally render copy option */}
         {item.canCopy && (
-        <DropdownMenuItem onClick={() => onItemAction('copy', item)}>
-          <Copy className="mr-2 h-4 w-4" />
-          Copy
-        </DropdownMenuItem>
-      )}
+          <DropdownMenuItem onClick={() => onItemAction('copy', item)}>
+            <Copy className="mr-2 h-4 w-4" />
+            Copy
+          </DropdownMenuItem>
+        )}
 
         {/* Conditionally render preview option */}
         {!item.isFolder && (
@@ -119,7 +118,7 @@ export function DriveDataView({
             Preview
           </DropdownMenuItem>
         )}
-        
+
         {/* Conditionally render download option */}
         {item.canDownload && (
           <DropdownMenuItem onClick={() => onItemAction('download', item)}>
@@ -159,7 +158,7 @@ export function DriveDataView({
             Delete
           </DropdownMenuItem>
         )}
-      
+
         {/* Conditionally render untrash option */}
         {item.canUntrash && (
           <DropdownMenuItem onClick={() => onItemAction('untrash', item)} className="text-destructive">
