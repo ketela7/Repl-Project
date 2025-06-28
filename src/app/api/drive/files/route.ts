@@ -37,6 +37,13 @@ function buildDriveQuery(filters: FileFilter): string {
       conditions.push('trashed=false')
       conditions.push('starred=true')
       break
+    case 'recent':
+      // Recent view - files modified in the last 30 days
+      conditions.push('trashed=false')
+      const thirtyDaysAgo = new Date()
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+      conditions.push(`modifiedTime >= '${thirtyDaysAgo.toISOString()}'`)
+      break
     case 'my-drive':
       // My Drive view - files owned by me
       conditions.push('trashed=false')
