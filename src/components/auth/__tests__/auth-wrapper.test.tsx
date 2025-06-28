@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react'
 import { useSession } from 'next-auth/react'
+import { render } from '@testing-library/react'
 
 import { AuthWrapper } from '../auth-wrapper'
-import { render } from '@testing-library/react'
 
 jest.mock('next-auth/react')
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>

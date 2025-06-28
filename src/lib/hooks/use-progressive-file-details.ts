@@ -3,16 +3,16 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { LoadingStage, ProgressiveLoadingMetrics } from '@/lib/google-drive/progressive-fields'
 
 interface ProgressiveFileData {
-  basic?: any
-  essential?: any
-  extended?: any
+  basic?: unknown
+  essential?: unknown
+  extended?: unknown
 }
 
 interface UseProgressiveFileDetailsOptions {
   fileId: string
   isOpen: boolean
-  onStageComplete?: (stage: LoadingStage, data: any) => void
-  onError?: (stage: LoadingStage, error: Error) => void
+  onStageComplete?: (_stage: LoadingStage, _data: unknown) => void
+  onError?: (_stage: LoadingStage, _error: Error) => void
 }
 
 interface UseProgressiveFileDetailsReturn {
@@ -30,7 +30,7 @@ interface UseProgressiveFileDetailsReturn {
   metrics: ProgressiveLoadingMetrics
   currentStage: LoadingStage
   progress: number
-  retry: (stage?: LoadingStage) => void
+  retry: (_stage?: LoadingStage) => void
 }
 
 export function useProgressiveFileDetails({

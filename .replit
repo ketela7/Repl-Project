@@ -100,6 +100,10 @@ args = "DevQuality"
 task = "workflow.run"
 args = "DevFast"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Test:RealTime"
+
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -169,3 +173,11 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run format:fix && npm run lint:fix && npx tsc --noEmit"
+
+[[workflows.workflow]]
+name = "Test:RealTime"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/test-realtime-api.js"
