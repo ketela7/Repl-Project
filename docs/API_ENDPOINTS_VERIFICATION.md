@@ -1,6 +1,7 @@
 # API Endpoints Verification Report
 
 ## Overview
+
 Complete refactoring from dynamic routing `/api/drive/files/[fileId]/operation` to static routing `/api/drive/files/operation` structure completed successfully.
 
 ## Refactoring Summary
@@ -12,6 +13,7 @@ Complete refactoring from dynamic routing `/api/drive/files/[fileId]/operation` 
    - All method names now match their corresponding API endpoint file names
 
 2. **New Static Routing Structure**
+
    ```
    src/app/api/drive/files/
    ├── copy/route.ts          - File copying operations
@@ -31,13 +33,14 @@ Complete refactoring from dynamic routing `/api/drive/files/[fileId]/operation` 
 
 3. **Unified Request Structure**
    All endpoints now use POST method with standardized request body:
+
    ```json
    {
      "fileId": "string",              // For single operations
      "items": [                       // For bulk operations
        {
          "id": "string",
-         "name": "string", 
+         "name": "string",
          "isFolder": boolean
        }
      ]
@@ -53,13 +56,16 @@ Complete refactoring from dynamic routing `/api/drive/files/[fileId]/operation` 
 ### ✅ **API Endpoint Testing Results**
 
 **Health Endpoints**: ✅ Working
+
 - `/api/health` - 200 OK (171ms response time)
 
 **Auth Endpoints**: ✅ Working
+
 - `/api/auth/providers` - 200 OK (205ms response time)
 - `/api/auth/session` - Available
 
 **File Operation Endpoints**: ✅ Created and Available
+
 - `/api/drive/files/details` - POST method, fileId in body
 - `/api/drive/files/essential` - POST method, fileId in body
 - `/api/drive/files/extended` - POST method, fileId in body
@@ -93,6 +99,7 @@ Complete refactoring from dynamic routing `/api/drive/files/[fileId]/operation` 
 ### Request/Response Patterns
 
 **Single File Operation**:
+
 ```javascript
 POST /api/drive/files/rename
 {
@@ -102,6 +109,7 @@ POST /api/drive/files/rename
 ```
 
 **Bulk Operation**:
+
 ```javascript
 POST /api/drive/files/rename
 {
@@ -114,6 +122,7 @@ POST /api/drive/files/rename
 ```
 
 **Response Structure**:
+
 ```javascript
 {
   "success": true,

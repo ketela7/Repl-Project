@@ -92,6 +92,14 @@ args = "PreCommit"
 task = "workflow.run"
 args = "Test:Fast"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "DevQuality"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "DevFast"
+
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -145,3 +153,19 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx jest --passWithNoTests --silent --maxWorkers=2 --watchAll=false"
+
+[[workflows.workflow]]
+name = "DevQuality"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint:fix && npm run redundant"
+
+[[workflows.workflow]]
+name = "DevFast"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format:fix && npm run lint:fix && npx tsc --noEmit"

@@ -2,7 +2,7 @@
 const nextConfig = {
   // Enable gzip compression for all responses
   compress: true,
-  
+
   // Fast development optimizations
   reactStrictMode: false, // Disable for faster development
 
@@ -36,7 +36,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  allowedDevOrigins: ['127.0.0.1','localhost','*.pike.replit.dev', '*.sisko.replit.dev'],
+  allowedDevOrigins: ['127.0.0.1', 'localhost', '*.pike.replit.dev', '*.sisko.replit.dev'],
 
   // Performance optimizations
   compiler: {
@@ -100,7 +100,6 @@ const nextConfig = {
               priority: -10,
               chunks: 'all',
             },
-            
           },
         },
       }

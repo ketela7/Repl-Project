@@ -25,6 +25,7 @@ Content-Type: application/json
 ## Common Response Formats
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -34,6 +35,7 @@ Content-Type: application/json
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -47,6 +49,7 @@ Content-Type: application/json
 ## 📁 Files API
 
 ### 1. Get Files List
+
 Mengambil daftar file dari Google Drive dengan berbagai filter dan sorting options.
 
 ```http
@@ -64,11 +67,13 @@ GET /api/drive/files
 | `sortOrder` | string | No | 'desc' | Urutan sorting: 'asc', 'desc' |
 
 **Example Request:**
+
 ```bash
 curl "http://localhost:5000/api/drive/files?pageSize=100&sortBy=name&sortOrder=asc"
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -112,27 +117,33 @@ curl "http://localhost:5000/api/drive/files?pageSize=100&sortBy=name&sortOrder=a
 ```
 
 ### 2. Get File Details (Progressive Loading)
+
 Mengambil detail file dengan progressive loading untuk performa optimal.
 
 #### Basic Details (Fastest)
+
 ```http
 GET /api/drive/files/[id]
 ```
 
 #### Essential Details (Optimized)
+
 ```http
 GET /api/drive/files/[id]/essential
 ```
 
 #### Extended Metadata (Background)
+
 ```http
 GET /api/drive/files/[id]/extended
 ```
 
 **Path Parameters:**
+
 - `id` (string, required): ID file Google Drive
 
 **Example Requests:**
+
 ```bash
 # Essential details (recommended for dialogs)
 curl "http://localhost:5000/api/drive/files/1abc123def456/essential"
@@ -142,6 +153,7 @@ curl "http://localhost:5000/api/drive/files/1abc123def456/extended"
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -175,6 +187,7 @@ curl "http://localhost:5000/api/drive/files/1abc123def456/extended"
 ## 🔄 Bulk Operations
 
 ### 1. Move Files (Bulk)
+
 Memindahkan multiple files ke folder tujuan.
 
 ```http
@@ -182,6 +195,7 @@ POST /api/drive/bulk/move
 ```
 
 **Request Body:**
+
 ```json
 {
   "fileIds": ["1abc123", "2def456", "3ghi789"],
@@ -190,6 +204,7 @@ POST /api/drive/bulk/move
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -207,6 +222,7 @@ POST /api/drive/bulk/move
 ```
 
 ### 2. Copy Files (Bulk)
+
 Menyalin multiple files ke folder tujuan.
 
 ```http
@@ -214,6 +230,7 @@ POST /api/drive/bulk/copy
 ```
 
 **Request Body:**
+
 ```json
 {
   "fileIds": ["1abc123", "2def456"],
@@ -222,6 +239,7 @@ POST /api/drive/bulk/copy
 ```
 
 ### 3. Delete Files (Bulk)
+
 Menghapus multiple files (ke trash atau permanent).
 
 ```http
@@ -229,6 +247,7 @@ POST /api/drive/bulk/delete
 ```
 
 **Request Body:**
+
 ```json
 {
   "fileIds": ["1abc123", "2def456"],
@@ -237,9 +256,11 @@ POST /api/drive/bulk/delete
 ```
 
 **Parameters:**
+
 - `permanent` (boolean): `true` untuk hapus permanent, `false` untuk pindah ke trash
 
 ### 4. Share Files (Bulk)
+
 Membagikan multiple files ke user/email tertentu.
 
 ```http
@@ -247,6 +268,7 @@ POST /api/drive/bulk/share
 ```
 
 **Request Body:**
+
 ```json
 {
   "fileIds": ["1abc123", "2def456"],
@@ -257,10 +279,12 @@ POST /api/drive/bulk/share
 ```
 
 **Parameters:**
+
 - `role`: "reader", "writer", "owner"
 - `type`: "user", "group", "domain", "anyone"
 
 ### 5. Rename Files (Bulk)
+
 Mengganti nama multiple files dengan pattern tertentu.
 
 ```http
@@ -268,6 +292,7 @@ POST /api/drive/files/bulk/rename
 ```
 
 **Request Body:**
+
 ```json
 {
   "fileIds": ["1abc123", "2def456"],
@@ -281,6 +306,7 @@ POST /api/drive/files/bulk/rename
 ## 📊 Performance & Monitoring
 
 ### 1. Get Performance Metrics
+
 Mengambil statistik performa API.
 
 ```http
@@ -288,6 +314,7 @@ GET /api/drive/performance
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -314,6 +341,7 @@ GET /api/drive/performance
 ```
 
 ### 2. Clear Cache
+
 Menghapus semua cache untuk development/testing.
 
 ```http
@@ -321,6 +349,7 @@ POST /api/cache/clear
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -336,56 +365,64 @@ POST /api/cache/clear
 
 ## ⚠️ Error Codes
 
-| Code | Description | HTTP Status |
-|------|-------------|------------|
-| `UNAUTHORIZED` | Autentikasi diperlukan | 401 |
-| `FORBIDDEN` | Permissions tidak cukup | 403 |
-| `NOT_FOUND` | Resource tidak ditemukan | 404 |
-| `RATE_LIMIT_EXCEEDED` | Terlalu banyak request | 429 |
-| `INTERNAL_ERROR` | Server error | 500 |
-| `INVALID_PARAMETER` | Parameter tidak valid | 400 |
-| `GOOGLE_API_ERROR` | Error dari Google Drive API | 502 |
+| Code                  | Description                 | HTTP Status |
+| --------------------- | --------------------------- | ----------- |
+| `UNAUTHORIZED`        | Autentikasi diperlukan      | 401         |
+| `FORBIDDEN`           | Permissions tidak cukup     | 403         |
+| `NOT_FOUND`           | Resource tidak ditemukan    | 404         |
+| `RATE_LIMIT_EXCEEDED` | Terlalu banyak request      | 429         |
+| `INTERNAL_ERROR`      | Server error                | 500         |
+| `INVALID_PARAMETER`   | Parameter tidak valid       | 400         |
+| `GOOGLE_API_ERROR`    | Error dari Google Drive API | 502         |
 
 ---
 
 ## 🚀 Performance Features
 
 ### Gzip Compression
+
 - **Enabled**: `compress: true` di Next.js config
 - **Response reduction**: 70-80% untuk file lists, 60-75% untuk file details
 - **Automatic**: Browser dan server otomatis handle compression
 - **Impact**: Significant bandwidth savings terutama untuk FileDetailsDialog
 
 ### Rate Limiting
+
 - Maximum 25 requests per second per user
 - Automatic throttling dengan queue system
 - Exponential backoff untuk retry logic
 
 ### Progressive Loading (FileDetailsDialog Optimization)
+
 - **Stage 1 - Basic**: 0ms (dari cache list view)
 - **Stage 2 - Essential**: ~200ms (permissions, capabilities)
 - **Stage 3 - Extended**: Background loading (metadata lengkap)
 - **Benefits**: 85% faster initial render, 65% smaller essential requests
 
 ### Caching System
+
 - **Multi-layer**: Basic (5min), Essential (15min), Extended (60min)
 - **Intelligent invalidation**: Per-stage cache clearing
 - **Request deduplication**: Mencegah duplicate calls
 
 ### Field Optimization
+
 API menggunakan progressive field selectors:
 
 **Basic Fields (List cache):**
+
 ```
 id, name, mimeType, size, createdTime, modifiedTime, owners(displayName, emailAddress)
 ```
 
 **Essential Fields (Dialog utama):**
+
 ```
 Basic + capabilities, permissions, lastModifyingUser, webViewLink, thumbnailLink
 ```
 
 **Extended Fields (Background):**
+
 ```
 Essential + properties, revisions, checksums, metadata lengkap
 ```
@@ -395,15 +432,16 @@ Essential + properties, revisions, checksums, metadata lengkap
 ## 💡 Best Practices
 
 ### 1. Error Handling
+
 ```javascript
 try {
   const response = await fetch('/api/drive/files')
   const data = await response.json()
-  
+
   if (!data.success) {
     throw new Error(data.error)
   }
-  
+
   // Handle success
 } catch (error) {
   // Handle error dengan exponential backoff
@@ -411,6 +449,7 @@ try {
 ```
 
 ### 2. Pagination
+
 ```javascript
 let allFiles = []
 let pageToken = null
@@ -419,13 +458,14 @@ do {
   const url = `/api/drive/files?pageSize=100${pageToken ? `&pageToken=${pageToken}` : ''}`
   const response = await fetch(url)
   const data = await response.json()
-  
+
   allFiles.push(...data.data.files)
   pageToken = data.data.nextPageToken
 } while (pageToken)
 ```
 
 ### 3. Bulk Operations
+
 ```javascript
 // Gunakan batch size yang reasonable
 const batchSize = 50
@@ -441,8 +481,8 @@ for (const batch of batches) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       fileIds: batch,
-      targetFolderId: 'target_folder'
-    })
+      targetFolderId: 'target_folder',
+    }),
   })
 }
 ```
@@ -452,17 +492,20 @@ for (const batch of batches) {
 ## 🔧 Development Notes
 
 ### Field Usage Analysis
+
 - **owners.emailAddress**: Ditampilkan di tabel utama, diperlukan untuk copy email
 - **owners.displayName**: Ditampilkan di dialog detail dan avatar
 - **capabilities**: CRITICAL untuk bulk operations - menentukan aksi yang diizinkan
 - **thumbnailLink**: Diperlukan untuk preview gambar
 
 ### Cache Keys
+
 ```
 drive:{userId}:{folderId}:p{pageSize}:{query}:{pageSize}
 ```
 
 ### Testing
+
 ```bash
 # Test dengan curl
 curl -X GET "http://localhost:5000/api/drive/files?pageSize=10" \
@@ -478,6 +521,7 @@ curl -X POST "http://localhost:5000/api/cache/clear" \
 ## 📞 Support
 
 Untuk pertanyaan atau masalah:
+
 1. Periksa logs di workflow console
 2. Gunakan endpoint `/api/drive/performance` untuk monitoring
 3. Clear cache jika ada masalah data

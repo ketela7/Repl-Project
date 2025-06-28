@@ -13,7 +13,7 @@ class APIEndpointTester {
 
   async testRequest(endpoint, method = 'POST', body = null) {
     const startTime = Date.now()
-    
+
     try {
       const requestOptions = {
         method,
@@ -25,7 +25,7 @@ class APIEndpointTester {
 
       const response = await fetch(`${this.config.baseUrl}${endpoint}`, requestOptions)
       const responseTime = Date.now() - startTime
-      
+
       let data
       try {
         data = await response.json()
@@ -77,7 +77,7 @@ class APIEndpointTester {
     console.log('\n🏥 Testing Health Endpoints...')
     await this.testRequest('/api/health', 'GET')
 
-    // 2. Auth Endpoints  
+    // 2. Auth Endpoints
     console.log('\n🔐 Testing Auth Endpoints...')
     await this.testRequest('/api/auth/session', 'GET')
     await this.testRequest('/api/auth/providers', 'GET')
@@ -89,45 +89,43 @@ class APIEndpointTester {
 
     // 4. File Operation Endpoints (POST-based)
     console.log('\n🔧 Testing File Operation Endpoints...')
-    
+
     // Details endpoint
     await this.testRequest('/api/drive/files/details', 'POST', {
-      fileId: sampleFileId
+      fileId: sampleFileId,
     })
 
     // Essential metadata
     await this.testRequest('/api/drive/files/essential', 'POST', {
-      fileId: sampleFileId
+      fileId: sampleFileId,
     })
 
     // Extended metadata
     await this.testRequest('/api/drive/files/extended', 'POST', {
-      fileId: sampleFileId
+      fileId: sampleFileId,
     })
 
     // Download endpoint
     await this.testRequest('/api/drive/files/download', 'POST', {
       fileId: sampleFileId,
-      downloadMode: 'exportLinks'
+      downloadMode: 'exportLinks',
     })
 
     // Export endpoint
     await this.testRequest('/api/drive/files/export', 'POST', {
       fileId: sampleFileId,
-      exportFormat: 'pdf'
+      exportFormat: 'pdf',
     })
 
     // 5. Bulk Operations (Read-Only Tests)
     console.log('\n📦 Testing Bulk Operations...')
-    
-    const sampleItems = [
-      { id: sampleFileId, name: 'test-file', isFolder: false }
-    ]
+
+    const sampleItems = [{ id: sampleFileId, name: 'test-file', isFolder: false }]
 
     // Bulk download links
     await this.testRequest('/api/drive/files/download', 'POST', {
       items: sampleItems,
-      downloadMode: 'exportLinks'
+      downloadMode: 'exportLinks',
     })
 
     // 6. Performance Endpoints
@@ -147,8 +145,8 @@ class APIEndpointTester {
     console.log('📊 API Endpoint Test Results:')
     console.log('━'.repeat(60))
 
-    const successCount = this.results.filter(r => r.success).length
-    const failCount = this.results.filter(r => !r.success).length
+    const successCount = this.results.filter((r) => r.success).length
+    const failCount = this.results.filter((r) => !r.success).length
     const totalCount = this.results.length
 
     console.log(`✅ Successful: ${successCount}`)
@@ -161,17 +159,17 @@ class APIEndpointTester {
 
     // Group by endpoint category
     const categories = {
-      health: this.results.filter(r => r.endpoint.includes('/health')),
-      auth: this.results.filter(r => r.endpoint.includes('/auth')),
-      files: this.results.filter(r => r.endpoint.includes('/drive/files')),
-      performance: this.results.filter(r => r.endpoint.includes('/performance')),
-      cache: this.results.filter(r => r.endpoint.includes('/cache')),
+      health: this.results.filter((r) => r.endpoint.includes('/health')),
+      auth: this.results.filter((r) => r.endpoint.includes('/auth')),
+      files: this.results.filter((r) => r.endpoint.includes('/drive/files')),
+      performance: this.results.filter((r) => r.endpoint.includes('/performance')),
+      cache: this.results.filter((r) => r.endpoint.includes('/cache')),
     }
 
     Object.entries(categories).forEach(([category, results]) => {
       if (results.length > 0) {
         console.log(`\n📁 ${category.toUpperCase()} ENDPOINTS:`)
-        results.forEach(result => {
+        results.forEach((result) => {
           const status = result.success ? '✅' : '❌'
           const statusCode = result.status === 0 ? 'ERR' : result.status
           console.log(`${status} ${result.method} ${result.endpoint} - ${statusCode} (${result.responseTime}ms)`)
@@ -183,10 +181,10 @@ class APIEndpointTester {
     })
 
     // Show failed endpoints for debugging
-    const failed = this.results.filter(r => !r.success)
+    const failed = this.results.filter((r) => !r.success)
     if (failed.length > 0) {
       console.log('\n🔍 Failed Endpoints Details:')
-      failed.forEach(result => {
+      failed.forEach((result) => {
         console.log(`\n❌ ${result.method} ${result.endpoint}`)
         console.log(`   Status: ${result.status}`)
         console.log(`   Error: ${result.error || 'Unknown error'}`)
@@ -198,7 +196,7 @@ class APIEndpointTester {
 
     console.log('\n━'.repeat(60))
     console.log('🎯 API Testing Complete!')
-    
+
     return { successCount, failCount, totalCount }
   }
 

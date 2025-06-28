@@ -47,7 +47,7 @@ module.exports = [
       // React rules
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'on',
+      'react/prop-types': 'off',
 
       // Import rules
       'import/order': [
