@@ -37,30 +37,15 @@ function buildDriveQuery(filters: FileFilter): string {
       conditions.push('trashed=false')
       conditions.push('starred=true')
       break
-    case 'recent':
-      // Recent view - ALL files (owned + shared) modified in the last 30 days
-      conditions.push('trashed=false')
-      const thirtyDaysAgo = new Date()
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
-      conditions.push(`modifiedTime >= '${thirtyDaysAgo.toISOString()}'`)
-      // Note: No ownership filter - shows both owned and shared files
-      break
     case 'my-drive':
-      // My Drive view - files owned by me only
+      // My Drive view - files owned by me
       conditions.push('trashed=false')
       conditions.push("'me' in owners")
       break
 
-    case 'all':
-      // All files view - ALL non-trashed files (owned + shared) everywhere
-      conditions.push('trashed=false')
-      // Note: No ownership filter, no parent filter - shows ALL files from entire drive
-      break
-
     default:
-      // Default case - ALL non-trashed files (owned + shared)
+      // All files view - show non-trashed files by default
       conditions.push('trashed=false')
-      // Note: No ownership filter - shows both owned and shared files
       break
   }
 
@@ -354,29 +339,7 @@ export async function GET(request: NextRequest) {
       sizeMax: searchParams.get('sizeMax') || undefined,
     }
 
-    // Build the query with proper parent folder handling
-    let baseQuery = buildDriveQuery(filters)
-
-    // Handle parent folder constraint based on context:
-    // 1. Folder navigation (folderId specified without viewStatus) - add parent constraint
-    // 2. View status filters - only "my-drive" needs parent constraint, "all" is global everywhere
-    if (folderId && folderId !== 'root' && !filters.viewStatus) {
-      // Pure folder navigation (no view filter) - show files in specific folder
-      if (baseQuery) {
-        baseQuery = `(${baseQuery}) and '${folderId}' in parents`
-      } else {
-        baseQuery = `'${folderId}' in parents`
-      }
-    } else if (folderId === 'root' && (!filters.viewStatus || filters.viewStatus === 'my-drive')) {
-      // Root folder navigation OR My Drive view - show files in root only
-      if (baseQuery) {
-        baseQuery = `(${baseQuery}) and 'root' in parents`
-      } else {
-        baseQuery = `'root' in parents`
-      }
-    }
-    // For "all", "recent", "shared", "starred", "trash" - no parent constraint (global search)
-
+    const query = buildDriveQuery(filters)
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
 
@@ -384,7 +347,7 @@ export async function GET(request: NextRequest) {
       parentId: folderId,
       userId: session.user?.email || '',
       pageToken,
-      query: baseQuery,
+      query: query,
       pageSize,
     })
 
@@ -393,9 +356,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    // Use the complete query instead of parentId parameter
+    // Use driveService from destructuring
+
     const result = await driveService.listFiles({
-      query: baseQuery,
+      parentId: folderId,
+      query,
       pageToken,
       pageSize,
       orderBy,

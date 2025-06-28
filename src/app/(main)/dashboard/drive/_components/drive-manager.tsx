@@ -32,7 +32,6 @@ type DriveItem = (DriveFile | DriveFolder) & {
   canMove?: boolean
   canCopy?: boolean
 }
-
 // Helper function to convert size units to bytes (Google Drive API requirement)
 function getSizeMultiplier(unit: string): number {
   switch (unit) {
@@ -398,7 +397,6 @@ export function DriveManager() {
   // Navigation handlers
   const handleFolderClick = useCallback(
     (folderId: string) => {
-      console.log('Drive Manager: Navigating to folder:', folderId)
       setCurrentFolderId(folderId)
       setSelectedItems(new Set())
       fetchFiles(folderId)
@@ -407,7 +405,6 @@ export function DriveManager() {
   )
 
   const handleBackToParent = useCallback(() => {
-    console.log('Drive Manager: Navigating back to root')
     setCurrentFolderId(null)
     setSelectedItems(new Set())
     fetchFiles()
@@ -602,18 +599,7 @@ export function DriveManager() {
           />
 
           {currentFolderId && (
-            <FileBreadcrumb
-              currentFolderId={currentFolderId}
-              onNavigate={(folderId) => {
-                if (folderId) {
-                  handleFolderClick(folderId)
-                } else {
-                  handleBackToParent()
-                }
-              }}
-              onBackToRoot={handleBackToParent}
-              loading={loading}
-            />
+            <FileBreadcrumb currentFolderId={currentFolderId} onNavigate={(folderId) => (folderId ? handleFolderClick(folderId) : handleBackToParent())} onBackToRoot={handleBackToParent} />
           )}
 
           <DriveDataView

@@ -31,39 +31,14 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       const response = await fetch('/api/drive/files/essential', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ fileId: folderId }),
       })
-
       if (!response.ok) {
-        if (response.status === 401) {
-          setError('Authentication required')
-          return
-        }
-        throw new Error(`Failed to fetch folder: ${response.status} ${response.statusText}`)
+        throw new Error(`Failed to fetch folder: ${response.status}`)
       }
 
-      const data = await response.json()
-
-      // Handle different response structures from the essential API
-      let folder = null
-      if (data.success && data.fileMetadata) {
-        folder = data.fileMetadata
-      } else if (data.fileMetadata) {
-        folder = data.fileMetadata
-      } else if (data.id) {
-        folder = data
-      } else {
-        console.error('Invalid API response structure:', data)
-        throw new Error('Invalid folder data received from API')
-      }
-
-      if (!folder || !folder.id) {
-        console.error('Folder object missing required fields:', folder)
-        throw new Error('Invalid folder data received')
-      }
-
-      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name || 'Untitled Folder' }]
+      const folder = await response.json()
+      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }]
 
       // Build path by traversing parent folders
       let currentParent = folder.parents?.[0]
@@ -75,47 +50,26 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           const parentResponse = await fetch('/api/drive/files/essential', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            credentials: 'include',
             body: JSON.stringify({ fileId: currentParent }),
           })
+          if (!parentResponse.ok) break
 
-          if (!parentResponse.ok) {
-            console.warn(`Failed to fetch parent folder ${currentParent}: ${parentResponse.status}`)
-            break
-          }
-
-          const parentData = await parentResponse.json()
-
-          // Handle different response structures from the essential API
-          let parentFolder = null
-          if (parentData.success && parentData.fileMetadata) {
-            parentFolder = parentData.fileMetadata
-          } else if (parentData.fileMetadata) {
-            parentFolder = parentData.fileMetadata
-          } else if (parentData.id) {
-            parentFolder = parentData
-          } else {
-            console.warn(`Invalid parent API response structure for ${currentParent}:`, parentData)
-            break
-          }
-
-          if (!parentFolder || !parentFolder.id) {
-            console.warn(`Invalid parent folder data for ${currentParent}`)
-            break
-          }
-
-          items.unshift({ id: parentFolder.id, name: parentFolder.name || 'Untitled Folder' })
+          const parentFolder = await parentResponse.json()
+          items.unshift({ id: parentFolder.id, name: parentFolder.name })
           currentParent = parentFolder.parents?.[0]
           depth++
         } catch (err) {
-          console.warn('Error fetching parent folder:', err)
+          if (process.env.NODE_ENV === 'development') {
+          }
           break
         }
       }
 
       setBreadcrumbItems(items)
     } catch (error) {
-      console.error('Error fetching folder path:', error)
+      // Log error for debugging in development only
+      if (process.env.NODE_ENV === 'development') {
+      }
       setError('Failed to load folder path')
       setBreadcrumbItems([])
     } finally {
@@ -144,7 +98,6 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
               href="#"
               onClick={(e) => {
                 e.preventDefault()
-                console.log('Breadcrumb: Clicking root/home')
                 onNavigate(null)
               }}
               className={`hover:text-primary flex items-center gap-2 whitespace-nowrap transition-colors ${!currentFolderId ? 'text-primary font-medium' : ''}`}
@@ -172,7 +125,6 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
-                      console.log('Breadcrumb: Clicking folder:', folder.name, 'id:', folder.id)
                       onNavigate(folder.id)
                     }}
                     className="hover:text-primary flex max-w-[120px] items-center gap-2 whitespace-nowrap transition-colors sm:max-w-[200px] md:max-w-none"
