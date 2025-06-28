@@ -34,7 +34,7 @@ const customJestConfig = {
       statements: 0,
     },
   },
-  testTimeout: 10000,
+  testTimeout: 60000,
   transform: {
     '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
   },

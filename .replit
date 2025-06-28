@@ -80,33 +80,10 @@ author = "agent"
 task = "workflow.run"
 args = "Server"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Test:Watch"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Test:Fast"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Test:RealTime"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "LintFast"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "DevFast"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "DevQuality"
-
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
+mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -119,7 +96,31 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run typecheck"
+args = "tsc --noEmit --watch --preserveWatchOutput && echo \"✅ Typecheck completed successfully\""
+
+[[workflows.workflow]]
+name = "Format"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format:fix && echo \"✅ Code formatting completed successfully\" "
+
+[[workflows.workflow]]
+name = "Lint"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint:fix && echo \"✅ Code Linter completed successfully\""
 
 [[workflows.workflow]]
 name = "Test:Watch"
@@ -127,15 +128,7 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx jest --watch --passWithNoTests --silent --maxWorkers=2"
-
-[[workflows.workflow]]
-name = "Test:Fast"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx jest --passWithNoTests --silent --maxWorkers=2 --watchAll=false"
+args = "npx jest --watch --passWithNoTests --silent && echo \"✅ Test Watch Completed\""
 
 [[workflows.workflow]]
 name = "Test:RealTime"
@@ -143,28 +136,4 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "node scripts/test-realtime-api.js"
-
-[[workflows.workflow]]
-name = "LintFast"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "echo \"ESLint check completed successfully\" && exit 0"
-
-[[workflows.workflow]]
-name = "DevFast"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format:fix && echo \"✅ Code formatting completed successfully\""
-
-[[workflows.workflow]]
-name = "DevQuality"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format:fix && echo \"✅ Development quality check completed\""
+args = "node scripts/test-realtime-api.js && echo \"✅ Test Realtime Completed\" "
