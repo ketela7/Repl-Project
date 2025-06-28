@@ -29,13 +29,16 @@ export async function GET(request: NextRequest) {
         // Get file metadata first for proper filename and content type
         const metadata = await throttledDriveRequest(async () => {
           return await retryDriveApiCall(async () => {
-            return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size'])
+            return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size', 'quotaBytesUsed'])
           })
         })
 
         const actualFileName = fileName || metadata.name
         const mimeType = metadata.mimeType || 'application/octet-stream'
-        const fileSize = metadata.size ? parseInt(metadata.size) : undefined
+        // Try multiple size fields from Google Drive API
+        const fileSize = metadata.size ? parseInt(metadata.size) : 
+                        metadata.quotaBytesUsed ? parseInt(metadata.quotaBytesUsed) : 
+                        undefined
 
         // Check if it's a Google Workspace file that needs export
         if (isGoogleWorkspaceFile(mimeType)) {
@@ -79,11 +82,14 @@ export async function GET(request: NextRequest) {
           'Content-Type': 'application/octet-stream',
           'Content-Disposition': `attachment; filename="${actualFileName}"`,
           'Accept-Ranges': 'bytes',
+          'Cache-Control': 'no-cache',
+          'Transfer-Encoding': 'chunked',
         }
 
         // Add Content-Length if file size is known
-        if (fileSize) {
+        if (fileSize && fileSize > 0) {
           headers['Content-Length'] = fileSize.toString()
+          delete headers['Transfer-Encoding'] // Remove chunked when we have content length
         }
 
         return new NextResponse(webStream, {
@@ -244,13 +250,16 @@ async function processSingleDownload(driveService: any, fileId: string, download
     // Get file metadata first for proper filename
     const metadata = await throttledDriveRequest(async () => {
       return await retryDriveApiCall(async () => {
-        return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size'])
+        return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size', 'quotaBytesUsed'])
       })
     })
 
     const fileName = metadata.name
     const mimeType = metadata.mimeType || 'application/octet-stream'
-    const fileSize = metadata.size ? parseInt(metadata.size) : undefined
+    // Try multiple size fields from Google Drive API
+    const fileSize = metadata.size ? parseInt(metadata.size) : 
+                    metadata.quotaBytesUsed ? parseInt(metadata.quotaBytesUsed) : 
+                    undefined
 
     // Check if it's a Google Workspace file that needs export
     if (isGoogleWorkspaceFile(mimeType)) {
@@ -294,11 +303,14 @@ async function processSingleDownload(driveService: any, fileId: string, download
       'Content-Type': mimeType,
       'Content-Disposition': `attachment; filename="${fileName}"`,
       'Accept-Ranges': 'bytes',
+      'Cache-Control': 'no-cache',
+      'Transfer-Encoding': 'chunked',
     }
 
     // Add Content-Length if file size is known
-    if (fileSize) {
+    if (fileSize && fileSize > 0) {
       headers['Content-Length'] = fileSize.toString()
+      delete headers['Transfer-Encoding'] // Remove chunked when we have content length
     }
 
     return new NextResponse(webStream, {
