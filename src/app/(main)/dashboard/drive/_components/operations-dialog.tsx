@@ -101,8 +101,6 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     handleClose()
   }
 
-
-
   // Bulk operation completion handlers with actual API calls
   const handleMoveComplete = async (targetFolderId: string) => {
     try {
@@ -307,74 +305,100 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
             })
           }
 
-          // Direct browser download using GET request - no blob mechanism
-          const downloadUrl = `/api/drive/files/download?fileId=${encodeURIComponent(item.id)}&fileName=${encodeURIComponent(item.name)}`
+          // Get download URL from API using POST request
+          const response = await fetch('/api/drive/files/download', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fileId: item.id,
+              downloadMode: 'oneByOne',
+            }),
+          })
 
-          // Create temporary link and trigger direct browser download
-          const link = document.createElement('a')
-          link.href = downloadUrl
-          link.download = item.name
-          link.target = '_blank'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
+          if (response.ok) {
+            const result = await response.json()
+            if (result.success && result.downloadUrl) {
+              // Create temporary link and trigger direct browser download
+              const link = document.createElement('a')
+              link.href = result.downloadUrl
+              link.download = item.name
+              link.target = '_blank'
+              document.body.appendChild(link)
+              link.click()
+              document.body.removeChild(link)
+            }
+          }
 
           // Small delay between downloads to prevent browser blocking
           await new Promise((resolve) => setTimeout(resolve, 1000))
         }
       } else if (downloadMode === 'batch') {
-        // For batch downloads, trigger direct browser downloads with delay
-        for (let i = 0; i < downloadableFiles.length; i++) {
-          const item = downloadableFiles[i]
+        // For batch downloads, get all download URLs at once
+        const response = await fetch('/api/drive/files/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: downloadableFiles,
+            downloadMode: 'batch',
+          }),
+        })
 
-          if (progressCallback) {
-            progressCallback({
-              current: i + 1,
-              total: downloadableFiles.length,
-              type: 'download',
-              currentOperation: `Batch downloading ${item.name}`,
-            })
+        if (response.ok) {
+          const result = await response.json()
+          
+          // Trigger downloads for successful results
+          if (result.success && result.success.length > 0) {
+            for (let i = 0; i < result.success.length; i++) {
+              const successItem = result.success[i]
+
+              if (progressCallback) {
+                progressCallback({
+                  current: i + 1,
+                  total: result.success.length,
+                  type: 'download',
+                  currentOperation: `Batch downloading ${successItem.name}`,
+                })
+              }
+
+              // Create temporary link and trigger direct browser download
+              const link = document.createElement('a')
+              link.href = successItem.downloadUrl
+              link.download = successItem.name
+              link.target = '_blank'
+              document.body.appendChild(link)
+              link.click()
+              document.body.removeChild(link)
+
+              // Small delay between downloads to prevent browser blocking
+              await new Promise((resolve) => setTimeout(resolve, 500))
+            }
           }
-
-          // Direct browser download using GET request - no blob mechanism
-          const downloadUrl = `/api/drive/files/download?fileId=${encodeURIComponent(item.id)}&fileName=${encodeURIComponent(item.name)}`
-
-          // Create temporary link and trigger direct browser download
-          const link = document.createElement('a')
-          link.href = downloadUrl
-          link.download = item.name
-          link.target = '_blank'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-
-          // Small delay between downloads to prevent browser blocking
-          await new Promise((resolve) => setTimeout(resolve, 500))
         }
       } else if (downloadMode === 'exportLinks') {
-        // For CSV export of download links, use direct URL approach when possible
-        try {
-          const csvFileName = `download-links-${new Date().toISOString().split('T')[0]}.csv`
-          const exportUrl = `/api/drive/files/export?format=csv&type=downloadLinks&fileName=${encodeURIComponent(csvFileName)}`
+        // For CSV export of download links
+        const response = await fetch('/api/drive/files/download', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: downloadableFiles,
+            downloadMode: 'exportLinks',
+          }),
+        })
 
-          // Create form data for POST request as URL parameters might be too long
-          const form = document.createElement('form')
-          form.method = 'POST'
-          form.action = exportUrl
-          form.style.display = 'none'
-
-          // Add selected items as form data
-          const itemsInput = document.createElement('input')
-          itemsInput.type = 'hidden'
-          itemsInput.name = 'items'
-          itemsInput.value = JSON.stringify(selectedItems)
-          form.appendChild(itemsInput)
-
-          document.body.appendChild(form)
-          form.submit()
-          document.body.removeChild(form)
-        } catch (error) {
-          console.error('Export links failed:', error)
+        if (response.ok) {
+          // If the response is a CSV file, handle it directly
+          const contentType = response.headers.get('content-type')
+          if (contentType && contentType.includes('text/csv')) {
+            const blob = await response.blob()
+            const downloadUrl = URL.createObjectURL(blob)
+            const link = document.createElement('a')
+            link.href = downloadUrl
+            link.download = `download-links-${new Date().toISOString().split('T')[0]}.csv`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(downloadUrl)
+          }
         }
       }
     } catch (error) {
