@@ -302,8 +302,7 @@ export function DriveManager() {
         if (filters.fileTypeFilter?.length > 0) params.append('fileType', filters.fileTypeFilter.join(','))
         if (filters.advancedFilters.createdDateRange?.from) params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
         if (filters.advancedFilters.createdDateRange?.to) params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
-        if (filters.advancedFilters.modifiedDateRange?.from)
-          params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
+        if (filters.advancedFilters.modifiedDateRange?.from) params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
         if (filters.advancedFilters.modifiedDateRange?.to) params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
         if (filters.advancedFilters.owner?.trim()) params.append('owner', filters.advancedFilters.owner.trim())
 
@@ -589,11 +588,7 @@ export function DriveManager() {
           />
 
           {currentFolderId && (
-            <FileBreadcrumb
-              currentFolderId={currentFolderId}
-              onNavigate={(folderId) => (folderId ? handleFolderClick(folderId) : handleBackToParent())}
-              onBackToRoot={handleBackToParent}
-            />
+            <FileBreadcrumb currentFolderId={currentFolderId} onNavigate={(folderId) => (folderId ? handleFolderClick(folderId) : handleBackToParent())} onBackToRoot={handleBackToParent} />
           )}
 
           <DriveDataView

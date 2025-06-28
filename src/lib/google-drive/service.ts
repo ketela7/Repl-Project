@@ -3,16 +3,7 @@ import { Readable } from 'stream'
 import { drive_v3 } from 'googleapis'
 
 import { createDriveClient } from './config'
-import {
-  DriveFile,
-  DriveFolder,
-  DriveSearchOptions,
-  DriveSearchResult,
-  DriveUploadOptions,
-  DrivePermission,
-  DriveUserInfo,
-  DriveFileMetadata,
-} from './types'
+import { DriveFile, DriveFolder, DriveSearchOptions, DriveSearchResult, DriveUploadOptions, DrivePermission, DriveUserInfo, DriveFileMetadata } from './types'
 import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
 import { getOptimizedRequestParams, DriveApiBatcher, performanceMonitor, requestDeduplicator } from './performance'
 
@@ -200,8 +191,7 @@ export class GoogleDriveService {
   async getFile(fileId: string): Promise<DriveFile> {
     const response = await this.drive.files.get({
       fileId,
-      fields:
-        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, shared, trashed, starred, capabilities, owners',
+      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, shared, trashed, starred, capabilities, owners',
     })
 
     return convertGoogleDriveFile(response.data)
@@ -759,8 +749,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.list({
       q: 'sharedWithMe=true and trashed=false',
       orderBy: 'modifiedTime desc',
-      fields:
-        'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed)',
+      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed)',
     })
 
     return response.data.files?.map(convertGoogleDriveFile) || []
@@ -770,8 +759,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.list({
       q: 'trashed=true',
       orderBy: 'modifiedTime desc',
-      fields:
-        'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed)',
+      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed)',
     })
 
     return response.data.files?.map(convertGoogleDriveFile) || []

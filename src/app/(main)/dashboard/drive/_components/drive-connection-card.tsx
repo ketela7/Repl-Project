@@ -50,9 +50,7 @@ export function DriveConnectionCard() {
           </div>
 
           <div className="space-y-4 text-center">
-            <p className="text-muted-foreground text-sm">
-              Click the button below to grant Google Drive access. You'll be redirected to Google to authorize permissions.
-            </p>
+            <p className="text-muted-foreground text-sm">Click the button below to grant Google Drive access. You&rsquo;ll be redirected to Google to authorize permissions.</p>
 
             <Button onClick={handleConnect} disabled={connecting} size="lg" className="w-full">
               {connecting ? (

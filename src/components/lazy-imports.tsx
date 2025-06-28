@@ -4,9 +4,7 @@
 import { lazy } from 'react'
 
 // Lazy load heavy dashboard components
-export const DriveManager = lazy(() =>
-  import('@/app/(main)/dashboard/drive/_components/drive-manager').then((mod) => ({ default: mod.DriveManager }))
-)
+export const DriveManager = lazy(() => import('@/app/(main)/dashboard/drive/_components/drive-manager').then((mod) => ({ default: mod.DriveManager })))
 
 export const DataTable = lazy(() =>
   import('@/components/data-table/data-table').then((mod) => ({
@@ -39,9 +37,7 @@ export const ItemsExportDialog = lazy(() => import('@/app/(main)/dashboard/drive
 
 export const ItemsUntrashDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-untrash-dialog'))
 
-export const DriveToolbar = lazy(() =>
-  import('@/app/(main)/dashboard/drive/_components/drive-toolbar').then((mod) => ({ default: mod.DriveToolbar }))
-)
+export const DriveToolbar = lazy(() => import('@/app/(main)/dashboard/drive/_components/drive-toolbar').then((mod) => ({ default: mod.DriveToolbar })))
 
 // Lazy load chart components (heavy recharts dependency)
 export const ChartComponents = lazy(() =>

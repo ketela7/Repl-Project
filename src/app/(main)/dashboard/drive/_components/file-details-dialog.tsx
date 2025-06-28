@@ -275,9 +275,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
       <div className="flex items-center gap-2">
         <div className="flex items-center gap-1">
           {hasPublicAccess ? <Globe className="h-4 w-4" /> : <Users className="h-4 w-4" />}
-          <span className="text-sm">
-            {hasPublicAccess ? 'Public' : `Shared with ${permissionCount} ${permissionCount === 1 ? 'person' : 'people'}`}
-          </span>
+          <span className="text-sm">{hasPublicAccess ? 'Public' : `Shared with ${permissionCount} ${permissionCount === 1 ? 'person' : 'people'}`}</span>
         </div>
         {fileDetails.shared && (
           <Badge variant="secondary" className="text-xs">
@@ -567,12 +565,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                   <span className="font-medium">MD5:</span>
                   <div className="flex items-center gap-2">
                     <span className="max-w-48 truncate font-mono text-xs">{fileDetails.md5Checksum}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(fileDetails.md5Checksum!, 'MD5 Checksum')}
-                      className="h-6 w-6 p-0"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(fileDetails.md5Checksum!, 'MD5 Checksum')} className="h-6 w-6 p-0">
                       <Copy className="h-3 w-3" />
                     </Button>
                   </div>
@@ -583,12 +576,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                   <span className="font-medium">SHA1:</span>
                   <div className="flex items-center gap-2">
                     <span className="max-w-48 truncate font-mono text-xs">{fileDetails.sha1Checksum}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(fileDetails.sha1Checksum!, 'SHA1 Checksum')}
-                      className="h-6 w-6 p-0"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(fileDetails.sha1Checksum!, 'SHA1 Checksum')} className="h-6 w-6 p-0">
                       <Copy className="h-3 w-3" />
                     </Button>
                   </div>
@@ -599,12 +587,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                   <span className="font-medium">SHA256:</span>
                   <div className="flex items-center gap-2">
                     <span className="max-w-48 truncate font-mono text-xs">{fileDetails.sha256Checksum}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(fileDetails.sha256Checksum!, 'SHA256 Checksum')}
-                      className="h-6 w-6 p-0"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(fileDetails.sha256Checksum!, 'SHA256 Checksum')} className="h-6 w-6 p-0">
                       <Copy className="h-3 w-3" />
                     </Button>
                   </div>
@@ -679,9 +662,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
   }
 
   const renderFileProperties = () => {
-    const hasProperties =
-      (fileDetails?.properties && Object.keys(fileDetails.properties).length > 0) ||
-      (fileDetails?.appProperties && Object.keys(fileDetails.appProperties).length > 0)
+    const hasProperties = (fileDetails?.properties && Object.keys(fileDetails.properties).length > 0) || (fileDetails?.appProperties && Object.keys(fileDetails.appProperties).length > 0)
 
     if (!hasProperties) return null
 
@@ -754,11 +735,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {fileType === 'folder' ? (
-              <Folder className="h-5 w-5 text-blue-500" />
-            ) : (
-              <FileIcon mimeType={fileDetails?.mimeType || 'application/octet-stream'} className="h-5 w-5" />
-            )}
+            {fileType === 'folder' ? <Folder className="h-5 w-5 text-blue-500" /> : <FileIcon mimeType={fileDetails?.mimeType || 'application/octet-stream'} className="h-5 w-5" />}
             Details: {fileName}
           </DialogTitle>
         </DialogHeader>
@@ -939,12 +916,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                     <span className="font-medium">MD5 Checksum:</span>
                     <div className="flex items-center gap-2">
                       <span className="max-w-64 truncate font-mono text-xs">{fileDetails.md5Checksum}</span>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(fileDetails.md5Checksum!, 'MD5 Checksum')}
-                        className="h-6 w-6 p-0"
-                      >
+                      <Button variant="ghost" size="sm" onClick={() => copyToClipboard(fileDetails.md5Checksum!, 'MD5 Checksum')} className="h-6 w-6 p-0">
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
@@ -982,12 +954,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                       <Download className="mr-2 h-4 w-4" />
                       Download Direct Link
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(fileDetails.webContentLink!, 'Download Link')}
-                      className="h-9 w-9 p-0"
-                    >
+                    <Button variant="ghost" size="sm" onClick={() => copyToClipboard(fileDetails.webContentLink!, 'Download Link')} className="h-9 w-9 p-0">
                       <Copy className="h-4 w-4" />
                     </Button>
                   </div>
@@ -1016,8 +983,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
             {renderTechnicalDetails()}
 
             {/* File Properties Section */}
-            {(fileDetails.properties && Object.keys(fileDetails.properties).length > 0) ||
-            (fileDetails.appProperties && Object.keys(fileDetails.appProperties).length > 0) ? (
+            {(fileDetails.properties && Object.keys(fileDetails.properties).length > 0) || (fileDetails.appProperties && Object.keys(fileDetails.appProperties).length > 0) ? (
               <>
                 <Separator />
                 {renderFileProperties()}
@@ -1094,10 +1060,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                       </Badge>
                     )}
                     {fileDetails.writersCanShare !== undefined && (
-                      <Badge
-                        variant="outline"
-                        className={fileDetails.writersCanShare ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'}
-                      >
+                      <Badge variant="outline" className={fileDetails.writersCanShare ? 'border-green-200 text-green-700' : 'border-red-200 text-red-700'}>
                         <Share2 className="mr-1 h-3 w-3" />
                         Writers {fileDetails.writersCanShare ? 'Can' : 'Cannot'} Share
                       </Badge>
@@ -1202,17 +1165,13 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                       {fileDetails.linkShareMetadata.securityUpdateEligible !== undefined && (
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Security Update Eligible:</span>
-                          <Badge variant={fileDetails.linkShareMetadata.securityUpdateEligible ? 'default' : 'secondary'}>
-                            {fileDetails.linkShareMetadata.securityUpdateEligible ? 'Yes' : 'No'}
-                          </Badge>
+                          <Badge variant={fileDetails.linkShareMetadata.securityUpdateEligible ? 'default' : 'secondary'}>{fileDetails.linkShareMetadata.securityUpdateEligible ? 'Yes' : 'No'}</Badge>
                         </div>
                       )}
                       {fileDetails.linkShareMetadata.securityUpdateEnabled !== undefined && (
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Security Update Enabled:</span>
-                          <Badge variant={fileDetails.linkShareMetadata.securityUpdateEnabled ? 'default' : 'secondary'}>
-                            {fileDetails.linkShareMetadata.securityUpdateEnabled ? 'Yes' : 'No'}
-                          </Badge>
+                          <Badge variant={fileDetails.linkShareMetadata.securityUpdateEnabled ? 'default' : 'secondary'}>{fileDetails.linkShareMetadata.securityUpdateEnabled ? 'Yes' : 'No'}</Badge>
                         </div>
                       )}
                     </div>

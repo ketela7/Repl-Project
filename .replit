@@ -80,6 +80,10 @@ author = "agent"
 task = "workflow.run"
 args = "Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Format:Fix"
+
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -137,3 +141,11 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/test-realtime-api.js && echo \"✅ Test Realtime Completed\" "
+
+[[workflows.workflow]]
+name = "Format:Fix"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format:fix"

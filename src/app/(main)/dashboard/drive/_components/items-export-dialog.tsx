@@ -95,21 +95,11 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
   // Filter exportable files (Google Workspace files only)
   const exportableFiles = selectedItems.filter(
-    (item) =>
-      !item.isFolder &&
-      item.mimeType &&
-      item.mimeType.startsWith('application/vnd.google-apps.') &&
-      !item.mimeType.includes('folder') &&
-      !item.mimeType.includes('shortcut')
+    (item) => !item.isFolder && item.mimeType && item.mimeType.startsWith('application/vnd.google-apps.') && !item.mimeType.includes('folder') && !item.mimeType.includes('shortcut')
   )
 
   const nonExportableFiles = selectedItems.filter(
-    (item) =>
-      item.isFolder ||
-      !item.mimeType ||
-      !item.mimeType.startsWith('application/vnd.google-apps.') ||
-      item.mimeType.includes('folder') ||
-      item.mimeType.includes('shortcut')
+    (item) => item.isFolder || !item.mimeType || !item.mimeType.startsWith('application/vnd.google-apps.') || item.mimeType.includes('folder') || item.mimeType.includes('shortcut')
   )
 
   // Get compatible files for selected format
@@ -226,9 +216,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       {nonExportableFiles.length > 0 && (
         <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20">
           <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
-          <div className="text-sm text-amber-800 dark:text-amber-200">
-            Only Google Workspace files (Docs, Sheets, Slides, Drawings) can be exported. Other files and folders will be skipped.
-          </div>
+          <div className="text-sm text-amber-800 dark:text-amber-200">Only Google Workspace files (Docs, Sheets, Slides, Drawings) can be exported. Other files and folders will be skipped.</div>
         </div>
       )}
 
@@ -310,9 +298,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-green-500">
               <div className="h-1.5 w-1.5 rounded-full bg-white" />
             </div>
-            <div className="text-sm text-green-800 dark:text-green-200">
-              Files will be downloaded automatically after export processing completes.
-            </div>
+            <div className="text-sm text-green-800 dark:text-green-200">Files will be downloaded automatically after export processing completes.</div>
           </div>
         </>
       )}
@@ -375,10 +361,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
         <DialogFooter className="flex-col gap-2 sm:flex-row">
           {compatibleFiles.length > 0 && (
-            <Button
-              onClick={handleExport}
-              className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800"
-            >
+            <Button onClick={handleExport} className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800">
               Export {compatibleFiles.length} File
               {compatibleFiles.length > 1 ? 's' : ''}
             </Button>

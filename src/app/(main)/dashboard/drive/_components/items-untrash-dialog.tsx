@@ -1,21 +1,14 @@
 'use client'
 
-import { RotateCcw } from 'lucide-react'
+import { useState } from 'react'
+import { RotateCcw, Loader2 } from 'lucide-react'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
-import { cn } from '@/lib/utils'
+import { cn, successToast, errorToast } from '@/lib/utils'
 
 interface ItemsUntrashDialogProps {
   isOpen: boolean
@@ -30,9 +23,39 @@ interface ItemsUntrashDialogProps {
 }
 
 function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsUntrashDialogProps) {
+  const [isLoading, setIsLoading] = useState(false)
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
   const isMobile = useIsMobile()
+
+  const handleUntrash = async () => {
+    if (isLoading) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/drive/files/untrash', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedItems.map((item) => ({ id: item.id })),
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} restored from trash`)
+        onConfirm()
+        onClose()
+      } else {
+        throw new Error(result.error || 'Failed to restore items from trash')
+      }
+    } catch (error: any) {
+      errorToast(error.message || 'Failed to restore items from trash')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const renderContent = () => (
     <div className="space-y-6">
@@ -80,9 +103,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
                 </Badge>
               </div>
             ))}
-            {selectedItems.length > 5 && (
-              <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>
-            )}
+            {selectedItems.length > 5 && <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>}
           </div>
         </div>
       </div>
@@ -92,9 +113,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500">
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-emerald-800 dark:text-emerald-200">
-          If the original parent folder was also deleted, items will be restored to the root of your Drive.
-        </div>
+        <div className="text-sm text-emerald-800 dark:text-emerald-200">If the original parent folder was also deleted, items will be restored to the root of your Drive.</div>
       </div>
     </div>
   )
@@ -119,11 +138,12 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
 
           <BottomSheetFooter className={cn('grid gap-4')}>
             <Button
-              onClick={onConfirm}
+              onClick={handleUntrash}
+              disabled={isLoading}
               className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-800`}
             >
-              <RotateCcw className="mr-2 h-4 w-4" />
-              Restore Items
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
+              {isLoading ? 'Restoring...' : 'Restore Items'}
             </Button>
             <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
               Cancel
@@ -153,10 +173,12 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
 
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={handleUntrash}
+            disabled={isLoading}
             className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800"
           >
-            Restore Items
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCcw className="mr-2 h-4 w-4" />}
+            {isLoading ? 'Restoring...' : 'Restore Items'}
           </AlertDialogAction>
           <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
         </AlertDialogFooter>

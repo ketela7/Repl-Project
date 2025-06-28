@@ -193,66 +193,33 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'text':
-            typeConditions.push(
-              '(' +
-                ["mimeType = 'text/plain'", "mimeType = 'text/markdown'", "mimeType = 'text/csv'", "mimeType = 'text/tab-separated-values'"].join(
-                  ' or '
-                ) +
-                ')'
-            )
+            typeConditions.push('(' + ["mimeType = 'text/plain'", "mimeType = 'text/markdown'", "mimeType = 'text/csv'", "mimeType = 'text/tab-separated-values'"].join(' or ') + ')')
             break
 
           case 'design':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/vnd.google-apps.drawing'",
-                  "mimeType = 'image/svg+xml'",
-                  "mimeType = 'application/postscript'",
-                  "mimeType = 'application/illustrator'",
-                ].join(' or ') +
-                ')'
+              '(' + ["mimeType = 'application/vnd.google-apps.drawing'", "mimeType = 'image/svg+xml'", "mimeType = 'application/postscript'", "mimeType = 'application/illustrator'"].join(' or ') + ')'
             )
             break
 
           case 'database':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/x-sqlite3'",
-                  "mimeType = 'application/vnd.ms-access'",
-                  "mimeType = 'application/x-dbf'",
-                  "mimeType contains 'database'",
-                ].join(' or ') +
-                ')'
+              '(' + ["mimeType = 'application/x-sqlite3'", "mimeType = 'application/vnd.ms-access'", "mimeType = 'application/x-dbf'", "mimeType contains 'database'"].join(' or ') + ')'
             )
             break
 
           case 'ebook':
             typeConditions.push(
               '(' +
-                [
-                  "mimeType = 'application/epub+zip'",
-                  "mimeType = 'application/x-mobipocket-ebook'",
-                  "mimeType = 'application/vnd.amazon.ebook'",
-                  "mimeType = 'application/x-fictionbook+xml'",
-                ].join(' or ') +
+                ["mimeType = 'application/epub+zip'", "mimeType = 'application/x-mobipocket-ebook'", "mimeType = 'application/vnd.amazon.ebook'", "mimeType = 'application/x-fictionbook+xml'"].join(
+                  ' or '
+                ) +
                 ')'
             )
             break
 
           case 'font':
-            typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'font/ttf'",
-                  "mimeType = 'font/otf'",
-                  "mimeType = 'font/woff'",
-                  "mimeType = 'font/woff2'",
-                  "mimeType = 'application/font-woff'",
-                ].join(' or ') +
-                ')'
-            )
+            typeConditions.push('(' + ["mimeType = 'font/ttf'", "mimeType = 'font/otf'", "mimeType = 'font/woff'", "mimeType = 'font/woff2'", "mimeType = 'application/font-woff'"].join(' or ') + ')')
             break
 
           case 'calendar':

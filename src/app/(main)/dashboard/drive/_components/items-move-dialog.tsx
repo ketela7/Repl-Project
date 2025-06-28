@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Move } from 'lucide-react'
+import { Move, Loader2, Folder } from 'lucide-react'
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn } from '@/lib/utils'
+import { cn, successToast, errorToast } from '@/lib/utils'
 
 // FileMoveDialog removed - functionality integrated into bulk operations
 
@@ -26,13 +26,45 @@ interface ItemsMoveDialogProps {
 
 function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: ItemsMoveDialogProps) {
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [selectedFolderId, setSelectedFolderId] = useState<string>('root')
   const isMobile = useIsMobile()
 
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
 
+  const handleMove = async () => {
+    if (isLoading) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/drive/files/move', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedItems.map((item) => ({ id: item.id })),
+          targetFolderId: selectedFolderId,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} moved successfully`)
+        onConfirm(selectedFolderId)
+        onOpenChange(false)
+      } else {
+        throw new Error(result.error || 'Failed to move items')
+      }
+    } catch (error: any) {
+      errorToast(error.message || 'Failed to move items')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleMoveConfirm = (targetFolderId: string) => {
-    onConfirm(targetFolderId)
+    setSelectedFolderId(targetFolderId)
     setIsMoveDialogOpen(false)
   }
 
@@ -82,9 +114,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
                 </Badge>
               </div>
             ))}
-            {selectedItems.length > 5 && (
-              <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>
-            )}
+            {selectedItems.length > 5 && <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>}
           </div>
         </div>
       </div>
@@ -94,7 +124,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
         <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500">
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-blue-800 dark:text-blue-200">Click "Choose Destination" to select where you want to move these items.</div>
+        <div className="text-sm text-blue-800 dark:text-blue-200">Click &ldquo;Choose Destination&rdquo; to select where you want to move these items.</div>
       </div>
     </div>
   )
@@ -119,9 +149,13 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
             <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
             <BottomSheetFooter className={cn('grid gap-4')}>
-              <Button onClick={() => setIsMoveDialogOpen(true)} className={cn('touch-target min-h-[44px] active:scale-95')}>
-                <Move className="mr-2 h-4 w-4" />
-                Choose Destination
+              <Button onClick={handleMove} disabled={isLoading} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Move className="mr-2 h-4 w-4" />}
+                {isLoading ? 'Moving...' : 'Move to Root'}
+              </Button>
+              <Button onClick={() => setIsMoveDialogOpen(true)} disabled={isLoading} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <Folder className="mr-2 h-4 w-4" />
+                Choose Different Folder
               </Button>
               <Button variant="outline" onClick={() => onOpenChange(false)} className={cn('touch-target min-h-[44px] active:scale-95')}>
                 Cancel
@@ -206,17 +240,12 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
                 <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-500">
                   <div className="h-1.5 w-1.5 rounded-full bg-white" />
                 </div>
-                <div className="text-sm text-blue-800 dark:text-blue-200">
-                  Click "Choose Destination" to select where you want to move these items.
-                </div>
+                <div className="text-sm text-blue-800 dark:text-blue-200">Click &ldquo;Choose Destination&rdquo; to select where you want to move these items.</div>
               </div>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-2 sm:flex-row">
-            <Button
-              onClick={() => setIsMoveDialogOpen(true)}
-              className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
-            >
+            <Button onClick={() => setIsMoveDialogOpen(true)} className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800">
               Choose Destination
             </Button>
             <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">

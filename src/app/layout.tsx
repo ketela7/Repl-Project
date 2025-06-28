@@ -16,15 +16,7 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'Google Drive Pro - Professional Drive Management',
   description: 'Advanced Google Drive management application with enterprise features',
-  keywords: [
-    'Professional Google Drive',
-    'Enterprise File Management',
-    'Document Management',
-    'Cloud Storage',
-    'Business Solutions',
-    'Next.js',
-    'React',
-  ],
+  keywords: ['Professional Google Drive', 'Enterprise File Management', 'Document Management', 'Cloud Storage', 'Business Solutions', 'Next.js', 'React'],
   authors: [{ name: 'Professional Google Drive Management Team' }],
   creator: 'Professional Google Drive Management',
   publisher: 'Professional Google Drive Management',

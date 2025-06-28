@@ -1,29 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import {
-  Archive,
-  Calendar,
-  ChevronDown,
-  ChevronUp,
-  Clock,
-  Code,
-  FileText,
-  Filter,
-  Folder,
-  HardDrive,
-  Home,
-  Image,
-  Link,
-  Music,
-  RefreshCw,
-  Share,
-  Star,
-  Trash,
-  User,
-  Video,
-  X,
-} from 'lucide-react'
+import { Archive, Calendar, ChevronDown, ChevronUp, Clock, Code, FileText, Filter, Folder, HardDrive, Home, Image, Link, Music, RefreshCw, Share, Star, Trash, User, Video, X } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -68,16 +46,7 @@ interface FiltersDialogProps {
   isApplying?: boolean
 }
 
-export function FiltersDialog({
-  open,
-  onOpenChange,
-  onFilterChange,
-  onApplyFilters,
-  currentFilters,
-  hasActiveFilters,
-  onClearFilters,
-  isApplying = false,
-}: FiltersDialogProps) {
+export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilters, currentFilters, hasActiveFilters, onClearFilters, isApplying = false }: FiltersDialogProps) {
   // Temporary state for filter changes (not applied until "Apply Filter" is clicked)
   const [tempActiveView, setTempActiveView] = useState(currentFilters?.activeView || 'all')
   const [tempFileTypeFilter, setTempFileTypeFilter] = useState(currentFilters?.fileTypeFilter || [])
@@ -109,9 +78,7 @@ export function FiltersDialog({
   }, [open, currentFilters])
 
   // Check if size filters are applied (Google Drive API limitation: size filters only work for files)
-  const hasSizeFilter =
-    (tempAdvancedFilters.sizeRange?.min && tempAdvancedFilters.sizeRange.min > 0) ||
-    (tempAdvancedFilters.sizeRange?.max && tempAdvancedFilters.sizeRange.max > 0)
+  const hasSizeFilter = (tempAdvancedFilters.sizeRange?.min && tempAdvancedFilters.sizeRange.min > 0) || (tempAdvancedFilters.sizeRange?.max && tempAdvancedFilters.sizeRange.max > 0)
 
   // Calculate if there are active temp filters to show Clear All button
   const hasTempActiveFilters =
@@ -262,8 +229,7 @@ export function FiltersDialog({
     setTempAdvancedFilters(newFilters)
 
     // Check if size filters are being applied
-    const newHasSizeFilter =
-      (newFilters.sizeRange?.min && newFilters.sizeRange.min > 0) || (newFilters.sizeRange?.max && newFilters.sizeRange.max > 0)
+    const newHasSizeFilter = (newFilters.sizeRange?.min && newFilters.sizeRange.min > 0) || (newFilters.sizeRange?.max && newFilters.sizeRange.max > 0)
 
     // Remove folder from file type filter if size filters are applied (Google Drive API limitation)
     let updatedFileTypeFilter = tempFileTypeFilter
@@ -355,8 +321,7 @@ export function FiltersDialog({
                     <div className="flex-1">
                       <p className="font-medium">Size filtering: Hanya akan menghasilkan file bukan folder</p>
                       <p className="mt-1 text-xs opacity-80">
-                        Google Drive API limitation: Filter ukuran hanya bekerja untuk file, bukan folder. Pemilihan folder dinonaktifkan ketika
-                        filter ukuran aktif.
+                        Google Drive API limitation: Filter ukuran hanya bekerja untuk file, bukan folder. Pemilihan folder dinonaktifkan ketika filter ukuran aktif.
                       </p>
                     </div>
                   </div>
@@ -378,9 +343,7 @@ export function FiltersDialog({
                       key={filter.id}
                       variant={isActive ? 'default' : 'outline'}
                       disabled={isDisabled}
-                      className={`h-12 justify-start ${
-                        isActive ? 'ring-primary/20 ring-2' : ''
-                      } ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
+                      className={`h-12 justify-start ${isActive ? 'ring-primary/20 ring-2' : ''} ${isDisabled ? 'cursor-not-allowed opacity-50' : ''}`}
                       onClick={() => {
                         if (!isDisabled) {
                           handleFileTypeFilter(filter.id)

@@ -33,12 +33,7 @@ interface UseProgressiveFileDetailsReturn {
   retry: (stage?: LoadingStage) => void
 }
 
-export function useProgressiveFileDetails({
-  fileId,
-  isOpen,
-  onStageComplete,
-  onError,
-}: UseProgressiveFileDetailsOptions): UseProgressiveFileDetailsReturn {
+export function useProgressiveFileDetails({ fileId, isOpen, onStageComplete, onError }: UseProgressiveFileDetailsOptions): UseProgressiveFileDetailsReturn {
   const [data, setData] = useState<ProgressiveFileData>({})
   const [loading, setLoading] = useState({
     basic: false,

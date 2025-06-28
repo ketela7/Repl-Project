@@ -45,6 +45,15 @@ export function FileThumbnailPreview({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
 
+  // Cleanup effect - must be unconditional
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
+
   // Don't show preview if no thumbnail available
   if (!thumbnailLink) {
     return <>{children}</>;
@@ -123,14 +132,6 @@ export function FileThumbnailPreview({
     setTimeout(() => setIsVisible(false), 4000);
   };
 
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, []);
-
   return (
     <>
       <div
@@ -186,12 +187,12 @@ export function FileThumbnailPreview({
                 <div className="w-full h-[140px] bg-gradient-to-br from-muted to-muted/60 rounded-lg flex items-center justify-center text-muted-foreground">
                   <div className="text-center space-y-2">
                     <div className="opacity-60 mx-auto">
-                      {mimeType?.startsWith('video/') ? <Video className="h-6 w-6 sm:h-8 sm:w-8" /> :
-                       mimeType?.startsWith('image/') ? <Image className="h-6 w-6 sm:h-8 sm:w-8" /> :
-                       mimeType?.includes('pdf') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" /> :
-                       mimeType?.includes('document') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" /> :
-                       mimeType?.includes('presentation') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" /> :
-                       mimeType?.includes('spreadsheet') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" /> : <FileText className="h-6 w-6 sm:h-8 sm:w-8" />}
+                      {mimeType?.startsWith('video/') ? <Video className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
+                       mimeType?.startsWith('image/') ? <Image className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
+                       mimeType?.includes('pdf') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
+                       mimeType?.includes('document') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
+                       mimeType?.includes('presentation') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
+                       mimeType?.includes('spreadsheet') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> : <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />}
                     </div>
                     <div className="text-xs font-medium">Preview unavailable</div>
                   </div>

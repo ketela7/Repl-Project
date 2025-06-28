@@ -89,9 +89,7 @@ class SearchOptimizer {
 
       // If current query extends a cached query, filter the cached results
       if (query.startsWith(cachedQuery) && cachedQuery.length >= 2) {
-        const filteredFiles = result.files.filter(
-          (file: any) => file.name?.toLowerCase().includes(query) || file.mimeType?.toLowerCase().includes(query)
-        )
+        const filteredFiles = result.files.filter((file: any) => file.name?.toLowerCase().includes(query) || file.mimeType?.toLowerCase().includes(query))
 
         return {
           files: filteredFiles,

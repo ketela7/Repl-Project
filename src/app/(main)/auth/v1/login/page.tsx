@@ -25,17 +25,13 @@ export default function LoginV1() {
         <div className="w-full max-w-md space-y-10 py-24 lg:py-32">
           <div className="space-y-4 text-center">
             <div className="text-foreground font-medium tracking-tight">Login</div>
-            <div className="text-muted-foreground mx-auto max-w-xl">
-              Welcome back. Enter your email and password, let&apos;s hope you remember them this time.
-            </div>
+            <div className="text-muted-foreground mx-auto max-w-xl">Welcome back. Enter your email and password, let&apos;s hope you remember them this time.</div>
           </div>
           <div className="space-y-4">
             <Suspense fallback={<div className="text-center">Loading...</div>}>
               <SearchParamsHandler>{(isReauth) => <NextAuthForm isReauth={isReauth} />}</SearchParamsHandler>
             </Suspense>
-            <p className="text-muted-foreground text-center text-xs font-medium">
-              Sign in with your Google account to access the Google Drive management system.
-            </p>
+            <p className="text-muted-foreground text-center text-xs font-medium">Sign in with your Google account to access the Google Drive management system.</p>
           </div>
         </div>
       </div>

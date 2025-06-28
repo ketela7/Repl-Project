@@ -17,15 +17,7 @@ interface DataTableProps<TData, TValue> {
   sortableId?: string
 }
 
-export function DataTable<TData, TValue>({
-  table,
-  columns,
-  dataIds = [],
-  dndEnabled = false,
-  handleDragEnd,
-  sensors,
-  sortableId,
-}: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ table, columns, dataIds = [], dndEnabled = false, handleDragEnd, sensors, sortableId }: DataTableProps<TData, TValue>) {
   const tableContent = (
     <Table>
       <TableHeader className="bg-muted sticky top-0 z-10">

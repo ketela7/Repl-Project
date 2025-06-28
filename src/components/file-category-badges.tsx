@@ -1,20 +1,7 @@
 'use client'
 
 import React from 'react'
-import {
-  FileVideo,
-  FileText,
-  FileImage,
-  FileAudio,
-  Archive,
-  FileCode,
-  FileSpreadsheet,
-  Presentation,
-  File,
-  Folder,
-  BookOpen,
-  Link,
-} from 'lucide-react'
+import { FileVideo, FileText, FileImage, FileAudio, Archive, FileCode, FileSpreadsheet, Presentation, File, Folder, BookOpen, Link } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 

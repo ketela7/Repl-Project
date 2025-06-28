@@ -163,9 +163,7 @@ export function DriveDataView({
             {items.map((item) => (
               <div
                 key={item.id}
-                className={`hover:bg-accent relative cursor-pointer rounded-lg border p-2 transition-colors sm:p-3 md:p-4 ${
-                  selectedItems.has(item.id) ? 'ring-primary bg-primary/5 ring-2' : ''
-                }`}
+                className={`hover:bg-accent relative cursor-pointer rounded-lg border p-2 transition-colors sm:p-3 md:p-4 ${selectedItems.has(item.id) ? 'ring-primary bg-primary/5 ring-2' : ''}`}
                 onClick={() => {
                   if (isSelectMode) {
                     onSelectItem(item.id)
@@ -195,21 +193,12 @@ export function DriveDataView({
               >
                 {isSelectMode && (
                   <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
-                    <Checkbox
-                      checked={selectedItems.has(item.id)}
-                      onCheckedChange={() => onSelectItem(item.id)}
-                      className="bg-background !size-4 !h-4 !w-4"
-                    />
+                    <Checkbox checked={selectedItems.has(item.id)} onCheckedChange={() => onSelectItem(item.id)} className="bg-background !size-4 !h-4 !w-4" />
                   </div>
                 )}
                 <div className="mb-2 flex items-start justify-between">
                   <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
-                    <FileThumbnailPreview
-                      thumbnailLink={item.thumbnailLink}
-                      fileName={item.name}
-                      mimeType={item.mimeType}
-                      modifiedTime={item.modifiedTime}
-                    >
+                    <FileThumbnailPreview thumbnailLink={item.thumbnailLink} fileName={item.name} mimeType={item.mimeType} modifiedTime={item.modifiedTime}>
                       <FileIcon mimeType={item.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
                     </FileThumbnailPreview>
                   </div>
@@ -310,21 +299,14 @@ export function DriveDataView({
                   {visibleColumns.name && (
                     <TableCell>
                       <div className="flex items-center space-x-3">
-                        <FileThumbnailPreview
-                          thumbnailLink={item.thumbnailLink}
-                          fileName={item.name}
-                          mimeType={item.mimeType}
-                          modifiedTime={item.modifiedTime}
-                        >
+                        <FileThumbnailPreview thumbnailLink={item.thumbnailLink} fileName={item.name} mimeType={item.mimeType} modifiedTime={item.modifiedTime}>
                           <FileIcon mimeType={item.mimeType} className="h-6 w-6" />
                         </FileThumbnailPreview>
                         <span className="font-medium">{item.name}</span>
                       </div>
                     </TableCell>
                   )}
-                  {visibleColumns.size && (
-                    <TableCell>{'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'}</TableCell>
-                  )}
+                  {visibleColumns.size && <TableCell>{'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'}</TableCell>}
                   {visibleColumns.owners && (
                     <TableCell
                       className="hover:bg-muted/50 group cursor-pointer transition-colors"
@@ -348,9 +330,7 @@ export function DriveDataView({
                     >
                       <div className="flex items-center gap-2">
                         <span>{item.owners?.[0]?.emailAddress || 'Unknown'}</span>
-                        {item.owners?.[0]?.emailAddress && (
-                          <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                        )}
+                        {item.owners?.[0]?.emailAddress && <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />}
                       </div>
                     </TableCell>
                   )}
@@ -366,9 +346,7 @@ export function DriveDataView({
                   )}
                   {visibleColumns.createdTime && (
                     <TableCell>
-                      <span className="text-muted-foreground text-sm">
-                        {item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}
-                      </span>
+                      <span className="text-muted-foreground text-sm">{item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}</span>
                     </TableCell>
                   )}
                   <TableCell onClick={(e) => e.stopPropagation()}>{renderContent(item)}</TableCell>

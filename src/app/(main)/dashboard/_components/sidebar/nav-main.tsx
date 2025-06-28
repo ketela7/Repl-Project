@@ -93,13 +93,7 @@ const NavItemCollapsed = ({ item, isActive }: { item: NavMainItem; isActive: (ur
         <DropdownMenuContent className="w-50 space-y-1" side="right" align="start">
           {item.subItems?.map((subItem) => (
             <DropdownMenuItem key={subItem.title} asChild>
-              <SidebarMenuSubButton
-                key={subItem.title}
-                asChild
-                className="focus-visible:ring-0"
-                aria-disabled={subItem.comingSoon}
-                isActive={isActive(subItem.url)}
-              >
+              <SidebarMenuSubButton key={subItem.title} asChild className="focus-visible:ring-0" aria-disabled={subItem.comingSoon} isActive={isActive(subItem.url)}>
                 <Link href={subItem.url} target={subItem.newTab ? '_blank' : undefined}>
                   {subItem.icon && <subItem.icon className="[&>svg]:text-sidebar-foreground" />}
                   <span>{subItem.title}</span>

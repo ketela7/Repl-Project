@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Edit3, Hash, Calendar, AlignLeft, Code2 } from 'lucide-react'
+import { Edit3, Hash, Calendar, AlignLeft, Code2, Loader2 } from 'lucide-react'
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn } from '@/lib/utils'
+import { cn, successToast, errorToast } from '@/lib/utils'
 
 interface ItemsRenameDialogProps {
   isOpen: boolean
@@ -81,15 +81,40 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
   const [renamePattern, setRenamePattern] = useState('')
   const [regexPattern, setRegexPattern] = useState('')
   const [showPreview, setShowPreview] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const isMobile = useIsMobile()
 
-  const handleRename = () => {
-    if (renameType === 'regex') {
-      if (regexPattern.trim()) {
-        onConfirm(regexPattern.trim(), renameType)
+  const handleRename = async () => {
+    const pattern = renameType === 'regex' ? regexPattern.trim() : renamePattern.trim()
+
+    if (!pattern && renameType !== 'timestamp') return
+    if (isLoading) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/drive/files/rename', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedItems.map((item) => ({ id: item.id, name: item.name })),
+          namePrefix: pattern,
+          renameType: renameType,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} renamed successfully`)
+        onConfirm(pattern, renameType)
+        onClose()
+      } else {
+        throw new Error(result.error || 'Failed to rename items')
       }
-    } else if (renamePattern.trim() || renameType === 'timestamp') {
-      onConfirm(renamePattern.trim(), renameType)
+    } catch (error: any) {
+      errorToast(error.message || 'Failed to rename items')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -154,12 +179,8 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
             placeholder={selectedRenameType.placeholder}
             className={selectedRenameType.id === 'regex' ? 'font-mono' : ''}
           />
-          {selectedRenameType.id === 'replace' && (
-            <div className="text-muted-foreground text-xs">Format: old_text|new_text (use | to separate old and new text)</div>
-          )}
-          {selectedRenameType.id === 'regex' && (
-            <div className="text-muted-foreground text-xs">Advanced users only. Use JavaScript regex syntax: /pattern/replacement/flags</div>
-          )}
+          {selectedRenameType.id === 'replace' && <div className="text-muted-foreground text-xs">Format: old_text|new_text (use | to separate old and new text)</div>}
+          {selectedRenameType.id === 'regex' && <div className="text-muted-foreground text-xs">Advanced users only. Use JavaScript regex syntax: /pattern/replacement/flags</div>}
         </div>
       )}
 
@@ -225,11 +246,11 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
           <BottomSheetFooter className={`${cn('grid gap-4')} px-4`}>
             <Button
               onClick={handleRename}
-              disabled={renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp'}
+              disabled={isLoading || (renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp')}
               className={cn('touch-target min-h-[44px] active:scale-95')}
             >
-              <Edit3 className="mr-2 h-4 w-4" />
-              Rename All
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Edit3 className="mr-2 h-4 w-4" />}
+              {isLoading ? 'Renaming...' : 'Rename All'}
             </Button>
             <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
               Cancel
@@ -258,13 +279,9 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         <div className="flex-1 overflow-y-auto px-1">{renderContent()}</div>
 
         <DialogFooter className="flex-col gap-2 sm:flex-row">
-          <Button
-            onClick={handleRename}
-            disabled={renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp'}
-            className="w-full sm:w-auto"
-          >
-            <Edit3 className="mr-2 h-4 w-4" />
-            Rename All
+          <Button onClick={handleRename} disabled={isLoading || (renameType === 'regex' ? !regexPattern.trim() : !renamePattern.trim() && renameType !== 'timestamp')} className="w-full sm:w-auto">
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Edit3 className="mr-2 h-4 w-4" />}
+            {isLoading ? 'Renaming...' : 'Rename All'}
           </Button>
           <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
             Cancel

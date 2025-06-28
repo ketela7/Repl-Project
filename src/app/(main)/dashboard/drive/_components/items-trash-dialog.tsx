@@ -1,21 +1,14 @@
 'use client'
 
-import { Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Trash2, Loader2 } from 'lucide-react'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn } from '@/lib/utils'
+import { cn, successToast, errorToast } from '@/lib/utils'
 
 interface ItemsTrashDialogProps {
   isOpen: boolean
@@ -29,9 +22,39 @@ interface ItemsTrashDialogProps {
 }
 
 function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTrashDialogProps) {
+  const [isLoading, setIsLoading] = useState(false)
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
   const isMobile = useIsMobile()
+
+  const handleTrash = async () => {
+    if (isLoading) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/drive/files/trash', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedItems.map((item) => ({ id: item.id })),
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} moved to trash`)
+        onConfirm()
+        onClose()
+      } else {
+        throw new Error(result.error || 'Failed to move items to trash')
+      }
+    } catch (error: any) {
+      errorToast(error.message || 'Failed to move items to trash')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const renderContent = () => (
     <div className="space-y-6">
@@ -79,9 +102,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
                 </Badge>
               </div>
             ))}
-            {selectedItems.length > 5 && (
-              <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>
-            )}
+            {selectedItems.length > 5 && <div className="text-muted-foreground py-2 text-center text-sm">... and {selectedItems.length - 5} more items</div>}
           </div>
         </div>
       </div>
@@ -91,9 +112,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
         <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-500">
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-amber-800 dark:text-amber-200">
-          These items will be moved to your Google Drive trash and can be restored later.
-        </div>
+        <div className="text-sm text-amber-800 dark:text-amber-200">These items will be moved to your Google Drive trash and can be restored later.</div>
       </div>
     </div>
   )
@@ -118,9 +137,11 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
 
           <BottomSheetFooter className={cn('grid gap-4')}>
             <Button
-              onClick={onConfirm}
+              onClick={handleTrash}
+              disabled={isLoading}
               className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 dark:bg-red-700 dark:hover:bg-red-800`}
             >
+              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
               Move to Trash
             </Button>
             <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
@@ -150,10 +171,8 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
         <div className="space-y-4 px-1">{renderContent()}</div>
 
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
-          <AlertDialogAction
-            onClick={onConfirm}
-            className="w-full bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800"
-          >
+          <AlertDialogAction onClick={handleTrash} disabled={isLoading} className="w-full bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800">
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Move to Trash
           </AlertDialogAction>
           <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>

@@ -159,9 +159,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
               </span>
             </div>
           ))}
-          {selectedItems.length > 5 && (
-            <div className="text-muted-foreground text-center text-xs italic">and {selectedItems.length - 5} more items...</div>
-          )}
+          {selectedItems.length > 5 && <div className="text-muted-foreground text-center text-xs italic">and {selectedItems.length - 5} more items...</div>}
         </div>
       </div>
 
@@ -249,9 +247,7 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
         <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-green-500">
           <div className="h-1.5 w-1.5 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-green-800 dark:text-green-200">
-          Share links will be generated for all selected items with the chosen access settings.
-        </div>
+        <div className="text-sm text-green-800 dark:text-green-200">Share links will be generated for all selected items with the chosen access settings.</div>
       </div>
     </div>
   )

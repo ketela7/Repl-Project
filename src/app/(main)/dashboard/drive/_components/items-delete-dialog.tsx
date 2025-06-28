@@ -1,18 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Trash2, Loader2 } from 'lucide-react'
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn } from '@/lib/utils'
+import { cn, successToast, errorToast } from '@/lib/utils'
 
 interface ItemsDeleteDialogProps {
   isOpen: boolean
@@ -37,14 +28,43 @@ interface ItemsDeleteDialogProps {
 function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsDeleteDialogProps) {
   const [confirmationText, setConfirmationText] = useState('')
   const [acknowledgeWarning, setAcknowledgeWarning] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const isMobile = useIsMobile()
 
   const isConfirmationValid = confirmationText.trim() === 'CONFIRM DELETE' && acknowledgeWarning
 
+  const handleDelete = async () => {
+    if (!isConfirmationValid || isLoading) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/drive/files/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedItems.map((item) => ({ id: item.id })),
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} permanently deleted`)
+        onConfirm()
+        handleClose()
+      } else {
+        throw new Error(result.error || 'Failed to delete items')
+      }
+    } catch (error: any) {
+      errorToast(error.message || 'Failed to delete items')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleConfirm = () => {
     if (isConfirmationValid) {
-      onConfirm()
-      handleClose()
+      handleDelete()
     }
   }
 
@@ -88,9 +108,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
               </span>
             </div>
           ))}
-          {selectedItems.length > 5 && (
-            <div className="text-center text-xs text-red-700 italic dark:text-red-300">and {selectedItems.length - 5} more items...</div>
-          )}
+          {selectedItems.length > 5 && <div className="text-center text-xs text-red-700 italic dark:text-red-300">and {selectedItems.length - 5} more items...</div>}
         </div>
       </div>
 
@@ -100,25 +118,14 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           <Label className="text-sm font-medium">
             Type <span className="font-mono text-red-600">CONFIRM DELETE</span> to proceed
           </Label>
-          <Input
-            type="text"
-            value={confirmationText}
-            onChange={(e) => setConfirmationText(e.target.value)}
-            placeholder="Type CONFIRM DELETE"
-            className="font-mono"
-          />
+          <Input type="text" value={confirmationText} onChange={(e) => setConfirmationText(e.target.value)} placeholder="Type CONFIRM DELETE" className="font-mono" />
         </div>
 
         <div className="flex items-start space-x-2">
-          <Checkbox
-            id="acknowledge-warning"
-            checked={acknowledgeWarning}
-            onCheckedChange={(checked) => setAcknowledgeWarning(checked === true)}
-            className="mt-1"
-          />
+          <Checkbox id="acknowledge-warning" checked={acknowledgeWarning} onCheckedChange={(checked) => setAcknowledgeWarning(checked === true)} className="mt-1" />
           <Label htmlFor="acknowledge-warning" className="cursor-pointer text-sm leading-relaxed">
-            I understand that this action will <span className="font-semibold text-red-600 dark:text-red-400">permanently delete</span> all selected
-            items and <span className="font-semibold">cannot be reversed</span>.
+            I understand that this action will <span className="font-semibold text-red-600 dark:text-red-400">permanently delete</span> all selected items and{' '}
+            <span className="font-semibold">cannot be reversed</span>.
           </Label>
         </div>
       </div>
@@ -195,10 +202,15 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
         <AlertDialogFooter className="flex-col gap-2 sm:flex-row">
           <AlertDialogAction
             onClick={handleConfirm}
-            disabled={!isConfirmationValid}
+            disabled={!isConfirmationValid || isLoading}
             className="w-full bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800"
           >
-            {isConfirmationValid ? (
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : isConfirmationValid ? (
               <>
                 <Trash2 className="mr-2 h-4 w-4" />
                 Permanently Delete

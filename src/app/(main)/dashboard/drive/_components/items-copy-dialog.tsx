@@ -1,14 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, AlertTriangle } from 'lucide-react'
+import { Copy, AlertTriangle, Loader2, Folder } from 'lucide-react'
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
-import { cn } from '@/lib/utils'
+import { cn, successToast, errorToast } from '@/lib/utils'
 
 interface ItemsCopyDialogProps {
   isOpen: boolean
@@ -23,13 +23,45 @@ interface ItemsCopyDialogProps {
 
 function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCopyDialogProps) {
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [selectedFolderId, setSelectedFolderId] = useState<string>('root')
   const isMobile = useIsMobile()
 
   const files = selectedItems.filter((item) => !item.isFolder)
   const folders = selectedItems.filter((item) => item.isFolder)
 
+  const handleCopy = async () => {
+    if (isLoading) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/drive/files/copy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: selectedItems.map((item) => ({ id: item.id, name: item.name })),
+          targetFolderId: selectedFolderId,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} copied successfully`)
+        onConfirm(selectedFolderId)
+        onClose()
+      } else {
+        throw new Error(result.error || 'Failed to copy items')
+      }
+    } catch (error: any) {
+      errorToast(error.message || 'Failed to copy items')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const handleCopyConfirm = (targetFolderId: string) => {
-    onConfirm(targetFolderId)
+    setSelectedFolderId(targetFolderId)
     setIsCopyDialogOpen(false)
   }
 
@@ -101,7 +133,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-green-500">
           <div className="h-2 w-2 rounded-full bg-white" />
         </div>
-        <div className="text-sm text-green-800 dark:text-green-200">Click "Choose Destination" to select where you want to copy these files.</div>
+        <div className="text-sm text-green-800 dark:text-green-200">Click &ldquo;Choose Destination&rdquo; to select where you want to copy these files.</div>
       </div>
     </div>
   )
@@ -126,10 +158,14 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
             <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
             <BottomSheetFooter className={cn('grid gap-4')}>
+              <Button onClick={handleCopy} disabled={isLoading || files.length === 0} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Copy className="mr-2 h-4 w-4" />}
+                {isLoading ? 'Copying...' : 'Copy to Root'}
+              </Button>
               {files.length > 0 && (
-                <Button onClick={() => setIsCopyDialogOpen(true)} className={cn('touch-target min-h-[44px] active:scale-95')}>
-                  <Copy className="mr-2 h-4 w-4" />
-                  Choose Destination
+                <Button onClick={() => setIsCopyDialogOpen(true)} disabled={isLoading} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Folder className="mr-2 h-4 w-4" />
+                  Choose Different Folder
                 </Button>
               )}
               <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
@@ -180,9 +216,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
               {folders.length > 0 && (
                 <div className="flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/20">
                   <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600 dark:text-amber-400" />
-                  <div className="text-sm text-amber-800 dark:text-amber-200">
-                    Folders cannot be copied through the Google Drive API. Only files will be copied.
-                  </div>
+                  <div className="text-sm text-amber-800 dark:text-amber-200">Folders cannot be copied through the Google Drive API. Only files will be copied.</div>
                 </div>
               )}
 
@@ -226,9 +260,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
                     <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-purple-500">
                       <div className="h-1.5 w-1.5 rounded-full bg-white" />
                     </div>
-                    <div className="text-sm text-purple-800 dark:text-purple-200">
-                      Click "Choose Destination" to select where you want to copy these files.
-                    </div>
+                    <div className="text-sm text-purple-800 dark:text-purple-200">Click &ldquo;Choose Destination&rdquo; to select where you want to copy these files.</div>
                   </div>
                 </>
               )}

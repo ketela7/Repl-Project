@@ -351,9 +351,5 @@ function isSkippableError(error: any): boolean {
   const errorCode = error?.response?.data?.error?.code
   const errorMessage = error?.response?.data?.error?.message || ''
 
-  return (
-    (errorCode === 403 &&
-      (errorMessage.includes('rateLimitExceeded') || errorMessage.includes('quotaExceeded') || errorMessage.includes('storageQuotaExceeded'))) ||
-    errorCode === 429
-  )
+  return (errorCode === 403 && (errorMessage.includes('rateLimitExceeded') || errorMessage.includes('quotaExceeded') || errorMessage.includes('storageQuotaExceeded'))) || errorCode === 429
 }

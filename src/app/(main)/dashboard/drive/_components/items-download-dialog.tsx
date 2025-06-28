@@ -285,9 +285,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
                     {file.size && <span className="ml-2 text-xs">({file.size})</span>}
                   </div>
                 ))}
-                {downloadableFiles.length > 5 && (
-                  <div className="text-muted-foreground text-xs">... and {downloadableFiles.length - 5} more files</div>
-                )}
+                {downloadableFiles.length > 5 && <div className="text-muted-foreground text-xs">... and {downloadableFiles.length - 5} more files</div>}
               </div>
             </div>
           )}

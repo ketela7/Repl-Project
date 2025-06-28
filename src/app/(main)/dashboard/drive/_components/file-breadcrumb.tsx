@@ -100,9 +100,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
                 e.preventDefault()
                 onNavigate(null)
               }}
-              className={`hover:text-primary flex items-center gap-2 whitespace-nowrap transition-colors ${
-                !currentFolderId ? 'text-primary font-medium' : ''
-              }`}
+              className={`hover:text-primary flex items-center gap-2 whitespace-nowrap transition-colors ${!currentFolderId ? 'text-primary font-medium' : ''}`}
             >
               <Home className="h-4 w-4 flex-shrink-0" />
               <span className="hidden sm:inline">My Drive</span>

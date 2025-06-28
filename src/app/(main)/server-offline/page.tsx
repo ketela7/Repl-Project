@@ -37,7 +37,7 @@ export default function ServerOfflinePage() {
             <WifiOff className="text-destructive h-8 w-8" />
           </div>
           <CardTitle className="text-2xl">Server Offline</CardTitle>
-          <CardDescription>We're unable to connect to the server right now.</CardDescription>
+          <CardDescription>We&rsquo;re unable to connect to the server right now.</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6">

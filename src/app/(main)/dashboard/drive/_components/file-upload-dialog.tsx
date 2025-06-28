@@ -157,26 +157,13 @@ export function FileUploadDialog({ isOpen, onClose, onUploadComplete, currentFol
           {/* File Name */}
           <div className="space-y-2">
             <Label htmlFor="file-name">File Name</Label>
-            <Input
-              id="file-name"
-              value={fileName}
-              onChange={(e) => setFileName(e.target.value)}
-              placeholder="Enter file name..."
-              disabled={uploading}
-            />
+            <Input id="file-name" value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="Enter file name..." disabled={uploading} />
           </div>
 
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Enter file description..."
-              disabled={uploading}
-              rows={3}
-            />
+            <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter file description..." disabled={uploading} rows={3} />
           </div>
 
           {/* Upload Progress */}

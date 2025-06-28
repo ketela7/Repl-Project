@@ -476,31 +476,13 @@ export function DriveToolbar({
       spreadsheets: items.filter((f) => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length,
       presentations: items.filter((f) => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length,
       audio: items.filter((f) => f.mimeType?.startsWith('audio/')).length,
-      archives: items.filter(
-        (f) =>
-          f.mimeType?.includes('zip') ||
-          f.mimeType?.includes('rar') ||
-          f.mimeType?.includes('tar') ||
-          f.mimeType?.includes('gz') ||
-          f.mimeType?.includes('7z')
-      ).length,
-      code: items.filter(
-        (f) =>
-          f.mimeType?.includes('javascript') ||
-          f.mimeType?.includes('json') ||
-          f.mimeType?.includes('html') ||
-          f.mimeType?.includes('css') ||
-          f.mimeType?.includes('xml')
-      ).length,
-      design: items.filter(
-        (f) =>
-          f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')
-      ).length,
+      archives: items.filter((f) => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length,
+      code: items.filter((f) => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml'))
+        .length,
+      design: items.filter((f) => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')).length,
       database: items.filter((f) => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length,
       ebooks: items.filter((f) => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length,
-      fonts: items.filter(
-        (f) => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')
-      ).length,
+      fonts: items.filter((f) => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')).length,
       shortcuts: items.filter((f) => f.mimeType === 'application/vnd.google-apps.shortcut').length,
       folders: items.filter((f) => f.mimeType === 'application/vnd.google-apps.folder').length,
     }
@@ -533,14 +515,8 @@ export function DriveToolbar({
   }, [onClearClientSideFilter, items.length])
 
   return (
-    <div
-      className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur transition-transform duration-200 ease-in-out"
-      id="drive-toolbar"
-    >
-      <div
-        className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth p-3"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
+    <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur transition-transform duration-200 ease-in-out" id="drive-toolbar">
+      <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth p-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {/* Main Menu - 5 Items - Horizontal Scrollable */}
         <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
           {/* Search */}
@@ -824,12 +800,7 @@ export function DriveToolbar({
                         >
                           Starred
                         </Button>
-                        <Button
-                          variant={filters.activeView === 'shared' ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => onFilterChange({ activeView: 'shared' })}
-                          className="justify-start text-xs"
-                        >
+                        <Button variant={filters.activeView === 'shared' ? 'default' : 'outline'} size="sm" onClick={() => onFilterChange({ activeView: 'shared' })} className="justify-start text-xs">
                           Shared
                         </Button>
                       </div>
@@ -850,9 +821,7 @@ export function DriveToolbar({
                           variant={filters.fileTypeFilter.includes('folder') ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => {
-                            const newTypes = filters.fileTypeFilter.includes('folder')
-                              ? filters.fileTypeFilter.filter((t) => t !== 'folder')
-                              : [...filters.fileTypeFilter, 'folder']
+                            const newTypes = filters.fileTypeFilter.includes('folder') ? filters.fileTypeFilter.filter((t) => t !== 'folder') : [...filters.fileTypeFilter, 'folder']
                             onFilterChange({ fileTypeFilter: newTypes })
                           }}
                           className="justify-center p-2 text-xs"
@@ -913,9 +882,7 @@ export function DriveToolbar({
                               variant={filters.fileTypeFilter.includes(filter.type) ? 'default' : 'outline'}
                               size="sm"
                               onClick={() => {
-                                const newTypes = filters.fileTypeFilter.includes(filter.type)
-                                  ? filters.fileTypeFilter.filter((t) => t !== filter.type)
-                                  : [...filters.fileTypeFilter, filter.type]
+                                const newTypes = filters.fileTypeFilter.includes(filter.type) ? filters.fileTypeFilter.filter((t) => t !== filter.type) : [...filters.fileTypeFilter, filter.type]
 
                                 onFilterChange({ fileTypeFilter: newTypes })
                               }}
@@ -1240,12 +1207,7 @@ export function DriveToolbar({
                 <div className="flex items-center justify-between border-b pb-2">
                   <div className="text-sm font-semibold">File Statistics</div>
                   {activeFilter && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleClearFilter}
-                      className="text-muted-foreground hover:text-foreground h-6 px-2 text-xs"
-                    >
+                    <Button variant="ghost" size="sm" onClick={handleClearFilter} className="text-muted-foreground hover:text-foreground h-6 px-2 text-xs">
                       <X className="mr-1 h-3 w-3" />
                       Clear Filter
                     </Button>
@@ -1273,9 +1235,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Images' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Images'
-                          ? 'border-green-500 bg-green-500 text-white'
-                          : 'border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50'
+                        activeFilter === 'Images' ? 'border-green-500 bg-green-500 text-white' : 'border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Images')}
                     >
@@ -1294,9 +1254,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Videos' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Videos'
-                          ? 'border-red-500 bg-red-500 text-white'
-                          : 'border-red-500 text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-900/50'
+                        activeFilter === 'Videos' ? 'border-red-500 bg-red-500 text-white' : 'border-red-500 text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Videos')}
                     >
@@ -1399,9 +1357,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Archives' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Archives'
-                          ? 'border-gray-500 bg-gray-500 text-white'
-                          : 'border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
+                        activeFilter === 'Archives' ? 'border-gray-500 bg-gray-500 text-white' : 'border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Archives')}
                     >
@@ -1420,9 +1376,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Code' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Code'
-                          ? 'border-cyan-500 bg-cyan-500 text-white'
-                          : 'border-cyan-500 text-cyan-700 hover:bg-cyan-100 dark:text-cyan-300 dark:hover:bg-cyan-900/50'
+                        activeFilter === 'Code' ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-cyan-500 text-cyan-700 hover:bg-cyan-100 dark:text-cyan-300 dark:hover:bg-cyan-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Code')}
                     >
@@ -1462,9 +1416,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Database' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Database'
-                          ? 'border-teal-500 bg-teal-500 text-white'
-                          : 'border-teal-500 text-teal-700 hover:bg-teal-100 dark:text-teal-300 dark:hover:bg-teal-900/50'
+                        activeFilter === 'Database' ? 'border-teal-500 bg-teal-500 text-white' : 'border-teal-500 text-teal-700 hover:bg-teal-100 dark:text-teal-300 dark:hover:bg-teal-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Database')}
                     >
@@ -1483,9 +1435,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Ebooks' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Ebooks'
-                          ? 'border-rose-500 bg-rose-500 text-white'
-                          : 'border-rose-500 text-rose-700 hover:bg-rose-100 dark:text-rose-300 dark:hover:bg-rose-900/50'
+                        activeFilter === 'Ebooks' ? 'border-rose-500 bg-rose-500 text-white' : 'border-rose-500 text-rose-700 hover:bg-rose-100 dark:text-rose-300 dark:hover:bg-rose-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Ebooks')}
                     >
@@ -1504,9 +1454,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Fonts' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Fonts'
-                          ? 'border-stone-500 bg-stone-500 text-white'
-                          : 'border-stone-500 text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900/50'
+                        activeFilter === 'Fonts' ? 'border-stone-500 bg-stone-500 text-white' : 'border-stone-500 text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Fonts')}
                     >
@@ -1525,9 +1473,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Shortcuts' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Shortcuts'
-                          ? 'border-sky-500 bg-sky-500 text-white'
-                          : 'border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50'
+                        activeFilter === 'Shortcuts' ? 'border-sky-500 bg-sky-500 text-white' : 'border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Shortcuts')}
                     >
@@ -1546,9 +1492,7 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Folders' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Folders'
-                          ? 'border-blue-500 bg-blue-500 text-white'
-                          : 'border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50'
+                        activeFilter === 'Folders' ? 'border-blue-500 bg-blue-500 text-white' : 'border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Folders')}
                     >
@@ -1797,12 +1741,7 @@ export function DriveToolbar({
       </div>
 
       {/* Operations Dialog */}
-      <OperationsDialog
-        isOpen={isOperationsOpen}
-        onClose={() => setIsOperationsOpen(false)}
-        selectedItems={selectedItems}
-        onRefreshAfterOp={handleOperationComplete}
-      />
+      <OperationsDialog isOpen={isOperationsOpen} onClose={() => setIsOperationsOpen(false)} selectedItems={selectedItems} onRefreshAfterOp={handleOperationComplete} />
 
       {/* Filters Dialog */}
       <FiltersDialog

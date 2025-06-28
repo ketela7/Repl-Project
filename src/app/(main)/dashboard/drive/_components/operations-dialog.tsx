@@ -7,16 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetDescription } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import {
-  ItemsMoveDialog,
-  ItemsCopyDialog,
-  ItemsTrashDialog,
-  ItemsShareDialog,
-  ItemsRenameDialog,
-  ItemsExportDialog,
-  ItemsDeleteDialog,
-  ItemsUntrashDialog,
-} from '@/components/lazy-imports'
+import { ItemsMoveDialog, ItemsCopyDialog, ItemsTrashDialog, ItemsShareDialog, ItemsRenameDialog, ItemsExportDialog, ItemsDeleteDialog, ItemsUntrashDialog } from '@/components/lazy-imports'
 
 import ItemsDownloadDialog from './items-download-dialog'
 
@@ -423,11 +414,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     <>
       <div className="grid gap-3">
         {/* Move Items */}
-        <Button
-          variant="outline"
-          onClick={handleMoveClick}
-          className="h-12 w-full justify-start gap-3 text-left hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/30"
-        >
+        <Button variant="outline" onClick={handleMoveClick} className="h-12 w-full justify-start gap-3 text-left hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/30">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
             <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </div>
@@ -438,11 +425,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         </Button>
 
         {/* Copy Items */}
-        <Button
-          variant="outline"
-          onClick={handleCopyClick}
-          className="h-12 w-full justify-start gap-3 text-left hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-950/30"
-        >
+        <Button variant="outline" onClick={handleCopyClick} className="h-12 w-full justify-start gap-3 text-left hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-950/30">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
             <Copy className="h-4 w-4 text-green-600 dark:text-green-400" />
           </div>
@@ -454,11 +437,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
         {/* Share Items */}
         {canShareCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleShareClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-950/30"
-          >
+          <Button variant="outline" onClick={handleShareClick} className="h-12 w-full justify-start gap-3 text-left hover:border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-950/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
               <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             </div>
@@ -471,11 +450,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
         {/* Rename */}
         {canRenameCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleRenameClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-950/30"
-          >
+          <Button variant="outline" onClick={handleRenameClick} className="h-12 w-full justify-start gap-3 text-left hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-950/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/50">
               <Edit className="h-4 w-4 text-orange-600 dark:text-orange-400" />
             </div>
@@ -488,11 +463,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
         {/* Download Files */}
         {fileCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleDownloadClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-          >
+          <Button variant="outline" onClick={handleDownloadClick} className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
               <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
@@ -506,11 +477,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         )}
 
         {fileCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleExportClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-indigo-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/30"
-          >
+          <Button variant="outline" onClick={handleExportClick} className="h-12 w-full justify-start gap-3 text-left hover:border-indigo-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
               <Download className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
@@ -532,11 +499,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
               {/* Move to Trash */}
               {canTrashCount > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={handleDeleteClick}
-                  className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
-                >
+                <Button variant="outline" onClick={handleDeleteClick} className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
                     <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                   </div>
@@ -549,11 +512,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
               {/* Permanent Delete */}
               {canDeleteCount > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={handlePermanentDeleteClick}
-                  className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
-                >
+                <Button variant="outline" onClick={handlePermanentDeleteClick} className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
                     <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
                   </div>
@@ -566,11 +525,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
               {/* Restore from Trash */}
               {canUntrashCount > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={handleRestoreClick}
-                  className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-                >
+                <Button variant="outline" onClick={handleRestoreClick} className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
                     <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                   </div>
@@ -624,61 +579,21 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       {/* Individual Items Operation Dialogs - Direct rendering tanpa Suspense */}
       <ItemsMoveDialog open={isMoveDialogOpen} onOpenChange={setIsMoveDialogOpen} onConfirm={handleMoveComplete} selectedItems={selectedItems} />
 
-      <ItemsCopyDialog
-        isOpen={isCopyDialogOpen}
-        onClose={() => setIsCopyDialogOpen(false)}
-        onConfirm={handleCopyComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsCopyDialog isOpen={isCopyDialogOpen} onClose={() => setIsCopyDialogOpen(false)} onConfirm={handleCopyComplete} selectedItems={selectedItems} />
 
-      <ItemsTrashDialog
-        isOpen={isTrashDialogOpen}
-        onClose={() => setIsTrashDialogOpen(false)}
-        onConfirm={handleDeleteComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsTrashDialog isOpen={isTrashDialogOpen} onClose={() => setIsTrashDialogOpen(false)} onConfirm={handleDeleteComplete} selectedItems={selectedItems} />
 
-      <ItemsShareDialog
-        open={isShareDialogOpen}
-        onOpenChange={() => setIsShareDialogOpen(false)}
-        onConfirm={handleShareComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsShareDialog open={isShareDialogOpen} onOpenChange={() => setIsShareDialogOpen(false)} onConfirm={handleShareComplete} selectedItems={selectedItems} />
 
-      <ItemsRenameDialog
-        isOpen={isRenameDialogOpen}
-        onClose={() => setIsRenameDialogOpen(false)}
-        onConfirm={handleRenameComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsRenameDialog isOpen={isRenameDialogOpen} onClose={() => setIsRenameDialogOpen(false)} onConfirm={handleRenameComplete} selectedItems={selectedItems} />
 
-      <ItemsExportDialog
-        isOpen={isExportDialogOpen}
-        onClose={() => setIsExportDialogOpen(false)}
-        onConfirm={handleExportComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsExportDialog isOpen={isExportDialogOpen} onClose={() => setIsExportDialogOpen(false)} onConfirm={handleExportComplete} selectedItems={selectedItems} />
 
-      <ItemsDownloadDialog
-        isOpen={isDownloadDialogOpen}
-        onClose={() => setIsDownloadDialogOpen(false)}
-        onConfirm={handleDownloadComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsDownloadDialog isOpen={isDownloadDialogOpen} onClose={() => setIsDownloadDialogOpen(false)} onConfirm={handleDownloadComplete} selectedItems={selectedItems} />
 
-      <ItemsDeleteDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={() => setIsDeleteDialogOpen(false)}
-        onConfirm={handlePermanentDeleteComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={handlePermanentDeleteComplete} selectedItems={selectedItems} />
 
-      <ItemsUntrashDialog
-        isOpen={isRestoreDialogOpen}
-        onClose={() => setIsRestoreDialogOpen(false)}
-        onConfirm={handleRestoreComplete}
-        selectedItems={selectedItems}
-      />
+      <ItemsUntrashDialog isOpen={isRestoreDialogOpen} onClose={() => setIsRestoreDialogOpen(false)} onConfirm={handleRestoreComplete} selectedItems={selectedItems} />
     </>
   )
 }
