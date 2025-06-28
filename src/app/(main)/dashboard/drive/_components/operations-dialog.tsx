@@ -345,7 +345,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
         if (response.ok) {
           const result = await response.json()
-          
+
           // Trigger downloads for successful results
           if (result.success && result.success.length > 0) {
             for (let i = 0; i < result.success.length; i++) {
