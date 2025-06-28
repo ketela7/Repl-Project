@@ -616,8 +616,6 @@ export function DriveManager() {
                   openDialog('preview')
                   break
                 case 'download':
-                  window.open(`https://drive.google.com/uc?export=download&id=${item.id}`, '_blank')
-                  break
                 case 'share':
                 case 'rename':
                 case 'move':
