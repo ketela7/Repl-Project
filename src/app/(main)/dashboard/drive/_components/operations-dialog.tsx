@@ -123,11 +123,11 @@ function OperationsDialog({
   // Bulk operation completion handlers with actual API calls
   const handleMoveComplete = async (targetFolderId: string) => {
     try {
-      const response = await fetch('/api/drive/files/move', {
+      const response = await fetch('/api/drive/files/bulk/move', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: selectedItems,
+          fileIds: selectedItems.map((item) => item.id),
           targetFolderId,
         }),
       })
@@ -144,11 +144,11 @@ function OperationsDialog({
 
   const handleCopyComplete = async (targetFolderId: string) => {
     try {
-      const response = await fetch('/api/drive/files/copy', {
+      const response = await fetch('/api/drive/files/bulk/copy', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: selectedItems.filter((item) => !item.isFolder),
+          fileIds: selectedItems.filter((item) => !item.isFolder).map((item) => item.id),
           targetFolderId,
         }),
       })
@@ -165,11 +165,11 @@ function OperationsDialog({
 
   const handleDeleteComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/trash', {
+      const response = await fetch('/api/drive/files/bulk/trash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: selectedItems,
+          fileIds: selectedItems.map((item) => item.id),
         }),
       })
 
@@ -185,11 +185,11 @@ function OperationsDialog({
 
   const handleShareComplete = async (shareOptions: any) => {
     try {
-      const response = await fetch('/api/drive/files/share', {
+      const response = await fetch('/api/drive/files/bulk/share', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: selectedItems,
+          fileIds: selectedItems.map((item) => item.id),
           ...shareOptions,
         }),
       })
@@ -211,11 +211,11 @@ function OperationsDialog({
 
   const handleRenameComplete = async (namePrefix: string, newName?: string) => {
     try {
-      const response = await fetch('/api/drive/files/rename', {
+      const response = await fetch('/api/drive/files/bulk/rename', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: selectedItems,
+          fileIds: selectedItems.map((item) => item.id),
           namePrefix,
           newName,
         }),
@@ -251,11 +251,11 @@ function OperationsDialog({
 
   const handlePermanentDeleteComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/delete', {
+      const response = await fetch('/api/drive/files/bulk/delete', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: selectedItems,
+          fileIds: selectedItems.map((item) => item.id),
         }),
       })
 
@@ -271,11 +271,11 @@ function OperationsDialog({
 
   const handleRestoreComplete = async () => {
     try {
-      const response = await fetch('/api/drive/files/untrash', {
+      const response = await fetch('/api/drive/files/bulk/untrash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: selectedItems,
+          fileIds: selectedItems.map((item) => item.id),
         }),
       })
 
@@ -308,10 +308,10 @@ function OperationsDialog({
             })
           }
 
-          const fileResponse = await fetch('/api/drive/files/download', {
+          const fileResponse = await fetch(`/api/drive/files/${item.id}/download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileId: item.id, downloadMode: 'oneByOne' }),
+            body: JSON.stringify({ downloadMode: 'oneByOne' }),
           })
 
           if (fileResponse.ok) {
@@ -353,10 +353,10 @@ function OperationsDialog({
             })
           }
 
-          const response = await fetch('/api/drive/files/download', {
+          const response = await fetch(`/api/drive/files/${item.id}/download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileId: item.id, downloadMode: 'batch' }),
+            body: JSON.stringify({ downloadMode: 'batch' }),
           })
 
           if (response.ok) {
@@ -370,7 +370,7 @@ function OperationsDialog({
         await Promise.all(downloadPromises)
       } else if (downloadMode === 'exportLinks') {
         // For CSV export, use unified endpoint - fileId='bulk' triggers bulk processing
-        const response = await fetch('/api/drive/files/download', {
+        const response = await fetch('/api/drive/files/bulk/download', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

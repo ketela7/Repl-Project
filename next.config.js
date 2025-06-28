@@ -36,7 +36,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
 
-  allowedDevOrigins: [127.0.0.1','localhost','*.pike.replit.dev', '*.sisko.replit.dev'],
+  allowedDevOrigins: ['127.0.0.1','localhost','*.pike.replit.dev', '*.sisko.replit.dev'],
 
   // Performance optimizations
   compiler: {
