@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Move, Loader2, Folder } from 'lucide-react'
+import { Move, Loader2, Folder, ArrowLeft } from 'lucide-react'
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { DriveDestinationSelector } from '@/components/drive-destination-selector'
 import { cn, successToast, errorToast } from '@/lib/utils'
 
 // FileMoveDialog removed - functionality integrated into bulk operations
@@ -25,9 +26,10 @@ interface ItemsMoveDialogProps {
 }
 
 function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: ItemsMoveDialogProps) {
-  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
+  const [showDestinationSelector, setShowDestinationSelector] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedFolderId, setSelectedFolderId] = useState<string>('root')
+  const [selectedFolderName, setSelectedFolderName] = useState<string>('My Drive')
   const isMobile = useIsMobile()
 
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
@@ -50,9 +52,10 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
       const result = await response.json()
 
       if (result.success) {
-        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} moved successfully`)
+        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} moved to "${selectedFolderName}"`)
         onConfirm(selectedFolderId)
         onOpenChange(false)
+        setShowDestinationSelector(false)
       } else {
         throw new Error(result.error || 'Failed to move items')
       }
@@ -63,9 +66,13 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
     }
   }
 
-  const handleMoveConfirm = (targetFolderId: string) => {
-    setSelectedFolderId(targetFolderId)
-    setIsMoveDialogOpen(false)
+  const handleDestinationSelect = (folderId: string, folderName?: string) => {
+    setSelectedFolderId(folderId)
+    setSelectedFolderName(folderName || (folderId === 'root' ? 'My Drive' : 'Selected Folder'))
+  }
+
+  const handleBackToMainDialog = () => {
+    setShowDestinationSelector(false)
   }
 
   const renderContent = () => (
@@ -149,13 +156,9 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
             <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
             <BottomSheetFooter className={cn('grid gap-4')}>
-              <Button onClick={handleMove} disabled={isLoading} className={cn('touch-target min-h-[44px] active:scale-95')}>
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Move className="mr-2 h-4 w-4" />}
-                {isLoading ? 'Moving...' : 'Move to Root'}
-              </Button>
-              <Button onClick={() => setIsMoveDialogOpen(true)} disabled={isLoading} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+              <Button onClick={() => setShowDestinationSelector(true)} disabled={isLoading} className={cn('touch-target min-h-[44px] active:scale-95')}>
                 <Folder className="mr-2 h-4 w-4" />
-                Choose Different Folder
+                Choose Destination
               </Button>
               <Button variant="outline" onClick={() => onOpenChange(false)} className={cn('touch-target min-h-[44px] active:scale-95')}>
                 Cancel
@@ -164,7 +167,54 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
           </BottomSheetContent>
         </BottomSheet>
 
-        {/* FileMoveDialog removed - functionality integrated into bulk operations */}
+        {/* Destination Selector Dialog for Mobile */}
+        <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
+          <DialogContent className="max-h-[80vh] max-w-2xl">
+            <DialogHeader>
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
+                  <ArrowLeft className="h-4 w-4" />
+                </Button>
+                <div>
+                  <DialogTitle>Choose Move Destination</DialogTitle>
+                  <DialogDescription>
+                    Select where to move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}
+                  </DialogDescription>
+                </div>
+              </div>
+            </DialogHeader>
+
+            <DriveDestinationSelector onSelect={handleDestinationSelect} selectedFolderId={selectedFolderId} className="py-4" />
+
+            <DialogFooter className="flex-col gap-2 sm:flex-row">
+              <div className="flex-1 text-left">
+                <div className="text-muted-foreground text-sm">
+                  Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
+                </div>
+              </div>
+              <Button
+                onClick={handleMove}
+                disabled={isLoading || !selectedFolderId}
+                className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Moving...
+                  </>
+                ) : (
+                  <>
+                    <Move className="mr-2 h-4 w-4" />
+                    Move {selectedItems.length} Item{selectedItems.length > 1 ? 's' : ''}
+                  </>
+                )}
+              </Button>
+              <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
+                Back
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </>
     )
   }
@@ -245,7 +295,8 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex-col gap-2 sm:flex-row">
-            <Button onClick={() => setIsMoveDialogOpen(true)} className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800">
+            <Button onClick={() => setShowDestinationSelector(true)} className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800">
+              <Folder className="mr-2 h-4 w-4" />
               Choose Destination
             </Button>
             <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
@@ -255,7 +306,54 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
         </DialogContent>
       </Dialog>
 
-      {/* FileMoveDialog removed - functionality integrated into bulk operations */}
+      {/* Destination Selector Dialog for Desktop */}
+      <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
+        <DialogContent className="max-h-[80vh] max-w-2xl">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div>
+                <DialogTitle>Choose Move Destination</DialogTitle>
+                <DialogDescription>
+                  Select where to move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <DriveDestinationSelector onSelect={handleDestinationSelect} selectedFolderId={selectedFolderId} className="py-4" />
+
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <div className="flex-1 text-left">
+              <div className="text-muted-foreground text-sm">
+                Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
+              </div>
+            </div>
+            <Button
+              onClick={handleMove}
+              disabled={isLoading || !selectedFolderId}
+              className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Moving...
+                </>
+              ) : (
+                <>
+                  <Move className="mr-2 h-4 w-4" />
+                  Move {selectedItems.length} Item{selectedItems.length > 1 ? 's' : ''}
+                </>
+              )}
+            </Button>
+            <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
+              Back
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

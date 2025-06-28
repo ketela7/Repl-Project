@@ -8,7 +8,7 @@ import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, get
 import { getOptimizedRequestParams, DriveApiBatcher, performanceMonitor, requestDeduplicator } from './performance'
 
 export class GoogleDriveService {
-  private drive: drive_v3.Drive
+  public drive: drive_v3.Drive
   private batcher: DriveApiBatcher
 
   constructor(accessToken: string) {

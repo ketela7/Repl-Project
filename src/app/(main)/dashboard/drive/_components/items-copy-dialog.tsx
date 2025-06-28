@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, AlertTriangle, Loader2, Folder } from 'lucide-react'
+import { Copy, AlertTriangle, Loader2, Folder, ArrowLeft } from 'lucide-react'
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
+import { DriveDestinationSelector } from '@/components/drive-destination-selector'
 import { cn, successToast, errorToast } from '@/lib/utils'
 
 interface ItemsCopyDialogProps {
@@ -22,9 +23,10 @@ interface ItemsCopyDialogProps {
 }
 
 function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCopyDialogProps) {
-  const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
+  const [showDestinationSelector, setShowDestinationSelector] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedFolderId, setSelectedFolderId] = useState<string>('root')
+  const [selectedFolderName, setSelectedFolderName] = useState<string>('My Drive')
   const isMobile = useIsMobile()
 
   const files = selectedItems.filter((item) => !item.isFolder)
@@ -47,9 +49,10 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
       const result = await response.json()
 
       if (result.success) {
-        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} copied successfully`)
+        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} copied to "${selectedFolderName}"`)
         onConfirm(selectedFolderId)
         onClose()
+        setShowDestinationSelector(false)
       } else {
         throw new Error(result.error || 'Failed to copy items')
       }
@@ -60,9 +63,13 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
     }
   }
 
-  const handleCopyConfirm = (targetFolderId: string) => {
-    setSelectedFolderId(targetFolderId)
-    setIsCopyDialogOpen(false)
+  const handleDestinationSelect = (folderId: string, folderName?: string) => {
+    setSelectedFolderId(folderId)
+    setSelectedFolderName(folderName || (folderId === 'root' ? 'My Drive' : 'Selected Folder'))
+  }
+
+  const handleBackToMainDialog = () => {
+    setShowDestinationSelector(false)
   }
 
   const renderContent = () => (
@@ -163,9 +170,9 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
                 {isLoading ? 'Copying...' : 'Copy to Root'}
               </Button>
               {files.length > 0 && (
-                <Button onClick={() => setIsCopyDialogOpen(true)} disabled={isLoading} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <Button onClick={() => setShowDestinationSelector(true)} disabled={isLoading} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
                   <Folder className="mr-2 h-4 w-4" />
-                  Choose Different Folder
+                  Choose Destination
                 </Button>
               )}
               <Button variant="outline" onClick={onClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
@@ -269,9 +276,10 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
           <DialogFooter className="flex-col gap-2 sm:flex-row">
             {files.length > 0 && (
               <Button
-                onClick={() => setIsCopyDialogOpen(true)}
+                onClick={() => setShowDestinationSelector(true)}
                 className="w-full bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500 sm:w-auto dark:bg-purple-700 dark:hover:bg-purple-800"
               >
+                <Folder className="mr-2 h-4 w-4" />
                 Choose Destination
               </Button>
             )}
@@ -282,7 +290,54 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         </DialogContent>
       </Dialog>
 
-      {/* FileCopyDialog removed - functionality integrated into bulk operations */}
+      {/* Destination Selector Dialog */}
+      <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
+        <DialogContent className="max-h-[80vh] max-w-2xl">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <div>
+                <DialogTitle>Choose Copy Destination</DialogTitle>
+                <DialogDescription>
+                  Select where to copy {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <DriveDestinationSelector onSelect={handleDestinationSelect} selectedFolderId={selectedFolderId} className="py-4" />
+
+          <DialogFooter className="flex-col gap-2 sm:flex-row">
+            <div className="flex-1 text-left">
+              <div className="text-muted-foreground text-sm">
+                Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
+              </div>
+            </div>
+            <Button
+              onClick={handleCopy}
+              disabled={isLoading || !selectedFolderId}
+              className="w-full bg-purple-600 text-white hover:bg-purple-700 focus:ring-purple-500 sm:w-auto dark:bg-purple-700 dark:hover:bg-purple-800"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Copying...
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-2 h-4 w-4" />
+                  Copy {files.length} Item{files.length > 1 ? 's' : ''}
+                </>
+              )}
+            </Button>
+            <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
+              Back
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }
