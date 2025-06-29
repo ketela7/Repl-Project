@@ -262,18 +262,25 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
             </div>
           )}
 
-          {/* Progress Display */}
-          {isProcessing && (
+          {/* Progress Display - Show during processing and after completion */}
+          {(isProcessing || isCompleted) && (
             <div className="space-y-4">
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span>Progress</span>
+                  <span>{isCompleted ? 'Download Results' : 'Progress'}</span>
                   <span>
                     {progress.current} of {progress.total} files
                   </span>
                 </div>
                 <Progress value={(progress.current / progress.total) * 100} className="h-2" />
-                {progress.currentFile && <div className="text-muted-foreground text-xs">Processing: {progress.currentFile}</div>}
+                {isProcessing && progress.currentFile && (
+                  <div className="text-muted-foreground text-xs">Processing: {progress.currentFile}</div>
+                )}
+                {isCompleted && (
+                  <div className="text-green-600 dark:text-green-400 text-xs font-medium">
+                    ✓ Download operation completed
+                  </div>
+                )}
               </div>
 
               {/* Progress Summary */}
@@ -303,12 +310,33 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
 
               {/* Error Details */}
               {progress.errors.length > 0 && (
-                <div className="max-h-32 space-y-1 overflow-y-auto">
-                  {progress.errors.map((error, index) => (
-                    <div key={index} className="rounded bg-red-50 p-2 text-xs text-red-600 dark:bg-red-950/50">
-                      <span className="font-medium">{error.file}:</span> {error.error}
+                <div className="space-y-2">
+                  <div className="text-sm font-medium text-red-600">Errors encountered:</div>
+                  <div className="max-h-32 space-y-1 overflow-y-auto">
+                    {progress.errors.map((error, index) => (
+                      <div key={index} className="rounded bg-red-50 p-2 text-xs text-red-600 dark:bg-red-950/50">
+                        <span className="font-medium">{error.file}:</span> {error.error}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Success Summary for Completed Downloads */}
+              {isCompleted && progress.success > 0 && (
+                <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950/50">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="mt-0.5 h-5 w-5 text-green-600" />
+                    <div className="space-y-1">
+                      <div className="font-medium text-green-800 dark:text-green-200">
+                        Download Completed Successfully
+                      </div>
+                      <div className="text-sm text-green-700 dark:text-green-300">
+                        {progress.success} file{progress.success > 1 ? 's' : ''} downloaded successfully
+                        {selectedMode === 'exportLinks' ? ' and export file generated' : ''}
+                      </div>
                     </div>
-                  ))}
+                  </div>
                 </div>
               )}
             </div>
