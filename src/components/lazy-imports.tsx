@@ -35,6 +35,8 @@ export const ItemsRenameDialog = lazy(() => import('@/app/(main)/dashboard/drive
 
 export const ItemsExportDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-export-dialog'))
 
+export const ItemsDownloadDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-download-dialog'))
+
 export const ItemsUntrashDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-untrash-dialog'))
 
 export const DriveToolbar = lazy(() => import('@/app/(main)/dashboard/drive/_components/drive-toolbar').then((mod) => ({ default: mod.DriveToolbar })))

@@ -9,9 +9,7 @@ import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, B
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { successToast, errorToast } from '@/lib/toast'
-import { ItemsMoveDialog, ItemsCopyDialog, ItemsTrashDialog, ItemsShareDialog, ItemsRenameDialog, ItemsExportDialog, ItemsDeleteDialog, ItemsUntrashDialog } from '@/components/lazy-imports'
-
-import ItemsDownloadDialog from './items-download-dialog'
+import { ItemsMoveDialog, ItemsCopyDialog, ItemsTrashDialog, ItemsShareDialog, ItemsRenameDialog, ItemsExportDialog, ItemsDeleteDialog, ItemsUntrashDialog, ItemsDownloadDialog } from '@/components/lazy-imports'
 
 interface OperationsDialogProps {
   isOpen?: boolean
