@@ -413,6 +413,13 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
     onClose()
   }
 
+  const handleCloseAndRefresh = () => {
+    if (!isProcessing) {
+      // Refresh immediately to show results
+      window.location.reload()
+    }
+  }
+
   // Render different content based on state
   const renderContent = () => {
     // 1. Initial State - Show selection and mode options
@@ -693,6 +700,13 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
               </div>
             </div>
           )}
+
+          {/* Refresh Notice */}
+          {(progress.success > 0 || progress.failed > 0) && (
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
+              <p className="text-sm text-blue-700 dark:text-blue-300">Click the button below to refresh and see your updated files.</p>
+            </div>
+          )}
         </div>
       )
     }
@@ -710,20 +724,40 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
           <div className="max-h-[70vh] overflow-y-auto px-4 pb-6">{renderContent()}</div>
           <BottomSheetFooter>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={handleClose} className="flex-1">
-                {isCompleted || isCancelled ? 'Close' : isProcessing ? 'Cancel' : 'Cancel'}
-              </Button>
-              {!isCompleted && !isCancelled && (
-                <Button onClick={isProcessing ? handleCancel : handleConfirm} disabled={isProcessing && isCancelled} className="flex-1">
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Cancel
-                    </>
-                  ) : (
-                    'Rename'
-                  )}
+              {!isProcessing && !isCompleted && (
+                <>
+                  <Button onClick={handleConfirm} className="flex-1">
+                    Rename
+                  </Button>
+                  <Button variant="outline" onClick={handleClose} className="flex-1">
+                    Cancel
+                  </Button>
+                </>
+              )}
+              {isProcessing && (
+                <Button onClick={handleCancel} variant="outline" disabled={isCancelled} className="flex-1">
+                  {isCancelled ? 'Cancelling...' : 'Cancel Operation'}
                 </Button>
+              )}
+              {isCompleted && (
+                <>
+                  {(progress.success > 0 || progress.failed > 0) ? (
+                    <Button onClick={handleCloseAndRefresh} className="flex-1">
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Refresh Now
+                    </Button>
+                  ) : (
+                    <Button onClick={handleClose} className="flex-1">
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Close
+                    </Button>
+                  )}
+                  {(progress.success > 0 || progress.failed > 0) && (
+                    <Button onClick={handleClose} variant="outline" className="flex-1">
+                      Close Without Refresh
+                    </Button>
+                  )}
+                </>
               )}
             </div>
           </BottomSheetFooter>
@@ -744,20 +778,40 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         <DialogFooter>
           <div className="flex w-full gap-2">
             {isProcessing ? (
-              <>
-                <Button variant="outline" onClick={handleCancel} disabled={isCancelled} className="flex-1">
-                  {isCancelled ? 'Cancelling...' : 'Cancel Operation'}
-                </Button>
-              </>
+              <Button variant="outline" onClick={handleCancel} disabled={isCancelled} className="flex-1">
+                {isCancelled ? 'Cancelling...' : 'Cancel Operation'}
+              </Button>
             ) : (
               <>
-                <Button variant="outline" onClick={handleClose} className="flex-1">
-                  {isCompleted || isCancelled ? 'Close' : 'Cancel'}
-                </Button>
                 {!isCompleted && !isCancelled && (
-                  <Button onClick={handleConfirm} className="flex-1">
-                    Rename
-                  </Button>
+                  <>
+                    <Button onClick={handleConfirm} className="flex-1">
+                      Rename
+                    </Button>
+                    <Button variant="outline" onClick={handleClose} className="flex-1">
+                      Cancel
+                    </Button>
+                  </>
+                )}
+                {isCompleted && (
+                  <>
+                    {(progress.success > 0 || progress.failed > 0) ? (
+                      <Button onClick={handleCloseAndRefresh} className="flex-1">
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Refresh Now
+                      </Button>
+                    ) : (
+                      <Button onClick={handleClose} className="flex-1">
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Close
+                      </Button>
+                    )}
+                    {(progress.success > 0 || progress.failed > 0) && (
+                      <Button onClick={handleClose} variant="outline" className="flex-1">
+                        Close Without Refresh
+                      </Button>
+                    )}
+                  </>
                 )}
               </>
             )}

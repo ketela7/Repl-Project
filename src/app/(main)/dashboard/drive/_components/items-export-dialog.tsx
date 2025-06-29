@@ -306,6 +306,13 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     }
   }
 
+  const handleCloseAndRefresh = () => {
+    if (!isProcessing) {
+      // Refresh immediately to show results
+      window.location.reload()
+    }
+  }
+
   // Render different content based on state
   const renderContent = () => {
     // 1. Initial State - Show export options and items preview
@@ -501,6 +508,13 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             </div>
           </div>
         )}
+
+        {/* Refresh Notice */}
+        {(progress.success > 0 || progress.failed > 0) && (
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
+            <p className="text-sm text-blue-700 dark:text-blue-300">Click the button below to refresh and see your updated files.</p>
+          </div>
+        )}
       </div>
     )
   }
@@ -542,10 +556,24 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
               </Button>
             )}
             {isCompleted && (
-              <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Close
-              </Button>
+              <>
+                {(progress.success > 0 || progress.failed > 0) ? (
+                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Refresh Now
+                  </Button>
+                ) : (
+                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Close
+                  </Button>
+                )}
+                {(progress.success > 0 || progress.failed > 0) && (
+                  <Button onClick={handleClose} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    Close Without Refresh
+                  </Button>
+                )}
+              </>
             )}
           </BottomSheetFooter>
         </BottomSheetContent>
@@ -593,10 +621,24 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             </Button>
           )}
           {isCompleted && (
-            <Button onClick={handleClose} className="w-full sm:w-auto">
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Close
-            </Button>
+            <>
+              {(progress.success > 0 || progress.failed > 0) ? (
+                <Button onClick={handleCloseAndRefresh} className="w-full sm:w-auto">
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Refresh Now
+                </Button>
+              ) : (
+                <Button onClick={handleClose} className="w-full sm:w-auto">
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Close
+                </Button>
+              )}
+              {(progress.success > 0 || progress.failed > 0) && (
+                <Button onClick={handleClose} variant="outline" className="w-full sm:w-auto">
+                  Close Without Refresh
+                </Button>
+              )}
+            </>
           )}
         </DialogFooter>
       </DialogContent>

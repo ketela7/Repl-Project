@@ -226,7 +226,6 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
 
   const handleClose = () => {
     if (!isProcessing) {
-      // Reset states when closing
       setIsCompleted(false)
       setIsCancelled(false)
       isCancelledRef.current = false
@@ -240,6 +239,13 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
         errors: [],
       })
       onClose()
+    }
+  }
+
+  const handleCloseAndRefresh = () => {
+    if (!isProcessing) {
+      // Refresh immediately to show results
+      window.location.reload()
     }
   }
 
@@ -558,6 +564,11 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
             <Button onClick={handleConfirm} disabled={downloadableFiles.length === 0} className="gap-2">
               <Download className="h-4 w-4" />
               Start Download
+            </Button>
+          )}
+          {isCompleted && (
+            <Button variant="default" onClick={handleCloseAndRefresh}>
+              Close & Refresh
             </Button>
           )}
         </DialogFooterComponent>
