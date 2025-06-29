@@ -647,13 +647,20 @@ export class GoogleDriveService {
         throw new Error('Filename contains invalid characters: < > : " / \\ | ? *')
       }
 
+      console.log(`[Rename Debug] Attempting to rename file ${fileId} to "${newName}"`)
+
       const response = await this.drive.files.update({
         fileId,
         requestBody: { name: newName.trim() },
         fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
       })
 
-      return convertGoogleDriveFile(response.data)
+      console.log(`[Rename Debug] API Response:`, response.data)
+
+      const convertedFile = convertGoogleDriveFile(response.data)
+      console.log(`[Rename Debug] Converted file:`, convertedFile)
+
+      return convertedFile
     } catch (error: any) {
       // Handle Google Drive API specific errors
       if (error.response?.status) {

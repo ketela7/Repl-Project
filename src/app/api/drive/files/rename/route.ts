@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { initDriveService, handleApiError, validateRenameRequest } from '@/lib/api-utils'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
+import { driveCache } from '@/lib/cache'
 
 /**
  * Rename pattern generators following Download Operations pattern
@@ -68,6 +69,8 @@ export async function POST(request: NextRequest) {
     // Handle both single and bulk operations
     const { fileId, namePrefix, newName, items, renameType = 'prefix' } = body
 
+    console.log(`[Rename Debug] Request body:`, JSON.stringify({ fileId, namePrefix, newName, items: items?.length, renameType }))
+
     // Determine operation type based on items array or single fileId
     const fileIds = items && items.length > 0 ? items.map((item: any) => item.id || item.fileId) : [fileId]
     const isBulkOperation = items && items.length > 1
@@ -85,18 +88,21 @@ export async function POST(request: NextRequest) {
       try {
         let finalName = newName
 
-        // For bulk operations, generate appropriate name based on rename type
-        if (isBulkOperation && items) {
+        // Priority: Use newName if provided directly (from rename dialog)
+        if (newName) {
+          finalName = newName
+        }
+        // Otherwise, generate name based on rename type and pattern
+        else if (namePrefix && items) {
           const originalItem = items.find((item: any) => item.id === id)
           const originalName = originalItem?.name || 'Unknown'
           const pattern = namePrefix || ''
 
-          finalName = generateRenamedFileName(originalName, pattern, renameType, i + 1)
-        } else if (!isBulkOperation && namePrefix && items) {
-          // Single item with pattern
-          const originalItem = items[0]
-          const originalName = originalItem?.name || 'Unknown'
-          finalName = generateRenamedFileName(originalName, namePrefix, renameType, 1)
+          if (isBulkOperation) {
+            finalName = generateRenamedFileName(originalName, pattern, renameType, i + 1)
+          } else {
+            finalName = generateRenamedFileName(originalName, pattern, renameType, 1)
+          }
         }
 
         if (!finalName) {
@@ -108,12 +114,16 @@ export async function POST(request: NextRequest) {
           continue
         }
 
+        console.log(`[Rename API] Processing file ${id} with name "${finalName}"`)
+
         // Use throttling and retry like Download Operations
         const result = await throttledDriveRequest(async () => {
           return await retryDriveApiCall(async () => {
             return await driveService.renameFile(id, finalName)
           }, `Rename file ${id}`)
         })
+
+        console.log(`[Rename API] Success for file ${id}:`, result)
 
         results.push({
           fileId: id,
@@ -170,6 +180,18 @@ export async function POST(request: NextRequest) {
           error: errorMessage,
         })
       }
+    }
+
+    // Clear cache for affected files to ensure UI updates
+    if (results.length > 0) {
+      const { session } = authResult
+      const userId = session?.user?.email || 'unknown'
+
+      // Clear related cache entries
+      driveCache.clearUserCache(userId)
+      driveCache.clearFolderCache(userId, 'root')
+
+      console.log(`[Rename Cache] Cleared cache for ${results.length} renamed files`)
     }
 
     const response = {
