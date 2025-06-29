@@ -180,8 +180,10 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
         setProgress((prev) => ({
           ...prev,
+          current: i + 1,
           success: successCount,
           failed: failedCount,
+          skipped: 0, // Share operation doesn't skip items
           errors,
           shareResults,
         }))
@@ -470,8 +472,8 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
               <div className="text-muted-foreground text-xs">Failed</div>
             </div>
             <div className="space-y-1">
-              <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-              <div className="text-muted-foreground text-xs">Skipped</div>
+              <div className="text-lg font-bold text-blue-600">{progress.current}</div>
+              <div className="text-muted-foreground text-xs">Processed</div>
             </div>
           </div>
         </div>
@@ -479,7 +481,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     }
 
     // 3. Completed State - Show results and share links
-    const totalProcessed = progress.success + progress.failed + progress.skipped
+    const totalProcessed = progress.success + progress.failed
     const wasSuccessful = progress.success > 0
     const hasErrors = progress.failed > 0
 

@@ -433,8 +433,8 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
             <div className="text-muted-foreground text-xs">Failed</div>
           </div>
           <div className="space-y-1">
-            <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-            <div className="text-muted-foreground text-xs">Skipped</div>
+            <div className="text-lg font-bold text-blue-600">{progress.current}</div>
+            <div className="text-muted-foreground text-xs">Processed</div>
           </div>
         </div>
 

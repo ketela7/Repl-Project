@@ -135,6 +135,7 @@ Changelog:
 - June 29, 2025. Completed all 9 operations with standardized init-process-end flow - Share, Export, Trash, Delete, and Untrash operations now follow identical pattern to Download/Rename/Move/Copy with comprehensive progress tracking, cancellation support, and completion results display
 - June 29, 2025. Fixed share operation API validation and request handling - updated validation logic to accept items array format, properly handled accessLevel and linkAccess parameters, added share link generation in API responses
 - June 29, 2025. Added comprehensive export functionality to share operation - users can now export successful share links in multiple formats (CSV, TXT, JSON) with structured data, automatic file naming with dates, and proper error handling. CSV format uses "name,sharelink" structure, TXT uses "name: sharelink" format, and JSON includes metadata with export date and file IDs
+- June 29, 2025. Fixed inconsistent "skipped" logic across all operations - replaced misleading skipped counters with accurate "processed" counters, removed non-functional skipped logic where items are either successful or failed, implemented proper progress tracking that shows meaningful statistics during operations
 ```
 
 ## User Preferences

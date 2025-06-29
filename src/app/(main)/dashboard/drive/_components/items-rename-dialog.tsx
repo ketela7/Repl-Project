@@ -664,8 +664,8 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
               <div className="text-muted-foreground text-xs">Renamed</div>
             </div>
             <div className="space-y-1">
-              <div className="text-lg font-semibold text-orange-600">{progress.skipped}</div>
-              <div className="text-muted-foreground text-xs">Skipped</div>
+              <div className="text-lg font-semibold text-blue-600">{progress.current}</div>
+              <div className="text-muted-foreground text-xs">Processed</div>
             </div>
             <div className="space-y-1">
               <div className="text-lg font-semibold text-red-600">{progress.failed}</div>
