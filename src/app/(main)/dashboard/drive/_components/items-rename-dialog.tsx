@@ -284,7 +284,8 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
           })
 
           if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`)
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(errorData.error || errorData.message || `Server error ${response.status}: ${response.statusText}`)
           }
 
           const result = await response.json()
@@ -293,9 +294,19 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
             successCount++
           } else {
             failedCount++
+            // Extract detailed error from API response
+            let errorMessage = 'Unknown error'
+            if (result.errors && result.errors.length > 0) {
+              errorMessage = result.errors[0].error || result.errors[0].message || 'Operation failed'
+            } else if (result.error) {
+              errorMessage = result.error
+            } else if (result.message) {
+              errorMessage = result.message
+            }
+
             errors.push({
               file: item.name,
-              error: result.message || 'Unknown error',
+              error: errorMessage,
             })
           }
         } catch (err: any) {
@@ -303,9 +314,32 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
             break
           }
           failedCount++
+
+          // Provide more detailed error messages
+          let errorMessage = 'Network error'
+          if (err.name === 'AbortError') {
+            errorMessage = 'Operation was cancelled'
+          } else if (err.message) {
+            if (err.message.includes('HTTP 401')) {
+              errorMessage = 'Authentication failed - please re-login to Google Drive'
+            } else if (err.message.includes('HTTP 403')) {
+              errorMessage = 'Permission denied - insufficient Drive access'
+            } else if (err.message.includes('HTTP 404')) {
+              errorMessage = 'File not found - may have been deleted or moved'
+            } else if (err.message.includes('HTTP 429')) {
+              errorMessage = 'Too many requests - please wait and try again'
+            } else if (err.message.includes('HTTP 500')) {
+              errorMessage = 'Google Drive server error - please try again later'
+            } else if (err.message.includes('Failed to fetch')) {
+              errorMessage = 'Network connection failed - check your internet'
+            } else {
+              errorMessage = err.message
+            }
+          }
+
           errors.push({
             file: item.name,
-            error: err.message || 'Network error',
+            error: errorMessage,
           })
         }
 
@@ -596,12 +630,26 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
 
           {/* Error Details */}
           {hasErrors && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium text-red-600">Errors encountered:</Label>
-              <div className="max-h-32 space-y-1 overflow-y-auto rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/50">
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-red-600">Issues found during rename:</Label>
+              <div className="max-h-40 space-y-2 overflow-y-auto rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/50">
                 {progress.errors.map((error, index) => (
-                  <div key={index} className="text-sm">
-                    <span className="font-medium text-red-800 dark:text-red-200">{error.file}:</span> <span className="text-red-700 dark:text-red-300">{error.error}</span>
+                  <div key={index} className="space-y-1 text-sm">
+                    <div className="flex items-start gap-2">
+                      <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
+                      <div className="space-y-1">
+                        <div className="font-medium text-red-800 dark:text-red-200">{error.file}</div>
+                        <div className="text-red-700 dark:text-red-300">{error.error}</div>
+                        {/* Provide helpful suggestions based on error type */}
+                        {error.error.includes('Authentication') && <div className="text-xs text-red-600 dark:text-red-400">→ Try refreshing the page and logging in again</div>}
+                        {error.error.includes('Permission denied') && <div className="text-xs text-red-600 dark:text-red-400">→ Check if you own this file or have edit access</div>}
+                        {error.error.includes('already exists') && <div className="text-xs text-red-600 dark:text-red-400">→ Try a different filename or add a number suffix</div>}
+                        {error.error.includes('invalid characters') && <div className="text-xs text-red-600 dark:text-red-400">→ Remove special characters like {'< > : " / \\ | ? *'}</div>}
+                        {error.error.includes('too long') && <div className="text-xs text-red-600 dark:text-red-400">→ Use a shorter filename (max 255 characters)</div>}
+                        {error.error.includes('Too many requests') && <div className="text-xs text-red-600 dark:text-red-400">→ Wait a few seconds and try again</div>}
+                        {error.error.includes('File not found') && <div className="text-xs text-red-600 dark:text-red-400">→ Refresh the file list - file may have been moved or deleted</div>}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>

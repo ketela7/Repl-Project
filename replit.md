@@ -125,6 +125,7 @@ Changelog:
 - June 29, 2025. Fixed driveService API access pattern - corrected all API calls to use driveService.drive.files instead of driveService.files for proper Google Drive API integration
 - June 29, 2025. Fixed download empty tab issue - implemented direct window.open() calls with full domain URLs instead of relative paths, simplified download system with proper Node.js to Web Stream conversion for browser compatibility
 - June 29, 2025. Completed ItemsRenameDialog alignment with ItemsDownloadDialog pattern - restructured with init-process-end flow in renderContent, implemented identical loading states and progress tracking, updated handleRenameComplete to match handleDownloadComplete pattern, added comprehensive error handling and cancellation support
+- June 29, 2025. Enhanced error handling system with detailed user-friendly messages - replaced "Unknown error" with specific error descriptions and actionable suggestions, added filename validation, improved Google Drive API error mapping, implemented helpful error suggestions for authentication, permissions, filename issues, and network problems
 ```
 
 ## User Preferences

@@ -122,10 +122,52 @@ export async function POST(request: NextRequest) {
           newName: finalName,
         })
       } catch (error: any) {
+        // Provide detailed error messages for common Google Drive API errors
+        let errorMessage = 'Rename failed'
+
+        if (error.code) {
+          switch (error.code) {
+            case 401:
+              errorMessage = 'Authentication expired - please re-login to Google Drive'
+              break
+            case 403:
+              errorMessage = "Permission denied - you don't have write access to this file"
+              break
+            case 404:
+              errorMessage = 'File not found - it may have been deleted or moved'
+              break
+            case 409:
+              errorMessage = 'A file with this name already exists in the same location'
+              break
+            case 429:
+              errorMessage = 'Too many requests - please wait and try again'
+              break
+            case 500:
+            case 502:
+            case 503:
+              errorMessage = 'Google Drive server error - please try again later'
+              break
+            default:
+              errorMessage = error.message || `Google Drive API error (${error.code})`
+          }
+        } else if (error.message) {
+          if (error.message.includes('Invalid file name')) {
+            errorMessage = 'Invalid filename - check for special characters'
+          } else if (error.message.includes('File name too long')) {
+            errorMessage = 'Filename is too long - please use a shorter name'
+          } else if (error.message.includes('duplicate')) {
+            errorMessage = 'A file with this name already exists'
+          } else if (error.message.includes('permission')) {
+            errorMessage = "Permission denied - you don't have write access"
+          } else {
+            errorMessage = error.message
+          }
+        }
+
         errors.push({
           fileId: id,
           success: false,
-          error: error.message || 'Rename failed',
+          error: errorMessage,
         })
       }
     }
