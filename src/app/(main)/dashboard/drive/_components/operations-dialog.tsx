@@ -214,8 +214,10 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
               <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="font-medium">Move Items</span>
-              <span className="text-muted-foreground text-xs">Move items to another location</span>
+              <span className="font-medium">Move</span>
+              <span className="text-muted-foreground text-xs">
+                Move {canMoveCount} item{canMoveCount > 1 ? 's' : ''} to another location
+              </span>
             </div>
           </Button>
         )}
@@ -227,8 +229,10 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
               <Copy className="h-4 w-4 text-green-600 dark:text-green-400" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="font-medium">Copy Items</span>
-              <span className="text-muted-foreground text-xs">Create copies in another location</span>
+              <span className="font-medium">Copy</span>
+              <span className="text-muted-foreground text-xs">
+                Create {canCopyCount} cop{canCopyCount > 1 ? 'ies' : 'y'} in another location
+              </span>
             </div>
           </Button>
         )}
@@ -240,8 +244,10 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
               <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="font-medium">Share Items</span>
-              <span className="text-muted-foreground text-xs">Generate {canShareCount} shareable links</span>
+              <span className="font-medium">Share</span>
+              <span className="text-muted-foreground text-xs">
+                Generate {canShareCount} shareable link{canShareCount > 1 ? 's' : ''}
+              </span>
             </div>
           </Button>
         )}
@@ -254,7 +260,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
             </div>
             <div className="flex flex-col items-start">
               <span className="font-medium">Rename</span>
-              <span className="text-muted-foreground text-xs">Rename {canRenameCount} items with patterns</span>
+              <span className="text-muted-foreground text-xs">
+                Rename {canRenameCount} item{canRenameCount > 1 ? 's' : ''} with patterns
+              </span>
             </div>
           </Button>
         )}
@@ -266,9 +274,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
               <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="font-medium">Download Files</span>
+              <span className="font-medium">Download</span>
               <span className="text-muted-foreground text-xs">
-                Download {fileCount} file{fileCount > 1 ? 's' : ''} directly
+                Download {canDownloadCount} file{canDownloadCount > 1 ? 's' : ''} directly
               </span>
             </div>
           </Button>
@@ -281,9 +289,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
               <Download className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div className="flex flex-col items-start">
-              <span className="font-medium">Export Files</span>
+              <span className="font-medium">Export</span>
               <span className="text-muted-foreground text-xs">
-                Export {fileCount} file{fileCount > 1 ? 's' : ''} in various formats
+                Export {canExportCount} file{canExportCount > 1 ? 's' : ''} in various formats
               </span>
             </div>
           </Button>

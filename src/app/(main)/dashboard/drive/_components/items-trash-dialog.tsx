@@ -426,7 +426,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
               </div>
               <div>
                 <div className="text-lg font-semibold">Move to Trash</div>
-                <div className="text-muted-foreground text-sm font-normal">Bulk trash operation</div>
+                <div className="text-muted-foreground text-sm font-normal">Trash operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -473,7 +473,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
             </div>
             <div>
               <div className="text-lg font-semibold">Move to Trash</div>
-              <div className="text-muted-foreground text-sm font-normal">Bulk trash operation</div>
+              <div className="text-muted-foreground text-sm font-normal">Trash operation</div>
             </div>
           </AlertDialogTitle>
         </AlertDialogHeader>

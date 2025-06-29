@@ -373,7 +373,9 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
             </div>
           </div>
           <div>
-            <h3 className="text-base font-semibold">{isCancelled ? 'Untrash Cancelled' : wasSuccessful && !hasErrors ? 'Items Untrashed' : hasErrors ? 'Partially Untrashed' : 'No Items Untrashed'}</h3>
+            <h3 className="text-base font-semibold">
+              {isCancelled ? 'Untrash Cancelled' : wasSuccessful && !hasErrors ? 'Items Untrashed' : hasErrors ? 'Partially Untrashed' : 'No Items Untrashed'}
+            </h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {selectedItems.length} items processed
             </p>
@@ -425,7 +427,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
               </div>
               <div>
                 <div className="text-lg font-semibold">Untrash Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Bulk untrash operation</div>
+                <div className="text-muted-foreground text-sm font-normal">Untrash operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -475,7 +477,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
             </div>
             <div>
               <div className="text-lg font-semibold">Untrash Items</div>
-              <div className="text-muted-foreground text-sm font-normal">Bulk untrash operation</div>
+              <div className="text-muted-foreground text-sm font-normal">Untrash operation</div>
             </div>
           </AlertDialogTitle>
         </AlertDialogHeader>

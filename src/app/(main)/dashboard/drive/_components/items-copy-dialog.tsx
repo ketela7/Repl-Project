@@ -450,7 +450,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
                 </div>
                 <div>
                   <div className="text-lg font-semibold">Copy Items</div>
-                  <div className="text-muted-foreground text-sm font-normal">Bulk copy operation</div>
+                  <div className="text-muted-foreground text-sm font-normal">Copy operation</div>
                 </div>
               </BottomSheetTitle>
             </BottomSheetHeader>
@@ -535,7 +535,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
               </div>
               <div>
                 <div className="text-lg font-semibold">Copy Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Bulk copy operation</div>
+                <div className="text-muted-foreground text-sm font-normal">Copy operation</div>
               </div>
             </DialogTitle>
           </DialogHeader>

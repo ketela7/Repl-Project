@@ -453,7 +453,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
                 </div>
                 <div>
                   <div className="text-lg font-semibold">Move Items</div>
-                  <div className="text-muted-foreground text-sm font-normal">Bulk move operation</div>
+                  <div className="text-muted-foreground text-sm font-normal">Move operation</div>
                 </div>
               </BottomSheetTitle>
             </BottomSheetHeader>
@@ -538,7 +538,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
               </div>
               <div>
                 <div className="text-lg font-semibold">Move Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Bulk move operation</div>
+                <div className="text-muted-foreground text-sm font-normal">Move operation</div>
               </div>
             </DialogTitle>
           </DialogHeader>

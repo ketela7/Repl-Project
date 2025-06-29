@@ -128,6 +128,7 @@ Changelog:
 - June 29, 2025. Enhanced error handling system with detailed user-friendly messages - replaced "Unknown error" with specific error descriptions and actionable suggestions, added filename validation, improved Google Drive API error mapping, implemented helpful error suggestions for authentication, permissions, filename issues, and network problems
 - June 29, 2025. Fixed Move operation folder validation - created dedicated `/api/drive/folders/validate` endpoint with improved error handling for access denied scenarios, updated DriveDestinationSelector to use new validation system, resolved "Folder not found or access denied" issues when pasting valid folder URLs/IDs
 - June 29, 2025. Completed naming consistency improvements - updated all "Restore from Trash" references to "Untrash Items", "Permanent Delete" to "Delete Permanently", and "can be restored" to "can be untrashed" throughout the application for clearer user understanding
+- June 29, 2025. Fixed Operations dialog declaration consistency - removed all "Bulk" references from dialog descriptions, updated button labels to be generic (Move, Copy, Share, etc.), changed descriptions to show actual item counts for both single and multiple selections, unified all dialogs to handle operations as arrays regardless of selection size
 ```
 
 ## User Preferences

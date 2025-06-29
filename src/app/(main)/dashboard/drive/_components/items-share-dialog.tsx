@@ -79,7 +79,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     toast.info('Share operation cancelled by user')
   }
 
-  const handleBulkShare = async () => {
+  const handleShare = async () => {
     if (selectedItems.length === 0) {
       toast.error('No items selected for sharing')
       return
@@ -526,7 +526,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
               </div>
               <div>
                 <div className="text-lg font-semibold">Share Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Bulk share operation</div>
+                <div className="text-muted-foreground text-sm font-normal">Share operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -536,7 +536,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           <BottomSheetFooter className={cn('grid gap-4')}>
             {!isProcessing && !isCompleted && (
               <>
-                <Button onClick={handleBulkShare} className={cn('touch-target min-h-[44px] bg-blue-600 text-white hover:bg-blue-700 active:scale-95')}>
+                <Button onClick={handleShare} className={cn('touch-target min-h-[44px] bg-blue-600 text-white hover:bg-blue-700 active:scale-95')}>
                   <Share2 className="mr-2 h-4 w-4" />
                   Share Items
                 </Button>
@@ -573,7 +573,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             </div>
             <div>
               <div className="text-lg font-semibold">Share Items</div>
-              <div className="text-muted-foreground text-sm font-normal">Bulk share operation</div>
+              <div className="text-muted-foreground text-sm font-normal">Share operation</div>
             </div>
           </DialogTitle>
         </DialogHeader>
@@ -583,7 +583,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
         <DialogFooter className="flex flex-col gap-2 sm:flex-row">
           {!isProcessing && !isCompleted && (
             <>
-              <Button onClick={handleBulkShare} className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800">
+              <Button onClick={handleShare} className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800">
                 <Share2 className="mr-2 h-4 w-4" />
                 Share Items
               </Button>
