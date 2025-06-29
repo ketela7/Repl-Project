@@ -130,7 +130,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       console.error('Move failed:', error)
     }
     setIsMoveDialogOpen(false)
-    onRefreshAfterOp?.()
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleCopyComplete = async (targetFolderId: string) => {
@@ -151,7 +153,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       console.error('Copy failed:', error)
     }
     setIsCopyDialogOpen(false)
-    onRefreshAfterOp?.()
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleTrashComplete = async () => {
@@ -171,7 +175,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       console.error('Delete failed:', error)
     }
     setIsTrashDialogOpen(false)
-    onRefreshAfterOp?.()
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleShareComplete = async (shareOptions: any) => {
@@ -196,13 +202,17 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       return []
     } finally {
       setIsShareDialogOpen(false)
-      onRefreshAfterOp?.()
+      setTimeout(() => {
+        onRefreshAfterOp?.()
+      }, 500)
     }
   }
 
   const handleRenameComplete = async () => {
     setIsRenameDialogOpen(false)
-    onRefreshAfterOp?.()
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleExportComplete = async (downloadMode: string) => {
@@ -248,7 +258,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       toast.error('Download failed')
     }
     setIsExportDialogOpen(false)
-    onRefreshAfterOp?.()
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleDeleteComplete = async () => {
@@ -268,7 +280,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       console.error('delete failed:', error)
     }
     setIsDeleteDialogOpen(false)
-    onRefreshAfterOp?.()
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleUntrashComplete = async () => {
@@ -288,12 +302,16 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       console.error('Restore failed:', error)
     }
     setIsUntrashDialogOpen(false)
-    onRefreshAfterOp?.()
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleDownloadComplete = async () => {
     setIsDownloadDialogOpen(false)
-    onRefreshAfterOp?.()
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const renderContent = () => (
