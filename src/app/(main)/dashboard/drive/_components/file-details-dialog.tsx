@@ -211,10 +211,9 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
       activeFileDetailRequests.add(fileId)
 
       const fetchPromise = (async (): Promise<DetailedFileInfo> => {
-        const response = await fetch('/api/drive/files/details', {
-          method: 'POST',
+        const response = await fetch(`/api/drive/files?fileId=${fileId}&fields=*`, {
+          method: 'GET',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fileId }),
         })
 
         if (!response.ok) {
