@@ -625,10 +625,12 @@ export function DriveManager() {
               switch (action) {
                 case 'preview':
                   setSelectedFileForPreview(item as DriveFile)
+                  setSelectedFileForDetails(null) // Clear details selection
                   openDialog('preview')
                   break
                 case 'details':
                   setSelectedFileForDetails(item)
+                  setSelectedFileForPreview(null) // Clear preview selection
                   openDialog('details')
                   break
                 case 'download':

@@ -277,7 +277,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           shares: successfulShares.map((result) => ({
             name: result.name,
             shareLink: result.shareLink,
-            fileId: result.fileId,
+            fileId: result.id,
           })),
         }
         content = JSON.stringify(jsonData, null, 2)
