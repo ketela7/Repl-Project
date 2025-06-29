@@ -100,8 +100,17 @@ export async function getFileIdFromParams(params: Promise<{ fileId: string }>): 
  * Validate request body for specific operations
  */
 export function validateShareRequest(body: any): boolean {
-  const requiredFields = ['action']
-  return requiredFields.every((field) => field in body)
+  // Check for new format with items array
+  if (body.items && Array.isArray(body.items) && body.items.length > 0) {
+    return true
+  }
+
+  // Check for legacy format with fileId
+  if (body.fileId) {
+    return true
+  }
+
+  return false
 }
 
 export function validateDownloadRequest(body: any): boolean {

@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle both single and bulk operations
-    const { fileId, items, permissions, notifyUsers = false, message } = body
+    const { fileId, items, permissions, accessLevel, linkAccess, notifyUsers = false, message } = body
 
     // Determine operation type based on items array or single fileId
     const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
@@ -28,8 +28,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File IDs are required' }, { status: 400 })
     }
 
-    if (!permissions || permissions.length === 0) {
-      return NextResponse.json({ error: 'Permissions are required' }, { status: 400 })
+    // Build permissions from accessLevel and linkAccess if not provided directly
+    let sharePermissions = permissions
+    if (!sharePermissions && accessLevel && linkAccess) {
+      sharePermissions = [
+        {
+          role: accessLevel === 'writer' ? 'writer' : accessLevel === 'commenter' ? 'commenter' : 'reader',
+          type: linkAccess === 'anyone' ? 'anyone' : linkAccess === 'domain' ? 'domain' : 'anyone',
+        },
+      ]
+    }
+
+    if (!sharePermissions || sharePermissions.length === 0) {
+      return NextResponse.json({ error: 'Share permissions are required' }, { status: 400 })
     }
 
     const results = []
@@ -37,24 +48,29 @@ export async function POST(request: NextRequest) {
 
     for (const id of fileIds) {
       try {
-        const shareResults = []
-
         // Apply each permission to the file
-        for (const permission of permissions) {
-          const shareResult = await driveService.shareFile(id, {
+        for (const permission of sharePermissions) {
+          await driveService.shareFile(id, {
             role: permission.role,
             type: permission.type,
             emailAddress: permission.emailAddress,
             domain: permission.domain,
             sendNotificationEmail: notifyUsers,
           })
-          shareResults.push(shareResult)
         }
+
+        // Get the file details to generate share link
+        const fileDetails = await driveService.drive.files.get({
+          fileId: id,
+          fields: 'id,name,mimeType,webViewLink',
+        })
+
+        const shareLink = fileDetails.data.webViewLink || `https://drive.google.com/file/d/${id}/view`
 
         results.push({
           fileId: id,
           success: true,
-          permissions: shareResults,
+          shareLink,
           notifyUsers,
           message,
         })
@@ -71,8 +87,10 @@ export async function POST(request: NextRequest) {
       success: errors.length === 0,
       processed: results.length,
       failed: errors.length,
+      total: fileIds.length,
       type: isBulkOperation ? 'bulk' : 'single',
       operation: 'share',
+      shareLink: results.length > 0 ? results[0].shareLink : undefined,
       results,
       errors: errors.length > 0 ? errors : undefined,
     }
