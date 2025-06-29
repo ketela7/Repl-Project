@@ -134,22 +134,11 @@ export async function POST(request: NextRequest) {
       items = [items]
     }
 
-    // Return streaming URLs for _blank opening
-    const downloadUrls = items.map((item: any) => ({
-      id: item.id,
-      name: item.name,
-      downloadUrl: `/api/drive/files/download?fileId=${item.id}`,
-      direct: true,
-    }))
-
+    // Since we're using direct window.open() calls, just return success
     return NextResponse.json({
-      success: downloadUrls,
-      summary: {
-        total: items.length,
-        successful: items.length,
-        failed: 0,
-        skipped: 0,
-      },
+      success: true,
+      message: 'Downloads initiated',
+      count: items.length,
     })
   } catch (error) {
     return handleApiError(error)

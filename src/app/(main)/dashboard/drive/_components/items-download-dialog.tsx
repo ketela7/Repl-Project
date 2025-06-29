@@ -30,13 +30,7 @@ const DOWNLOAD_MODES = [
   {
     id: 'direct',
     label: 'Direct Download',
-    description: 'Stream files directly with parallel processing',
-    icon: Download,
-  },
-  {
-    id: 'parallel',
-    label: 'Parallel Download',
-    description: 'Download multiple files simultaneously with progress tracking',
+    description: 'Download files simultaneously with progress tracking',
     icon: Download,
   },
   {
@@ -67,12 +61,15 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     errors: [],
   })
 
-  const isMobile = useIsMobile()
+  
 
   // Filter downloadable files (only files, skip folders)
   const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
   const skippedFolders = selectedItems.filter((item) => item.isFolder)
+  const selectedModeData = DOWNLOAD_MODES.find((mode) => mode.id === selectedMode)
 
+
+  {/* Handle */}
   const handleConfirm = async () => {
     if (downloadableFiles.length === 0) {
       toast.error('No files available for download')
@@ -126,7 +123,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
           setTimeout(() => {
             // Use streaming endpoint for direct download
             window.open(item.streamUrl, '_blank')
-          }, index * 500) // Stagger downloads to avoid browser blocking
+          }, index * 1000) // Stagger downloads to avoid browser blocking
         })
       }
 
@@ -162,8 +159,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     }
   }
 
-  const selectedModeData = DOWNLOAD_MODES.find((mode) => mode.id === selectedMode)
 
+  {/* Render */}
+  const isMobile = useIsMobile()
   const DialogComponent = isMobile ? BottomSheet : Dialog
   const DialogContentComponent = isMobile ? BottomSheetContent : DialogContent
   const DialogHeaderComponent = isMobile ? BottomSheetHeader : DialogHeader

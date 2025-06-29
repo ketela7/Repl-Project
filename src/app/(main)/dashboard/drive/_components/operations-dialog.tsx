@@ -213,35 +213,47 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     onRefreshAfterOp?.()
   }
 
-  const handleExportComplete = async () => {
+  const handleExportComplete = async (downloadMode: string) => {
     try {
-      // Get download URLs from API first
-      const response = await fetch('/api/drive/files/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems.filter((item) => !item.isFolder),
-          downloadMode: 'batch',
-        }),
-      })
+      if (downloadMode === 'direct') {
+        // Direct download - open each file in new tab with full domain URL
+        const baseUrl = window.location.origin
+        const filesToDownload = selectedItems.filter((item) => !item.isFolder)
+        
+        for (const item of filesToDownload) {
+          const fullUrl = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
+          window.open(fullUrl, '_blank')
+          await new Promise((resolve) => setTimeout(resolve, 500))
+        }
+        
+        toast.success(`Started downloading ${filesToDownload.length} files`)
+      } else if (downloadMode === 'exportLinks') {
+        // Export links as CSV
+        const response = await fetch('/api/drive/files/export', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: selectedItems.filter((item) => !item.isFolder),
+            format: 'csv',
+          }),
+        })
 
-      if (response.ok) {
-        const result = await response.json()
-
-        // Trigger downloads for successful results
-        for (const successItem of result.success || []) {
+        if (response.ok) {
+          const blob = await response.blob()
+          const url = URL.createObjectURL(blob)
           const link = document.createElement('a')
-          link.href = successItem.downloadUrl
-          link.download = successItem.name
-          link.target = '_blank'
+          link.href = url
+          link.download = 'download-links.csv'
           document.body.appendChild(link)
           link.click()
           document.body.removeChild(link)
-          await new Promise((resolve) => setTimeout(resolve, 500))
+          URL.revokeObjectURL(url)
+          toast.success('Download links exported to CSV')
         }
       }
     } catch (error) {
-      console.error('Export failed:', error)
+      console.error('Download failed:', error)
+      toast.error('Download failed')
     }
     setIsExportDialogOpen(false)
     onRefreshAfterOp?.()
@@ -284,6 +296,52 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       console.error('Restore failed:', error)
     }
     setIsUntrashDialogOpen(false)
+    onRefreshAfterOp?.()
+  }
+
+  const handleDownloadComplete = async (downloadMode: string) => {
+    try {
+      if (downloadMode === 'direct') {
+        // Direct download - open each file in new tab with full domain URL
+        const baseUrl = window.location.origin
+        const filesToDownload = selectedItems.filter((item) => !item.isFolder)
+        
+        for (const item of filesToDownload) {
+          const fullUrl = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
+          window.open(fullUrl, '_blank')
+          await new Promise((resolve) => setTimeout(resolve, 500))
+        }
+        
+        toast.success(`Started downloading ${filesToDownload.length} files`)
+      } else if (downloadMode === 'exportLinks') {
+        // Export links as CSV
+        const response = await fetch('/api/drive/files/export', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: selectedItems.filter((item) => !item.isFolder),
+            format: 'csv',
+          }),
+        })
+
+        if (response.ok) {
+          const blob = await response.blob()
+          const url = URL.createObjectURL(blob)
+          const link = document.createElement('a')
+          link.href = url
+          link.download = 'download-links.csv'
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          URL.revokeObjectURL(url)
+          toast.success('Download links exported to CSV')
+        }
+      }
+    } catch (error) {
+      console.error('Download failed:', error)
+      toast.error('Download failed')
+    }
+    setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()
   }
 
