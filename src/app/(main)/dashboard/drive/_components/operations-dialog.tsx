@@ -7,8 +7,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetDescription } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { successToast, errorToast } from '@/lib/toast'
 import { ItemsMoveDialog, ItemsCopyDialog, ItemsTrashDialog, ItemsShareDialog, ItemsRenameDialog, ItemsExportDialog, ItemsDeleteDialog, ItemsUntrashDialog } from '@/components/lazy-imports'
-import { handleDownloadOperation } from '@/lib/download-utils'
 
 import ItemsDownloadDialog from './items-download-dialog'
 
@@ -289,9 +289,52 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
   const handleDownloadComplete = async (downloadMode: string, progressCallback?: (progress: any) => void) => {
     try {
-      await handleDownloadOperation(selectedItems, downloadMode, progressCallback)
+      // Filter downloadable files (no folders)
+      const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
+
+      if (downloadableFiles.length === 0) {
+        errorToast.generic('No files selected for download')
+        return
+      }
+
+      // For single file, use direct streaming
+      if (downloadableFiles.length === 1) {
+        const fileId = downloadableFiles[0].id
+        const downloadUrl = `/api/drive/files/download?fileId=${fileId}`
+        window.open(downloadUrl, '_blank')
+        successToast.downloaded()
+      } else {
+        // For multiple files, use batch download with streaming URLs
+        const response = await fetch('/api/drive/files/download', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            items: downloadableFiles,
+            downloadMode,
+          }),
+        })
+
+        if (!response.ok) {
+          throw new Error(`Download failed: ${response.statusText}`)
+        }
+
+        const result = await response.json()
+
+        // Open streaming URLs in new tabs
+        if (result.success && Array.isArray(result.success)) {
+          result.success.forEach((item: any, index: number) => {
+            setTimeout(() => {
+              window.open(item.streamUrl, '_blank')
+            }, index * 500)
+          })
+          successToast.generic(`Started ${result.success.length} downloads`)
+        }
+      }
     } catch (error) {
       console.error('Download failed:', error)
+      errorToast.generic('Download operation failed')
     }
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()

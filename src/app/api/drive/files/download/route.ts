@@ -233,13 +233,13 @@ async function processParallelDownload(driveService: any, items: any[], download
     })
   }
 
-  // For batch or failed single downloads, return summary with URLs
+  // For batch downloads, return stream URLs for _blank opening
   return NextResponse.json({
     success: successful.map((item) => ({
       id: item.id,
       name: item.fileName,
-      downloadUrl: item.fallbackUrl || `https://drive.google.com/uc?export=download&id=${item.id}`,
-      direct: !item.fallbackUrl,
+      streamUrl: `/api/drive/files/download?fileId=${item.id}`, // Use our streaming endpoint
+      direct: true,
     })),
     failed,
     skipped,

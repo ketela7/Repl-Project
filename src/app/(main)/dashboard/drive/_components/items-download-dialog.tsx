@@ -102,17 +102,45 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     }
 
     try {
-      await onConfirm(selectedMode, progressCallback)
+      // Call the download API directly with streaming
+      const response = await fetch('/api/drive/files/download', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: downloadableFiles,
+          downloadMode: selectedMode,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+
+      // Handle streaming downloads by opening URLs in new tabs
+      if (result.success && Array.isArray(result.success)) {
+        result.success.forEach((item: any, index: number) => {
+          setTimeout(() => {
+            // Use streaming endpoint for direct download
+            window.open(item.streamUrl, '_blank')
+          }, index * 500) // Stagger downloads to avoid browser blocking
+        })
+      }
 
       // Update final progress
-      setProgress((prev) => ({
-        ...prev,
-        current: prev.total,
-        success: downloadableFiles.length,
-        currentFile: undefined,
-      }))
+      setProgress({
+        current: result.summary?.successful || 0,
+        total: result.summary?.total || downloadableFiles.length,
+        success: result.summary?.successful || 0,
+        failed: result.summary?.failed || 0,
+        skipped: result.summary?.skipped || skippedFolders.length,
+        errors: result.failed || [],
+      })
 
-      toast.success(`Downloaded ${downloadableFiles.length} files successfully`)
+      toast.success(`Downloaded ${result.summary?.successful || downloadableFiles.length} files successfully`)
     } catch (error) {
       toast.error('Download operation failed')
     } finally {
