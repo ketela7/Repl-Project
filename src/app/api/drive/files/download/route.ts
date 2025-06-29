@@ -1,112 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService, handleApiError, validateOperationsRequest } from '@/lib/api-utils'
+import { initDriveService, handleApiError, validateDownloadRequest } from '@/lib/api-utils'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
-
-export async function GET(request: NextRequest) {
-  try {
-    const url = new URL(request.url)
-    const fileId = url.searchParams.get('fileId')
-    const mode = url.searchParams.get('mode')
-    const fileName = url.searchParams.get('fileName')
-
-    if (!fileId) {
-      return NextResponse.json({ error: 'fileId is required' }, { status: 400 })
-    }
-
-    // For direct streaming mode
-    if (mode === 'stream') {
-      // Initialize Drive service with authentication
-      const authResult = await initDriveService()
-      if (!authResult.success) {
-        return authResult.response!
-      }
-
-      const { driveService } = authResult
-
-      try {
-        // Get file metadata first for proper filename and content type
-        const metadata = await throttledDriveRequest(async () => {
-          return await retryDriveApiCall(async () => {
-            return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size', 'quotaBytesUsed'])
-          })
-        })
-
-        const actualFileName = fileName || metadata.name
-        const mimeType = metadata.mimeType || 'application/octet-stream'
-        // Try multiple size fields from Google Drive API
-        const fileSize = metadata.size ? parseInt(metadata.size) : 
-                        metadata.quotaBytesUsed ? parseInt(metadata.quotaBytesUsed) : 
-                        undefined
-
-        // Check if it's a Google Workspace file that needs export
-        if (isGoogleWorkspaceFile(mimeType)) {
-          const exportMimeType = getExportFormat(mimeType)
-          const exportExtension = getFileExtension(exportMimeType)
-
-          // Export Google Workspace file
-          const exportBuffer = await throttledDriveRequest(async () => {
-            return await retryDriveApiCall(async () => {
-              return await driveService.exportFile(fileId, exportMimeType)
-            })
-          })
-
-          const uint8Array = new Uint8Array(exportBuffer)
-          const exportFileName = `${actualFileName}.${exportExtension}`
-
-          return new NextResponse(uint8Array, {
-            status: 200,
-            headers: {
-              'Content-Type': 'application/octet-stream',
-              'Content-Disposition': `attachment; filename="${exportFileName}"`,
-              'Content-Length': uint8Array.length.toString(),
-              'Accept-Ranges': 'bytes',
-            },
-          })
-        }
-
-        // For regular files, stream directly
-        const fileStream = await throttledDriveRequest(async () => {
-          return await retryDriveApiCall(async () => {
-            return await driveService.downloadFile(fileId)
-          })
-        })
-
-        // Convert Node.js Readable to Web ReadableStream
-        const { Readable } = await import('stream')
-        const webStream = Readable.toWeb(fileStream)
-
-        // Stream file directly to browser with octet-stream content type
-        const headers: Record<string, string> = {
-          'Content-Type': 'application/octet-stream',
-          'Content-Disposition': `attachment; filename="${actualFileName}"`,
-          'Accept-Ranges': 'bytes',
-          'Cache-Control': 'no-cache',
-          'Transfer-Encoding': 'chunked',
-        }
-
-        // Add Content-Length if file size is known
-        if (fileSize && fileSize > 0) {
-          headers['Content-Length'] = fileSize.toString()
-          delete headers['Transfer-Encoding'] // Remove chunked when we have content length
-        }
-
-        return new NextResponse(webStream, {
-          status: 200,
-          headers,
-        })
-      } catch (error: any) {
-        console.error('Direct download failed:', error)
-        return NextResponse.json({ error: 'Download failed' }, { status: 500 })
-      }
-    }
-
-    return NextResponse.json({ error: 'Invalid mode' }, { status: 400 })
-  } catch (error) {
-    return handleApiError(error)
-  }
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -120,265 +16,81 @@ export async function POST(request: NextRequest) {
 
     const { driveService } = authResult
 
-    // Get fileId from body and determine operation type
-    const { fileId, items, downloadMode = 'oneByOne' } = body
-    const isBulkOperation = items && items.length > 1
-
-    if (isBulkOperation) {
-      // Bulk operations handling
-      if (!validateOperationsRequest(body)) {
-        return NextResponse.json({ error: 'Invalid request body for bulk download' }, { status: 400 })
-      }
-
-      return await processBulkDownload(driveService, items, downloadMode)
+    const { items, downloadMode } = body
+    if (!validateDownloadRequest(body)) {
+      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    // Single file download handling
-    if (!fileId) {
-      return NextResponse.json({ error: 'fileId is required for single file download' }, { status: 400 })
-    }
-
-    return await processSingleDownload(driveService, fileId, downloadMode)
+    return await processDownload(driveService, items, downloadMode)
   } catch (error) {
     return handleApiError(error)
   }
 }
 
 /**
- * Process bulk download operations with chunked processing for efficiency
+ * Process download with streaming or URL fallback
  */
-async function processBulkDownload(driveService: any, items: any[], downloadMode: string) {
-  // Filter only files (skip folders automatically)
-  const downloadableFiles = items.filter((item: any) => !item.isFolder)
-  const skippedFolders = items.filter((item: any) => item.isFolder)
+async function processDownload(driveService: any, items: any[], downloadMode: string) {
+  const headers = 'File Name,Download Link\n'
+  for (const item of items) {
+    if (downloadMode === 'exportLinks') {
+      const rows = `${item.name},https://drive.google.com/uc?export=download&id=${item.id}\n`
 
-  const results = {
-    success: [] as Array<{ id: string; name: string; downloadUrl?: string }>,
-    skipped: skippedFolders.map((folder: any) => ({
-      id: folder.id,
-      name: folder.name,
-      reason: 'Folders not supported',
-    })),
-    failed: [] as Array<{ id: string; name: string; error: string }>,
-    downloadMode,
-    timestamp: new Date().toISOString(),
-  }
-
-  // Chunked processing for better performance and rate limit handling
-  const CHUNK_SIZE = 5
-  const chunks = chunkArray(downloadableFiles, CHUNK_SIZE)
-
-  for (const chunk of chunks) {
-    const chunkPromises = chunk.map(async (file: any) => {
-      try {
-        const downloadResult = await processFileDownload(driveService, file, downloadMode)
-
-        if (downloadResult.success) {
-          results.success.push({
-            id: file.id,
-            name: file.name,
-            downloadUrl: downloadResult.downloadUrl,
-          })
-        } else {
-          results.failed.push({
-            id: file.id,
-            name: file.name,
-            error: downloadResult.error || 'Unknown error',
-          })
-        }
-      } catch (error: any) {
-        const errorMessage = getErrorMessage(error)
-
-        if (isSkippableError(error)) {
-          results.skipped.push({
-            id: file.id,
-            name: file.name,
-            reason: errorMessage,
-          })
-        } else {
-          results.failed.push({
-            id: file.id,
-            name: file.name,
-            error: errorMessage,
-          })
-        }
-      }
-    })
-
-    // Process chunk in parallel
-    await Promise.all(chunkPromises)
-  }
-
-  // For exportLinks mode, generate and return CSV file
-  if (downloadMode === 'exportLinks') {
-    if (results.success.length > 0) {
-      const csvContent = generateDownloadCSV(results.success)
-      const fileName = `download-links-${new Date().toISOString().split('T')[0]}.csv`
-
-      return new NextResponse(csvContent, {
-        status: 200,
-        headers: {
-          'Content-Type': 'text/csv; charset=utf-8',
-          'Content-Disposition': `attachment; filename="${fileName}"`,
-        },
-      })
-    } else {
-      return NextResponse.json({ error: 'No files available for CSV export' }, { status: 400 })
+      // T0D0: save (headers+rows)to download-date.now().csv
+      return
     }
-  }
 
-  // For other modes, return JSON response with download URLs
-  return NextResponse.json(results)
-}
-
-/**
- * Process single file download with streaming or URL fallback
- */
-async function processSingleDownload(driveService: any, fileId: string, downloadMode: string) {
-  if (downloadMode === 'exportLinks') {
-    // Return Google Drive direct download URL for CSV generation
-    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-    return NextResponse.json({
-      success: true,
-      downloadUrl,
-      fileName: `file-${fileId}`,
-    })
-  }
-
-  // For direct downloads, stream file from Google Drive through our server
-  try {
-    // Get file metadata first for proper filename
-    const metadata = await throttledDriveRequest(async () => {
-      return await retryDriveApiCall(async () => {
-        return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size', 'quotaBytesUsed'])
-      })
-    })
-
-    const fileName = metadata.name
-    const mimeType = metadata.mimeType || 'application/octet-stream'
-    // Try multiple size fields from Google Drive API
-    const fileSize = metadata.size ? parseInt(metadata.size) : 
-                    metadata.quotaBytesUsed ? parseInt(metadata.quotaBytesUsed) : 
-                    undefined
-
-    // Check if it's a Google Workspace file that needs export
-    if (isGoogleWorkspaceFile(mimeType)) {
-      const exportMimeType = getExportFormat(mimeType)
-      const exportExtension = getFileExtension(exportMimeType)
-
-      // Export Google Workspace file
-      const exportBuffer = await throttledDriveRequest(async () => {
+    try {
+      // Get file metadata first for proper filename
+      const metadata = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
-          return await driveService.exportFile(fileId, exportMimeType)
+          return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size'])
         })
       })
 
-      const uint8Array = new Uint8Array(exportBuffer)
-      const exportFileName = `${fileName}.${exportExtension}`
+      const fileName = metadata.name
+      const mimeType = metadata.mimeType || 'application/octet-stream'
+      const fileSize = metadata.size ? parseInt(metadata.size) : null
 
-      return new NextResponse(uint8Array, {
-        status: 200,
-        headers: {
-          'Content-Type': exportMimeType,
-          'Content-Disposition': `attachment; filename="${exportFileName}"`,
-          'Content-Length': uint8Array.length.toString(),
-          'Accept-Ranges': 'bytes',
+      const response = await drive.files.get(
+        {
+          fileId,
+          alt: 'media',
         },
-      })
-    }
+        { responseType: 'stream' }
+      )
 
-    // For regular files, stream directly
-    const fileStream = await throttledDriveRequest(async () => {
-      return await retryDriveApiCall(async () => {
-        return await driveService.downloadFile(fileId)
-      })
-    })
+      downloadResult = {
+        data: response.data,
+        filename: fileMetadata.data.name || 'download',
+        mimeType: fileMetadata.data.mimeType || 'application/octet-stream',
+        size: fileMetadata.data.size || null,
+      }
+      if (!downloadResult) {
+        return res.status(500).json({ error: 'Failed to download file' })
+      }
 
-    // Convert Node.js Readable to Web ReadableStream
-    const { Readable } = await import('stream')
-    const webStream = Readable.toWeb(fileStream)
+      // Set appropriate headers
+      res.setHeader('Content-Type', downloadResult.mimeType || 'application/octet-stream')
+      res.setHeader('Content-Disposition', `attachment; filename="${downloadResult.filename}"`)
 
-    // Stream file directly to browser
-    const headers: Record<string, string> = {
-      'Content-Type': mimeType,
-      'Content-Disposition': `attachment; filename="${fileName}"`,
-      'Accept-Ranges': 'bytes',
-      'Cache-Control': 'no-cache',
-      'Transfer-Encoding': 'chunked',
-    }
+      if (downloadResult.size) {
+        res.setHeader('Content-Length', downloadResult.size)
+      }
 
-    // Add Content-Length if file size is known
-    if (fileSize && fileSize > 0) {
-      headers['Content-Length'] = fileSize.toString()
-      delete headers['Transfer-Encoding'] // Remove chunked when we have content length
-    }
-
-    return new NextResponse(webStream, {
-      status: 200,
-      headers,
-    })
-  } catch (error: any) {
-    // Fallback to Google Drive direct URL if streaming fails
-    const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-    return NextResponse.json({
-      success: true,
-      downloadUrl,
-      fileName: `file-${fileId}`,
-      fallback: true,
-    })
-  }
-}
-
-/**
- * Process individual file download - optimized for bulk operations
- */
-async function processFileDownload(driveService: any, file: any, downloadMode: string) {
-  try {
-    // For batch mode, directly return Google Drive URL without additional API calls
-    if (downloadMode === 'batch' || downloadMode === 'exportLinks') {
-      const downloadUrl = `https://drive.google.com/uc?export=download&id=${file.id}`
-      return {
+      // Send the file data
+      return res.status(200).send(downloadResult.data)
+    } catch (error: any) {
+      // Fallback to Google Drive direct URL if streaming fails
+      const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
+      return NextResponse.json({
         success: true,
         downloadUrl,
-        fileName: file.name,
-      }
-    }
-
-    // For other modes, get metadata if needed
-    const fileMetadata = await throttledDriveRequest(async () => {
-      return await retryDriveApiCall(async () => {
-        return await driveService.files.get({
-          fileId: file.id,
-          fields: 'id,name,mimeType,size,webViewLink',
-        })
+        fileName,
+        fallback: true,
       })
-    })
-
-    const fileData = fileMetadata.data
-    const downloadUrl = `https://drive.google.com/uc?export=download&id=${file.id}`
-
-    return {
-      success: true,
-      downloadUrl,
-      fileName: fileData.name,
-    }
-  } catch (error: any) {
-    return {
-      success: false,
-      error: getErrorMessage(error),
     }
   }
-}
-
-/**
- * Utility function to chunk array for batch processing
- */
-function chunkArray<T>(array: T[], chunkSize: number): T[][] {
-  const chunks: T[][] = []
-  for (let i = 0; i < array.length; i += chunkSize) {
-    chunks.push(array.slice(i, i + chunkSize))
-  }
-  return chunks
 }
 
 /**

@@ -104,14 +104,9 @@ export function validateShareRequest(body: any): boolean {
   return requiredFields.every((field) => field in body)
 }
 
-export function validateOperationsRequest(body: any): boolean {
-  // Support both old format (operation, fileIds) and new format (items)
-  if (body.operation && Array.isArray(body.fileIds) && body.fileIds.length > 0) {
-    return true
-  }
-
+export function validateDownloadRequest(body: any): boolean {
   // New format for download and other operations
-  if (Array.isArray(body.items) && body.items.length > 0) {
+  if body.items && (Array.isArray(body.items) && body.items.length > 0) {
     return true
   }
 

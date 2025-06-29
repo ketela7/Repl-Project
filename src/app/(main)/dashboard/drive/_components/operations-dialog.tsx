@@ -289,95 +289,19 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
   const handleDownloadComplete = async (downloadMode: string, progressCallback?: (progress: any) => void) => {
     try {
       const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
+      const response = await fetch('/api/drive/files/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: downloadableFiles,
+          downloadMode: downloadMode,
+        }),
+      })
 
-      if (downloadMode === 'oneByOne') {
-        // For one by one downloads with direct streaming
-        for (let i = 0; i < downloadableFiles.length; i++) {
-          const item = downloadableFiles[i]
-
-          // Update progress through callback if available
-          if (progressCallback) {
-            progressCallback({
-              current: i + 1,
-              total: downloadableFiles.length,
-              type: 'download',
-              currentOperation: `Downloading ${item.name}`,
-            })
-          }
-
-          // Create direct download link to our streaming endpoint
-          const downloadUrl = `/api/drive/files/download?fileId=${item.id}&mode=stream&fileName=${encodeURIComponent(item.name)}`
-
-          // Open in new tab for direct browser download
-          const link = document.createElement('a')
-          link.href = downloadUrl
-          link.download = item.name
-          link.target = '_blank'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-
-          // Small delay between downloads to prevent browser blocking
-          await new Promise((resolve) => setTimeout(resolve, 1000))
-        }
-      } else if (downloadMode === 'batch') {
-        // For batch downloads, trigger multiple streaming downloads
-        for (let i = 0; i < downloadableFiles.length; i++) {
-          const item = downloadableFiles[i]
-
-          if (progressCallback) {
-            progressCallback({
-              current: i + 1,
-              total: downloadableFiles.length,
-              type: 'download',
-              currentOperation: `Batch downloading ${item.name}`,
-            })
-          }
-
-          // Create direct download link to our streaming endpoint
-          const downloadUrl = `/api/drive/files/download?fileId=${item.id}&mode=stream&fileName=${encodeURIComponent(item.name)}`
-
-          // Open in new tab for direct browser download
-          const link = document.createElement('a')
-          link.href = downloadUrl
-          link.download = item.name
-          link.target = '_blank'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-
-          // Small delay between downloads to prevent browser blocking
-          await new Promise((resolve) => setTimeout(resolve, 500))
-        }
-      } else if (downloadMode === 'exportLinks') {
-        // For CSV export of download links
-        const response = await fetch('/api/drive/files/download', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: downloadableFiles,
-            downloadMode: 'exportLinks',
-          }),
-        })
-
-        if (response.ok) {
-          // If the response is a CSV file, handle it directly
-          const contentType = response.headers.get('content-type')
-          if (contentType && contentType.includes('text/csv')) {
-            const blob = await response.blob()
-            const downloadUrl = URL.createObjectURL(blob)
-            const link = document.createElement('a')
-            link.href = downloadUrl
-            link.download = `download-links-${new Date().toISOString().split('T')[0]}.csv`
-            document.body.appendChild(link)
-            link.click()
-            document.body.removeChild(link)
-            URL.revokeObjectURL(downloadUrl)
-          }
-        }
+      if (response.ok) {
       }
     } catch (error) {
-      // Handle errors
+      // T0DD0: Handle errors
     }
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()
