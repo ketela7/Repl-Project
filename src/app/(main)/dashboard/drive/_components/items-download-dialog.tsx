@@ -90,7 +90,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
           current: 0,
           total: downloadableFiles.length,
           success: 0,
-          skipped: 0,
+          skipped: skippedFolders.length,
           failed: 0,
           errors: [],
         })
@@ -120,7 +120,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
             successCount++
 
             // Small delay to prevent browser blocking multiple downloads
-            await new Promise(resolve => setTimeout(resolve, 500))
+            await new Promise(resolve => setTimeout(resolve, 5000))
 
           } catch (error: any) {
             failedCount++
