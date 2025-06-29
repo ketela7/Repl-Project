@@ -751,20 +751,23 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         <div className="max-h-[70vh] overflow-y-auto">{renderContent()}</div>
         <DialogFooter>
           <div className="flex w-full gap-2">
-            <Button variant="outline" onClick={handleClose} className="flex-1">
-              {isCompleted || isCancelled ? 'Close' : isProcessing ? 'Cancel' : 'Cancel'}
-            </Button>
-            {!isCompleted && !isCancelled && (
-              <Button onClick={isProcessing ? handleCancel : handleConfirm} disabled={isProcessing && isCancelled} className="flex-1">
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Cancel
-                  </>
-                ) : (
-                  'Rename'
+            {isProcessing ? (
+              <>
+                <Button variant="outline" onClick={handleCancel} disabled={isCancelled} className="flex-1">
+                  {isCancelled ? 'Cancelling...' : 'Cancel Operation'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" onClick={handleClose} className="flex-1">
+                  {isCompleted || isCancelled ? 'Close' : 'Cancel'}
+                </Button>
+                {!isCompleted && !isCancelled && (
+                  <Button onClick={handleConfirm} className="flex-1">
+                    Rename
+                  </Button>
                 )}
-              </Button>
+              </>
             )}
           </div>
         </DialogFooter>
