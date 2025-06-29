@@ -622,16 +622,26 @@ export function DriveManager() {
               }
             }}
             onItemAction={(action: string, item: DriveItem) => {
+              // First close all dialogs to prevent interference
+              closeDialog('preview')
+              closeDialog('details')
+              setSelectedFileForPreview(null)
+              setSelectedFileForDetails(null)
+
               switch (action) {
                 case 'preview':
-                  setSelectedFileForPreview(item as DriveFile)
-                  setSelectedFileForDetails(null) // Clear details selection
-                  openDialog('preview')
+                  // Small delay to ensure cleanup is complete
+                  setTimeout(() => {
+                    setSelectedFileForPreview(item as DriveFile)
+                    openDialog('preview')
+                  }, 50)
                   break
                 case 'details':
-                  setSelectedFileForDetails(item)
-                  setSelectedFileForPreview(null) // Clear preview selection
-                  openDialog('details')
+                  // Small delay to ensure cleanup is complete
+                  setTimeout(() => {
+                    setSelectedFileForDetails(item)
+                    openDialog('details')
+                  }, 50)
                   break
                 case 'download':
                 case 'share':
@@ -676,7 +686,7 @@ export function DriveManager() {
 
       {/* Individual dialog operations removed - using bulk operations instead */}
 
-      {selectedFileForPreview && (
+      {selectedFileForPreview && dialogs.preview && !dialogs.details && (
         <FilePreviewDialog
           open={dialogs.preview}
           onOpenChange={(open) => {
@@ -689,7 +699,7 @@ export function DriveManager() {
         />
       )}
 
-      {selectedFileForDetails && (
+      {selectedFileForDetails && dialogs.details && !dialogs.preview && (
         <FileDetailsDialog
           isOpen={dialogs.details}
           onClose={() => {
