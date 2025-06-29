@@ -55,14 +55,26 @@ export async function GET(request: NextRequest) {
       // Convert Node.js stream to Web Stream
       const stream = new ReadableStream({
         start(controller) {
+          let closed = false
+
           response.data.on('data', (chunk: Buffer) => {
-            controller.enqueue(new Uint8Array(chunk))
+            if (!closed) {
+              controller.enqueue(new Uint8Array(chunk))
+            }
           })
+
           response.data.on('end', () => {
-            controller.close()
+            if (!closed) {
+              closed = true
+              controller.close()
+            }
           })
+
           response.data.on('error', (err: Error) => {
-            controller.error(err)
+            if (!closed) {
+              closed = true
+              controller.error(err)
+            }
           })
         },
       })
@@ -94,14 +106,26 @@ export async function GET(request: NextRequest) {
     // Convert Node.js stream to Web Stream
     const stream = new ReadableStream({
       start(controller) {
+        let closed = false
+
         response.data.on('data', (chunk: Buffer) => {
-          controller.enqueue(new Uint8Array(chunk))
+          if (!closed) {
+            controller.enqueue(new Uint8Array(chunk))
+          }
         })
+
         response.data.on('end', () => {
-          controller.close()
+          if (!closed) {
+            closed = true
+            controller.close()
+          }
         })
+
         response.data.on('error', (err: Error) => {
-          controller.error(err)
+          if (!closed) {
+            closed = true
+            controller.error(err)
+          }
         })
       },
     })

@@ -2,13 +2,11 @@
 
 import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen } from 'lucide-react'
 import { useState } from 'react'
-import { toast } from 'sonner'
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetDescription } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { successToast, errorToast } from '@/lib/toast'
 import {
   ItemsMoveDialog,
   ItemsCopyDialog,
@@ -27,12 +25,6 @@ interface OperationsDialogProps {
   onClose?: () => void
   onOpenChange?: (open: boolean) => void
   selectedItems: any[]
-  onDelete?: () => void
-  onDownload?: () => void
-  onShare?: () => void
-  onMove?: () => void
-  onCopy?: () => void
-  onRename?: () => void
   onRefreshAfterOp?: () => void
 }
 
@@ -111,129 +103,103 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     handleClose()
   }
 
-  // Bulk operation completion handlers with actual API calls
-  const handleMoveComplete = async () => {
+  // Standardized close handlers
+  const handleMoveClose = () => {
+    setIsMoveDialogOpen(false)
+  }
+
+  const handleCopyClose = () => {
+    setIsCopyDialogOpen(false)
+  }
+
+  const handleTrashClose = () => {
+    setIsTrashDialogOpen(false)
+  }
+
+  const handleShareClose = () => {
+    setIsShareDialogOpen(false)
+  }
+
+  const handleRenameClose = () => {
+    setIsRenameDialogOpen(false)
+  }
+
+  const handleExportClose = () => {
+    setIsExportDialogOpen(false)
+  }
+
+  const handleDeleteClose = () => {
+    setIsDeleteDialogOpen(false)
+  }
+
+  const handleUntrashClose = () => {
+    setIsUntrashDialogOpen(false)
+  }
+
+  const handleDownloadClose = () => {
+    setIsDownloadDialogOpen(false)
+  }
+
+  // Standardized completion handlers with refresh
+  const handleMoveComplete = () => {
     setIsMoveDialogOpen(false)
     setTimeout(() => {
-      console.log('Refreshing after move operation')
       onRefreshAfterOp?.()
     }, 500)
   }
 
-  const handleCopyComplete = async () => {
-    // Copy operation is now handled inside the Copy dialog
-    // This function just needs to close the dialog and refresh
+  const handleCopyComplete = () => {
     setIsCopyDialogOpen(false)
     setTimeout(() => {
-      console.log('Refreshing after copy operation')
       onRefreshAfterOp?.()
     }, 500)
   }
 
-  const handleTrashComplete = async () => {
-    try {
-      const response = await fetch('/api/drive/files/trash', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems,
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-      }
-    } catch (error) {
-      console.error('Delete failed:', error)
-    } finally {
-      setIsTrashDialogOpen(false)
-      setTimeout(() => {
-        console.log('Refreshing after trash operation')
-        onRefreshAfterOp?.()
-      }, 500)
-    }
+  const handleTrashComplete = () => {
+    setIsTrashDialogOpen(false)
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
-  const handleShareComplete = async () => {
-    // Share operation is now handled inside the Share dialog
-    // This function just needs to close the dialog and refresh
+  const handleShareComplete = () => {
     setIsShareDialogOpen(false)
     setTimeout(() => {
-      console.log('Refreshing after share operation')
       onRefreshAfterOp?.()
     }, 500)
   }
 
-  const handleRenameComplete = async () => {
+  const handleRenameComplete = () => {
     setIsRenameDialogOpen(false)
     setTimeout(() => {
-      console.log('Refreshing after rename operation')
       onRefreshAfterOp?.()
     }, 500)
   }
 
-  const handleExportComplete = async () => {
-    // Export operation is now handled inside the Export dialog
-    // This function just needs to close the dialog and refresh
+  const handleExportComplete = () => {
     setIsExportDialogOpen(false)
     setTimeout(() => {
-      console.log('Refreshing after export operation')
       onRefreshAfterOp?.()
     }, 500)
   }
 
-  const handleDeleteComplete = async () => {
-    try {
-      const response = await fetch('/api/drive/files/delete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems,
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-      }
-    } catch (error) {
-      console.error('delete failed:', error)
-    } finally {
-      setIsDeleteDialogOpen(false)
-      setTimeout(() => {
-        console.log('Refreshing after delete operation')
-        onRefreshAfterOp?.()
-      }, 500)
-    }
+  const handleDeleteComplete = () => {
+    setIsDeleteDialogOpen(false)
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
-  const handleUntrashComplete = async () => {
-    try {
-      const response = await fetch('/api/drive/files/untrash', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems,
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-      }
-    } catch (error) {
-      console.error('Restore failed:', error)
-    } finally {
-      setIsUntrashDialogOpen(false)
-      setTimeout(() => {
-        console.log('Refreshing after untrash operation')
-        onRefreshAfterOp?.()
-      }, 500)
-    }
+  const handleUntrashComplete = () => {
+    setIsUntrashDialogOpen(false)
+    setTimeout(() => {
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
-  const handleDownloadComplete = async () => {
+  const handleDownloadComplete = () => {
     setIsDownloadDialogOpen(false)
     setTimeout(() => {
-      console.log('Refreshing after download operation')
       onRefreshAfterOp?.()
     }, 500)
   }
@@ -408,24 +374,24 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         </Dialog>
       )}
 
-      {/* Individual Items Operation Dialogs - Direct rendering tanpa Suspense */}
-      <ItemsMoveDialog isOpen={isMoveDialogOpen} onClose={() => setIsMoveDialogOpen(false)} onConfirm={handleMoveComplete} selectedItems={selectedItems} />
+      {/* Individual Items Operation Dialogs - Standardized Props Pattern */}
+      <ItemsMoveDialog isOpen={isMoveDialogOpen} onClose={handleMoveClose} onConfirm={handleMoveComplete} selectedItems={selectedItems} />
 
-      <ItemsCopyDialog isOpen={isCopyDialogOpen} onClose={() => setIsCopyDialogOpen(false)} onConfirm={handleCopyComplete} selectedItems={selectedItems} />
+      <ItemsCopyDialog isOpen={isCopyDialogOpen} onClose={handleCopyClose} onConfirm={handleCopyComplete} selectedItems={selectedItems} />
 
-      <ItemsTrashDialog isOpen={isTrashDialogOpen} onClose={() => setIsTrashDialogOpen(false)} onConfirm={handleDeleteComplete} selectedItems={selectedItems} />
+      <ItemsTrashDialog isOpen={isTrashDialogOpen} onClose={handleTrashClose} onConfirm={handleTrashComplete} selectedItems={selectedItems} />
 
-      <ItemsShareDialog isOpen={isShareDialogOpen} onClose={() => setIsShareDialogOpen(false)} onConfirm={handleShareComplete} selectedItems={selectedItems} />
+      <ItemsShareDialog isOpen={isShareDialogOpen} onClose={handleShareClose} onConfirm={handleShareComplete} selectedItems={selectedItems} />
 
-      <ItemsRenameDialog isOpen={isRenameDialogOpen} onClose={() => setIsRenameDialogOpen(false)} onConfirm={handleRenameComplete} selectedItems={selectedItems} />
+      <ItemsRenameDialog isOpen={isRenameDialogOpen} onClose={handleRenameClose} onConfirm={handleRenameComplete} selectedItems={selectedItems} />
 
-      <ItemsExportDialog isOpen={isExportDialogOpen} onClose={() => setIsExportDialogOpen(false)} onConfirm={handleExportComplete} selectedItems={selectedItems} />
+      <ItemsExportDialog isOpen={isExportDialogOpen} onClose={handleExportClose} onConfirm={handleExportComplete} selectedItems={selectedItems} />
 
-      <ItemsDownloadDialog isOpen={isDownloadDialogOpen} onClose={handleDownloadComplete} onConfirm={handleDownloadComplete} selectedItems={selectedItems} />
+      <ItemsDownloadDialog isOpen={isDownloadDialogOpen} onClose={handleDownloadClose} onConfirm={handleDownloadComplete} selectedItems={selectedItems} />
 
-      <ItemsDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={handleDeleteComplete} selectedItems={selectedItems} />
+      <ItemsDeleteDialog isOpen={isDeleteDialogOpen} onClose={handleDeleteClose} onConfirm={handleDeleteComplete} selectedItems={selectedItems} />
 
-      <ItemsUntrashDialog isOpen={isUntrashDialogOpen} onClose={() => setIsUntrashDialogOpen(false)} onConfirm={handleUntrashComplete} selectedItems={selectedItems} />
+      <ItemsUntrashDialog isOpen={isUntrashDialogOpen} onClose={handleUntrashClose} onConfirm={handleUntrashComplete} selectedItems={selectedItems} />
     </>
   )
 }

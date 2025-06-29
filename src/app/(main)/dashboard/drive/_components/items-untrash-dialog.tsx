@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useRef } from 'react'
@@ -290,10 +289,10 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
       return (
         <div className="space-y-4">
           {/* Header */}
-          <div className="text-center space-y-2">
+          <div className="space-y-2 text-center">
             <div className="flex justify-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                <Loader2 className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin" />
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400" />
               </div>
             </div>
             <div>
@@ -317,9 +316,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
           {progress.currentFile && (
             <div className="space-y-1">
               <div className="text-sm font-medium">Current:</div>
-              <div className="text-xs text-muted-foreground truncate font-mono bg-muted/50 rounded p-2">
-                {progress.currentFile}
-              </div>
+              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">{progress.currentFile}</div>
             </div>
           )}
 
@@ -327,15 +324,15 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="space-y-1">
               <div className="text-lg font-bold text-green-600">{progress.success}</div>
-              <div className="text-xs text-muted-foreground">Success</div>
+              <div className="text-muted-foreground text-xs">Success</div>
             </div>
             <div className="space-y-1">
               <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-              <div className="text-xs text-muted-foreground">Failed</div>
+              <div className="text-muted-foreground text-xs">Failed</div>
             </div>
             <div className="space-y-1">
               <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-              <div className="text-xs text-muted-foreground">Skipped</div>
+              <div className="text-muted-foreground text-xs">Skipped</div>
             </div>
           </div>
         </div>
@@ -350,14 +347,20 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
     return (
       <div className="space-y-4">
         {/* Results Header */}
-        <div className="text-center space-y-2">
+        <div className="space-y-2 text-center">
           <div className="flex justify-center">
-            <div className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full",
-              isCancelled ? "bg-orange-100 dark:bg-orange-900/30" :
-              wasSuccessful && !hasErrors ? "bg-green-100 dark:bg-green-900/30" :
-              hasErrors ? "bg-red-100 dark:bg-red-900/30" : "bg-gray-100 dark:bg-gray-900/30"
-            )}>
+            <div
+              className={cn(
+                'flex h-12 w-12 items-center justify-center rounded-full',
+                isCancelled
+                  ? 'bg-orange-100 dark:bg-orange-900/30'
+                  : wasSuccessful && !hasErrors
+                    ? 'bg-green-100 dark:bg-green-900/30'
+                    : hasErrors
+                      ? 'bg-red-100 dark:bg-red-900/30'
+                      : 'bg-gray-100 dark:bg-gray-900/30'
+              )}
+            >
               {isCancelled ? (
                 <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               ) : wasSuccessful && !hasErrors ? (
@@ -370,11 +373,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
             </div>
           </div>
           <div>
-            <h3 className="text-base font-semibold">
-              {isCancelled ? 'Restore Cancelled' :
-               wasSuccessful && !hasErrors ? 'Items Restored' :
-               hasErrors ? 'Partially Restored' : 'No Items Restored'}
-            </h3>
+            <h3 className="text-base font-semibold">{isCancelled ? 'Restore Cancelled' : wasSuccessful && !hasErrors ? 'Items Restored' : hasErrors ? 'Partially Restored' : 'No Items Restored'}</h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {selectedItems.length} items processed
             </p>
@@ -385,15 +384,15 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="space-y-1">
             <div className="text-lg font-bold text-green-600">{progress.success}</div>
-            <div className="text-xs text-muted-foreground">Restored</div>
+            <div className="text-muted-foreground text-xs">Restored</div>
           </div>
           <div className="space-y-1">
             <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-            <div className="text-xs text-muted-foreground">Failed</div>
+            <div className="text-muted-foreground text-xs">Failed</div>
           </div>
           <div className="space-y-1">
             <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-            <div className="text-xs text-muted-foreground">Skipped</div>
+            <div className="text-muted-foreground text-xs">Skipped</div>
           </div>
         </div>
 
@@ -401,9 +400,9 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         {progress.errors.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
-            <div className="max-h-32 overflow-y-auto space-y-1">
+            <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.errors.map((error, index) => (
-                <div key={index} className="text-xs bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-2">
+                <div key={index} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
                   <div className="font-medium">{error.file}</div>
                   <div className="text-red-600 dark:text-red-400">{error.error}</div>
                 </div>
@@ -486,10 +485,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         <AlertDialogFooter className="flex flex-col gap-2 sm:flex-row">
           {!isProcessing && !isCompleted && (
             <>
-              <AlertDialogAction
-                onClick={handleUntrash}
-                className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800"
-              >
+              <AlertDialogAction onClick={handleUntrash} className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800">
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Restore Items
               </AlertDialogAction>
