@@ -774,7 +774,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Type:</span>
-                    <Badge variant="secondary">{fileDetails.mimeType.split('/').pop()?.toUpperCase() || 'Unknown'}</Badge>
+                    <Badge variant="secondary">{fileDetails.mimeType?.split('/').pop()?.toUpperCase() || 'Unknown'}</Badge>
                   </div>
                   {fileDetails.size && (
                     <div className="flex items-center justify-between">
