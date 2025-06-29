@@ -43,6 +43,7 @@ const DOWNLOAD_MODES = [
 function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsDownloadDialogProps) {
   const [selectedMode, setSelectedMode] = useState('direct')
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isCompleted, setIsCompleted] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -150,11 +151,24 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     } catch (err) {
       console.error(err)
       toast.error('Download failed')
+    } finally {
+      setIsProcessing(false)
+      setIsCompleted(true)
     }
   }
 
   const handleClose = () => {
     if (!isProcessing) {
+      // Reset states when closing
+      setIsCompleted(false)
+      setProgress({
+        current: 0,
+        total: 0,
+        success: 0,
+        skipped: 0,
+        failed: 0,
+        errors: [],
+      })
       onClose()
     }
   }
@@ -319,11 +333,13 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
 
         <DialogFooterComponent className="flex gap-2">
           <Button variant="outline" onClick={handleClose} disabled={isProcessing}>
-            {isProcessing ? 'Processing...' : 'Cancel'}
+            {isProcessing ? 'Processing...' : isCompleted ? 'Close' : 'Cancel'}
           </Button>
-          <Button onClick={handleConfirm} disabled={downloadableFiles.length === 0 || isProcessing} className="gap-2">
+          <Button onClick={handleConfirm} disabled={downloadableFiles.length === 0 || isProcessing || isCompleted} className="gap-2">
             {isProcessing ? (
               <>Processing...</>
+            ) : isCompleted ? (
+              <>Download Complete</>
             ) : (
               <>
                 <Download className="h-4 w-4" />
