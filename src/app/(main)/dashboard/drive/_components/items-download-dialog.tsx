@@ -45,6 +45,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
   const [selectedMode, setSelectedMode] = useState('direct')
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
+  const [isCancelled, setIsCancelled] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -66,12 +67,20 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
   const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
   const skippedFolders = selectedItems.filter((item) => item.isFolder)
 
+  const handleCancel = () => {
+    setIsCancelled(true)
+    setIsProcessing(false)
+    setIsCompleted(true)
+    toast.info('Download operation cancelled by user')
+  }
+
   const handleConfirm = async () => {
     if (downloadableFiles.length === 0) {
       toast.error('No files available for download')
       return
     }
     setIsProcessing(true)
+    setIsCancelled(false)
     try {
       const baseUrl = window.location.origin
 
@@ -92,6 +101,11 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
 
         // Download files with progress tracking
         for (let i = 0; i < downloadableFiles.length; i++) {
+          // Check if operation was cancelled
+          if (isCancelled) {
+            break
+          }
+
           const file = downloadableFiles[i]
 
           try {
@@ -123,6 +137,11 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
             failed: failedCount,
             errors
           }))
+
+          // Check cancellation again after each file
+          if (isCancelled) {
+            break
+          }
         }
 
         if (successCount > 0) {
@@ -158,6 +177,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     if (!isProcessing) {
       // Reset states when closing
       setIsCompleted(false)
+      setIsCancelled(false)
       setProgress({
         current: 0,
         total: 0,
@@ -316,17 +336,34 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     if (isCompleted) {
       return (
         <div className="space-y-6">
-          {/* Success Header */}
+          {/* Header - Different for cancelled vs completed */}
           <div className="text-center">
             <div className="flex justify-center mb-3">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
-              </div>
+              {isCancelled ? (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30">
+                  <XCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
+                </div>
+              ) : (
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+                </div>
+              )}
             </div>
-            <div className="text-lg font-semibold text-green-600">Download Completed!</div>
-            <div className="text-sm text-muted-foreground">
-              {progress.success} of {progress.total} files processed successfully
-            </div>
+            {isCancelled ? (
+              <>
+                <div className="text-lg font-semibold text-orange-600">Download Cancelled</div>
+                <div className="text-sm text-muted-foreground">
+                  Operation was stopped by user. {progress.success} of {progress.total} files were processed before cancellation
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-lg font-semibold text-green-600">Download Completed!</div>
+                <div className="text-sm text-muted-foreground">
+                  {progress.success} of {progress.total} files processed successfully
+                </div>
+              </>
+            )}
           </div>
 
           {/* Final Results */}
@@ -364,18 +401,34 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
               </div>
             </div>
 
-            {/* Success Message */}
+            {/* Success/Cancellation Message */}
             {progress.success > 0 && (
-              <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950/50">
+              <div className={`rounded-lg border p-4 ${
+                isCancelled 
+                  ? 'border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950/50'
+                  : 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/50'
+              }`}>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="mt-0.5 h-5 w-5 text-green-600" />
+                  {isCancelled ? (
+                    <XCircle className="mt-0.5 h-5 w-5 text-orange-600" />
+                  ) : (
+                    <CheckCircle className="mt-0.5 h-5 w-5 text-green-600" />
+                  )}
                   <div className="space-y-1">
-                    <div className="font-medium text-green-800 dark:text-green-200">
-                      Download Operation Successful
+                    <div className={`font-medium ${
+                      isCancelled 
+                        ? 'text-orange-800 dark:text-orange-200'
+                        : 'text-green-800 dark:text-green-200'
+                    }`}>
+                      {isCancelled ? 'Download Operation Cancelled' : 'Download Operation Successful'}
                     </div>
-                    <div className="text-sm text-green-700 dark:text-green-300">
-                      {progress.success} file{progress.success > 1 ? 's' : ''} downloaded successfully
-                      {selectedMode === 'exportLinks' ? ' and export file generated' : ''}
+                    <div className={`text-sm ${
+                      isCancelled 
+                        ? 'text-orange-700 dark:text-orange-300'
+                        : 'text-green-700 dark:text-green-300'
+                    }`}>
+                      {progress.success} file{progress.success > 1 ? 's' : ''} {isCancelled ? 'processed before cancellation' : 'downloaded successfully'}
+                      {!isCancelled && selectedMode === 'exportLinks' ? ' and export file generated' : ''}
                     </div>
                   </div>
                 </div>
@@ -458,20 +511,24 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
           <Button variant="outline" onClick={handleClose} disabled={isProcessing}>
             {isProcessing ? 'Processing...' : isCompleted ? 'Close' : 'Cancel'}
           </Button>
-          {!isCompleted && (
+          {isProcessing && (
             <Button 
-              onClick={handleConfirm} 
-              disabled={downloadableFiles.length === 0 || isProcessing} 
+              variant="destructive" 
+              onClick={handleCancel} 
               className="gap-2"
             >
-              {isProcessing ? (
-                <>Processing...</>
-              ) : (
-                <>
-                  <Download className="h-4 w-4" />
-                  Start Download
-                </>
-              )}
+              <XCircle className="h-4 w-4" />
+              Cancel Download
+            </Button>
+          )}
+          {!isCompleted && !isProcessing && (
+            <Button 
+              onClick={handleConfirm} 
+              disabled={downloadableFiles.length === 0} 
+              className="gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Start Download
             </Button>
           )}
         </DialogFooterComponent>
