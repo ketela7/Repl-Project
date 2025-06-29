@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Share2, Globe, Users, Lock, Eye, Edit, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward, Copy } from 'lucide-react'
+import { Share2, Globe, Users, Lock, Eye, Edit, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward, Copy, Download } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -235,6 +235,34 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
       // Refresh immediately to show results
       window.location.reload()
     }
+  }
+
+  const handleExportCSV = () => {
+    const successfulShares = progress.shareResults.filter((result) => result.success && result.shareLink)
+
+    if (successfulShares.length === 0) {
+      toast.error('No successful shares to export')
+      return
+    }
+
+    // Create CSV content with header
+    const csvHeader = 'name,sharelink\n'
+    const csvContent = successfulShares.map((result) => `"${result.name}","${result.shareLink}"`).join('\n')
+
+    const fullCsv = csvHeader + csvContent
+
+    // Create and download the file
+    const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `share-links-${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+
+    toast.success(`Exported ${successfulShares.length} share links to CSV`)
   }
 
   // Render different content based on state
@@ -577,6 +605,12 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                     Close
                   </Button>
                 )}
+                {progress.success > 0 && (
+                  <Button onClick={handleExportCSV} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Export CSV
+                  </Button>
+                )}
                 {(progress.success > 0 || progress.failed > 0) && (
                   <Button onClick={handleClose} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
                     Close Without Refresh
@@ -636,6 +670,12 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                 <Button onClick={handleClose} className="w-full sm:w-auto">
                   <CheckCircle className="mr-2 h-4 w-4" />
                   Close
+                </Button>
+              )}
+              {progress.success > 0 && (
+                <Button onClick={handleExportCSV} variant="outline" className="w-full sm:w-auto">
+                  <Download className="mr-2 h-4 w-4" />
+                  Export CSV
                 </Button>
               )}
               {(progress.success > 0 || progress.failed > 0) && (
