@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from 'next/server'
 
 import { initDriveService, handleApiError, validateDownloadRequest } from '@/lib/api-utils'
@@ -16,79 +17,201 @@ export async function POST(request: NextRequest) {
 
     const { driveService } = authResult
 
-    const { items, downloadMode } = body
+    let { items, downloadMode } = body
     if (!validateDownloadRequest(body)) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    return await processDownload(driveService, items, downloadMode)
+    // Normalize single item to array for unified processing
+    if (!Array.isArray(items)) {
+      items = [items]
+    }
+
+    return await processParallelDownload(driveService, items, downloadMode)
   } catch (error) {
     return handleApiError(error)
   }
 }
 
 /**
- * Process download with streaming or URL fallback
+ * Process downloads with parallel streaming and progress tracking
  */
-async function processDownload(driveService: any, items: any[], downloadMode: string) {
-  const headers = 'File Name,Download Link\n'
-  for (const item of items) {
-    if (downloadMode === 'exportLinks') {
-      const rows = `${item.name},https://drive.google.com/uc?export=download&id=${item.id}\n`
+async function processParallelDownload(driveService: any, items: any[], downloadMode: string) {
+  // Handle export links mode
+  if (downloadMode === 'exportLinks') {
+    const csvContent = generateDownloadCSV(items.map(item => ({
+      id: item.id,
+      name: item.name,
+      downloadUrl: `https://drive.google.com/uc?export=download&id=${item.id}`
+    })))
+    
+    return new NextResponse(csvContent, {
+      headers: {
+        'Content-Type': 'text/csv',
+        'Content-Disposition': `attachment; filename="download-links-${Date.now()}.csv"`
+      }
+    })
+  }
 
-      // T0D0: save (headers+rows)to download-date.now().csv
-      return
+  // Parallel processing for streaming downloads
+  const results = await Promise.allSettled(
+    items.map(async (item, index) => {
+      try {
+        return await processItemDownload(driveService, item, index)
+      } catch (error) {
+        return {
+          success: false,
+          id: item.id,
+          name: item.name,
+          error: getErrorMessage(error),
+          skipped: isSkippableError(error)
+        }
+      }
+    })
+  )
+
+  // Process results
+  const successful = []
+  const failed = []
+  const skipped = []
+
+  results.forEach((result, index) => {
+    const item = items[index]
+    
+    if (result.status === 'fulfilled') {
+      const data = result.value
+      if (data.success) {
+        successful.push(data)
+      } else if (data.skipped) {
+        skipped.push({
+          id: item.id,
+          name: item.name,
+          reason: data.error
+        })
+      } else {
+        failed.push({
+          id: item.id,
+          name: item.name,
+          error: data.error
+        })
+      }
+    } else {
+      failed.push({
+        id: item.id,
+        name: item.name,
+        error: getErrorMessage(result.reason)
+      })
     }
+  })
 
-    try {
-      // Get file metadata first for proper filename
-      const metadata = await throttledDriveRequest(async () => {
+  // For single file success, return stream directly
+  if (items.length === 1 && successful.length === 1) {
+    const result = successful[0]
+    return new NextResponse(result.stream, {
+      headers: {
+        'Content-Type': result.mimeType,
+        'Content-Disposition': `attachment; filename="${result.fileName}"`,
+        ...(result.size && { 'Content-Length': result.size.toString() })
+      }
+    })
+  }
+
+  // For batch or failed single downloads, return summary with URLs
+  return NextResponse.json({
+    success: successful.map(item => ({
+      id: item.id,
+      name: item.fileName,
+      downloadUrl: item.fallbackUrl || `https://drive.google.com/uc?export=download&id=${item.id}`,
+      direct: !item.fallbackUrl
+    })),
+    failed,
+    skipped,
+    summary: {
+      total: items.length,
+      successful: successful.length,
+      failed: failed.length,
+      skipped: skipped.length
+    }
+  })
+}
+
+/**
+ * Process individual item download with stream handling
+ */
+async function processItemDownload(driveService: any, item: any, index: number) {
+  const fileId = item.id
+
+  try {
+    // Get file metadata
+    const metadata = await throttledDriveRequest(async () => {
+      return await retryDriveApiCall(async () => {
+        return await driveService.files.get({
+          fileId,
+          fields: 'name,mimeType,size,parents'
+        })
+      })
+    })
+
+    const fileName = metadata.data.name
+    const mimeType = metadata.data.mimeType
+    const fileSize = metadata.data.size
+
+    // Handle Google Workspace files
+    if (isGoogleWorkspaceFile(mimeType)) {
+      const exportFormat = getExportFormat(mimeType)
+      const exportResponse = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
-          return await driveService.getFileMetadata(fileId, ['name', 'mimeType', 'size'])
+          return await driveService.files.export({
+            fileId,
+            mimeType: exportFormat
+          }, { responseType: 'stream' })
         })
       })
 
-      const fileName = metadata.name
-      const mimeType = metadata.mimeType || 'application/octet-stream'
-      const fileSize = metadata.size ? parseInt(metadata.size) : null
-
-      const response = await drive.files.get(
-        {
-          fileId,
-          alt: 'media',
-        },
-        { responseType: 'stream' }
-      )
-
-      downloadResult = {
-        data: response.data,
-        filename: fileMetadata.data.name || 'download',
-        mimeType: fileMetadata.data.mimeType || 'application/octet-stream',
-        size: fileMetadata.data.size || null,
-      }
-      if (!downloadResult) {
-        return res.status(500).json({ error: 'Failed to download file' })
-      }
-
-      // Set appropriate headers
-      res.setHeader('Content-Type', downloadResult.mimeType || 'application/octet-stream')
-      res.setHeader('Content-Disposition', `attachment; filename="${downloadResult.filename}"`)
-
-      if (downloadResult.size) {
-        res.setHeader('Content-Length', downloadResult.size)
-      }
-
-      // Send the file data
-      return res.status(200).send(downloadResult.data)
-    } catch (error: any) {
-      // Fallback to Google Drive direct URL if streaming fails
-      const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-      return NextResponse.json({
+      const exportFileName = `${fileName.replace(/\.[^/.]+$/, "")}.${getFileExtension(exportFormat)}`
+      
+      return {
         success: true,
-        downloadUrl,
-        fileName,
-        fallback: true,
+        id: fileId,
+        fileName: exportFileName,
+        mimeType: exportFormat,
+        stream: exportResponse.data,
+        size: null,
+        index
+      }
+    }
+
+    // Regular file download
+    const downloadResponse = await throttledDriveRequest(async () => {
+      return await retryDriveApiCall(async () => {
+        return await driveService.files.get({
+          fileId,
+          alt: 'media'
+        }, { responseType: 'stream' })
       })
+    })
+
+    return {
+      success: true,
+      id: fileId,
+      fileName,
+      mimeType: mimeType || 'application/octet-stream',
+      stream: downloadResponse.data,
+      size: fileSize ? parseInt(fileSize) : null,
+      index
+    }
+
+  } catch (error: any) {
+    // Fallback to direct URL on stream failure
+    const fallbackUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
+    
+    return {
+      success: true,
+      id: fileId,
+      fileName: item.name || 'download',
+      fallbackUrl,
+      error: getErrorMessage(error),
+      index
     }
   }
 }
@@ -96,9 +219,9 @@ async function processDownload(driveService: any, items: any[], downloadMode: st
 /**
  * Generate CSV content for download links
  */
-function generateDownloadCSV(successfulDownloads: Array<{ id: string; name: string; downloadUrl?: string }>) {
+function generateDownloadCSV(items: Array<{ id: string; name: string; downloadUrl?: string }>) {
   const headers = 'File Name,Download Link\n'
-  const rows = successfulDownloads
+  const rows = items
     .filter((item) => item.downloadUrl)
     .map((item) => `"${item.name}","${item.downloadUrl}"`)
     .join('\n')

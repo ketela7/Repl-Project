@@ -27,15 +27,15 @@ interface ItemsDownloadDialogProps {
 
 const DOWNLOAD_MODES = [
   {
-    id: 'oneByOne',
-    label: 'One by One Download',
-    description: 'Download files individually with separate browser downloads',
+    id: 'direct',
+    label: 'Direct Download',
+    description: 'Stream files directly with parallel processing',
     icon: Download,
   },
   {
-    id: 'batch',
-    label: 'Batch Download',
-    description: 'Download multiple files simultaneously',
+    id: 'parallel',
+    label: 'Parallel Download',
+    description: 'Download multiple files simultaneously with progress tracking',
     icon: Download,
   },
   {
@@ -47,7 +47,7 @@ const DOWNLOAD_MODES = [
 ]
 
 function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsDownloadDialogProps) {
-  const [selectedMode, setSelectedMode] = useState('oneByOne')
+  const [selectedMode, setSelectedMode] = useState('direct')
   const [isProcessing, setIsProcessing] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
