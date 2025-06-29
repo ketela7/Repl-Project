@@ -150,6 +150,131 @@ class RealTimeAPITester {
     for (const endpoint of fileEndpoints) {
       await this.testEndpoint(endpoint)
     }
+
+    // Test comprehensive rename operations
+    await this.testRenameOperations(testFile)
+  }
+
+  /**
+   * Test comprehensive rename operations with all patterns
+   */
+  async testRenameOperations(testFile) {
+    console.log('\n🔧 Testing Rename Operations with All Patterns...')
+    
+    const originalName = testFile.name
+    console.log(`📄 Original file name: ${originalName}`)
+
+    // Test data for all rename types
+    const renameTests = [
+      {
+        name: 'Direct Rename',
+        body: {
+          items: [{ id: testFile.id, name: originalName }],
+          newName: `TEST_${Date.now()}_${originalName}`
+        }
+      },
+      {
+        name: 'Prefix Pattern',
+        body: {
+          items: [{ id: testFile.id, name: originalName }],
+          namePrefix: 'PREFIX_TEST',
+          renameType: 'prefix'
+        }
+      },
+      {
+        name: 'Suffix Pattern',
+        body: {
+          items: [{ id: testFile.id, name: originalName }],
+          namePrefix: 'SUFFIX_TEST',
+          renameType: 'suffix'
+        }
+      },
+      {
+        name: 'Numbering Pattern',
+        body: {
+          items: [{ id: testFile.id, name: originalName }],
+          namePrefix: 'NumberedFile',
+          renameType: 'numbering'
+        }
+      },
+      {
+        name: 'Timestamp Pattern',
+        body: {
+          items: [{ id: testFile.id, name: originalName }],
+          namePrefix: 'timestamp',
+          renameType: 'timestamp'
+        }
+      },
+      {
+        name: 'Replace Pattern',
+        body: {
+          items: [{ id: testFile.id, name: originalName }],
+          namePrefix: 'TEST|REPLACED',
+          renameType: 'replace'
+        }
+      },
+      {
+        name: 'Regex Pattern',
+        body: {
+          items: [{ id: testFile.id, name: originalName }],
+          namePrefix: '/[0-9]+/NUM/g',
+          renameType: 'regex'
+        }
+      }
+    ]
+
+    for (const test of renameTests) {
+      console.log(`\n🔄 Testing: ${test.name}`)
+      console.log(`📝 Request:`, JSON.stringify(test.body, null, 2))
+      
+      try {
+        const response = await fetch(`${this.config.baseUrl}/api/drive/files/rename`, {
+          method: 'POST',
+          headers: {
+            'Cookie': this.config.sessionCookie,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(test.body)
+        })
+
+        const result = await response.json()
+        
+        if (response.ok) {
+          console.log(`✅ ${test.name}: Success`)
+          console.log(`📊 Result:`, JSON.stringify(result, null, 2))
+          
+          // If successful, try to restore original name for next test
+          if (result.success && result.results && result.results[0]) {
+            const restoreResponse = await fetch(`${this.config.baseUrl}/api/drive/files/rename`, {
+              method: 'POST',
+              headers: {
+                'Cookie': this.config.sessionCookie,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                items: [{ id: testFile.id, name: result.results[0].newName }],
+                newName: originalName
+              })
+            })
+            
+            if (restoreResponse.ok) {
+              console.log(`🔄 Restored to original name: ${originalName}`)
+            }
+          }
+        } else {
+          console.log(`❌ ${test.name}: Failed (${response.status})`)
+          console.log(`📊 Error:`, JSON.stringify(result, null, 2))
+        }
+
+        // Wait between tests to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+      } catch (error) {
+        console.log(`❌ ${test.name}: Error - ${error.message}`)
+      }
+    }
+
+    console.log('\n✅ Rename operations testing completed')
   }
 
   /**
