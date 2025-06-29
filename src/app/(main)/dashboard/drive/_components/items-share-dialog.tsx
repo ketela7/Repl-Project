@@ -566,7 +566,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             )}
             {isCompleted && (
               <>
-                {(progress.success > 0 || progress.failed > 0) ? (
+                {progress.success > 0 || progress.failed > 0 ? (
                   <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
@@ -627,7 +627,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           )}
           {isCompleted && (
             <>
-              {(progress.success > 0 || progress.failed > 0) ? (
+              {progress.success > 0 || progress.failed > 0 ? (
                 <Button onClick={handleCloseAndRefresh} className="w-full sm:w-auto">
                   <CheckCircle className="mr-2 h-4 w-4" />
                   Refresh Now

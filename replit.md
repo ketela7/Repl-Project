@@ -132,6 +132,7 @@ Changelog:
 - June 29, 2025. Fixed Copy/Move folder selection workflow - reverted automatic tab switching behavior, URL/ID selection now works like Browse Folder button to show folder contents immediately after selection
 - June 29, 2025. Enhanced Copy/Move progress display - "Confirm Destination" button now triggers operation immediately and shows progress, changed button text to "Confirm & Move/Copy" for clarity, eliminated extra step of returning to main dialog before starting operation
 - June 29, 2025. Added comprehensive completion results display - operations now show complete results summary with success/failed/skipped counts, error details, and "Close & Refresh" button that automatically refreshes the page to display updated file listings
+- June 29, 2025. Completed all 9 operations with standardized init-process-end flow - Share, Export, Trash, Delete, and Untrash operations now follow identical pattern to Download/Rename/Move/Copy with comprehensive progress tracking, cancellation support, and completion results display
 ```
 
 ## User Preferences

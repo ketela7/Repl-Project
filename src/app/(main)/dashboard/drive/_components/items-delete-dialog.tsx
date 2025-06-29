@@ -291,7 +291,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           {/* Confirmation Form */}
           <div className="flex-shrink-0 space-y-3">
             <div className="space-y-2">
-              <Label className="text-xs font-medium">Type "CONFIRM DELETE" to proceed:</Label>
+              <Label className="text-xs font-medium">Type &quot;CONFIRM DELETE&quot; to proceed:</Label>
               <Input value={confirmationText} onChange={(e) => setConfirmationText(e.target.value)} placeholder="CONFIRM DELETE" className="h-8 font-mono text-xs" />
             </div>
             <div className="flex items-center space-x-2">
@@ -482,7 +482,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             )}
             {isCompleted && (
               <>
-                {(progress.success > 0 || progress.failed > 0) ? (
+                {progress.success > 0 || progress.failed > 0 ? (
                   <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
@@ -547,7 +547,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           )}
           {isCompleted && (
             <>
-              {(progress.success > 0 || progress.failed > 0) ? (
+              {progress.success > 0 || progress.failed > 0 ? (
                 <Button onClick={handleCloseAndRefresh} className="w-full sm:w-auto">
                   <CheckCircle className="mr-2 h-4 w-4" />
                   Refresh Now

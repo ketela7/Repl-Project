@@ -525,7 +525,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
                     <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
                     <div className="text-sm text-amber-800 dark:text-amber-200">
                       <div className="font-medium">Advanced Feature</div>
-                      <div className="text-amber-700 dark:text-amber-300">Use regular expressions for complex pattern matching. Click "Help & Examples" for guidance.</div>
+                      <div className="text-amber-700 dark:text-amber-300">Use regular expressions for complex pattern matching. Click &quot;Help &amp; Examples&quot; for guidance.</div>
                     </div>
                   </div>
                 </div>
@@ -741,7 +741,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
               )}
               {isCompleted && (
                 <>
-                  {(progress.success > 0 || progress.failed > 0) ? (
+                  {progress.success > 0 || progress.failed > 0 ? (
                     <Button onClick={handleCloseAndRefresh} className="flex-1">
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Refresh Now
@@ -795,7 +795,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
                 )}
                 {isCompleted && (
                   <>
-                    {(progress.success > 0 || progress.failed > 0) ? (
+                    {progress.success > 0 || progress.failed > 0 ? (
                       <Button onClick={handleCloseAndRefresh} className="flex-1">
                         <CheckCircle className="mr-2 h-4 w-4" />
                         Refresh Now
