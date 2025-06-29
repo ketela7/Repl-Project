@@ -235,6 +235,14 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
     setShowDestinationSelector(false)
   }
 
+  const handleConfirmDestinationAndMove = () => {
+    setShowDestinationSelector(false)
+    // Trigger move operation immediately
+    setTimeout(() => {
+      handleMove()
+    }, 100)
+  }
+
   // Render different content based on state
   const renderContent = () => {
     // 1. Initial State - Show selection and destination options
@@ -513,9 +521,9 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
                   Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
                 </div>
               </div>
-              <Button onClick={handleBackToMainDialog} className="w-full sm:w-auto">
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Confirm Destination
+              <Button onClick={handleConfirmDestinationAndMove} className="w-full sm:w-auto">
+                <Move className="mr-2 h-4 w-4" />
+                Confirm & Move
               </Button>
               <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
                 Back
@@ -598,9 +606,9 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
                 Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
               </div>
             </div>
-            <Button onClick={handleBackToMainDialog} className="w-full sm:w-auto">
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Confirm Destination
+            <Button onClick={handleConfirmDestinationAndMove} className="w-full sm:w-auto">
+              <Move className="mr-2 h-4 w-4" />
+              Confirm & Move
             </Button>
             <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
               Back

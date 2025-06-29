@@ -232,6 +232,14 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
     setShowDestinationSelector(false)
   }
 
+  const handleConfirmDestinationAndCopy = () => {
+    setShowDestinationSelector(false)
+    // Trigger copy operation immediately
+    setTimeout(() => {
+      handleCopy()
+    }, 100)
+  }
+
   // Render different content based on state
   const renderContent = () => {
     // 1. Initial State - Show selection and destination options
@@ -510,9 +518,9 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
                   Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
                 </div>
               </div>
-              <Button onClick={handleBackToMainDialog} className="w-full sm:w-auto">
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Confirm Destination
+              <Button onClick={handleConfirmDestinationAndCopy} className="w-full sm:w-auto">
+                <Copy className="mr-2 h-4 w-4" />
+                Confirm & Copy
               </Button>
               <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
                 Back
@@ -595,9 +603,9 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
                 Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
               </div>
             </div>
-            <Button onClick={handleBackToMainDialog} className="w-full sm:w-auto">
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Confirm Destination
+            <Button onClick={handleConfirmDestinationAndCopy} className="w-full sm:w-auto">
+              <Copy className="mr-2 h-4 w-4" />
+              Confirm & Copy
             </Button>
             <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
               Back

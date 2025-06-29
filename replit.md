@@ -130,6 +130,7 @@ Changelog:
 - June 29, 2025. Completed naming consistency improvements - updated all "Restore from Trash" references to "Untrash Items", "Permanent Delete" to "Delete Permanently", and "can be restored" to "can be untrashed" throughout the application for clearer user understanding
 - June 29, 2025. Fixed Operations dialog declaration consistency - removed all "Bulk" references from dialog descriptions, updated button labels to be generic (Move, Copy, Share, etc.), changed descriptions to show actual item counts for both single and multiple selections, unified all dialogs to handle operations as arrays regardless of selection size
 - June 29, 2025. Fixed Copy/Move folder selection workflow - reverted automatic tab switching behavior, URL/ID selection now works like Browse Folder button to show folder contents immediately after selection
+- June 29, 2025. Enhanced Copy/Move progress display - "Confirm Destination" button now triggers operation immediately and shows progress, changed button text to "Confirm & Move/Copy" for clarity, eliminated extra step of returning to main dialog before starting operation
 ```
 
 ## User Preferences
