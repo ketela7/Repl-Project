@@ -289,7 +289,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
           </Button>
         )}
 
-        {/* Restore from Trash */}
+        {/* Untrash Items */}
         {canUntrashCount > 0 && (
           <Button variant="outline" onClick={handleUntrashClick} className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
@@ -297,7 +297,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
             </div>
             <div className="flex flex-col items-start">
               <span className="font-medium">Untrash</span>
-              <span className="text-muted-foreground text-xs">Restore {canUntrashCount} items to original location</span>
+              <span className="text-muted-foreground text-xs">Untrash {canUntrashCount} items to original location</span>
             </div>
           </Button>
         )}
@@ -316,12 +316,12 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="font-medium">Move to Trash</span>
-                    <span className="text-muted-foreground text-xs">Move {canTrashCount} items to trash (can be restored)</span>
+                    <span className="text-muted-foreground text-xs">Move {canTrashCount} items to trash (can be untrashed)</span>
                   </div>
                 </Button>
               )}
 
-              {/* Permanent Delete */}
+              {/* Delete Permanently */}
               {canDeleteCount > 0 && (
                 <Button variant="outline" onClick={handleDeleteClick} className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
@@ -329,7 +329,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
                   </div>
                   <div className="flex flex-col items-start">
                     <span className="font-medium">Delete</span>
-                    <span className="text-muted-foreground text-xs">Delete permanently {canDeleteCount} items (cannot be undone)</span>
+                    <span className="text-muted-foreground text-xs">Delete {canDeleteCount} items permanently (cannot be undone)</span>
                   </div>
                 </Button>
               )}

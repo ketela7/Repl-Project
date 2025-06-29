@@ -229,7 +229,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
               </div>
             </div>
             <div className="space-y-1">
-              <h3 className="text-base font-semibold text-red-600">Permanent Delete</h3>
+              <h3 className="text-base font-semibold text-red-600">Delete Permanently</h3>
               <p className="text-muted-foreground text-xs">
                 {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} will be permanently deleted
               </p>

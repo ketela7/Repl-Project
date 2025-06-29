@@ -1196,7 +1196,7 @@ export function getFileActions(
   canShare: boolean
   canDetails: boolean
   canTrash: boolean
-  canRestore: boolean
+  canUntrash: boolean
   canPermanentDelete: boolean
 } {
   const isTrashed = file.trashed === true
@@ -1234,7 +1234,7 @@ export function getFileActions(
     canCopy: Boolean(finalCapabilities.canCopy),
     canShare: Boolean(finalCapabilities.canShare),
     canTrash: Boolean(finalCapabilities.canTrash),
-    canRestore: Boolean(isTrashed && finalCapabilities.canUntrash),
+    canUntrash: Boolean(isTrashed && finalCapabilities.canUntrash),
     canPermanentDelete: Boolean(finalCapabilities.canDelete),
   }
 }

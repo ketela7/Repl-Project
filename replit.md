@@ -127,6 +127,7 @@ Changelog:
 - June 29, 2025. Completed ItemsRenameDialog alignment with ItemsDownloadDialog pattern - restructured with init-process-end flow in renderContent, implemented identical loading states and progress tracking, updated handleRenameComplete to match handleDownloadComplete pattern, added comprehensive error handling and cancellation support
 - June 29, 2025. Enhanced error handling system with detailed user-friendly messages - replaced "Unknown error" with specific error descriptions and actionable suggestions, added filename validation, improved Google Drive API error mapping, implemented helpful error suggestions for authentication, permissions, filename issues, and network problems
 - June 29, 2025. Fixed Move operation folder validation - created dedicated `/api/drive/folders/validate` endpoint with improved error handling for access denied scenarios, updated DriveDestinationSelector to use new validation system, resolved "Folder not found or access denied" issues when pasting valid folder URLs/IDs
+- June 29, 2025. Completed naming consistency improvements - updated all "Restore from Trash" references to "Untrash Items", "Permanent Delete" to "Delete Permanently", and "can be restored" to "can be untrashed" throughout the application for clearer user understanding
 ```
 
 ## User Preferences

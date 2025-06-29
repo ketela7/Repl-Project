@@ -164,11 +164,11 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
 
       if (!isCancelledRef.current) {
         if (successCount > 0) {
-          successToast.generic(`Restored ${successCount} item${successCount > 1 ? 's' : ''} from trash`)
+          successToast.generic(`Untrashed ${successCount} item${successCount > 1 ? 's' : ''} from trash`)
           onConfirm()
         }
         if (failedCount > 0) {
-          errorToast.generic(`Failed to restore ${failedCount} item${failedCount > 1 ? 's' : ''}`)
+          errorToast.generic(`Failed to untrash ${failedCount} item${failedCount > 1 ? 's' : ''}`)
         }
       }
     } catch (err) {
@@ -216,7 +216,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
               </div>
             </div>
             <div className="space-y-1">
-              <h3 className="text-base font-semibold">Restore from Trash</h3>
+              <h3 className="text-base font-semibold">Untrash Items</h3>
               <p className="text-muted-foreground text-sm">
                 {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} will be restored
               </p>
@@ -373,7 +373,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
             </div>
           </div>
           <div>
-            <h3 className="text-base font-semibold">{isCancelled ? 'Restore Cancelled' : wasSuccessful && !hasErrors ? 'Items Restored' : hasErrors ? 'Partially Restored' : 'No Items Restored'}</h3>
+            <h3 className="text-base font-semibold">{isCancelled ? 'Untrash Cancelled' : wasSuccessful && !hasErrors ? 'Items Untrashed' : hasErrors ? 'Partially Untrashed' : 'No Items Untrashed'}</h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {selectedItems.length} items processed
             </p>
@@ -384,7 +384,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="space-y-1">
             <div className="text-lg font-bold text-green-600">{progress.success}</div>
-            <div className="text-muted-foreground text-xs">Restored</div>
+            <div className="text-muted-foreground text-xs">Untrashed</div>
           </div>
           <div className="space-y-1">
             <div className="text-lg font-bold text-red-600">{progress.failed}</div>
@@ -424,8 +424,8 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
                 <RotateCcw className="h-5 w-5 text-green-600 dark:text-green-400" />
               </div>
               <div>
-                <div className="text-lg font-semibold">Restore from Trash</div>
-                <div className="text-muted-foreground text-sm font-normal">Bulk restore operation</div>
+                <div className="text-lg font-semibold">Untrash Items</div>
+                <div className="text-muted-foreground text-sm font-normal">Bulk untrash operation</div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -440,7 +440,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
                   className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-800`}
                 >
                   <RotateCcw className="mr-2 h-4 w-4" />
-                  Restore Items
+                  Untrash Items
                 </Button>
                 <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
                   Cancel
@@ -474,8 +474,8 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
               <RotateCcw className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <div className="text-lg font-semibold">Restore from Trash</div>
-              <div className="text-muted-foreground text-sm font-normal">Bulk restore operation</div>
+              <div className="text-lg font-semibold">Untrash Items</div>
+              <div className="text-muted-foreground text-sm font-normal">Bulk untrash operation</div>
             </div>
           </AlertDialogTitle>
         </AlertDialogHeader>
@@ -487,7 +487,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
             <>
               <AlertDialogAction onClick={handleUntrash} className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800">
                 <RotateCcw className="mr-2 h-4 w-4" />
-                Restore Items
+                Untrash Items
               </AlertDialogAction>
               <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
             </>
