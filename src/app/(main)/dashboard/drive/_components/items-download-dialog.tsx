@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState } from 'react'
@@ -65,10 +66,6 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
   const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
   const skippedFolders = selectedItems.filter((item) => item.isFolder)
 
-
-  {
-    /* Handle */
-  }
   const handleConfirm = async () => {
     if (downloadableFiles.length === 0) {
       toast.error('No files available for download')
@@ -173,31 +170,11 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     }
   }
 
-  {
-    /* Render */
-  }
-  const isMobile = useIsMobile()
-  const DialogComponent = isMobile ? BottomSheet : Dialog
-  const DialogContentComponent = isMobile ? BottomSheetContent : DialogContent
-  const DialogHeaderComponent = isMobile ? BottomSheetHeader : DialogHeader
-  const DialogTitleComponent = isMobile ? BottomSheetTitle : DialogTitle
-  const DialogFooterComponent = isMobile ? BottomSheetFooter : DialogFooter
-
-  return (
-    <DialogComponent open={isOpen} onOpenChange={handleClose}>
-      <DialogContentComponent className="sm:max-w-[600px]">
-        <DialogHeaderComponent>
-          <DialogTitleComponent className="flex items-center gap-3">
-            <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-              <Download className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold">Download Files</h3>
-              <p className="text-muted-foreground text-sm">Choose how you want to download the selected files</p>
-            </div>
-          </DialogTitleComponent>
-        </DialogHeaderComponent>
-
+  // Render different content based on state
+  const renderContent = () => {
+    // 1. Initial State - Show selection and mode options
+    if (!isProcessing && !isCompleted) {
+      return (
         <div className="space-y-6">
           {/* File Summary */}
           <div className="bg-muted/50 rounded-lg border p-4">
@@ -262,88 +239,8 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
             </div>
           )}
 
-          {/* Progress Display - Show during processing and after completion */}
-          {(isProcessing || isCompleted) && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>{isCompleted ? 'Download Results' : 'Progress'}</span>
-                  <span>
-                    {progress.current} of {progress.total} files
-                  </span>
-                </div>
-                <Progress value={(progress.current / progress.total) * 100} className="h-2" />
-                {isProcessing && progress.currentFile && (
-                  <div className="text-muted-foreground text-xs">Processing: {progress.currentFile}</div>
-                )}
-                {isCompleted && (
-                  <div className="text-green-600 dark:text-green-400 text-xs font-medium">
-                    ✓ Download operation completed
-                  </div>
-                )}
-              </div>
-
-              {/* Progress Summary */}
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-1">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm font-medium text-green-600">{progress.success}</span>
-                  </div>
-                  <div className="text-muted-foreground text-xs">Success</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-1">
-                    <SkipForward className="h-4 w-4 text-orange-600" />
-                    <span className="text-sm font-medium text-orange-600">{progress.skipped}</span>
-                  </div>
-                  <div className="text-muted-foreground text-xs">Skipped</div>
-                </div>
-                <div className="space-y-1">
-                  <div className="flex items-center justify-center gap-1">
-                    <XCircle className="h-4 w-4 text-red-600" />
-                    <span className="text-sm font-medium text-red-600">{progress.failed}</span>
-                  </div>
-                  <div className="text-muted-foreground text-xs">Failed</div>
-                </div>
-              </div>
-
-              {/* Error Details */}
-              {progress.errors.length > 0 && (
-                <div className="space-y-2">
-                  <div className="text-sm font-medium text-red-600">Errors encountered:</div>
-                  <div className="max-h-32 space-y-1 overflow-y-auto">
-                    {progress.errors.map((error, index) => (
-                      <div key={index} className="rounded bg-red-50 p-2 text-xs text-red-600 dark:bg-red-950/50">
-                        <span className="font-medium">{error.file}:</span> {error.error}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Success Summary for Completed Downloads */}
-              {isCompleted && progress.success > 0 && (
-                <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950/50">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle className="mt-0.5 h-5 w-5 text-green-600" />
-                    <div className="space-y-1">
-                      <div className="font-medium text-green-800 dark:text-green-200">
-                        Download Completed Successfully
-                      </div>
-                      <div className="text-sm text-green-700 dark:text-green-300">
-                        {progress.success} file{progress.success > 1 ? 's' : ''} downloaded successfully
-                        {selectedMode === 'exportLinks' ? ' and export file generated' : ''}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
           {/* File Preview */}
-          {downloadableFiles.length > 0 && !isProcessing && (
+          {downloadableFiles.length > 0 && (
             <div className="space-y-2">
               <Label className="text-sm font-medium">Files to download:</Label>
               <div className="bg-muted/30 max-h-32 space-y-1 overflow-y-auto rounded-lg border p-3">
@@ -353,28 +250,230 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
                     {file.size && <span className="ml-2 text-xs">({file.size})</span>}
                   </div>
                 ))}
-                {downloadableFiles.length > 5 && <div className="text-muted-foreground text-xs">... and {downloadableFiles.length - 5} more files</div>}
+                {downloadableFiles.length > 5 && (
+                  <div className="text-muted-foreground text-xs">... and {downloadableFiles.length - 5} more files</div>
+                )}
               </div>
             </div>
           )}
         </div>
+      )
+    }
+
+    // 2. Processing State - Show progress
+    if (isProcessing) {
+      return (
+        <div className="space-y-6">
+          {/* Processing Header */}
+          <div className="text-center">
+            <div className="text-lg font-semibold text-blue-600">Downloading Files...</div>
+            <div className="text-sm text-muted-foreground">Please wait while we process your download</div>
+          </div>
+
+          {/* Progress Display */}
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span>Progress</span>
+                <span>{progress.current} of {progress.total} files</span>
+              </div>
+              <Progress value={(progress.current / progress.total) * 100} className="h-3" />
+              {progress.currentFile && (
+                <div className="text-muted-foreground text-xs">Processing: {progress.currentFile}</div>
+              )}
+            </div>
+
+            {/* Live Progress Summary */}
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-600">{progress.success}</span>
+                </div>
+                <div className="text-muted-foreground text-xs">Success</div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                  <SkipForward className="h-4 w-4 text-orange-600" />
+                  <span className="text-sm font-medium text-orange-600">{progress.skipped}</span>
+                </div>
+                <div className="text-muted-foreground text-xs">Skipped</div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                  <XCircle className="h-4 w-4 text-red-600" />
+                  <span className="text-sm font-medium text-red-600">{progress.failed}</span>
+                </div>
+                <div className="text-muted-foreground text-xs">Failed</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // 3. Completed State - Show results
+    if (isCompleted) {
+      return (
+        <div className="space-y-6">
+          {/* Success Header */}
+          <div className="text-center">
+            <div className="flex justify-center mb-3">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+                <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+              </div>
+            </div>
+            <div className="text-lg font-semibold text-green-600">Download Completed!</div>
+            <div className="text-sm text-muted-foreground">
+              {progress.success} of {progress.total} files processed successfully
+            </div>
+          </div>
+
+          {/* Final Results */}
+          <div className="space-y-4">
+            {/* Progress Bar - Final State */}
+            <div className="space-y-2">
+              <Progress value={100} className="h-2" />
+              <div className="text-green-600 dark:text-green-400 text-xs font-medium text-center">
+                ✓ All operations completed
+              </div>
+            </div>
+
+            {/* Final Summary */}
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div className="space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-lg font-bold text-green-600">{progress.success}</span>
+                </div>
+                <div className="text-muted-foreground text-sm">Success</div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                  <SkipForward className="h-5 w-5 text-orange-600" />
+                  <span className="text-lg font-bold text-orange-600">{progress.skipped}</span>
+                </div>
+                <div className="text-muted-foreground text-sm">Skipped</div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center justify-center gap-1">
+                  <XCircle className="h-5 w-5 text-red-600" />
+                  <span className="text-lg font-bold text-red-600">{progress.failed}</span>
+                </div>
+                <div className="text-muted-foreground text-sm">Failed</div>
+              </div>
+            </div>
+
+            {/* Success Message */}
+            {progress.success > 0 && (
+              <div className="rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900 dark:bg-green-950/50">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="mt-0.5 h-5 w-5 text-green-600" />
+                  <div className="space-y-1">
+                    <div className="font-medium text-green-800 dark:text-green-200">
+                      Download Operation Successful
+                    </div>
+                    <div className="text-sm text-green-700 dark:text-green-300">
+                      {progress.success} file{progress.success > 1 ? 's' : ''} downloaded successfully
+                      {selectedMode === 'exportLinks' ? ' and export file generated' : ''}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error Details */}
+            {progress.errors.length > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-red-600">Errors encountered:</div>
+                <div className="max-h-32 space-y-1 overflow-y-auto">
+                  {progress.errors.map((error, index) => (
+                    <div key={index} className="rounded bg-red-50 p-2 text-xs text-red-600 dark:bg-red-950/50">
+                      <span className="font-medium">{error.file}:</span> {error.error}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
+
+    return null
+  }
+
+  const isMobile = useIsMobile()
+  const DialogComponent = isMobile ? BottomSheet : Dialog
+  const DialogContentComponent = isMobile ? BottomSheetContent : DialogContent
+  const DialogHeaderComponent = isMobile ? BottomSheetHeader : DialogHeader
+  const DialogTitleComponent = isMobile ? BottomSheetTitle : DialogTitle
+  const DialogFooterComponent = isMobile ? BottomSheetFooter : DialogFooter
+
+  return (
+    <DialogComponent open={isOpen} onOpenChange={handleClose}>
+      <DialogContentComponent className="sm:max-w-[600px]">
+        <DialogHeaderComponent>
+          <DialogTitleComponent className="flex items-center gap-3">
+            {!isProcessing && !isCompleted && (
+              <>
+                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                  <Download className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Download Files</h3>
+                  <p className="text-muted-foreground text-sm">Choose how you want to download the selected files</p>
+                </div>
+              </>
+            )}
+            {isProcessing && (
+              <>
+                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
+                  <Download className="h-8 w-8 text-blue-600 dark:text-blue-400 animate-pulse" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Processing Download</h3>
+                  <p className="text-muted-foreground text-sm">Downloading your selected files...</p>
+                </div>
+              </>
+            )}
+            {isCompleted && (
+              <>
+                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
+                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Download Results</h3>
+                  <p className="text-muted-foreground text-sm">Review your download operation results</p>
+                </div>
+              </>
+            )}
+          </DialogTitleComponent>
+        </DialogHeaderComponent>
+
+        {/* Dynamic Content */}
+        {renderContent()}
 
         <DialogFooterComponent className="flex gap-2">
           <Button variant="outline" onClick={handleClose} disabled={isProcessing}>
             {isProcessing ? 'Processing...' : isCompleted ? 'Close' : 'Cancel'}
           </Button>
-          <Button onClick={handleConfirm} disabled={downloadableFiles.length === 0 || isProcessing || isCompleted} className="gap-2">
-            {isProcessing ? (
-              <>Processing...</>
-            ) : isCompleted ? (
-              <>Download Complete</>
-            ) : (
-              <>
-                <Download className="h-4 w-4" />
-                Start Download
-              </>
-            )}
-          </Button>
+          {!isCompleted && (
+            <Button 
+              onClick={handleConfirm} 
+              disabled={downloadableFiles.length === 0 || isProcessing} 
+              className="gap-2"
+            >
+              {isProcessing ? (
+                <>Processing...</>
+              ) : (
+                <>
+                  <Download className="h-4 w-4" />
+                  Start Download
+                </>
+              )}
+            </Button>
+          )}
         </DialogFooterComponent>
       </DialogContentComponent>
     </DialogComponent>
