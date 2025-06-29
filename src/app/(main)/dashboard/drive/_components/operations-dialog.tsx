@@ -9,7 +9,17 @@ import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, B
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { successToast, errorToast } from '@/lib/toast'
-import { ItemsMoveDialog, ItemsCopyDialog, ItemsTrashDialog, ItemsShareDialog, ItemsRenameDialog, ItemsExportDialog, ItemsDeleteDialog, ItemsUntrashDialog, ItemsDownloadDialog } from '@/components/lazy-imports'
+import {
+  ItemsMoveDialog,
+  ItemsCopyDialog,
+  ItemsTrashDialog,
+  ItemsShareDialog,
+  ItemsRenameDialog,
+  ItemsExportDialog,
+  ItemsDeleteDialog,
+  ItemsUntrashDialog,
+  ItemsDownloadDialog,
+} from '@/components/lazy-imports'
 
 interface OperationsDialogProps {
   isOpen?: boolean
@@ -486,7 +496,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
       <ItemsExportDialog isOpen={isExportDialogOpen} onClose={() => setIsExportDialogOpen(false)} onConfirm={handleExportComplete} selectedItems={selectedItems} />
 
-      <ItemsDownloadDialog isOpen={isDownloadDialogOpen} onClose={handleDownloadComplete} selectedItems={selectedItems} />
+      <ItemsDownloadDialog isOpen={isDownloadDialogOpen} onClose={handleDownloadComplete} onConfirm={handleDownloadComplete} selectedItems={selectedItems} />
 
       <ItemsDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={handleDeleteComplete} selectedItems={selectedItems} />
 

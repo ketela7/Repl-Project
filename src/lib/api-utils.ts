@@ -112,3 +112,15 @@ export function validateDownloadRequest(body: any): boolean {
 
   return false
 }
+
+export function validateRenameRequest(body: any): boolean {
+  if (body.items && Array.isArray(body.items) && body.items.length > 0) {
+    return true
+  }
+
+  if (body.fileId && body.newName) {
+    return true
+  }
+
+  return false
+}

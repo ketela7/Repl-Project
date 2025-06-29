@@ -119,9 +119,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-
-
-
 /**
  * Check if file is Google Workspace file that needs export
  */
