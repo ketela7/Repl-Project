@@ -112,54 +112,22 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
   }
 
   // Bulk operation completion handlers with actual API calls
-  const handleMoveComplete = async (targetFolderId: string) => {
-    try {
-      const response = await fetch('/api/drive/files/move', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems,
-          targetFolderId,
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-      }
-    } catch (error) {
-      console.error('Move failed:', error)
-    } finally {
-      setIsMoveDialogOpen(false)
-      setTimeout(() => {
-        console.log('Refreshing after move operation')
-        onRefreshAfterOp?.()
-      }, 500)
-    }
+  const handleMoveComplete = async () => {
+    setIsMoveDialogOpen(false)
+    setTimeout(() => {
+      console.log('Refreshing after move operation')
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
-  const handleCopyComplete = async (targetFolderId: string) => {
-    try {
-      const response = await fetch('/api/drive/files/copy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems.filter((item) => !item.isFolder),
-          targetFolderId,
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-      }
-    } catch (error) {
-      console.error('Copy failed:', error)
-    } finally {
-      setIsCopyDialogOpen(false)
-      setTimeout(() => {
-        console.log('Refreshing after copy operation')
-        onRefreshAfterOp?.()
-      }, 500)
-    }
+  const handleCopyComplete = async () => {
+    // Copy operation is now handled inside the Copy dialog
+    // This function just needs to close the dialog and refresh
+    setIsCopyDialogOpen(false)
+    setTimeout(() => {
+      console.log('Refreshing after copy operation')
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleTrashComplete = async () => {
@@ -186,32 +154,14 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     }
   }
 
-  const handleShareComplete = async (shareOptions: any) => {
-    try {
-      const response = await fetch('/api/drive/files/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems,
-          ...shareOptions,
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-
-        return result.results
-      }
-      return []
-    } catch (error) {
-      console.error('Share failed:', error)
-      return []
-    } finally {
-      setIsShareDialogOpen(false)
-      setTimeout(() => {
-        onRefreshAfterOp?.()
-      }, 500)
-    }
+  const handleShareComplete = async () => {
+    // Share operation is now handled inside the Share dialog
+    // This function just needs to close the dialog and refresh
+    setIsShareDialogOpen(false)
+    setTimeout(() => {
+      console.log('Refreshing after share operation')
+      onRefreshAfterOp?.()
+    }, 500)
   }
 
   const handleRenameComplete = async () => {
@@ -222,50 +172,12 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     }, 500)
   }
 
-  const handleExportComplete = async (downloadMode: string) => {
-    try {
-      if (downloadMode === 'direct') {
-        // Direct download - open each file in new tab with full domain URL
-        const baseUrl = window.location.origin
-        const filesToDownload = selectedItems.filter((item) => !item.isFolder)
-
-        for (const item of filesToDownload) {
-          const fullUrl = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
-          window.open(fullUrl, '_blank')
-          await new Promise((resolve) => setTimeout(resolve, 500))
-        }
-
-        toast.success(`Started downloading ${filesToDownload.length} files`)
-      } else if (downloadMode === 'exportLinks') {
-        // Export links as CSV
-        const response = await fetch('/api/drive/files/export', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: selectedItems.filter((item) => !item.isFolder),
-            format: 'csv',
-          }),
-        })
-
-        if (response.ok) {
-          const blob = await response.blob()
-          const url = URL.createObjectURL(blob)
-          const link = document.createElement('a')
-          link.href = url
-          link.download = 'download-links.csv'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          URL.revokeObjectURL(url)
-          toast.success('Download links exported to CSV')
-        }
-      }
-    } catch (error) {
-      console.error('Download failed:', error)
-      toast.error('Download failed')
-    }
+  const handleExportComplete = async () => {
+    // Export operation is now handled inside the Export dialog
+    // This function just needs to close the dialog and refresh
     setIsExportDialogOpen(false)
     setTimeout(() => {
+      console.log('Refreshing after export operation')
       onRefreshAfterOp?.()
     }, 500)
   }
@@ -497,13 +409,13 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
       )}
 
       {/* Individual Items Operation Dialogs - Direct rendering tanpa Suspense */}
-      <ItemsMoveDialog open={isMoveDialogOpen} onOpenChange={setIsMoveDialogOpen} onConfirm={handleMoveComplete} selectedItems={selectedItems} />
+      <ItemsMoveDialog isOpen={isMoveDialogOpen} onClose={() => setIsMoveDialogOpen(false)} onConfirm={handleMoveComplete} selectedItems={selectedItems} />
 
       <ItemsCopyDialog isOpen={isCopyDialogOpen} onClose={() => setIsCopyDialogOpen(false)} onConfirm={handleCopyComplete} selectedItems={selectedItems} />
 
       <ItemsTrashDialog isOpen={isTrashDialogOpen} onClose={() => setIsTrashDialogOpen(false)} onConfirm={handleDeleteComplete} selectedItems={selectedItems} />
 
-      <ItemsShareDialog open={isShareDialogOpen} onOpenChange={() => setIsShareDialogOpen(false)} onConfirm={handleShareComplete} selectedItems={selectedItems} />
+      <ItemsShareDialog isOpen={isShareDialogOpen} onClose={() => setIsShareDialogOpen(false)} onConfirm={handleShareComplete} selectedItems={selectedItems} />
 
       <ItemsRenameDialog isOpen={isRenameDialogOpen} onClose={() => setIsRenameDialogOpen(false)} onConfirm={handleRenameComplete} selectedItems={selectedItems} />
 

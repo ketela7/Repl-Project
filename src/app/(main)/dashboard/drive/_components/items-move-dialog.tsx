@@ -9,6 +9,7 @@ import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, B
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { DriveDestinationSelector } from '@/components/drive-destination-selector'
 import { cn } from '@/lib/utils'
@@ -16,9 +17,9 @@ import { cn } from '@/lib/utils'
 // FileMoveDialog removed - functionality integrated into bulk operations
 
 interface ItemsMoveDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: (targetFolderId: string) => void
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -27,7 +28,7 @@ interface ItemsMoveDialogProps {
   }>
 }
 
-function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: ItemsMoveDialogProps) {
+function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMoveDialogProps) {
   const [showDestinationSelector, setShowDestinationSelector] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -184,7 +185,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
       if (!isCancelledRef.current) {
         if (successCount > 0) {
           toast.success(`Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`)
-          onConfirm(selectedFolderId)
+          onConfirm()
         }
         if (failedCount > 0) {
           toast.error(`Failed to move ${failedCount} item${failedCount > 1 ? 's' : ''}`)
@@ -221,7 +222,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
         failed: 0,
         errors: [],
       })
-      onOpenChange(false)
+      onClose()
     }
   }
 
@@ -261,55 +262,50 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
               <Badge variant="secondary" className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100">
                 {fileCount} file{fileCount > 1 ? 's' : ''}
               </Badge>
-        )}
-        {folderCount > 0 && (
-          <Badge variant="secondary" className="bg-amber-100 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-            {folderCount} folder{folderCount > 1 ? 's' : ''}
-          </Badge>
-        )}
-      </div>
+            )}
+            {folderCount > 0 && (
+              <Badge variant="secondary" className="bg-amber-100 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+                {folderCount} folder{folderCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+          </div>
 
-      {/* Items Preview - Scrollable */}
-      <div className="min-h-0 flex-1 space-y-2">
-        <h4 className="text-center text-xs font-medium">Items to move:</h4>
-        <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
-          <div className="space-y-1 p-2">
-            {selectedItems.slice(0, 5).map((item) => (
-              <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
-                <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
-                <span className="flex-1 truncate font-mono text-xs" title={item.name}>
-                  {item.name}
-                </span>
-                <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
-                  {item.isFolder ? 'folder' : 'file'}
-                </Badge>
+          {/* Items Preview - Scrollable */}
+          <div className="min-h-0 flex-1 space-y-2">
+            <h4 className="text-center text-xs font-medium">Items to move:</h4>
+            <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
+              <div className="space-y-1 p-2">
+                {selectedItems.slice(0, 5).map((item) => (
+                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                    <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
+                    <span className="flex-1 truncate font-mono text-xs" title={item.name}>
+                      {item.name}
+                    </span>
+                    <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
+                      {item.isFolder ? 'folder' : 'file'}
+                    </Badge>
+                  </div>
+                ))}
+                {selectedItems.length > 5 && <div className="text-muted-foreground py-1 text-center text-xs">... and {selectedItems.length - 5} more items</div>}
               </div>
-            ))}
-            {selectedItems.length > 5 && <div className="text-muted-foreground py-1 text-center text-xs">... and {selectedItems.length - 5} more items</div>}
+            </div>
+          </div>
+
+          {/* Destination Selection */}
+          <div className="flex-shrink-0 space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-medium">Destination:</Label>
+              <Button variant="outline" size="sm" onClick={() => setShowDestinationSelector(true)} className="h-7 text-xs">
+                <Folder className="mr-1 h-3 w-3" />
+                Choose
+              </Button>
+            </div>
+            <div className="bg-muted/30 rounded-md border p-2">
+              <div className="text-muted-foreground text-xs">Moving to:</div>
+              <div className="text-sm font-medium">{selectedFolderName}</div>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Destination Selection */}
-      <div className="flex-shrink-0 space-y-2">
-        <div className="flex items-center justify-between">
-          <Label className="text-xs font-medium">Destination:</Label>
-          <Button
-            variant="outline" 
-            size="sm"
-            onClick={() => setShowDestinationSelector(true)}
-            className="h-7 text-xs"
-          >
-            <Folder className="mr-1 h-3 w-3" />
-            Choose
-          </Button>
-        </div>
-        <div className="rounded-md border bg-muted/30 p-2">
-          <div className="text-xs text-muted-foreground">Moving to:</div>
-          <div className="font-medium text-sm">{selectedFolderName}</div>
-        </div>
-      </div>
-    </div>
       )
     }
 
@@ -320,10 +316,10 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
       return (
         <div className="space-y-4">
           {/* Header */}
-          <div className="text-center space-y-2">
+          <div className="space-y-2 text-center">
             <div className="flex justify-center">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                <Loader2 className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin" />
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400" />
               </div>
             </div>
             <div>
@@ -347,9 +343,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
           {progress.currentFile && (
             <div className="space-y-1">
               <div className="text-sm font-medium">Current:</div>
-              <div className="text-xs text-muted-foreground truncate font-mono bg-muted/50 rounded p-2">
-                {progress.currentFile}
-              </div>
+              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">{progress.currentFile}</div>
             </div>
           )}
 
@@ -357,15 +351,15 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="space-y-1">
               <div className="text-lg font-bold text-green-600">{progress.success}</div>
-              <div className="text-xs text-muted-foreground">Success</div>
+              <div className="text-muted-foreground text-xs">Success</div>
             </div>
             <div className="space-y-1">
               <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-              <div className="text-xs text-muted-foreground">Failed</div>
+              <div className="text-muted-foreground text-xs">Failed</div>
             </div>
             <div className="space-y-1">
               <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-              <div className="text-xs text-muted-foreground">Skipped</div>
+              <div className="text-muted-foreground text-xs">Skipped</div>
             </div>
           </div>
         </div>
@@ -380,14 +374,20 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
     return (
       <div className="space-y-4">
         {/* Results Header */}
-        <div className="text-center space-y-2">
+        <div className="space-y-2 text-center">
           <div className="flex justify-center">
-            <div className={cn(
-              "flex h-12 w-12 items-center justify-center rounded-full",
-              isCancelled ? "bg-orange-100 dark:bg-orange-900/30" :
-              wasSuccessful && !hasErrors ? "bg-green-100 dark:bg-green-900/30" :
-              hasErrors ? "bg-red-100 dark:bg-red-900/30" : "bg-gray-100 dark:bg-gray-900/30"
-            )}>
+            <div
+              className={cn(
+                'flex h-12 w-12 items-center justify-center rounded-full',
+                isCancelled
+                  ? 'bg-orange-100 dark:bg-orange-900/30'
+                  : wasSuccessful && !hasErrors
+                    ? 'bg-green-100 dark:bg-green-900/30'
+                    : hasErrors
+                      ? 'bg-red-100 dark:bg-red-900/30'
+                      : 'bg-gray-100 dark:bg-gray-900/30'
+              )}
+            >
               {isCancelled ? (
                 <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
               ) : wasSuccessful && !hasErrors ? (
@@ -400,11 +400,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
             </div>
           </div>
           <div>
-            <h3 className="text-base font-semibold">
-              {isCancelled ? 'Move Cancelled' :
-               wasSuccessful && !hasErrors ? 'Move Completed' :
-               hasErrors ? 'Move Partially Completed' : 'No Items Moved'}
-            </h3>
+            <h3 className="text-base font-semibold">{isCancelled ? 'Move Cancelled' : wasSuccessful && !hasErrors ? 'Move Completed' : hasErrors ? 'Move Partially Completed' : 'No Items Moved'}</h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {selectedItems.length} items processed
             </p>
@@ -415,15 +411,15 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="space-y-1">
             <div className="text-lg font-bold text-green-600">{progress.success}</div>
-            <div className="text-xs text-muted-foreground">Moved</div>
+            <div className="text-muted-foreground text-xs">Moved</div>
           </div>
           <div className="space-y-1">
             <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-            <div className="text-xs text-muted-foreground">Failed</div>
+            <div className="text-muted-foreground text-xs">Failed</div>
           </div>
           <div className="space-y-1">
             <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-            <div className="text-xs text-muted-foreground">Skipped</div>
+            <div className="text-muted-foreground text-xs">Skipped</div>
           </div>
         </div>
 
@@ -431,9 +427,9 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
         {progress.errors.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
-            <div className="max-h-32 overflow-y-auto space-y-1">
+            <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.errors.map((error, index) => (
-                <div key={index} className="text-xs bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-2">
+                <div key={index} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
                   <div className="font-medium">{error.file}</div>
                   <div className="text-red-600 dark:text-red-400">{error.error}</div>
                 </div>
@@ -448,7 +444,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
   if (isMobile) {
     return (
       <>
-        <BottomSheet open={open} onOpenChange={onOpenChange}>
+        <BottomSheet open={isOpen} onOpenChange={onClose}>
           <BottomSheetContent className="max-h-[90vh]">
             <BottomSheetHeader className="pb-4">
               <BottomSheetTitle className="flex items-center gap-3">
@@ -517,22 +513,9 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
                   Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
                 </div>
               </div>
-              <Button
-                onClick={handleMove}
-                disabled={isLoading || !selectedFolderId}
-                className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Moving...
-                  </>
-                ) : (
-                  <>
-                    <Move className="mr-2 h-4 w-4" />
-                    Move {selectedItems.length} Item{selectedItems.length > 1 ? 's' : ''}
-                  </>
-                )}
+              <Button onClick={handleBackToMainDialog} className="w-full sm:w-auto">
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Confirm Destination
               </Button>
               <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
                 Back
@@ -546,7 +529,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
 
   return (
     <>
-      <Dialog open={open} onOpenChange={handleClose}>
+      <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">

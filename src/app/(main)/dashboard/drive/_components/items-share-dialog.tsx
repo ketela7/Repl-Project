@@ -1,21 +1,23 @@
 'use client'
 
-import { useState } from 'react'
-import { Share2, Globe, Users, Lock, Eye, Edit } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Share2, Globe, Users, Lock, Eye, Edit, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward, Copy } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { cn } from '@/lib/utils'
 
 interface ItemsShareDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: (accessLevel: string, linkAccess: string) => void
+  isOpen: boolean
+  onClose: () => void
+  onConfirm: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -31,235 +33,496 @@ interface ShareResult {
   error?: string
 }
 
-function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: ItemsShareDialogProps) {
+function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsShareDialogProps) {
   const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
   const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>('anyoneWithLink')
-  const [isLoading, setIsLoading] = useState(false)
-  const [showResults, setShowResults] = useState(false)
-  const [shareResults, setShareResults] = useState<ShareResult[]>([])
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [isCancelled, setIsCancelled] = useState(false)
+  const [progress, setProgress] = useState<{
+    current: number
+    total: number
+    currentFile?: string
+    success: number
+    skipped: number
+    failed: number
+    errors: Array<{ file: string; error: string }>
+    shareResults: ShareResult[]
+  }>({
+    current: 0,
+    total: 0,
+    success: 0,
+    skipped: 0,
+    failed: 0,
+    errors: [],
+    shareResults: [],
+  })
+
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
-
-  const handleBulkShare = async () => {
-    setIsLoading(true)
-    try {
-      onConfirm(accessLevel, linkAccess)
-      // Mock results for demo
-      const mockResults: ShareResult[] = selectedItems.map((item) => ({
-        id: item.id,
-        name: item.name,
-        success: true,
-        shareLink: `https://drive.google.com/file/d/${item.id}/view`,
-      }))
-      setShareResults(mockResults)
-      setShowResults(true)
-    } catch (error) {
-      toast.error('Failed to generate share links')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const copyToClipboard = async () => {
-    const links = shareResults
-      .filter((r) => r.success && r.shareLink)
-      .map((r) => `${r.name}: ${r.shareLink}`)
-      .join('\n')
-
-    try {
-      await navigator.clipboard.writeText(links)
-      toast.success('Share links copied to clipboard')
-    } catch (error) {
-      toast.error('Failed to copy to clipboard')
-    }
-  }
-
-  const exportToTxt = () => {
-    const content = shareResults.map((r) => `${r.name}: ${r.success ? r.shareLink : 'Failed'}`).join('\n')
-
-    const blob = new Blob([content], { type: 'text/plain' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'share-links.txt'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  const exportToCsv = () => {
-    const headers = 'Name,Share Link,Status\n'
-    const content = shareResults.map((r) => `"${r.name}","${r.shareLink || ''}","${r.success ? 'Success' : 'Failed'}"`).join('\n')
-
-    const blob = new Blob([headers + content], { type: 'text/csv' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'share-links.csv'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  const exportToJson = () => {
-    const content = JSON.stringify(shareResults, null, 2)
-    const blob = new Blob([content], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'share-links.json'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
 
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
 
-  const renderContent = () => (
-    <div className="space-y-6">
-      {/* Header Info */}
-      <div className="space-y-3 text-center">
-        <div className="flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
-            <Share2 className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+  const handleCancel = () => {
+    isCancelledRef.current = true
+    setIsCancelled(true)
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    setIsProcessing(false)
+    setIsCompleted(true)
+
+    toast.info('Share operation cancelled by user')
+  }
+
+  const handleBulkShare = async () => {
+    if (selectedItems.length === 0) {
+      toast.error('No items selected for sharing')
+      return
+    }
+
+    isCancelledRef.current = false
+    setIsCancelled(false)
+    setIsProcessing(true)
+    setIsCompleted(false)
+
+    abortControllerRef.current = new AbortController()
+
+    try {
+      setProgress({
+        current: 0,
+        total: selectedItems.length,
+        success: 0,
+        skipped: 0,
+        failed: 0,
+        errors: [],
+        shareResults: [],
+      })
+
+      let successCount = 0
+      let failedCount = 0
+      const errors: Array<{ file: string; error: string }> = []
+      const shareResults: ShareResult[] = []
+
+      for (let i = 0; i < selectedItems.length; i++) {
+        if (isCancelledRef.current) {
+          toast.info(`Share cancelled after ${successCount} items`)
+          break
+        }
+
+        const item = selectedItems[i]
+
+        try {
+          setProgress((prev) => ({
+            ...prev,
+            current: i + 1,
+            currentFile: item.name,
+          }))
+
+          if (isCancelledRef.current) {
+            break
+          }
+
+          const response = await fetch('/api/drive/files/share', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: [{ id: item.id }],
+              accessLevel,
+              linkAccess,
+            }),
+            signal: abortControllerRef.current?.signal,
+          })
+
+          if (abortControllerRef.current?.signal.aborted) {
+            break
+          }
+
+          const result = await response.json()
+
+          if (result.success) {
+            successCount++
+            shareResults.push({
+              id: item.id,
+              name: item.name,
+              success: true,
+              shareLink: result.shareLink || `https://drive.google.com/file/d/${item.id}/view`,
+            })
+          } else {
+            throw new Error(result.error || 'Failed to share item')
+          }
+
+          if (!isCancelledRef.current) {
+            await new Promise((resolve) => setTimeout(resolve, 100))
+          }
+        } catch (error: any) {
+          if (abortControllerRef.current?.signal.aborted) {
+            break
+          }
+
+          failedCount++
+          errors.push({
+            file: item.name,
+            error: error.message || 'Share failed',
+          })
+          shareResults.push({
+            id: item.id,
+            name: item.name,
+            success: false,
+            error: error.message || 'Share failed',
+          })
+        }
+
+        setProgress((prev) => ({
+          ...prev,
+          success: successCount,
+          failed: failedCount,
+          errors,
+          shareResults,
+        }))
+
+        if (isCancelledRef.current) {
+          break
+        }
+      }
+
+      if (!isCancelledRef.current) {
+        if (successCount > 0) {
+          toast.success(`Shared ${successCount} item${successCount > 1 ? 's' : ''}`)
+          onConfirm()
+        }
+        if (failedCount > 0) {
+          toast.error(`Failed to share ${failedCount} item${failedCount > 1 ? 's' : ''}`)
+        }
+      }
+    } catch (err) {
+      if (abortControllerRef.current?.signal.aborted) {
+        return
+      }
+      console.error(err)
+      toast.error('Share operation failed')
+    } finally {
+      abortControllerRef.current = null
+      setIsProcessing(false)
+      setIsCompleted(true)
+    }
+  }
+
+  const handleClose = () => {
+    if (!isProcessing) {
+      setIsCompleted(false)
+      setIsCancelled(false)
+      isCancelledRef.current = false
+      abortControllerRef.current = null
+      setProgress({
+        current: 0,
+        total: 0,
+        success: 0,
+        skipped: 0,
+        failed: 0,
+        errors: [],
+        shareResults: [],
+      })
+      onClose()
+    }
+  }
+
+  // Render different content based on state
+  const renderContent = () => {
+    // 1. Initial State - Show share options and items preview
+    if (!isProcessing && !isCompleted) {
+      return (
+        <div className="flex max-h-[60vh] flex-col space-y-4">
+          {/* Header Info - Compact */}
+          <div className="flex-shrink-0 space-y-2 text-center">
+            <div className="flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <Share2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-semibold">Share Items</h3>
+              <p className="text-muted-foreground text-xs">
+                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+              </p>
+            </div>
+          </div>
+
+          {/* Stats - Compact */}
+          <div className="flex flex-shrink-0 justify-center gap-1">
+            {fileCount > 0 && (
+              <Badge variant="secondary" className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                {fileCount} file{fileCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+            {folderCount > 0 && (
+              <Badge variant="secondary" className="bg-green-100 text-xs text-green-800 dark:bg-green-900 dark:text-green-100">
+                {folderCount} folder{folderCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+          </div>
+
+          {/* Share Options */}
+          <div className="flex-shrink-0 space-y-3">
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Permission Level:</Label>
+              <Select value={accessLevel} onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="reader">
+                    <div className="flex items-center gap-2">
+                      <Eye className="h-3 w-3" />
+                      <span>View only</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="commenter">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-3 w-3" />
+                      <span>Comment</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="writer">
+                    <div className="flex items-center gap-2">
+                      <Edit className="h-3 w-3" />
+                      <span>Edit</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-medium">Link Access:</Label>
+              <Select value={linkAccess} onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') => setLinkAccess(value)}>
+                <SelectTrigger className="h-8 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="anyoneWithLink">
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-3 w-3" />
+                      <span>Anyone with link</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="domain">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-3 w-3" />
+                      <span>Domain users</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="anyone">
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-3 w-3" />
+                      <span>Public</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* Items Preview - Scrollable */}
+          <div className="min-h-0 flex-1 space-y-2">
+            <h4 className="text-center text-xs font-medium">Items to share:</h4>
+            <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
+              <div className="space-y-1 p-2">
+                {selectedItems.slice(0, 5).map((item) => (
+                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                    <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
+                    <span className="flex-1 truncate font-mono text-xs" title={item.name}>
+                      {item.name}
+                    </span>
+                    <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
+                      {item.isFolder ? 'folder' : 'file'}
+                    </Badge>
+                  </div>
+                ))}
+                {selectedItems.length > 5 && <div className="text-muted-foreground py-1 text-center text-xs">... and {selectedItems.length - 5} more items</div>}
+              </div>
+            </div>
           </div>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">Share Items</h3>
-          <p className="text-muted-foreground text-sm">
-            Generate share links for {selectedItems.length} item
-            {selectedItems.length > 1 ? 's' : ''} with customizable privacy settings
-          </p>
-        </div>
-      </div>
+      )
+    }
 
-      {/* File Count Badges */}
-      <div className="flex justify-center gap-2">
-        <Badge variant="secondary" className="px-3 py-1">
-          {selectedItems.length} total
-        </Badge>
-        {fileCount > 0 && (
-          <Badge variant="outline" className="px-3 py-1">
-            {fileCount} file{fileCount > 1 ? 's' : ''}
-          </Badge>
-        )}
-        {folderCount > 0 && (
-          <Badge variant="outline" className="px-3 py-1">
-            {folderCount} folder{folderCount > 1 ? 's' : ''}
-          </Badge>
-        )}
-      </div>
+    // 2. Processing State - Show progress with cancellation
+    if (isProcessing) {
+      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
-      {/* Selected Items Preview */}
-      <div className="space-y-3">
-        <Label className="text-sm font-medium">Items to share</Label>
-        <div className="bg-muted/50 max-h-32 space-y-1 overflow-y-auto rounded-lg border p-3">
-          {selectedItems.slice(0, 5).map((item) => (
-            <div key={item.id} className="flex items-center gap-2 text-sm">
-              <Share2 className="h-4 w-4 flex-shrink-0 text-purple-500" />
-              <span className="truncate" title={item.name}>
-                {item.name}
-              </span>
+      return (
+        <div className="space-y-4">
+          {/* Header */}
+          <div className="space-y-2 text-center">
+            <div className="flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400" />
+              </div>
             </div>
-          ))}
-          {selectedItems.length > 5 && <div className="text-muted-foreground text-center text-xs italic">and {selectedItems.length - 5} more items...</div>}
-        </div>
-      </div>
+            <div>
+              <h3 className="text-base font-semibold">Sharing Items...</h3>
+              <p className="text-muted-foreground text-sm">
+                {progress.current} of {progress.total} items
+              </p>
+            </div>
+          </div>
 
-      {/* Share Settings */}
+          {/* Progress */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Progress</span>
+              <span>{progressPercentage}%</span>
+            </div>
+            <Progress value={progressPercentage} className="w-full" />
+          </div>
+
+          {/* Current File */}
+          {progress.currentFile && (
+            <div className="space-y-1">
+              <div className="text-sm font-medium">Current:</div>
+              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">{progress.currentFile}</div>
+            </div>
+          )}
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="space-y-1">
+              <div className="text-lg font-bold text-green-600">{progress.success}</div>
+              <div className="text-muted-foreground text-xs">Success</div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-lg font-bold text-red-600">{progress.failed}</div>
+              <div className="text-muted-foreground text-xs">Failed</div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
+              <div className="text-muted-foreground text-xs">Skipped</div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // 3. Completed State - Show results and share links
+    const totalProcessed = progress.success + progress.failed + progress.skipped
+    const wasSuccessful = progress.success > 0
+    const hasErrors = progress.failed > 0
+
+    return (
       <div className="space-y-4">
-        <div className="space-y-3">
-          <Label className="text-sm font-medium">Access level</Label>
-          <Select value={accessLevel} onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="reader">
-                <div className="flex items-center gap-2">
-                  <Eye className="h-4 w-4" />
-                  <div>
-                    <p className="font-medium">Viewer</p>
-                    <p className="text-muted-foreground text-xs">Can view only</p>
-                  </div>
-                </div>
-              </SelectItem>
-              <SelectItem value="commenter">
-                <div className="flex items-center gap-2">
-                  <Edit className="h-4 w-4" />
-                  <div>
-                    <p className="font-medium">Commenter</p>
-                    <p className="text-muted-foreground text-xs">Can view and comment</p>
-                  </div>
-                </div>
-              </SelectItem>
-              <SelectItem value="writer">
-                <div className="flex items-center gap-2">
-                  <Edit className="h-4 w-4" />
-                  <div>
-                    <p className="font-medium">Editor</p>
-                    <p className="text-muted-foreground text-xs">Can view, comment, and edit</p>
-                  </div>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Results Header */}
+        <div className="space-y-2 text-center">
+          <div className="flex justify-center">
+            <div
+              className={cn(
+                'flex h-12 w-12 items-center justify-center rounded-full',
+                isCancelled
+                  ? 'bg-orange-100 dark:bg-orange-900/30'
+                  : wasSuccessful && !hasErrors
+                    ? 'bg-green-100 dark:bg-green-900/30'
+                    : hasErrors
+                      ? 'bg-red-100 dark:bg-red-900/30'
+                      : 'bg-gray-100 dark:bg-gray-900/30'
+              )}
+            >
+              {isCancelled ? (
+                <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              ) : wasSuccessful && !hasErrors ? (
+                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+              ) : hasErrors ? (
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              ) : (
+                <SkipForward className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+              )}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-base font-semibold">{isCancelled ? 'Share Cancelled' : wasSuccessful && !hasErrors ? 'Items Shared' : hasErrors ? 'Partially Shared' : 'No Items Shared'}</h3>
+            <p className="text-muted-foreground text-sm">
+              {totalProcessed} of {selectedItems.length} items processed
+            </p>
+          </div>
         </div>
 
-        <div className="space-y-3">
-          <Label className="text-sm font-medium">Who has access</Label>
-          <Select value={linkAccess} onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') => setLinkAccess(value)}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="anyoneWithLink">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  <div>
-                    <p className="font-medium">Anyone with the link</p>
-                    <p className="text-muted-foreground text-xs">Anyone who has the link can access</p>
-                  </div>
-                </div>
-              </SelectItem>
-              <SelectItem value="anyone">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4" />
-                  <div>
-                    <p className="font-medium">Anyone on the internet</p>
-                    <p className="text-muted-foreground text-xs">Public on the web</p>
-                  </div>
-                </div>
-              </SelectItem>
-              <SelectItem value="domain">
-                <div className="flex items-center gap-2">
-                  <Lock className="h-4 w-4" />
-                  <div>
-                    <p className="font-medium">Anyone in your organization</p>
-                    <p className="text-muted-foreground text-xs">People in your organization can find and access</p>
-                  </div>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+        {/* Results Summary */}
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-green-600">{progress.success}</div>
+            <div className="text-muted-foreground text-xs">Shared</div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-red-600">{progress.failed}</div>
+            <div className="text-muted-foreground text-xs">Failed</div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
+            <div className="text-muted-foreground text-xs">Skipped</div>
+          </div>
         </div>
-      </div>
 
-      {/* Info Alert */}
-      <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
-        <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-green-500">
-          <div className="h-1.5 w-1.5 rounded-full bg-white" />
-        </div>
-        <div className="text-sm text-green-800 dark:text-green-200">Share links will be generated for all selected items with the chosen access settings.</div>
+        {/* Share Links */}
+        {progress.shareResults.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium">Share Links:</h4>
+            <div className="max-h-32 space-y-1 overflow-y-auto">
+              {progress.shareResults.map((result, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    'rounded border p-2 text-xs',
+                    result.success ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+                  )}
+                >
+                  <div className="font-medium">{result.name}</div>
+                  {result.success && result.shareLink ? (
+                    <div className="mt-1 flex items-center gap-1">
+                      <a href={result.shareLink} target="_blank" rel="noopener noreferrer" className="flex-1 truncate text-xs text-blue-600 hover:underline dark:text-blue-400">
+                        {result.shareLink}
+                      </a>
+                      <Button size="sm" variant="ghost" className="h-4 w-4 p-0" onClick={() => navigator.clipboard.writeText(result.shareLink || '')}>
+                        <Copy className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-xs text-red-600 dark:text-red-400">{result.error}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Error Details */}
+        {progress.errors.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-red-600">Errors:</h4>
+            <div className="max-h-32 space-y-1 overflow-y-auto">
+              {progress.errors.map((error, index) => (
+                <div key={index} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
+                  <div className="font-medium">{error.file}</div>
+                  <div className="text-red-600 dark:text-red-400">{error.error}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-    </div>
-  )
+    )
+  }
 
   if (isMobile) {
     return (
-      <BottomSheet open={open} onOpenChange={onOpenChange}>
-        <BottomSheetContent className="flex max-h-[90vh] flex-col">
+      <BottomSheet open={isOpen} onOpenChange={handleClose}>
+        <BottomSheetContent className="max-h-[90vh]">
           <BottomSheetHeader className="pb-4">
             <BottomSheetTitle className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                <Share2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
+                <Share2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div>
                 <div className="text-lg font-semibold">Share Items</div>
@@ -268,27 +531,32 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
             </BottomSheetTitle>
           </BottomSheetHeader>
 
-          <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">{renderContent()}</div>
+          <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
-          <BottomSheetFooter className="bg-background flex-shrink-0 border-t p-4">
-            <div className="grid w-full gap-4">
-              <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="min-h-[48px] text-base font-medium">
-                {isLoading ? (
-                  <>
-                    <Share2 className="mr-2 h-4 w-4 animate-pulse" />
-                    Sharing...
-                  </>
-                ) : (
-                  <>
-                    <Share2 className="mr-2 h-4 w-4" />
-                    Generate {selectedItems.length} Share Links
-                  </>
-                )}
+          <BottomSheetFooter className={cn('grid gap-4')}>
+            {!isProcessing && !isCompleted && (
+              <>
+                <Button onClick={handleBulkShare} className={cn('touch-target min-h-[44px] bg-blue-600 text-white hover:bg-blue-700 active:scale-95')}>
+                  <Share2 className="mr-2 h-4 w-4" />
+                  Share Items
+                </Button>
+                <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  Cancel
+                </Button>
+              </>
+            )}
+            {isProcessing && (
+              <Button onClick={handleCancel} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <XCircle className="mr-2 h-4 w-4" />
+                Cancel Operation
               </Button>
-              <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="min-h-[48px] text-base font-medium">
-                Cancel
+            )}
+            {isCompleted && (
+              <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Close
               </Button>
-            </div>
+            )}
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
@@ -296,38 +564,46 @@ function ItemsShareDialog({ open, onOpenChange, onConfirm, selectedItems }: Item
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-              <Share2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
+              <Share2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <div className="text-lg font-semibold">Share Items</div>
               <div className="text-muted-foreground text-sm font-normal">Bulk share operation</div>
             </div>
           </DialogTitle>
-          <DialogDescription className="space-y-4 pt-2">{renderContent()}</DialogDescription>
         </DialogHeader>
 
-        <DialogFooter className="flex-col gap-2 sm:flex-row">
-          <Button onClick={handleBulkShare} disabled={isLoading || selectedItems.length === 0} className="w-full sm:w-auto">
-            {isLoading ? (
-              <>
-                <Share2 className="mr-2 h-4 w-4 animate-pulse" />
-                Sharing...
-              </>
-            ) : (
-              <>
+        <div className="space-y-4 py-4">{renderContent()}</div>
+
+        <DialogFooter className="flex flex-col gap-2 sm:flex-row">
+          {!isProcessing && !isCompleted && (
+            <>
+              <Button onClick={handleBulkShare} className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800">
                 <Share2 className="mr-2 h-4 w-4" />
-                Generate Share Links
-              </>
-            )}
-          </Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="w-full sm:w-auto">
-            Cancel
-          </Button>
+                Share Items
+              </Button>
+              <Button variant="outline" onClick={handleClose} className="w-full sm:w-auto">
+                Cancel
+              </Button>
+            </>
+          )}
+          {isProcessing && (
+            <Button onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
+              <XCircle className="mr-2 h-4 w-4" />
+              Cancel Operation
+            </Button>
+          )}
+          {isCompleted && (
+            <Button onClick={handleClose} className="w-full sm:w-auto">
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Close
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
