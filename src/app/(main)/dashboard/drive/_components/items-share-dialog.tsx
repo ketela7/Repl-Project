@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Share2, Globe, Users, Lock, Eye, Edit, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward, Copy, Download } from 'lucide-react'
+import { Share2, Globe, Users, Lock, Eye, Edit, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward, Copy, Download, ChevronDown, FileText, Code } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
@@ -237,7 +238,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     }
   }
 
-  const handleExportCSV = () => {
+  const handleExportData = (format: 'csv' | 'txt' | 'json') => {
     const successfulShares = progress.shareResults.filter((result) => result.success && result.shareLink)
 
     if (successfulShares.length === 0) {
@@ -245,24 +246,59 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
       return
     }
 
-    // Create CSV content with header
-    const csvHeader = 'name,sharelink\n'
-    const csvContent = successfulShares.map((result) => `"${result.name}","${result.shareLink}"`).join('\n')
+    let content: string
+    let mimeType: string
+    let fileExtension: string
 
-    const fullCsv = csvHeader + csvContent
+    switch (format) {
+      case 'csv':
+        // Create CSV content with header
+        const csvHeader = 'name,sharelink\n'
+        const csvContent = successfulShares.map((result) => `"${result.name}","${result.shareLink}"`).join('\n')
+        content = csvHeader + csvContent
+        mimeType = 'text/csv;charset=utf-8;'
+        fileExtension = 'csv'
+        break
+
+      case 'txt':
+        // Create plain text content
+        content = successfulShares.map((result) => `${result.name}: ${result.shareLink}`).join('\n')
+        mimeType = 'text/plain;charset=utf-8;'
+        fileExtension = 'txt'
+        break
+
+      case 'json':
+        // Create JSON content
+        const jsonData = {
+          exportDate: new Date().toISOString(),
+          totalShares: successfulShares.length,
+          shares: successfulShares.map((result) => ({
+            name: result.name,
+            shareLink: result.shareLink,
+            fileId: result.fileId,
+          })),
+        }
+        content = JSON.stringify(jsonData, null, 2)
+        mimeType = 'application/json;charset=utf-8;'
+        fileExtension = 'json'
+        break
+
+      default:
+        return
+    }
 
     // Create and download the file
-    const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' })
+    const blob = new Blob([content], { type: mimeType })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `share-links-${new Date().toISOString().split('T')[0]}.csv`)
+    link.setAttribute('download', `share-links-${new Date().toISOString().split('T')[0]}.${fileExtension}`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
 
-    toast.success(`Exported ${successfulShares.length} share links to CSV`)
+    toast.success(`Exported ${successfulShares.length} share links to ${format.toUpperCase()}`)
   }
 
   // Render different content based on state
@@ -606,10 +642,29 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                   </Button>
                 )}
                 {progress.success > 0 && (
-                  <Button onClick={handleExportCSV} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
-                    <Download className="mr-2 h-4 w-4" />
-                    Export CSV
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                        <Download className="mr-2 h-4 w-4" />
+                        Export
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={() => handleExportData('csv')}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Export as CSV
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExportData('txt')}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Export as TXT
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleExportData('json')}>
+                        <Code className="mr-2 h-4 w-4" />
+                        Export as JSON
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
                 {(progress.success > 0 || progress.failed > 0) && (
                   <Button onClick={handleClose} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
@@ -673,10 +728,29 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                 </Button>
               )}
               {progress.success > 0 && (
-                <Button onClick={handleExportCSV} variant="outline" className="w-full sm:w-auto">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export CSV
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="w-full sm:w-auto">
+                      <Download className="mr-2 h-4 w-4" />
+                      Export
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleExportData('csv')}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export as CSV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExportData('txt')}>
+                      <FileText className="mr-2 h-4 w-4" />
+                      Export as TXT
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleExportData('json')}>
+                      <Code className="mr-2 h-4 w-4" />
+                      Export as JSON
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               )}
               {(progress.success > 0 || progress.failed > 0) && (
                 <Button onClick={handleClose} variant="outline" className="w-full sm:w-auto">
