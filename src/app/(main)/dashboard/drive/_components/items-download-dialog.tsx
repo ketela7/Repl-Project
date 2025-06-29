@@ -1,7 +1,7 @@
 
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Download, FileText, AlertTriangle, CheckCircle, XCircle, SkipForward } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -63,14 +63,28 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     errors: [],
   })
 
+  // Use ref for immediate cancellation control
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const isCancelledRef = useRef(false)
+
   // Filter downloadable files (only files, skip folders)
   const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
   const skippedFolders = selectedItems.filter((item) => item.isFolder)
 
   const handleCancel = () => {
+    // Immediately set cancellation flags
+    isCancelledRef.current = true
     setIsCancelled(true)
+    
+    // Abort any ongoing network requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Stop processing
     setIsProcessing(false)
     setIsCompleted(true)
+    
     toast.info('Download operation cancelled by user')
   }
 
@@ -79,8 +93,15 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
       toast.error('No files available for download')
       return
     }
-    setIsProcessing(true)
+    
+    // Reset cancellation flags
+    isCancelledRef.current = false
     setIsCancelled(false)
+    setIsProcessing(true)
+    
+    // Create new AbortController for this operation
+    abortControllerRef.current = new AbortController()
+    
     try {
       const baseUrl = window.location.origin
 
@@ -99,10 +120,11 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
         let failedCount = 0
         const errors: Array<{ file: string; error: string }> = []
 
-        // Download files with progress tracking
+        // Download files with progress tracking and cancellation support
         for (let i = 0; i < downloadableFiles.length; i++) {
-          // Check if operation was cancelled
-          if (isCancelled) {
+          // Check cancellation using ref (immediate)
+          if (isCancelledRef.current) {
+            toast.info(`Download cancelled after ${successCount} files`)
             break
           }
 
@@ -116,13 +138,28 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
             }))
 
             const url = `${baseUrl}/api/drive/files/download?fileId=${file.id}`
+            
+            // Check cancellation before opening download
+            if (isCancelledRef.current) {
+              break
+            }
+            
             window.open(url, '_blank')
             successCount++
 
-            // Small delay to prevent browser blocking multiple downloads
-            await new Promise(resolve => setTimeout(resolve, 5000))
+            // Interruptible delay with cancellation checks
+            for (let delayStep = 0; delayStep < 10; delayStep++) {
+              if (isCancelledRef.current) {
+                break
+              }
+              await new Promise(resolve => setTimeout(resolve, 500)) // 500ms * 10 = 5 seconds total
+            }
 
           } catch (error: any) {
+            if (abortControllerRef.current?.signal.aborted) {
+              break // Operation was cancelled
+            }
+            
             failedCount++
             errors.push({
               file: file.name,
@@ -138,36 +175,53 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
             errors
           }))
 
-          // Check cancellation again after each file
-          if (isCancelled) {
+          // Final cancellation check
+          if (isCancelledRef.current) {
             break
           }
         }
 
-        if (successCount > 0) {
-          toast.success(`Started downloading ${successCount} file${successCount > 1 ? 's' : ''}`)
-        }
-        if (failedCount > 0) {
-          toast.error(`Failed to download ${failedCount} file${failedCount > 1 ? 's' : ''}`)
+        // Show results only if not cancelled
+        if (!isCancelledRef.current) {
+          if (successCount > 0) {
+            toast.success(`Started downloading ${successCount} file${successCount > 1 ? 's' : ''}`)
+          }
+          if (failedCount > 0) {
+            toast.error(`Failed to download ${failedCount} file${failedCount > 1 ? 's' : ''}`)
+          }
         }
 
       } else if (selectedMode === 'exportLinks') {
+        // Check cancellation before export
+        if (isCancelledRef.current) {
+          return
+        }
+        
         let csv = 'File Name,Download Link\n'
         downloadableFiles.forEach((item) => {
           const url = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
           csv += `"${item.name}","${url}"\n`
         })
-        const blob = new Blob([csv], { type: 'text/csv' })
-        const link = document.createElement('a')
-        link.href = URL.createObjectURL(blob)
-        link.download = 'download_links.csv'
-        link.click()
-        toast.success('Download links exported')
+        
+        if (!isCancelledRef.current) {
+          const blob = new Blob([csv], { type: 'text/csv' })
+          const link = document.createElement('a')
+          link.href = URL.createObjectURL(blob)
+          link.download = 'download_links.csv'
+          link.click()
+          toast.success('Download links exported')
+        }
       }
     } catch (err) {
+      if (abortControllerRef.current?.signal.aborted) {
+        // Operation was cancelled, don't show error
+        return
+      }
       console.error(err)
       toast.error('Download failed')
     } finally {
+      // Clean up
+      abortControllerRef.current = null
       setIsProcessing(false)
       setIsCompleted(true)
     }
@@ -178,6 +232,8 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
       // Reset states when closing
       setIsCompleted(false)
       setIsCancelled(false)
+      isCancelledRef.current = false
+      abortControllerRef.current = null
       setProgress({
         current: 0,
         total: 0,
