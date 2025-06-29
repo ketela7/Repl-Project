@@ -320,7 +320,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
                 {downloadableFiles.slice(0, 5).map((file) => (
                   <div key={file.id} className="text-muted-foreground text-sm">
                     {file.name}
-                    {file.size && <span className="ml-2 text-xs">({file.size})</span>}
+                    {(file as any).size && <span className="ml-2 text-xs">({(file as any).size})</span>}
                   </div>
                 ))}
                 {downloadableFiles.length > 5 && <div className="text-muted-foreground text-xs">... and {downloadableFiles.length - 5} more files</div>}

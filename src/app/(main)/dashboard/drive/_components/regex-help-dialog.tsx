@@ -148,7 +148,7 @@ function RegexHelpDialog({ isOpen, onClose }: RegexHelpDialogProps) {
                         Pattern: {example.pattern}
                       </Badge>
                       <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
-                        Replace: {example.replacement}
+                        Replace: {typeof example.replacement === 'function' ? example.replacement('example') : example.replacement}
                       </Badge>
                     </div>
 

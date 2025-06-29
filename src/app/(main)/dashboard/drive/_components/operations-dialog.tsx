@@ -344,7 +344,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
               {/* Move to Trash */}
               {canTrashCount > 0 && (
-                <Button variant="outline" onClick={handleDeleteClick} className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30">
+                <Button variant="outline" onClick={handleTrashClick} className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
                     <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
                   </div>
