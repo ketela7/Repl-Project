@@ -63,7 +63,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
   // Filter downloadable files (only files, skip folders)
   const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
   const skippedFolders = selectedItems.filter((item) => item.isFolder)
-  const selectedModeData = DOWNLOAD_MODES.find((mode) => mode.id === selectedMode)
+
 
   {
     /* Handle */
