@@ -102,31 +102,23 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
   const validateFolderId = async (folderId: string) => {
     setIsValidating(true)
     try {
-      const response = await fetch('/api/drive/files/details', {
+      const response = await fetch('/api/drive/folders/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileIds: [folderId] }),
+        body: JSON.stringify({ folderId }),
       })
 
       const data = await response.json()
 
-      if (data.success && data.files?.[0]) {
-        const file = data.files[0]
-        if (file.mimeType === 'application/vnd.google-apps.folder') {
-          setValidationResult({
-            isValid: true,
-            folderName: file.name,
-          })
-        } else {
-          setValidationResult({
-            isValid: false,
-            error: 'The provided ID is not a folder',
-          })
-        }
+      if (data.success && data.folder) {
+        setValidationResult({
+          isValid: true,
+          folderName: data.folder.name,
+        })
       } else {
         setValidationResult({
           isValid: false,
-          error: 'Folder not found or access denied',
+          error: data.error || 'Folder validation failed',
         })
       }
     } catch (error) {

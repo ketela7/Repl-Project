@@ -164,11 +164,11 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
 
       if (!isCancelledRef.current) {
         if (successCount > 0) {
-          successToast(`Restored ${successCount} item${successCount > 1 ? 's' : ''} from trash`)
+          successToast.generic(`Restored ${successCount} item${successCount > 1 ? 's' : ''} from trash`)
           onConfirm()
         }
         if (failedCount > 0) {
-          errorToast(`Failed to restore ${failedCount} item${failedCount > 1 ? 's' : ''}`)
+          errorToast.generic(`Failed to restore ${failedCount} item${failedCount > 1 ? 's' : ''}`)
         }
       }
     } catch (err) {
@@ -176,7 +176,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         return
       }
       console.error(err)
-      errorToast('Untrash operation failed')
+      errorToast.generic('Untrash operation failed')
     } finally {
       abortControllerRef.current = null
       setIsProcessing(false)
