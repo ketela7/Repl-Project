@@ -28,10 +28,9 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       setLoading(true)
       setError(null)
 
-      const response = await fetch('/api/drive/files/essential', {
-        method: 'POST',
+      const response = await fetch(`/api/drive/files?fileId=${folderId}`, {
+        method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fileId: folderId }),
       })
       if (!response.ok) {
         throw new Error(`Failed to fetch folder: ${response.status}`)
@@ -47,10 +46,9 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
       while (currentParent && currentParent !== 'root' && depth < maxDepth) {
         try {
-          const parentResponse = await fetch('/api/drive/files/essential', {
-            method: 'POST',
+          const parentResponse = await fetch(`/api/drive/files?fileId=${currentParent}`, {
+            method: 'GET',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fileId: currentParent }),
           })
           if (!parentResponse.ok) break
 
