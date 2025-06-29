@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     const { fileId, namePrefix, newName, items, renameType = 'prefix' } = body
 
     // Determine operation type based on items array or single fileId
-    const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
+    const fileIds = items && items.length > 0 ? items.map((item: any) => item.id || item.fileId) : [fileId]
     const isBulkOperation = items && items.length > 1
 
     if (!fileIds || fileIds.length === 0) {

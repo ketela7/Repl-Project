@@ -274,10 +274,11 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
             body: JSON.stringify({
               items: [
                 {
-                  fileId: item.id,
-                  newName: preview.preview,
+                  id: item.id,
+                  name: item.name,
                 },
               ],
+              newName: preview.preview,
             }),
             signal: abortControllerRef.current.signal,
           })
