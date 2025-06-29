@@ -1,8 +1,10 @@
 'use client'
 
 import React, { useState, useRef } from 'react'
-import { Edit3, Hash, Calendar, AlignLeft, Code2, Loader2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react'
+import { Edit3, Hash, Calendar, AlignLeft, Code2, Loader2, CheckCircle, XCircle, AlertTriangle, HelpCircle } from 'lucide-react'
 import { toast } from 'sonner'
+
+import { RegexHelpDialog } from './regex-help-dialog'
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
@@ -60,7 +62,7 @@ const RENAME_MODES = [
   {
     id: 'regex',
     label: 'Regular Expression',
-    description: 'Advanced pattern-based renaming',
+    description: 'Advanced pattern matching with regex (click help for examples)',
     icon: Code2,
   },
 ]
@@ -102,6 +104,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
 
   // Preview states
   const [previews, setPreviews] = useState<Array<{ original: string; preview: string; valid: boolean }>>([])
+  const [showRegexHelp, setShowRegexHelp] = useState(false)
 
   const isMobile = useIsMobile()
 
@@ -503,13 +506,46 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
 
             {selectedMode === 'regex' && (
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="regex-pattern">Regular Expression Pattern</Label>
-                  <Input id="regex-pattern" placeholder="e.g., \\d+ or [a-z]+" value={regexPattern} onChange={(e) => setRegexPattern(e.target.value)} />
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-medium">Regular Expression</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowRegexHelp(true)}
+                    className="h-8 px-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                  >
+                    <HelpCircle className="h-4 w-4 mr-1" />
+                    Help & Examples
+                  </Button>
+                </div>
+                <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                    <div className="text-sm text-amber-800 dark:text-amber-200">
+                      <div className="font-medium">Advanced Feature</div>
+                      <div className="text-amber-700 dark:text-amber-300">Use regular expressions for complex pattern matching. Click "Help & Examples" for guidance.</div>
+                    </div>
+                  </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="regex-replace">Replacement</Label>
-                  <Input id="regex-replace" placeholder="e.g., $1 or NEW_" value={regexReplace} onChange={(e) => setRegexReplace(e.target.value)} />
+                  <Label htmlFor="regex-pattern">Pattern to Find</Label>
+                  <Input 
+                    id="regex-pattern" 
+                    placeholder="e.g., \\d+ (finds numbers) or [a-z]+ (finds lowercase letters)" 
+                    value={regexPattern} 
+                    onChange={(e) => setRegexPattern(e.target.value)}
+                    className="font-mono"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="regex-replace">Replacement Text</Label>
+                  <Input 
+                    id="regex-replace" 
+                    placeholder="e.g., $1 (use captured group) or NEW_ (literal text)" 
+                    value={regexReplace} 
+                    onChange={(e) => setRegexReplace(e.target.value)}
+                    className="font-mono"
+                  />
                 </div>
               </div>
             )}
@@ -697,6 +733,11 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
             </div>
           </BottomSheetFooter>
         </BottomSheetContent>
+        
+        <RegexHelpDialog 
+          isOpen={showRegexHelp} 
+          onClose={() => setShowRegexHelp(false)} 
+        />
       </BottomSheet>
     )
   }
@@ -728,6 +769,11 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
           </div>
         </DialogFooter>
       </DialogContent>
+      
+      <RegexHelpDialog 
+        isOpen={showRegexHelp} 
+        onClose={() => setShowRegexHelp(false)} 
+      />
     </Dialog>
   )
 }
