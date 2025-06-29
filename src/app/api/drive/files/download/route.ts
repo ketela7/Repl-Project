@@ -38,38 +38,80 @@ export async function GET(request: NextRequest) {
       const exportFormat = getExportFormat(mimeType)
       const response = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
-          return await driveService.drive.files.export({
-            fileId,
-            mimeType: exportFormat,
-          })
+          return await driveService.drive.files.export(
+            {
+              fileId,
+              mimeType: exportFormat,
+            },
+            {
+              responseType: 'stream',
+            }
+          )
         })
       })
 
       const exportFileName = `${fileName.replace(/\.[^/.]+$/, '')}.${getFileExtension(exportFormat)}`
 
-      return new NextResponse(response.data as BodyInit, {
+      // Convert Node.js stream to Web Stream
+      const stream = new ReadableStream({
+        start(controller) {
+          response.data.on('data', (chunk: Buffer) => {
+            controller.enqueue(new Uint8Array(chunk))
+          })
+          response.data.on('end', () => {
+            controller.close()
+          })
+          response.data.on('error', (err: Error) => {
+            controller.error(err)
+          })
+        },
+      })
+
+      return new Response(stream, {
         headers: {
           'Content-Type': exportFormat,
           'Content-Disposition': `attachment; filename="${exportFileName}"`,
+          'Cache-Control': 'no-cache',
         },
       })
     }
 
-    // Regular file download - direct pipe like GitHub example
+    // Regular file download - stream response
     const response = await throttledDriveRequest(async () => {
       return await retryDriveApiCall(async () => {
-        return await driveService.drive.files.get({
-          fileId,
-          alt: 'media',
-        })
+        return await driveService.drive.files.get(
+          {
+            fileId,
+            alt: 'media',
+          },
+          {
+            responseType: 'stream',
+          }
+        )
       })
     })
 
-    return new NextResponse(response.data as BodyInit, {
+    // Convert Node.js stream to Web Stream
+    const stream = new ReadableStream({
+      start(controller) {
+        response.data.on('data', (chunk: Buffer) => {
+          controller.enqueue(new Uint8Array(chunk))
+        })
+        response.data.on('end', () => {
+          controller.close()
+        })
+        response.data.on('error', (err: Error) => {
+          controller.error(err)
+        })
+      },
+    })
+
+    return new Response(stream, {
       headers: {
         'Content-Type': mimeType || 'application/octet-stream',
         'Content-Disposition': `attachment; filename="${fileName}"`,
         ...(size && { 'Content-Length': size }),
+        'Cache-Control': 'no-cache',
       },
     })
   } catch (error) {
@@ -92,7 +134,7 @@ export async function POST(request: NextRequest) {
       items = [items]
     }
 
-    // Return streaming URLs for _blank opening - no blob processing
+    // Return streaming URLs for _blank opening
     const downloadUrls = items.map((item: any) => ({
       id: item.id,
       name: item.name,
