@@ -77,13 +77,64 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     try {
       const baseUrl = window.location.origin
 
-      if (selectedModeData === 'direct') {
-        toast.success(`Started downloading ${downloadableFiles.length} files`)
-        downloadableFiles.forEach((item) => {
-          const url = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
-          window.open(url, '_blank')
+      if (selectedMode === 'direct') {
+        // Initialize progress
+        setProgress({
+          current: 0,
+          total: downloadableFiles.length,
+          success: 0,
+          skipped: 0,
+          failed: 0,
+          errors: [],
         })
-      } else if (selectedModeData === 'exportLinks') {
+
+        let successCount = 0
+        let failedCount = 0
+        const errors: Array<{ file: string; error: string }> = []
+
+        // Download files with progress tracking
+        for (let i = 0; i < downloadableFiles.length; i++) {
+          const file = downloadableFiles[i]
+
+          try {
+            setProgress(prev => ({
+              ...prev,
+              current: i + 1,
+              currentFile: file.name
+            }))
+
+            const url = `${baseUrl}/api/drive/files/download?fileId=${file.id}`
+            window.open(url, '_blank')
+            successCount++
+
+            // Small delay to prevent browser blocking multiple downloads
+            await new Promise(resolve => setTimeout(resolve, 500))
+
+          } catch (error: any) {
+            failedCount++
+            errors.push({
+              file: file.name,
+              error: error.message || 'Download failed'
+            })
+          }
+
+          // Update progress
+          setProgress(prev => ({
+            ...prev,
+            success: successCount,
+            failed: failedCount,
+            errors
+          }))
+        }
+
+        if (successCount > 0) {
+          toast.success(`Started downloading ${successCount} file${successCount > 1 ? 's' : ''}`)
+        }
+        if (failedCount > 0) {
+          toast.error(`Failed to download ${failedCount} file${failedCount > 1 ? 's' : ''}`)
+        }
+
+      } else if (selectedMode === 'exportLinks') {
         let csv = 'File Name,Download Link\n'
         downloadableFiles.forEach((item) => {
           const url = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
