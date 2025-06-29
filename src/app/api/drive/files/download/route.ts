@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from 'next/server'
 
 import { initDriveService, handleApiError, validateDownloadRequest } from '@/lib/api-utils'
@@ -39,17 +38,19 @@ export async function POST(request: NextRequest) {
 async function processParallelDownload(driveService: any, items: any[], downloadMode: string) {
   // Handle export links mode
   if (downloadMode === 'exportLinks') {
-    const csvContent = generateDownloadCSV(items.map(item => ({
-      id: item.id,
-      name: item.name,
-      downloadUrl: `https://drive.google.com/uc?export=download&id=${item.id}`
-    })))
-    
+    const csvContent = generateDownloadCSV(
+      items.map((item) => ({
+        id: item.id,
+        name: item.name,
+        downloadUrl: `https://drive.google.com/uc?export=download&id=${item.id}`,
+      }))
+    )
+
     return new NextResponse(csvContent, {
       headers: {
         'Content-Type': 'text/csv',
-        'Content-Disposition': `attachment; filename="download-links-${Date.now()}.csv"`
-      }
+        'Content-Disposition': `attachment; filename="download-links-${Date.now()}.csv"`,
+      },
     })
   }
 
@@ -64,7 +65,7 @@ async function processParallelDownload(driveService: any, items: any[], download
           id: item.id,
           name: item.name,
           error: getErrorMessage(error),
-          skipped: isSkippableError(error)
+          skipped: isSkippableError(error),
         }
       }
     })
@@ -77,7 +78,7 @@ async function processParallelDownload(driveService: any, items: any[], download
 
   results.forEach((result, index) => {
     const item = items[index]
-    
+
     if (result.status === 'fulfilled') {
       const data = result.value
       if (data.success) {
@@ -86,20 +87,20 @@ async function processParallelDownload(driveService: any, items: any[], download
         skipped.push({
           id: item.id,
           name: item.name,
-          reason: data.error
+          reason: data.error,
         })
       } else {
         failed.push({
           id: item.id,
           name: item.name,
-          error: data.error
+          error: data.error,
         })
       }
     } else {
       failed.push({
         id: item.id,
         name: item.name,
-        error: getErrorMessage(result.reason)
+        error: getErrorMessage(result.reason),
       })
     }
   })
@@ -111,18 +112,18 @@ async function processParallelDownload(driveService: any, items: any[], download
       headers: {
         'Content-Type': result.mimeType,
         'Content-Disposition': `attachment; filename="${result.fileName}"`,
-        ...(result.size && { 'Content-Length': result.size.toString() })
-      }
+        ...(result.size && { 'Content-Length': result.size.toString() }),
+      },
     })
   }
 
   // For batch or failed single downloads, return summary with URLs
   return NextResponse.json({
-    success: successful.map(item => ({
+    success: successful.map((item) => ({
       id: item.id,
       name: item.fileName,
       downloadUrl: item.fallbackUrl || `https://drive.google.com/uc?export=download&id=${item.id}`,
-      direct: !item.fallbackUrl
+      direct: !item.fallbackUrl,
     })),
     failed,
     skipped,
@@ -130,8 +131,8 @@ async function processParallelDownload(driveService: any, items: any[], download
       total: items.length,
       successful: successful.length,
       failed: failed.length,
-      skipped: skipped.length
-    }
+      skipped: skipped.length,
+    },
   })
 }
 
@@ -147,7 +148,7 @@ async function processItemDownload(driveService: any, item: any, index: number) 
       return await retryDriveApiCall(async () => {
         return await driveService.files.get({
           fileId,
-          fields: 'name,mimeType,size,parents'
+          fields: 'name,mimeType,size,parents',
         })
       })
     })
@@ -161,15 +162,18 @@ async function processItemDownload(driveService: any, item: any, index: number) 
       const exportFormat = getExportFormat(mimeType)
       const exportResponse = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
-          return await driveService.files.export({
-            fileId,
-            mimeType: exportFormat
-          }, { responseType: 'stream' })
+          return await driveService.files.export(
+            {
+              fileId,
+              mimeType: exportFormat,
+            },
+            { responseType: 'stream' }
+          )
         })
       })
 
-      const exportFileName = `${fileName.replace(/\.[^/.]+$/, "")}.${getFileExtension(exportFormat)}`
-      
+      const exportFileName = `${fileName.replace(/\.[^/.]+$/, '')}.${getFileExtension(exportFormat)}`
+
       return {
         success: true,
         id: fileId,
@@ -177,17 +181,20 @@ async function processItemDownload(driveService: any, item: any, index: number) 
         mimeType: exportFormat,
         stream: exportResponse.data,
         size: null,
-        index
+        index,
       }
     }
 
     // Regular file download
     const downloadResponse = await throttledDriveRequest(async () => {
       return await retryDriveApiCall(async () => {
-        return await driveService.files.get({
-          fileId,
-          alt: 'media'
-        }, { responseType: 'stream' })
+        return await driveService.files.get(
+          {
+            fileId,
+            alt: 'media',
+          },
+          { responseType: 'stream' }
+        )
       })
     })
 
@@ -198,20 +205,19 @@ async function processItemDownload(driveService: any, item: any, index: number) 
       mimeType: mimeType || 'application/octet-stream',
       stream: downloadResponse.data,
       size: fileSize ? parseInt(fileSize) : null,
-      index
+      index,
     }
-
   } catch (error: any) {
     // Fallback to direct URL on stream failure
     const fallbackUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-    
+
     return {
       success: true,
       id: fileId,
       fileName: item.name || 'download',
       fallbackUrl,
       error: getErrorMessage(error),
-      index
+      index,
     }
   }
 }

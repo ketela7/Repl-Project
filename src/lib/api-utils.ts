@@ -106,7 +106,7 @@ export function validateShareRequest(body: any): boolean {
 
 export function validateDownloadRequest(body: any): boolean {
   // New format for download and other operations
-  if (body.items && (Array.isArray(body.items) && body.items.length > 0)) {
+  if (body.items && Array.isArray(body.items) && body.items.length > 0) {
     return true
   }
 

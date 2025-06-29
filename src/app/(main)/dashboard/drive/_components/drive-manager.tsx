@@ -682,10 +682,6 @@ export function DriveManager() {
         />
       )}
 
-
-
-
-
       {/* Progress indicators */}
       {operationsProgress.isRunning && (
         <div className="bg-background fixed right-4 bottom-4 rounded-lg border p-4 shadow-lg">
@@ -703,7 +699,6 @@ export function DriveManager() {
           )}
         </div>
       )}
-
     </div>
   )
 }

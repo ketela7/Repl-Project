@@ -82,12 +82,12 @@ args = "Server"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Format:Fix"
+args = "Test:Watch"
 
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
-mode = "sequential"
+mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -97,6 +97,7 @@ waitForPort = 5000
 [[workflows.workflow]]
 name = "TypeCheck"
 author = "agent"
+mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -105,6 +106,7 @@ args = "tsc --noEmit --watch --preserveWatchOutput && echo \"✅ Typecheck compl
 [[workflows.workflow]]
 name = "Format"
 author = "agent"
+mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -129,14 +131,16 @@ args = "npm run lint:fix && echo \"✅ Code Linter completed successfully\""
 [[workflows.workflow]]
 name = "Test:Watch"
 author = "agent"
+mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npx jest --watch --passWithNoTests --silent && echo \"✅ Test Watch Completed\""
+args = "npx jest --watchAll"
 
 [[workflows.workflow]]
 name = "Test:RealTime"
 author = "agent"
+mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -145,6 +149,7 @@ args = "node scripts/test-realtime-api.js && echo \"✅ Test Realtime Completed\
 [[workflows.workflow]]
 name = "Format:Fix"
 author = "agent"
+mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
