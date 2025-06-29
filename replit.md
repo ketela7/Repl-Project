@@ -122,6 +122,7 @@ Changelog:
 - June 28, 2025. Updated download operations to use direct browser downloads instead of blob mechanism - simplified download process for better browser compatibility and reduced memory usage
 - June 28, 2025. Updated operation button labels and function names for consistency - "Restore from Trash" → "Untrash", "Permanent Delete" → "Delete", updated corresponding function names
 - June 29, 2025. Implemented direct streaming downloads with _blank opening - extended existing download route to stream files directly from Google Drive API without using Google Drive download URLs, follows "extend over create" principle
+- June 29, 2025. Fixed driveService API access pattern - corrected all API calls to use driveService.drive.files instead of driveService.files for proper Google Drive API integration
 ```
 
 ## User Preferences
