@@ -137,20 +137,8 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
   }
 
   // Handle URL selection
-  const handleUrlSelect = async () => {
+  const handleUrlSelect = () => {
     if (parsedResult.folderId && validationResult?.isValid) {
-      // Navigate to the selected folder in browse mode
-      const selectedFolder: DriveFolder = {
-        id: parsedResult.folderId,
-        name: validationResult.folderName || 'Selected Folder',
-      }
-
-      // Switch to browse tab and navigate to folder
-      setActiveTab('browse')
-      setCurrentPath([{ id: 'root', name: 'My Drive' }, selectedFolder])
-      await loadFolders(parsedResult.folderId)
-
-      // Also call onSelect to update parent component
       onSelect(parsedResult.folderId, validationResult.folderName)
     }
   }
@@ -327,8 +315,7 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
                     </div>
                     {validationResult.isValid && (
                       <Button size="sm" onClick={handleUrlSelect} className="w-full">
-                        <Folder className="mr-2 h-4 w-4" />
-                        Browse in This Folder
+                        Select This Folder
                       </Button>
                     )}
                   </div>
