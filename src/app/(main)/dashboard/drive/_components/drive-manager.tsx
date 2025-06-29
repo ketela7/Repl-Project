@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw } from 'lucide-react'
 
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
-import { normalizeFileSize } from '@/lib/google-drive/utils'
+import { normalizeFileSize, getFileActions } from '@/lib/google-drive/utils'
 import { errorToast } from '@/lib/utils'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { useTimezoneContext } from '@/components/timezone-provider'
@@ -486,10 +486,32 @@ export function DriveManager() {
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
-    const itemsToSort = [...displayItems].map((item) => ({
-      ...item,
-      isFolder: item.mimeType === 'application/vnd.google-apps.folder',
-    }))
+    const currentView = filters.activeView || 'all'
+    const itemsToSort = [...displayItems].map((item) => {
+      const isFolder = item.mimeType === 'application/vnd.google-apps.folder'
+      const actions = getFileActions(
+        {
+          capabilities: item.capabilities,
+          trashed: item.trashed,
+          mimeType: item.mimeType,
+          itemType: isFolder ? 'folder' : 'file',
+        },
+        currentView
+      )
+
+      return {
+        ...item,
+        isFolder,
+        canDownload: actions.canDownload,
+        canRename: actions.canRename,
+        canMove: actions.canMove,
+        canCopy: actions.canCopy,
+        canShare: actions.canShare,
+        canTrash: actions.canTrash,
+        canDelete: actions.canPermanentDelete,
+        canUntrash: actions.canUntrash,
+      }
+    })
 
     if (sortConfig && sortConfig.key) {
       itemsToSort.sort((a, b) => {
@@ -648,7 +670,9 @@ export function DriveManager() {
                 case 'rename':
                 case 'move':
                 case 'copy':
+                case 'trash':
                 case 'delete':
+                case 'untrash':
                   // Individual actions now handled through bulk operations
                   setSelectedItems(new Set([item.id]))
                   break
@@ -699,7 +723,7 @@ export function DriveManager() {
         />
       )}
 
-      {selectedFileForDetails && dialogs.details && !dialogs.preview && (
+      {selectedFileForDetails && dialogs.details && (
         <FileDetailsDialog
           isOpen={dialogs.details}
           onClose={() => {
