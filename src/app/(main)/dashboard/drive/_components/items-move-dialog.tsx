@@ -1,15 +1,17 @@
 'use client'
 
-import { useState } from 'react'
-import { Move, Loader2, Folder, ArrowLeft } from 'lucide-react'
+import { useState, useRef } from 'react'
+import { Move, Loader2, Folder, ArrowLeft, CheckCircle, XCircle, AlertTriangle, SkipForward } from 'lucide-react'
+import { toast } from 'sonner'
 
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { DriveDestinationSelector } from '@/components/drive-destination-selector'
-import { cn, successToast, errorToast } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 // FileMoveDialog removed - functionality integrated into bulk operations
 
@@ -27,42 +29,199 @@ interface ItemsMoveDialogProps {
 
 function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: ItemsMoveDialogProps) {
   const [showDestinationSelector, setShowDestinationSelector] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [isCompleted, setIsCompleted] = useState(false)
+  const [isCancelled, setIsCancelled] = useState(false)
   const [selectedFolderId, setSelectedFolderId] = useState<string>('root')
   const [selectedFolderName, setSelectedFolderName] = useState<string>('My Drive')
+  const [progress, setProgress] = useState<{
+    current: number
+    total: number
+    currentFile?: string
+    success: number
+    skipped: number
+    failed: number
+    errors: Array<{ file: string; error: string }>
+  }>({
+    current: 0,
+    total: 0,
+    success: 0,
+    skipped: 0,
+    failed: 0,
+    errors: [],
+  })
+
+  // Use ref for immediate cancellation control
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
   const fileCount = selectedItems.filter((item) => !item.isFolder).length
   const folderCount = selectedItems.filter((item) => item.isFolder).length
 
-  const handleMove = async () => {
-    if (isLoading) return
+  const handleCancel = () => {
+    // Immediately set cancellation flags
+    isCancelledRef.current = true
+    setIsCancelled(true)
 
-    setIsLoading(true)
+    // Abort any ongoing network requests
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Stop processing
+    setIsProcessing(false)
+    setIsCompleted(true)
+
+    toast.info('Move operation cancelled by user')
+  }
+
+  const handleMove = async () => {
+    if (selectedItems.length === 0) {
+      toast.error('No items selected for moving')
+      return
+    }
+
+    // Reset cancellation flags
+    isCancelledRef.current = false
+    setIsCancelled(false)
+    setIsProcessing(true)
+    setIsCompleted(false)
+
+    // Create new AbortController for this operation
+    abortControllerRef.current = new AbortController()
+
     try {
-      const response = await fetch('/api/drive/files/move', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems.map((item) => ({ id: item.id })),
-          targetFolderId: selectedFolderId,
-        }),
+      // Initialize progress
+      setProgress({
+        current: 0,
+        total: selectedItems.length,
+        success: 0,
+        skipped: 0,
+        failed: 0,
+        errors: [],
       })
 
-      const result = await response.json()
+      let successCount = 0
+      let failedCount = 0
+      const errors: Array<{ file: string; error: string }> = []
 
-      if (result.success) {
-        successToast(`${selectedItems.length} item${selectedItems.length > 1 ? 's' : ''} moved to "${selectedFolderName}"`)
-        onConfirm(selectedFolderId)
-        onOpenChange(false)
-        setShowDestinationSelector(false)
-      } else {
-        throw new Error(result.error || 'Failed to move items')
+      // Move items with progress tracking and cancellation support
+      for (let i = 0; i < selectedItems.length; i++) {
+        // Check cancellation using ref (immediate)
+        if (isCancelledRef.current) {
+          toast.info(`Move cancelled after ${successCount} items`)
+          break
+        }
+
+        const item = selectedItems[i]
+
+        try {
+          setProgress((prev) => ({
+            ...prev,
+            current: i + 1,
+            currentFile: item.name,
+          }))
+
+          // Check cancellation before API call
+          if (isCancelledRef.current) {
+            break
+          }
+
+          const response = await fetch('/api/drive/files/move', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: [{ id: item.id }],
+              targetFolderId: selectedFolderId,
+            }),
+            signal: abortControllerRef.current?.signal,
+          })
+
+          if (abortControllerRef.current?.signal.aborted) {
+            break // Operation was cancelled
+          }
+
+          const result = await response.json()
+
+          if (result.success) {
+            successCount++
+          } else {
+            throw new Error(result.error || 'Failed to move item')
+          }
+
+          // Small delay between items to allow cancellation
+          if (!isCancelledRef.current) {
+            await new Promise((resolve) => setTimeout(resolve, 100))
+          }
+        } catch (error: any) {
+          if (abortControllerRef.current?.signal.aborted) {
+            break // Operation was cancelled
+          }
+
+          failedCount++
+          errors.push({
+            file: item.name,
+            error: error.message || 'Move failed',
+          })
+        }
+
+        // Update progress
+        setProgress((prev) => ({
+          ...prev,
+          success: successCount,
+          failed: failedCount,
+          errors,
+        }))
+
+        // Final cancellation check
+        if (isCancelledRef.current) {
+          break
+        }
       }
-    } catch (error: any) {
-      errorToast(error.message || 'Failed to move items')
+
+      // Show results only if not cancelled
+      if (!isCancelledRef.current) {
+        if (successCount > 0) {
+          toast.success(`Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`)
+          onConfirm(selectedFolderId)
+        }
+        if (failedCount > 0) {
+          toast.error(`Failed to move ${failedCount} item${failedCount > 1 ? 's' : ''}`)
+        }
+      }
+    } catch (err) {
+      if (abortControllerRef.current?.signal.aborted) {
+        // Operation was cancelled, don't show error
+        return
+      }
+      console.error(err)
+      toast.error('Move operation failed')
     } finally {
-      setIsLoading(false)
+      // Clean up
+      abortControllerRef.current = null
+      setIsProcessing(false)
+      setIsCompleted(true)
+    }
+  }
+
+  const handleClose = () => {
+    if (!isProcessing) {
+      // Reset states when closing
+      setIsCompleted(false)
+      setIsCancelled(false)
+      isCancelledRef.current = false
+      abortControllerRef.current = null
+      setShowDestinationSelector(false)
+      setProgress({
+        current: 0,
+        total: 0,
+        success: 0,
+        skipped: 0,
+        failed: 0,
+        errors: [],
+      })
+      onOpenChange(false)
     }
   }
 
@@ -75,29 +234,33 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
     setShowDestinationSelector(false)
   }
 
-  const renderContent = () => (
-    <div className="flex max-h-[60vh] flex-col space-y-4">
-      {/* Header Info - Compact */}
-      <div className="flex-shrink-0 space-y-2 text-center">
-        <div className="flex justify-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-            <Move className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+  // Render different content based on state
+  const renderContent = () => {
+    // 1. Initial State - Show selection and destination options
+    if (!isProcessing && !isCompleted) {
+      return (
+        <div className="flex max-h-[60vh] flex-col space-y-4">
+          {/* Header Info - Compact */}
+          <div className="flex-shrink-0 space-y-2 text-center">
+            <div className="flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <Move className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-base font-semibold">Move Items</h3>
+              <p className="text-muted-foreground text-xs">
+                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="space-y-1">
-          <h3 className="text-base font-semibold">Move Items</h3>
-          <p className="text-muted-foreground text-xs">
-            {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
-          </p>
-        </div>
-      </div>
 
-      {/* Stats - Compact */}
-      <div className="flex flex-shrink-0 justify-center gap-1">
-        {fileCount > 0 && (
-          <Badge variant="secondary" className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-            {fileCount} file{fileCount > 1 ? 's' : ''}
-          </Badge>
+          {/* Stats - Compact */}
+          <div className="flex flex-shrink-0 justify-center gap-1">
+            {fileCount > 0 && (
+              <Badge variant="secondary" className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+                {fileCount} file{fileCount > 1 ? 's' : ''}
+              </Badge>
         )}
         {folderCount > 0 && (
           <Badge variant="secondary" className="bg-amber-100 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100">
@@ -126,8 +289,161 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
           </div>
         </div>
       </div>
+
+      {/* Destination Selection */}
+      <div className="flex-shrink-0 space-y-2">
+        <div className="flex items-center justify-between">
+          <Label className="text-xs font-medium">Destination:</Label>
+          <Button
+            variant="outline" 
+            size="sm"
+            onClick={() => setShowDestinationSelector(true)}
+            className="h-7 text-xs"
+          >
+            <Folder className="mr-1 h-3 w-3" />
+            Choose
+          </Button>
+        </div>
+        <div className="rounded-md border bg-muted/30 p-2">
+          <div className="text-xs text-muted-foreground">Moving to:</div>
+          <div className="font-medium text-sm">{selectedFolderName}</div>
+        </div>
+      </div>
     </div>
-  )
+      )
+    }
+
+    // 2. Processing State - Show progress with cancellation
+    if (isProcessing) {
+      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+
+      return (
+        <div className="space-y-4">
+          {/* Header */}
+          <div className="text-center space-y-2">
+            <div className="flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
+                <Loader2 className="h-6 w-6 text-blue-600 dark:text-blue-400 animate-spin" />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-base font-semibold">Moving Items...</h3>
+              <p className="text-muted-foreground text-sm">
+                {progress.current} of {progress.total} items
+              </p>
+            </div>
+          </div>
+
+          {/* Progress */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Progress</span>
+              <span>{progressPercentage}%</span>
+            </div>
+            <Progress value={progressPercentage} className="w-full" />
+          </div>
+
+          {/* Current File */}
+          {progress.currentFile && (
+            <div className="space-y-1">
+              <div className="text-sm font-medium">Current:</div>
+              <div className="text-xs text-muted-foreground truncate font-mono bg-muted/50 rounded p-2">
+                {progress.currentFile}
+              </div>
+            </div>
+          )}
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-2 text-center">
+            <div className="space-y-1">
+              <div className="text-lg font-bold text-green-600">{progress.success}</div>
+              <div className="text-xs text-muted-foreground">Success</div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-lg font-bold text-red-600">{progress.failed}</div>
+              <div className="text-xs text-muted-foreground">Failed</div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
+              <div className="text-xs text-muted-foreground">Skipped</div>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // 3. Completed State - Show results and allow close
+    const totalProcessed = progress.success + progress.failed + progress.skipped
+    const wasSuccessful = progress.success > 0
+    const hasErrors = progress.failed > 0
+
+    return (
+      <div className="space-y-4">
+        {/* Results Header */}
+        <div className="text-center space-y-2">
+          <div className="flex justify-center">
+            <div className={cn(
+              "flex h-12 w-12 items-center justify-center rounded-full",
+              isCancelled ? "bg-orange-100 dark:bg-orange-900/30" :
+              wasSuccessful && !hasErrors ? "bg-green-100 dark:bg-green-900/30" :
+              hasErrors ? "bg-red-100 dark:bg-red-900/30" : "bg-gray-100 dark:bg-gray-900/30"
+            )}>
+              {isCancelled ? (
+                <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              ) : wasSuccessful && !hasErrors ? (
+                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+              ) : hasErrors ? (
+                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
+              ) : (
+                <SkipForward className="h-6 w-6 text-gray-600 dark:text-gray-400" />
+              )}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-base font-semibold">
+              {isCancelled ? 'Move Cancelled' :
+               wasSuccessful && !hasErrors ? 'Move Completed' :
+               hasErrors ? 'Move Partially Completed' : 'No Items Moved'}
+            </h3>
+            <p className="text-muted-foreground text-sm">
+              {totalProcessed} of {selectedItems.length} items processed
+            </p>
+          </div>
+        </div>
+
+        {/* Results Summary */}
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-green-600">{progress.success}</div>
+            <div className="text-xs text-muted-foreground">Moved</div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-red-600">{progress.failed}</div>
+            <div className="text-xs text-muted-foreground">Failed</div>
+          </div>
+          <div className="space-y-1">
+            <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
+            <div className="text-xs text-muted-foreground">Skipped</div>
+          </div>
+        </div>
+
+        {/* Error Details */}
+        {progress.errors.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-sm font-medium text-red-600">Errors:</h4>
+            <div className="max-h-32 overflow-y-auto space-y-1">
+              {progress.errors.map((error, index) => (
+                <div key={index} className="text-xs bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded p-2">
+                  <div className="font-medium">{error.file}</div>
+                  <div className="text-red-600 dark:text-red-400">{error.error}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   if (isMobile) {
     return (
@@ -149,13 +465,29 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
             <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
 
             <BottomSheetFooter className={cn('grid gap-4')}>
-              <Button onClick={() => setShowDestinationSelector(true)} disabled={isLoading} className={cn('touch-target min-h-[44px] active:scale-95')}>
-                <Folder className="mr-2 h-4 w-4" />
-                Choose Destination
-              </Button>
-              <Button variant="outline" onClick={() => onOpenChange(false)} className={cn('touch-target min-h-[44px] active:scale-95')}>
-                Cancel
-              </Button>
+              {!isProcessing && !isCompleted && (
+                <>
+                  <Button onClick={handleMove} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    <Move className="mr-2 h-4 w-4" />
+                    Move to {selectedFolderName}
+                  </Button>
+                  <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    Cancel
+                  </Button>
+                </>
+              )}
+              {isProcessing && (
+                <Button onClick={handleCancel} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Cancel Move
+                </Button>
+              )}
+              {isCompleted && (
+                <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Close
+                </Button>
+              )}
             </BottomSheetFooter>
           </BottomSheetContent>
         </BottomSheet>
@@ -214,7 +546,7 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
+      <Dialog open={open} onOpenChange={handleClose}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
@@ -226,80 +558,39 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
                 <div className="text-muted-foreground text-sm font-normal">Bulk move operation</div>
               </div>
             </DialogTitle>
-            <DialogDescription className="space-y-4 pt-2">
-              <div className="text-base">
-                You are about to move <span className="font-semibold">{selectedItems.length}</span> item
-                {selectedItems.length > 1 ? 's' : ''} to a new location.
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {fileCount > 0 && (
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-                    {fileCount} file{fileCount > 1 ? 's' : ''}
-                  </Badge>
-                )}
-                {folderCount > 0 && (
-                  <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100">
-                    {folderCount} folder{folderCount > 1 ? 's' : ''}
-                  </Badge>
-                )}
-              </div>
-
-              {selectedItems.length <= 5 ? (
-                <div className="space-y-2">
-                  <div className="text-sm font-semibold">Items to be moved:</div>
-                  <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-                    <ul className="space-y-1 text-sm">
-                      {selectedItems.map((item) => (
-                        <li key={item.id} className="flex items-center gap-2 truncate">
-                          <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                          <span className="truncate">{item.name}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <div className="text-sm font-semibold">Preview (first 3 items):</div>
-                  <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-                    <ul className="space-y-1 text-sm">
-                      {selectedItems.slice(0, 3).map((item) => (
-                        <li key={item.id} className="flex items-center gap-2 truncate">
-                          <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                          <span className="truncate">{item.name}</span>
-                        </li>
-                      ))}
-                      <li className="text-muted-foreground/70 flex items-center gap-2 italic">
-                        <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
-                        and {selectedItems.length - 3} more items...
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-
-              <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
-                <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-500">
-                  <div className="h-1.5 w-1.5 rounded-full bg-white" />
-                </div>
-                <div className="text-sm text-blue-800 dark:text-blue-200">Click &ldquo;Choose Destination&rdquo; to select where you want to move these items.</div>
-              </div>
-            </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="flex-col gap-2 sm:flex-row">
-            <Button onClick={() => setShowDestinationSelector(true)} className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800">
-              <Folder className="mr-2 h-4 w-4" />
-              Choose Destination
-            </Button>
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="w-full sm:w-auto">
-              Cancel
-            </Button>
+
+          <div className="space-y-4 py-4">{renderContent()}</div>
+
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row">
+            {!isProcessing && !isCompleted && (
+              <>
+                <Button onClick={handleMove} className="w-full sm:w-auto">
+                  <Move className="mr-2 h-4 w-4" />
+                  Move to {selectedFolderName}
+                </Button>
+                <Button variant="outline" onClick={handleClose} className="w-full sm:w-auto">
+                  Cancel
+                </Button>
+              </>
+            )}
+            {isProcessing && (
+              <Button onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
+                <XCircle className="mr-2 h-4 w-4" />
+                Cancel Move
+              </Button>
+            )}
+            {isCompleted && (
+              <Button onClick={handleClose} className="w-full sm:w-auto">
+                <CheckCircle className="mr-2 h-4 w-4" />
+                Close
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Destination Selector Dialog for Desktop */}
+      {/* Destination Selector Dialog */}
       <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
         <DialogContent className="max-h-[80vh] max-w-2xl">
           <DialogHeader>
@@ -324,22 +615,9 @@ function ItemsMoveDialog({ open, onOpenChange, onConfirm, selectedItems }: Items
                 Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
               </div>
             </div>
-            <Button
-              onClick={handleMove}
-              disabled={isLoading || !selectedFolderId}
-              className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Moving...
-                </>
-              ) : (
-                <>
-                  <Move className="mr-2 h-4 w-4" />
-                  Move {selectedItems.length} Item{selectedItems.length > 1 ? 's' : ''}
-                </>
-              )}
+            <Button onClick={handleBackToMainDialog} className="w-full sm:w-auto">
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Confirm Destination
             </Button>
             <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
               Back
