@@ -4,6 +4,30 @@ import { initDriveService, handleApiError, validateDownloadRequest } from '@/lib
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
 
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const fileId = searchParams.get('fileId')
+
+    if (!fileId) {
+      return NextResponse.json({ error: 'File ID is required' }, { status: 400 })
+    }
+
+    // Initialize Drive service with authentication
+    const authResult = await initDriveService()
+    if (!authResult.success) {
+      return authResult.response!
+    }
+
+    const { driveService } = authResult
+
+    // Stream the file directly
+    return await streamSingleFile(driveService, { id: fileId })
+  } catch (error) {
+    return handleApiError(error)
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
@@ -21,14 +45,106 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 
+    // Handle single file direct streaming download
+    if (!Array.isArray(items) && items.id) {
+      return await streamSingleFile(driveService, items)
+    }
+
     // Normalize single item to array for unified processing
     if (!Array.isArray(items)) {
       items = [items]
     }
 
+    // Handle single file in array format
+    if (items.length === 1) {
+      return await streamSingleFile(driveService, items[0])
+    }
+
     return await processParallelDownload(driveService, items, downloadMode)
   } catch (error) {
     return handleApiError(error)
+  }
+}
+
+/**
+ * Stream single file directly to browser for immediate download
+ */
+async function streamSingleFile(driveService: any, item: any) {
+  const fileId = item.id
+
+  try {
+    // Get file metadata
+    const metadata = await throttledDriveRequest(async () => {
+      return await retryDriveApiCall(async () => {
+        return await driveService.files.get({
+          fileId,
+          fields: 'name,mimeType,size,parents',
+        })
+      })
+    })
+
+    const fileName = metadata.data.name
+    const mimeType = metadata.data.mimeType
+    const fileSize = metadata.data.size
+
+    // Handle Google Workspace files (export to downloadable format)
+    if (isGoogleWorkspaceFile(mimeType)) {
+      const exportFormat = getExportFormat(mimeType)
+      const exportResponse = await throttledDriveRequest(async () => {
+        return await retryDriveApiCall(async () => {
+          return await driveService.files.export(
+            {
+              fileId,
+              mimeType: exportFormat,
+            },
+            { responseType: 'stream' }
+          )
+        })
+      })
+
+      const exportFileName = `${fileName.replace(/\.[^/.]+$/, '')}.${getFileExtension(exportFormat)}`
+
+      return new NextResponse(exportResponse.data, {
+        headers: {
+          'Content-Type': exportFormat,
+          'Content-Disposition': `attachment; filename="${exportFileName}"`,
+          'Cache-Control': 'no-cache',
+        },
+      })
+    }
+
+    // Regular file download with streaming
+    const downloadResponse = await throttledDriveRequest(async () => {
+      return await retryDriveApiCall(async () => {
+        return await driveService.files.get(
+          {
+            fileId,
+            alt: 'media',
+          },
+          { responseType: 'stream' }
+        )
+      })
+    })
+
+    return new NextResponse(downloadResponse.data, {
+      headers: {
+        'Content-Type': mimeType || 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+        ...(fileSize && { 'Content-Length': fileSize.toString() }),
+        'Cache-Control': 'no-cache',
+      },
+    })
+  } catch (error: any) {
+    console.error('Stream download failed:', error)
+    return NextResponse.json(
+      {
+        error: 'Stream download failed',
+        details: getErrorMessage(error),
+        fileId,
+        fileName: item.name,
+      },
+      { status: 500 }
+    )
   }
 }
 
@@ -83,7 +199,7 @@ async function processParallelDownload(driveService: any, items: any[], download
       const data = result.value
       if (data.success) {
         successful.push(data)
-      } else if (data.skipped) {
+      } else if ((data as any).skipped) {
         skipped.push({
           id: item.id,
           name: item.name,

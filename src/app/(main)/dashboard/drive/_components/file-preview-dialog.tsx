@@ -53,13 +53,9 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
 
   const handleDownload = async () => {
     try {
-      const link = document.createElement('a')
-      link.href = `/api/drive/download/${file.id}`
-      link.download = file.name
-      link.style.display = 'none'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      // Use the new GET endpoint for direct streaming download
+      const downloadUrl = `/api/drive/files/download?fileId=${file.id}`
+      window.open(downloadUrl, '_blank')
       successToast.downloaded(file.name)
     } catch (error) {
       errorToast.downloadFailed(file.name)

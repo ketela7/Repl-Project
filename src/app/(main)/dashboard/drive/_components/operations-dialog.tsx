@@ -8,6 +8,7 @@ import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, B
 import { Button } from '@/components/ui/button'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { ItemsMoveDialog, ItemsCopyDialog, ItemsTrashDialog, ItemsShareDialog, ItemsRenameDialog, ItemsExportDialog, ItemsDeleteDialog, ItemsUntrashDialog } from '@/components/lazy-imports'
+import { handleDownloadOperation } from '@/lib/download-utils'
 
 import ItemsDownloadDialog from './items-download-dialog'
 
@@ -288,20 +289,9 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
   const handleDownloadComplete = async (downloadMode: string, progressCallback?: (progress: any) => void) => {
     try {
-      const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
-      const response = await fetch('/api/drive/files/download', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: downloadableFiles,
-          downloadMode: downloadMode,
-        }),
-      })
-
-      if (response.ok) {
-      }
+      await handleDownloadOperation(selectedItems, downloadMode, progressCallback)
     } catch (error) {
-      // T0DD0: Handle errors
+      console.error('Download failed:', error)
     }
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()

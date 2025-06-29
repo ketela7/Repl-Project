@@ -22,6 +22,7 @@ interface ItemsDownloadDialogProps {
     id: string
     name: string
     isFolder: boolean
+    size?: string
   }>
 }
 
@@ -70,7 +71,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
 
   // Filter downloadable files (only files, skip folders)
   const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
-  const skippedFolders = selectedItems - downloadableFiles
+  const skippedFolders = selectedItems.filter((item) => item.isFolder)
 
   const handleConfirm = async () => {
     if (downloadableFiles.length === 0) {
