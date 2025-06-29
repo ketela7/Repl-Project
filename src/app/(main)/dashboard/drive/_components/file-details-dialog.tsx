@@ -211,9 +211,10 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
       activeFileDetailRequests.add(fileId)
 
       const fetchPromise = (async (): Promise<DetailedFileInfo> => {
-        const response = await fetch(`/api/drive/files?fileId=${fileId}&fields=*`, {
-          method: 'GET',
+        const response = await fetch('/api/drive/files/details', {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileId }),
         })
 
         if (!response.ok) {
@@ -221,7 +222,8 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
           throw new Error(errorData.error || 'Failed to fetch file details')
         }
 
-        const details = await response.json()
+        const result = await response.json()
+        const details = result.fileDetails
 
         // Cache the result with 5-minute TTL
         fileDetailsCache.set(fileId, details)
