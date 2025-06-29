@@ -17,6 +17,7 @@ import { DriveGridSkeleton } from './drive-skeleton'
 import { FileUploadDialog } from './file-upload-dialog'
 import { CreateFolderDialog } from './create-folder-dialog'
 import { FilePreviewDialog } from './file-preview-dialog'
+import { FileDetailsDialog } from './file-details-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
 
@@ -116,6 +117,7 @@ export function DriveManager() {
   const [isSelectMode, setIsSelectMode] = useState(false)
 
   const [selectedFileForPreview, setSelectedFileForPreview] = useState<DriveFile | null>(null)
+  const [selectedFileForDetails, setSelectedFileForDetails] = useState<DriveItem | null>(null)
 
   // Progress states
   const [operationsProgress, setOperationsProgress] = useState<{
@@ -625,13 +627,16 @@ export function DriveManager() {
                   setSelectedFileForPreview(item as DriveFile)
                   openDialog('preview')
                   break
+                case 'details':
+                  setSelectedFileForDetails(item)
+                  openDialog('details')
+                  break
                 case 'download':
                 case 'share':
                 case 'rename':
                 case 'move':
                 case 'copy':
                 case 'delete':
-                case 'details':
                   // Individual actions now handled through bulk operations
                   setSelectedItems(new Set([item.id]))
                   break
@@ -679,6 +684,19 @@ export function DriveManager() {
             }
           }}
           file={selectedFileForPreview}
+        />
+      )}
+
+      {selectedFileForDetails && (
+        <FileDetailsDialog
+          isOpen={dialogs.details}
+          onClose={() => {
+            closeDialog('details')
+            setSelectedFileForDetails(null)
+          }}
+          fileId={selectedFileForDetails.id}
+          fileName={selectedFileForDetails.name}
+          fileType={selectedFileForDetails.isFolder ? 'folder' : 'file'}
         />
       )}
 
