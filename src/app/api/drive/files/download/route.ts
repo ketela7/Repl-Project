@@ -76,7 +76,7 @@ async function streamSingleFile(driveService: any, item: any) {
     // Get file metadata
     const metadata = await throttledDriveRequest(async () => {
       return await retryDriveApiCall(async () => {
-        return await driveService.files.get({
+        return await driveService.drive.files.get({
           fileId,
           fields: 'name,mimeType,size,parents',
         })
@@ -92,7 +92,7 @@ async function streamSingleFile(driveService: any, item: any) {
       const exportFormat = getExportFormat(mimeType)
       const exportResponse = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
-          return await driveService.files.export(
+          return await driveService.drive.files.export(
             {
               fileId,
               mimeType: exportFormat,
@@ -116,7 +116,7 @@ async function streamSingleFile(driveService: any, item: any) {
     // Regular file download with streaming
     const downloadResponse = await throttledDriveRequest(async () => {
       return await retryDriveApiCall(async () => {
-        return await driveService.files.get(
+        return await driveService.drive.files.get(
           {
             fileId,
             alt: 'media',
@@ -262,7 +262,7 @@ async function processItemDownload(driveService: any, item: any, index: number) 
     // Get file metadata
     const metadata = await throttledDriveRequest(async () => {
       return await retryDriveApiCall(async () => {
-        return await driveService.files.get({
+        return await driveService.drive.files.get({
           fileId,
           fields: 'name,mimeType,size,parents',
         })
@@ -278,7 +278,7 @@ async function processItemDownload(driveService: any, item: any, index: number) 
       const exportFormat = getExportFormat(mimeType)
       const exportResponse = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
-          return await driveService.files.export(
+          return await driveService.drive.files.export(
             {
               fileId,
               mimeType: exportFormat,
@@ -304,7 +304,7 @@ async function processItemDownload(driveService: any, item: any, index: number) 
     // Regular file download
     const downloadResponse = await throttledDriveRequest(async () => {
       return await retryDriveApiCall(async () => {
-        return await driveService.files.get(
+        return await driveService.drive.files.get(
           {
             fileId,
             alt: 'media',
