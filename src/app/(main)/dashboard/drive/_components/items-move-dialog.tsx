@@ -237,6 +237,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
   const handleConfirmDestinationAndMove = () => {
     setShowDestinationSelector(false)
+    setIsProcessing(true)
     // Trigger move operation immediately
     setTimeout(() => {
       handleMove()

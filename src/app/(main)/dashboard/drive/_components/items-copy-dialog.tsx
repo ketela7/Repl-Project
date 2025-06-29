@@ -234,6 +234,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
   const handleConfirmDestinationAndCopy = () => {
     setShowDestinationSelector(false)
+    setIsProcessing(true)
     // Trigger copy operation immediately
     setTimeout(() => {
       handleCopy()
