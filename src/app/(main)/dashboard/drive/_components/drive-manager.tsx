@@ -682,9 +682,9 @@ export function DriveManager() {
         />
       )}
 
-      {/* Individual item action dialogs removed - using bulk operations instead */}
 
-      {/* Filters Dialog - functionality integrated into toolbar */}
+
+
 
       {/* Progress indicators */}
       {operationsProgress.isRunning && (
@@ -704,7 +704,6 @@ export function DriveManager() {
         </div>
       )}
 
-      {/* <PerformanceMonitor /> */}
     </div>
   )
 }
