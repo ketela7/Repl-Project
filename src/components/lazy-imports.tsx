@@ -31,7 +31,7 @@ export const ItemsTrashDialog = lazy(() => import('@/app/(main)/dashboard/drive/
 
 export const ItemsShareDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-share-dialog'))
 
-export const ItemsRenameDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-rename-dialog'))
+export const ItemsRenameDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-rename-dialog').then((mod) => ({ default: mod.ItemsRenameDialog })))
 
 export const ItemsExportDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-export-dialog'))
 

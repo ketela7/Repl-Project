@@ -200,24 +200,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     }
   }
 
-  const handleRenameComplete = async (namePrefix: string, newName?: string) => {
-    try {
-      const response = await fetch('/api/drive/files/rename', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: selectedItems,
-          namePrefix,
-          newName,
-        }),
-      })
-
-      if (response.ok) {
-        const result = await response.json()
-      }
-    } catch (error) {
-      console.error('Rename failed:', error)
-    }
+  const handleRenameComplete = async () => {
     setIsRenameDialogOpen(false)
     onRefreshAfterOp?.()
   }
