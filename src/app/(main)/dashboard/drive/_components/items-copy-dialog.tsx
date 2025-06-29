@@ -220,6 +220,11 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         errors: [],
       })
       onClose()
+
+      // Refresh page if operations were completed to show updated file list
+      if (isCompleted && (progress.success > 0 || progress.failed > 0)) {
+        window.location.reload()
+      }
     }
   }
 
@@ -443,6 +448,13 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
             </div>
           </div>
         )}
+
+        {/* Refresh Notice */}
+        {(progress.success > 0 || progress.failed > 0) && (
+          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
+            <p className="text-sm text-blue-700 dark:text-blue-300">The page will refresh to show updated files when you close this dialog.</p>
+          </div>
+        )}
       </div>
     )
   }
@@ -487,7 +499,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
               {isCompleted && (
                 <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
                   <CheckCircle className="mr-2 h-4 w-4" />
-                  Close
+                  Close & Refresh
                 </Button>
               )}
             </BottomSheetFooter>
@@ -572,7 +584,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
             {isCompleted && (
               <Button onClick={handleClose} className="w-full sm:w-auto">
                 <CheckCircle className="mr-2 h-4 w-4" />
-                Close
+                Close & Refresh
               </Button>
             )}
           </DialogFooter>
