@@ -2,6 +2,7 @@
 
 import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen } from 'lucide-react'
 import { useState } from 'react'
+import { toast } from 'sonner'
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetDescription } from '@/components/ui/bottom-sheet'
@@ -219,13 +220,13 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         // Direct download - open each file in new tab with full domain URL
         const baseUrl = window.location.origin
         const filesToDownload = selectedItems.filter((item) => !item.isFolder)
-        
+
         for (const item of filesToDownload) {
           const fullUrl = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
           window.open(fullUrl, '_blank')
           await new Promise((resolve) => setTimeout(resolve, 500))
         }
-        
+
         toast.success(`Started downloading ${filesToDownload.length} files`)
       } else if (downloadMode === 'exportLinks') {
         // Export links as CSV
@@ -305,13 +306,13 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
         // Direct download - open each file in new tab with full domain URL
         const baseUrl = window.location.origin
         const filesToDownload = selectedItems.filter((item) => !item.isFolder)
-        
+
         for (const item of filesToDownload) {
           const fullUrl = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
           window.open(fullUrl, '_blank')
           await new Promise((resolve) => setTimeout(resolve, 500))
         }
-        
+
         toast.success(`Started downloading ${filesToDownload.length} files`)
       } else if (downloadMode === 'exportLinks') {
         // Export links as CSV
@@ -340,59 +341,6 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     } catch (error) {
       console.error('Download failed:', error)
       toast.error('Download failed')
-    }
-    setIsDownloadDialogOpen(false)
-    onRefreshAfterOp?.()
-  }
-
-  const handleDownloadComplete = async (downloadMode: string, progressCallback?: (progress: any) => void) => {
-    try {
-      // Filter downloadable files (no folders)
-      const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
-
-      if (downloadableFiles.length === 0) {
-        errorToast.generic('No files selected for download')
-        return
-      }
-
-      // For single file, use direct streaming
-      if (downloadableFiles.length === 1) {
-        const fileId = downloadableFiles[0].id
-        const downloadUrl = `/api/drive/files/download?fileId=${fileId}`
-        window.open(downloadUrl, '_blank')
-        successToast.downloaded()
-      } else {
-        // For multiple files, use batch download with streaming URLs
-        const response = await fetch('/api/drive/files/download', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            items: downloadableFiles,
-            downloadMode,
-          }),
-        })
-
-        if (!response.ok) {
-          throw new Error(`Download failed: ${response.statusText}`)
-        }
-
-        const result = await response.json()
-
-        // Open streaming URLs in new tabs
-        if (result.success && Array.isArray(result.success)) {
-          result.success.forEach((item: any, index: number) => {
-            setTimeout(() => {
-              window.open(item.streamUrl, '_blank')
-            }, index * 500)
-          })
-          successToast.generic(`Started ${result.success.length} downloads`)
-        }
-      }
-    } catch (error) {
-      console.error('Download failed:', error)
-      errorToast.generic('Download operation failed')
     }
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()

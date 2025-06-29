@@ -123,6 +123,7 @@ Changelog:
 - June 28, 2025. Updated operation button labels and function names for consistency - "Restore from Trash" → "Untrash", "Permanent Delete" → "Delete", updated corresponding function names
 - June 29, 2025. Implemented direct streaming downloads with _blank opening - extended existing download route to stream files directly from Google Drive API without using Google Drive download URLs, follows "extend over create" principle
 - June 29, 2025. Fixed driveService API access pattern - corrected all API calls to use driveService.drive.files instead of driveService.files for proper Google Drive API integration
+- June 29, 2025. Fixed download empty tab issue - implemented direct window.open() calls with full domain URLs instead of relative paths, simplified download system with proper Node.js to Web Stream conversion for browser compatibility
 ```
 
 ## User Preferences

@@ -61,15 +61,14 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     errors: [],
   })
 
-  
-
   // Filter downloadable files (only files, skip folders)
   const downloadableFiles = selectedItems.filter((item) => !item.isFolder)
   const skippedFolders = selectedItems.filter((item) => item.isFolder)
   const selectedModeData = DOWNLOAD_MODES.find((mode) => mode.id === selectedMode)
 
-
-  {/* Handle */}
+  {
+    /* Handle */
+  }
   const handleConfirm = async () => {
     if (downloadableFiles.length === 0) {
       toast.error('No files available for download')
@@ -159,8 +158,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
     }
   }
 
-
-  {/* Render */}
+  {
+    /* Render */
+  }
   const isMobile = useIsMobile()
   const DialogComponent = isMobile ? BottomSheet : Dialog
   const DialogContentComponent = isMobile ? BottomSheetContent : DialogContent
