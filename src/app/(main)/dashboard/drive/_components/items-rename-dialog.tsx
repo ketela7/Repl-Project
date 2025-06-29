@@ -115,9 +115,8 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
       abortControllerRef.current.abort()
     }
 
-    // Stop processing
+    // Stop processing immediately
     setIsProcessing(false)
-    setIsCompleted(true)
 
     toast.info('Rename operation cancelled by user')
   }
@@ -371,36 +370,44 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
       console.error(err)
       toast.error('Rename operation failed')
     } finally {
-      // Clean up
+      // Clean up only if not cancelled
+      if (!isCancelledRef.current) {
+        setIsCompleted(true)
+      }
       abortControllerRef.current = null
       setIsProcessing(false)
-      setIsCompleted(true)
     }
   }
 
   const handleClose = () => {
-    if (!isProcessing) {
-      // Reset states when closing
-      setIsCompleted(false)
-      setIsCancelled(false)
-      isCancelledRef.current = false
-      abortControllerRef.current = null
-      setProgress({
-        current: 0,
-        total: 0,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
-      setRenameText('')
-      setFindText('')
-      setReplaceText('')
-      setRegexPattern('')
-      setRegexReplace('')
-      setPreviews([])
-      onClose()
+    // If processing, force cancel first
+    if (isProcessing) {
+      handleCancel()
+      return
     }
+
+    // Reset all states when closing
+    setIsCompleted(false)
+    setIsCancelled(false)
+    isCancelledRef.current = false
+    abortControllerRef.current = null
+    setProgress({
+      current: 0,
+      total: 0,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+    setRenameText('')
+    setFindText('')
+    setReplaceText('')
+    setRegexPattern('')
+    setRegexReplace('')
+    setNumberingStart(1)
+    setNumberingPadding(2)
+    setPreviews([])
+    onClose()
   }
 
   // Render different content based on state
@@ -664,7 +671,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
 
   if (isMobile) {
     return (
-      <BottomSheet open={isOpen} onOpenChange={isProcessing ? undefined : handleClose}>
+      <BottomSheet open={isOpen} onOpenChange={(open) => !open && handleClose()}>
         <BottomSheetContent>
           <BottomSheetHeader>
             <BottomSheetTitle>Rename Items</BottomSheetTitle>
@@ -672,11 +679,11 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
           <div className="max-h-[70vh] overflow-y-auto px-4 pb-6">{renderContent()}</div>
           <BottomSheetFooter>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={handleClose} disabled={isProcessing} className="flex-1">
-                {isCompleted ? 'Close' : 'Cancel'}
+              <Button variant="outline" onClick={handleClose} className="flex-1">
+                {isCompleted || isCancelled ? 'Close' : isProcessing ? 'Cancel' : 'Cancel'}
               </Button>
-              {!isCompleted && (
-                <Button onClick={isProcessing ? handleCancel : handleConfirm} disabled={isProcessing} className="flex-1">
+              {!isCompleted && !isCancelled && (
+                <Button onClick={isProcessing ? handleCancel : handleConfirm} disabled={isProcessing && isCancelled} className="flex-1">
                   {isProcessing ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -695,7 +702,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={isProcessing ? undefined : handleClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Rename Items</DialogTitle>
@@ -703,11 +710,11 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         <div className="max-h-[70vh] overflow-y-auto">{renderContent()}</div>
         <DialogFooter>
           <div className="flex w-full gap-2">
-            <Button variant="outline" onClick={handleClose} disabled={isProcessing} className="flex-1">
-              {isCompleted ? 'Close' : 'Cancel'}
+            <Button variant="outline" onClick={handleClose} className="flex-1">
+              {isCompleted || isCancelled ? 'Close' : isProcessing ? 'Cancel' : 'Cancel'}
             </Button>
-            {!isCompleted && (
-              <Button onClick={isProcessing ? handleCancel : handleConfirm} disabled={isProcessing} className="flex-1">
+            {!isCompleted && !isCancelled && (
+              <Button onClick={isProcessing ? handleCancel : handleConfirm} disabled={isProcessing && isCancelled} className="flex-1">
                 {isProcessing ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
