@@ -21,8 +21,57 @@ export async function GET(request: NextRequest) {
 
     const { driveService } = authResult
 
-    // Stream the file directly
-    return await streamSingleFile(driveService, { id: fileId })
+    // Get file metadata first
+    const metadata = await throttledDriveRequest(async () => {
+      return await retryDriveApiCall(async () => {
+        return await driveService.drive.files.get({
+          fileId,
+          fields: 'name,mimeType,size',
+        })
+      })
+    })
+
+    const { name: fileName, mimeType, size } = metadata.data
+
+    // Handle Google Workspace files (export)
+    if (isGoogleWorkspaceFile(mimeType)) {
+      const exportFormat = getExportFormat(mimeType)
+      const response = await throttledDriveRequest(async () => {
+        return await retryDriveApiCall(async () => {
+          return await driveService.drive.files.export({
+            fileId,
+            mimeType: exportFormat,
+          })
+        })
+      })
+
+      const exportFileName = `${fileName.replace(/\.[^/.]+$/, '')}.${getFileExtension(exportFormat)}`
+
+      return new NextResponse(response.data as BodyInit, {
+        headers: {
+          'Content-Type': exportFormat,
+          'Content-Disposition': `attachment; filename="${exportFileName}"`,
+        },
+      })
+    }
+
+    // Regular file download - direct pipe like GitHub example
+    const response = await throttledDriveRequest(async () => {
+      return await retryDriveApiCall(async () => {
+        return await driveService.drive.files.get({
+          fileId,
+          alt: 'media',
+        })
+      })
+    })
+
+    return new NextResponse(response.data as BodyInit, {
+      headers: {
+        'Content-Type': mimeType || 'application/octet-stream',
+        'Content-Disposition': `attachment; filename="${fileName}"`,
+        ...(size && { 'Content-Length': size }),
+      },
+    })
   } catch (error) {
     return handleApiError(error)
   }
@@ -32,324 +81,40 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    // Initialize Drive service with authentication
-    const authResult = await initDriveService()
-    if (!authResult.success) {
-      return authResult.response!
-    }
-
-    const { driveService } = authResult
-
-    let { items, downloadMode } = body
     if (!validateDownloadRequest(body)) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    // Handle single file direct streaming download
-    if (!Array.isArray(items) && items.id) {
-      return await streamSingleFile(driveService, items)
-    }
+    let { items } = body
 
-    // Normalize single item to array for unified processing
+    // Normalize single item to array
     if (!Array.isArray(items)) {
       items = [items]
     }
 
-    // Handle single file in array format
-    if (items.length === 1) {
-      return await streamSingleFile(driveService, items[0])
-    }
+    // Return streaming URLs for _blank opening - no blob processing
+    const downloadUrls = items.map((item: any) => ({
+      id: item.id,
+      name: item.name,
+      downloadUrl: `/api/drive/files/download?fileId=${item.id}`,
+      direct: true,
+    }))
 
-    return await processParallelDownload(driveService, items, downloadMode)
+    return NextResponse.json({
+      success: downloadUrls,
+      summary: {
+        total: items.length,
+        successful: items.length,
+        failed: 0,
+        skipped: 0,
+      },
+    })
   } catch (error) {
     return handleApiError(error)
   }
 }
 
-/**
- * Stream single file directly to browser for immediate download
- */
-async function streamSingleFile(driveService: any, item: any) {
-  const fileId = item.id
-
-  try {
-    // Get file metadata
-    const metadata = await throttledDriveRequest(async () => {
-      return await retryDriveApiCall(async () => {
-        return await driveService.drive.files.get({
-          fileId,
-          fields: 'name,mimeType,size,parents',
-        })
-      })
-    })
-
-    const fileName = metadata.data.name
-    const mimeType = metadata.data.mimeType
-    const fileSize = metadata.data.size
-
-    // Handle Google Workspace files (export to downloadable format)
-    if (isGoogleWorkspaceFile(mimeType)) {
-      const exportFormat = getExportFormat(mimeType)
-      const exportResponse = await throttledDriveRequest(async () => {
-        return await retryDriveApiCall(async () => {
-          return await driveService.drive.files.export(
-            {
-              fileId,
-              mimeType: exportFormat,
-            },
-            { responseType: 'stream' }
-          )
-        })
-      })
-
-      const exportFileName = `${fileName.replace(/\.[^/.]+$/, '')}.${getFileExtension(exportFormat)}`
-
-      return new NextResponse(exportResponse.data, {
-        headers: {
-          'Content-Type': exportFormat,
-          'Content-Disposition': `attachment; filename="${exportFileName}"`,
-          'Cache-Control': 'no-cache',
-        },
-      })
-    }
-
-    // Regular file download with streaming
-    const downloadResponse = await throttledDriveRequest(async () => {
-      return await retryDriveApiCall(async () => {
-        return await driveService.drive.files.get(
-          {
-            fileId,
-            alt: 'media',
-          },
-          { responseType: 'stream' }
-        )
-      })
-    })
-
-    return new NextResponse(downloadResponse.data, {
-      headers: {
-        'Content-Type': mimeType || 'application/octet-stream',
-        'Content-Disposition': `attachment; filename="${fileName}"`,
-        ...(fileSize && { 'Content-Length': fileSize.toString() }),
-        'Cache-Control': 'no-cache',
-      },
-    })
-  } catch (error: any) {
-    console.error('Stream download failed:', error)
-    return NextResponse.json(
-      {
-        error: 'Stream download failed',
-        details: getErrorMessage(error),
-        fileId,
-        fileName: item.name,
-      },
-      { status: 500 }
-    )
-  }
-}
-
-/**
- * Process downloads with parallel streaming and progress tracking
- */
-async function processParallelDownload(driveService: any, items: any[], downloadMode: string) {
-  // Handle export links mode
-  if (downloadMode === 'exportLinks') {
-    const csvContent = generateDownloadCSV(
-      items.map((item) => ({
-        id: item.id,
-        name: item.name,
-        downloadUrl: `https://drive.google.com/uc?export=download&id=${item.id}`,
-      }))
-    )
-
-    return new NextResponse(csvContent, {
-      headers: {
-        'Content-Type': 'text/csv',
-        'Content-Disposition': `attachment; filename="download-links-${Date.now()}.csv"`,
-      },
-    })
-  }
-
-  // Parallel processing for streaming downloads
-  const results = await Promise.allSettled(
-    items.map(async (item, index) => {
-      try {
-        return await processItemDownload(driveService, item, index)
-      } catch (error) {
-        return {
-          success: false,
-          id: item.id,
-          name: item.name,
-          error: getErrorMessage(error),
-          skipped: isSkippableError(error),
-        }
-      }
-    })
-  )
-
-  // Process results
-  const successful = []
-  const failed = []
-  const skipped = []
-
-  results.forEach((result, index) => {
-    const item = items[index]
-
-    if (result.status === 'fulfilled') {
-      const data = result.value
-      if (data.success) {
-        successful.push(data)
-      } else if ((data as any).skipped) {
-        skipped.push({
-          id: item.id,
-          name: item.name,
-          reason: data.error,
-        })
-      } else {
-        failed.push({
-          id: item.id,
-          name: item.name,
-          error: data.error,
-        })
-      }
-    } else {
-      failed.push({
-        id: item.id,
-        name: item.name,
-        error: getErrorMessage(result.reason),
-      })
-    }
-  })
-
-  // For single file success, return stream directly
-  if (items.length === 1 && successful.length === 1) {
-    const result = successful[0]
-    return new NextResponse(result.stream, {
-      headers: {
-        'Content-Type': result.mimeType,
-        'Content-Disposition': `attachment; filename="${result.fileName}"`,
-        ...(result.size && { 'Content-Length': result.size.toString() }),
-      },
-    })
-  }
-
-  // For batch downloads, return stream URLs for _blank opening
-  return NextResponse.json({
-    success: successful.map((item) => ({
-      id: item.id,
-      name: item.fileName,
-      streamUrl: `/api/drive/files/download?fileId=${item.id}`, // Use our streaming endpoint
-      direct: true,
-    })),
-    failed,
-    skipped,
-    summary: {
-      total: items.length,
-      successful: successful.length,
-      failed: failed.length,
-      skipped: skipped.length,
-    },
-  })
-}
-
-/**
- * Process individual item download with stream handling
- */
-async function processItemDownload(driveService: any, item: any, index: number) {
-  const fileId = item.id
-
-  try {
-    // Get file metadata
-    const metadata = await throttledDriveRequest(async () => {
-      return await retryDriveApiCall(async () => {
-        return await driveService.drive.files.get({
-          fileId,
-          fields: 'name,mimeType,size,parents',
-        })
-      })
-    })
-
-    const fileName = metadata.data.name
-    const mimeType = metadata.data.mimeType
-    const fileSize = metadata.data.size
-
-    // Handle Google Workspace files
-    if (isGoogleWorkspaceFile(mimeType)) {
-      const exportFormat = getExportFormat(mimeType)
-      const exportResponse = await throttledDriveRequest(async () => {
-        return await retryDriveApiCall(async () => {
-          return await driveService.drive.files.export(
-            {
-              fileId,
-              mimeType: exportFormat,
-            },
-            { responseType: 'stream' }
-          )
-        })
-      })
-
-      const exportFileName = `${fileName.replace(/\.[^/.]+$/, '')}.${getFileExtension(exportFormat)}`
-
-      return {
-        success: true,
-        id: fileId,
-        fileName: exportFileName,
-        mimeType: exportFormat,
-        stream: exportResponse.data,
-        size: null,
-        index,
-      }
-    }
-
-    // Regular file download
-    const downloadResponse = await throttledDriveRequest(async () => {
-      return await retryDriveApiCall(async () => {
-        return await driveService.drive.files.get(
-          {
-            fileId,
-            alt: 'media',
-          },
-          { responseType: 'stream' }
-        )
-      })
-    })
-
-    return {
-      success: true,
-      id: fileId,
-      fileName,
-      mimeType: mimeType || 'application/octet-stream',
-      stream: downloadResponse.data,
-      size: fileSize ? parseInt(fileSize) : null,
-      index,
-    }
-  } catch (error: any) {
-    // Fallback to direct URL on stream failure
-    const fallbackUrl = `https://drive.google.com/uc?export=download&id=${fileId}`
-
-    return {
-      success: true,
-      id: fileId,
-      fileName: item.name || 'download',
-      fallbackUrl,
-      error: getErrorMessage(error),
-      index,
-    }
-  }
-}
-
-/**
- * Generate CSV content for download links
- */
-function generateDownloadCSV(items: Array<{ id: string; name: string; downloadUrl?: string }>) {
-  const headers = 'File Name,Download Link\n'
-  const rows = items
-    .filter((item) => item.downloadUrl)
-    .map((item) => `"${item.name}","${item.downloadUrl}"`)
-    .join('\n')
-
-  return headers + rows
-}
+// Helper functions for Google Workspace files
 
 /**
  * Check if file is Google Workspace file that needs export
@@ -388,45 +153,4 @@ function getFileExtension(mimeType: string): string {
   }
 
   return extensionMap[mimeType] || 'pdf'
-}
-
-/**
- * Extract user-friendly error message
- */
-function getErrorMessage(error: any): string {
-  if (error?.response?.data?.error) {
-    const apiError = error.response.data.error
-
-    switch (apiError.code) {
-      case 403:
-        if (apiError.message?.includes('rateLimitExceeded')) {
-          return 'Rate limit exceeded'
-        }
-        if (apiError.message?.includes('quotaExceeded')) {
-          return 'Quota exceeded'
-        }
-        if (apiError.message?.includes('storageQuotaExceeded')) {
-          return 'Storage quota exceeded'
-        }
-        return 'Access denied'
-      case 404:
-        return 'File not found'
-      case 429:
-        return 'Too many requests'
-      default:
-        return apiError.message || 'Download failed'
-    }
-  }
-
-  return error?.message || 'Unknown error occurred'
-}
-
-/**
- * Check if error should cause file to be skipped rather than failed
- */
-function isSkippableError(error: any): boolean {
-  const errorCode = error?.response?.data?.error?.code
-  const errorMessage = error?.response?.data?.error?.message || ''
-
-  return (errorCode === 403 && (errorMessage.includes('rateLimitExceeded') || errorMessage.includes('quotaExceeded') || errorMessage.includes('storageQuotaExceeded'))) || errorCode === 429
 }
