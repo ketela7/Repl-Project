@@ -301,8 +301,6 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
   }
 
   const handleDownloadComplete = async () => {
-    
-
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()
   }
@@ -490,7 +488,7 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
 
       <ItemsExportDialog isOpen={isExportDialogOpen} onClose={() => setIsExportDialogOpen(false)} onConfirm={handleExportComplete} selectedItems={selectedItems} />
 
-      <ItemsDownloadDialog isOpen={isDownloadDialogOpen} onClose={() => setIsDownloadDialogOpen(false)} onConfirm={handleDownloadComplete} selectedItems={selectedItems} />
+      <ItemsDownloadDialog isOpen={isDownloadDialogOpen} onClose={handleDownloadComplete} selectedItems={selectedItems} />
 
       <ItemsDeleteDialog isOpen={isDeleteDialogOpen} onClose={() => setIsDeleteDialogOpen(false)} onConfirm={handleDeleteComplete} selectedItems={selectedItems} />
 
