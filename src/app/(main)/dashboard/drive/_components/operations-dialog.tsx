@@ -300,61 +300,11 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     onRefreshAfterOp?.()
   }
 
-  const handleDownloadComplete = async (downloadMode: string) => {
-    try {
-      if (downloadMode === 'direct') {
-        // Direct download - open each file in new tab with full domain URL
-        const baseUrl = window.location.origin
-        const filesToDownload = selectedItems.filter((item) => !item.isFolder)
+  const handleDownloadComplete = async () => {
+    
 
-        for (const item of filesToDownload) {
-          const fullUrl = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
-          window.open(fullUrl, '_blank')
-          await new Promise((resolve) => setTimeout(resolve, 500))
-        }
-
-        toast.success(`Started downloading ${filesToDownload.length} files`)
-      } else if (downloadMode === 'exportLinks') {
-        // Export links as CSV
-        const response = await fetch('/api/drive/files/export', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            items: selectedItems.filter((item) => !item.isFolder),
-            format: 'csv',
-          }),
-        })
-
-        if (response.ok) {
-          const blob = await response.blob()
-          const url = URL.createObjectURL(blob)
-          const link = document.createElement('a')
-          link.href = url
-          link.download = 'download-links.csv'
-          document.body.appendChild(link)
-          link.click()
-          document.body.removeChild(link)
-          URL.revokeObjectURL(url)
-          toast.success('Download links exported to CSV')
-        }
-      }
-    } catch (error) {
-      console.error('Download failed:', error)
-      toast.error('Download failed')
-    }
     setIsDownloadDialogOpen(false)
     onRefreshAfterOp?.()
-  }
-
-  // Helper function to generate CSV content
-  const generateCSV = (successfulDownloads: Array<{ id: string; name: string; downloadUrl?: string }>) => {
-    const headers = 'File Name,Download Link\n'
-    const rows = successfulDownloads
-      .filter((item) => item.downloadUrl)
-      .map((item) => `"${item.name}","${item.downloadUrl}"`)
-      .join('\n')
-
-    return headers + rows
   }
 
   const renderContent = () => (

@@ -119,33 +119,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json()
 
-    if (!validateDownloadRequest(body)) {
-      return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
-    }
 
-    let { items } = body
-
-    // Normalize single item to array
-    if (!Array.isArray(items)) {
-      items = [items]
-    }
-
-    // Since we're using direct window.open() calls, just return success
-    return NextResponse.json({
-      success: true,
-      message: 'Downloads initiated',
-      count: items.length,
-    })
-  } catch (error) {
-    return handleApiError(error)
-  }
-}
-
-// Helper functions for Google Workspace files
 
 /**
  * Check if file is Google Workspace file that needs export

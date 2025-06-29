@@ -80,9 +80,6 @@ author = "agent"
 task = "workflow.run"
 args = "Server"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Test:Watch"
 
 [[workflows.workflow]]
 name = "Server"

@@ -17,12 +17,11 @@ import { cn } from '@/lib/utils'
 interface ItemsDownloadDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (downloadMode: string, progressCallback?: (progress: any) => void) => void
+  onConfirm: () => void
   selectedItems: Array<{
     id: string
     name: string
     isFolder: boolean
-    size?: string
   }>
 }
 
@@ -74,87 +73,38 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
       toast.error('No files available for download')
       return
     }
-
     setIsProcessing(true)
-    setProgress({
-      current: 0,
-      total: downloadableFiles.length,
-      success: 0,
-      skipped: skippedFolders.length, // Folders are auto-skipped
-      failed: 0,
-      errors: [],
-    })
-
-    // Progress callback to update UI
-    const progressCallback = (progressData: any) => {
-      setProgress((prev) => ({
-        ...prev,
-        current: progressData.current || prev.current,
-        total: progressData.total || prev.total,
-        currentFile: progressData.currentOperation || prev.currentFile,
-        success: progressData.success || prev.success,
-        failed: progressData.failed || prev.failed,
-      }))
-    }
-
     try {
-      // Call the download API directly with streaming
-      const response = await fetch('/api/drive/files/download', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          items: downloadableFiles,
-          downloadMode: selectedMode,
-        }),
-      })
+      const baseUrl = window.location.origin
 
-      if (!response.ok) {
-        throw new Error(`Download failed: ${response.statusText}`)
-      }
-
-      const result = await response.json()
-
-      // Handle streaming downloads by opening URLs in new tabs
-      if (result.success && Array.isArray(result.success)) {
-        result.success.forEach((item: any, index: number) => {
-          setTimeout(() => {
-            // Use streaming endpoint for direct download
-            window.open(item.streamUrl, '_blank')
-          }, index * 1000) // Stagger downloads to avoid browser blocking
+      if (selectedModeData === 'direct') {
+        toast.success(`Started downloading ${downloadableFiles.length} files`)
+        downloadableFiles.forEach((item) => {
+          const url = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
+          window.open(url, '_blank')
         })
+      } else if (selectedModeData === 'exportLinks') {
+        let csv = 'File Name,Download Link\n'
+        downloadableFiles.forEach((item) => {
+          const url = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
+          csv += `"${item.name}","${url}"\n`
+        })
+        const blob = new Blob([csv], { type: 'text/csv' })
+        const link = document.createElement('a')
+        link.href = URL.createObjectURL(blob)
+        link.download = 'download_links.csv'
+        link.click()
+        toast.success('Download links exported')
       }
-
-      // Update final progress
-      setProgress({
-        current: result.summary?.successful || 0,
-        total: result.summary?.total || downloadableFiles.length,
-        success: result.summary?.successful || 0,
-        failed: result.summary?.failed || 0,
-        skipped: result.summary?.skipped || skippedFolders.length,
-        errors: result.failed || [],
-      })
-
-      toast.success(`Downloaded ${result.summary?.successful || downloadableFiles.length} files successfully`)
-    } catch (error) {
-      toast.error('Download operation failed')
-    } finally {
-      setIsProcessing(false)
+    } catch (err) {
+      console.error(err)
+      toast.error('Download failed')
     }
   }
 
   const handleClose = () => {
     if (!isProcessing) {
       onClose()
-      setProgress({
-        current: 0,
-        total: 0,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
     }
   }
 
