@@ -165,7 +165,6 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
       if (!isCancelledRef.current) {
         if (successCount > 0) {
           successToast.generic(`Untrashed ${successCount} item${successCount > 1 ? 's' : ''} from trash`)
-          onConfirm()
         }
         if (failedCount > 0) {
           errorToast.generic(`Failed to untrash ${failedCount} item${failedCount > 1 ? 's' : ''}`)

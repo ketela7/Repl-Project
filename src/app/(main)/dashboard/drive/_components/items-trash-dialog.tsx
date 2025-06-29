@@ -176,7 +176,6 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
       if (!isCancelledRef.current) {
         if (successCount > 0) {
           toast.success(`Moved ${successCount} item${successCount > 1 ? 's' : ''} to trash`)
-          onConfirm()
         }
         if (failedCount > 0) {
           toast.error(`Failed to move ${failedCount} item${failedCount > 1 ? 's' : ''} to trash`)

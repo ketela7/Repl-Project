@@ -193,7 +193,6 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
       if (!isCancelledRef.current) {
         if (successCount > 0) {
           toast.success(`Shared ${successCount} item${successCount > 1 ? 's' : ''}`)
-          onConfirm()
         }
         if (failedCount > 0) {
           toast.error(`Failed to share ${failedCount} item${failedCount > 1 ? 's' : ''}`)

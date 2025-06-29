@@ -176,7 +176,6 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
       if (!isCancelledRef.current) {
         if (successCount > 0) {
           toast.success(`Permanently deleted ${successCount} item${successCount > 1 ? 's' : ''}`)
-          onConfirm()
         }
         if (failedCount > 0) {
           toast.error(`Failed to delete ${failedCount} item${failedCount > 1 ? 's' : ''}`)

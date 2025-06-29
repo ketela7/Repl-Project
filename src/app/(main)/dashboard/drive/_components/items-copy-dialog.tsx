@@ -182,7 +182,6 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
       if (!isCancelledRef.current) {
         if (successCount > 0) {
           toast.success(`Copied ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`)
-          onConfirm()
         }
         if (failedCount > 0) {
           toast.error(`Failed to copy ${failedCount} item${failedCount > 1 ? 's' : ''}`)

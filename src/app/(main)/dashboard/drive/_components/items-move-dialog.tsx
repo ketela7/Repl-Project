@@ -185,7 +185,6 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
       if (!isCancelledRef.current) {
         if (successCount > 0) {
           toast.success(`Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`)
-          onConfirm()
         }
         if (failedCount > 0) {
           toast.error(`Failed to move ${failedCount} item${failedCount > 1 ? 's' : ''}`)

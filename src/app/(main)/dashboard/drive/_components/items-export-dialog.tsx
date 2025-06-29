@@ -263,7 +263,6 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       if (!isCancelledRef.current) {
         if (successCount > 0) {
           toast.success(`Exported ${successCount} file${successCount > 1 ? 's' : ''}`)
-          onConfirm()
         }
         if (failedCount > 0) {
           toast.error(`Failed to export ${failedCount} file${failedCount > 1 ? 's' : ''}`)

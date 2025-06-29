@@ -244,7 +244,8 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
 
   const handleCloseAndRefresh = () => {
     if (!isProcessing) {
-      // Refresh immediately to show results
+      // Close dialog and refresh page
+      handleClose()
       window.location.reload()
     }
   }
