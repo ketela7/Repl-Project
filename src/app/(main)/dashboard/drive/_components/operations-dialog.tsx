@@ -140,68 +140,41 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems, 
     setIsDownloadDialogOpen(false)
   }
 
-  // Standardized completion handlers with refresh
+  // Standardized completion handlers - no automatic refresh since dialogs handle their own refresh
   const handleMoveComplete = () => {
     setIsMoveDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const handleCopyComplete = () => {
     setIsCopyDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const handleTrashComplete = () => {
     setIsTrashDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const handleShareComplete = () => {
     setIsShareDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const handleRenameComplete = () => {
     setIsRenameDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const handleExportComplete = () => {
     setIsExportDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const handleDeleteComplete = () => {
     setIsDeleteDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const handleUntrashComplete = () => {
     setIsUntrashDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const handleDownloadComplete = () => {
     setIsDownloadDialogOpen(false)
-    setTimeout(() => {
-      onRefreshAfterOp?.()
-    }, 500)
   }
 
   const renderContent = () => (
