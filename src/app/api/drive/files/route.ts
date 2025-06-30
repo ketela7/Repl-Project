@@ -337,8 +337,8 @@ export async function GET(request: NextRequest) {
         id: fileMetadata.id || fileId, // Fallback to requested fileId if id is missing
       }
       
-      // // console.log('[Drive API] Single file response:', response)
-      // // console.log('[Drive API] File ID check:', { requestedId: fileId, responseId: response.id })
+      // // // console.log('[Drive API] Single file response:', response)
+      // // // console.log('[Drive API] File ID check:', { requestedId: fileId, responseId: response.id })
       
       return NextResponse.json(response)
     }
@@ -404,7 +404,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    // // console.log('[Drive API] Request details:', {
+    // // // console.log('[Drive API] Request details:', {
     //   folderId,
     //   viewStatus: filters.viewStatus,
     //   query,
@@ -433,7 +433,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error: any) {
-    //// // console.error('Drive API Error:', error)
+    //// // // console.error('Drive API Error:', error)
 
     // Handle authentication errors
     if (error.name === 'AuthenticationError' || error.code === 401) {

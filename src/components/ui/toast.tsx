@@ -2,7 +2,7 @@
  * Enhanced toast notification utilities for better user feedback
  */
 import { toast } from 'sonner'
-import React from 'react'
+import type { ReactNode } from 'react'
 import type { ReactNode } from 'react'
 import type { ReactNode } from 'react'
 import type { ReactNode } from 'react'

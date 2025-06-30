@@ -370,7 +370,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         // Operation was cancelled, don't show error
         return
       }
-      // // console.error(err)
+      // // // console.error(err)
       toast.error('Rename operation failed')
     } finally {
       // Clean up only if not cancelled

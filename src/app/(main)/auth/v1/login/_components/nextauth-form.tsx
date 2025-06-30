@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 const FormSchema = z.object({
-  remember: z.boolean().optional().default(false),
+  remember: z.boolean().default(false),
 })
 
 interface NextAuthFormProps {

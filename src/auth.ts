@@ -70,11 +70,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
             token.exp = Math.floor(Date.now() / 1000) + (refreshedTokens.expires_in || 3600)
           } else {
-            // // console.error('Token refresh failed:', response.status)
+            // // // console.error('Token refresh failed:', response.status)
             token.accessToken = undefined
           }
         } catch (error) {
-          // // console.error('Token refresh error:', error)
+          // // // console.error('Token refresh error:', error)
           token.accessToken = undefined
         }
       }

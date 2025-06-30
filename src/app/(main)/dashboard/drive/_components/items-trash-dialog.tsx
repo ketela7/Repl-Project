@@ -186,7 +186,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
         // Operation was cancelled, don't show error
         return
       }
-      // // console.error(err)
+      // // // console.error(err)
       toast.error('Trash operation failed')
     } finally {
       // Clean up
