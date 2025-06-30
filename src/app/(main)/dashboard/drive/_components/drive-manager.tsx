@@ -20,6 +20,7 @@ import { FilePreviewDialog } from './file-preview-dialog'
 import { FileDetailsDialog } from './file-details-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
+import { OperationsDialog } from './operations-dialog'
 
 type DriveItem = (DriveFile | DriveFolder) & {
   itemType?: 'file' | 'folder'
@@ -776,8 +777,11 @@ export function DriveManager() {
                 case 'trash':
                 case 'delete':
                 case 'untrash':
-                  // Individual actions now handled through bulk operations
+                  // Individual actions handled through bulk operations
                   setSelectedItems(new Set([item.id]))
+                  setTimeout(() => {
+                    openDialog('operations')
+                  }, 50)
                   break
               }
             }}
@@ -811,7 +815,19 @@ export function DriveManager() {
         }}
       />
 
-      {/* Individual dialog operations removed - using bulk operations instead */}
+      {/* Operations Dialog for bulk actions */}
+      {dialogs.operations && selectedItems.size > 0 && (
+        <OperationsDialog
+          isOpen={dialogs.operations}
+          onClose={() => {
+            closeDialog('operations')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onRefresh={handleRefresh}
+        />
+      )}
 
       {selectedFileForPreview && dialogs.preview && !dialogs.details && (
         <FilePreviewDialog
