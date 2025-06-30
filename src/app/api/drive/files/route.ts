@@ -29,17 +29,17 @@ function buildDriveQuery(filters: FileFilter): string {
       break
     case 'shared':
       // Shared with me view - files shared by others
-      conditions.push('trashed=false')
+      //conditions.push('trashed=false')
       conditions.push('sharedWithMe=true')
       break
     case 'starred':
       // Starred view - starred files only
-      conditions.push('trashed=false')
+      //conditions.push('trashed=false')
       conditions.push('starred=true')
       break
     case 'my-drive':
       // My Drive view - files owned by me
-      conditions.push('trashed=false')
+      //conditions.push('trashed=false')
       conditions.push("'me' in owners")
       break
 
@@ -369,12 +369,9 @@ export async function GET(request: NextRequest) {
       // My Drive view - always constrain to folders I own
       const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
-    } else if (filters.viewStatus === 'shared' || filters.viewStatus === 'starred' || filters.viewStatus === 'recent') {
+    }  else if (['shared', 'starred', 'recent','trash'].includes(filters.viewStatus)) {
       // These views don't need parent constraints - they show files from anywhere
       // query already contains the appropriate filters from buildDriveQuery
-    } else if (filters.viewStatus === 'trash') {
-      // Trash view - don't add parent constraints, show all trashed files
-      // query already contains trashed=true from buildDriveQuery
     } else {
       // Default/all view - show files in current folder
       const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
