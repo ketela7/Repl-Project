@@ -1,3 +1,4 @@
+
 modules = ["web", "nodejs-23"]
 
 [[ports]]
@@ -7,70 +8,7 @@ externalPort = 80
 [workflows]
 runButton = "Project"
 
-[[workflows.workflow]]
-name = "Check Format"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format"
-
-[[workflows.workflow]]
-name = "Check Lint"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run lint"
-
-[[workflows.workflow]]
-name = "Check Duplicate"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx jscpd src"
-
-[[workflows.workflow]]
-name = "Build"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run build"
-
-[[workflows.workflow]]
-name = "Production"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run start"
-
-[[workflows.workflow]]
-name = "Clean Up"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "rm -rf ~/.{npm,nvm,yarn,bun} node_modules package-lock.json .cache tsconfig.tsbuildinfo"
-
-[[workflows.workflow]]
-name = "Prepare"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx npm-check-updates -u"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm install"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm audit fix"
-
+# ===== MAIN WORKFLOWS =====
 [[workflows.workflow]]
 name = "Project"
 mode = "parallel"
@@ -90,6 +28,16 @@ task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
 
+# ===== DEVELOPMENT WORKFLOWS =====
+[[workflows.workflow]]
+name = "Dev Fast"
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev:fast"
+waitForPort = 5000
+
 [[workflows.workflow]]
 name = "TypeCheck"
 author = "agent"
@@ -97,24 +45,12 @@ mode = "parallel"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "tsc --noEmit --watch --preserveWatchOutput && echo \"✅ Typecheck completed successfully\""
+args = "npm run type-check && echo '✅ Typecheck completed successfully'"
 
-[[workflows.workflow]]
-name = "Format"
-author = "agent"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format:fix && echo \"✅ Code formatting completed successfully\" "
-
+# ===== CODE QUALITY WORKFLOWS =====
 [[workflows.workflow]]
 name = "Lint"
-author = "agent"
+mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -122,51 +58,10 @@ args = "npm run lint"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run lint:fix && echo \"✅ Code Linter completed successfully\""
+args = "npm run lint:fix && echo '✅ Code linting completed successfully'"
 
 [[workflows.workflow]]
-name = "Test:Watch"
-author = "agent"
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx jest --watchAll"
-
-[[workflows.workflow]]
-name = "Test:RealTime"
-author = "agent"
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node scripts/test-realtime-api.js && echo \"✅ Test Realtime Completed\" "
-
-[[workflows.workflow]]
-name = "Format:Fix"
-author = "agent"
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format:fix && echo \"✅ Format Completed successfully\""
-
-[[workflows.workflow]]
-name = "Check Unused"
-author = 44419511
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run lint -- --fix"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx eslint src --ext .ts,.tsx,.js,.jsx --format=table"
-
-[[workflows.workflow]]
-name = "Format Check"
-author = 44419511
+name = "Format"
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
@@ -175,33 +70,10 @@ args = "npm run format"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "echo \"✅ Prettier format check completed\""
-
-[[workflows.workflow]]
-name = "Format Fix"
-author = 44419511
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format:fix"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "echo \"✅ Code formatted successfully\""
-
-[[workflows.workflow]]
-name = "Dev Fast"
-author = 44419511
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev:fast"
+args = "npm run format:fix && echo '✅ Code formatting completed successfully'"
 
 [[workflows.workflow]]
 name = "Full Check"
-author = 44419511
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
@@ -219,3 +91,120 @@ args = "npm run format"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run build"
+
+# ===== TESTING WORKFLOWS =====
+[[workflows.workflow]]
+name = "Test:Watch"
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx jest --watchAll"
+
+[[workflows.workflow]]
+name = "Test:RealTime"
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/test-realtime-api.js && echo '✅ Test Realtime Completed'"
+
+# ===== BUILD & DEPLOYMENT WORKFLOWS =====
+[[workflows.workflow]]
+name = "Build"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build"
+
+[[workflows.workflow]]
+name = "Production"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run start"
+
+[[workflows.workflow]]
+name = "Preview"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run preview"
+
+# ===== MAINTENANCE WORKFLOWS =====
+[[workflows.workflow]]
+name = "Update Dependencies"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx npm-check-updates -u"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm audit fix"
+
+[[workflows.workflow]]
+name = "Clean"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run clean"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "rm -rf ~/.{npm,nvm,yarn,bun} .cache tsconfig.tsbuildinfo"
+
+[[workflows.workflow]]
+name = "Reset Project"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "rm -rf node_modules package-lock.json .next"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm install"
+
+# ===== ANALYSIS WORKFLOWS =====
+[[workflows.workflow]]
+name = "Check Duplicates"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx jscpd src"
+
+[[workflows.workflow]]
+name = "Bundle Analyze"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build:analyze"
+
+# ===== QUICK ACCESS WORKFLOWS =====
+[[workflows.workflow]]
+name = "Quick Format"
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format:fix && echo '✅ Format completed successfully'"
+
+[[workflows.workflow]]
+name = "Quick Lint"
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint:fix && echo '✅ Lint completed successfully'"
