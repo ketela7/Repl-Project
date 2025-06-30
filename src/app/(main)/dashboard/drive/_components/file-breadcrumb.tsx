@@ -38,19 +38,26 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
       const folder = await response.json()
       const pathItems: BreadcrumbItemData[] = []
-
+      console.log('[Breadcrumb] folder:', folder)
       // Build path by traversing from current folder to root
       let currentFolder = folder
-      let depth = 0
-      const maxDepth = 10 // Prevent infinite loops
+      let pushedFolder = {}
+      
+
+
 
       // Add current folder first
       pathItems.push({ id: currentFolder.id, name: currentFolder.name })
 
+
       // Traverse up to root
-      while (currentFolder.parents?.[0] && currentFolder.parents[0] !== 'root' && depth < maxDepth) {
+      let fileId = currentFolder.parents[0]
+      
+      while (currentFolder.parents[0] !== 'root' && currentFolder !== pushedFolder) {
         try {
-          const parentResponse = await fetch(`/api/drive/files?fileId=${currentFolder.parents[0]}`, {
+          
+          
+          const parentResponse = await fetch(`/api/drive/files?fileId=${fileId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           })
@@ -59,21 +66,25 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           const parentFolder = await parentResponse.json()
           pathItems.push({ id: parentFolder.id, name: parentFolder.name })
           currentFolder = parentFolder
-          depth++
+          pushedFolder = parentFolder
+          
+
         } catch (err) {
-          if (process.env.NODE_ENV === 'development') {
-            console.error('Error fetching parent folder:', err)
-          }
+            console.error(`Error fetching parent folder:${fileId}`, err)        
           break
         }
       }
 
-      // Reverse the array so it goes from root to current folder
-      setBreadcrumbItems(pathItems.reverse())
+
+      // Reverse path items to show from root to current folder
+      pathItems.reverse()
+      console.log('[Breadcrumb] Final items:', pathItems)
+      setBreadcrumbItems(pathItems)
     } catch (error) {
       // Log error for debugging in development only
-      if (process.env.NODE_ENV === 'development') {
-      }
+      console.error(`Error fetching folder path: ${folderId}`, error)
+
+      
       setError('Failed to load folder path')
       setBreadcrumbItems([])
     } finally {

@@ -674,11 +674,12 @@ export function DriveManager() {
             onNavigate={(folderId) => {
               if (folderId) {
                 handleFolderClick(folderId)
-              } else {
-                // Navigate to root
-                setCurrentFolderId(null)
-                fetchFiles(undefined, searchQuery.trim() || undefined)
-              }
+               } 
+              //  else {
+              //   // Navigate to root
+              //   setCurrentFolderId(null)
+              //   fetchFiles(undefined, searchQuery.trim() || undefined)
+              // }
             }} 
             onBackToRoot={() => {
               setCurrentFolderId(null)
