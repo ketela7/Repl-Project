@@ -44,7 +44,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { useStickyToolbar } from '@/lib/hooks/use-sticky-toolbar'
 import { successToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
@@ -114,7 +113,6 @@ interface DriveToolbarProps {
   selectedItems: DriveItem[]
   onDeselectAll: () => void
   onRefreshAfterOp: () => void
-  onDialogStateChange?: (_hasOpenDialog: boolean) => void
   filters: {
     activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'
     fileTypeFilter: string[]
@@ -449,12 +447,8 @@ export function DriveToolbar({
   setVisibleColumns,
   onClientSideFilter,
   onClearClientSideFilter,
-  onDialogStateChange,
 }: DriveToolbarProps) {
   const isMobile = useIsMobile()
-  
-  // Android-like sticky toolbar behavior
-  const { isScrolled } = useStickyToolbar('drive-toolbar')
 
   // Optimized bulk operation handlers
 
@@ -466,13 +460,6 @@ export function DriveToolbar({
   // Actions Dialog State
   const [isOperationsOpen, setIsOperationsOpen] = useState(false)
   const [isFiltersDialogOpen, setIsFiltersDialogOpen] = useState(false)
-
-  // Notify parent component about dialog state changes
-  React.useEffect(() => {
-    if (onDialogStateChange) {
-      onDialogStateChange(isOperationsOpen || isFiltersDialogOpen)
-    }
-  }, [isOperationsOpen, isFiltersDialogOpen, onDialogStateChange])
 
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters
@@ -528,20 +515,8 @@ export function DriveToolbar({
   }, [onClearClientSideFilter, items.length])
 
   return (
-    <div 
-                        className={`fixed left-0 right-0 z-[100] border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 transition-all duration-100 ease-out ${
-        isScrolled ? 'shadow-lg top-0' : 'shadow-sm top-14'
-      }`}
-      id="drive-toolbar"
-      style={{
-        backdropFilter: 'blur(14px)',
-        WebkitBackdropFilter: 'blur(14px)',
-        boxShadow: isScrolled 
-          ? '0 4px 12px 0 rgb(0 0 0 / 0.15), 0 2px 4px -1px rgb(0 0 0 / 0.1)'
-          : 'none',
-      }}
-    >
-      <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth px-4 py-2.5 min-h-[3rem]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur transition-transform duration-200 ease-in-out" id="drive-toolbar">
+      <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth p-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {/* Main Menu - 5 Items - Horizontal Scrollable */}
         <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
           {/* Search */}

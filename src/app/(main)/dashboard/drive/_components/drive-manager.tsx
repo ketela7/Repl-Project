@@ -580,59 +580,48 @@ export function DriveManager() {
     return <DriveErrorDisplay error={driveAccessError} onRetry={handleRefresh} />
   }
 
-  // Track toolbar internal dialog states
-  const [hasToolbarDialogs, setHasToolbarDialogs] = useState(false)
-  
-  // Check if any dialog is open
-  const hasOpenDialog = Object.values(dialogs).some(isOpen => isOpen) || !!selectedFileForPreview || !!selectedFileForDetails || hasToolbarDialogs
-
   return (
     <div className="flex h-full flex-col">
-      {/* Global Fixed Toolbar - Hidden when dialogs are open */}
-      {!hasOpenDialog && (
-        <DriveToolbar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              onSearchSubmit={(e) => {
-                e.preventDefault()
-                fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
-              }}
-              viewMode={viewMode}
-              onViewModeChange={setViewMode}
-              isSelectMode={isSelectMode}
-              onSelectModeChange={setIsSelectMode}
-              selectedCount={selectedItems.size}
-              onSelectAll={handleSelectAll}
-              onRefresh={handleRefresh}
-              refreshing={refreshing}
-              onUpload={() => openDialog('upload')}
-              onCreateFolder={() => openDialog('createFolder')}
-              selectedItems={selectedItemsWithDetails}
-              onDeselectAll={() => {
-                setSelectedItems(new Set())
-              }}
-              onRefreshAfterOp={handleRefresh}
-              filters={filters}
-              onFilterChange={handleFilter as any}
-              onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
-              onClearFilters={clearAllFilters}
-              hasActiveFilters={hasActiveFilters}
-              items={items}
-              visibleColumns={visibleColumns}
-              setVisibleColumns={setVisibleColumns}
-              setIsUploadDialogOpen={() => openDialog('upload')}
-              setIsCreateFolderDialogOpen={() => openDialog('createFolder')}
-              loading={loading}
-              onClientSideFilter={handleClientSideFilter}
-              onClearClientSideFilter={clearClientSideFilter}
-              isApplying={false}
-              onDialogStateChange={setHasToolbarDialogs}
-            />
-      )}
-
-      {/* Content with dynamic padding based on toolbar visibility */}
-      <div className={`flex flex-1 overflow-hidden ${hasOpenDialog ? 'pt-0' : 'pt-[4.5rem]'}`}>
+      <div className="flex flex-1 overflow-hidden">
         <div className="flex flex-1 flex-col overflow-hidden">
+          <DriveToolbar
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            onSearchSubmit={(e) => {
+              e.preventDefault()
+              fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+            }}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            isSelectMode={isSelectMode}
+            onSelectModeChange={setIsSelectMode}
+            selectedCount={selectedItems.size}
+            onSelectAll={handleSelectAll}
+            onRefresh={handleRefresh}
+            refreshing={refreshing}
+            onUpload={() => openDialog('upload')}
+            onCreateFolder={() => openDialog('createFolder')}
+            selectedItems={selectedItemsWithDetails}
+            onDeselectAll={() => {
+              setSelectedItems(new Set())
+            }}
+            onRefreshAfterOp={handleRefresh}
+            filters={filters}
+            onFilterChange={handleFilter as any}
+            onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
+            onClearFilters={clearAllFilters}
+            hasActiveFilters={hasActiveFilters}
+            items={items}
+            visibleColumns={visibleColumns}
+            setVisibleColumns={setVisibleColumns}
+            setIsUploadDialogOpen={() => openDialog('upload')}
+            setIsCreateFolderDialogOpen={() => openDialog('createFolder')}
+            loading={loading}
+            onClientSideFilter={handleClientSideFilter}
+            onClearClientSideFilter={clearClientSideFilter}
+            isApplying={false}
+          />
+
           {currentFolderId && (
             <FileBreadcrumb currentFolderId={currentFolderId} onNavigate={(folderId) => (folderId ? handleFolderClick(folderId) : handleBackToParent())} onBackToRoot={handleBackToParent} />
           )}
