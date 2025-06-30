@@ -279,7 +279,7 @@ export function DriveManager() {
     async (folderId?: string, searchQuery?: string, pageToken?: string) => {
       let callId = ''
       try {
-        if (!folderId && folderId !== '') folderId = currentFolderId || undefined
+        if (!folderId) folderId = currentFolderId || undefined
 
         const filterKey = JSON.stringify({
           view: filters.activeView,
@@ -336,6 +336,7 @@ export function DriveManager() {
           params.append('pageSize', String(filters.advancedFilters.pageSize))
         }
 
+        console.log('[DriveManager] Fetching files with params:', params.toString())
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -357,6 +358,8 @@ export function DriveManager() {
           itemType: item.mimeType === 'application/vnd.google-apps.folder' ? ('folder' as const) : ('file' as const),
         }))
 
+        console.log('[DriveManager] Received items:', newItems.length, 'items for folder:', folderId)
+        console.log('[DriveManager] Items preview:', newItems.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
         setItems((prev) => (pageToken ? [...prev, ...newItems] : newItems))
 
         setNextPageToken(data.nextPageToken || null)
@@ -399,6 +402,7 @@ export function DriveManager() {
   // Navigation handlers
   const handleFolderClick = useCallback(
     (folderId: string) => {
+      console.log('[DriveManager] Navigating to folder:', folderId)
       setCurrentFolderId(folderId)
       setSelectedItems(new Set())
       // Clear cache for the new folder to ensure fresh data
