@@ -345,28 +345,7 @@ export function DriveManager() {
           params.append('pageSize', String(filters.advancedFilters.pageSize))
         }
 
-        // Build query based on filters and current view
-        let query = 'trashed=false'
-
-        // Handle different view types
-        if (activeView === 'my-drive') {
-          // For my-drive view, respect folder navigation
-          if (folderId && folderId !== 'root') {
-            query += ` and '${folderId}' in parents`
-          } else {
-            query += ` and 'root' in parents`
-          }
-        } else if (activeView === 'shared') {
-          query += ` and sharedWithMe=true`
-        } else if (activeView === 'recent') {
-          // For recent view, don't add parent restrictions - show all recent files
-          // query already has trashed=false, that's sufficient
-        } else if (activeView === 'starred') {
-          query += ` and starred=true`
-        } else if (activeView === 'trash') {
-          query = 'trashed=true' // Override the trashed=false for trash view
-        }
-        params.append('q', query)
+        // Don't manually build query here - let the API handle it based on viewStatus and folderId
         console.log('[Drive API] - Query:', query)
         console.log('[DriveManager] Fetching files with params:', params.toString())
         const response = await fetch(`/api/drive/files?${params}`, {

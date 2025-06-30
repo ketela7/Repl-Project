@@ -360,9 +360,18 @@ export async function GET(request: NextRequest) {
 
     const baseQuery = buildDriveQuery(filters)
     
-    // Add parent folder constraint for folder navigation
-    const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
-    const query = baseQuery ? `${baseQuery} and ${parentQuery}` : parentQuery
+    // Only add parent folder constraint for my-drive view or when explicitly navigating folders
+    let query = baseQuery
+    
+    // Add parent constraint only for my-drive view or when in folder navigation mode
+    if (filters.viewStatus === 'my-drive' || (folderId && folderId !== 'root' && !filters.viewStatus)) {
+      const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
+      query = query ? `${query} and ${parentQuery}` : parentQuery
+    } else if (!filters.viewStatus && folderId === 'root') {
+      // Default view without specific viewStatus - apply root constraint
+      const parentQuery = "'root' in parents"
+      query = query ? `${query} and ${parentQuery}` : parentQuery
+    }
     
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
