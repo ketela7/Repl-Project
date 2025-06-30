@@ -1164,7 +1164,7 @@ export function getFileActions(
     mimeType?: string
     itemType?: 'file' | 'folder'
   },
-  activeView: string
+  _activeView: string
 ): {
   canCopy: boolean
   canDelete: boolean
@@ -1185,7 +1185,7 @@ export function getFileActions(
     canDelete: capabilities?.canDelete === true, // Only if explicitly allowed
     canDownload: !trashed && !isFolder && capabilities?.canDownload !== false,
     canTrash: !trashed && capabilities?.canTrash !== false,
-    canUntrash: trashed && capabilities?.canUntrash !== false,
+    canUntrash: Boolean(trashed && capabilities?.canUntrash !== false),
     canRename: !trashed && capabilities?.canRename !== false,
     canShare: !trashed, // Allow share for non-trashed items
     canMove: !trashed && capabilities?.canMoveItemWithinDrive !== false,

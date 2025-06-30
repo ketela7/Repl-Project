@@ -87,7 +87,8 @@ export function useProgressiveFileDetails({ fileId, isOpen, onStageComplete, onE
         }
 
         const response = await fetch(endpoint, {
-          signal: abortControllerRef.current?.signal,
+          method: 'GET',
+          signal: abortControllerRef.current?.signal || null,
         })
 
         if (!response.ok) {
@@ -160,12 +161,14 @@ export function useProgressiveFileDetails({ fileId, isOpen, onStageComplete, onE
         abortControllerRef.current?.abort()
       }
     }
+    return
   }, [isOpen, fileId, fetchStage])
 
   // Auto-load next stages
   useEffect(() => {
     if (currentStage === LoadingStage.ESSENTIAL && !loading.essential && !data.essential && !error.essential) {
       fetchStage(LoadingStage.ESSENTIAL)
+      return
     } else if (currentStage === LoadingStage.EXTENDED && !loading.extended && !data.extended && !error.extended) {
       // Load extended in background with small delay
       const timer = setTimeout(() => {
@@ -173,6 +176,7 @@ export function useProgressiveFileDetails({ fileId, isOpen, onStageComplete, onE
       }, 100)
       return () => clearTimeout(timer)
     }
+    return
   }, [currentStage, loading, data, error, fetchStage])
 
   return {

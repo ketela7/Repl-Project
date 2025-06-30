@@ -166,7 +166,7 @@ class SearchOptimizer {
     const now = Date.now()
     const expiredKeys = Object.keys(this.cache).filter((key) => {
       const result = this.cache[key]
-      return now - result.timestamp > this.CACHE_TTL
+      return result && now - result.timestamp > this.CACHE_TTL
     })
 
     expiredKeys.forEach((key) => delete this.cache[key])
