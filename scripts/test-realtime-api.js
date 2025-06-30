@@ -1,5 +1,4 @@
 
-#!/usr/bin/env node
 /**
  * Comprehensive Real-time API Testing Script with Full Arguments
  * Tests all Google Drive API endpoints with detailed parameters and scenarios
