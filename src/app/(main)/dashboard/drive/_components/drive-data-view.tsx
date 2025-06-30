@@ -106,9 +106,9 @@ const CopyableCell = ({
 
   return (
     <TableCell className={`hover:bg-muted/50 group cursor-pointer transition-colors ${className}`} onClick={handleClick} title={title || `Click to copy: ${value}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">{children}</div>
-        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center space-x-3 min-w-0 flex-1">{children}</div>
+        <CopyIcon className="h-3 w-3 text-muted-foreground/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex-shrink-0" />
       </div>
     </TableCell>
   )
