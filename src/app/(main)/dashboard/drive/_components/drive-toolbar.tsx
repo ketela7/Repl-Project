@@ -520,14 +520,17 @@ export function DriveToolbar({
 
   return (
     <div 
-      className="fixed top-14 left-0 right-0 z-[100] border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 transition-all duration-300 ease-out shadow-sm" 
+      className="fixed top-14 left-0 right-0 z-[100] bg-background/98 backdrop-blur-md supports-[backdrop-filter]:bg-background/95 transition-all duration-200 ease-out border-b"
       id="drive-toolbar"
       style={{
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: isScrolled 
+          ? '0 4px 12px 0 rgb(0 0 0 / 0.15), 0 2px 4px -1px rgb(0 0 0 / 0.1)'
+          : '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06)',
       }}
     >
-      <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth p-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth px-4 py-2.5 min-h-[3rem]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {/* Main Menu - 5 Items - Horizontal Scrollable */}
         <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
           {/* Search */}
