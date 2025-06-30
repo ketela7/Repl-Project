@@ -320,6 +320,15 @@ export async function GET(request: NextRequest) {
     const { session, driveService } = authResult
 
     const { searchParams } = new URL(request.url)
+    const fileId = searchParams.get('fileId')
+    
+    // If fileId is provided, return single file metadata (used by breadcrumb)
+    if (fileId) {
+      const fileMetadata = await driveService.getFileMetadata(fileId, ['id', 'name', 'parents', 'mimeType'])
+      return NextResponse.json(fileMetadata)
+    }
+    
+    // Otherwise, list folder contents
     const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
     const pageToken = searchParams.get('pageToken') || undefined
     const folderId = searchParams.get('folderId') || 'root'
