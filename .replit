@@ -7,7 +7,6 @@ externalPort = 80
 [workflows]
 runButton = "Project"
 
-# ===== MAIN WORKFLOWS =====
 [[workflows.workflow]]
 name = "Project"
 mode = "parallel"
@@ -27,7 +26,6 @@ task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
 
-# ===== DEVELOPMENT WORKFLOWS =====
 [[workflows.workflow]]
 name = "Dev Fast"
 mode = "parallel"
@@ -37,16 +35,7 @@ task = "shell.exec"
 args = "npm run dev:fast"
 waitForPort = 5000
 
-[[workflows.workflow]]
-name = "TypeCheck"
-author = "agent"
-mode = "parallel"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run type-check && echo '✅ Typecheck completed successfully'"
-
-# ===== CODE QUALITY WORKFLOWS =====
 [[workflows.workflow]]
 name = "Lint"
 mode = "sequential"
@@ -74,6 +63,8 @@ args = "npm run format:fix && echo '✅ Code formatting completed successfully'"
 [[workflows.workflow]]
 name = "Full Check"
 mode = "sequential"
+author = "agent"
+
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -87,11 +78,6 @@ args = "npm run lint"
 task = "shell.exec"
 args = "npm run format"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run build"
-
-# ===== TESTING WORKFLOWS =====
 [[workflows.workflow]]
 name = "Test:Watch"
 mode = "parallel"
@@ -108,7 +94,6 @@ mode = "parallel"
 task = "shell.exec"
 args = "node scripts/test-realtime-api.js && echo '✅ Test Realtime Completed'"
 
-# ===== BUILD & DEPLOYMENT WORKFLOWS =====
 [[workflows.workflow]]
 name = "Build"
 mode = "sequential"
@@ -133,7 +118,6 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run preview"
 
-# ===== MAINTENANCE WORKFLOWS =====
 [[workflows.workflow]]
 name = "Update Dependencies"
 mode = "sequential"
@@ -174,7 +158,6 @@ args = "rm -rf node_modules package-lock.json .next"
 task = "shell.exec"
 args = "npm install"
 
-# ===== ANALYSIS WORKFLOWS =====
 [[workflows.workflow]]
 name = "Check Duplicates"
 mode = "sequential"
@@ -191,7 +174,6 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run build:analyze"
 
-# ===== QUICK ACCESS WORKFLOWS =====
 [[workflows.workflow]]
 name = "Quick Format"
 mode = "parallel"

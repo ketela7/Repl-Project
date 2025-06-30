@@ -1,7 +1,7 @@
 /**
  * Enhanced clipboard utilities with toast notifications
  */
-import { successToast, errorToast } from './toast'
+import { successToast, errorToast } from '@/components/ui/toast'
 
 /**
  * Copy text to clipboard with automatic toast feedback

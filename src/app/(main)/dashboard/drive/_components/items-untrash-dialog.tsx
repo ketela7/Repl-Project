@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { successToast, errorToast } from '@/lib/toast'
+import { successToast, errorToast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
 
 interface ItemsUntrashDialogProps {
