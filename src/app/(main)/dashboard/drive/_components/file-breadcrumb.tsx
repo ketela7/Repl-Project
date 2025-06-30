@@ -38,17 +38,24 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       }
 
       const folder = await response.json()
-      const pathItems: BreadcrumbItemData[] = []
       console.log('[Breadcrumb] Initial folder data:', folder)
+      console.log('[Breadcrumb] Folder properties:', Object.keys(folder))
+      console.log('[Breadcrumb] Folder ID:', folder.id)
+      console.log('[Breadcrumb] Folder name:', folder.name)
       console.log('[Breadcrumb] Folder parents:', folder.parents)
-      // Build path by traversing from current folder to root
+      
+      // Validate folder data
+      if (!folder.id) {
+        console.error('[Breadcrumb] ERROR: Folder missing ID property!', folder)
+        throw new Error('Invalid folder data: missing ID')
+      }
+      
+      const pathItems: BreadcrumbItemData[] = []
       let currentFolder = folder
       let pushedFolder = {}
 
-
-
-
       // Add current folder first
+      console.log('[Breadcrumb] Adding current folder - ID:', currentFolder.id, 'Name:', currentFolder.name)
       pathItems.push({ id: currentFolder.id, name: currentFolder.name })
 
 
@@ -71,6 +78,17 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
           const parentFolder = await parentResponse.json()
           console.log('[Breadcrumb] Parent folder data:', parentFolder)
+          console.log('[Breadcrumb] Parent folder properties:', Object.keys(parentFolder))
+          console.log('[Breadcrumb] Parent folder ID:', parentFolder.id)
+          console.log('[Breadcrumb] Parent folder name:', parentFolder.name)
+          
+          // Validate parent folder data
+          if (!parentFolder.id) {
+            console.error('[Breadcrumb] ERROR: Parent folder missing ID!', parentFolder)
+            break
+          }
+          
+          console.log('[Breadcrumb] Adding parent folder - ID:', parentFolder.id, 'Name:', parentFolder.name)
           pathItems.push({ id: parentFolder.id, name: parentFolder.name })
           currentFolder = parentFolder
           pushedFolder = parentFolder
@@ -150,10 +168,13 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
-                      console.log('[Breadcrumb] Clicked folder:', folder.name)
-                      console.log('[Breadcrumb] Folder object:', folder)
-                      console.log('[Breadcrumb] Folder ID:', folder.id)
-                      console.log('[Breadcrumb] Calling onNavigate with:', folder.id)
+                      console.log('[Breadcrumb] Navigating to folder:', folder.name, 'ID:', folder.id)
+                      console.log('[Breadcrumb] Full folder object:', folder)
+                      if (!folder.id) {
+                        console.error('[Breadcrumb] ERROR: Folder ID is null/undefined!', folder)
+                        console.error('[Breadcrumb] Cannot navigate without valid folder ID')
+                        return
+                      }
                       onNavigate(folder.id)
                     }}
                     className="hover:text-primary flex max-w-[120px] items-center gap-2 whitespace-nowrap transition-colors sm:max-w-[200px] md:max-w-none"

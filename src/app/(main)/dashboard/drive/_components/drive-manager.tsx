@@ -672,16 +672,18 @@ export function DriveManager() {
           <FileBreadcrumb 
             currentFolderId={currentFolderId} 
             onNavigate={(folderId) => {
+              console.log('[DriveManager] Breadcrumb navigation called with folderId:', folderId)
               if (folderId) {
+                console.log('[DriveManager] Navigating to folder:', folderId)
                 handleFolderClick(folderId)
-               } 
-              //  else {
-              //   // Navigate to root
-              //   setCurrentFolderId(null)
-              //   fetchFiles(undefined, searchQuery.trim() || undefined)
-              // }
+              } else {
+                console.log('[DriveManager] Navigating to root (My Drive)')
+                setCurrentFolderId(null)
+                fetchFiles(undefined, searchQuery.trim() || undefined)
+              }
             }} 
             onBackToRoot={() => {
+              console.log('[DriveManager] Back to root called')
               setCurrentFolderId(null)
               fetchFiles(undefined, searchQuery.trim() || undefined)
             }} 
