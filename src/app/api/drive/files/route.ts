@@ -351,7 +351,10 @@ export async function GET(request: NextRequest) {
       pageSize,
     })
 
-    const cachedData = driveCache.get(cacheKey)
+    // For folder navigation, bypass cache if no pageToken (first page)
+    // This ensures fresh data when navigating between folders
+    const shouldUseCache = pageToken !== undefined
+    const cachedData = shouldUseCache ? driveCache.get(cacheKey) : null
     if (cachedData) {
       return NextResponse.json(cachedData)
     }

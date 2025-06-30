@@ -401,6 +401,9 @@ export function DriveManager() {
     (folderId: string) => {
       setCurrentFolderId(folderId)
       setSelectedItems(new Set())
+      // Clear cache for the new folder to ensure fresh data
+      setItems([]) // Clear current items immediately for better UX
+      setNextPageToken(null)
       fetchFiles(folderId)
     },
     [fetchFiles]
@@ -409,6 +412,9 @@ export function DriveManager() {
   const handleBackToParent = useCallback(() => {
     setCurrentFolderId(null)
     setSelectedItems(new Set())
+    // Clear cache when navigating back to root
+    setItems([]) // Clear current items immediately for better UX
+    setNextPageToken(null)
     fetchFiles()
   }, [fetchFiles])
 
