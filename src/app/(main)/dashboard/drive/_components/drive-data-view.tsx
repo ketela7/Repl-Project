@@ -184,43 +184,64 @@ export function DriveDataView({
     [visibleColumns]
   )
 
-  // Optimized menu items configuration
+  // Optimized menu items configuration with condition handling
   const getMenuItems = useMemo(
-    () => (item: DriveItem) =>
-      [
+    () => (item: DriveItem) => {
+      const menuItems = [
         { key: 'details', label: 'Details', icon: Info, condition: true },
         { key: 'preview', label: 'Preview', icon: Eye, condition: !item.isFolder },
-        { key: 'move', label: 'Move', icon: Move, condition: item.canMove },
-        { key: 'copy', label: 'Copy', icon: Copy, condition: item.canCopy },
-        { key: 'download', label: 'Download', icon: Download, condition: item.canDownload },
-        { key: 'rename', label: 'Rename', icon: Edit, condition: item.canRename },
-        { key: 'share', label: 'Share', icon: Share, condition: item.canShare },
-        { key: 'trash', label: 'Move to Trash', icon: Trash2, condition: item.canTrash, destructive: true },
-        { key: 'delete', label: 'Delete', icon: Triangle, condition: item.canDelete, destructive: true },
-        { key: 'untrash', label: 'Untrash', icon: RefreshCw, condition: item.canUntrash, destructive: true },
-        { key: 'export', label: 'Export', icon: FileDown, condition: item.canExport }
-      ].filter((menuItem) => menuItem.condition),
+        { key: 'move', label: 'Move', icon: Move, condition: Boolean(item.canMove) },
+        { key: 'copy', label: 'Copy', icon: Copy, condition: Boolean(item.canCopy) },
+        { key: 'download', label: 'Download', icon: Download, condition: Boolean(item.canDownload) },
+        { key: 'rename', label: 'Rename', icon: Edit, condition: Boolean(item.canRename) },
+        { key: 'share', label: 'Share', icon: Share, condition: Boolean(item.canShare) },
+        { key: 'trash', label: 'Move to Trash', icon: Trash2, condition: Boolean(item.canTrash), destructive: true },
+        { key: 'delete', label: 'Delete', icon: Triangle, condition: Boolean(item.canDelete), destructive: true },
+        { key: 'untrash', label: 'Untrash', icon: RefreshCw, condition: Boolean(item.canUntrash), destructive: true },
+        { key: 'export', label: 'Export', icon: FileDown, condition: Boolean(item.canExport) }
+      ]
+      
+      // Filter menu items based on condition boolean
+      return menuItems.filter((menuItem) => {
+        // Ensure condition is explicitly a boolean
+        const shouldShow = menuItem.condition === true
+        return shouldShow
+      })
+    },
     []
   )
 
   const renderContent = useCallback(
-    (item: DriveItem) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {getMenuItems(item).map(({ key, label, icon: Icon, destructive }) => (
-            <DropdownMenuItem key={key} onClick={() => onItemAction(key, item)} className={destructive ? 'text-destructive' : ''}>
-              <Icon className="mr-2 h-4 w-4" />
-              {label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
+    (item: DriveItem) => {
+      const availableMenuItems = getMenuItems(item)
+      
+      // Only render dropdown if there are available menu items
+      if (availableMenuItems.length === 0) {
+        return null
+      }
+
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="sm">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {availableMenuItems.map(({ key, label, icon: Icon, destructive }) => (
+              <DropdownMenuItem 
+                key={key} 
+                onClick={() => onItemAction(key, item)} 
+                className={destructive ? 'text-destructive' : ''}
+              >
+                <Icon className="mr-2 h-4 w-4" />
+                {label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )
+    },
     [getMenuItems, onItemAction]
   )
 
