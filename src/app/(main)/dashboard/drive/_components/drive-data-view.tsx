@@ -271,7 +271,7 @@ export function DriveDataView({
               <TableRow>
                 {isSelectMode && (
                   <TableHead className="w-12">
-                    <Checkbox checked={items.length > 0 && items.every((item) => selectedItems.has(item.id))} onCheckedChange={handleSelectAll} />
+                    {/* <Checkbox checked={items.length > 0 && items.every((item) => selectedItems.has(item.id))} onCheckedChange={handleSelectAll} /> */}
                   </TableHead>
                 )}
                 {tableHeaders.map(({ key, label }) => (
