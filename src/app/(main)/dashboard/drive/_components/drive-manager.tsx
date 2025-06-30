@@ -677,6 +677,7 @@ export function DriveManager() {
                 console.log('[DriveManager] Navigating to folder:', folderId)
                 handleFolderClick(folderId)
               } else {
+                // [icon home] Drive
                 console.log('[DriveManager] Navigating to root (My Drive)')
                 setCurrentFolderId(null)
                 fetchFiles(undefined, searchQuery.trim() || undefined)
