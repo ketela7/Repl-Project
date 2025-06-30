@@ -520,7 +520,7 @@ export function DriveToolbar({
 
   return (
     <div 
-      className="sticky top-0 z-[100] border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 transition-all duration-300 ease-out shadow-sm" 
+      className="fixed top-14 left-0 right-0 z-[100] border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 transition-all duration-300 ease-out shadow-sm" 
       id="drive-toolbar"
       style={{
         backdropFilter: 'blur(12px)',

@@ -582,9 +582,8 @@ export function DriveManager() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex flex-1 overflow-hidden">
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <DriveToolbar
+      {/* Global Fixed Toolbar */}
+      <DriveToolbar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
             onSearchSubmit={(e) => {
@@ -622,6 +621,9 @@ export function DriveManager() {
             isApplying={false}
           />
 
+      {/* Content with padding to account for fixed toolbar */}
+      <div className="pt-16 flex flex-1 overflow-hidden">
+        <div className="flex flex-1 flex-col overflow-hidden">
           {currentFolderId && (
             <FileBreadcrumb currentFolderId={currentFolderId} onNavigate={(folderId) => (folderId ? handleFolderClick(folderId) : handleBackToParent())} onBackToRoot={handleBackToParent} />
           )}
@@ -753,6 +755,8 @@ export function DriveManager() {
           )}
         </div>
       )}
+        </div>
+      </div>
     </div>
   )
 }
