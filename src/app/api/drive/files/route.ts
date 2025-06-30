@@ -405,10 +405,10 @@ export async function GET(request: NextRequest) {
     }
 
     // console.log('[Drive API] Request details:', {
-      folderId,
-      viewStatus: filters.viewStatus,
-      query,
-    })
+    //   folderId,
+    //   viewStatus: filters.viewStatus,
+    //   query,
+    // })
 
     // Pass the complete query to the Drive service
     const result = await driveService.listFiles({
