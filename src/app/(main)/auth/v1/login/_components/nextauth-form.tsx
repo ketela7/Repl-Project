@@ -11,12 +11,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 
 const FormSchema = z.object({
-  remember: z.boolean().default(false),
+  remember: z.boolean(),
 })
-
-type FormValues = {
-  remember: boolean
-}
 
 interface NextAuthFormProps {
   isReauth?: boolean
@@ -25,11 +21,12 @@ interface NextAuthFormProps {
 export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
   const { update } = useSession()
 
-  const form = useForm<FormValues>({
+  const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       remember: false,
     },
+    mode: 'onChange',
   })
 
   // Store remember me preference in localStorage for use during authentication
