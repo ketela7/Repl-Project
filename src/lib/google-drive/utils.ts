@@ -976,29 +976,7 @@ export function isShortcutFile(mimeType: string): boolean {
   return mimeType === 'application/vnd.google-apps.shortcut'
 }
 
-/**
- * Check if a file type supports preview functionality
- */
-export const isPreviewable = (mimeType: string): boolean => {
-  // Shortcuts should not be previewable - they should be opened directly
-  if (isShortcutFile(mimeType)) {
-    return false
-  }
-
-  // Use proper mimeType category checking instead of specific formats
-  return (
-    isImageFile(mimeType) ||
-    isVideoFile(mimeType) ||
-    isAudioFile(mimeType) ||
-    isDocumentFile(mimeType) ||
-    mimeType.startsWith('text/') ||
-    mimeType === 'application/pdf' ||
-    mimeType === 'application/json' ||
-    mimeType.includes('google-apps')
-  )
-}
-
-// Unused utility functions removed
+// Removed isPreviewable function - simplified to use getPreviewUrl directly
 
 /**
  * Generate preview URL for different media types
