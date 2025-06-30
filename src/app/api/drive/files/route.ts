@@ -348,7 +348,12 @@ export async function GET(request: NextRequest) {
       sizeMax: searchParams.get('sizeMax') || undefined,
     }
 
-    const query = buildDriveQuery(filters)
+    const baseQuery = buildDriveQuery(filters)
+    
+    // Add parent folder constraint for folder navigation
+    const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
+    const query = baseQuery ? `${baseQuery} and ${parentQuery}` : parentQuery
+    
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
 
@@ -368,10 +373,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    // Use driveService from destructuring
+    console.log('[Drive API] Fetching files in parents:', folderId)
 
+    // Pass the complete query to the Drive service
     const result = await driveService.listFiles({
-      parentId: folderId,
       query,
       pageToken,
       pageSize,
