@@ -16,6 +16,10 @@ author = "agent"
 task = "workflow.run"
 args = "Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Production Ready"
+
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -189,6 +193,14 @@ mode = "parallel"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run lint:fix && echo '✅ Lint completed successfully'"
+
+[[workflows.workflow]]
+name = "Production Ready"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/production-ready.js"
 
 [nix]
 channel = "stable-24_05"

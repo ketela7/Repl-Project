@@ -3,8 +3,8 @@ const nextConfig = {
   // Enable gzip compression for all responses
   compress: true,
 
-  // Fast development optimizations
-  reactStrictMode: false, // Disable for faster development
+  // Production optimization
+  reactStrictMode: true, // Enable for production stability
 
   experimental: {
     optimizePackageImports: [
@@ -26,15 +26,15 @@ const nextConfig = {
 
   serverExternalPackages: ['googleapis'],
 
-  // Fast TypeScript compilation
+  // Production TypeScript compilation
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
     tsconfigPath: './tsconfig.json',
   },
 
-  // Skip ESLint during builds for speed
+  // Enable ESLint for production builds
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
   allowedDevOrigins: ['127.0.0.1', 'localhost', '*.pike.replit.dev', '*.sisko.replit.dev'],
@@ -44,28 +44,45 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Simplified headers for development speed
+  // Production security headers
   async headers() {
     return [
       {
         source: '/_next/:path*',
         headers: [
           {
-            key: 'Access-Control-Allow-Origin',
-            value: '*',
-          },
-          {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
           },
         ],
       },
     ]
   },
 
-  // Fast compilation settings
+  // Production compilation settings
   output: 'standalone',
-  productionBrowserSourceMaps: false,
+  productionBrowserSourceMaps: true,
 
   // Development optimizations
   onDemandEntries: {
@@ -73,38 +90,44 @@ const nextConfig = {
     pagesBufferLength: 2,
   },
 
-  // Webpack optimizations for lazy loading
+  // Webpack optimizations for production
   webpack: (config, { dev, isServer }) => {
-    if (dev) {
-      // Enable filesystem caching
-      config.cache = {
-        type: 'filesystem',
-        buildDependencies: {
-          config: [__filename],
-        },
-      }
+    // Enable filesystem caching for both dev and production
+    config.cache = {
+      type: 'filesystem',
+      buildDependencies: {
+        config: [__filename],
+      },
+    }
 
-      // Optimize chunk splitting for lazy components
-      config.optimization = {
-        ...config.optimization,
-        splitChunks: {
-          chunks: 'all',
-          cacheGroups: {
-            default: {
-              minChunks: 2,
-              priority: -20,
-              reuseExistingChunk: true,
-            },
-            vendor: {
-              test: /[\\/]node_modules[\\/]/,
-              name: 'vendors',
-              priority: -10,
-              chunks: 'all',
-            },
+    // Optimize chunk splitting for better performance
+    config.optimization = {
+      ...config.optimization,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            priority: -10,
+            chunks: 'all',
+          },
+          // Group UI components together
+          ui: {
+            test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
+            name: 'ui-components',
+            priority: 10,
+            chunks: 'all',
           },
         },
-      }
+      },
     }
+
     return config
   },
 }
