@@ -520,12 +520,14 @@ export function DriveToolbar({
 
   return (
     <div 
-      className="fixed top-14 left-0 right-0 z-[100] bg-background border-t-0 border-b transition-all duration-200 ease-out -mt-px"
+      className="fixed top-14 left-0 right-0 z-[100] bg-background/98 backdrop-blur-md supports-[backdrop-filter]:bg-background/95 transition-all duration-200 ease-out border-b"
       id="drive-toolbar"
       style={{
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
         boxShadow: isScrolled 
           ? '0 4px 12px 0 rgb(0 0 0 / 0.15), 0 2px 4px -1px rgb(0 0 0 / 0.1)'
-          : 'none',
+          : '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06)',
       }}
     >
       <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth px-4 py-2.5 min-h-[3rem]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>

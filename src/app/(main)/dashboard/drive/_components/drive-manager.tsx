@@ -622,7 +622,7 @@ export function DriveManager() {
           />
 
       {/* Content with padding to account for fixed toolbar */}
-      <div className="pt-[3.5rem] flex flex-1 overflow-hidden">
+      <div className="pt-[4.5rem] flex flex-1 overflow-hidden">
         <div className="flex flex-1 flex-col overflow-hidden">
           {currentFolderId && (
             <FileBreadcrumb currentFolderId={currentFolderId} onNavigate={(folderId) => (folderId ? handleFolderClick(folderId) : handleBackToParent())} onBackToRoot={handleBackToParent} />
