@@ -641,7 +641,7 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'application/x-photoshop': 'text-blue-600 dark:text-blue-400',
     'image/vnd.adobe.photoshop': 'text-blue-600 dark:text-blue-400',
     'image/psd': 'text-blue-600 dark:text-blue-400',
-    'application/postscript': 'text-pink-600 dark:text-pink-400',
+    'application/postscript': 'text-pink-600 dark:text-pink-600 dark:text-pink-400',
     'application/illustrator': 'text-orange-600 dark:text-orange-400',
     'image/vnd.adobe.illustrator': 'text-orange-600 dark:text-orange-400',
     'application/x-indesign': 'text-purple-600 dark:text-purple-400',
@@ -1158,65 +1158,38 @@ export function getMimeTypeFromFileName(fileName: string): string {
  * Get available actions for a file based on its capabilities and current view
  */
 export function getFileActions(
-  file: {
-    capabilities?: DriveFileCapabilities
+  fileInfo: {
+    capabilities?: any
     trashed?: boolean
     mimeType?: string
-    itemType?: string
+    itemType?: 'file' | 'folder'
   },
   activeView: string
 ): {
-  canPreview: boolean
-  canDownload: boolean
-  canRename: boolean
-  canMove: boolean
   canCopy: boolean
-  canShare: boolean
-  canDetails: boolean
+  canDelete: boolean
+  canDownload: boolean
   canTrash: boolean
   canUntrash: boolean
-  canDelete: boolean
+  canRename: boolean
+  canShare: boolean
+  canMove: boolean
   canExport: boolean
 } {
-  const isTrashed = file.trashed === true
-  const isFolder = file.itemType === 'folder' || file.mimeType === 'application/vnd.google-apps.folder'
-  const capabilities = file.capabilities || ({} as DriveFileCapabilities)
+  const { capabilities, trashed, mimeType, itemType } = fileInfo
+  const isFolder = mimeType === 'application/vnd.google-apps.folder' || itemType === 'folder'
 
-  // If we don't have capabilities data, provide conservative defaults
-  const defaultCapabilities = {
-    canDownload: true,
-    canCopy: false,
-    canDelete: false,
-    canEdit: false,
-    canRename: false,
-    canShare: false,
-    canTrash: false,
-    canUntrash: false,
-    canMoveItemWithinDrive: false,
-    canExport: true
-  }
-
-  const finalCapabilities: DriveFileCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities
-
+  // Match the logic from selectedItemsWithDetails that's working correctly
   return {
-    // Preview available for all files (not folders)
-    canPreview: !isFolder,
-
-    // Download - always available, API handles restrictions
-    canDownload: Boolean(finalCapabilities.canDownload),
-
-    // Details - always available
-    canDetails: true,
-
-    // All other actions: use direct API capabilities without extra logic
-    canRename: Boolean(finalCapabilities.canRename),
-    canMove: Boolean(finalCapabilities.canMoveItemWithinDrive),
-    canCopy: Boolean(finalCapabilities.canCopy),
-    canShare: Boolean(finalCapabilities.canShare),
-    canTrash: Boolean(finalCapabilities.canTrash),
-    canUntrash: Boolean(isTrashed && finalCapabilities.canUntrash),
-    canDelete: Boolean(finalCapabilities.canDelete),
-    canExport: Boolean(finalCapabilities.canExport)
+    canCopy: !trashed, // Allow copy for non-trashed items
+    canDelete: capabilities?.canDelete === true, // Only if explicitly allowed
+    canDownload: !trashed && !isFolder && capabilities?.canDownload !== false,
+    canTrash: !trashed && capabilities?.canTrash !== false,
+    canUntrash: trashed && capabilities?.canUntrash !== false,
+    canRename: !trashed && capabilities?.canRename !== false,
+    canShare: !trashed, // Allow share for non-trashed items
+    canMove: !trashed && capabilities?.canMoveItemWithinDrive !== false,
+    canExport: !trashed && !isFolder, // Allow export for non-trashed files
   }
 }
 

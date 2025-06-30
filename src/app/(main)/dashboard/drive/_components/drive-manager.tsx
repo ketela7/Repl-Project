@@ -272,11 +272,22 @@ export function DriveManager() {
   }, [items, sortConfig])
   // Sorting End
 
-  // Selected items with details for operations
+  // Selected items with details for operations - using getFileActions for consistency
   const selectedItemsWithDetails = useMemo(() => {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
       const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
+      
+      // Use getFileActions for consistent capability checking
+      const actions = getFileActions(
+        {
+          capabilities: item?.capabilities,
+          trashed: item?.trashed,
+          mimeType: item?.mimeType,
+          itemType: itemIsFolder ? 'folder' : 'file',
+        },
+        filters.activeView
+      )
 
       return {
         id: itemId,
@@ -290,18 +301,19 @@ export function DriveManager() {
         isStarred: item?.starred || false,
         isShared: item?.shared || false,
         isFolder: itemIsFolder,
-        canCopy: !item?.trashed, //&& item?.capabilities?.canCopy,
-        canDelete: item?.capabilities?.canDelete,
-        canDownload: !item?.trashed && !itemIsFolder && item?.capabilities?.canDownload,
-        canTrash: !item?.trashed && item?.capabilities?.canTrash,
-        canUntrash: item?.trashed && item?.capabilities?.canUntrash,
-        canRename: !item?.trashed && item?.capabilities?.canRename,
-        canShare: !item?.trashed,
-        canMove: !item?.trashed && item?.capabilities?.canMoveItemWithinDrive,
-        canExport: !item?.trashed && !itemIsFolder,
+        // Use actions from getFileActions for consistency
+        canCopy: actions.canCopy,
+        canDelete: actions.canDelete,
+        canDownload: actions.canDownload,
+        canTrash: actions.canTrash,
+        canUntrash: actions.canUntrash,
+        canRename: actions.canRename,
+        canShare: actions.canShare,
+        canMove: actions.canMove,
+        canExport: actions.canExport,
       }
     })
-  }, [selectedItems, items])
+  }, [selectedItems, items, filters.activeView])
 
   // API call function - Remove dependency on currentFolderId to prevent stale closures
   const fetchFiles = useCallback(
