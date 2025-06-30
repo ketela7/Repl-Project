@@ -18,8 +18,6 @@ type FormValues = {
   remember: boolean
 }
 
-type FormData = z.infer<typeof FormSchema>
-
 interface NextAuthFormProps {
   isReauth?: boolean
 }

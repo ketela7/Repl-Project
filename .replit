@@ -20,6 +20,14 @@ args = "Server"
 task = "workflow.run"
 args = "Production Ready"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Type Check Watch"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Lint Strict"
+
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -199,6 +207,22 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/production-ready.js"
+
+[[workflows.workflow]]
+name = "Type Check Watch"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "tsc --noEmit --watch"
+
+[[workflows.workflow]]
+name = "Lint Strict"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "eslint src --ext .ts,.tsx,.js,.jsx --max-warnings 0"
 
 [nix]
 channel = "stable-24_05"
