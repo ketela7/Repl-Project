@@ -14,7 +14,6 @@ import {
   Triangle,
   CopyIcon,
   Info,
-  ChevronsUpDown,
   ChevronUp,
   ChevronDown,
   FileDown,
