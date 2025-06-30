@@ -44,6 +44,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { useStickyToolbar } from '@/lib/hooks/use-sticky-toolbar'
 import { successToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
@@ -449,6 +450,9 @@ export function DriveToolbar({
   onClearClientSideFilter,
 }: DriveToolbarProps) {
   const isMobile = useIsMobile()
+  
+  // Android-like sticky toolbar behavior
+  const { isScrolled } = useStickyToolbar('drive-toolbar')
 
   // Optimized bulk operation handlers
 
@@ -515,7 +519,14 @@ export function DriveToolbar({
   }, [onClearClientSideFilter, items.length])
 
   return (
-    <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur transition-transform duration-200 ease-in-out" id="drive-toolbar">
+    <div 
+      className="sticky top-0 z-[100] border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 transition-all duration-300 ease-out shadow-sm" 
+      id="drive-toolbar"
+      style={{
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+    >
       <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth p-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {/* Main Menu - 5 Items - Horizontal Scrollable */}
         <div className="flex min-w-0 flex-shrink-0 items-center gap-2">

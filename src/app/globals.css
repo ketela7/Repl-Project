@@ -33,6 +33,30 @@ body {
   display: none;
 }
 
+/* Android Material Design elevation classes for sticky toolbar */
+.elevation-4 {
+  box-shadow: 
+    0 2px 4px -1px rgba(0, 0, 0, 0.2),
+    0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Smooth transitions for sticky toolbar */
+#drive-toolbar {
+  will-change: transform, box-shadow, background-color;
+  contain: layout style paint;
+}
+
+/* Android-like toolbar animations */
+@keyframes toolbar-shadow-in {
+  from {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0);
+  }
+  to {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14);
+  }
+}
+
 /* Mobile optimizations */
 @media (max-width: 768px) {
   body {

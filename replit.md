@@ -140,6 +140,7 @@ Changelog:
 - June 29, 2025. Added comprehensive copy functionality to table data view - all cells (name, size, MIME type, modified time, created time, owners) now have copy icons that appear on hover with proper toast notifications and event handling to prevent row selection conflicts
 - June 30, 2025. Major code optimization of drive-data-view.tsx - created reusable CopyableCell component to eliminate 150+ lines of duplicate code across table cells, added memoized handlers and table headers for better performance, implemented proper component composition following React best practices
 - June 30, 2025. Media preview optimization - removed isPreviewable function and simplified preview logic to use getPreviewUrl directly, improved renderPreviewContent with perfect iframe sizing that matches preview container, removed file description for clean appearance, implemented minimal floating controls with only fullscreen/miniscreen and close buttons
+- June 30, 2025. Enhanced DriveToolbar with Android-like sticky positioning - implemented dynamic shadow and background opacity changes based on scroll position, added Material Design elevation classes, created useStickyToolbar hook for smooth scroll-based animations with GPU acceleration and performance optimization
 ```
 
 ## User Preferences
