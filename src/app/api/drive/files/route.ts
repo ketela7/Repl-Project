@@ -29,20 +29,24 @@ function buildDriveQuery(filters: FileFilter): string {
       break
     case 'shared':
       // Shared with me view - files shared by others
-      //conditions.push('trashed=false')
+      conditions.push('trashed=false')
       conditions.push('sharedWithMe=true')
       break
     case 'starred':
       // Starred view - starred files only
-      //conditions.push('trashed=false')
+      conditions.push('trashed=false')
       conditions.push('starred=true')
       break
     case 'my-drive':
       // My Drive view - files owned by me
-      //conditions.push('trashed=false')
+      conditions.push('trashed=false')
       conditions.push("'me' in owners")
       break
-
+    case 'recent':
+      // Recent view - recently modified files
+      conditions.push('trashed=false')
+      break
+    case 'all':
     default:
       // All files view - show non-trashed files by default
       conditions.push('trashed=false')
@@ -346,7 +350,7 @@ export async function GET(request: NextRequest) {
 
     const filters: FileFilter = {
       fileType: searchParams.get('fileType') || 'all',
-      viewStatus: searchParams.get('viewStatus') || undefined,
+      viewStatus: searchParams.get('viewStatus') || 'all',
       sortBy: searchParams.get('sortBy') || undefined,
       sortOrder: searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc',
       search: searchParams.get('search') || undefined,
@@ -366,14 +370,15 @@ export async function GET(request: NextRequest) {
     
     // Handle different view types with proper parent constraints
     if (filters.viewStatus === 'my-drive') {
-      // My Drive view - always constrain to folders I own
+      // My Drive view - always constrain to specific folder
       const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
-    }  else if (['shared', 'starred', 'recent','trash'].includes(filters.viewStatus)) {
-      // These views don't need parent constraints - they show files from anywhere
-      // query already contains the appropriate filters from buildDriveQuery
+    } else if (['shared', 'starred', 'recent', 'trash', 'all'].includes(filters.viewStatus)) {
+      // These views search across entire Drive without parent constraints
+      // They already have their specific filters from buildDriveQuery
+      // No parent constraint needed - search globally
     } else {
-      // Default/all view - show files in current folder
+      // Unknown view status - default to current folder constraint
       const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
     }
@@ -383,7 +388,7 @@ export async function GET(request: NextRequest) {
 
     const cacheKey = driveCache.generateDriveKey({
       parentId: folderId,
-      userId: session.user?.email || '',
+      userId: session.user?.email,
       pageToken,
       query: query,
       pageSize,
@@ -425,7 +430,7 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    driveCache.set(cacheKey, result, 15)
+    driveCache.set(cacheKey, result)
 
     return NextResponse.json(result)
   } catch (error: any) {

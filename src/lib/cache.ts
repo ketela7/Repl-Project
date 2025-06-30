@@ -13,7 +13,7 @@ class MemoryCache {
   private cache = new Map<string, CacheEntry<any>>()
   private maxSize = 20000 // Increased cache size for better performance
 
-  set<T>(key: string, data: T, ttlMinutes: number = 10): void {
+  set<T>(key: string, data: T, ttlMinutes: number = 60): void {
     // Increased default TTL
     // Clean up old entries if cache is getting too large
     if (this.cache.size >= this.maxSize) {

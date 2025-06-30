@@ -798,42 +798,6 @@ export class GoogleDriveService {
     return this.removeFilePermission(folderId, permissionId)
   }
 
-  async searchFiles(searchQuery: string, options: Partial<DriveSearchOptions> = {}): Promise<DriveSearchResult> {
-    return this.listFiles({
-      ...options,
-      query: searchQuery,
-    })
-  }
-
-  async getRecentFiles(limit: number = 20): Promise<DriveFile[]> {
-    const result = await this.listFiles({
-      pageSize: limit,
-      orderBy: 'modifiedTime desc',
-    })
-
-    return result.files
-  }
-
-  async getSharedFiles(): Promise<DriveFile[]> {
-    const response = await this.drive.files.list({
-      q: 'sharedWithMe=true and trashed=false',
-      orderBy: 'modifiedTime desc',
-      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed)',
-    })
-
-    return response.data.files?.map(convertGoogleDriveFile) || []
-  }
-
-  async getTrashedFiles(): Promise<DriveFile[]> {
-    const response = await this.drive.files.list({
-      q: 'trashed=true',
-      orderBy: 'modifiedTime desc',
-      fields: 'files(id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed)',
-    })
-
-    return response.data.files?.map(convertGoogleDriveFile) || []
-  }
-
   // Unified share operation for both files and folders
   async shareFile(fileId: string, permission: DrivePermission): Promise<void> {
     try {

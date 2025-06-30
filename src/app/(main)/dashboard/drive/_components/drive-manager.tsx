@@ -270,7 +270,7 @@ export function DriveManager() {
         isStarred: item?.starred || false,
         isShared: item?.shared || false,
         isFolder: itemIsFolder,
-        canCopy: !item?.trashed && item?.capabilities?.canCopy,
+        canCopy: !item?.trashed, //&& item?.capabilities?.canCopy,
         canDelete: item?.capabilities?.canDelete,
         canDownload: !item?.trashed && !itemIsFolder && item?.capabilities?.canDownload,
         canTrash: !item?.trashed && item?.capabilities?.canTrash,
