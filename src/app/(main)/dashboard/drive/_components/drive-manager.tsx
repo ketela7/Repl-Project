@@ -27,7 +27,8 @@ import { ItemsRenameDialog } from './items-rename-dialog'
 import { ItemsTrashDialog } from './items-trash-dialog'
 import { ItemsDeleteDialog } from './items-delete-dialog'
 import { ItemsUntrashDialog } from './items-untrash-dialog'
-import { ItemsDownloadDialog } from './items-download-dialog'
+import ItemsDownloadDialog from './items-download-dialog'
+import ItemsExportDialog from './items-export-dialog'
 
 type DriveItem = (DriveFile | DriveFolder) & {
   itemType?: 'file' | 'folder'
@@ -129,6 +130,7 @@ export function DriveManager() {
     delete: false,
     untrash: false,
     download: false,
+    export: false,
   })
 
   // Sorting state
@@ -774,7 +776,7 @@ export function DriveManager() {
                     setTimeout(() => {
                       setSelectedFileForPreview(item as DriveFile)
                       openDialog('preview')
-                    }, 50)
+                    }, 100)
                   }
                   break
                 case 'details':
@@ -782,39 +784,43 @@ export function DriveManager() {
                   setTimeout(() => {
                     setSelectedFileForDetails(item)
                     openDialog('details')
-                  }, 50)
+                  }, 100)
                   break
                 case 'download':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('download'), 50)
+                  setTimeout(() => openDialog('download'), 100)
                   break
                 case 'share':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('share'), 50)
+                  setTimeout(() => openDialog('share'), 100)
                   break
                 case 'rename':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('rename'), 50)
+                  setTimeout(() => openDialog('rename'), 100)
                   break
                 case 'move':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('move'), 50)
+                  setTimeout(() => openDialog('move'), 100)
                   break
                 case 'copy':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('copy'), 50)
+                  setTimeout(() => openDialog('copy'), 100)
                   break
                 case 'trash':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('trash'), 50)
+                  setTimeout(() => openDialog('trash'), 100)
                   break
                 case 'delete':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('delete'), 50)
+                  setTimeout(() => openDialog('delete'), 100)
                   break
                 case 'untrash':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('untrash'), 50)
+                  setTimeout(() => openDialog('untrash'), 100)
+                  break
+                case 'export':
+                  setSelectedItems(new Set([item.id]))
+                  setTimeout(() => openDialog('export'), 100)
                   break
               }
             }}
@@ -980,6 +986,23 @@ export function DriveManager() {
           onComplete={() => {
             closeDialog('download')
             setSelectedItems(new Set())
+          }}
+        />
+      )}
+
+      {dialogs.export && selectedItems.size > 0 && (
+        <ItemsExportDialog
+          isOpen={dialogs.export}
+          onClose={() => {
+            closeDialog('export')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onComplete={() => {
+            closeDialog('export')
+            setSelectedItems(new Set())
+            handleRefresh()
           }}
         />
       )}
