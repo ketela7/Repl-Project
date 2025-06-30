@@ -1,11 +1,33 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Move, Loader2, Folder, ArrowLeft, CheckCircle, XCircle, AlertTriangle, SkipForward } from 'lucide-react'
+import {
+  Move,
+  Loader2,
+  Folder,
+  ArrowLeft,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  SkipForward,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -57,8 +79,8 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter((item) => !item.isFolder).length
-  const folderCount = selectedItems.filter((item) => item.isFolder).length
+  const fileCount = selectedItems.filter(item => !item.isFolder).length
+  const folderCount = selectedItems.filter(item => item.isFolder).length
 
   const handleCancel = () => {
     // Immediately set cancellation flags
@@ -118,7 +140,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         const item = selectedItems[i]
 
         try {
-          setProgress((prev) => ({
+          setProgress(prev => ({
             ...prev,
             current: i + 1,
             currentFile: item.name,
@@ -153,7 +175,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
           // Small delay between items to allow cancellation
           if (!isCancelledRef.current) {
-            await new Promise((resolve) => setTimeout(resolve, 100))
+            await new Promise(resolve => setTimeout(resolve, 100))
           }
         } catch (error: any) {
           if (abortControllerRef.current?.signal.aborted) {
@@ -168,7 +190,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         }
 
         // Update progress
-        setProgress((prev) => ({
+        setProgress(prev => ({
           ...prev,
           success: successCount,
           failed: failedCount,
@@ -184,7 +206,9 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
       // Show results only if not cancelled
       if (!isCancelledRef.current) {
         if (successCount > 0) {
-          toast.success(`Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`)
+          toast.success(
+            `Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`,
+          )
         }
         if (failedCount > 0) {
           toast.error(`Failed to move ${failedCount} item${failedCount > 1 ? 's' : ''}`)
@@ -195,7 +219,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         // Operation was cancelled, don't show error
         return
       }
-      // // // console.error(err)
+      // // // // console.error(err)
       toast.error('Move operation failed')
     } finally {
       // Clean up
@@ -274,12 +298,18 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           {/* Stats - Compact */}
           <div className="flex flex-shrink-0 justify-center gap-1">
             {fileCount > 0 && (
-              <Badge variant="secondary" className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+              <Badge
+                variant="secondary"
+                className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+              >
                 {fileCount} file{fileCount > 1 ? 's' : ''}
               </Badge>
             )}
             {folderCount > 0 && (
-              <Badge variant="secondary" className="bg-amber-100 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100">
+              <Badge
+                variant="secondary"
+                className="bg-amber-100 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100"
+              >
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
@@ -290,8 +320,11 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
             <h4 className="text-center text-xs font-medium">Items to move:</h4>
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
-                {selectedItems.slice(0, 5).map((item) => (
-                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                {selectedItems.slice(0, 5).map(item => (
+                  <div
+                    key={item.id}
+                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                  >
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={item.name}>
                       {item.name}
@@ -301,7 +334,11 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
                     </Badge>
                   </div>
                 ))}
-                {selectedItems.length > 5 && <div className="text-muted-foreground py-1 text-center text-xs">... and {selectedItems.length - 5} more items</div>}
+                {selectedItems.length > 5 && (
+                  <div className="text-muted-foreground py-1 text-center text-xs">
+                    ... and {selectedItems.length - 5} more items
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -310,7 +347,12 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           <div className="flex-shrink-0 space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-xs font-medium">Destination:</Label>
-              <Button variant="outline" size="sm" onClick={() => setShowDestinationSelector(true)} className="h-7 text-xs">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowDestinationSelector(true)}
+                className="h-7 text-xs"
+              >
                 <Folder className="mr-1 h-3 w-3" />
                 Choose
               </Button>
@@ -326,7 +368,8 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage =
+        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -358,7 +401,9 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           {progress.currentFile && (
             <div className="space-y-1">
               <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">{progress.currentFile}</div>
+              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
+                {progress.currentFile}
+              </div>
             </div>
           )}
 
@@ -400,7 +445,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
                     ? 'bg-green-100 dark:bg-green-900/30'
                     : hasErrors
                       ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30'
+                      : 'bg-gray-100 dark:bg-gray-900/30',
               )}
             >
               {isCancelled ? (
@@ -415,7 +460,15 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
             </div>
           </div>
           <div>
-            <h3 className="text-base font-semibold">{isCancelled ? 'Move Cancelled' : wasSuccessful && !hasErrors ? 'Move Completed' : hasErrors ? 'Move Partially Completed' : 'No Items Moved'}</h3>
+            <h3 className="text-base font-semibold">
+              {isCancelled
+                ? 'Move Cancelled'
+                : wasSuccessful && !hasErrors
+                  ? 'Move Completed'
+                  : hasErrors
+                    ? 'Move Partially Completed'
+                    : 'No Items Moved'}
+            </h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {selectedItems.length} items processed
             </p>
@@ -444,7 +497,10 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
             <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.errors.map((error, index) => (
-                <div key={`error-${error.file}-${index}`} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
+                <div
+                  key={`error-${error.file}-${index}`}
+                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
+                >
                   <div className="font-medium">{error.file}</div>
                   <div className="text-red-600 dark:text-red-400">{error.error}</div>
                 </div>
@@ -456,7 +512,9 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         {/* Refresh Notice */}
         {(progress.success > 0 || progress.failed > 0) && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">Click the button below to refresh and see your updated files.</p>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              Click the button below to refresh and see your updated files.
+            </p>
           </div>
         )}
       </div>
@@ -485,17 +543,28 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
             <BottomSheetFooter className={cn('grid gap-4')}>
               {!isProcessing && !isCompleted && (
                 <>
-                  <Button onClick={handleMove} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleMove}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <Move className="mr-2 h-4 w-4" />
                     Move to {selectedFolderName}
                   </Button>
-                  <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    variant="outline"
+                    onClick={handleClose}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     Cancel
                   </Button>
                 </>
               )}
               {isProcessing && (
-                <Button onClick={handleCancel} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <Button
+                  onClick={handleCancel}
+                  variant="outline"
+                  className={cn('touch-target min-h-[44px] active:scale-95')}
+                >
                   <XCircle className="mr-2 h-4 w-4" />
                   Cancel Move
                 </Button>
@@ -503,18 +572,28 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
               {isCompleted && (
                 <>
                   {progress.success > 0 || progress.failed > 0 ? (
-                    <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    <Button
+                      onClick={handleCloseAndRefresh}
+                      className={cn('touch-target min-h-[44px] active:scale-95')}
+                    >
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Refresh Now
                     </Button>
                   ) : (
-                    <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    <Button
+                      onClick={handleClose}
+                      className={cn('touch-target min-h-[44px] active:scale-95')}
+                    >
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Close
                     </Button>
                   )}
                   {(progress.success > 0 || progress.failed > 0) && (
-                    <Button onClick={handleClose} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                    <Button
+                      onClick={handleClose}
+                      variant="outline"
+                      className={cn('touch-target min-h-[44px] active:scale-95')}
+                    >
                       Close Without Refresh
                     </Button>
                   )}
@@ -529,31 +608,46 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           <DialogContent className="max-h-[80vh] max-w-2xl">
             <DialogHeader>
               <div className="flex items-center gap-3">
-                <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleBackToMainDialog}
+                  className="h-8 w-8 p-1"
+                >
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
                   <DialogTitle>Choose Move Destination</DialogTitle>
                   <DialogDescription>
-                    Select where to move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}
+                    Select where to move {selectedItems.length} item
+                    {selectedItems.length > 1 ? 's' : ''}
                   </DialogDescription>
                 </div>
               </div>
             </DialogHeader>
 
-            <DriveDestinationSelector onSelect={handleDestinationSelect} selectedFolderId={selectedFolderId} className="py-4" />
+            <DriveDestinationSelector
+              onSelect={handleDestinationSelect}
+              selectedFolderId={selectedFolderId}
+              className="py-4"
+            />
 
             <DialogFooter className="flex-col gap-2 sm:flex-row">
               <div className="flex-1 text-left">
                 <div className="text-muted-foreground text-sm">
-                  Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
+                  Selected:{' '}
+                  <span className="text-foreground font-medium">{selectedFolderName}</span>
                 </div>
               </div>
               <Button onClick={handleConfirmDestinationAndMove} className="w-full sm:w-auto">
                 <Move className="mr-2 h-4 w-4" />
                 Confirm & Move
               </Button>
-              <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
+              <Button
+                variant="outline"
+                onClick={handleBackToMainDialog}
+                className="w-full sm:w-auto"
+              >
                 Back
               </Button>
             </DialogFooter>
@@ -628,19 +722,29 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         <DialogContent className="max-h-[80vh] max-w-2xl">
           <DialogHeader>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBackToMainDialog}
+                className="h-8 w-8 p-1"
+              >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
                 <DialogTitle>Choose Move Destination</DialogTitle>
                 <DialogDescription>
-                  Select where to move {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''}
+                  Select where to move {selectedItems.length} item
+                  {selectedItems.length > 1 ? 's' : ''}
                 </DialogDescription>
               </div>
             </div>
           </DialogHeader>
 
-          <DriveDestinationSelector onSelect={handleDestinationSelect} selectedFolderId={selectedFolderId} className="py-4" />
+          <DriveDestinationSelector
+            onSelect={handleDestinationSelect}
+            selectedFolderId={selectedFolderId}
+            className="py-4"
+          />
 
           <DialogFooter className="flex-col gap-2 sm:flex-row">
             <div className="flex-1 text-left">

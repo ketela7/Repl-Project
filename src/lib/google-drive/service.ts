@@ -3,9 +3,28 @@ import { Readable } from 'stream'
 import { drive_v3 } from 'googleapis'
 
 import { createDriveClient } from './config'
-import { DriveFile, DriveFolder, DriveSearchOptions, DriveSearchResult, DriveUploadOptions, DrivePermission, DriveUserInfo, DriveFileMetadata } from './types'
-import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
-import { getOptimizedRequestParams, DriveApiBatcher, performanceMonitor, requestDeduplicator } from './performance'
+import {
+  DriveFile,
+  DriveFolder,
+  DriveSearchOptions,
+  DriveSearchResult,
+  DriveUploadOptions,
+  DrivePermission,
+  DriveUserInfo,
+  DriveFileMetadata,
+} from './types'
+import {
+  convertGoogleDriveFile,
+  convertGoogleDriveFolder,
+  buildSearchQuery,
+  getMimeTypeFromFileName,
+} from './utils'
+import {
+  getOptimizedRequestParams,
+  DriveApiBatcher,
+  performanceMonitor,
+  requestDeduplicator,
+} from './performance'
 
 export class GoogleDriveService {
   public drive: drive_v3.Drive
@@ -47,7 +66,15 @@ export class GoogleDriveService {
   }
 
   async listFiles(options: DriveSearchOptions = {}): Promise<DriveSearchResult> {
-    const { query, parentId, mimeType, pageSize = 50, pageToken, orderBy = 'modifiedTime desc', includeTeamDriveItems = true } = options
+    const {
+      query,
+      parentId,
+      mimeType,
+      pageSize = 50,
+      pageToken,
+      orderBy = 'modifiedTime desc',
+      includeTeamDriveItems = true,
+    } = options
 
     // Validate and sanitize pageSize
     const validPageSize = Math.min(Math.max(pageSize, 1), 1000)
@@ -62,7 +89,11 @@ export class GoogleDriveService {
         }
 
         // Basic validation for pageToken format
-        if (typeof validPageToken !== 'string' || validPageToken.length === 0 || validPageToken.length > 2048) {
+        if (
+          typeof validPageToken !== 'string' ||
+          validPageToken.length === 0 ||
+          validPageToken.length > 2048
+        ) {
           validPageToken = undefined
         } else {
           // Additional validation: pageToken should not contain certain invalid characters
@@ -81,7 +112,12 @@ export class GoogleDriveService {
 
     if (query) {
       // If query is already formatted (contains operators), use it directly
-      if (query.includes('=') || query.includes('and') || query.includes('or') || query.includes('in')) {
+      if (
+        query.includes('=') ||
+        query.includes('and') ||
+        query.includes('or') ||
+        query.includes('in')
+      ) {
         searchQuery = query
       } else {
         // Otherwise treat it as a search term and build proper query
@@ -191,13 +227,18 @@ export class GoogleDriveService {
   async getFile(fileId: string): Promise<DriveFile> {
     const response = await this.drive.files.get({
       fileId,
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, shared, trashed, starred, capabilities, owners',
+      fields:
+        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, shared, trashed, starred, capabilities, owners',
     })
 
-    return convertGoogleDriveFile(response.data)
+    const result = await response
+    return convertGoogleDriveFile(result.data)
   }
 
-  async getFileDetails(fileId: string, fields?: string): Promise<
+  async getFileDetails(
+    fileId: string,
+    fields?: string,
+  ): Promise<
     DriveFile & {
       description?: string
       lastModifyingUser?: {
@@ -347,41 +388,47 @@ export class GoogleDriveService {
 
     return {
       ...file,
-      ...(response.data.description  && { description: response.data.description  }),
+      ...(response.data.description && { description: response.data.description }),
       lastModifyingUser: response.data.lastModifyingUser
         ? {
             displayName: response.data.lastModifyingUser.displayName || '',
             emailAddress: response.data.lastModifyingUser.emailAddress || '',
-            ...((response.data.lastModifyingUser.photoLink ) && { photoLink: response.data.lastModifyingUser.photoLink  }),
+            ...(response.data.lastModifyingUser.photoLink && {
+              photoLink: response.data.lastModifyingUser.photoLink,
+            }),
           }
         : undefined,
       sharingUser: response.data.sharingUser
         ? {
             displayName: response.data.sharingUser.displayName || '',
             emailAddress: response.data.sharingUser.emailAddress || '',
-            ...((response.data.sharingUser.photoLink ) && { photoLink: response.data.sharingUser.photoLink  }),
+            ...(response.data.sharingUser.photoLink && {
+              photoLink: response.data.sharingUser.photoLink,
+            }),
           }
         : undefined,
-      ...(response.data.version  && { version: response.data.version  }),
-      ...(response.data.md5Checksum  && { md5Checksum: response.data.md5Checksum  }),
-      ...(response.data.sha1Checksum  && { sha1Checksum: response.data.sha1Checksum  }),
-      ...(response.data.sha256Checksum  && { sha256Checksum: response.data.sha256Checksum  }),
-      ...(response.data.quotaBytesUsed  && { quotaBytesUsed: response.data.quotaBytesUsed  }),
+      ...(response.data.version && { version: response.data.version }),
+      ...(response.data.md5Checksum && { md5Checksum: response.data.md5Checksum }),
+      ...(response.data.sha1Checksum && { sha1Checksum: response.data.sha1Checksum }),
+      ...(response.data.sha256Checksum && { sha256Checksum: response.data.sha256Checksum }),
+      ...(response.data.quotaBytesUsed && { quotaBytesUsed: response.data.quotaBytesUsed }),
       starred: response.data.starred || false,
       viewed: response.data.viewedByMe || false,
       explicitlyTrashed: response.data.explicitlyTrashed || false,
-      ...(response.data.folderColorRgb  && { folderColorRgb: response.data.folderColorRgb  }),
-      ...(response.data.fullFileExtension  && { fullFileExtension: response.data.fullFileExtension  }),
-      ...(response.data.fileExtension  && { fileExtension: response.data.fileExtension  }),
-      ...(response.data.originalFilename  && { originalFilename: response.data.originalFilename  }),
-      ...(response.data.headRevisionId  && { headRevisionId: response.data.headRevisionId  }),
+      ...(response.data.folderColorRgb && { folderColorRgb: response.data.folderColorRgb }),
+      ...(response.data.fullFileExtension && {
+        fullFileExtension: response.data.fullFileExtension,
+      }),
+      ...(response.data.fileExtension && { fileExtension: response.data.fileExtension }),
+      ...(response.data.originalFilename && { originalFilename: response.data.originalFilename }),
+      ...(response.data.headRevisionId && { headRevisionId: response.data.headRevisionId }),
       isAppAuthorized: response.data.isAppAuthorized || false,
       copyRequiresWriterPermission: response.data.copyRequiresWriterPermission || false,
       writersCanShare: response.data.writersCanShare || true,
       hasAugmentedPermissions: response.data.hasAugmentedPermissions || false,
       ownedByMe: response.data.ownedByMe || false,
 
-      ...(response.data.teamDriveId  && { teamDriveId: response.data.teamDriveId  }),
+      ...(response.data.teamDriveId && { teamDriveId: response.data.teamDriveId }),
       spaces: response.data.spaces || [],
       properties: response.data.properties || {},
       appProperties: response.data.appProperties || {},
@@ -432,20 +479,22 @@ export class GoogleDriveService {
           }
         : undefined,
       contentRestrictions:
-        response.data.contentRestrictions?.map((restriction) => ({
+        response.data.contentRestrictions?.map(restriction => ({
           readOnly: restriction.readOnly || false,
-          ...(restriction.reason  && { reason: restriction.reason  }),
+          ...(restriction.reason && { reason: restriction.reason }),
           restrictingUser: restriction.restrictingUser
             ? {
                 displayName: restriction.restrictingUser.displayName || '',
                 emailAddress: restriction.restrictingUser.emailAddress || '',
-                ...((restriction.restrictingUser.photoLink ) && { photoLink: restriction.restrictingUser.photoLink  }),
+                ...(restriction.restrictingUser.photoLink && {
+                  photoLink: restriction.restrictingUser.photoLink,
+                }),
               }
             : undefined,
-          ...(restriction.restrictionTime  && { restrictionTime: restriction.restrictionTime  }),
-          ...(restriction.type  && { type: restriction.type  }),
+          ...(restriction.restrictionTime && { restrictionTime: restriction.restrictionTime }),
+          ...(restriction.type && { type: restriction.type }),
         })) || [],
-      ...(response.data.resourceKey  && { resourceKey: response.data.resourceKey  }),
+      ...(response.data.resourceKey && { resourceKey: response.data.resourceKey }),
       linkShareMetadata: response.data.linkShareMetadata
         ? {
             securityUpdateEligible: response.data.linkShareMetadata.securityUpdateEligible,
@@ -455,11 +504,11 @@ export class GoogleDriveService {
       labelInfo: response.data.labelInfo
         ? {
             labels:
-              response.data.labelInfo.labels?.map((label) => ({
-                ...(label.id  && { id: label.id  }),
-                ...(label.revisionId  && { revisionId: label.revisionId  }),
-                ...(label.kind  && { kind: label.kind  }),
-                ...(label.fields  && { fields: label.fields  }),
+              response.data.labelInfo.labels?.map(label => ({
+                ...(label.id && { id: label.id }),
+                ...(label.revisionId && { revisionId: label.revisionId }),
+                ...(label.kind && { kind: label.kind }),
+                ...(label.fields && { fields: label.fields }),
               })) || undefined,
           }
         : undefined,
@@ -528,10 +577,12 @@ export class GoogleDriveService {
       requestBody: fileMetadata,
       media,
       uploadType: 'multipart',
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields:
+        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
-    return convertGoogleDriveFile(response.data)
+    const result = await response
+    return convertGoogleDriveFile(result.data)
   }
 
   async downloadFile(fileId: string): Promise<Readable> {
@@ -540,7 +591,7 @@ export class GoogleDriveService {
         fileId,
         alt: 'media',
       },
-      { responseType: 'stream' }
+      { responseType: 'stream' },
     )
 
     return response.data as Readable
@@ -549,14 +600,17 @@ export class GoogleDriveService {
   /**
    * Get file metadata with specific fields
    */
-  async getFileMetadata(fileId: string, fields: string[]): Promise<DriveFileMetadata & { id: string }> {
+  async getFileMetadata(
+    fileId: string,
+    fields: string[],
+  ): Promise<DriveFileMetadata & { id: string }> {
     const response = await this.drive.files.get({
       fileId,
       fields: fields.join(','),
     })
 
-    // // // console.log('[Google Drive Service] Raw API response:', response.data)
-    // // // console.log('[Google Drive Service] Response ID:', response.data.id)
+    // // // // console.log('[Google Drive Service] Raw API response:', response.data)
+    // // // // console.log('[Google Drive Service] Response ID:', response.data.id)
 
     return {
       id: response.data.id || fileId, // Ensure id is always present
@@ -591,7 +645,7 @@ export class GoogleDriveService {
       },
       {
         responseType: 'arraybuffer',
-      }
+      },
     )
     return response.data as ArrayBuffer
   }
@@ -606,10 +660,12 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: true },
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields:
+        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
-    return convertGoogleDriveFile(response.data)
+    const result = await response
+    return convertGoogleDriveFile(result.data)
   }
 
   // Alias for clarity - same operation works for both files and folders
@@ -622,10 +678,12 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: false },
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields:
+        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
-    return convertGoogleDriveFile(response.data)
+    const result = await response
+    return convertGoogleDriveFile(result.data)
   }
 
   // Alias for clarity - same operation works for both files and folders
@@ -651,18 +709,19 @@ export class GoogleDriveService {
         throw new Error('Filename contains invalid characters: < > : " / \\ | ? *')
       }
 
-      // // // console.log(`[Rename Debug] Attempting to rename file ${fileId} to "${newName}"`)
+      // // // // console.log(`[Rename Debug] Attempting to rename file ${fileId} to "${newName}"`)
 
       const response = await this.drive.files.update({
         fileId,
         requestBody: { name: newName.trim() },
-        fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+        fields:
+          'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
       })
 
-      // // // console.log(`[Rename Debug] API Response:`, response.data)
+      // // // // console.log(`[Rename Debug] API Response:`, response.data)
 
       const convertedFile = convertGoogleDriveFile(response.data)
-      // // // console.log(`[Rename Debug] Converted file:`, convertedFile)
+      // // // // console.log(`[Rename Debug] Converted file:`, convertedFile)
 
       return convertedFile
     } catch (error: any) {
@@ -715,7 +774,11 @@ export class GoogleDriveService {
   }
 
   // Unified move operation for both files and folders with error recovery
-  async moveFile(fileId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
+  async moveFile(
+    fileId: string,
+    newParentId: string,
+    currentParentId?: string,
+  ): Promise<DriveFile> {
     try {
       // According to Drive API docs, we should get current parents if not provided
       if (!currentParentId) {
@@ -727,10 +790,12 @@ export class GoogleDriveService {
         fileId,
         addParents: newParentId,
         removeParents: currentParentId,
-        fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+        fields:
+          'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
       })
 
-      return convertGoogleDriveFile(response.data)
+      const result = await response
+      return convertGoogleDriveFile(result.data)
     } catch (error: any) {
       // Handle specific Google API errors according to documentation
       if (error.code === 403) {
@@ -749,7 +814,11 @@ export class GoogleDriveService {
   }
 
   // Alias for clarity - same operation works for both files and folders
-  async moveFolder(folderId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
+  async moveFolder(
+    folderId: string,
+    newParentId: string,
+    currentParentId?: string,
+  ): Promise<DriveFile> {
     return this.moveFile(folderId, newParentId, currentParentId)
   }
 
@@ -766,10 +835,12 @@ export class GoogleDriveService {
     const response = await this.drive.files.copy({
       fileId,
       requestBody: metadata,
-      fields: 'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+      fields:
+        'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
     })
 
-    return convertGoogleDriveFile(response.data)
+    const result = await response
+    return convertGoogleDriveFile(result.data)
   }
 
   // Special handling for folder copying
@@ -777,7 +848,10 @@ export class GoogleDriveService {
     const originalFolder = await this.getFile(folderId)
 
     // Create new folder with the specified metadata
-    const newFolder = await this.createFolder(metadata.name || `${originalFolder.name} - Copy`, metadata.parents?.[0])
+    const newFolder = await this.createFolder(
+      metadata.name || `${originalFolder.name} - Copy`,
+      metadata.parents?.[0],
+    )
 
     // Note: For full folder copying with contents, we would need recursive copying
     // This creates an empty copy of the folder structure
@@ -787,9 +861,9 @@ export class GoogleDriveService {
       mimeType: 'application/vnd.google-apps.folder',
       createdTime: newFolder.createdTime!,
       modifiedTime: newFolder.modifiedTime!,
-      ...(newFolder.parents  && { parents: newFolder.parents  }),
-      ...(newFolder.shared  && { shared: newFolder.shared  }),
-      ...(newFolder.trashed  && { trashed: newFolder.trashed  }),
+      ...(newFolder.parents && { parents: newFolder.parents }),
+      ...(newFolder.shared && { shared: newFolder.shared }),
+      ...(newFolder.trashed && { trashed: newFolder.trashed }),
     })
   }
 
@@ -901,7 +975,7 @@ export class GoogleDriveService {
   }
 
   // Send notification email (for enhanced sharing)
-  async sendNotificationEmail(fileId: string, emailData: any): Promise<void> {
+  async sendNotificationEmail(_fileId: string, _emailData: any): Promise<void> {
     // Note: This would typically use the Gmail API or similar service
     // For now, we'll just log the action
   }

@@ -22,7 +22,7 @@ export const lazyWithRetry = (componentImport: () => Promise<any>) => {
     const retry = (retries = 3) => {
       componentImport()
         .then(resolve)
-        .catch((error) => {
+        .catch(error => {
           if (retries > 0) {
             setTimeout(() => retry(retries - 1), 1000)
           } else {

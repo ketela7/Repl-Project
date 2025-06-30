@@ -14,6 +14,12 @@ const FormSchema = z.object({
   remember: z.boolean().default(false),
 })
 
+type FormValues = {
+  remember: boolean
+}
+
+type FormData = z.infer<typeof FormSchema>
+
 interface NextAuthFormProps {
   isReauth?: boolean
 }
@@ -21,7 +27,7 @@ interface NextAuthFormProps {
 export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
   const { update } = useSession()
 
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       remember: false,
@@ -54,18 +60,29 @@ export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
       {isReauth && (
         <Alert className="border-blue-200 bg-blue-50">
           <Shield className="h-4 w-4" />
-          <AlertDescription>Please sign in again to grant Google Drive access permissions.</AlertDescription>
+          <AlertDescription>
+            Please sign in again to grant Google Drive access permissions.
+          </AlertDescription>
         </Alert>
       )}
 
       {/* Remember Me Checkbox */}
       <div className="bg-muted/30 flex items-center space-x-2 rounded-md border p-3">
-        <Checkbox id="remember-me-nextauth" checked={form.watch('remember')} onCheckedChange={(checked) => form.setValue('remember', !!checked)} />
+        <Checkbox
+          id="remember-me-nextauth"
+          checked={form.watch('remember')}
+          onCheckedChange={checked => form.setValue('remember', !!checked)}
+        />
         <div className="space-y-1">
-          <label htmlFor="remember-me-nextauth" className="cursor-pointer text-sm font-medium select-none">
+          <label
+            htmlFor="remember-me-nextauth"
+            className="cursor-pointer text-sm font-medium select-none"
+          >
             Keep me signed in for 30 days
           </label>
-          <p className="text-muted-foreground text-xs">Default: Sign out after 1 day for security</p>
+          <p className="text-muted-foreground text-xs">
+            Default: Sign out after 1 day for security
+          </p>
         </div>
       </div>
 

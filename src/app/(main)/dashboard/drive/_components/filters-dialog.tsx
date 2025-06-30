@@ -1,16 +1,57 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Archive, Calendar, ChevronDown, ChevronUp, Clock, Code, FileText, Filter, Folder, HardDrive, Home, Image, Link, Music, RefreshCw, Share, Star, Trash, User, Video, X } from 'lucide-react'
+import {
+  Archive,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  Code,
+  FileText,
+  Filter,
+  Folder,
+  HardDrive,
+  Home,
+  Image,
+  Link,
+  Music,
+  RefreshCw,
+  Share,
+  Star,
+  Trash,
+  User,
+  Video,
+  X,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { SimpleDatePicker } from '@/components/ui/simple-date-picker'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -46,11 +87,22 @@ interface FiltersDialogProps {
   isApplying?: boolean
 }
 
-export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilters, currentFilters, hasActiveFilters, onClearFilters, isApplying = false }: FiltersDialogProps) {
+export function FiltersDialog({
+  open,
+  onOpenChange,
+  onFilterChange,
+  onApplyFilters,
+  currentFilters,
+  hasActiveFilters,
+  onClearFilters,
+  isApplying = false,
+}: FiltersDialogProps) {
   // Temporary state for filter changes (not applied until "Apply Filter" is clicked)
   const [tempActiveView, setTempActiveView] = useState(currentFilters?.activeView || 'all')
   const [tempFileTypeFilter, setTempFileTypeFilter] = useState(currentFilters?.fileTypeFilter || [])
-  const [tempAdvancedFilters, setTempAdvancedFilters] = useState<AdvancedFilters>(currentFilters?.advancedFilters || {})
+  const [tempAdvancedFilters, setTempAdvancedFilters] = useState<AdvancedFilters>(
+    currentFilters?.advancedFilters || {},
+  )
 
   const [showViewStatus, setShowViewStatus] = useState(false)
   const [showFileTypes, setShowFileTypes] = useState(false)
@@ -61,7 +113,9 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
   useEffect(() => {
     if (open) {
       setTempActiveView(currentFilters?.activeView || 'all')
-      setTempFileTypeFilter(Array.isArray(currentFilters?.fileTypeFilter) ? currentFilters.fileTypeFilter : [])
+      setTempFileTypeFilter(
+        Array.isArray(currentFilters?.fileTypeFilter) ? currentFilters.fileTypeFilter : [],
+      )
       setTempAdvancedFilters({
         sizeRange: {
           unit: 'MB',
@@ -78,7 +132,9 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
   }, [open, currentFilters])
 
   // Check if size filters are applied (Google Drive API limitation: size filters only work for files)
-  const hasSizeFilter = (tempAdvancedFilters.sizeRange?.min && tempAdvancedFilters.sizeRange.min > 0) || (tempAdvancedFilters.sizeRange?.max && tempAdvancedFilters.sizeRange.max > 0)
+  const hasSizeFilter =
+    (tempAdvancedFilters.sizeRange?.min && tempAdvancedFilters.sizeRange.min > 0) ||
+    (tempAdvancedFilters.sizeRange?.max && tempAdvancedFilters.sizeRange.max > 0)
 
   // Calculate if there are active temp filters to show Clear All button
   const hasTempActiveFilters =
@@ -209,7 +265,9 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
     const currentArray = Array.isArray(tempFileTypeFilter) ? tempFileTypeFilter : []
 
     // Toggle behavior - add if not present, remove if present
-    let newFilter = currentArray.includes(typeId) ? currentArray.filter((type: string) => type !== typeId) : [...currentArray, typeId]
+    let newFilter = currentArray.includes(typeId)
+      ? currentArray.filter((type: string) => type !== typeId)
+      : [...currentArray, typeId]
 
     // Remove folder from selection if size filters are active (Google Drive API limitation)
     if (hasSizeFilter && newFilter.includes('folder')) {
@@ -229,11 +287,17 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
     setTempAdvancedFilters(newFilters)
 
     // Check if size filters are being applied
-    const newHasSizeFilter = (newFilters.sizeRange?.min && newFilters.sizeRange.min > 0) || (newFilters.sizeRange?.max && newFilters.sizeRange.max > 0)
+    const newHasSizeFilter =
+      (newFilters.sizeRange?.min && newFilters.sizeRange.min > 0) ||
+      (newFilters.sizeRange?.max && newFilters.sizeRange.max > 0)
 
     // Remove folder from file type filter if size filters are applied (Google Drive API limitation)
     let updatedFileTypeFilter = tempFileTypeFilter
-    if (newHasSizeFilter && Array.isArray(tempFileTypeFilter) && tempFileTypeFilter.includes('folder')) {
+    if (
+      newHasSizeFilter &&
+      Array.isArray(tempFileTypeFilter) &&
+      tempFileTypeFilter.includes('folder')
+    ) {
       updatedFileTypeFilter = tempFileTypeFilter.filter((type: string) => type !== 'folder')
       setTempFileTypeFilter(updatedFileTypeFilter)
     }
@@ -269,14 +333,22 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
       <div className="space-y-6 pt-2">
         {/* View Status Section */}
         <div className="space-y-3">
-          <Button variant="ghost" onClick={() => setShowViewStatus(!showViewStatus)} className="h-auto w-full justify-between p-0">
+          <Button
+            variant="ghost"
+            onClick={() => setShowViewStatus(!showViewStatus)}
+            className="h-auto w-full justify-between p-0"
+          >
             <h3 className="text-sm font-semibold">View Status</h3>
-            {showViewStatus ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {showViewStatus ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
 
           {showViewStatus && (
             <div className="grid grid-cols-2 gap-2 pt-2">
-              {basicMenuItems.map((item) => {
+              {basicMenuItems.map(item => {
                 const Icon = item.icon
                 const isActive = tempActiveView === item.id
 
@@ -291,7 +363,9 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                       <Icon className="h-4 w-4 flex-shrink-0" />
                       <div className="min-w-0 flex-1 text-left">
                         <div className="truncate text-sm font-medium">{item.label}</div>
-                        <div className="text-muted-foreground truncate text-xs">{item.description}</div>
+                        <div className="text-muted-foreground truncate text-xs">
+                          {item.description}
+                        </div>
                       </div>
                     </div>
                   </Button>
@@ -305,9 +379,17 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
 
         {/* File Types Section */}
         <div className="space-y-3">
-          <Button variant="ghost" onClick={() => setShowFileTypes(!showFileTypes)} className="h-auto w-full justify-between p-0">
+          <Button
+            variant="ghost"
+            onClick={() => setShowFileTypes(!showFileTypes)}
+            className="h-auto w-full justify-between p-0"
+          >
             <h3 className="text-sm font-semibold">File Types</h3>
-            {showFileTypes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {showFileTypes ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
 
           {showFileTypes && (
@@ -319,20 +401,27 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                       Notice
                     </Badge>
                     <div className="flex-1">
-                      <p className="font-medium">Size filtering: Hanya akan menghasilkan file bukan folder</p>
+                      <p className="font-medium">
+                        Size filtering: Hanya akan menghasilkan file bukan folder
+                      </p>
                       <p className="mt-1 text-xs opacity-80">
-                        Google Drive API limitation: Filter ukuran hanya bekerja untuk file, bukan folder. Pemilihan folder dinonaktifkan ketika filter ukuran aktif.
+                        Google Drive API limitation: Filter ukuran hanya bekerja untuk file, bukan
+                        folder. Pemilihan folder dinonaktifkan ketika filter ukuran aktif.
                       </p>
                     </div>
                   </div>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-2">
-                {fileTypeFilters.map((filter) => {
+                {fileTypeFilters.map(filter => {
                   const Icon = filter.icon
                   const currentFilter = tempFileTypeFilter || []
                   const isArray = Array.isArray(currentFilter)
-                  const currentArray = isArray ? currentFilter : currentFilter ? [currentFilter] : []
+                  const currentArray = isArray
+                    ? currentFilter
+                    : currentFilter
+                      ? [currentFilter]
+                      : []
                   const isActive = currentArray.includes(filter.id)
 
                   // Disable folder selection when size filters are active
@@ -350,8 +439,12 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                         }
                       }}
                     >
-                      <Icon className={`mr-2 h-4 w-4 ${filter.color} ${isDisabled ? 'opacity-50' : ''}`} />
-                      <span className={`text-sm ${isDisabled ? 'opacity-50' : ''}`}>{filter.label}</span>
+                      <Icon
+                        className={`mr-2 h-4 w-4 ${filter.color} ${isDisabled ? 'opacity-50' : ''}`}
+                      />
+                      <span className={`text-sm ${isDisabled ? 'opacity-50' : ''}`}>
+                        {filter.label}
+                      </span>
                     </Button>
                   )
                 })}
@@ -364,7 +457,11 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
 
         {/* Advanced Filters Section */}
         <div className="space-y-3">
-          <Button variant="ghost" onClick={() => setShowAdvanced(!showAdvanced)} className="h-auto w-full justify-between p-0">
+          <Button
+            variant="ghost"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="h-auto w-full justify-between p-0"
+          >
             <h3 className="text-sm font-semibold">Advanced Filters</h3>
             {showAdvanced ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </Button>
@@ -383,12 +480,12 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                         placeholder="0"
                         className="text-sm"
                         value={tempAdvancedFilters.sizeRange?.min || ''}
-                        onChange={(e) =>
+                        onChange={e =>
                           handleAdvancedFiltersChange({
                             ...tempAdvancedFilters,
                             sizeRange: {
                               ...tempAdvancedFilters.sizeRange,
-                              ...(Number(e.target.value)  && { min: Number(e.target.value)  }),
+                              ...(Number(e.target.value) && { min: Number(e.target.value) }),
                               unit: tempAdvancedFilters.sizeRange?.unit || 'MB',
                             },
                           })
@@ -427,12 +524,12 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                         placeholder="∞"
                         className="text-sm"
                         value={tempAdvancedFilters.sizeRange?.max || ''}
-                        onChange={(e) =>
+                        onChange={e =>
                           handleAdvancedFiltersChange({
                             ...tempAdvancedFilters,
                             sizeRange: {
                               ...tempAdvancedFilters.sizeRange,
-                              ...(Number(e.target.value)  && { max: Number(e.target.value)  }),
+                              ...(Number(e.target.value) && { max: Number(e.target.value) }),
                               unit: tempAdvancedFilters.sizeRange?.unit || 'MB',
                             },
                           })
@@ -477,12 +574,12 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                       <Label className="text-muted-foreground text-xs">From</Label>
                       <SimpleDatePicker
                         date={tempAdvancedFilters.createdDateRange?.from}
-                        onDateChange={(date) =>
+                        onDateChange={date =>
                           handleAdvancedFiltersChange({
                             ...tempAdvancedFilters,
                             createdDateRange: {
                               ...tempAdvancedFilters.createdDateRange,
-                              ...(date  && { from: date  }),
+                              ...(date && { from: date }),
                             },
                           })
                         }
@@ -493,12 +590,12 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                       <Label className="text-muted-foreground text-xs">To</Label>
                       <SimpleDatePicker
                         date={tempAdvancedFilters.createdDateRange?.to}
-                        onDateChange={(date) =>
+                        onDateChange={date =>
                           handleAdvancedFiltersChange({
                             ...tempAdvancedFilters,
                             createdDateRange: {
                               ...tempAdvancedFilters.createdDateRange,
-                              ...(date  && { to: date  }),
+                              ...(date && { to: date }),
                             },
                           })
                         }
@@ -518,12 +615,12 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                       <Label className="text-muted-foreground text-xs">From</Label>
                       <SimpleDatePicker
                         date={tempAdvancedFilters.modifiedDateRange?.from}
-                        onDateChange={(date) =>
+                        onDateChange={date =>
                           handleAdvancedFiltersChange({
                             ...tempAdvancedFilters,
                             modifiedDateRange: {
                               ...tempAdvancedFilters.modifiedDateRange,
-                              ...(date  && { from: date  }),
+                              ...(date && { from: date }),
                             },
                           })
                         }
@@ -534,12 +631,12 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                       <Label className="text-muted-foreground text-xs">To</Label>
                       <SimpleDatePicker
                         date={tempAdvancedFilters.modifiedDateRange?.to}
-                        onDateChange={(date) =>
+                        onDateChange={date =>
                           handleAdvancedFiltersChange({
                             ...tempAdvancedFilters,
                             modifiedDateRange: {
                               ...tempAdvancedFilters.modifiedDateRange,
-                              ...(date  && { to: date  }),
+                              ...(date && { to: date }),
                             },
                           })
                         }
@@ -615,10 +712,10 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                   placeholder="Search by owner email"
                   className={`${cn('min-h-[44px]')} text-sm`}
                   value={tempAdvancedFilters.owner || ''}
-                  onChange={(e) =>
+                  onChange={e =>
                     handleAdvancedFiltersChange({
                       ...tempAdvancedFilters,
-                      ...(e.target.value  && { owner: e.target.value  }),
+                      ...(e.target.value && { owner: e.target.value }),
                     })
                   }
                 />
@@ -632,7 +729,7 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                 </Label>
                 <Select
                   value={String(tempAdvancedFilters.pageSize || 50)}
-                  onValueChange={(value) =>
+                  onValueChange={value =>
                     handleAdvancedFiltersChange({
                       ...tempAdvancedFilters,
                       pageSize: Number(value),
@@ -650,7 +747,9 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                     <SelectItem value="1000">1000 items (max)</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="text-muted-foreground text-xs">Higher values may increase loading time</div>
+                <div className="text-muted-foreground text-xs">
+                  Higher values may increase loading time
+                </div>
               </div>
             </div>
           )}
@@ -683,7 +782,12 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                   </div>
                 </BottomSheetTitle>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+                className="h-8 w-8 p-0"
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>

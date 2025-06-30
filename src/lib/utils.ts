@@ -103,7 +103,7 @@ export function formatCreationTime(dateString: string, timezone?: string): strin
 export function getInitials(name: string): string {
   return name
     .split(' ')
-    .map((word) => word.charAt(0))
+    .map(word => word.charAt(0))
     .join('')
     .toUpperCase()
     .slice(0, 2)

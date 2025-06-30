@@ -4,8 +4,20 @@ import { useState, useRef } from 'react'
 import { Trash2, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
@@ -54,8 +66,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter((item) => !item.isFolder).length
-  const folderCount = selectedItems.filter((item) => item.isFolder).length
+  const fileCount = selectedItems.filter(item => !item.isFolder).length
+  const folderCount = selectedItems.filter(item => item.isFolder).length
 
   const isConfirmationValid = confirmationText.trim() === 'CONFIRM DELETE' && acknowledgeWarning
 
@@ -114,7 +126,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
         const item = selectedItems[i]
 
         try {
-          setProgress((prev) => ({
+          setProgress(prev => ({
             ...prev,
             current: i + 1,
             currentFile: item.name,
@@ -146,7 +158,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           }
 
           if (!isCancelledRef.current) {
-            await new Promise((resolve) => setTimeout(resolve, 100))
+            await new Promise(resolve => setTimeout(resolve, 100))
           }
         } catch (error: any) {
           if (abortControllerRef.current?.signal.aborted) {
@@ -160,7 +172,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           })
         }
 
-        setProgress((prev) => ({
+        setProgress(prev => ({
           ...prev,
           success: successCount,
           failed: failedCount,
@@ -184,7 +196,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
       if (abortControllerRef.current?.signal.aborted) {
         return
       }
-      // // // console.error(err)
+      // // // // console.error(err)
       toast.error('Delete operation failed')
     } finally {
       abortControllerRef.current = null
@@ -236,7 +248,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             <div className="space-y-1">
               <h3 className="text-base font-semibold text-red-600">Delete Permanently</h3>
               <p className="text-muted-foreground text-xs">
-                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} will be permanently deleted
+                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} will be permanently
+                deleted
               </p>
             </div>
           </div>
@@ -244,12 +257,18 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           {/* Stats - Compact */}
           <div className="flex flex-shrink-0 justify-center gap-1">
             {fileCount > 0 && (
-              <Badge variant="secondary" className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100">
+              <Badge
+                variant="secondary"
+                className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100"
+              >
                 {fileCount} file{fileCount > 1 ? 's' : ''}
               </Badge>
             )}
             {folderCount > 0 && (
-              <Badge variant="secondary" className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100">
+              <Badge
+                variant="secondary"
+                className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100"
+              >
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
@@ -271,8 +290,11 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             <h4 className="text-center text-xs font-medium">Items to delete:</h4>
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
-                {selectedItems.slice(0, 5).map((item) => (
-                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                {selectedItems.slice(0, 5).map(item => (
+                  <div
+                    key={item.id}
+                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                  >
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={item.name}>
                       {item.name}
@@ -282,7 +304,11 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
                     </Badge>
                   </div>
                 ))}
-                {selectedItems.length > 5 && <div className="text-muted-foreground py-1 text-center text-xs">... and {selectedItems.length - 5} more items</div>}
+                {selectedItems.length > 5 && (
+                  <div className="text-muted-foreground py-1 text-center text-xs">
+                    ... and {selectedItems.length - 5} more items
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -290,11 +316,23 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           {/* Confirmation Form */}
           <div className="flex-shrink-0 space-y-3">
             <div className="space-y-2">
-              <Label className="text-xs font-medium">Type &quot;CONFIRM DELETE&quot; to proceed:</Label>
-              <Input value={confirmationText} onChange={(e) => setConfirmationText(e.target.value)} placeholder="CONFIRM DELETE" className="h-8 font-mono text-xs" />
+              <Label className="text-xs font-medium">
+                Type &quot;CONFIRM DELETE&quot; to proceed:
+              </Label>
+              <Input
+                value={confirmationText}
+                onChange={e => setConfirmationText(e.target.value)}
+                placeholder="CONFIRM DELETE"
+                className="h-8 font-mono text-xs"
+              />
             </div>
             <div className="flex items-center space-x-2">
-              <Checkbox id="acknowledge" checked={acknowledgeWarning} onCheckedChange={(checked) => setAcknowledgeWarning(!!checked)} className="h-3 w-3" />
+              <Checkbox
+                id="acknowledge"
+                checked={acknowledgeWarning}
+                onCheckedChange={checked => setAcknowledgeWarning(!!checked)}
+                className="h-3 w-3"
+              />
               <Label htmlFor="acknowledge" className="text-xs">
                 I understand this action is permanent and cannot be undone
               </Label>
@@ -306,7 +344,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage =
+        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -338,7 +377,9 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           {progress.currentFile && (
             <div className="space-y-1">
               <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">{progress.currentFile}</div>
+              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
+                {progress.currentFile}
+              </div>
             </div>
           )}
 
@@ -380,7 +421,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
                     ? 'bg-green-100 dark:bg-green-900/30'
                     : hasErrors
                       ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30'
+                      : 'bg-gray-100 dark:bg-gray-900/30',
               )}
             >
               {isCancelled ? (
@@ -395,7 +436,15 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             </div>
           </div>
           <div>
-            <h3 className="text-base font-semibold">{isCancelled ? 'Delete Cancelled' : wasSuccessful && !hasErrors ? 'Items Deleted' : hasErrors ? 'Partially Deleted' : 'No Items Deleted'}</h3>
+            <h3 className="text-base font-semibold">
+              {isCancelled
+                ? 'Delete Cancelled'
+                : wasSuccessful && !hasErrors
+                  ? 'Items Deleted'
+                  : hasErrors
+                    ? 'Partially Deleted'
+                    : 'No Items Deleted'}
+            </h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {selectedItems.length} items processed
             </p>
@@ -424,7 +473,10 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
             <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.errors.map((error, index) => (
-                <div key={`error-${error.file}-${index}`} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
+                <div
+                  key={`error-${error.file}-${index}`}
+                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
+                >
                   <div className="font-medium">{error.file}</div>
                   <div className="text-red-600 dark:text-red-400">{error.error}</div>
                 </div>
@@ -436,7 +488,9 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
         {/* Refresh Notice */}
         {(progress.success > 0 || progress.failed > 0) && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">Click the button below to refresh and see your updated files.</p>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              Click the button below to refresh and see your updated files.
+            </p>
           </div>
         )}
       </div>
@@ -454,7 +508,9 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
               </div>
               <div>
                 <div className="text-lg font-semibold">Delete Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Permanent deletion operation</div>
+                <div className="text-muted-foreground text-sm font-normal">
+                  Permanent deletion operation
+                </div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -464,17 +520,31 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           <BottomSheetFooter className={cn('grid gap-4')}>
             {!isProcessing && !isCompleted && (
               <>
-                <Button onClick={handleDelete} disabled={!isConfirmationValid} className={cn('touch-target min-h-[44px] bg-red-600 text-white hover:bg-red-700 active:scale-95')}>
+                <Button
+                  onClick={handleDelete}
+                  disabled={!isConfirmationValid}
+                  className={cn(
+                    'touch-target min-h-[44px] bg-red-600 text-white hover:bg-red-700 active:scale-95',
+                  )}
+                >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete Items
                 </Button>
-                <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <Button
+                  variant="outline"
+                  onClick={handleClose}
+                  className={cn('touch-target min-h-[44px] active:scale-95')}
+                >
                   Cancel
                 </Button>
               </>
             )}
             {isProcessing && (
-              <Button onClick={handleCancel} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+              <Button
+                onClick={handleCancel}
+                variant="outline"
+                className={cn('touch-target min-h-[44px] active:scale-95')}
+              >
                 <XCircle className="mr-2 h-4 w-4" />
                 Cancel Delete
               </Button>
@@ -482,18 +552,28 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleCloseAndRefresh}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>
                 )}
                 {(progress.success > 0 || progress.failed > 0) && (
-                  <Button onClick={handleClose} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    variant="outline"
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     Close Without Refresh
                   </Button>
                 )}
@@ -515,7 +595,9 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
             </div>
             <div>
               <div className="text-lg font-semibold">Delete Items</div>
-              <div className="text-muted-foreground text-sm font-normal">Permanent deletion operation</div>
+              <div className="text-muted-foreground text-sm font-normal">
+                Permanent deletion operation
+              </div>
             </div>
           </DialogTitle>
         </DialogHeader>

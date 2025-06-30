@@ -13,7 +13,11 @@ interface DrivePermissionRequiredProps {
   compact?: boolean
 }
 
-export function DrivePermissionRequired({ error, onRetry, compact = false }: DrivePermissionRequiredProps) {
+export function DrivePermissionRequired({
+  error,
+  onRetry,
+  compact = false,
+}: DrivePermissionRequiredProps) {
   const [connecting, setConnecting] = useState(false)
 
   const handleReconnect = async () => {
@@ -71,13 +75,17 @@ export function DrivePermissionRequired({ error, onRetry, compact = false }: Dri
             <AlertTriangle className="h-8 w-8 text-orange-600" />
           </div>
           <CardTitle className="text-xl">Google Drive Access Required</CardTitle>
-          <CardDescription>We need permission to access your Google Drive to manage your files</CardDescription>
+          <CardDescription>
+            We need permission to access your Google Drive to manage your files
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
             <Alert className="border-red-200 bg-red-50">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription className="text-sm">{error.message || error.toString()}</AlertDescription>
+              <AlertDescription className="text-sm">
+                {error.message || error.toString()}
+              </AlertDescription>
             </Alert>
           )}
 
@@ -114,7 +122,9 @@ export function DrivePermissionRequired({ error, onRetry, compact = false }: Dri
             </Button>
           </div>
 
-          <p className="text-muted-foreground text-center text-xs">You&rsquo;ll be redirected to Google to authorize Drive permissions</p>
+          <p className="text-muted-foreground text-center text-xs">
+            You&rsquo;ll be redirected to Google to authorize Drive permissions
+          </p>
         </CardContent>
       </Card>
     </div>

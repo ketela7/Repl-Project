@@ -105,13 +105,16 @@ function getExportMimeType(format: string, originalMimeType: string): string {
       'application/vnd.google-apps.drawing': 'application/pdf',
     },
     docx: {
-      'application/vnd.google-apps.document': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.google-apps.document':
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     },
     xlsx: {
-      'application/vnd.google-apps.spreadsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.google-apps.spreadsheet':
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     },
     pptx: {
-      'application/vnd.google-apps.presentation': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.google-apps.presentation':
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     },
     png: {
       'application/vnd.google-apps.drawing': 'image/png',

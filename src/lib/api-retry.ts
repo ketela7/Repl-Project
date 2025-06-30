@@ -40,7 +40,11 @@ function isRetryableError(error: any): boolean {
   }
 
   // Google API specific errors
-  if (error.message?.includes('Rate Limit Exceeded') || error.message?.includes('Backend Error') || error.message?.includes('Internal error')) {
+  if (
+    error.message?.includes('Rate Limit Exceeded') ||
+    error.message?.includes('Backend Error') ||
+    error.message?.includes('Internal error')
+  ) {
     return true
   }
 
@@ -51,7 +55,10 @@ function isRetryableError(error: any): boolean {
  * Calculate delay with exponential backoff and jitter
  */
 function calculateDelay(attempt: number, config: RetryConfig): number {
-  const exponentialDelay = Math.min(config.baseDelay * Math.pow(config.backoffMultiplier, attempt), config.maxDelay)
+  const exponentialDelay = Math.min(
+    config.baseDelay * Math.pow(config.backoffMultiplier, attempt),
+    config.maxDelay,
+  )
 
   // Add jitter to prevent thundering herd
   const jitter = exponentialDelay * config.jitterFactor * Math.random()
@@ -62,13 +69,17 @@ function calculateDelay(attempt: number, config: RetryConfig): number {
  * Sleep for specified milliseconds
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 /**
  * Retry an async operation with exponential backoff
  */
-export async function retryOperation<T>(operation: () => Promise<T>, config: Partial<RetryConfig> = {}, context: string = 'operation'): Promise<T> {
+export async function retryOperation<T>(
+  operation: () => Promise<T>,
+  config: Partial<RetryConfig> = {},
+  context: string = 'operation',
+): Promise<T> {
   const finalConfig = { ...DEFAULT_CONFIG, ...config }
   let lastError: any
 
@@ -112,7 +123,10 @@ export async function retryOperation<T>(operation: () => Promise<T>, config: Par
 /**
  * Specialized retry for Google Drive API calls
  */
-export async function retryDriveApiCall<T>(operation: () => Promise<T>, context: string = 'Drive API call'): Promise<T> {
+export async function retryDriveApiCall<T>(
+  operation: () => Promise<T>,
+  context: string = 'Drive API call',
+): Promise<T> {
   return retryOperation(
     operation,
     {
@@ -120,6 +134,6 @@ export async function retryDriveApiCall<T>(operation: () => Promise<T>, context:
       baseDelay: 2000, // Start with 2 seconds for API calls
       maxDelay: 15000, // Max 15 seconds
     },
-    context
+    context,
   )
 }

@@ -38,7 +38,7 @@ export async function initDriveService(): Promise<AuthResult> {
             error: 'Google Drive access token not found. Please reconnect your Google account.',
             needsReauth: true,
           },
-          { status: 401 }
+          { status: 401 },
         ),
       }
     }
@@ -70,7 +70,7 @@ export function handleApiError(error: any): NextResponse {
           error: 'Google Drive access expired. Please reconnect your account.',
           needsReauth: true,
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -79,7 +79,10 @@ export function handleApiError(error: any): NextResponse {
     }
 
     if (error.message.includes('quota')) {
-      return NextResponse.json({ error: 'Google Drive quota exceeded. Please try again later.' }, { status: 429 })
+      return NextResponse.json(
+        { error: 'Google Drive quota exceeded. Please try again later.' },
+        { status: 429 },
+      )
     }
 
     return NextResponse.json({ error: error.message }, { status: 400 })

@@ -1,17 +1,46 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, Triangle, CopyIcon, Info, ChevronsUpDown, ChevronUp, ChevronDown, FileDown } from 'lucide-react'
+import {
+  MoreVertical,
+  Eye,
+  Download,
+  Edit,
+  Move,
+  Copy,
+  Share,
+  RefreshCw,
+  Trash2,
+  Triangle,
+  CopyIcon,
+  Info,
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
+  FileDown,
+} from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { FileIcon } from '@/components/file-icon'
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
 import { useTimezone } from '@/lib/hooks/use-timezone'
 import { formatFileTime } from '@/lib/utils'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import { toast } from 'sonner'
 import type { DriveFile, DriveFolder } from '@/lib/google-drive/types'
@@ -70,7 +99,7 @@ const useCopyToClipboard = () => {
     } catch (err) {
       const { errorToast } = await import('@/lib/utils')
       errorToast.generic(`Failed to copy ${label.toLowerCase()}`)
-      // // // console.error(`Failed to copy ${label.toLowerCase()}:`, err)
+      // // // // console.error(`Failed to copy ${label.toLowerCase()}:`, err)
     }
   }, [])
 }
@@ -102,15 +131,15 @@ const CopyableCell = ({
         await copyToClipboard(value, label)
       }
     },
-    [copyToClipboard, value, label, onClick]
+    [copyToClipboard, value, label, onClick],
   )
 
   return (
     <TableCell className={className}>
       <div className="flex items-center gap-2">
-        <div className="flex items-center space-x-3 min-w-0 flex-1">{children}</div>
-        <CopyIcon 
-          className="h-3 w-3 text-muted-foreground/60 hover:text-muted-foreground cursor-pointer flex-shrink-0 transition-colors" 
+        <div className="flex min-w-0 flex-1 items-center space-x-3">{children}</div>
+        <CopyIcon
+          className="text-muted-foreground/60 hover:text-muted-foreground h-3 w-3 flex-shrink-0 cursor-pointer transition-colors"
           onClick={handleClick}
           title={title || `Click to copy: ${value}`}
         />
@@ -147,21 +176,21 @@ export function DriveDataView({
   // Memoized handlers for better performance
   const handleItemClick = useCallback(
     (item: DriveItem) => {
-      // // // console.log('[DriveDataView] Item clicked:', item.name, 'isFolder:', item.isFolder, 'isSelectMode:', isSelectMode)
+      // // // // console.log('[DriveDataView] Item clicked:', item.name, 'isFolder:', item.isFolder, 'isSelectMode:', isSelectMode)
       if (isSelectMode) {
         onSelectItem(item.id)
       } else if (item.isFolder) {
-        // // // console.log('[DriveDataView] Calling onFolderClick for folder:', item.id)
+        // // // // console.log('[DriveDataView] Calling onFolderClick for folder:', item.id)
         onFolderClick(item.id)
       } else {
         onItemAction('preview', item)
       }
     },
-    [isSelectMode, onSelectItem, onFolderClick, onItemAction]
+    [isSelectMode, onSelectItem, onFolderClick, onItemAction],
   )
 
   const handleSelectAll = useCallback(() => {
-    items.forEach((item) => {
+    items.forEach(item => {
       if (selectedItems.has(item.id)) {
         onSelectItem(item.id)
       } else {
@@ -180,8 +209,8 @@ export function DriveDataView({
         { key: 'mimeType', label: 'Type', visible: visibleColumns.mimeType },
         { key: 'modifiedTime', label: 'Modified', visible: visibleColumns.modifiedTime },
         { key: 'createdTime', label: 'Created', visible: visibleColumns.createdTime },
-      ].filter((header) => header.visible),
-    [visibleColumns]
+      ].filter(header => header.visible),
+    [visibleColumns],
   )
 
   // Optimized menu items configuration with condition handling
@@ -192,28 +221,51 @@ export function DriveDataView({
         { key: 'preview', label: 'Preview', icon: Eye, condition: !item.isFolder },
         { key: 'move', label: 'Move', icon: Move, condition: item.canMove === true },
         { key: 'copy', label: 'Copy', icon: Copy, condition: item.canCopy === true },
-        { key: 'download', label: 'Download', icon: Download, condition: item.canDownload === true },
+        {
+          key: 'download',
+          label: 'Download',
+          icon: Download,
+          condition: item.canDownload === true,
+        },
         { key: 'rename', label: 'Rename', icon: Edit, condition: item.canRename === true },
         { key: 'share', label: 'Share', icon: Share, condition: item.canShare === true },
-        { key: 'trash', label: 'Move to Trash', icon: Trash2, condition: item.canTrash === true, destructive: true },
-        { key: 'delete', label: 'Delete', icon: Triangle, condition: item.canDelete === true, destructive: true },
-        { key: 'untrash', label: 'Untrash', icon: RefreshCw, condition: item.canUntrash === true, destructive: true },
-        { key: 'export', label: 'Export', icon: FileDown, condition: item.canExport === true }
+        {
+          key: 'trash',
+          label: 'Move to Trash',
+          icon: Trash2,
+          condition: item.canTrash === true,
+          destructive: true,
+        },
+        {
+          key: 'delete',
+          label: 'Delete',
+          icon: Triangle,
+          condition: item.canDelete === true,
+          destructive: true,
+        },
+        {
+          key: 'untrash',
+          label: 'Untrash',
+          icon: RefreshCw,
+          condition: item.canUntrash === true,
+          destructive: true,
+        },
+        { key: 'export', label: 'Export', icon: FileDown, condition: item.canExport === true },
       ]
-      
+
       // Filter menu items based on condition boolean
-      return menuItems.filter((menuItem) => {
+      return menuItems.filter(menuItem => {
         // Ensure condition is explicitly true (not just truthy)
         return menuItem.condition === true
       })
     },
-    []
+    [],
   )
 
   const renderContent = useCallback(
     (item: DriveItem) => {
       const availableMenuItems = getMenuItems(item)
-      
+
       // Only render dropdown if there are available menu items
       if (availableMenuItems.length === 0) {
         return null
@@ -228,9 +280,9 @@ export function DriveDataView({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {availableMenuItems.map(({ key, label, icon: Icon, destructive }) => (
-              <DropdownMenuItem 
-                key={key} 
-                onClick={() => onItemAction(key, item)} 
+              <DropdownMenuItem
+                key={key}
+                onClick={() => onItemAction(key, item)}
                 className={destructive ? 'text-destructive' : ''}
               >
                 <Icon className="mr-2 h-4 w-4" />
@@ -241,7 +293,7 @@ export function DriveDataView({
         </DropdownMenu>
       )
     },
-    [getMenuItems, onItemAction]
+    [getMenuItems, onItemAction],
   )
 
   return (
@@ -257,7 +309,7 @@ export function DriveDataView({
           </div>
         ) : viewMode === 'grid' ? (
           <div className="xs:grid-cols-2 grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4 xl:grid-cols-5">
-            {items.map((item) => (
+            {items.map(item => (
               <div
                 key={item.id}
                 className={`hover:bg-accent relative cursor-pointer rounded-lg border p-2 transition-colors sm:p-3 md:p-4 ${selectedItems.has(item.id) ? 'ring-primary bg-primary/5 ring-2' : ''}`}
@@ -272,23 +324,37 @@ export function DriveDataView({
                 }}
               >
                 {isSelectMode && (
-                  <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
-                    <Checkbox checked={selectedItems.has(item.id)} onCheckedChange={() => onSelectItem(item.id)} className="bg-background !size-4 !h-4 !w-4" />
+                  <div className="absolute top-2 left-2 z-10" onClick={e => e.stopPropagation()}>
+                    <Checkbox
+                      checked={selectedItems.has(item.id)}
+                      onCheckedChange={() => onSelectItem(item.id)}
+                      className="bg-background !size-4 !h-4 !w-4"
+                    />
                   </div>
                 )}
                 <div className="mb-2 flex items-start justify-between">
                   <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
-                    <FileThumbnailPreview thumbnailLink={item.thumbnailLink} fileName={item.name} mimeType={item.mimeType} modifiedTime={item.modifiedTime}>
-                      <FileIcon mimeType={item.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
+                    <FileThumbnailPreview
+                      thumbnailLink={item.thumbnailLink}
+                      fileName={item.name}
+                      mimeType={item.mimeType}
+                      modifiedTime={item.modifiedTime}
+                    >
+                      <FileIcon
+                        mimeType={item.mimeType}
+                        className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
+                      />
                     </FileThumbnailPreview>
                   </div>
-                  <div onClick={(e) => e.stopPropagation()}>{renderContent(item)}</div>
+                  <div onClick={e => e.stopPropagation()}>{renderContent(item)}</div>
                 </div>
                 <div className="flex min-h-0 flex-col">
                   <h3 className="mb-1 truncate text-sm font-medium sm:text-base" title={item.name}>
                     {item.name}
                   </h3>
-                  <p className="text-muted-foreground text-xs sm:text-sm">{formatFileTime(item.modifiedTime, effectiveTimezone)}</p>
+                  <p className="text-muted-foreground text-xs sm:text-sm">
+                    {formatFileTime(item.modifiedTime, effectiveTimezone)}
+                  </p>
                 </div>
               </div>
             ))}
@@ -303,10 +369,18 @@ export function DriveDataView({
                   </TableHead>
                 )}
                 {tableHeaders.map(({ key, label }) => (
-                  <TableHead key={key} className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: key })}>
+                  <TableHead
+                    key={key}
+                    className="hover:bg-muted/50 cursor-pointer"
+                    onClick={() => onColumnsChange({ sortBy: key })}
+                  >
                     <div className="flex items-center space-x-1">
                       <span>{label}</span>
-                      {sortConfig?.key === key && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
+                      {sortConfig?.key === key && (
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
                     </div>
                   </TableHead>
                 ))}
@@ -314,30 +388,57 @@ export function DriveDataView({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((item) => (
-                <TableRow key={item.id} className={`cursor-pointer ${selectedItems.has(item.id) ? 'bg-primary/5' : ''}`} onClick={() => handleItemClick(item)}>
+              {items.map(item => (
+                <TableRow
+                  key={item.id}
+                  className={`cursor-pointer ${selectedItems.has(item.id) ? 'bg-primary/5' : ''}`}
+                  onClick={() => handleItemClick(item)}
+                >
                   {isSelectMode && (
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      <Checkbox checked={selectedItems.has(item.id)} onCheckedChange={() => onSelectItem(item.id)} />
+                    <TableCell onClick={e => e.stopPropagation()}>
+                      <Checkbox
+                        checked={selectedItems.has(item.id)}
+                        onCheckedChange={() => onSelectItem(item.id)}
+                      />
                     </TableCell>
                   )}
                   {visibleColumns.name && (
                     <CopyableCell value={item.name} label="File name">
-                      <FileThumbnailPreview thumbnailLink={item.thumbnailLink} fileName={item.name} mimeType={item.mimeType} modifiedTime={item.modifiedTime}>
+                      <FileThumbnailPreview
+                        thumbnailLink={item.thumbnailLink}
+                        fileName={item.name}
+                        mimeType={item.mimeType}
+                        modifiedTime={item.modifiedTime}
+                      >
                         <FileIcon mimeType={item.mimeType} className="h-6 w-6" />
                       </FileThumbnailPreview>
                       <span className="font-medium">{item.name}</span>
                     </CopyableCell>
                   )}
                   {visibleColumns.size && (
-                    <CopyableCell value={'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'} label="File size">
-                      <span>{'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'}</span>
+                    <CopyableCell
+                      value={
+                        'size' in item && item.size
+                          ? formatFileSize(parseInt(item.size))
+                          : item.isFolder
+                            ? '—'
+                            : 'Unknown'
+                      }
+                      label="File size"
+                    >
+                      <span>
+                        {'size' in item && item.size
+                          ? formatFileSize(parseInt(item.size))
+                          : item.isFolder
+                            ? '—'
+                            : 'Unknown'}
+                      </span>
                     </CopyableCell>
                   )}
                   {visibleColumns.owners && (
                     <TableCell
                       className="hover:bg-muted/50 group cursor-pointer transition-colors"
-                      onClick={async (e) => {
+                      onClick={async e => {
                         e.stopPropagation()
                         const email = item.owners?.[0]?.emailAddress
                         if (email) {
@@ -349,7 +450,7 @@ export function DriveDataView({
                           } catch (err) {
                             const { errorToast } = await import('@/lib/utils')
                             errorToast.generic('Failed to copy email')
-                            // // // console.error('Failed to copy email:', err)
+                            // // // // console.error('Failed to copy email:', err)
                           }
                         }
                       }}
@@ -357,7 +458,9 @@ export function DriveDataView({
                     >
                       <div className="flex items-center gap-2">
                         <span>{item.owners?.[0]?.emailAddress || 'Unknown'}</span>
-                        {item.owners?.[0]?.emailAddress && <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />}
+                        {item.owners?.[0]?.emailAddress && (
+                          <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                        )}
                       </div>
                     </TableCell>
                   )}
@@ -367,16 +470,30 @@ export function DriveDataView({
                     </CopyableCell>
                   )}
                   {visibleColumns.modifiedTime && (
-                    <CopyableCell value={formatFileTime(item.modifiedTime, effectiveTimezone)} label="Modified time">
-                      <span className="text-muted-foreground text-sm">{formatFileTime(item.modifiedTime, effectiveTimezone)}</span>
+                    <CopyableCell
+                      value={formatFileTime(item.modifiedTime, effectiveTimezone)}
+                      label="Modified time"
+                    >
+                      <span className="text-muted-foreground text-sm">
+                        {formatFileTime(item.modifiedTime, effectiveTimezone)}
+                      </span>
                     </CopyableCell>
                   )}
                   {visibleColumns.createdTime && (
-                    <CopyableCell value={item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'} label="Created time">
-                      <span className="text-muted-foreground text-sm">{item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}</span>
+                    <CopyableCell
+                      value={
+                        item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'
+                      }
+                      label="Created time"
+                    >
+                      <span className="text-muted-foreground text-sm">
+                        {item.createdTime
+                          ? formatFileTime(item.createdTime, effectiveTimezone)
+                          : '—'}
+                      </span>
                     </CopyableCell>
                   )}
-                  <TableCell onClick={(e) => e.stopPropagation()}>{renderContent(item)}</TableCell>
+                  <TableCell onClick={e => e.stopPropagation()}>{renderContent(item)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

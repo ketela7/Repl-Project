@@ -9,7 +9,14 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Progress } from '@/components/ui/progress'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { formatFileSize } from '@/lib/google-drive/utils'
 
 interface FileUploadDialogProps {
@@ -19,7 +26,12 @@ interface FileUploadDialogProps {
   currentFolderId?: string | null
 }
 
-export function FileUploadDialog({ isOpen, onClose, onUploadComplete, currentFolderId }: FileUploadDialogProps) {
+export function FileUploadDialog({
+  isOpen,
+  onClose,
+  onUploadComplete,
+  currentFolderId,
+}: FileUploadDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileName, setFileName] = useState('')
   const [description, setDescription] = useState('')
@@ -67,7 +79,9 @@ export function FileUploadDialog({ isOpen, onClose, onUploadComplete, currentFol
 
         // Handle reauthentication needed
         if (errorData.needsReauth || response.status === 401 || response.status === 403) {
-          toast.error(errorData.error || 'Google Drive access expired. Please reconnect your account.')
+          toast.error(
+            errorData.error || 'Google Drive access expired. Please reconnect your account.',
+          )
           window.location.reload()
           return
         }
@@ -157,13 +171,26 @@ export function FileUploadDialog({ isOpen, onClose, onUploadComplete, currentFol
           {/* File Name */}
           <div className="space-y-2">
             <Label htmlFor="file-name">File Name</Label>
-            <Input id="file-name" value={fileName} onChange={(e) => setFileName(e.target.value)} placeholder="Enter file name..." disabled={uploading} />
+            <Input
+              id="file-name"
+              value={fileName}
+              onChange={e => setFileName(e.target.value)}
+              placeholder="Enter file name..."
+              disabled={uploading}
+            />
           </div>
 
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="description">Description (Optional)</Label>
-            <Textarea id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter file description..." disabled={uploading} rows={3} />
+            <Textarea
+              id="description"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              placeholder="Enter file description..."
+              disabled={uploading}
+              rows={3}
+            />
           </div>
 
           {/* Upload Progress */}

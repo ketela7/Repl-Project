@@ -40,7 +40,13 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Checkbox } from '@/components/ui/checkbox'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
@@ -123,7 +129,7 @@ interface DriveToolbarProps {
       activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'
       fileTypeFilter: string[]
       advancedFilters: AdvancedFilters
-    }>
+    }>,
   ) => void
   onApplyFilters: () => void
   onClearFilters: () => void
@@ -134,7 +140,9 @@ interface DriveToolbarProps {
 
   // Table columns
   visibleColumns: VisibleColumns
-  setVisibleColumns: (_columns: VisibleColumns | ((_prev: VisibleColumns) => VisibleColumns)) => void
+  setVisibleColumns: (
+    _columns: VisibleColumns | ((_prev: VisibleColumns) => VisibleColumns),
+  ) => void
 
   // Loading states
   loading: boolean
@@ -470,21 +478,68 @@ export function DriveToolbar({
   // Memoize category counts to avoid repetitive filtering
   const categoryCounts = useMemo(() => {
     return {
-      images: items.filter((f) => f.mimeType?.includes('image')).length,
-      videos: items.filter((f) => f.mimeType?.includes('video')).length,
-      documents: items.filter((f) => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf')).length,
-      spreadsheets: items.filter((f) => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv')).length,
-      presentations: items.filter((f) => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint')).length,
-      audio: items.filter((f) => f.mimeType?.startsWith('audio/')).length,
-      archives: items.filter((f) => f.mimeType?.includes('zip') || f.mimeType?.includes('rar') || f.mimeType?.includes('tar') || f.mimeType?.includes('gz') || f.mimeType?.includes('7z')).length,
-      code: items.filter((f) => f.mimeType?.includes('javascript') || f.mimeType?.includes('json') || f.mimeType?.includes('html') || f.mimeType?.includes('css') || f.mimeType?.includes('xml'))
-        .length,
-      design: items.filter((f) => f.mimeType?.includes('photoshop') || f.mimeType?.includes('illustrator') || f.mimeType?.includes('sketch') || f.mimeType?.includes('figma')).length,
-      database: items.filter((f) => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite')).length,
-      ebooks: items.filter((f) => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle')).length,
-      fonts: items.filter((f) => f.mimeType?.includes('font') || f.mimeType?.includes('ttf') || f.mimeType?.includes('otf') || f.mimeType?.includes('woff')).length,
-      shortcuts: items.filter((f) => f.mimeType === 'application/vnd.google-apps.shortcut').length,
-      folders: items.filter((f) => f.mimeType === 'application/vnd.google-apps.folder').length,
+      images: items.filter(f => f.mimeType?.includes('image')).length,
+      videos: items.filter(f => f.mimeType?.includes('video')).length,
+      documents: items.filter(
+        f =>
+          f.mimeType?.includes('document') ||
+          f.mimeType?.includes('text') ||
+          f.mimeType?.includes('pdf'),
+      ).length,
+      spreadsheets: items.filter(
+        f =>
+          f.mimeType?.includes('spreadsheet') ||
+          f.mimeType?.includes('excel') ||
+          f.mimeType?.includes('csv'),
+      ).length,
+      presentations: items.filter(
+        f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint'),
+      ).length,
+      audio: items.filter(f => f.mimeType?.startsWith('audio/')).length,
+      archives: items.filter(
+        f =>
+          f.mimeType?.includes('zip') ||
+          f.mimeType?.includes('rar') ||
+          f.mimeType?.includes('tar') ||
+          f.mimeType?.includes('gz') ||
+          f.mimeType?.includes('7z'),
+      ).length,
+      code: items.filter(
+        f =>
+          f.mimeType?.includes('javascript') ||
+          f.mimeType?.includes('json') ||
+          f.mimeType?.includes('html') ||
+          f.mimeType?.includes('css') ||
+          f.mimeType?.includes('xml'),
+      ).length,
+      design: items.filter(
+        f =>
+          f.mimeType?.includes('photoshop') ||
+          f.mimeType?.includes('illustrator') ||
+          f.mimeType?.includes('sketch') ||
+          f.mimeType?.includes('figma'),
+      ).length,
+      database: items.filter(
+        f =>
+          f.mimeType?.includes('database') ||
+          f.mimeType?.includes('sql') ||
+          f.mimeType?.includes('sqlite'),
+      ).length,
+      ebooks: items.filter(
+        f =>
+          f.mimeType?.includes('epub') ||
+          f.mimeType?.includes('mobi') ||
+          f.mimeType?.includes('kindle'),
+      ).length,
+      fonts: items.filter(
+        f =>
+          f.mimeType?.includes('font') ||
+          f.mimeType?.includes('ttf') ||
+          f.mimeType?.includes('otf') ||
+          f.mimeType?.includes('woff'),
+      ).length,
+      shortcuts: items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length,
+      folders: items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').length,
     }
   }, [items])
 
@@ -500,7 +555,7 @@ export function DriveToolbar({
         })
       }
     },
-    [items, onClientSideFilter]
+    [items, onClientSideFilter],
   )
 
   // Handle clear filter
@@ -515,8 +570,14 @@ export function DriveToolbar({
   }, [onClearClientSideFilter, items.length])
 
   return (
-    <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur transition-transform duration-200 ease-in-out" id="drive-toolbar">
-      <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth p-3" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <div
+      className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur transition-transform duration-200 ease-in-out"
+      id="drive-toolbar"
+    >
+      <div
+        className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth p-3"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
         {/* Main Menu - 5 Items - Horizontal Scrollable */}
         <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
           {/* Search */}
@@ -526,7 +587,8 @@ export function DriveToolbar({
             onClick={() => {
               const searchExpanded = document.querySelector('#search-expanded') as HTMLElement
               if (searchExpanded) {
-                searchExpanded.style.display = searchExpanded.style.display === 'none' ? 'block' : 'none'
+                searchExpanded.style.display =
+                  searchExpanded.style.display === 'none' ? 'block' : 'none'
                 if (searchExpanded.style.display === 'block') {
                   setTimeout(() => {
                     const input = searchExpanded.querySelector('input') as HTMLInputElement
@@ -560,7 +622,12 @@ export function DriveToolbar({
           {selectedCount <= items.length && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant={isSelectMode ? 'default' : 'ghost'} size="sm" disabled={items.length === 0} className="h-8 px-2">
+                <Button
+                  variant={isSelectMode ? 'default' : 'ghost'}
+                  size="sm"
+                  disabled={items.length === 0}
+                  className="h-8 px-2"
+                >
                   <Square className="h-4 w-4" />
                   {selectedCount > 0 && (
                     <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
@@ -598,7 +665,7 @@ export function DriveToolbar({
                     <DropdownMenuSeparator />
                     {selectedCount < items.length && (
                       <DropdownMenuItem
-                        onClick={(e) => {
+                        onClick={e => {
                           e.preventDefault()
                           e.stopPropagation()
                           onSelectAll()
@@ -611,7 +678,7 @@ export function DriveToolbar({
 
                     {selectedCount > 0 && (
                       <DropdownMenuItem
-                        onClick={(e) => {
+                        onClick={e => {
                           e.preventDefault()
                           e.stopPropagation()
                           onDeselectAll()
@@ -628,7 +695,7 @@ export function DriveToolbar({
                   <>
                     {isMobile ? (
                       <DropdownMenuItem
-                        onClick={(e) => {
+                        onClick={e => {
                           e.preventDefault()
                           e.stopPropagation()
                           setIsOperationsOpen(true)
@@ -640,7 +707,7 @@ export function DriveToolbar({
                     ) : (
                       <>
                         <DropdownMenuItem
-                          onClick={(e) => {
+                          onClick={e => {
                             e.preventDefault()
                             e.stopPropagation()
                             setIsOperationsOpen(true)
@@ -800,7 +867,12 @@ export function DriveToolbar({
                         >
                           Starred
                         </Button>
-                        <Button variant={filters.activeView === 'shared' ? 'default' : 'outline'} size="sm" onClick={() => onFilterChange({ activeView: 'shared' })} className="justify-start text-xs">
+                        <Button
+                          variant={filters.activeView === 'shared' ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => onFilterChange({ activeView: 'shared' })}
+                          className="justify-start text-xs"
+                        >
                           Shared
                         </Button>
                       </div>
@@ -818,10 +890,14 @@ export function DriveToolbar({
                     <CollapsibleContent className="mt-2 ml-2 space-y-2">
                       <div className="grid grid-cols-3 gap-2">
                         <Button
-                          variant={filters.fileTypeFilter.includes('folder') ? 'default' : 'outline'}
+                          variant={
+                            filters.fileTypeFilter.includes('folder') ? 'default' : 'outline'
+                          }
                           size="sm"
                           onClick={() => {
-                            const newTypes = filters.fileTypeFilter.includes('folder') ? filters.fileTypeFilter.filter((t) => t !== 'folder') : [...filters.fileTypeFilter, 'folder']
+                            const newTypes = filters.fileTypeFilter.includes('folder')
+                              ? filters.fileTypeFilter.filter(t => t !== 'folder')
+                              : [...filters.fileTypeFilter, 'folder']
                             onFilterChange({ fileTypeFilter: newTypes })
                           }}
                           className="justify-center p-2 text-xs"
@@ -875,14 +951,18 @@ export function DriveToolbar({
                             mimeType: 'application/vnd.google-apps.shortcut',
                             title: 'Shortcuts',
                           },
-                        ].map((filter) => {
+                        ].map(filter => {
                           return (
                             <Button
                               key={filter.type}
-                              variant={filters.fileTypeFilter.includes(filter.type) ? 'default' : 'outline'}
+                              variant={
+                                filters.fileTypeFilter.includes(filter.type) ? 'default' : 'outline'
+                              }
                               size="sm"
                               onClick={() => {
-                                const newTypes = filters.fileTypeFilter.includes(filter.type) ? filters.fileTypeFilter.filter((t) => t !== filter.type) : [...filters.fileTypeFilter, filter.type]
+                                const newTypes = filters.fileTypeFilter.includes(filter.type)
+                                  ? filters.fileTypeFilter.filter(t => t !== filter.type)
+                                  : [...filters.fileTypeFilter, filter.type]
 
                                 onFilterChange({ fileTypeFilter: newTypes })
                               }}
@@ -910,7 +990,9 @@ export function DriveToolbar({
                         <label className="text-muted-foreground text-xs font-medium">Sort By</label>
                         <div className="grid grid-cols-2 gap-2">
                           <Button
-                            variant={filters.advancedFilters.sortBy === 'name' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortBy === 'name' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -925,7 +1007,9 @@ export function DriveToolbar({
                             Name
                           </Button>
                           <Button
-                            variant={filters.advancedFilters.sortBy === 'modified' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortBy === 'modified' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -940,7 +1024,9 @@ export function DriveToolbar({
                             Modified
                           </Button>
                           <Button
-                            variant={filters.advancedFilters.sortBy === 'created' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortBy === 'created' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -955,7 +1041,9 @@ export function DriveToolbar({
                             Created
                           </Button>
                           <Button
-                            variant={filters.advancedFilters.sortBy === 'size' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortBy === 'size' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -973,10 +1061,14 @@ export function DriveToolbar({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">Sort Order</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          Sort Order
+                        </label>
                         <div className="grid grid-cols-2 gap-2">
                           <Button
-                            variant={filters.advancedFilters.sortOrder === 'asc' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortOrder === 'asc' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -991,7 +1083,9 @@ export function DriveToolbar({
                             Ascending
                           </Button>
                           <Button
-                            variant={filters.advancedFilters.sortOrder === 'desc' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortOrder === 'desc' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1021,19 +1115,23 @@ export function DriveToolbar({
                     <CollapsibleContent className="mt-3 ml-2 space-y-4">
                       {/* Size Range */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">File Size Range</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          File Size Range
+                        </label>
                         <div className="grid grid-cols-3 gap-2">
                           <Input
                             type="number"
                             placeholder="Min"
                             value={filters.advancedFilters.sizeRange?.min || ''}
-                            onChange={(e) =>
+                            onChange={e =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
                                   sizeRange: {
                                     ...filters.advancedFilters.sizeRange,
-                                    ...(parseInt(e.target.value)  && { min: parseInt(e.target.value)  }),
+                                    ...(parseInt(e.target.value) && {
+                                      min: parseInt(e.target.value),
+                                    }),
                                     unit: filters.advancedFilters.sizeRange?.unit || 'MB',
                                   },
                                 },
@@ -1045,13 +1143,15 @@ export function DriveToolbar({
                             type="number"
                             placeholder="Max"
                             value={filters.advancedFilters.sizeRange?.max || ''}
-                            onChange={(e) =>
+                            onChange={e =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
                                   sizeRange: {
                                     ...filters.advancedFilters.sizeRange,
-                                    ...(parseInt(e.target.value)  && { max: parseInt(e.target.value)  }),
+                                    ...(parseInt(e.target.value) && {
+                                      max: parseInt(e.target.value),
+                                    }),
                                     unit: filters.advancedFilters.sizeRange?.unit || 'MB',
                                   },
                                 },
@@ -1061,7 +1161,7 @@ export function DriveToolbar({
                           />
                           <select
                             value={filters.advancedFilters.sizeRange?.unit || 'MB'}
-                            onChange={(e) =>
+                            onChange={e =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
@@ -1084,12 +1184,18 @@ export function DriveToolbar({
 
                       {/* Date Ranges */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">Created Date Range</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          Created Date Range
+                        </label>
                         <div className="grid grid-cols-2 gap-2">
                           <Input
                             type="date"
-                            value={filters.advancedFilters.createdDateRange?.from?.toISOString().split('T')[0] || ''}
-                            onChange={(e) =>
+                            value={
+                              filters.advancedFilters.createdDateRange?.from
+                                ?.toISOString()
+                                .split('T')[0] || ''
+                            }
+                            onChange={e =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
@@ -1104,8 +1210,12 @@ export function DriveToolbar({
                           />
                           <Input
                             type="date"
-                            value={filters.advancedFilters.createdDateRange?.to?.toISOString().split('T')[0] || ''}
-                            onChange={(e) =>
+                            value={
+                              filters.advancedFilters.createdDateRange?.to
+                                ?.toISOString()
+                                .split('T')[0] || ''
+                            }
+                            onChange={e =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
@@ -1122,12 +1232,18 @@ export function DriveToolbar({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">Modified Date Range</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          Modified Date Range
+                        </label>
                         <div className="grid grid-cols-2 gap-2">
                           <Input
                             type="date"
-                            value={filters.advancedFilters.modifiedDateRange?.from?.toISOString().split('T')[0] || ''}
-                            onChange={(e) =>
+                            value={
+                              filters.advancedFilters.modifiedDateRange?.from
+                                ?.toISOString()
+                                .split('T')[0] || ''
+                            }
+                            onChange={e =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
@@ -1142,8 +1258,12 @@ export function DriveToolbar({
                           />
                           <Input
                             type="date"
-                            value={filters.advancedFilters.modifiedDateRange?.to?.toISOString().split('T')[0] || ''}
-                            onChange={(e) =>
+                            value={
+                              filters.advancedFilters.modifiedDateRange?.to
+                                ?.toISOString()
+                                .split('T')[0] || ''
+                            }
+                            onChange={e =>
                               onFilterChange({
                                 advancedFilters: {
                                   ...filters.advancedFilters,
@@ -1161,16 +1281,18 @@ export function DriveToolbar({
 
                       {/* Owner */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">Owner Email</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          Owner Email
+                        </label>
                         <Input
                           type="email"
                           placeholder="Enter owner email"
                           value={filters.advancedFilters.owner || ''}
-                          onChange={(e) =>
+                          onChange={e =>
                             onFilterChange({
                               advancedFilters: {
                                 ...filters.advancedFilters,
-                                ...(e.target.value  && { owner: e.target.value  }),
+                                ...(e.target.value && { owner: e.target.value }),
                               },
                             })
                           }
@@ -1180,10 +1302,20 @@ export function DriveToolbar({
 
                       {/* Apply and Clear Filters */}
                       <div className="flex gap-2">
-                        <Button variant="default" size="sm" onClick={onApplyFilters} className="flex-1 text-xs">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={onApplyFilters}
+                          className="flex-1 text-xs"
+                        >
                           Apply Filters
                         </Button>
-                        <Button variant="outline" size="sm" onClick={onClearFilters} className="flex-1 text-xs">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={onClearFilters}
+                          className="flex-1 text-xs"
+                        >
                           Clear All
                         </Button>
                       </div>
@@ -1207,7 +1339,12 @@ export function DriveToolbar({
                 <div className="flex items-center justify-between border-b pb-2">
                   <div className="text-sm font-semibold">File Statistics</div>
                   {activeFilter && (
-                    <Button variant="ghost" size="sm" onClick={handleClearFilter} className="text-muted-foreground hover:text-foreground h-6 px-2 text-xs">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearFilter}
+                      className="text-muted-foreground hover:text-foreground h-6 px-2 text-xs"
+                    >
                       <X className="mr-1 h-3 w-3" />
                       Clear Filter
                     </Button>
@@ -1235,7 +1372,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Images' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Images' ? 'border-green-500 bg-green-500 text-white' : 'border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50'
+                        activeFilter === 'Images'
+                          ? 'border-green-500 bg-green-500 text-white'
+                          : 'border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Images')}
                     >
@@ -1254,7 +1393,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Videos' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Videos' ? 'border-red-500 bg-red-500 text-white' : 'border-red-500 text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-900/50'
+                        activeFilter === 'Videos'
+                          ? 'border-red-500 bg-red-500 text-white'
+                          : 'border-red-500 text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Videos')}
                     >
@@ -1357,7 +1498,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Archives' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Archives' ? 'border-gray-500 bg-gray-500 text-white' : 'border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
+                        activeFilter === 'Archives'
+                          ? 'border-gray-500 bg-gray-500 text-white'
+                          : 'border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Archives')}
                     >
@@ -1376,7 +1519,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Code' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Code' ? 'border-cyan-500 bg-cyan-500 text-white' : 'border-cyan-500 text-cyan-700 hover:bg-cyan-100 dark:text-cyan-300 dark:hover:bg-cyan-900/50'
+                        activeFilter === 'Code'
+                          ? 'border-cyan-500 bg-cyan-500 text-white'
+                          : 'border-cyan-500 text-cyan-700 hover:bg-cyan-100 dark:text-cyan-300 dark:hover:bg-cyan-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Code')}
                     >
@@ -1416,7 +1561,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Database' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Database' ? 'border-teal-500 bg-teal-500 text-white' : 'border-teal-500 text-teal-700 hover:bg-teal-100 dark:text-teal-300 dark:hover:bg-teal-900/50'
+                        activeFilter === 'Database'
+                          ? 'border-teal-500 bg-teal-500 text-white'
+                          : 'border-teal-500 text-teal-700 hover:bg-teal-100 dark:text-teal-300 dark:hover:bg-teal-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Database')}
                     >
@@ -1435,7 +1582,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Ebooks' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Ebooks' ? 'border-rose-500 bg-rose-500 text-white' : 'border-rose-500 text-rose-700 hover:bg-rose-100 dark:text-rose-300 dark:hover:bg-rose-900/50'
+                        activeFilter === 'Ebooks'
+                          ? 'border-rose-500 bg-rose-500 text-white'
+                          : 'border-rose-500 text-rose-700 hover:bg-rose-100 dark:text-rose-300 dark:hover:bg-rose-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Ebooks')}
                     >
@@ -1454,7 +1603,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Fonts' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Fonts' ? 'border-stone-500 bg-stone-500 text-white' : 'border-stone-500 text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900/50'
+                        activeFilter === 'Fonts'
+                          ? 'border-stone-500 bg-stone-500 text-white'
+                          : 'border-stone-500 text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Fonts')}
                     >
@@ -1473,7 +1624,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Shortcuts' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Shortcuts' ? 'border-sky-500 bg-sky-500 text-white' : 'border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50'
+                        activeFilter === 'Shortcuts'
+                          ? 'border-sky-500 bg-sky-500 text-white'
+                          : 'border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Shortcuts')}
                     >
@@ -1492,7 +1645,9 @@ export function DriveToolbar({
                     <Badge
                       variant={activeFilter === 'Folders' ? 'default' : 'outline'}
                       className={`cursor-pointer transition-all ${
-                        activeFilter === 'Folders' ? 'border-blue-500 bg-blue-500 text-white' : 'border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50'
+                        activeFilter === 'Folders'
+                          ? 'border-blue-500 bg-blue-500 text-white'
+                          : 'border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50'
                       }`}
                       onClick={() => handleCategoryClick('Folders')}
                     >
@@ -1536,9 +1691,9 @@ export function DriveToolbar({
                   </CollapsibleTrigger>
                   <CollapsibleContent className="ml-4 space-y-1">
                     <DropdownMenuItem
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault()
-                        setVisibleColumns((prev) => ({
+                        setVisibleColumns(prev => ({
                           ...prev,
                           name: !prev.name,
                         }))
@@ -1548,8 +1703,8 @@ export function DriveToolbar({
                       <Checkbox
                         checked={visibleColumns.name}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={(checked) => {
-                          setVisibleColumns((prev) => ({
+                        onCheckedChange={checked => {
+                          setVisibleColumns(prev => ({
                             ...prev,
                             name: !!checked,
                           }))
@@ -1558,9 +1713,9 @@ export function DriveToolbar({
                       <span className="text-xs">Name</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault()
-                        setVisibleColumns((prev) => ({
+                        setVisibleColumns(prev => ({
                           ...prev,
                           size: !prev.size,
                         }))
@@ -1570,8 +1725,8 @@ export function DriveToolbar({
                       <Checkbox
                         checked={visibleColumns.size}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={(checked) => {
-                          setVisibleColumns((prev) => ({
+                        onCheckedChange={checked => {
+                          setVisibleColumns(prev => ({
                             ...prev,
                             size: !!checked,
                           }))
@@ -1580,9 +1735,9 @@ export function DriveToolbar({
                       <span className="text-xs">Size</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault()
-                        setVisibleColumns((prev) => ({
+                        setVisibleColumns(prev => ({
                           ...prev,
                           mimeType: !prev.mimeType,
                         }))
@@ -1592,8 +1747,8 @@ export function DriveToolbar({
                       <Checkbox
                         checked={visibleColumns.mimeType}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={(checked) => {
-                          setVisibleColumns((prev) => ({
+                        onCheckedChange={checked => {
+                          setVisibleColumns(prev => ({
                             ...prev,
                             mimeType: !!checked,
                           }))
@@ -1602,9 +1757,9 @@ export function DriveToolbar({
                       <span className="text-xs">MIME Type</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault()
-                        setVisibleColumns((prev) => ({
+                        setVisibleColumns(prev => ({
                           ...prev,
                           owners: !prev.owners,
                         }))
@@ -1614,8 +1769,8 @@ export function DriveToolbar({
                       <Checkbox
                         checked={visibleColumns.owners}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={(checked) => {
-                          setVisibleColumns((prev) => ({
+                        onCheckedChange={checked => {
+                          setVisibleColumns(prev => ({
                             ...prev,
                             owners: !!checked,
                           }))
@@ -1624,9 +1779,9 @@ export function DriveToolbar({
                       <span className="text-xs">Owner</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault()
-                        setVisibleColumns((prev) => ({
+                        setVisibleColumns(prev => ({
                           ...prev,
                           createdTime: !prev.createdTime,
                         }))
@@ -1636,8 +1791,8 @@ export function DriveToolbar({
                       <Checkbox
                         checked={visibleColumns.createdTime}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={(checked) => {
-                          setVisibleColumns((prev) => ({
+                        onCheckedChange={checked => {
+                          setVisibleColumns(prev => ({
                             ...prev,
                             createdTime: !!checked,
                           }))
@@ -1646,9 +1801,9 @@ export function DriveToolbar({
                       <span className="text-xs">Created</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={(e) => {
+                      onClick={e => {
                         e.preventDefault()
-                        setVisibleColumns((prev) => ({
+                        setVisibleColumns(prev => ({
                           ...prev,
                           modifiedTime: !prev.modifiedTime,
                         }))
@@ -1658,8 +1813,8 @@ export function DriveToolbar({
                       <Checkbox
                         checked={visibleColumns.modifiedTime}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={(checked) => {
-                          setVisibleColumns((prev) => ({
+                        onCheckedChange={checked => {
+                          setVisibleColumns(prev => ({
                             ...prev,
                             modifiedTime: !!checked,
                           }))
@@ -1684,7 +1839,11 @@ export function DriveToolbar({
       </div>
 
       {/* Search Expanded - Hidden by default */}
-      <div id="search-expanded" style={{ display: 'none' }} className="bg-muted/30 border-t p-3 md:p-4">
+      <div
+        id="search-expanded"
+        style={{ display: 'none' }}
+        className="bg-muted/30 border-t p-3 md:p-4"
+      >
         <div className="flex items-center gap-2 md:gap-4">
           <div className="relative flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
@@ -1692,8 +1851,8 @@ export function DriveToolbar({
               type="text"
               placeholder="Search files and folders..."
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit(e)}
+              onChange={e => onSearchChange(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && onSearchSubmit(e)}
               className="h-10 pr-20 pl-10"
               disabled={false}
             />
@@ -1728,7 +1887,13 @@ export function DriveToolbar({
               </Button>
             </div>
           </div>
-          <Button variant="default" size="sm" onClick={(e) => onSearchSubmit(e)} disabled={!searchQuery.trim()} className="h-10 px-4">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={e => onSearchSubmit(e)}
+            disabled={!searchQuery.trim()}
+            className="h-10 px-4"
+          >
             {refreshing ? (
               <RefreshCw className="h-4 w-4 animate-spin" />
             ) : (
@@ -1741,7 +1906,12 @@ export function DriveToolbar({
       </div>
 
       {/* Operations Dialog */}
-      <OperationsDialog isOpen={isOperationsOpen} onClose={() => setIsOperationsOpen(false)} selectedItems={selectedItems} onRefreshAfterOp={handleOperationComplete} />
+      <OperationsDialog
+        isOpen={isOperationsOpen}
+        onClose={() => setIsOperationsOpen(false)}
+        selectedItems={selectedItems}
+        onRefreshAfterOp={handleOperationComplete}
+      />
 
       {/* Filters Dialog */}
       <FiltersDialog

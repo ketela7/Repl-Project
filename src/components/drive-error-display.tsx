@@ -4,7 +4,16 @@ import type { ReactNode } from 'react'
 import type { ReactNode } from 'react'
 import type { ReactNode } from 'react'
 import type { ReactNode } from 'react'
-import { AlertTriangle, RefreshCw, Settings, Wifi, Lock, HardDrive, FileX, Clock } from 'lucide-react'
+import {
+  AlertTriangle,
+  RefreshCw,
+  Settings,
+  Wifi,
+  Lock,
+  HardDrive,
+  FileX,
+  Clock,
+} from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -19,13 +28,25 @@ interface DriveErrorDisplayProps {
   className?: string
 }
 
-export function DriveErrorDisplay({ error, onRetry, onReconnect, compact = false, className = '' }: DriveErrorDisplayProps) {
+export function DriveErrorDisplay({
+  error,
+  onRetry,
+  onReconnect,
+  compact = false,
+  className = '',
+}: DriveErrorDisplayProps) {
   const getErrorDetails = (error: any) => {
     const message = error?.message || error?.toString() || 'Unknown error'
     const code = error?.code || error?.status
 
     // Network errors
-    if (message.includes('network') || message.includes('fetch') || message.includes('connection') || message.includes('timeout') || code === 0) {
+    if (
+      message.includes('network') ||
+      message.includes('fetch') ||
+      message.includes('connection') ||
+      message.includes('timeout') ||
+      code === 0
+    ) {
       return {
         type: 'network',
         icon: <Wifi className="h-4 w-4" />,
@@ -38,7 +59,12 @@ export function DriveErrorDisplay({ error, onRetry, onReconnect, compact = false
     }
 
     // Authentication errors
-    if (message.includes('unauthorized') || message.includes('invalid') || message.includes('authentication') || code === 401) {
+    if (
+      message.includes('unauthorized') ||
+      message.includes('invalid') ||
+      message.includes('authentication') ||
+      code === 401
+    ) {
       return {
         type: 'auth',
         icon: <Lock className="h-4 w-4" />,
@@ -148,7 +174,10 @@ export function DriveErrorDisplay({ error, onRetry, onReconnect, compact = false
           <div className="flex-1 space-y-2">
             <div className="flex items-center gap-2">
               <h4 className="text-sm font-medium">{errorDetails.title}</h4>
-              <Badge variant={errorDetails.retryable ? 'secondary' : 'destructive'} className="text-xs">
+              <Badge
+                variant={errorDetails.retryable ? 'secondary' : 'destructive'}
+                className="text-xs"
+              >
                 {errorDetails.retryable ? 'Retryable' : 'Manual Fix Required'}
               </Badge>
             </div>

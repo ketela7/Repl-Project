@@ -49,7 +49,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
 
       // Handle token refresh on every request if needed
-      if (token.refreshToken && (!token.accessToken || (account?.expires_at && Date.now() >= account.expires_at * 1000))) {
+      if (
+        token.refreshToken &&
+        (!token.accessToken || (account?.expires_at && Date.now() >= account.expires_at * 1000))
+      ) {
         try {
           const response = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
@@ -70,11 +73,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
             token.exp = Math.floor(Date.now() / 1000) + (refreshedTokens.expires_in || 3600)
           } else {
-            // // // console.error('Token refresh failed:', response.status)
+            // // // // console.error('Token refresh failed:', response.status)
             token.accessToken = undefined
           }
         } catch (error) {
-          // // // console.error('Token refresh error:', error)
+          // // // // console.error('Token refresh error:', error)
           token.accessToken = undefined
         }
       }
@@ -100,8 +103,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Build session object with tokens
       return {
         ...session,
-        ...((token.accessToken as string)  && { accessToken: (token.accessToken as string)  }),
-        ...((token.refreshToken as string)  && { refreshToken: (token.refreshToken as string)  }),
+        ...((token.accessToken as string) && { accessToken: token.accessToken as string }),
+        ...((token.refreshToken as string) && { refreshToken: token.refreshToken as string }),
         provider: (token.provider as string) || 'google',
         rememberMe: Boolean(token.rememberMe),
       }
@@ -132,7 +135,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-next-auth.session-token'
+          : 'next-auth.session-token',
       options: {
         httpOnly: true,
         sameSite: 'lax',
@@ -152,7 +158,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
     pkceCodeVerifier: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-authjs.pkce.code_verifier' : 'authjs.pkce.code_verifier',
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-authjs.pkce.code_verifier'
+          : 'authjs.pkce.code_verifier',
       options: {
         httpOnly: true,
         sameSite: 'lax',

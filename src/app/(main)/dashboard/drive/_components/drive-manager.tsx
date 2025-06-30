@@ -42,7 +42,6 @@ type DriveItem = (DriveFile | DriveFolder) & {
   canMove?: boolean
   canCopy?: boolean
   canExport?: boolean
-
 }
 // Helper function to convert size units to bytes (Google Drive API requirement)
 function getSizeMultiplier(unit: string): number {
@@ -87,10 +86,10 @@ export function DriveManager() {
 
   // Debug effect to track items changes
   useEffect(() => {
-    // // // console.log('[DriveManager] Items state changed:', items.length, 'items')
-    // // // console.log('[DriveManager] Current folder ID:', currentFolderId)
+    // // // // console.log('[DriveManager] Items state changed:', items.length, 'items')
+    // // // // console.log('[DriveManager] Current folder ID:', currentFolderId)
     if (items.length > 0) {
-      // // // console.log('[DriveManager] First 3 items:', items.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
+      // // // // console.log('[DriveManager] First 3 items:', items.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
     }
   }, [items, currentFolderId])
   const [refreshing, setRefreshing] = useState(false)
@@ -163,11 +162,11 @@ export function DriveManager() {
 
   // Helper functions
   const openDialog = (dialogName: keyof typeof dialogs) => {
-    setDialogs((prev) => ({ ...prev, [dialogName]: true }))
+    setDialogs(prev => ({ ...prev, [dialogName]: true }))
   }
 
   const closeDialog = (dialogName: keyof typeof dialogs) => {
-    setDialogs((prev) => ({ ...prev, [dialogName]: false }))
+    setDialogs(prev => ({ ...prev, [dialogName]: false }))
   }
 
   const clearAllFilters = useCallback(() => {
@@ -177,7 +176,7 @@ export function DriveManager() {
   }, [currentFolderId])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
-    setFilters((prev) => ({
+    setFilters(prev => ({
       ...prev,
       ...newFilters,
       advancedFilters: {
@@ -201,7 +200,9 @@ export function DriveManager() {
     !!(filters.advancedFilters.owner && String(filters.advancedFilters.owner).trim())
 
   // Sorting Start
-  const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
+  const handleSort = (
+    key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners',
+  ) => {
     let direction: 'asc' | 'desc' = 'asc'
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc'
@@ -213,7 +214,11 @@ export function DriveManager() {
     if (!sortConfig || sortConfig.key !== columnKey) {
       return <ChevronsUpDown className="h-4 w-4" />
     }
-    return sortConfig.direction === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+    return sortConfig.direction === 'asc' ? (
+      <ChevronUp className="h-4 w-4" />
+    ) : (
+      <ChevronDown className="h-4 w-4" />
+    )
   }
 
   const sortedItems = useMemo(() => {
@@ -262,8 +267,10 @@ export function DriveManager() {
           return 0
       }
 
-      if (aValue === null || aValue === undefined || aValue === '' || aValue === '-') aValue = key === 'size' ? 0 : ''
-      if (bValue === null || bValue === undefined || bValue === '' || bValue === '-') bValue = key === 'size' ? 0 : ''
+      if (aValue === null || aValue === undefined || aValue === '' || aValue === '-')
+        aValue = key === 'size' ? 0 : ''
+      if (bValue === null || bValue === undefined || bValue === '' || bValue === '-')
+        bValue = key === 'size' ? 0 : ''
 
       if (aValue < bValue) return direction === 'asc' ? -1 : 1
       if (aValue > bValue) return direction === 'asc' ? 1 : -1
@@ -274,8 +281,8 @@ export function DriveManager() {
 
   // Selected items with details for operations - using getFileActions for consistency
   const selectedItemsWithDetails = useMemo(() => {
-    return Array.from(selectedItems).map((itemId) => {
-      const item = items.find((i) => i.id === itemId)
+    return Array.from(selectedItems).map(itemId => {
+      const item = items.find(i => i.id === itemId)
       const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
 
       // Use getFileActions for consistent capability checking
@@ -286,7 +293,7 @@ export function DriveManager() {
           mimeType: item?.mimeType,
           itemType: itemIsFolder ? 'folder' : 'file',
         },
-        filters.activeView
+        filters.activeView,
       )
 
       return {
@@ -354,13 +361,26 @@ export function DriveManager() {
         if (actualFolderId) params.append('folderId', actualFolderId)
         if (searchQuery) params.append('search', searchQuery)
         if (pageToken) params.append('pageToken', pageToken)
-        if (filters.activeView && filters.activeView !== 'all') params.append('viewStatus', filters.activeView)
-        if (filters.fileTypeFilter?.length > 0) params.append('fileType', filters.fileTypeFilter.join(','))
-        if (filters.advancedFilters.createdDateRange?.from) params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
-        if (filters.advancedFilters.createdDateRange?.to) params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
-        if (filters.advancedFilters.modifiedDateRange?.from) params.append('modifiedAfter', filters.advancedFilters.modifiedDateRange.from.toISOString())
-        if (filters.advancedFilters.modifiedDateRange?.to) params.append('modifiedBefore', filters.advancedFilters.modifiedDateRange.to.toISOString())
-        if (filters.advancedFilters.owner?.trim()) params.append('owner', filters.advancedFilters.owner.trim())
+        if (filters.activeView && filters.activeView !== 'all')
+          params.append('viewStatus', filters.activeView)
+        if (filters.fileTypeFilter?.length > 0)
+          params.append('fileType', filters.fileTypeFilter.join(','))
+        if (filters.advancedFilters.createdDateRange?.from)
+          params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
+        if (filters.advancedFilters.createdDateRange?.to)
+          params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
+        if (filters.advancedFilters.modifiedDateRange?.from)
+          params.append(
+            'modifiedAfter',
+            filters.advancedFilters.modifiedDateRange.from.toISOString(),
+          )
+        if (filters.advancedFilters.modifiedDateRange?.to)
+          params.append(
+            'modifiedBefore',
+            filters.advancedFilters.modifiedDateRange.to.toISOString(),
+          )
+        if (filters.advancedFilters.owner?.trim())
+          params.append('owner', filters.advancedFilters.owner.trim())
 
         // Add size filtering parameters (Google Drive API specification - values in bytes)
         if (filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) {
@@ -379,7 +399,7 @@ export function DriveManager() {
           params.append('pageSize', String(filters.advancedFilters.pageSize))
         }
 
-        // // // console.log('[DriveManager] Fetching files with params:', params.toString())
+        // // // // console.log('[DriveManager] Fetching files with params:', params.toString())
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -398,14 +418,17 @@ export function DriveManager() {
 
         const newItems = (data.files || data || []).map((item: any) => ({
           ...item,
-          itemType: item.mimeType === 'application/vnd.google-apps.folder' ? ('folder' as const) : ('file' as const),
+          itemType:
+            item.mimeType === 'application/vnd.google-apps.folder'
+              ? ('folder' as const)
+              : ('file' as const),
         }))
 
-        // // // console.log('[DriveManager] Received items:', newItems.length, 'items for folder:', folderId)
-        // // // console.log('[DriveManager] Items preview:', newItems.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
-        setItems((prev) => {
+        // // // // console.log('[DriveManager] Received items:', newItems.length, 'items for folder:', folderId)
+        // // // // console.log('[DriveManager] Items preview:', newItems.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
+        setItems(prev => {
           const result = pageToken ? [...prev, ...newItems] : newItems
-          // // // console.log('[DriveManager] Setting items to:', result.length, 'items')
+          // // // // console.log('[DriveManager] Setting items to:', result.length, 'items')
           return result
         })
 
@@ -413,7 +436,11 @@ export function DriveManager() {
         setHasAccess(true)
         setDriveAccessError(null)
       } catch (error: any) {
-        if (error.message?.includes('Authentication') || error.message?.includes('401') || error.status === 401) {
+        if (
+          error.message?.includes('Authentication') ||
+          error.message?.includes('401') ||
+          error.status === 401
+        ) {
           setNeedsReauth(true)
           setDriveAccessError(error)
           window.location.href = '/auth/v1/login'
@@ -429,7 +456,7 @@ export function DriveManager() {
         if (callId) activeRequestsRef.current.delete(callId)
       }
     },
-    [filters]
+    [filters],
   )
 
   // Search submit handler
@@ -438,7 +465,7 @@ export function DriveManager() {
       e.preventDefault()
       fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
     },
-    [fetchFiles, currentFolderId, searchQuery]
+    [fetchFiles, currentFolderId, searchQuery],
   )
 
   // Effects for initial load and dependencies
@@ -449,7 +476,7 @@ export function DriveManager() {
   // Navigation handlers
   const handleFolderClick = useCallback(
     (folderId: string) => {
-      // // // console.log('[DriveManager] Navigating to folder:', folderId)
+      // // // // console.log('[DriveManager] Navigating to folder:', folderId)
 
       // Force immediate state update
       setLoading(true)
@@ -462,11 +489,11 @@ export function DriveManager() {
       // Force a new fetch with the folder ID
       fetchFiles(folderId)
     },
-    [fetchFiles]
+    [fetchFiles],
   )
 
   const handleBackToParent = useCallback(() => {
-    // // // console.log('[DriveManager] Navigating back to root')
+    // // // // console.log('[DriveManager] Navigating back to root')
 
     // Force immediate state update
     setLoading(true)
@@ -480,41 +507,44 @@ export function DriveManager() {
     fetchFiles()
   }, [fetchFiles])
 
-  const handleShortcutFile = useCallback(async (item: DriveItem) => {
-    try {
-      // Try to get shortcut details and open the target
-      const response = await fetch(`/api/drive/files/details`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          fileIds: [item.id],
-          fields: 'shortcutDetails'
-        }),
-      })
+  const handleShortcutFile = useCallback(
+    async (item: DriveItem) => {
+      try {
+        // Try to get shortcut details and open the target
+        const response = await fetch(`/api/drive/files/details`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileIds: [item.id],
+            fields: 'shortcutDetails',
+          }),
+        })
 
-      const data = await response.json()
-      const targetId = data.results?.[0]?.shortcutDetails?.targetId
-      const targetMimeType = data.results?.[0]?.shortcutDetails?.targetMimeType
+        const data = await response.json()
+        const targetId = data.results?.[0]?.shortcutDetails?.targetId
+        const targetMimeType = data.results?.[0]?.shortcutDetails?.targetMimeType
 
-      if (targetId && targetMimeType === 'application/vnd.google-apps.folder') {
-        // Open folder
-        handleFolderClick(targetId)
-        return
+        if (targetId && targetMimeType === 'application/vnd.google-apps.folder') {
+          // Open folder
+          handleFolderClick(targetId)
+          return
+        }
+
+        throw new Error('Cannot open shortcut target')
+      } catch {
+        // Fallback: show preview
+        setTimeout(() => {
+          setSelectedFileForPreview(item as DriveFile)
+          openDialog('preview')
+        }, 50)
       }
-
-      throw new Error('Cannot open shortcut target')
-    } catch {
-      // Fallback: show preview
-      setTimeout(() => {
-        setSelectedFileForPreview(item as DriveFile)
-        openDialog('preview')
-      }, 50)
-    }
-  }, [handleFolderClick, setSelectedFileForPreview, openDialog])
+    },
+    [handleFolderClick, setSelectedFileForPreview, openDialog],
+  )
 
   // Selection handlers
   const handleSelectItem = useCallback((itemId: string) => {
-    setSelectedItems((prev) => {
+    setSelectedItems(prev => {
       const newSet = new Set(prev)
       if (newSet.has(itemId)) {
         newSet.delete(itemId)
@@ -543,19 +573,25 @@ export function DriveManager() {
     const hasMinSize = filters.advancedFilters.sizeRange?.min
     const hasMaxSize = filters.advancedFilters.sizeRange?.max
 
-    // // // console.log('[DriveManager] Size filtering - items:', items.length, 'hasMinSize:', hasMinSize, 'hasMaxSize:', hasMaxSize)
+    // // // // console.log('[DriveManager] Size filtering - items:', items.length, 'hasMinSize:', hasMinSize, 'hasMaxSize:', hasMaxSize)
 
     if (!hasMinSize && !hasMaxSize) {
-      // // // console.log('[DriveManager] No size filters, returning all items:', items.length)
+      // // // // console.log('[DriveManager] No size filters, returning all items:', items.length)
       return items
     }
 
-    const filtered = items.filter((item) => {
+    const filtered = items.filter(item => {
       if (item.mimeType === 'application/vnd.google-apps.folder') return true
 
       const sizeStr = (item as any).size
       let sizeBytes = 0
-      if (sizeStr && sizeStr !== '-' && sizeStr !== 'undefined' && sizeStr !== 'null' && sizeStr.trim() !== '') {
+      if (
+        sizeStr &&
+        sizeStr !== '-' &&
+        sizeStr !== 'undefined' &&
+        sizeStr !== 'null' &&
+        sizeStr.trim() !== ''
+      ) {
         const parsed = parseInt(sizeStr, 10)
         if (!isNaN(parsed)) {
           sizeBytes = parsed
@@ -586,14 +622,14 @@ export function DriveManager() {
       return true
     })
 
-    // // // console.log('[DriveManager] Size filtered items:', filtered.length)
+    // // // // console.log('[DriveManager] Size filtered items:', filtered.length)
     return filtered
   }, [items, filters.advancedFilters.sizeRange])
 
   const displayItems = useMemo(() => {
-    // // // console.log('[DriveManager] Display items calculation - filteredItems:', filteredItems.length, 'sizeFilteredItems:', sizeFilteredItems.length)
+    // // // // console.log('[DriveManager] Display items calculation - filteredItems:', filteredItems.length, 'sizeFilteredItems:', sizeFilteredItems.length)
     const result = filteredItems.length > 0 ? filteredItems : sizeFilteredItems
-    // // // console.log('[DriveManager] Display items calculated:', result.length, 'items')
+    // // // // console.log('[DriveManager] Display items calculated:', result.length, 'items')
     return result
   }, [filteredItems, sizeFilteredItems])
 
@@ -611,7 +647,7 @@ export function DriveManager() {
       return sortConfig.direction === 'asc' ? comparison : -comparison
     })
 
-    return sorted.map((item) => {
+    return sorted.map(item => {
       const isFolder = item.mimeType === 'application/vnd.google-apps.folder'
       const actions = getFileActions(
         {
@@ -620,7 +656,7 @@ export function DriveManager() {
           mimeType: item.mimeType,
           itemType: isFolder ? 'folder' : 'file',
         },
-        filters.activeView
+        filters.activeView,
       )
 
       return {
@@ -644,7 +680,7 @@ export function DriveManager() {
     if (selectedItems.size === sortedDisplayItems.length) {
       setSelectedItems(new Set())
     } else {
-      setSelectedItems(new Set(sortedDisplayItems.map((item) => item.id)))
+      setSelectedItems(new Set(sortedDisplayItems.map(item => item.id)))
     }
   }, [sortedDisplayItems, selectedItems.size])
 
@@ -672,7 +708,7 @@ export function DriveManager() {
           <DriveToolbar
             searchQuery={searchQuery}
             onSearchChange={setSearchQuery}
-            onSearchSubmit={(e) => {
+            onSearchSubmit={e => {
               e.preventDefault()
               fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
             }}
@@ -693,7 +729,9 @@ export function DriveManager() {
             onRefreshAfterOp={handleRefresh}
             filters={filters}
             onFilterChange={handleFilter as any}
-            onApplyFilters={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)}
+            onApplyFilters={() =>
+              fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+            }
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
             items={items}
@@ -708,25 +746,25 @@ export function DriveManager() {
           />
 
           {/* Always show breadcrumb - for both root and sub-folders */}
-          <FileBreadcrumb 
-            currentFolderId={currentFolderId} 
-            onNavigate={(folderId) => {
-              // // // console.log('[DriveManager] Breadcrumb navigation called with folderId:', folderId)
+          <FileBreadcrumb
+            currentFolderId={currentFolderId}
+            onNavigate={folderId => {
+              // // // // console.log('[DriveManager] Breadcrumb navigation called with folderId:', folderId)
               if (folderId) {
-                // // // console.log('[DriveManager] Navigating to folder:', folderId)
+                // // // // console.log('[DriveManager] Navigating to folder:', folderId)
                 handleFolderClick(folderId)
               } else {
                 // [icon home] Drive
-                // // // console.log('[DriveManager] Navigating to root (My Drive)')
+                // // // // console.log('[DriveManager] Navigating to root (My Drive)')
                 setCurrentFolderId(null)
                 fetchFiles(undefined, searchQuery.trim() || undefined)
               }
-            }} 
+            }}
             onBackToRoot={() => {
-              // // // console.log('[DriveManager] Back to root called')
+              // // // // console.log('[DriveManager] Back to root called')
               setCurrentFolderId(null)
               fetchFiles(undefined, searchQuery.trim() || undefined)
-            }} 
+            }}
           />
 
           <DriveDataView
@@ -743,7 +781,7 @@ export function DriveManager() {
               if (changes.sortBy) {
                 handleSort(changes.sortBy)
               } else {
-                setVisibleColumns((prev) => ({ ...prev, ...changes }))
+                setVisibleColumns(prev => ({ ...prev, ...changes }))
               }
             }}
             onItemAction={(action: string, item: DriveItem) => {
@@ -815,7 +853,13 @@ export function DriveManager() {
             loading={loading}
             loadingMore={loadingMore}
             hasMore={!!nextPageToken}
-            onLoadMore={() => fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined, nextPageToken || undefined)}
+            onLoadMore={() =>
+              fetchFiles(
+                currentFolderId || undefined,
+                searchQuery.trim() || undefined,
+                nextPageToken || undefined,
+              )
+            }
           />
         </div>
       </div>
@@ -997,7 +1041,7 @@ export function DriveManager() {
       {selectedFileForPreview && dialogs.preview && !dialogs.details && (
         <FilePreviewDialog
           open={dialogs.preview}
-          onOpenChange={(open) => {
+          onOpenChange={open => {
             if (!open) {
               closeDialog('preview')
               setSelectedFileForPreview(null)
@@ -1029,7 +1073,10 @@ export function DriveManager() {
           </div>
           {operationsProgress.type === 'bulk' && operationsProgress.total > 0 && (
             <>
-              <Progress value={(operationsProgress.current / operationsProgress.total) * 100} className="mt-2 w-64" />
+              <Progress
+                value={(operationsProgress.current / operationsProgress.total) * 100}
+                className="mt-2 w-64"
+              />
               <div className="text-muted-foreground mt-1 text-xs">
                 {operationsProgress.current} of {operationsProgress.total}
               </div>

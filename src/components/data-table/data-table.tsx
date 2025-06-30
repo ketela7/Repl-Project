@@ -1,9 +1,21 @@
-import { DndContext, closestCenter, type UniqueIdentifier, type SensorDescriptor } from '@dnd-kit/core'
+import {
+  DndContext,
+  closestCenter,
+  type UniqueIdentifier,
+  type SensorDescriptor,
+} from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { ColumnDef, flexRender, type Table as TanStackTable } from '@tanstack/react-table'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 import { DraggableRow } from './draggable-row'
 
@@ -17,16 +29,26 @@ interface DataTableProps<TData, TValue> {
   sortableId?: string
 }
 
-export function DataTable<TData, TValue>({ table, columns, dataIds = [], dndEnabled = false, handleDragEnd, sensors, sortableId }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+  table,
+  columns,
+  dataIds = [],
+  dndEnabled = false,
+  handleDragEnd,
+  sensors,
+  sortableId,
+}: DataTableProps<TData, TValue>) {
   const tableContent = (
     <Table>
       <TableHeader className="bg-muted sticky top-0 z-10">
-        {table.getHeaderGroups().map((headerGroup) => (
+        {table.getHeaderGroups().map(headerGroup => (
           <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map((header) => {
+            {headerGroup.headers.map(header => {
               return (
                 <TableHead key={header.id} colSpan={header.colSpan}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               )
             })}
@@ -37,15 +59,17 @@ export function DataTable<TData, TValue>({ table, columns, dataIds = [], dndEnab
         {table.getRowModel().rows.length ? (
           dndEnabled ? (
             <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
-              {table.getRowModel().rows.map((row) => (
+              {table.getRowModel().rows.map(row => (
                 <DraggableRow key={row.id} row={row} />
               ))}
             </SortableContext>
           ) : (
-            table.getRowModel().rows.map((row) => (
+            table.getRowModel().rows.map(row => (
               <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                {row.getVisibleCells().map(cell => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
                 ))}
               </TableRow>
             ))
@@ -63,7 +87,13 @@ export function DataTable<TData, TValue>({ table, columns, dataIds = [], dndEnab
 
   if (dndEnabled) {
     return (
-      <DndContext collisionDetection={closestCenter} modifiers={[restrictToVerticalAxis]} onDragEnd={handleDragEnd} sensors={sensors} id={sortableId}>
+      <DndContext
+        collisionDetection={closestCenter}
+        modifiers={[restrictToVerticalAxis]}
+        onDragEnd={handleDragEnd}
+        sensors={sensors}
+        id={sortableId}
+      >
         {tableContent}
       </DndContext>
     )

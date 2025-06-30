@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
             },
             {
               responseType: 'stream',
-            }
+            },
           )
         })
       })
@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
           },
           {
             responseType: 'stream',
-          }
+          },
         )
       })
     })
@@ -156,8 +156,10 @@ function isGoogleWorkspaceFile(mimeType: string): boolean {
 function getExportFormat(mimeType: string): string {
   const exportMap: { [key: string]: string } = {
     'application/vnd.google-apps.document': 'application/pdf',
-    'application/vnd.google-apps.spreadsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    'application/vnd.google-apps.presentation': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.google-apps.spreadsheet':
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.google-apps.presentation':
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     'application/vnd.google-apps.drawing': 'image/png',
   }
 

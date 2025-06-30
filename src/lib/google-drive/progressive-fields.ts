@@ -7,7 +7,8 @@
  * Stage 1: Basic info (available from list cache - 0ms)
  * Data already available from main file list
  */
-export const BASIC_FIELDS = 'id,name,mimeType,size,createdTime,modifiedTime,owners(displayName,emailAddress),shared,trashed,starred'
+export const BASIC_FIELDS =
+  'id,name,mimeType,size,createdTime,modifiedTime,owners(displayName,emailAddress),shared,trashed,starred'
 
 /**
  * Stage 2: Essential details (~200ms response)
@@ -107,7 +108,11 @@ export const PROGRESSIVE_FIELD_CONFIG = {
 /**
  * Generate cache key for progressive loading
  */
-export function generateProgressiveKey(fileId: string, userId: string, stage: LoadingStage): string {
+export function generateProgressiveKey(
+  fileId: string,
+  userId: string,
+  stage: LoadingStage,
+): string {
   return `file-details:${stage}:${userId}:${fileId}`
 }
 

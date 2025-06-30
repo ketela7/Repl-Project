@@ -39,7 +39,6 @@ task = "shell.exec"
 args = "npm run dev:fast"
 waitForPort = 5000
 
-
 [[workflows.workflow]]
 name = "Lint"
 mode = "sequential"
@@ -66,9 +65,8 @@ args = "npm run format:fix && echo '✅ Code formatting completed successfully'"
 
 [[workflows.workflow]]
 name = "Full Check"
-mode = "sequential"
+mode = "parallel"
 author = "agent"
-
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

@@ -68,7 +68,7 @@ class APIThrottle {
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms))
+    return new Promise(resolve => setTimeout(resolve, ms))
   }
 
   /**
@@ -90,7 +90,7 @@ class APIThrottle {
    * Clear the queue (emergency use)
    */
   clearQueue(): void {
-    this.queue.forEach((item) => {
+    this.queue.forEach(item => {
       item.reject(new Error('Queue cleared'))
     })
     this.queue = []

@@ -114,7 +114,7 @@ export async function GET(request: NextRequest) {
       cached: false,
     })
   } catch (error) {
-    // // // console.error('Error in folders API:', error)
+    // // // // console.error('Error in folders API:', error)
     return handleApiError(error)
   }
 }
@@ -129,7 +129,10 @@ export async function POST(request: NextRequest) {
     const { name, parentId = 'root' } = body
 
     if (!name) {
-      return NextResponse.json({ success: false, error: 'Folder name is required' }, { status: 400 })
+      return NextResponse.json(
+        { success: false, error: 'Folder name is required' },
+        { status: 400 },
+      )
     }
 
     const authResult = await initDriveService()
@@ -172,7 +175,7 @@ export async function POST(request: NextRequest) {
       message: `Folder "${name}" created successfully`,
     })
   } catch (error) {
-    // // // console.error('Error creating folder:', error)
+    // // // // console.error('Error creating folder:', error)
     return handleApiError(error)
   }
 }

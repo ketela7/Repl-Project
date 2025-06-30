@@ -57,7 +57,7 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
         <div className="absolute inset-0 bg-white">
           <iframe
             src={previewUrl}
-            className="w-full h-full"
+            className="h-full w-full"
             title={`Preview: ${file.name}`}
             allow="autoplay; encrypted-media; fullscreen"
             allowFullScreen
@@ -74,10 +74,10 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
 
     // Normal dialog view with perfect edge spacing
     return (
-      <div className="w-full h-[75vh] min-h-[400px] max-h-[80vh] bg-white rounded-lg overflow-hidden border">
+      <div className="h-[75vh] max-h-[80vh] min-h-[400px] w-full overflow-hidden rounded-lg border bg-white">
         <iframe
           src={previewUrl}
-          className="w-full h-full"
+          className="h-full w-full"
           title={`Preview: ${file.name}`}
           allow="autoplay; encrypted-media; fullscreen"
           allowFullScreen
@@ -98,19 +98,19 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
       <div className="fixed inset-0 z-[100] bg-black">
         {/* Minimal floating controls - moved to top-left */}
         <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setIsFullscreen(false)} 
-            className="text-white hover:bg-white/20 bg-black/50 backdrop-blur-sm rounded-full w-10 h-10 p-0"
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsFullscreen(false)}
+            className="h-10 w-10 rounded-full bg-black/50 p-0 text-white backdrop-blur-sm hover:bg-white/20"
           >
             <Minimize2 className="h-5 w-5" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => onOpenChange(false)} 
-            className="text-white hover:bg-white/20 bg-black/50 backdrop-blur-sm rounded-full w-10 h-10 p-0"
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+            className="h-10 w-10 rounded-full bg-black/50 p-0 text-white backdrop-blur-sm hover:bg-white/20"
           >
             <X className="h-5 w-5" />
           </Button>
@@ -134,7 +134,9 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
                 <Maximize2 className="h-4 w-4" />
               </Button>
             </div>
-            <DialogTitle className="flex-1 text-center truncate text-base font-medium md:text-lg">{file.name}</DialogTitle>
+            <DialogTitle className="flex-1 truncate text-center text-base font-medium md:text-lg">
+              {file.name}
+            </DialogTitle>
             <div className="w-8"></div> {/* Spacer for balance */}
           </div>
         </DialogHeader>

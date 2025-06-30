@@ -78,7 +78,7 @@ class MemoryCache {
       }
     }
 
-    toDelete.forEach((key) => this.cache.delete(key))
+    toDelete.forEach(key => this.cache.delete(key))
 
     // If still too large, remove oldest entries
     if (this.cache.size >= this.maxSize) {
@@ -91,14 +91,20 @@ class MemoryCache {
   }
 
   // Generate cache key for Drive API requests
-  generateDriveKey(params: { parentId?: string; userId: string; pageToken?: string; query?: string; pageSize?: number }): string {
+  generateDriveKey(params: {
+    parentId?: string
+    userId: string
+    pageToken?: string
+    query?: string
+    pageSize?: number
+  }): string {
     const { parentId = 'root', userId, pageToken = 'p1', query = '', pageSize = 50 } = params
 
     // Create a more comprehensive cache key with all filter parameters including pageSize
     const keyParts = ['drive', userId, parentId, pageToken, query, pageSize.toString()]
 
     // Join with ':' and remove empty parts to avoid unnecessary cache misses
-    return keyParts.map((part) => part || 'empty').join(':')
+    return keyParts.map(part => part || 'empty').join(':')
   }
 
   // Generate cache key for file details
@@ -142,7 +148,7 @@ class MemoryCache {
       }
     }
 
-    keysToDelete.forEach((key) => this.cache.delete(key))
+    keysToDelete.forEach(key => this.cache.delete(key))
   }
 
   // Clear cache entries for specific folder/context
@@ -155,7 +161,7 @@ class MemoryCache {
       }
     }
 
-    keysToDelete.forEach((key) => this.cache.delete(key))
+    keysToDelete.forEach(key => this.cache.delete(key))
   }
 
   // Clear cache entries that match specific filter patterns
@@ -168,7 +174,7 @@ class MemoryCache {
       }
     }
 
-    keysToDelete.forEach((key) => this.cache.delete(key))
+    keysToDelete.forEach(key => this.cache.delete(key))
   }
 
   // Smart cache invalidation - clear only related entries
@@ -178,7 +184,7 @@ class MemoryCache {
       folderId?: string
       viewStatus?: string
       fileType?: string
-    }
+    },
   ): void {
     const keysToDelete: string[] = []
 
@@ -204,7 +210,7 @@ class MemoryCache {
       }
     }
 
-    keysToDelete.forEach((key) => this.cache.delete(key))
+    keysToDelete.forEach(key => this.cache.delete(key))
   }
 }
 

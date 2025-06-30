@@ -4,8 +4,22 @@ import { useState, useRef } from 'react'
 import { RotateCcw, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
@@ -25,7 +39,12 @@ interface ItemsUntrashDialogProps {
   }>
 }
 
-function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsUntrashDialogProps) {
+function ItemsUntrashDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+  selectedItems,
+}: ItemsUntrashDialogProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
@@ -50,8 +69,8 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter((item) => !item.isFolder).length
-  const folderCount = selectedItems.filter((item) => item.isFolder).length
+  const fileCount = selectedItems.filter(item => !item.isFolder).length
+  const folderCount = selectedItems.filter(item => item.isFolder).length
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -103,7 +122,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         const item = selectedItems[i]
 
         try {
-          setProgress((prev) => ({
+          setProgress(prev => ({
             ...prev,
             current: i + 1,
             currentFile: item.name,
@@ -135,7 +154,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
           }
 
           if (!isCancelledRef.current) {
-            await new Promise((resolve) => setTimeout(resolve, 100))
+            await new Promise(resolve => setTimeout(resolve, 100))
           }
         } catch (error: any) {
           if (abortControllerRef.current?.signal.aborted) {
@@ -149,7 +168,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
           })
         }
 
-        setProgress((prev) => ({
+        setProgress(prev => ({
           ...prev,
           success: successCount,
           failed: failedCount,
@@ -163,7 +182,9 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
 
       if (!isCancelledRef.current) {
         if (successCount > 0) {
-          successToast.generic(`Untrashed ${successCount} item${successCount > 1 ? 's' : ''} from trash`)
+          successToast.generic(
+            `Untrashed ${successCount} item${successCount > 1 ? 's' : ''} from trash`,
+          )
         }
         if (failedCount > 0) {
           errorToast.generic(`Failed to untrash ${failedCount} item${failedCount > 1 ? 's' : ''}`)
@@ -173,7 +194,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
       if (abortControllerRef.current?.signal.aborted) {
         return
       }
-      // // // console.error(err)
+      // // // // console.error(err)
       errorToast.generic('Untrash operation failed')
     } finally {
       abortControllerRef.current = null
@@ -231,12 +252,18 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
           {/* Stats */}
           <div className="flex justify-center gap-2">
             {fileCount > 0 && (
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+              <Badge
+                variant="secondary"
+                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+              >
                 {fileCount} file{fileCount > 1 ? 's' : ''}
               </Badge>
             )}
             {folderCount > 0 && (
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+              <Badge
+                variant="secondary"
+                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+              >
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
@@ -248,7 +275,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
               <h4 className="text-sm font-medium">Items to restore:</h4>
               <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
                 <ul className="space-y-1 text-sm">
-                  {selectedItems.map((item) => (
+                  {selectedItems.map(item => (
                     <li key={item.id} className="flex items-center gap-2 truncate">
                       <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                       <span className="truncate">{item.name}</span>
@@ -262,7 +289,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
               <h4 className="text-sm font-medium">Preview (first 3 items):</h4>
               <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
                 <ul className="space-y-1 text-sm">
-                  {selectedItems.slice(0, 3).map((item) => (
+                  {selectedItems.slice(0, 3).map(item => (
                     <li key={item.id} className="flex items-center gap-2 truncate">
                       <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
                       <span className="truncate">{item.name}</span>
@@ -281,7 +308,9 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
             <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-500">
               <div className="h-1.5 w-1.5 rounded-full bg-white" />
             </div>
-            <div className="text-sm text-blue-800 dark:text-blue-200">Items will be restored to their original location in Google Drive.</div>
+            <div className="text-sm text-blue-800 dark:text-blue-200">
+              Items will be restored to their original location in Google Drive.
+            </div>
           </div>
         </div>
       )
@@ -289,7 +318,8 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage =
+        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -321,7 +351,9 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
           {progress.currentFile && (
             <div className="space-y-1">
               <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">{progress.currentFile}</div>
+              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
+                {progress.currentFile}
+              </div>
             </div>
           )}
 
@@ -363,7 +395,7 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
                     ? 'bg-green-100 dark:bg-green-900/30'
                     : hasErrors
                       ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30'
+                      : 'bg-gray-100 dark:bg-gray-900/30',
               )}
             >
               {isCancelled ? (
@@ -379,7 +411,13 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
           </div>
           <div>
             <h3 className="text-base font-semibold">
-              {isCancelled ? 'Untrash Cancelled' : wasSuccessful && !hasErrors ? 'Items Untrashed' : hasErrors ? 'Partially Untrashed' : 'No Items Untrashed'}
+              {isCancelled
+                ? 'Untrash Cancelled'
+                : wasSuccessful && !hasErrors
+                  ? 'Items Untrashed'
+                  : hasErrors
+                    ? 'Partially Untrashed'
+                    : 'No Items Untrashed'}
             </h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {selectedItems.length} items processed
@@ -409,7 +447,10 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
             <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.errors.map((error, index) => (
-                <div key={`error-${error.file}-${index}`} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
+                <div
+                  key={`error-${error.file}-${index}`}
+                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
+                >
                   <div className="font-medium">{error.file}</div>
                   <div className="text-red-600 dark:text-red-400">{error.error}</div>
                 </div>
@@ -421,7 +462,9 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         {/* Refresh Notice */}
         {(progress.success > 0 || progress.failed > 0) && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">Click the button below to refresh and see your updated files.</p>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              Click the button below to refresh and see your updated files.
+            </p>
           </div>
         )}
       </div>
@@ -456,13 +499,21 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Untrash Items
                 </Button>
-                <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <Button
+                  variant="outline"
+                  onClick={handleClose}
+                  className={cn('touch-target min-h-[44px] active:scale-95')}
+                >
                   Cancel
                 </Button>
               </>
             )}
             {isProcessing && (
-              <Button onClick={handleCancel} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+              <Button
+                onClick={handleCancel}
+                variant="outline"
+                className={cn('touch-target min-h-[44px] active:scale-95')}
+              >
                 <XCircle className="mr-2 h-4 w-4" />
                 Cancel Operation
               </Button>
@@ -470,18 +521,28 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleCloseAndRefresh}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>
                 )}
                 {(progress.success > 0 || progress.failed > 0) && (
-                  <Button onClick={handleClose} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    variant="outline"
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     Close Without Refresh
                   </Button>
                 )}
@@ -513,7 +574,10 @@ function ItemsUntrashDialog({ isOpen, onClose, onConfirm, selectedItems }: Items
         <AlertDialogFooter className="flex flex-col gap-2 sm:flex-row">
           {!isProcessing && !isCompleted && (
             <>
-              <AlertDialogAction onClick={handleUntrash} className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800">
+              <AlertDialogAction
+                onClick={handleUntrash}
+                className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800"
+              >
                 <RotateCcw className="mr-2 h-4 w-4" />
                 Untrash Items
               </AlertDialogAction>

@@ -1,6 +1,6 @@
 import { drive_v3 } from 'googleapis'
 
-import { DriveFile, DriveFolder, DriveFileCapabilities } from './types'
+import { DriveFile, DriveFolder } from './types'
 
 export function formatFileSize(bytes: string | number): string {
   const size = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes
@@ -40,7 +40,12 @@ export function getSizeMultiplier(unit: 'B' | 'KB' | 'MB' | 'GB'): number {
   }
 }
 
-export function isFileSizeInRange(fileSize: any, minSize?: number, maxSize?: number, unit: 'B' | 'KB' | 'MB' | 'GB' = 'MB'): boolean {
+export function isFileSizeInRange(
+  fileSize: any,
+  minSize?: number,
+  maxSize?: number,
+  unit: 'B' | 'KB' | 'MB' | 'GB' = 'MB',
+): boolean {
   const normalizedFileSize = normalizeFileSize(fileSize)
   const multiplier = getSizeMultiplier(unit)
   const minBytes = minSize ? minSize * multiplier : 0
@@ -524,17 +529,20 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'text/plain': 'text-gray-600 dark:text-gray-400',
     'text/markdown': 'text-slate-600 dark:text-slate-400',
     'application/msword': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'text-blue-600 dark:text-blue-400',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+      'text-blue-600 dark:text-blue-400',
     'application/rtf': 'text-blue-600 dark:text-blue-400',
 
     // Spreadsheets
     'application/vnd.ms-excel': 'text-green-600 dark:text-green-400',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'text-green-600 dark:text-green-400',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+      'text-green-600 dark:text-green-400',
     'text/csv': 'text-green-600 dark:text-green-400',
 
     // Presentations
     'application/vnd.ms-powerpoint': 'text-orange-600 dark:text-orange-400',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+      'text-orange-600 dark:text-orange-400',
 
     // Images
     'image/jpeg': 'text-purple-600 dark:text-purple-400',
@@ -968,7 +976,13 @@ export function isAudioFile(mimeType: string): boolean {
 }
 
 export function isDocumentFile(mimeType: string): boolean {
-  const documentTypes = ['application/pdf', 'text/plain', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.google-apps.document']
+  const documentTypes = [
+    'application/pdf',
+    'text/plain',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.google-apps.document',
+  ]
   return documentTypes.includes(mimeType)
 }
 
@@ -992,23 +1006,24 @@ export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
     id: file.id!,
     name: file.name!,
     mimeType: file.mimeType!,
-    ...(file.size  && { size: file.size  }),
+    ...(file.size && { size: file.size }),
     createdTime: file.createdTime!,
     modifiedTime: file.modifiedTime!,
-    ...(file.webViewLink  && { webViewLink: file.webViewLink  }),
-    ...(file.webContentLink  && { webContentLink: file.webContentLink  }),
-    ...(file.thumbnailLink  && { thumbnailLink: file.thumbnailLink  }),
-    ...(file.parents  && { parents: file.parents  }),
-    owners: file.owners?.map((owner) => ({
-      displayName: owner.displayName!,
-      emailAddress: owner.emailAddress!,
-      ...(owner.photoLink && { photoLink: owner.photoLink }),
-    })) || [],
+    ...(file.webViewLink && { webViewLink: file.webViewLink }),
+    ...(file.webContentLink && { webContentLink: file.webContentLink }),
+    ...(file.thumbnailLink && { thumbnailLink: file.thumbnailLink }),
+    ...(file.parents && { parents: file.parents }),
+    owners:
+      file.owners?.map(owner => ({
+        displayName: owner.displayName!,
+        emailAddress: owner.emailAddress!,
+        ...(owner.photoLink && { photoLink: owner.photoLink }),
+      })) || [],
     shared: file.shared ?? false,
     starred: file.starred ?? false,
     trashed: file.trashed ?? false,
     ownedByMe: file.ownedByMe ?? true,
-    ...(file.viewedByMeTime  && { viewedByMeTime: file.viewedByMeTime  }),
+    ...(file.viewedByMeTime && { viewedByMeTime: file.viewedByMeTime }),
     viewedByMe: file.viewedByMe ?? false,
     capabilities: {
       canCopy: file.capabilities?.canCopy ?? false,
@@ -1035,16 +1050,17 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
     mimeType: 'application/vnd.google-apps.folder',
     createdTime: folder.createdTime!,
     modifiedTime: folder.modifiedTime!,
-    ...(folder.parents  && { parents: folder.parents  }),
+    ...(folder.parents && { parents: folder.parents }),
     shared: folder.shared ?? false,
     starred: folder.starred ?? false,
     trashed: folder.trashed ?? false,
     ownedByMe: folder.ownedByMe ?? true,
-    owners: folder.owners?.map((owner) => ({
-      displayName: owner.displayName || '',
-      emailAddress: owner.emailAddress || '',
-      ...(owner.photoLink && { photoLink: owner.photoLink }),
-    })) || [],
+    owners:
+      folder.owners?.map(owner => ({
+        displayName: owner.displayName || '',
+        emailAddress: owner.emailAddress || '',
+        ...(owner.photoLink && { photoLink: owner.photoLink }),
+      })) || [],
     capabilities: {
       canCopy: folder.capabilities?.canCopy ?? false,
       canDelete: folder.capabilities?.canDelete ?? false,
@@ -1063,7 +1079,13 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
   }
 }
 
-export function buildSearchQuery(options: { name?: string; mimeType?: string; parentId?: string; trashed?: boolean; shared?: boolean }): string {
+export function buildSearchQuery(options: {
+  name?: string
+  mimeType?: string
+  parentId?: string
+  trashed?: boolean
+  shared?: boolean
+}): string {
   const conditions: string[] = []
 
   if (options.name) {
@@ -1159,7 +1181,7 @@ export function getFileActions(
     mimeType?: string
     itemType?: 'file' | 'folder'
   },
-  _activeView: string
+  _activeView: string,
 ): {
   canCopy: boolean
   canDelete: boolean
@@ -1191,7 +1213,11 @@ export function getFileActions(
 /**
  * Format Google Drive file dates with user timezone
  */
-export const formatDriveFileDate = (dateString: string, timezone?: string, showRelative: boolean = true): string => {
+export const formatDriveFileDate = (
+  dateString: string,
+  timezone?: string,
+  showRelative: boolean = true,
+): string => {
   if (!dateString) return 'Unknown'
 
   try {
@@ -1227,7 +1253,7 @@ export const formatDriveFileDate = (dateString: string, timezone?: string, showR
  */
 export function getFileIconProps(
   mimeType: string,
-  fileName?: string
+  fileName?: string,
 ): {
   iconName: string
   colorClass: string
@@ -1299,8 +1325,15 @@ export function getFileCategory(mimeType: string): string {
   if (mimeType.includes('spreadsheet') || mimeType === 'text/csv') return 'spreadsheet'
   if (mimeType.includes('presentation')) return 'presentation'
   if (mimeType.includes('document') || mimeType.startsWith('text/')) return 'document'
-  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive')) return 'archive'
-  if (mimeType.includes('javascript') || mimeType.includes('json') || mimeType.includes('html') || mimeType.includes('css')) return 'code'
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive'))
+    return 'archive'
+  if (
+    mimeType.includes('javascript') ||
+    mimeType.includes('json') ||
+    mimeType.includes('html') ||
+    mimeType.includes('css')
+  )
+    return 'code'
   if (mimeType.includes('sql') || mimeType.includes('database')) return 'database'
   if (mimeType.includes('photoshop') || mimeType.includes('illustrator')) return 'design'
 
@@ -1321,7 +1354,7 @@ export function renderFileIcon(
     size?: 'sm' | 'md' | 'lg' | 'xl'
     className?: string
     strokeWidth?: number
-  } = {}
+  } = {},
 ): { iconName: string; colorClass: string; sizeClass: string } {
   const { iconName, colorClass } = getFileIconProps(mimeType, fileName)
 

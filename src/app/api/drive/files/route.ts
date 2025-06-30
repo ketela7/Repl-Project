@@ -45,24 +45,26 @@ function buildDriveQuery(filters: FileFilter): string {
     case 'recent':
       // Recent view - recently modified files on 30 days ago
       //conditions.push('trashed=false')
-      conditions.push(`modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`)
-      //break
+      conditions.push(
+        `modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`,
+      )
+    //break
     //case 'all':
     //default:
-      // All files view - show non-trashed files by default
-      //conditions.push('trashed=false')
-      //break
+    // All files view - show non-trashed files by default
+    //conditions.push('trashed=false')
+    //break
   }
 
   // File type filters - handle both single and multiple types
   if (filters.fileType && filters.fileType !== 'all') {
     // Handle comma-separated file types from frontend
-    const fileTypes = filters.fileType.split(',').filter((type) => type && type !== 'all')
+    const fileTypes = filters.fileType.split(',').filter(type => type && type !== 'all')
 
     if (fileTypes.length > 0) {
       const typeConditions: string[] = []
 
-      fileTypes.forEach((type) => {
+      fileTypes.forEach(type => {
         switch (type.trim()) {
           case 'folder':
             typeConditions.push("mimeType = 'application/vnd.google-apps.folder'")
@@ -82,7 +84,7 @@ function buildDriveQuery(filters: FileFilter): string {
                   "mimeType = 'application/msword'",
                   "mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'",
                 ].join(' or ') +
-                ')'
+                ')',
             )
             break
 
@@ -94,7 +96,7 @@ function buildDriveQuery(filters: FileFilter): string {
                   "mimeType = 'application/vnd.ms-excel'",
                   "mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'",
                 ].join(' or ') +
-                ')'
+                ')',
             )
             break
 
@@ -106,7 +108,7 @@ function buildDriveQuery(filters: FileFilter): string {
                   "mimeType = 'application/vnd.ms-powerpoint'",
                   "mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'",
                 ].join(' or ') +
-                ')'
+                ')',
             )
             break
 
@@ -136,7 +138,7 @@ function buildDriveQuery(filters: FileFilter): string {
                   "mimeType = 'application/x-bzip2'",
                   "mimeType = 'application/x-xz'",
                 ].join(' or ') +
-                ')'
+                ')',
             )
             break
 
@@ -157,7 +159,7 @@ function buildDriveQuery(filters: FileFilter): string {
                   "mimeType contains 'text/x-'",
                   "mimeType contains 'application/x-'",
                 ].join(' or ') +
-                ')'
+                ')',
             )
             break
 
@@ -198,41 +200,83 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'text':
-            typeConditions.push('(' + ["mimeType = 'text/plain'", "mimeType = 'text/markdown'", "mimeType = 'text/csv'", "mimeType = 'text/tab-separated-values'"].join(' or ') + ')')
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'text/plain'",
+                  "mimeType = 'text/markdown'",
+                  "mimeType = 'text/csv'",
+                  "mimeType = 'text/tab-separated-values'",
+                ].join(' or ') +
+                ')',
+            )
             break
 
           case 'design':
             typeConditions.push(
-              '(' + ["mimeType = 'application/vnd.google-apps.drawing'", "mimeType = 'image/svg+xml'", "mimeType = 'application/postscript'", "mimeType = 'application/illustrator'"].join(' or ') + ')'
+              '(' +
+                [
+                  "mimeType = 'application/vnd.google-apps.drawing'",
+                  "mimeType = 'image/svg+xml'",
+                  "mimeType = 'application/postscript'",
+                  "mimeType = 'application/illustrator'",
+                ].join(' or ') +
+                ')',
             )
             break
 
           case 'database':
             typeConditions.push(
-              '(' + ["mimeType = 'application/x-sqlite3'", "mimeType = 'application/vnd.ms-access'", "mimeType = 'application/x-dbf'", "mimeType contains 'database'"].join(' or ') + ')'
+              '(' +
+                [
+                  "mimeType = 'application/x-sqlite3'",
+                  "mimeType = 'application/vnd.ms-access'",
+                  "mimeType = 'application/x-dbf'",
+                  "mimeType contains 'database'",
+                ].join(' or ') +
+                ')',
             )
             break
 
           case 'ebook':
             typeConditions.push(
               '(' +
-                ["mimeType = 'application/epub+zip'", "mimeType = 'application/x-mobipocket-ebook'", "mimeType = 'application/vnd.amazon.ebook'", "mimeType = 'application/x-fictionbook+xml'"].join(
-                  ' or '
-                ) +
-                ')'
+                [
+                  "mimeType = 'application/epub+zip'",
+                  "mimeType = 'application/x-mobipocket-ebook'",
+                  "mimeType = 'application/vnd.amazon.ebook'",
+                  "mimeType = 'application/x-fictionbook+xml'",
+                ].join(' or ') +
+                ')',
             )
             break
 
           case 'font':
-            typeConditions.push('(' + ["mimeType = 'font/ttf'", "mimeType = 'font/otf'", "mimeType = 'font/woff'", "mimeType = 'font/woff2'", "mimeType = 'application/font-woff'"].join(' or ') + ')')
+            typeConditions.push(
+              '(' +
+                [
+                  "mimeType = 'font/ttf'",
+                  "mimeType = 'font/otf'",
+                  "mimeType = 'font/woff'",
+                  "mimeType = 'font/woff2'",
+                  "mimeType = 'application/font-woff'",
+                ].join(' or ') +
+                ')',
+            )
             break
 
           case 'calendar':
-            typeConditions.push('(' + ["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ') + ')')
+            typeConditions.push(
+              '(' +
+                ["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ') +
+                ')',
+            )
             break
 
           case 'contact':
-            typeConditions.push('(' + ["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ') + ')')
+            typeConditions.push(
+              '(' + ["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ') + ')',
+            )
             break
 
           case 'other':
@@ -248,7 +292,7 @@ function buildDriveQuery(filters: FileFilter): string {
                   "not mimeType contains 'zip'",
                   "not mimeType contains 'archive'",
                 ].join(' and ') +
-                ')'
+                ')',
             )
             break
         }
@@ -326,23 +370,28 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const fileId = searchParams.get('fileId')
-    
+
     // If fileId is provided, return single file metadata (used by breadcrumb)
     if (fileId) {
-      const fileMetadata = await driveService.getFileMetadata(fileId, ['id', 'name', 'parents', 'mimeType'])
-      
+      const fileMetadata = await driveService.getFileMetadata(fileId, [
+        'id',
+        'name',
+        'parents',
+        'mimeType',
+      ])
+
       // Ensure id is always included in response
       const response = {
         ...fileMetadata,
         id: fileMetadata.id || fileId, // Fallback to requested fileId if id is missing
       }
-      
-      // // // console.log('[Drive API] Single file response:', response)
-      // // // console.log('[Drive API] File ID check:', { requestedId: fileId, responseId: response.id })
-      
+
+      // // // // console.log('[Drive API] Single file response:', response)
+      // // // // console.log('[Drive API] File ID check:', { requestedId: fileId, responseId: response.id })
+
       return NextResponse.json(response)
     }
-    
+
     // Otherwise, list folder contents
     const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
     const pageToken = searchParams.get('pageToken') || undefined
@@ -352,23 +401,29 @@ export async function GET(request: NextRequest) {
     const filters: FileFilter = {
       fileType: searchParams.get('fileType') || 'all',
       viewStatus: searchParams.get('viewStatus') || 'all',
-      ...(searchParams.get('sortBy')  && { sortBy: searchParams.get('sortBy')  }),
+      ...(searchParams.get('sortBy') && { sortBy: searchParams.get('sortBy') }),
       sortOrder: searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc',
-      ...(searchParams.get('search')  && { search: searchParams.get('search')  }),
-      ...(searchParams.get('createdAfter')  && { createdAfter: searchParams.get('createdAfter')  }),
-      ...(searchParams.get('createdBefore')  && { createdBefore: searchParams.get('createdBefore')  }),
-      ...(searchParams.get('modifiedAfter')  && { modifiedAfter: searchParams.get('modifiedAfter')  }),
-      ...(searchParams.get('modifiedBefore')  && { modifiedBefore: searchParams.get('modifiedBefore')  }),
-      ...(searchParams.get('owner')  && { owner: searchParams.get('owner')  }),
-      ...(searchParams.get('sizeMin')  && { sizeMin: searchParams.get('sizeMin')  }),
-      ...(searchParams.get('sizeMax')  && { sizeMax: searchParams.get('sizeMax')  }),
+      ...(searchParams.get('search') && { search: searchParams.get('search') }),
+      ...(searchParams.get('createdAfter') && { createdAfter: searchParams.get('createdAfter') }),
+      ...(searchParams.get('createdBefore') && {
+        createdBefore: searchParams.get('createdBefore'),
+      }),
+      ...(searchParams.get('modifiedAfter') && {
+        modifiedAfter: searchParams.get('modifiedAfter'),
+      }),
+      ...(searchParams.get('modifiedBefore') && {
+        modifiedBefore: searchParams.get('modifiedBefore'),
+      }),
+      ...(searchParams.get('owner') && { owner: searchParams.get('owner') }),
+      ...(searchParams.get('sizeMin') && { sizeMin: searchParams.get('sizeMin') }),
+      ...(searchParams.get('sizeMax') && { sizeMax: searchParams.get('sizeMax') }),
     }
 
     const baseQuery = buildDriveQuery(filters)
-    
+
     // Build query with parent constraints
     let query = baseQuery
-    
+
     // Handle different view types with proper parent constraints
     if (folderIdParam) {
       // When navigating to specific folder, always apply parent constraint
@@ -383,8 +438,8 @@ export async function GET(request: NextRequest) {
       // These views search across entire Drive without parent constraints
       // They already have their specific filters from buildDriveQuery
       // No parent constraint needed - search globally
-    } 
-    
+    }
+
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
 
@@ -404,7 +459,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    // // // console.log('[Drive API] Request details:', {
+    // // // // console.log('[Drive API] Request details:', {
     //   folderId,
     //   viewStatus: filters.viewStatus,
     //   query,
@@ -433,7 +488,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result)
   } catch (error: any) {
-    //// // // console.error('Drive API Error:', error)
+    //// // // // console.error('Drive API Error:', error)
 
     // Handle authentication errors
     if (error.name === 'AuthenticationError' || error.code === 401) {
@@ -443,7 +498,7 @@ export async function GET(request: NextRequest) {
           needsReauth: true,
           redirect: '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive',
         },
-        { status: 401 }
+        { status: 401 },
       )
     }
 
@@ -455,7 +510,7 @@ export async function GET(request: NextRequest) {
           needsReauth: true,
           redirect: '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive',
         },
-        { status: 403 }
+        { status: 403 },
       )
     }
 

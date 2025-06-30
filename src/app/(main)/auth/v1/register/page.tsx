@@ -12,7 +12,10 @@ export default function RegisterV1() {
         <div className="w-full max-w-md space-y-10 py-24 lg:py-32">
           <div className="space-y-4 text-center">
             <div className="text-foreground font-medium tracking-tight">Register</div>
-            <div className="text-muted-foreground mx-auto max-w-xl">Fill in your details below. We promise not to quiz you about your first pet&apos;s name (this time).</div>
+            <div className="text-muted-foreground mx-auto max-w-xl">
+              Fill in your details below. We promise not to quiz you about your first pet&apos;s
+              name (this time).
+            </div>
           </div>
           <div className="space-y-4">
             <RegisterFormV1 />

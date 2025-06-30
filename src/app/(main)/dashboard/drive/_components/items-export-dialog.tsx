@@ -1,17 +1,40 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { FileDown, AlertTriangle, FileText, FileSpreadsheet, Presentation, Image, Loader2, CheckCircle, XCircle, SkipForward } from 'lucide-react'
+import {
+  FileDown,
+  AlertTriangle,
+  FileText,
+  FileSpreadsheet,
+  Presentation,
+  Image,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  SkipForward,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
 import { cn } from '@/lib/utils'
 // Simple error handling without complex recovery
 
@@ -33,7 +56,11 @@ const EXPORT_FORMATS = [
     label: 'PDF Document',
     icon: FileText,
     description: 'For Docs, Sheets, and Slides',
-    supportedTypes: ['application/vnd.google-apps.document', 'application/vnd.google-apps.spreadsheet', 'application/vnd.google-apps.presentation'],
+    supportedTypes: [
+      'application/vnd.google-apps.document',
+      'application/vnd.google-apps.spreadsheet',
+      'application/vnd.google-apps.presentation',
+    ],
   },
   {
     id: 'docx',
@@ -116,17 +143,31 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
   // Filter exportable files (Google Workspace files only)
   const exportableFiles = selectedItems.filter(
-    (item) => !item.isFolder && item.mimeType && item.mimeType.startsWith('application/vnd.google-apps.') && !item.mimeType.includes('folder') && !item.mimeType.includes('shortcut')
+    item =>
+      !item.isFolder &&
+      item.mimeType &&
+      item.mimeType.startsWith('application/vnd.google-apps.') &&
+      !item.mimeType.includes('folder') &&
+      !item.mimeType.includes('shortcut'),
   )
 
   const nonExportableFiles = selectedItems.filter(
-    (item) => item.isFolder || !item.mimeType || !item.mimeType.startsWith('application/vnd.google-apps.') || item.mimeType.includes('folder') || item.mimeType.includes('shortcut')
+    item =>
+      item.isFolder ||
+      !item.mimeType ||
+      !item.mimeType.startsWith('application/vnd.google-apps.') ||
+      item.mimeType.includes('folder') ||
+      item.mimeType.includes('shortcut'),
   )
 
   // Get compatible files for selected format
-  const selectedFormatData = EXPORT_FORMATS.find((f) => f.id === selectedFormat)
-  const compatibleFiles = exportableFiles.filter((file) => selectedFormatData?.supportedTypes.includes(file.mimeType || ''))
-  const incompatibleFiles = exportableFiles.filter((file) => !selectedFormatData?.supportedTypes.includes(file.mimeType || ''))
+  const selectedFormatData = EXPORT_FORMATS.find(f => f.id === selectedFormat)
+  const compatibleFiles = exportableFiles.filter(file =>
+    selectedFormatData?.supportedTypes.includes(file.mimeType || ''),
+  )
+  const incompatibleFiles = exportableFiles.filter(
+    file => !selectedFormatData?.supportedTypes.includes(file.mimeType || ''),
+  )
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -170,7 +211,12 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       let successCount = 0
       let failedCount = 0
       const errors: Array<{ file: string; error: string }> = []
-      const results: Array<{ fileName: string; success: boolean; downloadUrl?: string; error?: string }> = []
+      const results: Array<{
+        fileName: string
+        success: boolean
+        downloadUrl?: string
+        error?: string
+      }> = []
 
       for (let i = 0; i < compatibleFiles.length; i++) {
         if (isCancelledRef.current) {
@@ -181,7 +227,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
         const file = compatibleFiles[i]
 
         try {
-          setProgress((prev) => ({
+          setProgress(prev => ({
             ...prev,
             current: i + 1,
             currentFile: file.name,
@@ -229,7 +275,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           }
 
           if (!isCancelledRef.current) {
-            await new Promise((resolve) => setTimeout(resolve, 100))
+            await new Promise(resolve => setTimeout(resolve, 100))
           }
         } catch (error: any) {
           if (abortControllerRef.current?.signal.aborted) {
@@ -248,7 +294,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           })
         }
 
-        setProgress((prev) => ({
+        setProgress(prev => ({
           ...prev,
           success: successCount,
           failed: failedCount,
@@ -273,7 +319,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       if (abortControllerRef.current?.signal.aborted) {
         return
       }
-      // // // console.error(err)
+      // // // // console.error(err)
       toast.error('Export operation failed')
     } finally {
       abortControllerRef.current = null
@@ -329,7 +375,8 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             <div className="space-y-1">
               <h3 className="text-base font-semibold">Export Files</h3>
               <p className="text-muted-foreground text-xs">
-                {compatibleFiles.length} compatible file{compatibleFiles.length > 1 ? 's' : ''} for export
+                {compatibleFiles.length} compatible file{compatibleFiles.length > 1 ? 's' : ''} for
+                export
               </p>
             </div>
           </div>
@@ -337,11 +384,18 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           {/* Export Format Selection */}
           <div className="flex-shrink-0 space-y-3">
             <Label className="text-xs font-medium">Export Format:</Label>
-            <RadioGroup value={selectedFormat} onValueChange={setSelectedFormat} className="space-y-2">
-              {EXPORT_FORMATS.map((format) => (
+            <RadioGroup
+              value={selectedFormat}
+              onValueChange={setSelectedFormat}
+              className="space-y-2"
+            >
+              {EXPORT_FORMATS.map(format => (
                 <div key={format.id} className="flex items-center space-x-2">
                   <RadioGroupItem value={format.id} id={format.id} className="h-3 w-3" />
-                  <Label htmlFor={format.id} className="flex cursor-pointer items-center gap-2 text-xs">
+                  <Label
+                    htmlFor={format.id}
+                    className="flex cursor-pointer items-center gap-2 text-xs"
+                  >
                     <format.icon className="h-3 w-3" />
                     <span>{format.label}</span>
                   </Label>
@@ -355,15 +409,22 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             <h4 className="text-center text-xs font-medium">Compatible files:</h4>
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
-                {compatibleFiles.slice(0, 5).map((file) => (
-                  <div key={file.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                {compatibleFiles.slice(0, 5).map(file => (
+                  <div
+                    key={file.id}
+                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                  >
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={file.name}>
                       {file.name}
                     </span>
                   </div>
                 ))}
-                {compatibleFiles.length > 5 && <div className="text-muted-foreground py-1 text-center text-xs">... and {compatibleFiles.length - 5} more files</div>}
+                {compatibleFiles.length > 5 && (
+                  <div className="text-muted-foreground py-1 text-center text-xs">
+                    ... and {compatibleFiles.length - 5} more files
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -371,8 +432,12 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           {/* Warnings */}
           {incompatibleFiles.length > 0 && (
             <div className="flex-shrink-0 text-center">
-              <Badge variant="secondary" className="bg-orange-100 text-xs text-orange-800 dark:bg-orange-900 dark:text-orange-100">
-                {incompatibleFiles.length} incompatible file{incompatibleFiles.length > 1 ? 's' : ''} will be skipped
+              <Badge
+                variant="secondary"
+                className="bg-orange-100 text-xs text-orange-800 dark:bg-orange-900 dark:text-orange-100"
+              >
+                {incompatibleFiles.length} incompatible file
+                {incompatibleFiles.length > 1 ? 's' : ''} will be skipped
               </Badge>
             </div>
           )}
@@ -382,7 +447,8 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage =
+        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -414,7 +480,9 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           {progress.currentFile && (
             <div className="space-y-1">
               <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">{progress.currentFile}</div>
+              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
+                {progress.currentFile}
+              </div>
             </div>
           )}
 
@@ -456,7 +524,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
                     ? 'bg-green-100 dark:bg-green-900/30'
                     : hasErrors
                       ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30'
+                      : 'bg-gray-100 dark:bg-gray-900/30',
               )}
             >
               {isCancelled ? (
@@ -471,7 +539,15 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             </div>
           </div>
           <div>
-            <h3 className="text-base font-semibold">{isCancelled ? 'Export Cancelled' : wasSuccessful && !hasErrors ? 'Files Exported' : hasErrors ? 'Partially Exported' : 'No Files Exported'}</h3>
+            <h3 className="text-base font-semibold">
+              {isCancelled
+                ? 'Export Cancelled'
+                : wasSuccessful && !hasErrors
+                  ? 'Files Exported'
+                  : hasErrors
+                    ? 'Partially Exported'
+                    : 'No Files Exported'}
+            </h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {compatibleFiles.length} files processed
             </p>
@@ -500,7 +576,10 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
             <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.errors.map((error, index) => (
-                <div key={`error-${error.file}-${index}`} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
+                <div
+                  key={`error-${error.file}-${index}`}
+                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
+                >
                   <div className="font-medium">{error.file}</div>
                   <div className="text-red-600 dark:text-red-400">{error.error}</div>
                 </div>
@@ -512,7 +591,9 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
         {/* Refresh Notice */}
         {(progress.success > 0 || progress.failed > 0) && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">Click the button below to refresh and see your updated files.</p>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              Click the button below to refresh and see your updated files.
+            </p>
           </div>
         )}
       </div>
@@ -530,7 +611,9 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
               </div>
               <div>
                 <div className="text-lg font-semibold">Export Files</div>
-                <div className="text-muted-foreground text-sm font-normal">Convert and download Google Workspace files</div>
+                <div className="text-muted-foreground text-sm font-normal">
+                  Convert and download Google Workspace files
+                </div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -540,17 +623,31 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           <BottomSheetFooter className={cn('grid gap-4')}>
             {!isProcessing && !isCompleted && (
               <>
-                <Button onClick={handleExport} disabled={compatibleFiles.length === 0} className={cn('touch-target min-h-[44px] bg-green-600 text-white hover:bg-green-700 active:scale-95')}>
+                <Button
+                  onClick={handleExport}
+                  disabled={compatibleFiles.length === 0}
+                  className={cn(
+                    'touch-target min-h-[44px] bg-green-600 text-white hover:bg-green-700 active:scale-95',
+                  )}
+                >
                   <FileDown className="mr-2 h-4 w-4" />
                   Export Files
                 </Button>
-                <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <Button
+                  variant="outline"
+                  onClick={handleClose}
+                  className={cn('touch-target min-h-[44px] active:scale-95')}
+                >
                   Cancel
                 </Button>
               </>
             )}
             {isProcessing && (
-              <Button onClick={handleCancel} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+              <Button
+                onClick={handleCancel}
+                variant="outline"
+                className={cn('touch-target min-h-[44px] active:scale-95')}
+              >
                 <XCircle className="mr-2 h-4 w-4" />
                 Cancel Export
               </Button>
@@ -558,18 +655,28 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleCloseAndRefresh}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>
                 )}
                 {(progress.success > 0 || progress.failed > 0) && (
-                  <Button onClick={handleClose} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    variant="outline"
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     Close Without Refresh
                   </Button>
                 )}
@@ -591,7 +698,9 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             </div>
             <div>
               <div className="text-lg font-semibold">Export Files</div>
-              <div className="text-muted-foreground text-sm font-normal">Convert and download Google Workspace files</div>
+              <div className="text-muted-foreground text-sm font-normal">
+                Convert and download Google Workspace files
+              </div>
             </div>
           </DialogTitle>
         </DialogHeader>

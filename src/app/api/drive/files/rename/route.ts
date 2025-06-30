@@ -8,9 +8,18 @@ import { driveCache } from '@/lib/cache'
 /**
  * Rename pattern generators following Download Operations pattern
  */
-function generateRenamedFileName(originalName: string, pattern: string, renameType: string, index?: number): string {
-  const extension = originalName.includes('.') ? originalName.substring(originalName.lastIndexOf('.')) : ''
-  const nameWithoutExt = extension ? originalName.substring(0, originalName.lastIndexOf('.')) : originalName
+function generateRenamedFileName(
+  originalName: string,
+  pattern: string,
+  renameType: string,
+  index?: number,
+): string {
+  const extension = originalName.includes('.')
+    ? originalName.substring(originalName.lastIndexOf('.'))
+    : ''
+  const nameWithoutExt = extension
+    ? originalName.substring(0, originalName.lastIndexOf('.'))
+    : originalName
 
   switch (renameType) {
     case 'prefix':
@@ -21,12 +30,16 @@ function generateRenamedFileName(originalName: string, pattern: string, renameTy
 
     case 'numbering':
       const basePattern = pattern || 'File'
-      return extension ? `${basePattern} (${index || 1})${extension}` : `${basePattern} (${index || 1})`
+      return extension
+        ? `${basePattern} (${index || 1})${extension}`
+        : `${basePattern} (${index || 1})`
 
     case 'timestamp':
       const now = new Date()
       const timestamp = now.toISOString().slice(0, 19).replace(/[T:]/g, '_').replace(/-/g, '')
-      return extension ? `${nameWithoutExt}_${timestamp}${extension}` : `${originalName}_${timestamp}`
+      return extension
+        ? `${nameWithoutExt}_${timestamp}${extension}`
+        : `${originalName}_${timestamp}`
 
     case 'replace':
       if (!pattern.includes('|')) return originalName
@@ -69,10 +82,11 @@ export async function POST(request: NextRequest) {
     // Handle both single and bulk operations
     const { fileId, namePrefix, newName, items, renameType = 'prefix' } = body
 
-    // // // console.log(`[Rename Debug] Request body:`, JSON.stringify({ fileId, namePrefix, newName, items: items?.length, renameType }))
+    // // // // console.log(`[Rename Debug] Request body:`, JSON.stringify({ fileId, namePrefix, newName, items: items?.length, renameType }))
 
     // Determine operation type based on items array or single fileId
-    const fileIds = items && items.length > 0 ? items.map((item: any) => item.id || item.fileId) : [fileId]
+    const fileIds =
+      items && items.length > 0 ? items.map((item: any) => item.id || item.fileId) : [fileId]
     const isBulkOperation = items && items.length > 1
 
     if (!fileIds || fileIds.length === 0) {
@@ -114,7 +128,7 @@ export async function POST(request: NextRequest) {
           continue
         }
 
-        // // // console.log(`[Rename API] Processing file ${id} with name "${finalName}"`)
+        // // // // console.log(`[Rename API] Processing file ${id} with name "${finalName}"`)
 
         // Use throttling and retry like Download Operations
         const result = await throttledDriveRequest(async () => {
@@ -123,7 +137,7 @@ export async function POST(request: NextRequest) {
           }, `Rename file ${id}`)
         })
 
-        // // // console.log(`[Rename API] Success for file ${id}:`, result)
+        // // // // console.log(`[Rename API] Success for file ${id}:`, result)
 
         results.push({
           fileId: id,
@@ -191,7 +205,7 @@ export async function POST(request: NextRequest) {
       driveCache.clearUserCache(userId)
       driveCache.clearFolderCache(userId, 'root')
 
-      // // // console.log(`[Rename Cache] Cleared cache for ${results.length} renamed files`)
+      // // // // console.log(`[Rename Cache] Cleared cache for ${results.length} renamed files`)
     }
 
     const response = {

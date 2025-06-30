@@ -1,16 +1,55 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Share2, Globe, Users, Eye, Edit, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward, Copy, Download, ChevronDown, FileText, Code } from 'lucide-react'
+import {
+  Share2,
+  Globe,
+  Users,
+  Eye,
+  Edit,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  SkipForward,
+  Copy,
+  Download,
+  ChevronDown,
+  FileText,
+  Code,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
+  BottomSheet,
+  BottomSheetContent,
+  BottomSheetHeader,
+  BottomSheetTitle,
+  BottomSheetFooter,
+} from '@/components/ui/bottom-sheet'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -36,7 +75,9 @@ interface ShareResult {
 
 function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsShareDialogProps) {
   const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
-  const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>('anyoneWithLink')
+  const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>(
+    'anyoneWithLink',
+  )
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
@@ -63,8 +104,8 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter((item) => !item.isFolder).length
-  const folderCount = selectedItems.filter((item) => item.isFolder).length
+  const fileCount = selectedItems.filter(item => !item.isFolder).length
+  const folderCount = selectedItems.filter(item => item.isFolder).length
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -118,7 +159,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
         const item = selectedItems[i]
 
         try {
-          setProgress((prev) => ({
+          setProgress(prev => ({
             ...prev,
             current: i + 1,
             currentFile: item.name,
@@ -158,7 +199,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           }
 
           if (!isCancelledRef.current) {
-            await new Promise((resolve) => setTimeout(resolve, 100))
+            await new Promise(resolve => setTimeout(resolve, 100))
           }
         } catch (error: any) {
           if (abortControllerRef.current?.signal.aborted) {
@@ -178,7 +219,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           })
         }
 
-        setProgress((prev) => ({
+        setProgress(prev => ({
           ...prev,
           current: i + 1,
           success: successCount,
@@ -205,7 +246,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
       if (abortControllerRef.current?.signal.aborted) {
         return
       }
-      // // // console.error(err)
+      // // // // console.error(err)
       toast.error('Share operation failed')
     } finally {
       abortControllerRef.current = null
@@ -241,7 +282,9 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
   }
 
   const handleExportData = (format: 'csv' | 'txt' | 'json') => {
-    const successfulShares = progress.shareResults.filter((result) => result.success && result.shareLink)
+    const successfulShares = progress.shareResults.filter(
+      result => result.success && result.shareLink,
+    )
 
     if (successfulShares.length === 0) {
       toast.error('No successful shares to export')
@@ -256,7 +299,9 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
       case 'csv':
         // Create CSV content with header
         const csvHeader = 'name,sharelink\n'
-        const csvContent = successfulShares.map((result) => `"${result.name}","${result.shareLink}"`).join('\n')
+        const csvContent = successfulShares
+          .map(result => `"${result.name}","${result.shareLink}"`)
+          .join('\n')
         content = csvHeader + csvContent
         mimeType = 'text/csv;charset=utf-8;'
         fileExtension = 'csv'
@@ -264,7 +309,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
       case 'txt':
         // Create plain text content
-        content = successfulShares.map((result) => `${result.name}: ${result.shareLink}`).join('\n')
+        content = successfulShares.map(result => `${result.name}: ${result.shareLink}`).join('\n')
         mimeType = 'text/plain;charset=utf-8;'
         fileExtension = 'txt'
         break
@@ -274,7 +319,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
         const jsonData = {
           exportDate: new Date().toISOString(),
           totalShares: successfulShares.length,
-          shares: successfulShares.map((result) => ({
+          shares: successfulShares.map(result => ({
             name: result.name,
             shareLink: result.shareLink,
             fileId: result.id,
@@ -294,7 +339,10 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute('download', `share-links-${new Date().toISOString().split('T')[0]}.${fileExtension}`)
+    link.setAttribute(
+      'download',
+      `share-links-${new Date().toISOString().split('T')[0]}.${fileExtension}`,
+    )
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -327,12 +375,18 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           {/* Stats - Compact */}
           <div className="flex flex-shrink-0 justify-center gap-1">
             {fileCount > 0 && (
-              <Badge variant="secondary" className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+              <Badge
+                variant="secondary"
+                className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100"
+              >
                 {fileCount} file{fileCount > 1 ? 's' : ''}
               </Badge>
             )}
             {folderCount > 0 && (
-              <Badge variant="secondary" className="bg-green-100 text-xs text-green-800 dark:bg-green-900 dark:text-green-100">
+              <Badge
+                variant="secondary"
+                className="bg-green-100 text-xs text-green-800 dark:bg-green-900 dark:text-green-100"
+              >
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
@@ -342,7 +396,10 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           <div className="flex-shrink-0 space-y-3">
             <div className="space-y-2">
               <Label className="text-xs font-medium">Permission Level:</Label>
-              <Select value={accessLevel} onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}>
+              <Select
+                value={accessLevel}
+                onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}
+              >
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
                 </SelectTrigger>
@@ -371,7 +428,12 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
             <div className="space-y-2">
               <Label className="text-xs font-medium">Link Access:</Label>
-              <Select value={linkAccess} onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') => setLinkAccess(value)}>
+              <Select
+                value={linkAccess}
+                onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
+                  setLinkAccess(value)
+                }
+              >
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
                 </SelectTrigger>
@@ -404,8 +466,11 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             <h4 className="text-center text-xs font-medium">Items to share:</h4>
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
-                {selectedItems.slice(0, 5).map((item) => (
-                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                {selectedItems.slice(0, 5).map(item => (
+                  <div
+                    key={item.id}
+                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                  >
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={item.name}>
                       {item.name}
@@ -415,7 +480,11 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                     </Badge>
                   </div>
                 ))}
-                {selectedItems.length > 5 && <div className="text-muted-foreground py-1 text-center text-xs">... and {selectedItems.length - 5} more items</div>}
+                {selectedItems.length > 5 && (
+                  <div className="text-muted-foreground py-1 text-center text-xs">
+                    ... and {selectedItems.length - 5} more items
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -425,7 +494,8 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage =
+        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -457,7 +527,9 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           {progress.currentFile && (
             <div className="space-y-1">
               <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">{progress.currentFile}</div>
+              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
+                {progress.currentFile}
+              </div>
             </div>
           )}
 
@@ -499,7 +571,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                     ? 'bg-green-100 dark:bg-green-900/30'
                     : hasErrors
                       ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30'
+                      : 'bg-gray-100 dark:bg-gray-900/30',
               )}
             >
               {isCancelled ? (
@@ -514,7 +586,15 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             </div>
           </div>
           <div>
-            <h3 className="text-base font-semibold">{isCancelled ? 'Share Cancelled' : wasSuccessful && !hasErrors ? 'Items Shared' : hasErrors ? 'Partially Shared' : 'No Items Shared'}</h3>
+            <h3 className="text-base font-semibold">
+              {isCancelled
+                ? 'Share Cancelled'
+                : wasSuccessful && !hasErrors
+                  ? 'Items Shared'
+                  : hasErrors
+                    ? 'Partially Shared'
+                    : 'No Items Shared'}
+            </h3>
             <p className="text-muted-foreground text-sm">
               {totalProcessed} of {selectedItems.length} items processed
             </p>
@@ -547,16 +627,28 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                   key={`share-result-${result.name}-${index}`}
                   className={cn(
                     'rounded border p-2 text-xs',
-                    result.success ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+                    result.success
+                      ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
+                      : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20',
                   )}
                 >
                   <div className="font-medium">{result.name}</div>
                   {result.success && result.shareLink ? (
                     <div className="mt-1 flex items-center gap-1">
-                      <a href={result.shareLink} target="_blank" rel="noopener noreferrer" className="flex-1 truncate text-xs text-blue-600 hover:underline dark:text-blue-400">
+                      <a
+                        href={result.shareLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 truncate text-xs text-blue-600 hover:underline dark:text-blue-400"
+                      >
                         {result.shareLink}
                       </a>
-                      <Button size="sm" variant="ghost" className="h-4 w-4 p-0" onClick={() => navigator.clipboard.writeText(result.shareLink || '')}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-4 w-4 p-0"
+                        onClick={() => navigator.clipboard.writeText(result.shareLink || '')}
+                      >
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
@@ -575,7 +667,10 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
             <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.errors.map((error, index) => (
-                <div key={`error-${error.file}-${index}`} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
+                <div
+                  key={`error-${error.file}-${index}`}
+                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
+                >
                   <div className="font-medium">{error.file}</div>
                   <div className="text-red-600 dark:text-red-400">{error.error}</div>
                 </div>
@@ -587,7 +682,9 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
         {/* Refresh Notice */}
         {(progress.success > 0 || progress.failed > 0) && (
           <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">Click the button below to refresh and see your updated files.</p>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              Click the button below to refresh and see your updated files.
+            </p>
           </div>
         )}
       </div>
@@ -615,17 +712,30 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           <BottomSheetFooter className={cn('grid gap-4')}>
             {!isProcessing && !isCompleted && (
               <>
-                <Button onClick={handleShare} className={cn('touch-target min-h-[44px] bg-blue-600 text-white hover:bg-blue-700 active:scale-95')}>
+                <Button
+                  onClick={handleShare}
+                  className={cn(
+                    'touch-target min-h-[44px] bg-blue-600 text-white hover:bg-blue-700 active:scale-95',
+                  )}
+                >
                   <Share2 className="mr-2 h-4 w-4" />
                   Share Items
                 </Button>
-                <Button variant="outline" onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                <Button
+                  variant="outline"
+                  onClick={handleClose}
+                  className={cn('touch-target min-h-[44px] active:scale-95')}
+                >
                   Cancel
                 </Button>
               </>
             )}
             {isProcessing && (
-              <Button onClick={handleCancel} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+              <Button
+                onClick={handleCancel}
+                variant="outline"
+                className={cn('touch-target min-h-[44px] active:scale-95')}
+              >
                 <XCircle className="mr-2 h-4 w-4" />
                 Cancel Operation
               </Button>
@@ -633,12 +743,18 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleCloseAndRefresh}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>
@@ -646,7 +762,10 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                 {progress.success > 0 && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                      <Button
+                        variant="outline"
+                        className={cn('touch-target min-h-[44px] active:scale-95')}
+                      >
                         <Download className="mr-2 h-4 w-4" />
                         Export
                         <ChevronDown className="ml-2 h-4 w-4" />
@@ -669,7 +788,11 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                   </DropdownMenu>
                 )}
                 {(progress.success > 0 || progress.failed > 0) && (
-                  <Button onClick={handleClose} variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    variant="outline"
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     Close Without Refresh
                   </Button>
                 )}
@@ -701,7 +824,10 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
         <DialogFooter className="flex flex-col gap-2 sm:flex-row">
           {!isProcessing && !isCompleted && (
             <>
-              <Button onClick={handleShare} className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800">
+              <Button
+                onClick={handleShare}
+                className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
+              >
                 <Share2 className="mr-2 h-4 w-4" />
                 Share Items
               </Button>

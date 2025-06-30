@@ -45,10 +45,17 @@ export async function copyToClipboard(text: string, label?: string): Promise<boo
 /**
  * Copy file URL or share link to clipboard
  */
-export async function copyFileLink(fileId: string, fileName: string, linkType: 'view' | 'download' = 'view'): Promise<boolean> {
+export async function copyFileLink(
+  fileId: string,
+  fileName: string,
+  linkType: 'view' | 'download' = 'view',
+): Promise<boolean> {
   try {
     const baseUrl = window.location.origin
-    const link = linkType === 'download' ? `${baseUrl}/api/drive/download/${fileId}` : `https://drive.google.com/file/d/${fileId}/view`
+    const link =
+      linkType === 'download'
+        ? `${baseUrl}/api/drive/download/${fileId}`
+        : `https://drive.google.com/file/d/${fileId}/view`
 
     const success = await copyToClipboard(link, `${fileName} link`)
     if (success) {

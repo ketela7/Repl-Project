@@ -46,7 +46,13 @@ interface FileIconProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
-export function FileIcon({ mimeType, fileName, className, strokeWidth = 2, size = 'md' }: FileIconProps) {
+export function FileIcon({
+  mimeType,
+  fileName,
+  className,
+  strokeWidth = 2,
+  size = 'md',
+}: FileIconProps) {
   const { iconName, colorClass } = getFileIconProps(mimeType, fileName)
 
   // Size mapping for consistency
@@ -59,7 +65,9 @@ export function FileIcon({ mimeType, fileName, className, strokeWidth = 2, size 
 
   const sizeClass = sizeMap[size]
   const baseClasses = 'drop-shadow-sm transition-colors duration-200'
-  const finalClassName = className ? `${className} ${colorClass} ${baseClasses}` : `${sizeClass} ${colorClass} ${baseClasses}`
+  const finalClassName = className
+    ? `${className} ${colorClass} ${baseClasses}`
+    : `${sizeClass} ${colorClass} ${baseClasses}`
 
   const iconProps = {
     className: finalClassName,
