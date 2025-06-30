@@ -1,5 +1,4 @@
-
-modules = ["web", "nodejs-23"]
+modules = ["web", "nodejs-20"]
 
 [[ports]]
 localPort = 5000
@@ -208,3 +207,6 @@ mode = "parallel"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run lint:fix && echo '✅ Lint completed successfully'"
+
+[nix]
+channel = "stable-24_05"

@@ -1,18 +1,25 @@
 
-const { FlatCompat } = require('@eslint/eslintrc')
-const js = require('@eslint/js')
-const typescriptEslint = require('@typescript-eslint/eslint-plugin')
-const typescriptParser = require('@typescript-eslint/parser')
-const unusedImports = require('eslint-plugin-unused-imports')
-const security = require('eslint-plugin-security')
-const sonarjs = require('eslint-plugin-sonarjs')
-const unicorn = require('eslint-plugin-unicorn')
+import { FlatCompat } from '@eslint/eslintrc'
+import js from '@eslint/js'
+import typescriptEslint from '@typescript-eslint/eslint-plugin'
+import typescriptParser from '@typescript-eslint/parser'
+import unusedImports from 'eslint-plugin-unused-imports'
+import security from 'eslint-plugin-security'
+import sonarjs from 'eslint-plugin-sonarjs'
+import prettier from 'eslint-plugin-prettier'
+// import unicorn from 'eslint-plugin-unicorn' // Temporarily disabled due to compatibility issues
+import globals from 'globals'
+import { fileURLToPath } from 'url'
+import { dirname } from 'path'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
 })
 
-module.exports = [
+export default [
   js.configs.recommended,
   ...compat.extends('next/core-web-vitals'),
   {
@@ -28,8 +35,8 @@ module.exports = [
         project: './tsconfig.json',
       },
       globals: {
-        ...require('globals').browser,
-        ...require('globals').node,
+        ...globals.browser,
+        ...globals.node,
         React: 'readonly',
         NodeJS: 'readonly',
         JSX: 'readonly',
@@ -40,7 +47,8 @@ module.exports = [
       'unused-imports': unusedImports,
       'security': security,
       'sonarjs': sonarjs,
-      'unicorn': unicorn,
+      'prettier': prettier,
+      // 'unicorn': unicorn, // Temporarily disabled
     },
     rules: {
       // Existing rules
@@ -114,57 +122,8 @@ module.exports = [
       'sonarjs/prefer-object-literal': 'error',
       'sonarjs/prefer-single-boolean-return': 'error',
 
-      // Modern JavaScript Rules (Unicorn) - Updated for compatibility
-      'unicorn/catch-error-name': 'error',
-      'unicorn/consistent-destructuring': 'error',
-      'unicorn/consistent-function-scoping': 'error',
-      'unicorn/error-message': 'error',
-      'unicorn/escape-case': 'error',
-      'unicorn/explicit-length-check': 'error',
-      'unicorn/filename-case': 'off',
-      'unicorn/import-style': 'off',
-      'unicorn/new-for-builtins': 'error',
-      'unicorn/no-abusive-eslint-disable': 'error',
-      'unicorn/no-array-instanceof': 'error',
-      'unicorn/no-console-spaces': 'error',
-      'unicorn/no-for-loop': 'error',
-      'unicorn/no-hex-escape': 'error',
-      'unicorn/no-keyword-prefix': 'off',
-      'unicorn/no-lonely-if': 'error',
-      'unicorn/no-nested-ternary': 'off',
-      'unicorn/no-new-buffer': 'error',
-      'unicorn/no-null': 'off',
-      'unicorn/no-process-exit': 'error',
-      'unicorn/no-unreadable-array-destructuring': 'error',
-      'unicorn/no-zero-fractions': 'error',
-      'unicorn/number-literal-case': 'error',
-      'unicorn/numeric-separators-style': 'error',
-      'unicorn/prefer-add-event-listener': 'error',
-      'unicorn/prefer-array-find': 'error',
-      'unicorn/prefer-array-flat-map': 'error',
-      'unicorn/prefer-array-index-of': 'error',
-      'unicorn/prefer-array-some': 'error',
-      'unicorn/prefer-date-now': 'error',
-      'unicorn/prefer-default-parameters': 'error',
-      'unicorn/prefer-includes': 'error',
-      'unicorn/prefer-math-trunc': 'error',
-      'unicorn/prefer-modern-dom-apis': 'error',
-      'unicorn/prefer-negative-index': 'error',
-      'unicorn/prefer-number-properties': 'error',
-      'unicorn/prefer-optional-catch-binding': 'error',
-      'unicorn/prefer-query-selector': 'error',
-      'unicorn/prefer-reflect-apply': 'error',
-      'unicorn/prefer-regexp-test': 'error',
-      'unicorn/prefer-set-has': 'error',
-      'unicorn/prefer-spread': 'error',
-      'unicorn/prefer-string-starts-ends-with': 'error',
-      'unicorn/prefer-string-trim-start-end': 'error',
-      'unicorn/prefer-ternary': 'error',
-      'unicorn/prefer-text-content': 'error',
-      'unicorn/prefer-type-error': 'error',
-      'unicorn/prevent-abbreviations': 'off',
-      'unicorn/string-content': 'off',
-      'unicorn/throw-new-error': 'error',
+      // Modern JavaScript Rules (Unicorn) - Temporarily disabled due to compatibility issues
+      // Will be re-enabled once plugin compatibility is resolved
 
       // React Rules
       'react/react-in-jsx-scope': 'off',

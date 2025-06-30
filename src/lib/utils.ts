@@ -28,15 +28,15 @@ export function loadingToast(message: string, description?: string) {
 
 // Extended toast utility functions
 loadingToast.start = (message: string, id?: string) => {
-  return toast.loading(message, { id })
+  return toast.loading(message, id ? { id } : {})
 }
 
 loadingToast.success = (message: string, id?: string) => {
-  toast.success(message, { id })
+  toast.success(message, id ? { id } : {})
 }
 
 loadingToast.error = (message: string, id?: string) => {
-  toast.error(message, { id })
+  toast.error(message, id ? { id } : {})
 }
 
 loadingToast.dismiss = (id?: string) => {
