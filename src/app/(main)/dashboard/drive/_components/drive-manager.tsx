@@ -755,8 +755,6 @@ export function DriveManager() {
           )}
         </div>
       )}
-        </div>
-      </div>
     </div>
   )
 }
