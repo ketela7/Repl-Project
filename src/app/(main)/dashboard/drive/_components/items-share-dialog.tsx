@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Share2, Globe, Users, Lock, Eye, Edit, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward, Copy, Download, ChevronDown, FileText, Code } from 'lucide-react'
+import { Share2, Globe, Users, Eye, Edit, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward, Copy, Download, ChevronDown, FileText, Code } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { BottomSheet, BottomSheetContent, BottomSheetHeader, BottomSheetTitle, BottomSheetFooter } from '@/components/ui/bottom-sheet'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'

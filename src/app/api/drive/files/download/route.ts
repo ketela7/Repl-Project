@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService, handleApiError, validateDownloadRequest } from '@/lib/api-utils'
+import { initDriveService, handleApiError } from '@/lib/api-utils'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { FileDown, AlertTriangle, FileText, FileSpreadsheet, Presentation, Image, Info, Loader2, CheckCircle, XCircle, SkipForward } from 'lucide-react'
+import { FileDown, AlertTriangle, FileText, FileSpreadsheet, Presentation, Image, Loader2, CheckCircle, XCircle, SkipForward } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
