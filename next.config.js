@@ -22,14 +22,7 @@ const nextConfig = {
     useWasmBinary: false,
     },
 
-  // Turbopack configuration (stable in Next.js 15+)
-  turbo: {
-    rules: {
-      '*.tsx': {
-        loaders: ['@/components/ui/**'],
-      },
-    },
-  },
+  
 
   serverExternalPackages: ['googleapis'],
 
