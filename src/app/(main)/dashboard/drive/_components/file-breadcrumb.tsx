@@ -33,22 +33,36 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
       })
+      
+      console.log('[Breadcrumb] API Response status:', response.status)
+      console.log('[Breadcrumb] API Response headers:', response.headers)
+      
       if (!response.ok) {
-        throw new Error(`Failed to fetch folder: ${response.status}`)
+        const errorText = await response.text()
+        console.error('[Breadcrumb] API Error response:', errorText)
+        throw new Error(`Failed to fetch folder: ${response.status} - ${errorText}`)
       }
 
       const folder = await response.json()
       console.log('[Breadcrumb] Initial folder data:', folder)
       console.log('[Breadcrumb] Folder properties:', Object.keys(folder))
-      console.log('[Breadcrumb] Folder ID:', folder.id)
+      console.log('[Breadcrumb] Folder ID raw:', folder.id)
+      console.log('[Breadcrumb] Folder fileId:', folder.fileId)
       console.log('[Breadcrumb] Folder name:', folder.name)
       console.log('[Breadcrumb] Folder parents:', folder.parents)
       
+      // Use fileId if id is not available (common in Google Drive API responses)
+      const actualId = folder.id || folder.fileId || folderId
+      console.log('[Breadcrumb] Resolved folder ID:', actualId)
+      
       // Validate folder data
-      if (!folder.id) {
+      if (!actualId) {
         console.error('[Breadcrumb] ERROR: Folder missing ID property!', folder)
         throw new Error('Invalid folder data: missing ID')
       }
+      
+      // Update folder object with correct ID
+      folder.id = actualId
       
       const pathItems: BreadcrumbItemData[] = []
       let currentFolder = folder
@@ -79,14 +93,22 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           const parentFolder = await parentResponse.json()
           console.log('[Breadcrumb] Parent folder data:', parentFolder)
           console.log('[Breadcrumb] Parent folder properties:', Object.keys(parentFolder))
-          console.log('[Breadcrumb] Parent folder ID:', parentFolder.id)
+          console.log('[Breadcrumb] Parent folder ID raw:', parentFolder.id)
+          console.log('[Breadcrumb] Parent folder fileId:', parentFolder.fileId)
           console.log('[Breadcrumb] Parent folder name:', parentFolder.name)
           
+          // Use fileId if id is not available
+          const actualParentId = parentFolder.id || parentFolder.fileId || fileId
+          console.log('[Breadcrumb] Resolved parent folder ID:', actualParentId)
+          
           // Validate parent folder data
-          if (!parentFolder.id) {
+          if (!actualParentId) {
             console.error('[Breadcrumb] ERROR: Parent folder missing ID!', parentFolder)
             break
           }
+          
+          // Update parent folder object with correct ID
+          parentFolder.id = actualParentId
           
           console.log('[Breadcrumb] Adding parent folder - ID:', parentFolder.id, 'Name:', parentFolder.name)
           pathItems.push({ id: parentFolder.id, name: parentFolder.name })
