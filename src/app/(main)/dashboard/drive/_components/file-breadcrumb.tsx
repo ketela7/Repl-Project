@@ -44,7 +44,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       // Build path by traversing from current folder to root
       let currentFolder = folder
       let pushedFolder = {}
-      
+
 
 
 
@@ -55,11 +55,11 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       // Traverse up to root
       let fileId = currentFolder.parents[0]
       console.log('[Breadcrumb] Starting parent traversal, first parent fileId:', fileId)
-      
+
       while (currentFolder.parents[0] !== 'root' && currentFolder !== pushedFolder) {
         try {
           console.log('[Breadcrumb] Fetching parent with fileId:', fileId)
-          
+
           const parentResponse = await fetch(`/api/drive/files?fileId=${fileId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
@@ -82,7 +82,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           break
         }
       }
-      
+
       console.log('[Breadcrumb] Finished parent traversal, pathItems before reverse:', pathItems)
 
 
@@ -94,7 +94,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       // Log error for debugging in development only
       console.error(`Error fetching folder path: ${folderId}`, error)
 
-      
+
       setError('Failed to load folder path')
       setBreadcrumbItems([])
     } finally {
@@ -150,7 +150,10 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
-                      console.log('[Breadcrumb] Navigating to folder:', folder.name, 'ID:', folder.id)
+                      console.log('[Breadcrumb] Clicked folder:', folder.name)
+                      console.log('[Breadcrumb] Folder object:', folder)
+                      console.log('[Breadcrumb] Folder ID:', folder.id)
+                      console.log('[Breadcrumb] Calling onNavigate with:', folder.id)
                       onNavigate(folder.id)
                     }}
                     className="hover:text-primary flex max-w-[120px] items-center gap-2 whitespace-nowrap transition-colors sm:max-w-[200px] md:max-w-none"
