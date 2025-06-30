@@ -20,7 +20,14 @@ import { FilePreviewDialog } from './file-preview-dialog'
 import { FileDetailsDialog } from './file-details-dialog'
 import { DriveToolbar } from './drive-toolbar'
 import { DriveDataView } from './drive-data-view'
-import { OperationsDialog } from './operations-dialog'
+import { ItemsMoveDialog } from './items-move-dialog'
+import { ItemsCopyDialog } from './items-copy-dialog'
+import { ItemsShareDialog } from './items-share-dialog'
+import { ItemsRenameDialog } from './items-rename-dialog'
+import { ItemsTrashDialog } from './items-trash-dialog'
+import { ItemsDeleteDialog } from './items-delete-dialog'
+import { ItemsUntrashDialog } from './items-untrash-dialog'
+import { ItemsDownloadDialog } from './items-download-dialog'
 
 type DriveItem = (DriveFile | DriveFolder) & {
   itemType?: 'file' | 'folder'
@@ -114,6 +121,14 @@ export function DriveManager() {
     details: false,
     preview: false,
     mobileFilters: false,
+    move: false,
+    copy: false,
+    share: false,
+    rename: false,
+    trash: false,
+    delete: false,
+    untrash: false,
+    download: false,
   })
 
   // Sorting state
@@ -770,18 +785,36 @@ export function DriveManager() {
                   }, 50)
                   break
                 case 'download':
-                case 'share':
-                case 'rename':
-                case 'move':
-                case 'copy':
-                case 'trash':
-                case 'delete':
-                case 'untrash':
-                  // Individual actions handled through bulk operations
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => {
-                    openDialog('operations')
-                  }, 50)
+                  setTimeout(() => openDialog('download'), 50)
+                  break
+                case 'share':
+                  setSelectedItems(new Set([item.id]))
+                  setTimeout(() => openDialog('share'), 50)
+                  break
+                case 'rename':
+                  setSelectedItems(new Set([item.id]))
+                  setTimeout(() => openDialog('rename'), 50)
+                  break
+                case 'move':
+                  setSelectedItems(new Set([item.id]))
+                  setTimeout(() => openDialog('move'), 50)
+                  break
+                case 'copy':
+                  setSelectedItems(new Set([item.id]))
+                  setTimeout(() => openDialog('copy'), 50)
+                  break
+                case 'trash':
+                  setSelectedItems(new Set([item.id]))
+                  setTimeout(() => openDialog('trash'), 50)
+                  break
+                case 'delete':
+                  setSelectedItems(new Set([item.id]))
+                  setTimeout(() => openDialog('delete'), 50)
+                  break
+                case 'untrash':
+                  setSelectedItems(new Set([item.id]))
+                  setTimeout(() => openDialog('untrash'), 50)
                   break
               }
             }}
@@ -815,17 +848,139 @@ export function DriveManager() {
         }}
       />
 
-      {/* Operations Dialog for bulk actions */}
-      {dialogs.operations && selectedItems.size > 0 && (
-        <OperationsDialog
-          isOpen={dialogs.operations}
+      {/* Individual Operation Dialogs */}
+      {dialogs.move && selectedItems.size > 0 && (
+        <ItemsMoveDialog
+          isOpen={dialogs.move}
           onClose={() => {
-            closeDialog('operations')
+            closeDialog('move')
             setSelectedItems(new Set())
           }}
           selectedItems={Array.from(selectedItems)}
           allItems={displayItems}
-          onRefresh={handleRefresh}
+          onComplete={() => {
+            closeDialog('move')
+            setSelectedItems(new Set())
+            handleRefresh()
+          }}
+        />
+      )}
+
+      {dialogs.copy && selectedItems.size > 0 && (
+        <ItemsCopyDialog
+          isOpen={dialogs.copy}
+          onClose={() => {
+            closeDialog('copy')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onComplete={() => {
+            closeDialog('copy')
+            setSelectedItems(new Set())
+            handleRefresh()
+          }}
+        />
+      )}
+
+      {dialogs.share && selectedItems.size > 0 && (
+        <ItemsShareDialog
+          isOpen={dialogs.share}
+          onClose={() => {
+            closeDialog('share')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onComplete={() => {
+            closeDialog('share')
+            setSelectedItems(new Set())
+            handleRefresh()
+          }}
+        />
+      )}
+
+      {dialogs.rename && selectedItems.size > 0 && (
+        <ItemsRenameDialog
+          isOpen={dialogs.rename}
+          onClose={() => {
+            closeDialog('rename')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onComplete={() => {
+            closeDialog('rename')
+            setSelectedItems(new Set())
+            handleRefresh()
+          }}
+        />
+      )}
+
+      {dialogs.trash && selectedItems.size > 0 && (
+        <ItemsTrashDialog
+          isOpen={dialogs.trash}
+          onClose={() => {
+            closeDialog('trash')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onComplete={() => {
+            closeDialog('trash')
+            setSelectedItems(new Set())
+            handleRefresh()
+          }}
+        />
+      )}
+
+      {dialogs.delete && selectedItems.size > 0 && (
+        <ItemsDeleteDialog
+          isOpen={dialogs.delete}
+          onClose={() => {
+            closeDialog('delete')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onComplete={() => {
+            closeDialog('delete')
+            setSelectedItems(new Set())
+            handleRefresh()
+          }}
+        />
+      )}
+
+      {dialogs.untrash && selectedItems.size > 0 && (
+        <ItemsUntrashDialog
+          isOpen={dialogs.untrash}
+          onClose={() => {
+            closeDialog('untrash')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onComplete={() => {
+            closeDialog('untrash')
+            setSelectedItems(new Set())
+            handleRefresh()
+          }}
+        />
+      )}
+
+      {dialogs.download && selectedItems.size > 0 && (
+        <ItemsDownloadDialog
+          isOpen={dialogs.download}
+          onClose={() => {
+            closeDialog('download')
+            setSelectedItems(new Set())
+          }}
+          selectedItems={Array.from(selectedItems)}
+          allItems={displayItems}
+          onComplete={() => {
+            closeDialog('download')
+            setSelectedItems(new Set())
+          }}
         />
       )}
 
