@@ -25,6 +25,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
   const fetchFolderPath = async (folderId: string) => {
     try {
+      console.log('[Breadcrumb] Starting fetchFolderPath for:', folderId)
       setLoading(true)
       setError(null)
 
@@ -38,7 +39,8 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
       const folder = await response.json()
       const pathItems: BreadcrumbItemData[] = []
-      console.log('[Breadcrumb] folder:', folder)
+      console.log('[Breadcrumb] Initial folder data:', folder)
+      console.log('[Breadcrumb] Folder parents:', folder.parents)
       // Build path by traversing from current folder to root
       let currentFolder = folder
       let pushedFolder = {}
@@ -52,28 +54,36 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
       // Traverse up to root
       let fileId = currentFolder.parents[0]
+      console.log('[Breadcrumb] Starting parent traversal, first parent fileId:', fileId)
       
       while (currentFolder.parents[0] !== 'root' && currentFolder !== pushedFolder) {
         try {
-          
+          console.log('[Breadcrumb] Fetching parent with fileId:', fileId)
           
           const parentResponse = await fetch(`/api/drive/files?fileId=${fileId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           })
-          if (!parentResponse.ok) break
+          if (!parentResponse.ok) {
+            console.log('[Breadcrumb] Parent response not ok:', parentResponse.status)
+            break
+          }
 
           const parentFolder = await parentResponse.json()
+          console.log('[Breadcrumb] Parent folder data:', parentFolder)
           pathItems.push({ id: parentFolder.id, name: parentFolder.name })
           currentFolder = parentFolder
           pushedFolder = parentFolder
-          
+          fileId = currentFolder.parents[0]
+          console.log('[Breadcrumb] Next parent fileId:', fileId)
 
         } catch (err) {
-            console.error(`Error fetching parent folder:${fileId}`, err)        
+          console.error(`[Breadcrumb] Error fetching parent folder:${fileId}`, err)        
           break
         }
       }
+      
+      console.log('[Breadcrumb] Finished parent traversal, pathItems before reverse:', pathItems)
 
 
       // Reverse path items to show from root to current folder
