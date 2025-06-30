@@ -559,7 +559,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
               <Label className="text-sm font-medium">Preview:</Label>
               <div className="bg-muted/30 max-h-32 space-y-1 overflow-y-auto rounded-lg border p-3">
                 {previews.slice(0, 5).map((preview, index) => (
-                  <div key={index} className={cn('text-sm', preview.valid ? 'text-foreground' : 'text-muted-foreground line-through')}>
+                  <div key={`preview-${preview.original}-${index}`} className={cn('text-sm', preview.valid ? 'text-foreground' : 'text-muted-foreground line-through')}>
                     <span className="text-muted-foreground">{preview.original}</span>
                     <span className="mx-2">→</span>
                     <span className={preview.valid ? 'font-medium text-green-600' : 'text-red-500'}>{preview.preview}</span>
@@ -679,7 +679,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
               <Label className="text-sm font-medium text-red-600">Issues found during rename:</Label>
               <div className="max-h-40 space-y-2 overflow-y-auto rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/50">
                 {progress.errors.map((error, index) => (
-                  <div key={index} className="space-y-1 text-sm">
+                  <div key={`error-${error.file}-${index}`} className="space-y-1 text-sm">
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
                       <div className="space-y-1">

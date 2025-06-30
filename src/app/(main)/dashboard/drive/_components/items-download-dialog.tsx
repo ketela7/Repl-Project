@@ -485,7 +485,7 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm, selectedItems }: Item
                 <div className="text-sm font-medium text-red-600">Errors encountered:</div>
                 <div className="max-h-32 space-y-1 overflow-y-auto">
                   {progress.errors.map((error, index) => (
-                    <div key={index} className="rounded bg-red-50 p-2 text-xs text-red-600 dark:bg-red-950/50">
+                    <div key={`error-${error.file}-${index}`} className="rounded bg-red-50 p-2 text-xs text-red-600 dark:bg-red-950/50">
                       <span className="font-medium">{error.file}:</span> {error.error}
                     </div>
                   ))}

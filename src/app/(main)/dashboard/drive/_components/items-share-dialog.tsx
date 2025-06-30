@@ -544,7 +544,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.shareResults.map((result, index) => (
                 <div
-                  key={index}
+                  key={`share-result-${result.name}-${index}`}
                   className={cn(
                     'rounded border p-2 text-xs',
                     result.success ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
@@ -575,7 +575,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
             <div className="max-h-32 space-y-1 overflow-y-auto">
               {progress.errors.map((error, index) => (
-                <div key={index} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
+                <div key={`error-${error.file}-${index}`} className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20">
                   <div className="font-medium">{error.file}</div>
                   <div className="text-red-600 dark:text-red-400">{error.error}</div>
                 </div>
