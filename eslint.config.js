@@ -20,11 +20,19 @@ module.exports = [
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
-        ecmaVersion: 'latest',
+        ecmaVersion: 2022,
         sourceType: 'module',
         ecmaFeatures: {
           jsx: true,
         },
+        project: './tsconfig.json',
+      },
+      globals: {
+        ...require('globals').browser,
+        ...require('globals').node,
+        React: 'readonly',
+        NodeJS: 'readonly',
+        JSX: 'readonly',
       },
     },
     plugins: {
@@ -165,6 +173,12 @@ module.exports = [
       'unicorn/string-content': 'off',
       'unicorn/throw-new-error': 'error',
 
+      // React Rules
+      'react/react-in-jsx-scope': 'off',
+      'react/jsx-uses-react': 'off',
+      'react/display-name': 'off',
+      'react/prop-types': 'off',
+
       // TypeScript Specific Rules
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-non-null-assertion': 'warn',
@@ -175,6 +189,12 @@ module.exports = [
       '@typescript-eslint/no-unnecessary-type-assertion': 'error',
       '@typescript-eslint/prefer-string-starts-ends-with': 'error',
       '@typescript-eslint/prefer-includes': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { 
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+        caughtErrorsIgnorePattern: '^_',
+        destructuredArrayIgnorePattern: '^_'
+      }],
 
       // React/JSX Rules
       'jsx-a11y/alt-text': 'error',

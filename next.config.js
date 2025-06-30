@@ -20,8 +20,14 @@ const nextConfig = {
     ],
     optimisticClientCache: true,
     useWasmBinary: false,
-    // optimizeCss: true, // Disabled to avoid critters dependency
+    turbo: {
+      rules: {
+        '*.tsx': ['@/components/ui/**'],
+      },
+    },
   },
+
+  swcMinify: true,
 
   serverExternalPackages: ['googleapis'],
 
