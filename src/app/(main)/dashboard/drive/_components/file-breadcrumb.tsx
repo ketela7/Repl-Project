@@ -108,7 +108,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
           {/* Folder Breadcrumb Items */}
           {breadcrumbItems.map((folder, index) => (
-            <Fragment key={folder.id}>
+            <Fragment key={`breadcrumb-${folder.id}-${index}`}>
               <BreadcrumbSeparator>
                 <ChevronRight className="h-4 w-4" />
               </BreadcrumbSeparator>
