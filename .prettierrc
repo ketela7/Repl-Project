@@ -11,6 +11,5 @@
   "useTabs": false,
   "quoteProps": "as-needed",
   "jsxSingleQuote": false,
-  "semi": false,
   "plugins": ["prettier-plugin-tailwindcss"]
 }
