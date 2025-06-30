@@ -34,18 +34,18 @@ function buildDriveQuery(filters: FileFilter): string {
       break
     case 'starred':
       // Starred view - starred files only
-      conditions.push('trashed=false')
+      //conditions.push('trashed=false')
       conditions.push('starred=true')
       break
     case 'my-drive':
       // My Drive view - files owned by me
-      conditions.push('trashed=false')
+      //conditions.push('trashed=false')
       conditions.push("'me' in owners")
       break
     case 'recent':
       // Recent view - recently modified files
-      conditions.push('trashed=false')
-      break
+      //conditions.push('trashed=false')
+      //break
     case 'all':
     default:
       // All files view - show non-trashed files by default
@@ -369,17 +369,21 @@ export async function GET(request: NextRequest) {
     let query = baseQuery
     
     // Handle different view types with proper parent constraints
-    if (filters.viewStatus === 'my-drive') {
-      // My Drive view - always constrain to specific folder
+    if (folderIdParam) {
+      // When navigating to specific folder, always apply parent constraint
       const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
+      query = query ? `${query} and ${parentQuery}` : parentQuery
+    } else if (filters.viewStatus === 'my-drive') {
+      // My Drive view without folder navigation - show root folder
+      const parentQuery = "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
     } else if (['shared', 'starred', 'recent', 'trash', 'all'].includes(filters.viewStatus)) {
       // These views search across entire Drive without parent constraints
       // They already have their specific filters from buildDriveQuery
       // No parent constraint needed - search globally
     } else {
-      // Unknown view status - default to current folder constraint
-      const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
+      // Unknown view status - default to root folder constraint
+      const parentQuery = "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
     }
     
@@ -404,11 +408,8 @@ export async function GET(request: NextRequest) {
 
     console.log('[Drive API] Request details:', {
       folderId,
-      folderIdParam,
       viewStatus: filters.viewStatus,
       query,
-      pageSize,
-      orderBy
     })
 
     // Pass the complete query to the Drive service
