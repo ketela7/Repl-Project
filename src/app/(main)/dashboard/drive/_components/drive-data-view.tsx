@@ -210,7 +210,7 @@ export function DriveDataView({
                       <FileIcon mimeType={item.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
                     </FileThumbnailPreview>
                   </div>
-                  {renderContent(item)}
+                  <div onClick={(e) => e.stopPropagation()}>{renderContent(item)}</div>
                 </div>
                 <div className="flex min-h-0 flex-col">
                   <h3 className="mb-1 truncate text-sm font-medium sm:text-base" title={item.name}>
