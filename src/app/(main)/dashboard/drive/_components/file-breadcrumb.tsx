@@ -37,7 +37,6 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       }
 
       const folder = await response.json()
-      console.log('[Breadcrumb] Current folder data:', folder)
       const pathItems: BreadcrumbItemData[] = []
 
       // Build path by traversing from current folder to root
@@ -47,7 +46,6 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
 
       // Add current folder first
       pathItems.push({ id: currentFolder.id, name: currentFolder.name })
-      console.log('[Breadcrumb] Added current folder:', currentFolder.name)
 
       // Traverse up to root
       while (currentFolder.parents?.[0] && currentFolder.parents[0] !== 'root' && depth < maxDepth) {
@@ -59,9 +57,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           if (!parentResponse.ok) break
 
           const parentFolder = await parentResponse.json()
-          console.log('[Breadcrumb] Parent folder data:', parentFolder)
           pathItems.push({ id: parentFolder.id, name: parentFolder.name })
-          console.log('[Breadcrumb] Added parent folder:', parentFolder.name)
           currentFolder = parentFolder
           depth++
         } catch (err) {
@@ -73,9 +69,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       }
 
       // Reverse the array so it goes from root to current folder
-      const finalItems = pathItems.reverse()
-      console.log('[Breadcrumb] Final breadcrumb items:', finalItems)
-      setBreadcrumbItems(finalItems)
+      setBreadcrumbItems(pathItems.reverse())
     } catch (error) {
       // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
@@ -135,6 +129,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
                     href="#"
                     onClick={(e) => {
                       e.preventDefault()
+                      console.log('[Breadcrumb] Navigating to folder:', folder.name, 'ID:', folder.id)
                       onNavigate(folder.id)
                     }}
                     className="hover:text-primary flex max-w-[120px] items-center gap-2 whitespace-nowrap transition-colors sm:max-w-[200px] md:max-w-none"
