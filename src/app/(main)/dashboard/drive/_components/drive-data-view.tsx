@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, Triangle, CopyIcon, Info } from 'lucide-react'
+import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, Triangle, CopyIcon, Info, ChevronsUpDown, ChevronUp, ChevronDown, FileDown } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -29,6 +29,7 @@ type DriveItem = (DriveFile | DriveFolder) & {
   canUntrash?: boolean
   canMove?: boolean
   canCopy?: boolean
+  canExport?: boolean
 }
 
 interface DriveDataViewProps {
@@ -197,6 +198,7 @@ export function DriveDataView({
         { key: 'trash', label: 'Move to Trash', icon: Trash2, condition: item.canTrash, destructive: true },
         { key: 'delete', label: 'Delete', icon: Triangle, condition: item.canDelete, destructive: true },
         { key: 'untrash', label: 'Untrash', icon: RefreshCw, condition: item.canUntrash, destructive: true },
+        { key: 'export', label: 'Export', icon: FileDown, condition: item.canExport }
       ].filter((menuItem) => menuItem.condition),
     []
   )

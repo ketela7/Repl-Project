@@ -41,6 +41,8 @@ type DriveItem = (DriveFile | DriveFolder) & {
   canUntrash?: boolean
   canMove?: boolean
   canCopy?: boolean
+  canExport?: boolean
+  
 }
 // Helper function to convert size units to bytes (Google Drive API requirement)
 function getSizeMultiplier(unit: string): number {
@@ -606,8 +608,9 @@ export function DriveManager() {
         canCopy: actions.canCopy,
         canShare: actions.canShare,
         canTrash: actions.canTrash,
-        canDelete: actions.canPermanentDelete,
+        canDelete: actions.canDelete,
         canUntrash: actions.canUntrash,
+        canExport: actions.canExport
       }
     })
 
