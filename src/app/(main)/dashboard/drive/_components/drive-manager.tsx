@@ -833,7 +833,7 @@ export function DriveManager() {
 
       <CreateFolderDialog
         isOpen={dialogs.createFolder}
-        onClose(() => closeDialog('createFolder')}
+        onClose={() => closeDialog('createFolder')}
         currentFolderId={currentFolderId}
         onFolderCreated={() => {
           closeDialog('createFolder')
