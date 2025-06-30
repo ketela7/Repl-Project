@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import type { ReactNode } from 'react'
 import { AlertTriangle, RefreshCw, Settings, Wifi, Lock, HardDrive, FileX, Clock } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'

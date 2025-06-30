@@ -34,7 +34,7 @@ export class GoogleDriveService {
       id: user.permissionId || 'unknown',
       name: user.displayName || 'Unknown User',
       email: user.emailAddress || '',
-      picture: user.photoLink ?? undefined,
+      ...(user.photoLink && { picture: user.photoLink }),
       storageQuota: about.storageQuota
         ? {
             limit: about.storageQuota.limit!,
@@ -347,41 +347,41 @@ export class GoogleDriveService {
 
     return {
       ...file,
-      description: response.data.description || undefined,
+      ...(response.data.description  && { description: response.data.description  }),
       lastModifyingUser: response.data.lastModifyingUser
         ? {
             displayName: response.data.lastModifyingUser.displayName || '',
             emailAddress: response.data.lastModifyingUser.emailAddress || '',
-            photoLink: response.data.lastModifyingUser.photoLink || undefined,
+            ...((response.data.lastModifyingUser.photoLink ) && { photoLink: response.data.lastModifyingUser.photoLink  }),
           }
         : undefined,
       sharingUser: response.data.sharingUser
         ? {
             displayName: response.data.sharingUser.displayName || '',
             emailAddress: response.data.sharingUser.emailAddress || '',
-            photoLink: response.data.sharingUser.photoLink || undefined,
+            ...((response.data.sharingUser.photoLink ) && { photoLink: response.data.sharingUser.photoLink  }),
           }
         : undefined,
-      version: response.data.version || undefined,
-      md5Checksum: response.data.md5Checksum || undefined,
-      sha1Checksum: response.data.sha1Checksum || undefined,
-      sha256Checksum: response.data.sha256Checksum || undefined,
-      quotaBytesUsed: response.data.quotaBytesUsed || undefined,
+      ...(response.data.version  && { version: response.data.version  }),
+      ...(response.data.md5Checksum  && { md5Checksum: response.data.md5Checksum  }),
+      ...(response.data.sha1Checksum  && { sha1Checksum: response.data.sha1Checksum  }),
+      ...(response.data.sha256Checksum  && { sha256Checksum: response.data.sha256Checksum  }),
+      ...(response.data.quotaBytesUsed  && { quotaBytesUsed: response.data.quotaBytesUsed  }),
       starred: response.data.starred || false,
       viewed: response.data.viewedByMe || false,
       explicitlyTrashed: response.data.explicitlyTrashed || false,
-      folderColorRgb: response.data.folderColorRgb || undefined,
-      fullFileExtension: response.data.fullFileExtension || undefined,
-      fileExtension: response.data.fileExtension || undefined,
-      originalFilename: response.data.originalFilename || undefined,
-      headRevisionId: response.data.headRevisionId || undefined,
+      ...(response.data.folderColorRgb  && { folderColorRgb: response.data.folderColorRgb  }),
+      ...(response.data.fullFileExtension  && { fullFileExtension: response.data.fullFileExtension  }),
+      ...(response.data.fileExtension  && { fileExtension: response.data.fileExtension  }),
+      ...(response.data.originalFilename  && { originalFilename: response.data.originalFilename  }),
+      ...(response.data.headRevisionId  && { headRevisionId: response.data.headRevisionId  }),
       isAppAuthorized: response.data.isAppAuthorized || false,
       copyRequiresWriterPermission: response.data.copyRequiresWriterPermission || false,
       writersCanShare: response.data.writersCanShare || true,
       hasAugmentedPermissions: response.data.hasAugmentedPermissions || false,
       ownedByMe: response.data.ownedByMe || false,
 
-      teamDriveId: response.data.teamDriveId || undefined,
+      ...(response.data.teamDriveId  && { teamDriveId: response.data.teamDriveId  }),
       spaces: response.data.spaces || [],
       properties: response.data.properties || {},
       appProperties: response.data.appProperties || {},
@@ -434,18 +434,18 @@ export class GoogleDriveService {
       contentRestrictions:
         response.data.contentRestrictions?.map((restriction) => ({
           readOnly: restriction.readOnly || false,
-          reason: restriction.reason || undefined,
+          ...(restriction.reason  && { reason: restriction.reason  }),
           restrictingUser: restriction.restrictingUser
             ? {
                 displayName: restriction.restrictingUser.displayName || '',
                 emailAddress: restriction.restrictingUser.emailAddress || '',
-                photoLink: restriction.restrictingUser.photoLink || undefined,
+                ...((restriction.restrictingUser.photoLink ) && { photoLink: restriction.restrictingUser.photoLink  }),
               }
             : undefined,
-          restrictionTime: restriction.restrictionTime || undefined,
-          type: restriction.type || undefined,
+          ...(restriction.restrictionTime  && { restrictionTime: restriction.restrictionTime  }),
+          ...(restriction.type  && { type: restriction.type  }),
         })) || [],
-      resourceKey: response.data.resourceKey || undefined,
+      ...(response.data.resourceKey  && { resourceKey: response.data.resourceKey  }),
       linkShareMetadata: response.data.linkShareMetadata
         ? {
             securityUpdateEligible: response.data.linkShareMetadata.securityUpdateEligible,
@@ -456,10 +456,10 @@ export class GoogleDriveService {
         ? {
             labels:
               response.data.labelInfo.labels?.map((label) => ({
-                id: label.id || undefined,
-                revisionId: label.revisionId || undefined,
-                kind: label.kind || undefined,
-                fields: label.fields || undefined,
+                ...(label.id  && { id: label.id  }),
+                ...(label.revisionId  && { revisionId: label.revisionId  }),
+                ...(label.kind  && { kind: label.kind  }),
+                ...(label.fields  && { fields: label.fields  }),
               })) || undefined,
           }
         : undefined,
@@ -787,9 +787,9 @@ export class GoogleDriveService {
       mimeType: 'application/vnd.google-apps.folder',
       createdTime: newFolder.createdTime!,
       modifiedTime: newFolder.modifiedTime!,
-      parents: newFolder.parents ?? undefined,
-      shared: newFolder.shared ?? undefined,
-      trashed: newFolder.trashed ?? undefined,
+      ...(newFolder.parents  && { parents: newFolder.parents  }),
+      ...(newFolder.shared  && { shared: newFolder.shared  }),
+      ...(newFolder.trashed  && { trashed: newFolder.trashed  }),
     })
   }
 

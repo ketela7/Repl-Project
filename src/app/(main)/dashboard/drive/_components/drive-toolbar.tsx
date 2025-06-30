@@ -1033,7 +1033,7 @@ export function DriveToolbar({
                                   ...filters.advancedFilters,
                                   sizeRange: {
                                     ...filters.advancedFilters.sizeRange,
-                                    min: parseInt(e.target.value) || undefined,
+                                    ...(parseInt(e.target.value)  && { min: parseInt(e.target.value)  }),
                                     unit: filters.advancedFilters.sizeRange?.unit || 'MB',
                                   },
                                 },
@@ -1051,7 +1051,7 @@ export function DriveToolbar({
                                   ...filters.advancedFilters,
                                   sizeRange: {
                                     ...filters.advancedFilters.sizeRange,
-                                    max: parseInt(e.target.value) || undefined,
+                                    ...(parseInt(e.target.value)  && { max: parseInt(e.target.value)  }),
                                     unit: filters.advancedFilters.sizeRange?.unit || 'MB',
                                   },
                                 },
@@ -1170,7 +1170,7 @@ export function DriveToolbar({
                             onFilterChange({
                               advancedFilters: {
                                 ...filters.advancedFilters,
-                                owner: e.target.value || undefined,
+                                ...(e.target.value  && { owner: e.target.value  }),
                               },
                             })
                           }

@@ -61,7 +61,7 @@ export async function initDriveService(): Promise<AuthResult> {
 /**
  * Common error handling for API routes
  */
-export function handleApiError(error: unknown): NextResponse {
+export function handleApiError(error: any): NextResponse {
   if (error instanceof Error) {
     // Handle Google API specific errors
     if (error.message.includes('Invalid Credentials') || error.message.includes('unauthorized')) {

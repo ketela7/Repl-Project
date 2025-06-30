@@ -388,7 +388,7 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                             ...tempAdvancedFilters,
                             sizeRange: {
                               ...tempAdvancedFilters.sizeRange,
-                              min: Number(e.target.value) || undefined,
+                              ...(Number(e.target.value)  && { min: Number(e.target.value)  }),
                               unit: tempAdvancedFilters.sizeRange?.unit || 'MB',
                             },
                           })
@@ -432,7 +432,7 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                             ...tempAdvancedFilters,
                             sizeRange: {
                               ...tempAdvancedFilters.sizeRange,
-                              max: Number(e.target.value) || undefined,
+                              ...(Number(e.target.value)  && { max: Number(e.target.value)  }),
                               unit: tempAdvancedFilters.sizeRange?.unit || 'MB',
                             },
                           })
@@ -482,7 +482,7 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                             ...tempAdvancedFilters,
                             createdDateRange: {
                               ...tempAdvancedFilters.createdDateRange,
-                              from: date || undefined,
+                              ...(date  && { from: date  }),
                             },
                           })
                         }
@@ -498,7 +498,7 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                             ...tempAdvancedFilters,
                             createdDateRange: {
                               ...tempAdvancedFilters.createdDateRange,
-                              to: date || undefined,
+                              ...(date  && { to: date  }),
                             },
                           })
                         }
@@ -523,7 +523,7 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                             ...tempAdvancedFilters,
                             modifiedDateRange: {
                               ...tempAdvancedFilters.modifiedDateRange,
-                              from: date || undefined,
+                              ...(date  && { from: date  }),
                             },
                           })
                         }
@@ -539,7 +539,7 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                             ...tempAdvancedFilters,
                             modifiedDateRange: {
                               ...tempAdvancedFilters.modifiedDateRange,
-                              to: date || undefined,
+                              ...(date  && { to: date  }),
                             },
                           })
                         }
@@ -618,7 +618,7 @@ export function FiltersDialog({ open, onOpenChange, onFilterChange, onApplyFilte
                   onChange={(e) =>
                     handleAdvancedFiltersChange({
                       ...tempAdvancedFilters,
-                      owner: e.target.value || undefined,
+                      ...(e.target.value  && { owner: e.target.value  }),
                     })
                   }
                 />

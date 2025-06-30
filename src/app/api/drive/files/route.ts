@@ -352,16 +352,16 @@ export async function GET(request: NextRequest) {
     const filters: FileFilter = {
       fileType: searchParams.get('fileType') || 'all',
       viewStatus: searchParams.get('viewStatus') || 'all',
-      sortBy: searchParams.get('sortBy') || undefined,
+      ...(searchParams.get('sortBy')  && { sortBy: searchParams.get('sortBy')  }),
       sortOrder: searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc',
-      search: searchParams.get('search') || undefined,
-      createdAfter: searchParams.get('createdAfter') || undefined,
-      createdBefore: searchParams.get('createdBefore') || undefined,
-      modifiedAfter: searchParams.get('modifiedAfter') || undefined,
-      modifiedBefore: searchParams.get('modifiedBefore') || undefined,
-      owner: searchParams.get('owner') || undefined,
-      sizeMin: searchParams.get('sizeMin') || undefined,
-      sizeMax: searchParams.get('sizeMax') || undefined,
+      ...(searchParams.get('search')  && { search: searchParams.get('search')  }),
+      ...(searchParams.get('createdAfter')  && { createdAfter: searchParams.get('createdAfter')  }),
+      ...(searchParams.get('createdBefore')  && { createdBefore: searchParams.get('createdBefore')  }),
+      ...(searchParams.get('modifiedAfter')  && { modifiedAfter: searchParams.get('modifiedAfter')  }),
+      ...(searchParams.get('modifiedBefore')  && { modifiedBefore: searchParams.get('modifiedBefore')  }),
+      ...(searchParams.get('owner')  && { owner: searchParams.get('owner')  }),
+      ...(searchParams.get('sizeMin')  && { sizeMin: searchParams.get('sizeMin')  }),
+      ...(searchParams.get('sizeMax')  && { sizeMax: searchParams.get('sizeMax')  }),
     }
 
     const baseQuery = buildDriveQuery(filters)

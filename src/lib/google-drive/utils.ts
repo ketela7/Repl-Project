@@ -992,24 +992,23 @@ export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
     id: file.id!,
     name: file.name!,
     mimeType: file.mimeType!,
-    size: file.size ?? undefined,
+    ...(file.size  && { size: file.size  }),
     createdTime: file.createdTime!,
     modifiedTime: file.modifiedTime!,
-    webViewLink: file.webViewLink ?? undefined,
-    webContentLink: file.webContentLink ?? undefined,
-    thumbnailLink: file.thumbnailLink ?? undefined,
-    parents: file.parents ?? undefined,
-    owners:
-      file.owners?.map((owner) => ({
-        displayName: owner.displayName!,
-        emailAddress: owner.emailAddress!,
-        photoLink: owner.photoLink ?? undefined,
-      })) ?? undefined,
+    ...(file.webViewLink  && { webViewLink: file.webViewLink  }),
+    ...(file.webContentLink  && { webContentLink: file.webContentLink  }),
+    ...(file.thumbnailLink  && { thumbnailLink: file.thumbnailLink  }),
+    ...(file.parents  && { parents: file.parents  }),
+    owners: file.owners?.map((owner) => ({
+      displayName: owner.displayName!,
+      emailAddress: owner.emailAddress!,
+      ...(owner.photoLink && { photoLink: owner.photoLink }),
+    })),
     shared: file.shared ?? false,
     starred: file.starred ?? false,
     trashed: file.trashed ?? false,
     ownedByMe: file.ownedByMe ?? true,
-    viewedByMeTime: file.viewedByMeTime ?? undefined,
+    ...(file.viewedByMeTime  && { viewedByMeTime: file.viewedByMeTime  }),
     viewedByMe: file.viewedByMe ?? false,
     capabilities: file.capabilities
       ? {
@@ -1038,7 +1037,7 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
     mimeType: 'application/vnd.google-apps.folder',
     createdTime: folder.createdTime!,
     modifiedTime: folder.modifiedTime!,
-    parents: folder.parents ?? undefined,
+    ...(folder.parents  && { parents: folder.parents  }),
     shared: folder.shared ?? false,
     starred: folder.starred ?? false,
     trashed: folder.trashed ?? false,
@@ -1046,7 +1045,7 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
     owners: folder.owners?.map((owner) => ({
       displayName: owner.displayName || '',
       emailAddress: owner.emailAddress || '',
-      photoLink: owner.photoLink || undefined,
+      ...(owner.photoLink && { photoLink: owner.photoLink }),
     })),
     capabilities: folder.capabilities
       ? {

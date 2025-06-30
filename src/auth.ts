@@ -100,8 +100,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // Build session object with tokens
       return {
         ...session,
-        accessToken: (token.accessToken as string) || undefined,
-        refreshToken: (token.refreshToken as string) || undefined,
+        ...((token.accessToken as string)  && { accessToken: (token.accessToken as string)  }),
+        ...((token.refreshToken as string)  && { refreshToken: (token.refreshToken as string)  }),
         provider: (token.provider as string) || 'google',
         rememberMe: Boolean(token.rememberMe),
       }
