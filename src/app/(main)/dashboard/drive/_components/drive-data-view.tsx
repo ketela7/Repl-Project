@@ -146,9 +146,11 @@ export function DriveDataView({
   // Memoized handlers for better performance
   const handleItemClick = useCallback(
     (item: DriveItem) => {
+      console.log('[DriveDataView] Item clicked:', item.name, 'isFolder:', item.isFolder, 'isSelectMode:', isSelectMode)
       if (isSelectMode) {
         onSelectItem(item.id)
       } else if (item.isFolder) {
+        console.log('[DriveDataView] Calling onFolderClick for folder:', item.id)
         onFolderClick(item.id)
       } else {
         onItemAction('preview', item)
