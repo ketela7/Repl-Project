@@ -66,22 +66,29 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       
       const pathItems: BreadcrumbItemData[] = []
       let currentFolder = folder
-      let pushedFolder = {}
+      const visitedFolders = new Set<string>()
 
       // Add current folder first
       console.log('[Breadcrumb] Adding current folder - ID:', currentFolder.id, 'Name:', currentFolder.name)
       pathItems.push({ id: currentFolder.id, name: currentFolder.name })
-
+      visitedFolders.add(currentFolder.id)
 
       // Traverse up to root
-      let fileId = currentFolder.parents[0]
-      console.log('[Breadcrumb] Starting parent traversal, first parent fileId:', fileId)
+      console.log('[Breadcrumb] Starting parent traversal, current folder parents:', currentFolder.parents)
 
-      while (currentFolder.parents[0] !== 'root' && currentFolder !== pushedFolder) {
+      while (currentFolder.parents && currentFolder.parents.length > 0 && currentFolder.parents[0] !== 'root') {
+        const parentId = currentFolder.parents[0]
+        console.log('[Breadcrumb] Processing parent ID:', parentId)
+        
+        // Prevent infinite loops
+        if (visitedFolders.has(parentId)) {
+          console.log('[Breadcrumb] Detected circular reference, breaking loop')
+          break
+        }
         try {
-          console.log('[Breadcrumb] Fetching parent with fileId:', fileId)
+          console.log('[Breadcrumb] Fetching parent with fileId:', parentId)
 
-          const parentResponse = await fetch(`/api/drive/files?fileId=${fileId}`, {
+          const parentResponse = await fetch(`/api/drive/files?fileId=${parentId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           })
@@ -98,7 +105,7 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           console.log('[Breadcrumb] Parent folder name:', parentFolder.name)
           
           // Use fileId if id is not available
-          const actualParentId = parentFolder.id || parentFolder.fileId || fileId
+          const actualParentId = parentFolder.id || parentFolder.fileId || parentId
           console.log('[Breadcrumb] Resolved parent folder ID:', actualParentId)
           
           // Validate parent folder data
@@ -112,13 +119,12 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           
           console.log('[Breadcrumb] Adding parent folder - ID:', parentFolder.id, 'Name:', parentFolder.name)
           pathItems.push({ id: parentFolder.id, name: parentFolder.name })
+          visitedFolders.add(actualParentId)
           currentFolder = parentFolder
-          pushedFolder = parentFolder
-          fileId = currentFolder.parents[0]
-          console.log('[Breadcrumb] Next parent fileId:', fileId)
+          console.log('[Breadcrumb] Next parent will be:', currentFolder.parents ? currentFolder.parents[0] : 'none')
 
         } catch (err) {
-          console.error(`[Breadcrumb] Error fetching parent folder:${fileId}`, err)        
+          console.error(`[Breadcrumb] Error fetching parent folder:${parentId}`, err)        
           break
         }
       }

@@ -377,15 +377,12 @@ export async function GET(request: NextRequest) {
       // My Drive view without folder navigation - show root folder
       const parentQuery = "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
-    } else if (['shared', 'starred', 'recent', 'trash', 'all'].includes(filters.viewStatus)) {
+    } else {
+      // Other views (shared, starred, recent, etc.)
       // These views search across entire Drive without parent constraints
       // They already have their specific filters from buildDriveQuery
       // No parent constraint needed - search globally
-    } else {
-      // Unknown view status - default to root folder constraint
-      const parentQuery = "'root' in parents"
-      query = query ? `${query} and ${parentQuery}` : parentQuery
-    }
+    } 
     
     const sortKey = getSortKey(filters.sortBy)
     const orderBy = `${sortKey} ${filters.sortOrder}`
