@@ -136,6 +136,8 @@ Changelog:
 - June 29, 2025. Fixed share operation API validation and request handling - updated validation logic to accept items array format, properly handled accessLevel and linkAccess parameters, added share link generation in API responses
 - June 29, 2025. Added comprehensive export functionality to share operation - users can now export successful share links in multiple formats (CSV, TXT, JSON) with structured data, automatic file naming with dates, and proper error handling. CSV format uses "name,sharelink" structure, TXT uses "name: sharelink" format, and JSON includes metadata with export date and file IDs
 - June 29, 2025. Fixed inconsistent "skipped" logic across all operations - replaced misleading skipped counters with accurate "processed" counters, removed non-functional skipped logic where items are either successful or failed, implemented proper progress tracking that shows meaningful statistics during operations
+- June 29, 2025. Fixed critical grid view event propagation bug where dropdown menu clicks triggered card onClick events causing both preview and details dialogs to open simultaneously - added stopPropagation wrapper around dropdown menu container
+- June 29, 2025. Added comprehensive copy functionality to table data view - all cells (name, size, MIME type, modified time, created time, owners) now have copy icons that appear on hover with proper toast notifications and event handling to prevent row selection conflicts
 ```
 
 ## User Preferences

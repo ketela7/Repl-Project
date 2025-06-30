@@ -305,16 +305,57 @@ export function DriveDataView({
                     </TableCell>
                   )}
                   {visibleColumns.name && (
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <FileThumbnailPreview thumbnailLink={item.thumbnailLink} fileName={item.name} mimeType={item.mimeType} modifiedTime={item.modifiedTime}>
-                          <FileIcon mimeType={item.mimeType} className="h-6 w-6" />
-                        </FileThumbnailPreview>
-                        <span className="font-medium">{item.name}</span>
+                    <TableCell
+                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        try {
+                          await navigator.clipboard.writeText(item.name)
+                          const { toast } = await import('sonner')
+                          toast.success('File name copied', { duration: 2000 })
+                        } catch (err) {
+                          const { errorToast } = await import('@/lib/utils')
+                          errorToast.generic('Failed to copy file name')
+                          console.error('Failed to copy file name:', err)
+                        }
+                      }}
+                      title={`Click to copy: ${item.name}`}
+                    >
+                      <div className="flex items-center justify-between space-x-3">
+                        <div className="flex items-center space-x-3">
+                          <FileThumbnailPreview thumbnailLink={item.thumbnailLink} fileName={item.name} mimeType={item.mimeType} modifiedTime={item.modifiedTime}>
+                            <FileIcon mimeType={item.mimeType} className="h-6 w-6" />
+                          </FileThumbnailPreview>
+                          <span className="font-medium">{item.name}</span>
+                        </div>
+                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
                       </div>
                     </TableCell>
                   )}
-                  {visibleColumns.size && <TableCell>{'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'}</TableCell>}
+                  {visibleColumns.size && (
+                    <TableCell
+                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        const sizeText = 'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'
+                        try {
+                          await navigator.clipboard.writeText(sizeText)
+                          const { toast } = await import('sonner')
+                          toast.success('File size copied', { duration: 2000 })
+                        } catch (err) {
+                          const { errorToast } = await import('@/lib/utils')
+                          errorToast.generic('Failed to copy file size')
+                          console.error('Failed to copy file size:', err)
+                        }
+                      }}
+                      title={`Click to copy size`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span>{'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'}</span>
+                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
+                    </TableCell>
+                  )}
                   {visibleColumns.owners && (
                     <TableCell
                       className="hover:bg-muted/50 group cursor-pointer transition-colors"
@@ -343,18 +384,74 @@ export function DriveDataView({
                     </TableCell>
                   )}
                   {visibleColumns.mimeType && (
-                    <TableCell>
-                      <span className="text-muted-foreground text-sm">{item.mimeType}</span>
+                    <TableCell
+                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        try {
+                          await navigator.clipboard.writeText(item.mimeType)
+                          const { toast } = await import('sonner')
+                          toast.success('MIME type copied', { duration: 2000 })
+                        } catch (err) {
+                          const { errorToast } = await import('@/lib/utils')
+                          errorToast.generic('Failed to copy MIME type')
+                          console.error('Failed to copy MIME type:', err)
+                        }
+                      }}
+                      title={`Click to copy: ${item.mimeType}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-sm">{item.mimeType}</span>
+                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
                     </TableCell>
                   )}
                   {visibleColumns.modifiedTime && (
-                    <TableCell>
-                      <span className="text-muted-foreground text-sm">{formatFileTime(item.modifiedTime, effectiveTimezone)}</span>
+                    <TableCell
+                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        const timeText = formatFileTime(item.modifiedTime, effectiveTimezone)
+                        try {
+                          await navigator.clipboard.writeText(timeText)
+                          const { toast } = await import('sonner')
+                          toast.success('Modified time copied', { duration: 2000 })
+                        } catch (err) {
+                          const { errorToast } = await import('@/lib/utils')
+                          errorToast.generic('Failed to copy modified time')
+                          console.error('Failed to copy modified time:', err)
+                        }
+                      }}
+                      title={`Click to copy: ${formatFileTime(item.modifiedTime, effectiveTimezone)}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-sm">{formatFileTime(item.modifiedTime, effectiveTimezone)}</span>
+                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
                     </TableCell>
                   )}
                   {visibleColumns.createdTime && (
-                    <TableCell>
-                      <span className="text-muted-foreground text-sm">{item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}</span>
+                    <TableCell
+                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        const timeText = item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'
+                        try {
+                          await navigator.clipboard.writeText(timeText)
+                          const { toast } = await import('sonner')
+                          toast.success('Created time copied', { duration: 2000 })
+                        } catch (err) {
+                          const { errorToast } = await import('@/lib/utils')
+                          errorToast.generic('Failed to copy created time')
+                          console.error('Failed to copy created time:', err)
+                        }
+                      }}
+                      title={`Click to copy: ${item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground text-sm">{item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}</span>
+                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </div>
                     </TableCell>
                   )}
                   <TableCell onClick={(e) => e.stopPropagation()}>{renderContent(item)}</TableCell>
