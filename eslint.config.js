@@ -206,6 +206,22 @@ module.exports = [
       'jsx-a11y/role-supports-aria-props': 'error',
       'jsx-a11y/scope': 'error',
       'jsx-a11y/tabindex-no-positive': 'error',
+
+      // Prettier integration
+      'prettier/prettier': [
+        'error',
+        {
+          semi: false,
+          singleQuote: true,
+          trailingComma: 'es5',
+          tabWidth: 2,
+          printWidth: 120,
+          bracketSpacing: true,
+          bracketSameLine: false,
+          arrowParens: 'avoid',
+          endOfLine: 'lf',
+        },
+      ],
     },
   },
 ]

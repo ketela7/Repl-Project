@@ -163,3 +163,29 @@ args = "npm run lint -- --fix"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx eslint src --ext .ts,.tsx,.js,.jsx --format=table"
+
+[[workflows.workflow]]
+name = "Format Check"
+author = 44419511
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "echo \"✅ Prettier format check completed\""
+
+[[workflows.workflow]]
+name = "Format Fix"
+author = 44419511
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format:fix"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "echo \"✅ Code formatted successfully\""
