@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback, useMemo } from 'react'
 import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, Triangle, CopyIcon, Info } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
@@ -12,6 +13,7 @@ import { useTimezone } from '@/lib/hooks/use-timezone'
 import { formatFileTime } from '@/lib/utils'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { formatFileSize } from '@/lib/google-drive/utils'
+import { toast } from 'sonner'
 import type { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 
 import { DriveGridSkeleton } from './drive-skeleton'
@@ -58,6 +60,60 @@ interface DriveDataViewProps {
   onLoadMore?: () => void
 }
 
+// Optimized copy function to reduce code duplication
+const useCopyToClipboard = () => {
+  return useCallback(async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      toast.success(`${label} copied`, { duration: 2000 })
+    } catch (err) {
+      const { errorToast } = await import('@/lib/utils')
+      errorToast.generic(`Failed to copy ${label.toLowerCase()}`)
+      console.error(`Failed to copy ${label.toLowerCase()}:`, err)
+    }
+  }, [])
+}
+
+// Optimized cell component with copy functionality
+const CopyableCell = ({
+  children,
+  value,
+  label,
+  className = '',
+  onClick,
+  title,
+}: {
+  children: React.ReactNode
+  value: string
+  label: string
+  className?: string
+  onClick?: (e: React.MouseEvent) => void
+  title?: string
+}) => {
+  const copyToClipboard = useCopyToClipboard()
+
+  const handleClick = useCallback(
+    async (e: React.MouseEvent) => {
+      e.stopPropagation()
+      if (onClick) {
+        onClick(e)
+      } else {
+        await copyToClipboard(value, label)
+      }
+    },
+    [copyToClipboard, value, label, onClick]
+  )
+
+  return (
+    <TableCell className={`hover:bg-muted/50 group cursor-pointer transition-colors ${className}`} onClick={handleClick} title={title || `Click to copy: ${value}`}>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-3">{children}</div>
+        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+      </div>
+    </TableCell>
+  )
+}
+
 export function DriveDataView({
   items,
   viewMode,
@@ -83,93 +139,81 @@ export function DriveDataView({
     return <DriveGridSkeleton />
   }
 
-  const renderContent = (item: DriveItem) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm">
-          <MoreVertical className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        {/* Conditionally render details option */}
-        <DropdownMenuItem onClick={() => onItemAction('details', item)}>
-          <Info className="mr-2 h-4 w-4" />
-          Details
-        </DropdownMenuItem>
+  // Memoized handlers for better performance
+  const handleItemClick = useCallback(
+    (item: DriveItem) => {
+      if (isSelectMode) {
+        onSelectItem(item.id)
+      } else if (item.isFolder) {
+        onFolderClick(item.id)
+      } else {
+        onItemAction('preview', item)
+      }
+    },
+    [isSelectMode, onSelectItem, onFolderClick, onItemAction]
+  )
 
-        {/* Conditionally render move option */}
-        {item.canMove && (
-          <DropdownMenuItem onClick={() => onItemAction('move', item)}>
-            <Move className="mr-2 h-4 w-4" />
-            Move
-          </DropdownMenuItem>
-        )}
+  const handleSelectAll = useCallback(() => {
+    items.forEach((item) => {
+      if (selectedItems.has(item.id)) {
+        onSelectItem(item.id)
+      } else {
+        onSelectItem(item.id)
+      }
+    })
+  }, [items, selectedItems, onSelectItem])
 
-        {/* Conditionally render copy option */}
-        {item.canCopy && (
-          <DropdownMenuItem onClick={() => onItemAction('copy', item)}>
-            <Copy className="mr-2 h-4 w-4" />
-            Copy
-          </DropdownMenuItem>
-        )}
+  // Memoized table headers for performance
+  const tableHeaders = useMemo(
+    () =>
+      [
+        { key: 'name', label: 'Name', visible: visibleColumns.name },
+        { key: 'size', label: 'Size', visible: visibleColumns.size },
+        { key: 'owners', label: 'Owner', visible: visibleColumns.owners },
+        { key: 'mimeType', label: 'Type', visible: visibleColumns.mimeType },
+        { key: 'modifiedTime', label: 'Modified', visible: visibleColumns.modifiedTime },
+        { key: 'createdTime', label: 'Created', visible: visibleColumns.createdTime },
+      ].filter((header) => header.visible),
+    [visibleColumns]
+  )
 
-        {/* Conditionally render preview option */}
-        {!item.isFolder && (
-          <DropdownMenuItem onClick={() => onItemAction('preview', item)}>
-            <Eye className="mr-2 h-4 w-4" />
-            Preview
-          </DropdownMenuItem>
-        )}
+  // Optimized menu items configuration
+  const getMenuItems = useMemo(
+    () => (item: DriveItem) =>
+      [
+        { key: 'details', label: 'Details', icon: Info, condition: true },
+        { key: 'preview', label: 'Preview', icon: Eye, condition: !item.isFolder },
+        { key: 'move', label: 'Move', icon: Move, condition: item.canMove },
+        { key: 'copy', label: 'Copy', icon: Copy, condition: item.canCopy },
+        { key: 'download', label: 'Download', icon: Download, condition: item.canDownload },
+        { key: 'rename', label: 'Rename', icon: Edit, condition: item.canRename },
+        { key: 'share', label: 'Share', icon: Share, condition: item.canShare },
+        { key: 'trash', label: 'Move to Trash', icon: Trash2, condition: item.canTrash, destructive: true },
+        { key: 'delete', label: 'Delete', icon: Triangle, condition: item.canDelete, destructive: true },
+        { key: 'untrash', label: 'Untrash', icon: RefreshCw, condition: item.canUntrash, destructive: true },
+      ].filter((menuItem) => menuItem.condition),
+    []
+  )
 
-        {/* Conditionally render download option */}
-        {item.canDownload && (
-          <DropdownMenuItem onClick={() => onItemAction('download', item)}>
-            <Download className="mr-2 h-4 w-4" />
-            Download
-          </DropdownMenuItem>
-        )}
-
-        {/* Conditionally render rename option */}
-        {item.canRename && (
-          <DropdownMenuItem onClick={() => onItemAction('rename', item)}>
-            <Edit className="mr-2 h-4 w-4" />
-            Rename
-          </DropdownMenuItem>
-        )}
-
-        {/* Conditionally render share option */}
-        {item.canShare && (
-          <DropdownMenuItem onClick={() => onItemAction('share', item)}>
-            <Share className="mr-2 h-4 w-4" />
-            Share
-          </DropdownMenuItem>
-        )}
-
-        {/* Conditionally render trash option */}
-        {item.canTrash && (
-          <DropdownMenuItem onClick={() => onItemAction('trash', item)} className="text-destructive">
-            <Trash2 className="mr-2 h-4 w-4" />
-            Move to Trash
-          </DropdownMenuItem>
-        )}
-
-        {/* Conditionally render delete option */}
-        {item.canDelete && (
-          <DropdownMenuItem onClick={() => onItemAction('delete', item)} className="text-destructive">
-            <Triangle className="mr-2 h-4 w-4" />
-            Delete
-          </DropdownMenuItem>
-        )}
-
-        {/* Conditionally render untrash option */}
-        {item.canUntrash && (
-          <DropdownMenuItem onClick={() => onItemAction('untrash', item)} className="text-destructive">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Untrash
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+  const renderContent = useCallback(
+    (item: DriveItem) => (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {getMenuItems(item).map(({ key, label, icon: Icon, destructive }) => (
+            <DropdownMenuItem key={key} onClick={() => onItemAction(key, item)} className={destructive ? 'text-destructive' : ''}>
+              <Icon className="mr-2 h-4 w-4" />
+              {label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    ),
+    [getMenuItems, onItemAction]
   )
 
   return (
@@ -227,134 +271,40 @@ export function DriveDataView({
               <TableRow>
                 {isSelectMode && (
                   <TableHead className="w-12">
-                    <Checkbox
-                      checked={items.length > 0 && items.every((item) => selectedItems.has(item.id))}
-                      onCheckedChange={(checked) => {
-                        items.forEach((item) => {
-                          if (checked) {
-                            onSelectItem(item.id)
-                          } else if (selectedItems.has(item.id)) {
-                            onSelectItem(item.id)
-                          }
-                        })
-                      }}
-                    />
+                    <Checkbox checked={items.length > 0 && items.every((item) => selectedItems.has(item.id))} onCheckedChange={handleSelectAll} />
                   </TableHead>
                 )}
-                {visibleColumns.name && (
-                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'name' })}>
+                {tableHeaders.map(({ key, label }) => (
+                  <TableHead key={key} className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: key })}>
                     <div className="flex items-center space-x-1">
-                      <span>Name</span>
-                      {sortConfig?.key === 'name' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
+                      <span>{label}</span>
+                      {sortConfig?.key === key && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
                     </div>
                   </TableHead>
-                )}
-                {visibleColumns.size && (
-                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'size' })}>
-                    <div className="flex items-center space-x-1">
-                      <span>Size</span>
-                      {sortConfig?.key === 'size' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
-                    </div>
-                  </TableHead>
-                )}
-                {visibleColumns.owners && (
-                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'owners' })}>
-                    <div className="flex items-center space-x-1">
-                      <span>Owner</span>
-                      {sortConfig?.key === 'owners' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
-                    </div>
-                  </TableHead>
-                )}
-                {visibleColumns.mimeType && (
-                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'mimeType' })}>
-                    <div className="flex items-center space-x-1">
-                      <span>Type</span>
-                      {sortConfig?.key === 'mimeType' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
-                    </div>
-                  </TableHead>
-                )}
-                {visibleColumns.modifiedTime && (
-                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'modifiedTime' })}>
-                    <div className="flex items-center space-x-1">
-                      <span>Modified</span>
-                      {sortConfig?.key === 'modifiedTime' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
-                    </div>
-                  </TableHead>
-                )}
-                {visibleColumns.createdTime && (
-                  <TableHead className="hover:bg-muted/50 cursor-pointer" onClick={() => onColumnsChange({ sortBy: 'createdTime' })}>
-                    <div className="flex items-center space-x-1">
-                      <span>Created</span>
-                      {sortConfig?.key === 'createdTime' && <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>}
-                    </div>
-                  </TableHead>
-                )}
+                ))}
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {items.map((item) => (
-                <TableRow
-                  key={item.id}
-                  className={`cursor-pointer ${selectedItems.has(item.id) ? 'bg-primary/5' : ''}`}
-                  onClick={() => (isSelectMode ? onSelectItem(item.id) : item.isFolder ? onFolderClick(item.id) : onItemAction('preview', item))}
-                >
+                <TableRow key={item.id} className={`cursor-pointer ${selectedItems.has(item.id) ? 'bg-primary/5' : ''}`} onClick={() => handleItemClick(item)}>
                   {isSelectMode && (
                     <TableCell onClick={(e) => e.stopPropagation()}>
                       <Checkbox checked={selectedItems.has(item.id)} onCheckedChange={() => onSelectItem(item.id)} />
                     </TableCell>
                   )}
                   {visibleColumns.name && (
-                    <TableCell
-                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
-                      onClick={async (e) => {
-                        e.stopPropagation()
-                        try {
-                          await navigator.clipboard.writeText(item.name)
-                          const { toast } = await import('sonner')
-                          toast.success('File name copied', { duration: 2000 })
-                        } catch (err) {
-                          const { errorToast } = await import('@/lib/utils')
-                          errorToast.generic('Failed to copy file name')
-                          console.error('Failed to copy file name:', err)
-                        }
-                      }}
-                      title={`Click to copy: ${item.name}`}
-                    >
-                      <div className="flex items-center justify-between space-x-3">
-                        <div className="flex items-center space-x-3">
-                          <FileThumbnailPreview thumbnailLink={item.thumbnailLink} fileName={item.name} mimeType={item.mimeType} modifiedTime={item.modifiedTime}>
-                            <FileIcon mimeType={item.mimeType} className="h-6 w-6" />
-                          </FileThumbnailPreview>
-                          <span className="font-medium">{item.name}</span>
-                        </div>
-                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                      </div>
-                    </TableCell>
+                    <CopyableCell value={item.name} label="File name">
+                      <FileThumbnailPreview thumbnailLink={item.thumbnailLink} fileName={item.name} mimeType={item.mimeType} modifiedTime={item.modifiedTime}>
+                        <FileIcon mimeType={item.mimeType} className="h-6 w-6" />
+                      </FileThumbnailPreview>
+                      <span className="font-medium">{item.name}</span>
+                    </CopyableCell>
                   )}
                   {visibleColumns.size && (
-                    <TableCell
-                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
-                      onClick={async (e) => {
-                        e.stopPropagation()
-                        const sizeText = 'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'
-                        try {
-                          await navigator.clipboard.writeText(sizeText)
-                          const { toast } = await import('sonner')
-                          toast.success('File size copied', { duration: 2000 })
-                        } catch (err) {
-                          const { errorToast } = await import('@/lib/utils')
-                          errorToast.generic('Failed to copy file size')
-                          console.error('Failed to copy file size:', err)
-                        }
-                      }}
-                      title={`Click to copy size`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span>{'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'}</span>
-                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                      </div>
-                    </TableCell>
+                    <CopyableCell value={'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'} label="File size">
+                      <span>{'size' in item && item.size ? formatFileSize(parseInt(item.size)) : item.isFolder ? '—' : 'Unknown'}</span>
+                    </CopyableCell>
                   )}
                   {visibleColumns.owners && (
                     <TableCell
@@ -384,75 +334,19 @@ export function DriveDataView({
                     </TableCell>
                   )}
                   {visibleColumns.mimeType && (
-                    <TableCell
-                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
-                      onClick={async (e) => {
-                        e.stopPropagation()
-                        try {
-                          await navigator.clipboard.writeText(item.mimeType)
-                          const { toast } = await import('sonner')
-                          toast.success('MIME type copied', { duration: 2000 })
-                        } catch (err) {
-                          const { errorToast } = await import('@/lib/utils')
-                          errorToast.generic('Failed to copy MIME type')
-                          console.error('Failed to copy MIME type:', err)
-                        }
-                      }}
-                      title={`Click to copy: ${item.mimeType}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground text-sm">{item.mimeType}</span>
-                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                      </div>
-                    </TableCell>
+                    <CopyableCell value={item.mimeType} label="MIME type">
+                      <span className="text-muted-foreground text-sm">{item.mimeType}</span>
+                    </CopyableCell>
                   )}
                   {visibleColumns.modifiedTime && (
-                    <TableCell
-                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
-                      onClick={async (e) => {
-                        e.stopPropagation()
-                        const timeText = formatFileTime(item.modifiedTime, effectiveTimezone)
-                        try {
-                          await navigator.clipboard.writeText(timeText)
-                          const { toast } = await import('sonner')
-                          toast.success('Modified time copied', { duration: 2000 })
-                        } catch (err) {
-                          const { errorToast } = await import('@/lib/utils')
-                          errorToast.generic('Failed to copy modified time')
-                          console.error('Failed to copy modified time:', err)
-                        }
-                      }}
-                      title={`Click to copy: ${formatFileTime(item.modifiedTime, effectiveTimezone)}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground text-sm">{formatFileTime(item.modifiedTime, effectiveTimezone)}</span>
-                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                      </div>
-                    </TableCell>
+                    <CopyableCell value={formatFileTime(item.modifiedTime, effectiveTimezone)} label="Modified time">
+                      <span className="text-muted-foreground text-sm">{formatFileTime(item.modifiedTime, effectiveTimezone)}</span>
+                    </CopyableCell>
                   )}
                   {visibleColumns.createdTime && (
-                    <TableCell
-                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
-                      onClick={async (e) => {
-                        e.stopPropagation()
-                        const timeText = item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'
-                        try {
-                          await navigator.clipboard.writeText(timeText)
-                          const { toast } = await import('sonner')
-                          toast.success('Created time copied', { duration: 2000 })
-                        } catch (err) {
-                          const { errorToast } = await import('@/lib/utils')
-                          errorToast.generic('Failed to copy created time')
-                          console.error('Failed to copy created time:', err)
-                        }
-                      }}
-                      title={`Click to copy: ${item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground text-sm">{item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}</span>
-                        <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                      </div>
-                    </TableCell>
+                    <CopyableCell value={item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'} label="Created time">
+                      <span className="text-muted-foreground text-sm">{item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}</span>
+                    </CopyableCell>
                   )}
                   <TableCell onClick={(e) => e.stopPropagation()}>{renderContent(item)}</TableCell>
                 </TableRow>
