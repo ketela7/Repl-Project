@@ -233,9 +233,9 @@ module.exports = [
         {
           semi: false,
           singleQuote: true,
-          trailingComma: 'es5',
+          trailingComma: 'all',
           tabWidth: 2,
-          printWidth: 120,
+          printWidth: 100,
           bracketSpacing: true,
           bracketSameLine: false,
           arrowParens: 'avoid',

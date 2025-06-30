@@ -20,14 +20,16 @@ const nextConfig = {
     ],
     optimisticClientCache: true,
     useWasmBinary: false,
-    turbo: {
-      rules: {
-        '*.tsx': ['@/components/ui/**'],
+    },
+
+  // Turbopack configuration (stable in Next.js 15+)
+  turbo: {
+    rules: {
+      '*.tsx': {
+        loaders: ['@/components/ui/**'],
       },
     },
   },
-
-  swcMinify: true,
 
   serverExternalPackages: ['googleapis'],
 

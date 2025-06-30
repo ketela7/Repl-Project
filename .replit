@@ -189,3 +189,33 @@ args = "npm run format:fix"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "echo \"✅ Code formatted successfully\""
+
+[[workflows.workflow]]
+name = "Dev Fast"
+author = 44419511
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev:fast"
+
+[[workflows.workflow]]
+name = "Full Check"
+author = 44419511
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run type-check"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run lint"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run build"
