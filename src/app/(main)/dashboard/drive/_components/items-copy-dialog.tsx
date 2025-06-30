@@ -216,7 +216,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         // Operation was cancelled, don't show error
         return
       }
-      // // // // console.error(err)
+      // // // // // console.error(err)
       toast.error('Copy operation failed')
     } finally {
       // Clean up

@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     // Handle both single and bulk operations
     const { fileId, namePrefix, newName, items, renameType = 'prefix' } = body
 
-    // // // // console.log(`[Rename Debug] Request body:`, JSON.stringify({ fileId, namePrefix, newName, items: items?.length, renameType }))
+    // // // // // console.log(`[Rename Debug] Request body:`, JSON.stringify({ fileId, namePrefix, newName, items: items?.length, renameType }))
 
     // Determine operation type based on items array or single fileId
     const fileIds =
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
           continue
         }
 
-        // // // // console.log(`[Rename API] Processing file ${id} with name "${finalName}"`)
+        // // // // // console.log(`[Rename API] Processing file ${id} with name "${finalName}"`)
 
         // Use throttling and retry like Download Operations
         const result = await throttledDriveRequest(async () => {
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
           }, `Rename file ${id}`)
         })
 
-        // // // // console.log(`[Rename API] Success for file ${id}:`, result)
+        // // // // // console.log(`[Rename API] Success for file ${id}:`, result)
 
         results.push({
           fileId: id,
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
       driveCache.clearUserCache(userId)
       driveCache.clearFolderCache(userId, 'root')
 
-      // // // // console.log(`[Rename Cache] Cleared cache for ${results.length} renamed files`)
+      // // // // // console.log(`[Rename Cache] Cleared cache for ${results.length} renamed files`)
     }
 
     const response = {

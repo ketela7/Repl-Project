@@ -4,10 +4,10 @@ declare global {
   namespace jest {
     interface Matchers<R> {
       toBeInTheDocument(): R
-      toHaveTextContent(_text?: string | RegExp): R
-      toHaveClass(_className?: string): R
+      toHaveTextContent(_?: string | RegExp): R
+      toHaveClass(_?: string): R
       toBeVisible(): R
-      toHaveAttribute(_attribute?: string, _value?: string): R
+      toHaveAttribute(_?: string, _?: string): R
     }
   }
 }

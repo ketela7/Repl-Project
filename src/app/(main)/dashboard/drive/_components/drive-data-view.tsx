@@ -1,23 +1,7 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import {
-  MoreVertical,
-  Eye,
-  Download,
-  Edit,
-  Move,
-  Copy,
-  Share,
-  RefreshCw,
-  Trash2,
-  Triangle,
-  CopyIcon,
-  Info,
-  ChevronUp,
-  ChevronDown,
-  FileDown,
-} from 'lucide-react'
+import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, Triangle, CopyIcon, Info, ChevronUp, ChevronDown, FileDown } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -98,7 +82,7 @@ const useCopyToClipboard = () => {
     } catch (err) {
       const { errorToast } = await import('@/lib/utils')
       errorToast.generic(`Failed to copy ${label.toLowerCase()}`)
-      // // // // console.error(`Failed to copy ${label.toLowerCase()}:`, err)
+      // // // // // console.error(`Failed to copy ${label.toLowerCase()}:`, err)
     }
   }, [])
 }
@@ -175,11 +159,11 @@ export function DriveDataView({
   // Memoized handlers for better performance
   const handleItemClick = useCallback(
     (item: DriveItem) => {
-      // // // // console.log('[DriveDataView] Item clicked:', item.name, 'isFolder:', item.isFolder, 'isSelectMode:', isSelectMode)
+      // // // // // console.log('[DriveDataView] Item clicked:', item.name, 'isFolder:', item.isFolder, 'isSelectMode:', isSelectMode)
       if (isSelectMode) {
         onSelectItem(item.id)
       } else if (item.isFolder) {
-        // // // // console.log('[DriveDataView] Calling onFolderClick for folder:', item.id)
+        // // // // // console.log('[DriveDataView] Calling onFolderClick for folder:', item.id)
         onFolderClick(item.id)
       } else {
         onItemAction('preview', item)
@@ -449,7 +433,7 @@ export function DriveDataView({
                           } catch (err) {
                             const { errorToast } = await import('@/lib/utils')
                             errorToast.generic('Failed to copy email')
-                            // // // // console.error('Failed to copy email:', err)
+                            // // // // // console.error('Failed to copy email:', err)
                           }
                         }
                       }}

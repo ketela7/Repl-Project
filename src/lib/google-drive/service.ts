@@ -609,8 +609,8 @@ export class GoogleDriveService {
       fields: fields.join(','),
     })
 
-    // // // // console.log('[Google Drive Service] Raw API response:', response.data)
-    // // // // console.log('[Google Drive Service] Response ID:', response.data.id)
+    // // // // // console.log('[Google Drive Service] Raw API response:', response.data)
+    // // // // // console.log('[Google Drive Service] Response ID:', response.data.id)
 
     return {
       id: response.data.id || fileId, // Ensure id is always present
@@ -709,7 +709,7 @@ export class GoogleDriveService {
         throw new Error('Filename contains invalid characters: < > : " / \\ | ? *')
       }
 
-      // // // // console.log(`[Rename Debug] Attempting to rename file ${fileId} to "${newName}"`)
+      // // // // // console.log(`[Rename Debug] Attempting to rename file ${fileId} to "${newName}"`)
 
       const response = await this.drive.files.update({
         fileId,
@@ -718,10 +718,10 @@ export class GoogleDriveService {
           'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
       })
 
-      // // // // console.log(`[Rename Debug] API Response:`, response.data)
+      // // // // // console.log(`[Rename Debug] API Response:`, response.data)
 
       const convertedFile = convertGoogleDriveFile(response.data)
-      // // // // console.log(`[Rename Debug] Converted file:`, convertedFile)
+      // // // // // console.log(`[Rename Debug] Converted file:`, convertedFile)
 
       return convertedFile
     } catch (error: any) {
