@@ -148,7 +148,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 15 * 60, // 15 minutes
+        maxAge: 60 * 60, // 15 minutes
       },
     },
     pkceCodeVerifier: {
@@ -158,7 +158,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 15 * 60, // 15 minutes
+        maxAge: 60 * 60, // 15 minutes
       },
     },
   },
