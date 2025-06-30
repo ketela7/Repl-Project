@@ -96,8 +96,8 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
   if (isFullscreen) {
     return (
       <div className="fixed inset-0 z-[100] bg-black">
-        {/* Minimal floating controls */}
-        <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
+        {/* Minimal floating controls - moved to top-left */}
+        <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -125,20 +125,17 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="h-auto max-h-[95vh] w-[95vw] max-w-6xl overflow-hidden p-4 md:p-6">
-        {/* Minimal header with clean controls */}
+        {/* Minimal header with clean controls - moved to top-left */}
         <DialogHeader className="pb-3">
           <div className="flex items-center justify-between gap-4">
-            <DialogTitle className="flex-1 truncate text-base font-medium md:text-lg">{file.name}</DialogTitle>
             <div className="flex items-center gap-2">
-              {/* Fullscreen toggle */}
+              {/* Fullscreen toggle - moved to left */}
               <Button variant="outline" size="sm" onClick={() => setIsFullscreen(true)}>
                 <Maximize2 className="h-4 w-4" />
               </Button>
-              {/* Close button */}
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="h-8 w-8 p-0">
-                <X className="h-4 w-4" />
-              </Button>
             </div>
+            <DialogTitle className="flex-1 text-center truncate text-base font-medium md:text-lg">{file.name}</DialogTitle>
+            <div className="w-8"></div> {/* Spacer for balance */}
           </div>
         </DialogHeader>
 
