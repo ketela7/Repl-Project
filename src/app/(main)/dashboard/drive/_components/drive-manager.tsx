@@ -474,11 +474,17 @@ export function DriveManager() {
 
   // Apply client-side size filtering
   const sizeFilteredItems = useMemo(() => {
-    if (!filters.advancedFilters.sizeRange?.min && !filters.advancedFilters.sizeRange?.max) {
+    const hasMinSize = filters.advancedFilters.sizeRange?.min
+    const hasMaxSize = filters.advancedFilters.sizeRange?.max
+    
+    console.log('[DriveManager] Size filtering - items:', items.length, 'hasMinSize:', hasMinSize, 'hasMaxSize:', hasMaxSize)
+    
+    if (!hasMinSize && !hasMaxSize) {
+      console.log('[DriveManager] No size filters, returning all items:', items.length)
       return items
     }
 
-    return items.filter((item) => {
+    const filtered = items.filter((item) => {
       if (item.mimeType === 'application/vnd.google-apps.folder') return true
 
       const sizeStr = (item as any).size
@@ -513,9 +519,13 @@ export function DriveManager() {
       if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit)) return false
       return true
     })
+    
+    console.log('[DriveManager] Size filtered items:', filtered.length)
+    return filtered
   }, [items, filters.advancedFilters.sizeRange])
 
   const displayItems = useMemo(() => {
+    console.log('[DriveManager] Display items calculation - filteredItems:', filteredItems.length, 'sizeFilteredItems:', sizeFilteredItems.length)
     const result = filteredItems.length > 0 ? filteredItems : sizeFilteredItems
     console.log('[DriveManager] Display items calculated:', result.length, 'items')
     return result
