@@ -36,17 +36,10 @@ export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    // Store remember me preference before sign in
-    const rememberMe = form.getValues('remember')
-    setRememberMePreference(rememberMe)
-
-    // Update session with remember me preference if already authenticated
-    try {
-      await update({ rememberMe })
-    } catch (error) {
-      // Session update will happen after authentication completes
-    }
+  // Handle remember me preference change
+  const handleRememberChange = (checked: boolean) => {
+    form.setValue('remember', checked)
+    setRememberMePreference(checked)
   }
 
   return (
@@ -66,7 +59,7 @@ export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
         <Checkbox
           id="remember-me-nextauth"
           checked={form.watch('remember')}
-          onCheckedChange={checked => form.setValue('remember', !!checked)}
+          onCheckedChange={checked => handleRememberChange(!!checked)}
         />
         <div className="space-y-1">
           <label
