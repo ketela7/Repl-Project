@@ -37,33 +37,39 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       }
 
       const folder = await response.json()
-      const items: BreadcrumbItemData[] = [{ id: folder.id, name: folder.name }]
+      const pathItems: BreadcrumbItemData[] = []
 
-      // Build path by traversing parent folders
-      let currentParent = folder.parents?.[0]
+      // Build path by traversing from current folder to root
+      let currentFolder = folder
       let depth = 0
       const maxDepth = 10 // Prevent infinite loops
 
-      while (currentParent && currentParent !== 'root' && depth < maxDepth) {
+      // Add current folder first
+      pathItems.push({ id: currentFolder.id, name: currentFolder.name })
+
+      // Traverse up to root
+      while (currentFolder.parents?.[0] && currentFolder.parents[0] !== 'root' && depth < maxDepth) {
         try {
-          const parentResponse = await fetch(`/api/drive/files?fileId=${currentParent}`, {
+          const parentResponse = await fetch(`/api/drive/files?fileId=${currentFolder.parents[0]}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           })
           if (!parentResponse.ok) break
 
           const parentFolder = await parentResponse.json()
-          items.unshift({ id: parentFolder.id, name: parentFolder.name })
-          currentParent = parentFolder.parents?.[0]
+          pathItems.push({ id: parentFolder.id, name: parentFolder.name })
+          currentFolder = parentFolder
           depth++
         } catch (err) {
           if (process.env.NODE_ENV === 'development') {
+            console.error('Error fetching parent folder:', err)
           }
           break
         }
       }
 
-      setBreadcrumbItems(items)
+      // Reverse the array so it goes from root to current folder
+      setBreadcrumbItems(pathItems.reverse())
     } catch (error) {
       // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
