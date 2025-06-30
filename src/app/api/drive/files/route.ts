@@ -325,7 +325,17 @@ export async function GET(request: NextRequest) {
     // If fileId is provided, return single file metadata (used by breadcrumb)
     if (fileId) {
       const fileMetadata = await driveService.getFileMetadata(fileId, ['id', 'name', 'parents', 'mimeType'])
-      return NextResponse.json(fileMetadata)
+      
+      // Ensure id is always included in response
+      const response = {
+        ...fileMetadata,
+        id: fileMetadata.id || fileId, // Fallback to requested fileId if id is missing
+      }
+      
+      console.log('[Drive API] Single file response:', response)
+      console.log('[Drive API] File ID check:', { requestedId: fileId, responseId: response.id })
+      
+      return NextResponse.json(response)
     }
     
     // Otherwise, list folder contents

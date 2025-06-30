@@ -549,13 +549,17 @@ export class GoogleDriveService {
   /**
    * Get file metadata with specific fields
    */
-  async getFileMetadata(fileId: string, fields: string[]): Promise<DriveFileMetadata> {
+  async getFileMetadata(fileId: string, fields: string[]): Promise<DriveFileMetadata & { id: string }> {
     const response = await this.drive.files.get({
       fileId,
       fields: fields.join(','),
     })
 
+    console.log('[Google Drive Service] Raw API response:', response.data)
+    console.log('[Google Drive Service] Response ID:', response.data.id)
+
     return {
+      id: response.data.id || fileId, // Ensure id is always present
       name: response.data.name!,
       mimeType: response.data.mimeType!,
       createdTime: response.data.createdTime!,
