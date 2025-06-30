@@ -29,7 +29,7 @@ function buildDriveQuery(filters: FileFilter): string {
       break
     case 'shared':
       // Shared with me view - files shared by others
-      conditions.push('trashed=false')
+      //conditions.push('trashed=false')
       conditions.push('sharedWithMe=true')
       break
     case 'starred':
@@ -43,14 +43,15 @@ function buildDriveQuery(filters: FileFilter): string {
       conditions.push("'me' in owners")
       break
     case 'recent':
-      // Recent view - recently modified files
+      // Recent view - recently modified files on 30 days ago
+      //conditions.push('trashed=false')
+      conditions.push(`modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`)
+      //break
+    //case 'all':
+    //default:
+      // All files view - show non-trashed files by default
       //conditions.push('trashed=false')
       //break
-    case 'all':
-    default:
-      // All files view - show non-trashed files by default
-      conditions.push('trashed=false')
-      break
   }
 
   // File type filters - handle both single and multiple types

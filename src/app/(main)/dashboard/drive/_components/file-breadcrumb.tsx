@@ -47,12 +47,11 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       console.log('[Breadcrumb] Initial folder data:', folder)
       console.log('[Breadcrumb] Folder properties:', Object.keys(folder))
       console.log('[Breadcrumb] Folder ID raw:', folder.id)
-      console.log('[Breadcrumb] Folder fileId:', folder.fileId)
       console.log('[Breadcrumb] Folder name:', folder.name)
       console.log('[Breadcrumb] Folder parents:', folder.parents)
       
       // Use fileId if id is not available (common in Google Drive API responses)
-      const actualId = folder.id || folder.fileId || folderId
+      const actualId = folder.id || folderId
       console.log('[Breadcrumb] Resolved folder ID:', actualId)
       
       // Validate folder data
@@ -101,11 +100,10 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
           console.log('[Breadcrumb] Parent folder data:', parentFolder)
           console.log('[Breadcrumb] Parent folder properties:', Object.keys(parentFolder))
           console.log('[Breadcrumb] Parent folder ID raw:', parentFolder.id)
-          console.log('[Breadcrumb] Parent folder fileId:', parentFolder.fileId)
           console.log('[Breadcrumb] Parent folder name:', parentFolder.name)
           
           // Use fileId if id is not available
-          const actualParentId = parentFolder.id || parentFolder.fileId || parentId
+          const actualParentId = parentFolder.id || parentId
           console.log('[Breadcrumb] Resolved parent folder ID:', actualParentId)
           
           // Validate parent folder data
