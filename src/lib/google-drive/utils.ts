@@ -1175,7 +1175,8 @@ export function getFileActions(
   canDetails: boolean
   canTrash: boolean
   canUntrash: boolean
-  canPermanentDelete: boolean
+  canDelete: boolean
+  canExport: boolean
 } {
   const isTrashed = file.trashed === true
   const isFolder = file.itemType === 'folder' || file.mimeType === 'application/vnd.google-apps.folder'
@@ -1192,6 +1193,7 @@ export function getFileActions(
     canTrash: false,
     canUntrash: false,
     canMoveItemWithinDrive: false,
+    canExport: true
   }
 
   const finalCapabilities: DriveFileCapabilities = Object.keys(capabilities).length > 0 ? capabilities : defaultCapabilities
@@ -1213,7 +1215,8 @@ export function getFileActions(
     canShare: Boolean(finalCapabilities.canShare),
     canTrash: Boolean(finalCapabilities.canTrash),
     canUntrash: Boolean(isTrashed && finalCapabilities.canUntrash),
-    canPermanentDelete: Boolean(finalCapabilities.canDelete),
+    canDelete: Boolean(finalCapabilities.canDelete),
+    canExport: Boolean(finalCapabilities.canExport)
   }
 }
 
