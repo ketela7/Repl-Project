@@ -114,6 +114,7 @@ interface DriveToolbarProps {
   selectedItems: DriveItem[]
   onDeselectAll: () => void
   onRefreshAfterOp: () => void
+  onDialogStateChange?: (_hasOpenDialog: boolean) => void
   filters: {
     activeView: 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash'
     fileTypeFilter: string[]
@@ -448,6 +449,7 @@ export function DriveToolbar({
   setVisibleColumns,
   onClientSideFilter,
   onClearClientSideFilter,
+  onDialogStateChange,
 }: DriveToolbarProps) {
   const isMobile = useIsMobile()
   
@@ -464,6 +466,13 @@ export function DriveToolbar({
   // Actions Dialog State
   const [isOperationsOpen, setIsOperationsOpen] = useState(false)
   const [isFiltersDialogOpen, setIsFiltersDialogOpen] = useState(false)
+
+  // Notify parent component about dialog state changes
+  React.useEffect(() => {
+    if (onDialogStateChange) {
+      onDialogStateChange(isOperationsOpen || isFiltersDialogOpen)
+    }
+  }, [isOperationsOpen, isFiltersDialogOpen, onDialogStateChange])
 
   // Extract necessary props from filters
   const { activeView, fileTypeFilter, advancedFilters } = filters
@@ -520,14 +529,16 @@ export function DriveToolbar({
 
   return (
     <div 
-      className="fixed top-14 left-0 right-0 z-[100] bg-background/98 backdrop-blur-md supports-[backdrop-filter]:bg-background/95 transition-all duration-200 ease-out border-b"
+                        className={`fixed left-0 right-0 z-[100] border-b bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80 transition-all duration-100 ease-out ${
+        isScrolled ? 'shadow-lg top-0' : 'shadow-sm top-14'
+      }`}
       id="drive-toolbar"
       style={{
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
         boxShadow: isScrolled 
           ? '0 4px 12px 0 rgb(0 0 0 / 0.15), 0 2px 4px -1px rgb(0 0 0 / 0.1)'
-          : '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.06)',
+          : 'none',
       }}
     >
       <div className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth px-4 py-2.5 min-h-[3rem]" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
