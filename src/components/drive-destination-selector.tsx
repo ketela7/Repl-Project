@@ -92,7 +92,7 @@ export function DriveDestinationSelector({ onSelect, selectedFolderId = 'root', 
         setFolders(data.folders || [])
       }
     } catch (error) {
-      console.error('Failed to load folders:', error)
+      // console.error('Failed to load folders:', error)
     } finally {
       setIsLoadingFolders(false)
     }

@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         try {
           return await driveService.getFileDetails(id, fields)
         } catch (error) {
-          console.error(`Failed to get details for file ${id}:`, error)
+          // console.error(`Failed to get details for file ${id}:`, error)
           return null
         }
       })

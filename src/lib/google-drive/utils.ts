@@ -1047,23 +1047,21 @@ export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFol
       emailAddress: owner.emailAddress || '',
       ...(owner.photoLink && { photoLink: owner.photoLink }),
     })),
-    capabilities: folder.capabilities
-      ? {
-          canCopy: folder.capabilities.canCopy ?? false,
-          canDelete: folder.capabilities.canDelete ?? false,
-          canDownload: folder.capabilities.canDownload ?? false,
-          canEdit: folder.capabilities.canEdit ?? false,
-          canRename: folder.capabilities.canRename ?? false,
-          canShare: folder.capabilities.canShare ?? false,
-          canTrash: folder.capabilities.canTrash ?? false,
-          canUntrash: folder.capabilities.canUntrash ?? false,
-          canMoveItemWithinDrive: folder.capabilities.canMoveItemWithinDrive ?? false,
-          canMoveItemOutOfDrive: folder.capabilities.canMoveItemOutOfDrive ?? false,
-          canAddChildren: folder.capabilities.canAddChildren ?? false,
-          canListChildren: folder.capabilities.canListChildren ?? false,
-          canRemoveChildren: folder.capabilities.canRemoveChildren ?? false,
-        }
-      : undefined,
+    capabilities: {
+      canCopy: folder.capabilities?.canCopy ?? false,
+      canDelete: folder.capabilities?.canDelete ?? false,
+      canDownload: folder.capabilities?.canDownload ?? false,
+      canEdit: folder.capabilities?.canEdit ?? false,
+      canRename: folder.capabilities?.canRename ?? false,
+      canShare: folder.capabilities?.canShare ?? false,
+      canTrash: folder.capabilities?.canTrash ?? false,
+      canUntrash: folder.capabilities?.canUntrash ?? false,
+      canMoveItemWithinDrive: folder.capabilities?.canMoveItemWithinDrive ?? false,
+      canMoveItemOutOfDrive: folder.capabilities?.canMoveItemOutOfDrive ?? false,
+      canAddChildren: folder.capabilities?.canAddChildren ?? false,
+      canListChildren: folder.capabilities?.canListChildren ?? false,
+      canRemoveChildren: folder.capabilities?.canRemoveChildren ?? false,
+    },
   }
 }
 

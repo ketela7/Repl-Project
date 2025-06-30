@@ -205,7 +205,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
       if (abortControllerRef.current?.signal.aborted) {
         return
       }
-      console.error(err)
+      // console.error(err)
       toast.error('Share operation failed')
     } finally {
       abortControllerRef.current = null

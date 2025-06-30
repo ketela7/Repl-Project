@@ -87,10 +87,10 @@ export function DriveManager() {
 
   // Debug effect to track items changes
   useEffect(() => {
-    console.log('[DriveManager] Items state changed:', items.length, 'items')
-    console.log('[DriveManager] Current folder ID:', currentFolderId)
+    // console.log('[DriveManager] Items state changed:', items.length, 'items')
+    // console.log('[DriveManager] Current folder ID:', currentFolderId)
     if (items.length > 0) {
-      console.log('[DriveManager] First 3 items:', items.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
+      // console.log('[DriveManager] First 3 items:', items.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
     }
   }, [items, currentFolderId])
   const [refreshing, setRefreshing] = useState(false)
@@ -379,7 +379,7 @@ export function DriveManager() {
           params.append('pageSize', String(filters.advancedFilters.pageSize))
         }
 
-        console.log('[DriveManager] Fetching files with params:', params.toString())
+        // console.log('[DriveManager] Fetching files with params:', params.toString())
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
@@ -401,11 +401,11 @@ export function DriveManager() {
           itemType: item.mimeType === 'application/vnd.google-apps.folder' ? ('folder' as const) : ('file' as const),
         }))
 
-        console.log('[DriveManager] Received items:', newItems.length, 'items for folder:', folderId)
-        console.log('[DriveManager] Items preview:', newItems.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
+        // console.log('[DriveManager] Received items:', newItems.length, 'items for folder:', folderId)
+        // console.log('[DriveManager] Items preview:', newItems.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
         setItems((prev) => {
           const result = pageToken ? [...prev, ...newItems] : newItems
-          console.log('[DriveManager] Setting items to:', result.length, 'items')
+          // console.log('[DriveManager] Setting items to:', result.length, 'items')
           return result
         })
 
@@ -449,7 +449,7 @@ export function DriveManager() {
   // Navigation handlers
   const handleFolderClick = useCallback(
     (folderId: string) => {
-      console.log('[DriveManager] Navigating to folder:', folderId)
+      // console.log('[DriveManager] Navigating to folder:', folderId)
 
       // Force immediate state update
       setLoading(true)
@@ -466,7 +466,7 @@ export function DriveManager() {
   )
 
   const handleBackToParent = useCallback(() => {
-    console.log('[DriveManager] Navigating back to root')
+    // console.log('[DriveManager] Navigating back to root')
 
     // Force immediate state update
     setLoading(true)
@@ -543,10 +543,10 @@ export function DriveManager() {
     const hasMinSize = filters.advancedFilters.sizeRange?.min
     const hasMaxSize = filters.advancedFilters.sizeRange?.max
 
-    console.log('[DriveManager] Size filtering - items:', items.length, 'hasMinSize:', hasMinSize, 'hasMaxSize:', hasMaxSize)
+    // console.log('[DriveManager] Size filtering - items:', items.length, 'hasMinSize:', hasMinSize, 'hasMaxSize:', hasMaxSize)
 
     if (!hasMinSize && !hasMaxSize) {
-      console.log('[DriveManager] No size filters, returning all items:', items.length)
+      // console.log('[DriveManager] No size filters, returning all items:', items.length)
       return items
     }
 
@@ -586,14 +586,14 @@ export function DriveManager() {
       return true
     })
 
-    console.log('[DriveManager] Size filtered items:', filtered.length)
+    // console.log('[DriveManager] Size filtered items:', filtered.length)
     return filtered
   }, [items, filters.advancedFilters.sizeRange])
 
   const displayItems = useMemo(() => {
-    console.log('[DriveManager] Display items calculation - filteredItems:', filteredItems.length, 'sizeFilteredItems:', sizeFilteredItems.length)
+    // console.log('[DriveManager] Display items calculation - filteredItems:', filteredItems.length, 'sizeFilteredItems:', sizeFilteredItems.length)
     const result = filteredItems.length > 0 ? filteredItems : sizeFilteredItems
-    console.log('[DriveManager] Display items calculated:', result.length, 'items')
+    // console.log('[DriveManager] Display items calculated:', result.length, 'items')
     return result
   }, [filteredItems, sizeFilteredItems])
 
@@ -711,19 +711,19 @@ export function DriveManager() {
           <FileBreadcrumb 
             currentFolderId={currentFolderId} 
             onNavigate={(folderId) => {
-              console.log('[DriveManager] Breadcrumb navigation called with folderId:', folderId)
+              // console.log('[DriveManager] Breadcrumb navigation called with folderId:', folderId)
               if (folderId) {
-                console.log('[DriveManager] Navigating to folder:', folderId)
+                // console.log('[DriveManager] Navigating to folder:', folderId)
                 handleFolderClick(folderId)
               } else {
                 // [icon home] Drive
-                console.log('[DriveManager] Navigating to root (My Drive)')
+                // console.log('[DriveManager] Navigating to root (My Drive)')
                 setCurrentFolderId(null)
                 fetchFiles(undefined, searchQuery.trim() || undefined)
               }
             }} 
             onBackToRoot={() => {
-              console.log('[DriveManager] Back to root called')
+              // console.log('[DriveManager] Back to root called')
               setCurrentFolderId(null)
               fetchFiles(undefined, searchQuery.trim() || undefined)
             }} 
