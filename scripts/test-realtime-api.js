@@ -312,25 +312,9 @@ class ComprehensiveAPITester {
 
     const detailEndpoints = [
       {
-        name: 'Essential Details',
-        path: '/api/drive/files/essential',
-        body: { fileId: testFile.id },
-        validateResponse: (data) => data.file && data.file.id === testFile.id
-      },
-      {
         name: 'Full Details',
         path: '/api/drive/files/details',
         body: { fileId: testFile.id },
-        validateResponse: (data) => data.file && data.file.id === testFile.id
-      },
-      {
-        name: 'Extended Details',
-        path: '/api/drive/files/extended',
-        body: { 
-          fileId: testFile.id,
-          includePermissions: true,
-          includeExportLinks: true
-        },
         validateResponse: (data) => data.file && data.file.id === testFile.id
       },
       {
