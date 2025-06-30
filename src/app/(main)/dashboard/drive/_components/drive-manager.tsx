@@ -288,7 +288,8 @@ export function DriveManager() {
     async (folderId?: string, searchQuery?: string, pageToken?: string) => {
       let callId = ''
       try {
-        // Don't use currentFolderId from closure - use the passed parameter directly
+        // Handle null/undefined folderId properly
+        const actualFolderId = folderId || null
         const activeView = filters.activeView
         const filterKey = JSON.stringify({
           view: activeView,
@@ -301,7 +302,7 @@ export function DriveManager() {
           owner: filters.advancedFilters.owner,
         })
 
-        callId = `${folderId}-${searchQuery}-${pageToken}-${filterKey}`
+        callId = `${actualFolderId}-${searchQuery}-${pageToken}-${filterKey}`
 
         if (activeRequestsRef.current.has(callId)) return
         if (filterKey !== lastFiltersRef.current && pageToken) return
@@ -317,7 +318,8 @@ export function DriveManager() {
           sortOrder: filters.advancedFilters.sortOrder,
         })
 
-        if (folderId) params.append('folderId', folderId)
+        // Only add folderId if it's not null/undefined
+        if (actualFolderId) params.append('folderId', actualFolderId)
         if (searchQuery) params.append('search', searchQuery)
         if (pageToken) params.append('pageToken', pageToken)
         if (filters.activeView && filters.activeView !== 'all') params.append('viewStatus', filters.activeView)
@@ -345,8 +347,6 @@ export function DriveManager() {
           params.append('pageSize', String(filters.advancedFilters.pageSize))
         }
 
-        // Don't manually build query here - let the API handle it based on viewStatus and folderId
-        console.log('[Drive API] - Query:', query)
         console.log('[DriveManager] Fetching files with params:', params.toString())
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',

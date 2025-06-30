@@ -341,7 +341,8 @@ export async function GET(request: NextRequest) {
     // Otherwise, list folder contents
     const pageSize = Math.min(Number(searchParams.get('pageSize')) || 50, 1000)
     const pageToken = searchParams.get('pageToken') || undefined
-    const folderId = searchParams.get('folderId') || 'root'
+    const folderIdParam = searchParams.get('folderId')
+    const folderId = folderIdParam || 'root'
 
     const filters: FileFilter = {
       fileType: searchParams.get('fileType') || 'all',
@@ -360,16 +361,23 @@ export async function GET(request: NextRequest) {
 
     const baseQuery = buildDriveQuery(filters)
     
-    // Only add parent folder constraint for my-drive view or when explicitly navigating folders
+    // Build query with parent constraints
     let query = baseQuery
     
-    // Add parent constraint only for my-drive view or when in folder navigation mode
-    if (filters.viewStatus === 'my-drive' || (folderId && folderId !== 'root' && !filters.viewStatus)) {
+    // Handle different view types with proper parent constraints
+    if (filters.viewStatus === 'my-drive') {
+      // My Drive view - always constrain to folders I own
       const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
-    } else if (!filters.viewStatus && folderId === 'root') {
-      // Default view without specific viewStatus - apply root constraint
-      const parentQuery = "'root' in parents"
+    } else if (filters.viewStatus === 'shared' || filters.viewStatus === 'starred' || filters.viewStatus === 'recent') {
+      // These views don't need parent constraints - they show files from anywhere
+      // query already contains the appropriate filters from buildDriveQuery
+    } else if (filters.viewStatus === 'trash') {
+      // Trash view - don't add parent constraints, show all trashed files
+      // query already contains trashed=true from buildDriveQuery
+    } else {
+      // Default/all view - show files in current folder
+      const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
     }
     
@@ -392,7 +400,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    console.log('[Drive API] Fetching files in parents:', folderId)
+    console.log('[Drive API] Request details:', {
+      folderId,
+      folderIdParam,
+      viewStatus: filters.viewStatus,
+      query,
+      pageSize,
+      orderBy
+    })
 
     // Pass the complete query to the Drive service
     const result = await driveService.listFiles({
