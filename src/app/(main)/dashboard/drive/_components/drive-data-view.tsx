@@ -190,22 +190,21 @@ export function DriveDataView({
       const menuItems = [
         { key: 'details', label: 'Details', icon: Info, condition: true },
         { key: 'preview', label: 'Preview', icon: Eye, condition: !item.isFolder },
-        { key: 'move', label: 'Move', icon: Move, condition: Boolean(item.canMove) },
-        { key: 'copy', label: 'Copy', icon: Copy, condition: Boolean(item.canCopy) },
-        { key: 'download', label: 'Download', icon: Download, condition: Boolean(item.canDownload) },
-        { key: 'rename', label: 'Rename', icon: Edit, condition: Boolean(item.canRename) },
-        { key: 'share', label: 'Share', icon: Share, condition: Boolean(item.canShare) },
-        { key: 'trash', label: 'Move to Trash', icon: Trash2, condition: Boolean(item.canTrash), destructive: true },
-        { key: 'delete', label: 'Delete', icon: Triangle, condition: Boolean(item.canDelete), destructive: true },
-        { key: 'untrash', label: 'Untrash', icon: RefreshCw, condition: Boolean(item.canUntrash), destructive: true },
-        { key: 'export', label: 'Export', icon: FileDown, condition: Boolean(item.canExport) }
+        { key: 'move', label: 'Move', icon: Move, condition: item.canMove === true },
+        { key: 'copy', label: 'Copy', icon: Copy, condition: item.canCopy === true },
+        { key: 'download', label: 'Download', icon: Download, condition: item.canDownload === true },
+        { key: 'rename', label: 'Rename', icon: Edit, condition: item.canRename === true },
+        { key: 'share', label: 'Share', icon: Share, condition: item.canShare === true },
+        { key: 'trash', label: 'Move to Trash', icon: Trash2, condition: item.canTrash === true, destructive: true },
+        { key: 'delete', label: 'Delete', icon: Triangle, condition: item.canDelete === true, destructive: true },
+        { key: 'untrash', label: 'Untrash', icon: RefreshCw, condition: item.canUntrash === true, destructive: true },
+        { key: 'export', label: 'Export', icon: FileDown, condition: item.canExport === true }
       ]
       
       // Filter menu items based on condition boolean
       return menuItems.filter((menuItem) => {
-        // Ensure condition is explicitly a boolean
-        const shouldShow = menuItem.condition === true
-        return shouldShow
+        // Ensure condition is explicitly true (not just truthy)
+        return menuItem.condition === true
       })
     },
     []

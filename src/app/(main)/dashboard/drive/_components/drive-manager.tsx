@@ -42,7 +42,7 @@ type DriveItem = (DriveFile | DriveFolder) & {
   canMove?: boolean
   canCopy?: boolean
   canExport?: boolean
-  
+
 }
 // Helper function to convert size units to bytes (Google Drive API requirement)
 function getSizeMultiplier(unit: string): number {
@@ -277,7 +277,7 @@ export function DriveManager() {
     return Array.from(selectedItems).map((itemId) => {
       const item = items.find((i) => i.id === itemId)
       const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
-      
+
       // Use getFileActions for consistent capability checking
       const actions = getFileActions(
         {
@@ -598,8 +598,20 @@ export function DriveManager() {
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
-    const currentView = filters.activeView || 'all'
-    const itemsToSort = [...displayItems].map((item) => {
+    const sorted = [...items].sort((a, b) => {
+      if (!sortConfig) return 0
+
+      const aValue = a[sortConfig.key as keyof typeof a]
+      const bValue = b[sortConfig.key as keyof typeof b]
+
+      if (aValue === undefined || aValue === null) return 1
+      if (bValue === undefined || bValue === null) return -1
+
+      const comparison = String(aValue).localeCompare(String(bValue), undefined, { numeric: true })
+      return sortConfig.direction === 'asc' ? comparison : -comparison
+    })
+
+    return sorted.map((item) => {
       const isFolder = item.mimeType === 'application/vnd.google-apps.folder'
       const actions = getFileActions(
         {
@@ -608,65 +620,25 @@ export function DriveManager() {
           mimeType: item.mimeType,
           itemType: isFolder ? 'folder' : 'file',
         },
-        currentView
+        filters.activeView
       )
 
       return {
         ...item,
         isFolder,
+        // Use all actions from getFileActions for consistency
         canDownload: actions.canDownload,
         canRename: actions.canRename,
         canMove: actions.canMove,
         canCopy: actions.canCopy,
-        canShare: actions.canShare,
-        canTrash: actions.canTrash,
         canDelete: actions.canDelete,
+        canTrash: actions.canTrash,
         canUntrash: actions.canUntrash,
-        canExport: actions.canExport
+        canShare: actions.canShare,
+        canExport: actions.canExport,
       }
     })
-
-    if (sortConfig && sortConfig.key) {
-      itemsToSort.sort((a, b) => {
-        let aValue: any, bValue: any
-
-        switch (sortConfig.key) {
-          case 'name':
-            aValue = a.name?.toLowerCase() || ''
-            bValue = b.name?.toLowerCase() || ''
-            break
-          case 'size':
-            aValue = normalizeFileSize((a as any).size || '0 B')
-            bValue = normalizeFileSize((b as any).size || '0 B')
-            break
-          case 'modifiedTime':
-            aValue = new Date(a.modifiedTime || 0).getTime()
-            bValue = new Date(b.modifiedTime || 0).getTime()
-            break
-          case 'createdTime':
-            aValue = new Date((a as any).createdTime || 0).getTime()
-            bValue = new Date((b as any).createdTime || 0).getTime()
-            break
-          case 'mimeType':
-            aValue = a.isFolder ? 'folder' : (a.mimeType || '').toLowerCase()
-            bValue = b.isFolder ? 'folder' : (b.mimeType || '').toLowerCase()
-            break
-          case 'owners':
-            aValue = ((a as any).owners?.[0]?.displayName || (a as any).owners?.[0]?.emailAddress || '').toLowerCase()
-            bValue = ((b as any).owners?.[0]?.displayName || (b as any).owners?.[0]?.emailAddress || '').toLowerCase()
-            break
-          default:
-            return 0
-        }
-
-        if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
-        if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
-        return 0
-      })
-    }
-
-    return itemsToSort
-  }, [displayItems, sortConfig])
+  }, [items, sortConfig, filters.activeView])
 
   const handleSelectAll = useCallback(() => {
     if (selectedItems.size === sortedDisplayItems.length) {
@@ -861,7 +833,7 @@ export function DriveManager() {
 
       <CreateFolderDialog
         isOpen={dialogs.createFolder}
-        onClose={() => closeDialog('createFolder')}
+        onClose(() => closeDialog('createFolder')}
         currentFolderId={currentFolderId}
         onFolderCreated={() => {
           closeDialog('createFolder')
