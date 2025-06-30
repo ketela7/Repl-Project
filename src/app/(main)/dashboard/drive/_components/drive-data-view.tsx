@@ -344,7 +344,7 @@ export function DriveDataView({
                           try {
                             await navigator.clipboard.writeText(email)
                             // Show toast notification
-                            const { successToast } = await import('@/lib/toast')
+                            const { successToast } = await import('@/components/ui/toast')
                             successToast.copied()
                           } catch (err) {
                             const { errorToast } = await import('@/lib/utils')
