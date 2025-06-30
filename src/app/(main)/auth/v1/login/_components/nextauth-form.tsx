@@ -3,7 +3,6 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { useSession } from 'next-auth/react'
 import { Shield } from 'lucide-react'
 
 import { GoogleAuthButton } from '@/components/auth/google-auth-button'
@@ -19,7 +18,6 @@ interface NextAuthFormProps {
 }
 
 export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
-  const { update } = useSession()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
