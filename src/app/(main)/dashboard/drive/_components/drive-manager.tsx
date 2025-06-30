@@ -283,12 +283,12 @@ export function DriveManager() {
     })
   }, [selectedItems, items])
 
-  // API call function
+  // API call function - Remove dependency on currentFolderId to prevent stale closures
   const fetchFiles = useCallback(
     async (folderId?: string, searchQuery?: string, pageToken?: string) => {
       let callId = ''
       try {
-        if (!folderId) folderId = currentFolderId || undefined
+        // Don't use currentFolderId from closure - use the passed parameter directly
 
         const filterKey = JSON.stringify({
           view: filters.activeView,
@@ -395,7 +395,7 @@ export function DriveManager() {
         if (callId) activeRequestsRef.current.delete(callId)
       }
     },
-    [currentFolderId, filters]
+    [filters]
   )
 
   // Search submit handler
@@ -416,22 +416,33 @@ export function DriveManager() {
   const handleFolderClick = useCallback(
     (folderId: string) => {
       console.log('[DriveManager] Navigating to folder:', folderId)
+      
+      // Force immediate state update
+      setLoading(true)
       setCurrentFolderId(folderId)
       setSelectedItems(new Set())
-      // Clear cache for the new folder to ensure fresh data
-      setItems([]) // Clear current items immediately for better UX
+      setItems([]) // Clear immediately
+      setFilteredItems([]) // Clear filtered items too
       setNextPageToken(null)
+      
+      // Force a new fetch with the folder ID
       fetchFiles(folderId)
     },
     [fetchFiles]
   )
 
   const handleBackToParent = useCallback(() => {
+    console.log('[DriveManager] Navigating back to root')
+    
+    // Force immediate state update
+    setLoading(true)
     setCurrentFolderId(null)
     setSelectedItems(new Set())
-    // Clear cache when navigating back to root
-    setItems([]) // Clear current items immediately for better UX
+    setItems([]) // Clear immediately
+    setFilteredItems([]) // Clear filtered items too
     setNextPageToken(null)
+    
+    // Force fetch root folder
     fetchFiles()
   }, [fetchFiles])
 
@@ -505,7 +516,9 @@ export function DriveManager() {
   }, [items, filters.advancedFilters.sizeRange])
 
   const displayItems = useMemo(() => {
-    return filteredItems.length > 0 ? filteredItems : sizeFilteredItems
+    const result = filteredItems.length > 0 ? filteredItems : sizeFilteredItems
+    console.log('[DriveManager] Display items calculated:', result.length, 'items')
+    return result
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
