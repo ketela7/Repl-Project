@@ -450,96 +450,29 @@ export function DriveManager() {
 
   const handleShortcutFile = useCallback(async (item: DriveItem) => {
     try {
-      console.log('[DriveManager] Handling shortcut file:', item.name, 'ID:', item.id)
-      
-      // First try to get detailed shortcut information
+      // Try to get shortcut details and open the target
       const response = await fetch(`/api/drive/files/details`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           fileIds: [item.id],
-          fields: 'shortcutDetails,webViewLink,webContentLink'
+          fields: 'shortcutDetails'
         }),
       })
 
-      if (!response.ok) {
-        throw new Error('Failed to get shortcut details')
-      }
-
       const data = await response.json()
-      const shortcutDetails = data.results?.[0]
+      const targetId = data.results?.[0]?.shortcutDetails?.targetId
+      const targetMimeType = data.results?.[0]?.shortcutDetails?.targetMimeType
 
-      console.log('[DriveManager] Shortcut details:', shortcutDetails)
-
-      // Check if shortcut has a target that can be opened
-      if (shortcutDetails?.shortcutDetails?.targetId) {
-        const targetId = shortcutDetails.shortcutDetails.targetId
-        const targetMimeType = shortcutDetails.shortcutDetails.targetMimeType
-
-        console.log('[DriveManager] Shortcut target - ID:', targetId, 'Type:', targetMimeType)
-
-        // If target is a folder, navigate to it
-        if (targetMimeType === 'application/vnd.google-apps.folder') {
-          console.log('[DriveManager] Opening shortcut to folder:', targetId)
-          handleFolderClick(targetId)
-          return
-        }
-
-        // If target is a Google Apps file (docs, sheets, etc.), open in new tab
-        if (targetMimeType?.startsWith('application/vnd.google-apps.') && 
-            targetMimeType !== 'application/vnd.google-apps.shortcut') {
-          
-          const openUrl = shortcutDetails.webViewLink || `https://drive.google.com/file/d/${targetId}/view`
-          console.log('[DriveManager] Opening Google Apps shortcut in new tab:', openUrl)
-          window.open(openUrl, '_blank', 'noopener,noreferrer')
-          return
-        }
-
-        // For other file types, try to create a preview-like experience
-        // Create a virtual file object for the target
-        const virtualFile: DriveFile = {
-          id: targetId,
-          name: item.name.replace(/\.lnk$/, ''), // Remove shortcut suffix if present
-          mimeType: targetMimeType || 'application/octet-stream',
-          size: undefined,
-          modifiedTime: item.modifiedTime,
-          createdTime: (item as any).createdTime,
-          webViewLink: shortcutDetails.webViewLink,
-          webContentLink: shortcutDetails.webContentLink,
-          thumbnailLink: undefined,
-          iconLink: undefined,
-          parents: undefined,
-          owners: (item as any).owners,
-          shared: item.shared,
-          starred: (item as any).starred,
-          trashed: item.trashed,
-          ownedByMe: (item as any).ownedByMe,
-          viewedByMeTime: undefined,
-          viewedByMe: false,
-          explicitlyTrashed: false,
-          capabilities: undefined,
-          exportLinks: {},
-          description: `Shortcut to: ${item.name}`
-        }
-
-        console.log('[DriveManager] Opening shortcut target as preview:', virtualFile)
-        setTimeout(() => {
-          setSelectedFileForPreview(virtualFile)
-          openDialog('preview')
-        }, 50)
+      if (targetId && targetMimeType === 'application/vnd.google-apps.folder') {
+        // Open folder
+        handleFolderClick(targetId)
         return
       }
 
-      // Fallback: if we can't resolve the shortcut, show the shortcut file itself in preview
-      console.log('[DriveManager] Cannot resolve shortcut, showing shortcut preview')
-      setTimeout(() => {
-        setSelectedFileForPreview(item as DriveFile)
-        openDialog('preview')
-      }, 50)
-
-    } catch (error) {
-      console.error('[DriveManager] Error handling shortcut:', error)
-      // Fallback to normal preview on error
+      throw new Error('Cannot open shortcut target')
+    } catch {
+      // Fallback: show preview
       setTimeout(() => {
         setSelectedFileForPreview(item as DriveFile)
         openDialog('preview')

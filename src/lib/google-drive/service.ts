@@ -197,7 +197,7 @@ export class GoogleDriveService {
     return convertGoogleDriveFile(response.data)
   }
 
-  async getFileDetails(fileId: string): Promise<
+  async getFileDetails(fileId: string, fields?: string): Promise<
     DriveFile & {
       description?: string
       lastModifyingUser?: {
@@ -340,7 +340,7 @@ export class GoogleDriveService {
   > {
     const response = await this.drive.files.get({
       fileId,
-      fields: '*',
+      fields: fields || '*',
     })
 
     const file = convertGoogleDriveFile(response.data)
