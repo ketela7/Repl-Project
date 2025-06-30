@@ -73,7 +73,7 @@ export function DriveManager() {
   const [filteredItems, setFilteredItems] = useState<DriveItem[]>([])
   const [loading, setLoading] = useState(true)
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null)
-  
+
   // Debug effect to track items changes
   useEffect(() => {
     console.log('[DriveManager] Items state changed:', items.length, 'items')
@@ -289,9 +289,9 @@ export function DriveManager() {
       let callId = ''
       try {
         // Don't use currentFolderId from closure - use the passed parameter directly
-
+        const activeView = filters.activeView
         const filterKey = JSON.stringify({
-          view: filters.activeView,
+          view: activeView,
           types: filters.fileTypeFilter,
           sort: filters.advancedFilters.sortBy,
           order: filters.advancedFilters.sortOrder,
@@ -345,6 +345,29 @@ export function DriveManager() {
           params.append('pageSize', String(filters.advancedFilters.pageSize))
         }
 
+        // Build query based on filters and current view
+        let query = 'trashed=false'
+
+        // Handle different view types
+        if (activeView === 'my-drive') {
+          // For my-drive view, respect folder navigation
+          if (folderId && folderId !== 'root') {
+            query += ` and '${folderId}' in parents`
+          } else {
+            query += ` and 'root' in parents`
+          }
+        } else if (activeView === 'shared') {
+          query += ` and sharedWithMe=true`
+        } else if (activeView === 'recent') {
+          // For recent view, don't add parent restrictions - show all recent files
+          // query already has trashed=false, that's sufficient
+        } else if (activeView === 'starred') {
+          query += ` and starred=true`
+        } else if (activeView === 'trash') {
+          query = 'trashed=true' // Override the trashed=false for trash view
+        }
+        params.append('q', query)
+        console.log('[Drive API] - Query:', query)
         console.log('[DriveManager] Fetching files with params:', params.toString())
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',
@@ -416,7 +439,7 @@ export function DriveManager() {
   const handleFolderClick = useCallback(
     (folderId: string) => {
       console.log('[DriveManager] Navigating to folder:', folderId)
-      
+
       // Force immediate state update
       setLoading(true)
       setCurrentFolderId(folderId)
@@ -424,7 +447,7 @@ export function DriveManager() {
       setItems([]) // Clear immediately
       setFilteredItems([]) // Clear filtered items too
       setNextPageToken(null)
-      
+
       // Force a new fetch with the folder ID
       fetchFiles(folderId)
     },
@@ -433,7 +456,7 @@ export function DriveManager() {
 
   const handleBackToParent = useCallback(() => {
     console.log('[DriveManager] Navigating back to root')
-    
+
     // Force immediate state update
     setLoading(true)
     setCurrentFolderId(null)
@@ -441,7 +464,7 @@ export function DriveManager() {
     setItems([]) // Clear immediately
     setFilteredItems([]) // Clear filtered items too
     setNextPageToken(null)
-    
+
     // Force fetch root folder
     fetchFiles()
   }, [fetchFiles])
@@ -476,9 +499,9 @@ export function DriveManager() {
   const sizeFilteredItems = useMemo(() => {
     const hasMinSize = filters.advancedFilters.sizeRange?.min
     const hasMaxSize = filters.advancedFilters.sizeRange?.max
-    
+
     console.log('[DriveManager] Size filtering - items:', items.length, 'hasMinSize:', hasMinSize, 'hasMaxSize:', hasMaxSize)
-    
+
     if (!hasMinSize && !hasMaxSize) {
       console.log('[DriveManager] No size filters, returning all items:', items.length)
       return items
@@ -519,7 +542,7 @@ export function DriveManager() {
       if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit)) return false
       return true
     })
-    
+
     console.log('[DriveManager] Size filtered items:', filtered.length)
     return filtered
   }, [items, filters.advancedFilters.sizeRange])
