@@ -17,6 +17,11 @@ import {
   TrendingUp,
   PieChart,
   Database,
+  Upload,
+  Settings,
+  Palette,
+  Download,
+  Share2,
 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -33,6 +38,7 @@ interface StorageQuota {
   usedInDriveTrash: number
   available: number | null
   usagePercentage: number | null
+  hasUnlimitedStorage: boolean
 }
 
 interface FileStats {
@@ -63,10 +69,25 @@ interface LargestFile {
   mimeType: string
 }
 
+interface SystemCapabilities {
+  maxUploadSize: number | null
+  canCreateDrives: boolean
+  maxImportSizes: Record<string, string>
+  importFormats: Record<string, any>
+  exportFormats: Record<string, any>
+  folderColorPalette: string[]
+  driveThemes: Array<{
+    id: string
+    backgroundImageLink?: string
+    colorRgb?: string
+  }>
+}
+
 interface StorageAnalyticsData {
   quota: StorageQuota
   fileStats: FileStats
   largestFiles: LargestFile[]
+  systemCapabilities: SystemCapabilities
   user: {
     displayName?: string
     emailAddress?: string
@@ -95,6 +116,72 @@ function getFileTypeIcon(mimeType: string) {
   return FileIcon
 }
 
+function SystemCapabilitiesCard({ capabilities }: { capabilities: SystemCapabilities }) {
+  const importFormatCount = Object.keys(capabilities.importFormats).length
+  const exportFormatCount = Object.keys(capabilities.exportFormats).length
+
+  return (
+    <Card>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium">System Capabilities</CardTitle>
+        <Settings className="text-muted-foreground h-4 w-4" />
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {capabilities.maxUploadSize && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="flex items-center gap-1">
+                <Upload className="h-3 w-3" />
+                Max Upload Size
+              </span>
+              <span className="font-medium">{formatBytes(capabilities.maxUploadSize)}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-1">
+              <Share2 className="h-3 w-3" />
+              Can Create Drives
+            </span>
+            <Badge variant={capabilities.canCreateDrives ? 'default' : 'secondary'}>
+              {capabilities.canCreateDrives ? 'Yes' : 'No'}
+            </Badge>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-1">
+              <Download className="h-3 w-3" />
+              Import Formats
+            </span>
+            <span className="font-medium">{importFormatCount}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-1">
+              <Upload className="h-3 w-3" />
+              Export Formats
+            </span>
+            <span className="font-medium">{exportFormatCount}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="flex items-center gap-1">
+              <Palette className="h-3 w-3" />
+              Folder Colors
+            </span>
+            <span className="font-medium">{capabilities.folderColorPalette.length}</span>
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span>Drive Themes</span>
+            <span className="font-medium">{capabilities.driveThemes.length}</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 function StorageQuotaCard({ quota }: { quota: StorageQuota }) {
   return (
     <Card>
@@ -112,18 +199,14 @@ function StorageQuotaCard({ quota }: { quota: StorageQuota }) {
                 {quota.limit && ` / ${formatBytes(quota.limit)}`}
               </span>
             </div>
-            {quota.usagePercentage !== null && (
-              <Progress value={quota.usagePercentage} className="mt-2" />
-            )}
+            {quota.usagePercentage !== null && <Progress value={quota.usagePercentage} className="mt-2" />}
           </div>
 
           {quota.limit && (
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Available</p>
-                <p className="font-medium text-green-600">
-                  {quota.available ? formatBytes(quota.available) : 'N/A'}
-                </p>
+                <p className="font-medium text-green-600">{quota.available ? formatBytes(quota.available) : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Usage</p>
@@ -319,10 +402,7 @@ function LargestFilesCard({ largestFiles }: { largestFiles: LargestFile[] }) {
               const Icon = getFileTypeIcon(file.mimeType)
 
               return (
-                <div
-                  key={index}
-                  className="flex items-center justify-between rounded-lg border p-2"
-                >
+                <div key={index} className="flex items-center justify-between rounded-lg border p-2">
                   <div className="flex min-w-0 flex-1 items-center gap-3">
                     <Icon className="text-muted-foreground h-4 w-4 flex-shrink-0" />
                     <div className="min-w-0 flex-1">
@@ -469,8 +549,11 @@ export function StorageAnalytics() {
         <ActivityCard fileStats={data.fileStats} />
       </div>
 
-      {/* Largest files */}
-      <LargestFilesCard largestFiles={data.largestFiles} />
+      {/* System capabilities and largest files */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SystemCapabilitiesCard capabilities={data.systemCapabilities} />
+        <LargestFilesCard largestFiles={data.largestFiles} />
+      </div>
 
       {/* Last updated */}
       <div className="text-muted-foreground text-center text-xs">

@@ -155,13 +155,7 @@ interface DetailedFileInfo extends DriveFile {
   capabilities?: Record<string, boolean>
 }
 
-export function FileDetailsDialog({
-  isOpen,
-  onClose,
-  fileId,
-  fileName,
-  fileType,
-}: FileDetailsDialogProps) {
+export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType }: FileDetailsDialogProps) {
   const [fileDetails, setFileDetails] = useState<DetailedFileInfo | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -303,9 +297,7 @@ export function FileDetailsDialog({
     const capabilities = fileDetails.capabilities
 
     const allCapabilities = Object.entries(capabilities).filter(([_key, value]) => value === true)
-    const deniedCapabilities = Object.entries(capabilities).filter(
-      ([_key, value]) => value === false,
-    )
+    const deniedCapabilities = Object.entries(capabilities).filter(([_key, value]) => value === false)
 
     // Group capabilities by category for better organization
     const groupCapabilities = (caps: [string, boolean][]) => {
@@ -332,11 +324,7 @@ export function FileDetailsDialog({
           key.includes('Rename')
         ) {
           groups['File Operations'].push(cleanKey)
-        } else if (
-          key.includes('Content') ||
-          key.includes('Comment') ||
-          key.includes('ModifyContent')
-        ) {
+        } else if (key.includes('Content') || key.includes('Comment') || key.includes('ModifyContent')) {
           groups['Content Management'].push(cleanKey)
         } else if (key.includes('Share') || key.includes('Permission') || key.includes('Owner')) {
           groups['Sharing & Permissions'].push(cleanKey)
@@ -360,11 +348,7 @@ export function FileDetailsDialog({
     const allowedGroups = groupCapabilities(allCapabilities)
     const restrictedGroups = groupCapabilities(deniedCapabilities)
 
-    const renderCapabilityGroup = (
-      groupName: string,
-      capabilities: string[],
-      isAllowed: boolean,
-    ) => {
+    const renderCapabilityGroup = (groupName: string, capabilities: string[], isAllowed: boolean) => {
       if (capabilities.length === 0) return null
 
       const colorClasses = isAllowed
@@ -378,11 +362,7 @@ export function FileDetailsDialog({
           </h5>
           <div className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3">
             {capabilities.map(capability => (
-              <Badge
-                key={capability}
-                variant="outline"
-                className={`justify-start text-xs ${colorClasses}`}
-              >
+              <Badge key={capability} variant="outline" className={`justify-start text-xs ${colorClasses}`}>
                 {capability}
               </Badge>
             ))}
@@ -499,9 +479,7 @@ export function FileDetailsDialog({
             {meta.flashUsed !== undefined && (
               <div className="flex items-center justify-between">
                 <span className="font-medium">Flash:</span>
-                <Badge variant={meta.flashUsed ? 'default' : 'secondary'}>
-                  {meta.flashUsed ? 'Used' : 'Not Used'}
-                </Badge>
+                <Badge variant={meta.flashUsed ? 'default' : 'secondary'}>{meta.flashUsed ? 'Used' : 'Not Used'}</Badge>
               </div>
             )}
           </div>
@@ -648,9 +626,7 @@ export function FileDetailsDialog({
                 <div className="flex items-center justify-between">
                   <span className="font-medium">MD5:</span>
                   <div className="flex items-center gap-2">
-                    <span className="max-w-48 truncate font-mono text-xs">
-                      {fileDetails.md5Checksum}
-                    </span>
+                    <span className="max-w-48 truncate font-mono text-xs">{fileDetails.md5Checksum}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -666,9 +642,7 @@ export function FileDetailsDialog({
                 <div className="flex items-center justify-between">
                   <span className="font-medium">SHA1:</span>
                   <div className="flex items-center gap-2">
-                    <span className="max-w-48 truncate font-mono text-xs">
-                      {fileDetails.sha1Checksum}
-                    </span>
+                    <span className="max-w-48 truncate font-mono text-xs">{fileDetails.sha1Checksum}</span>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -684,15 +658,11 @@ export function FileDetailsDialog({
                 <div className="flex items-center justify-between">
                   <span className="font-medium">SHA256:</span>
                   <div className="flex items-center gap-2">
-                    <span className="max-w-48 truncate font-mono text-xs">
-                      {fileDetails.sha256Checksum}
-                    </span>
+                    <span className="max-w-48 truncate font-mono text-xs">{fileDetails.sha256Checksum}</span>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        copyToClipboard(fileDetails.sha256Checksum!, 'SHA256 Checksum')
-                      }
+                      onClick={() => copyToClipboard(fileDetails.sha256Checksum!, 'SHA256 Checksum')}
                       className="h-6 w-6 p-0"
                     >
                       <Copy className="h-3 w-3" />
@@ -719,17 +689,13 @@ export function FileDetailsDialog({
               {fileDetails?.headRevisionId && (
                 <div className="flex items-center justify-between">
                   <span className="font-medium">Revision ID:</span>
-                  <span className="max-w-32 truncate font-mono text-xs">
-                    {fileDetails.headRevisionId}
-                  </span>
+                  <span className="max-w-32 truncate font-mono text-xs">{fileDetails.headRevisionId}</span>
                 </div>
               )}
               {fileDetails?.resourceKey && (
                 <div className="flex items-center justify-between">
                   <span className="font-medium">Resource Key:</span>
-                  <span className="max-w-32 truncate font-mono text-xs">
-                    {fileDetails.resourceKey}
-                  </span>
+                  <span className="max-w-32 truncate font-mono text-xs">{fileDetails.resourceKey}</span>
                 </div>
               )}
               {fileDetails?.spaces && fileDetails.spaces.length > 0 && (
@@ -755,17 +721,13 @@ export function FileDetailsDialog({
                 {fileDetails.driveId && (
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Drive ID:</span>
-                    <span className="max-w-48 truncate font-mono text-xs">
-                      {fileDetails.driveId}
-                    </span>
+                    <span className="max-w-48 truncate font-mono text-xs">{fileDetails.driveId}</span>
                   </div>
                 )}
                 {fileDetails.teamDriveId && (
                   <div className="flex items-center justify-between">
                     <span className="font-medium">Team Drive ID:</span>
-                    <span className="max-w-48 truncate font-mono text-xs">
-                      {fileDetails.teamDriveId}
-                    </span>
+                    <span className="max-w-48 truncate font-mono text-xs">{fileDetails.teamDriveId}</span>
                   </div>
                 )}
               </div>
@@ -833,12 +795,7 @@ export function FileDetailsDialog({
         <div className="space-y-2">
           {Object.entries(fileDetails.exportLinks).map(([format, link]) => (
             <div key={format} className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open(link, '_blank')}
-                className="flex-1"
-              >
+              <Button variant="outline" size="sm" onClick={() => window.open(link, '_blank')} className="flex-1">
                 <Download className="mr-2 h-4 w-4" />
                 Export as {format.split('/').pop()?.toUpperCase()}
               </Button>
@@ -865,10 +822,7 @@ export function FileDetailsDialog({
             {fileType === 'folder' ? (
               <Folder className="h-5 w-5 text-blue-500" />
             ) : (
-              <FileIcon
-                mimeType={fileDetails?.mimeType || 'application/octet-stream'}
-                className="h-5 w-5"
-              />
+              <FileIcon mimeType={fileDetails?.mimeType || 'application/octet-stream'} className="h-5 w-5" />
             )}
             Details: {fileName}
           </DialogTitle>
@@ -927,9 +881,7 @@ export function FileDetailsDialog({
                   {fileDetails.quotaBytesUsed && (
                     <div className="flex items-center justify-between">
                       <span className="font-medium">Storage Used:</span>
-                      <span className="text-sm">
-                        {formatFileSize(parseInt(fileDetails.quotaBytesUsed))}
-                      </span>
+                      <span className="text-sm">{formatFileSize(parseInt(fileDetails.quotaBytesUsed))}</span>
                     </div>
                   )}
                 </div>
@@ -1013,9 +965,7 @@ export function FileDetailsDialog({
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">
-                          {fileDetails.lastModifyingUser.displayName}
-                        </span>
+                        <span className="text-sm font-medium">{fileDetails.lastModifyingUser.displayName}</span>
                         <span className="text-muted-foreground text-xs">
                           {fileDetails.lastModifyingUser.emailAddress}
                         </span>
@@ -1041,17 +991,11 @@ export function FileDetailsDialog({
                   <div className="mt-2 flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={fileDetails.owners[0]?.photoLink} />
-                      <AvatarFallback>
-                        {getInitials(fileDetails.owners[0]?.displayName || 'Unknown')}
-                      </AvatarFallback>
+                      <AvatarFallback>{getInitials(fileDetails.owners[0]?.displayName || 'Unknown')}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                      <span className="text-sm font-medium">
-                        {fileDetails.owners[0]?.displayName || 'Unknown'}
-                      </span>
-                      <span className="text-muted-foreground text-xs">
-                        {fileDetails.owners[0]?.emailAddress || ''}
-                      </span>
+                      <span className="text-sm font-medium">{fileDetails.owners[0]?.displayName || 'Unknown'}</span>
+                      <span className="text-muted-foreground text-xs">{fileDetails.owners[0]?.emailAddress || ''}</span>
                     </div>
                   </div>
                 </div>
@@ -1077,9 +1021,7 @@ export function FileDetailsDialog({
                   <div className="flex items-center justify-between">
                     <span className="font-medium">MD5 Checksum:</span>
                     <div className="flex items-center gap-2">
-                      <span className="max-w-64 truncate font-mono text-xs">
-                        {fileDetails.md5Checksum}
-                      </span>
+                      <span className="max-w-64 truncate font-mono text-xs">{fileDetails.md5Checksum}</span>
                       <Button
                         variant="ghost"
                         size="sm"
@@ -1309,13 +1251,9 @@ export function FileDetailsDialog({
                         <div key={index} className="rounded-lg border border-red-200 bg-red-50 p-3">
                           <div className="mb-2 flex items-center gap-2">
                             <Lock className="h-4 w-4 text-red-500" />
-                            <span className="font-medium text-red-700">
-                              {restriction.type || 'Restriction'}
-                            </span>
+                            <span className="font-medium text-red-700">{restriction.type || 'Restriction'}</span>
                           </div>
-                          {restriction.reason && (
-                            <p className="mb-2 text-sm text-red-600">{restriction.reason}</p>
-                          )}
+                          {restriction.reason && <p className="mb-2 text-sm text-red-600">{restriction.reason}</p>}
                           {restriction.restrictingUser && (
                             <div className="flex items-center gap-2">
                               <Avatar className="h-6 w-6">
@@ -1325,9 +1263,7 @@ export function FileDetailsDialog({
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <span className="text-sm font-medium">
-                                  {restriction.restrictingUser.displayName}
-                                </span>
+                                <span className="text-sm font-medium">{restriction.restrictingUser.displayName}</span>
                                 <span className="text-muted-foreground ml-2 text-xs">
                                   {restriction.restrictingUser.emailAddress}
                                 </span>
@@ -1351,17 +1287,13 @@ export function FileDetailsDialog({
                       {fileDetails.shortcutDetails.targetId && (
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Target ID:</span>
-                          <span className="font-mono text-xs">
-                            {fileDetails.shortcutDetails.targetId}
-                          </span>
+                          <span className="font-mono text-xs">{fileDetails.shortcutDetails.targetId}</span>
                         </div>
                       )}
                       {fileDetails.shortcutDetails.targetMimeType && (
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Target Type:</span>
-                          <Badge variant="outline">
-                            {fileDetails.shortcutDetails.targetMimeType}
-                          </Badge>
+                          <Badge variant="outline">{fileDetails.shortcutDetails.targetMimeType}</Badge>
                         </div>
                       )}
                     </div>
@@ -1377,11 +1309,7 @@ export function FileDetailsDialog({
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Security Update Eligible:</span>
                           <Badge
-                            variant={
-                              fileDetails.linkShareMetadata.securityUpdateEligible
-                                ? 'default'
-                                : 'secondary'
-                            }
+                            variant={fileDetails.linkShareMetadata.securityUpdateEligible ? 'default' : 'secondary'}
                           >
                             {fileDetails.linkShareMetadata.securityUpdateEligible ? 'Yes' : 'No'}
                           </Badge>
@@ -1391,11 +1319,7 @@ export function FileDetailsDialog({
                         <div className="flex items-center justify-between">
                           <span className="font-medium">Security Update Enabled:</span>
                           <Badge
-                            variant={
-                              fileDetails.linkShareMetadata.securityUpdateEnabled
-                                ? 'default'
-                                : 'secondary'
-                            }
+                            variant={fileDetails.linkShareMetadata.securityUpdateEnabled ? 'default' : 'secondary'}
                           >
                             {fileDetails.linkShareMetadata.securityUpdateEnabled ? 'Yes' : 'No'}
                           </Badge>
@@ -1412,17 +1336,11 @@ export function FileDetailsDialog({
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={fileDetails.sharingUser.photoLink} />
-                        <AvatarFallback>
-                          {getInitials(fileDetails.sharingUser.displayName)}
-                        </AvatarFallback>
+                        <AvatarFallback>{getInitials(fileDetails.sharingUser.displayName)}</AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">
-                          {fileDetails.sharingUser.displayName}
-                        </span>
-                        <span className="text-muted-foreground text-xs">
-                          {fileDetails.sharingUser.emailAddress}
-                        </span>
+                        <span className="text-sm font-medium">{fileDetails.sharingUser.displayName}</span>
+                        <span className="text-muted-foreground text-xs">{fileDetails.sharingUser.emailAddress}</span>
                       </div>
                     </div>
                   </div>

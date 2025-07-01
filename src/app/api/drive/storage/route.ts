@@ -6,13 +6,15 @@ export async function GET(request: NextRequest) {
     const { driveService, response } = await initDriveService()
     if (response) return response
 
-    // Get about information which includes storage quota
+    // Get comprehensive about information including storage quota and system capabilities
     const aboutResponse = await driveService.drive.about.get({
-      fields: 'storageQuota,user',
+      fields:
+        'storageQuota,user,maxUploadSize,maxImportSizes,importFormats,exportFormats,canCreateDrives,folderColorPalette,driveThemes',
     })
 
-    const storageQuota = aboutResponse.data.storageQuota
-    const user = aboutResponse.data.user
+    const about = aboutResponse.data
+    const storageQuota = about.storageQuota
+    const user = about.user
 
     // Get file statistics by querying files with specific criteria
     const [
@@ -150,21 +152,18 @@ export async function GET(request: NextRequest) {
     // Parse storage quota information
     const quotaLimit = storageQuota?.limit ? parseInt(storageQuota.limit) : null
     const quotaUsage = storageQuota?.usage ? parseInt(storageQuota.usage) : totalUsedBytes
-    const quotaUsageInDrive = storageQuota?.usageInDrive
-      ? parseInt(storageQuota.usageInDrive)
-      : totalUsedBytes
+    const quotaUsageInDrive = storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : totalUsedBytes
 
-    // Calculate storage analytics
+    // Calculate comprehensive storage analytics with all Google Drive API statistics
     const storageAnalytics = {
       quota: {
         limit: quotaLimit,
         used: quotaUsage,
         usedInDrive: quotaUsageInDrive,
-        usedInDriveTrash: storageQuota?.usageInDriveTrash
-          ? parseInt(storageQuota.usageInDriveTrash)
-          : 0,
+        usedInDriveTrash: storageQuota?.usageInDriveTrash ? parseInt(storageQuota.usageInDriveTrash) : 0,
         available: quotaLimit ? quotaLimit - quotaUsage : null,
         usagePercentage: quotaLimit ? Math.round((quotaUsage / quotaLimit) * 100) : null,
+        hasUnlimitedStorage: !quotaLimit,
       },
       fileStats: {
         totalFiles: allFiles.length,
@@ -175,6 +174,15 @@ export async function GET(request: NextRequest) {
         starredFiles: starredResponse.data.files?.length || 0,
       },
       largestFiles,
+      systemCapabilities: {
+        maxUploadSize: about.maxUploadSize ? parseInt(about.maxUploadSize) : null,
+        canCreateDrives: about.canCreateDrives || false,
+        maxImportSizes: about.maxImportSizes || {},
+        importFormats: about.importFormats || {},
+        exportFormats: about.exportFormats || {},
+        folderColorPalette: about.folderColorPalette || [],
+        driveThemes: about.driveThemes || [],
+      },
       user: {
         displayName: user?.displayName,
         emailAddress: user?.emailAddress,
