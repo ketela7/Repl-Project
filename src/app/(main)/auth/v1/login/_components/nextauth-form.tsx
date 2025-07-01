@@ -45,9 +45,7 @@ export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
       {isReauth && (
         <Alert className="border-blue-200 bg-blue-50">
           <Shield className="h-4 w-4" />
-          <AlertDescription>
-            Please sign in again to grant Google Drive access permissions.
-          </AlertDescription>
+          <AlertDescription>Please sign in again to grant Google Drive access permissions.</AlertDescription>
         </Alert>
       )}
 
@@ -59,15 +57,10 @@ export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
           onCheckedChange={checked => handleRememberChange(!!checked)}
         />
         <div className="space-y-1">
-          <label
-            htmlFor="remember-me-nextauth"
-            className="cursor-pointer text-sm font-medium select-none"
-          >
+          <label htmlFor="remember-me-nextauth" className="cursor-pointer text-sm font-medium select-none">
             Keep me signed in for 30 days
           </label>
-          <p className="text-muted-foreground text-xs">
-            Default: Sign out after 1 day for security
-          </p>
+          <p className="text-muted-foreground text-xs">Default: Sign out after 1 day for security</p>
         </div>
       </div>
 

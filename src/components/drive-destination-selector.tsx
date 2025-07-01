@@ -13,8 +13,6 @@ import {
   ChevronRight,
   FolderOpen,
   Users,
-  Star,
-  Clock,
   Shield,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -24,7 +22,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 
 interface DriveFolder {
@@ -205,9 +202,7 @@ export function DriveDestinationSelector({
           <FolderOpen className="h-5 w-5 text-blue-500" />
           Select Destination Folder
         </CardTitle>
-        <p className="text-muted-foreground text-sm">
-          Choose where you want to save your files in Google Drive
-        </p>
+        <p className="text-muted-foreground text-sm">Choose where you want to save your files in Google Drive</p>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'browse' | 'url')}>
@@ -235,9 +230,7 @@ export function DriveDestinationSelector({
               <div className="flex items-center gap-1 overflow-x-auto">
                 {currentPath.map((folder, index) => (
                   <div key={folder.id} className="flex flex-shrink-0 items-center gap-1">
-                    {index > 0 && (
-                      <ChevronRight className="text-muted-foreground h-3 w-3 flex-shrink-0" />
-                    )}
+                    {index > 0 && <ChevronRight className="text-muted-foreground h-3 w-3 flex-shrink-0" />}
                     <button
                       onClick={() => navigateBack(index)}
                       className={cn(
@@ -296,9 +289,7 @@ export function DriveDestinationSelector({
                           {searchQuery ? 'No folders found' : 'No folders available'}
                         </p>
                         <p className="text-muted-foreground mt-1 text-xs">
-                          {searchQuery
-                            ? 'Try adjusting your search terms'
-                            : 'This location is empty'}
+                          {searchQuery ? 'Try adjusting your search terms' : 'This location is empty'}
                         </p>
                       </div>
                     </div>
@@ -339,10 +330,7 @@ export function DriveDestinationSelector({
                               )}
                             </div>
                             {folder.path && (
-                              <p
-                                className="text-muted-foreground truncate text-xs"
-                                title={folder.path}
-                              >
+                              <p className="text-muted-foreground truncate text-xs" title={folder.path}>
                                 {folder.path}
                               </p>
                             )}
@@ -392,9 +380,7 @@ export function DriveDestinationSelector({
                           <p className="text-muted-foreground text-xs">
                             Showing first 20 of {filteredFolders.length} folders
                           </p>
-                          <p className="text-muted-foreground mt-1 text-xs">
-                            Use search to find specific folders
-                          </p>
+                          <p className="text-muted-foreground mt-1 text-xs">Use search to find specific folders</p>
                         </div>
                       )}
                     </>
@@ -421,19 +407,14 @@ export function DriveDestinationSelector({
                   onChange={e => setUrlInput(e.target.value)}
                   className={cn(
                     'h-12 text-sm transition-all duration-200',
-                    parsedResult.isValid &&
-                      'border-green-500 focus:border-green-600 focus:ring-green-200',
-                    urlInput &&
-                      !parsedResult.isValid &&
-                      'border-red-500 focus:border-red-600 focus:ring-red-200',
+                    parsedResult.isValid && 'border-green-500 focus:border-green-600 focus:ring-green-200',
+                    urlInput && !parsedResult.isValid && 'border-red-500 focus:border-red-600 focus:ring-red-200',
                     !urlInput && 'bg-muted/30 border-muted',
                   )}
                 />
 
                 <div className="bg-muted/30 rounded-lg p-3">
-                  <p className="text-muted-foreground mb-2 text-xs font-medium">
-                    Supported formats:
-                  </p>
+                  <p className="text-muted-foreground mb-2 text-xs font-medium">Supported formats:</p>
                   <ul className="text-muted-foreground space-y-1 text-xs">
                     <li className="flex items-center gap-2">
                       <div className="bg-muted-foreground h-1 w-1 rounded-full" />
@@ -513,12 +494,10 @@ export function DriveDestinationSelector({
                         <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="text-sm font-medium text-red-800 dark:text-red-200">
-                          Invalid URL Format
-                        </h4>
+                        <h4 className="text-sm font-medium text-red-800 dark:text-red-200">Invalid URL Format</h4>
                         <p className="mt-1 text-xs text-red-700 dark:text-red-300">
-                          Please check the URL format and try again. Make sure it's a valid Google
-                          Drive folder URL or ID.
+                          Please check the URL format and try again. Make sure it's a valid Google Drive folder URL or
+                          ID.
                         </p>
                       </div>
                     </div>
@@ -561,9 +540,7 @@ export function DriveDestinationSelector({
                                 : 'text-red-800 dark:text-red-200',
                             )}
                           >
-                            {validationResult.isValid
-                              ? 'Folder Access Confirmed'
-                              : 'Access Validation Failed'}
+                            {validationResult.isValid ? 'Folder Access Confirmed' : 'Access Validation Failed'}
                           </h4>
                           <p
                             className={cn(
