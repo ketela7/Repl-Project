@@ -40,17 +40,13 @@ export const FIELD_SELECTORS = {
   FOLDER_STRUCTURE: 'files(id, name, parents, mimeType)',
 
   // Fields for search results
-  SEARCH_RESULTS:
-    'nextPageToken, files(id, name, mimeType, size, modifiedTime, parents, webViewLink)',
+  SEARCH_RESULTS: 'nextPageToken, files(id, name, mimeType, size, modifiedTime, parents, webViewLink)',
 } as const
 
 /**
  * Performance-optimized request parameters
  */
-export function getOptimizedRequestParams(
-  operation: keyof typeof FIELD_SELECTORS,
-  baseParams: any = {},
-): any {
+export function getOptimizedRequestParams(operation: keyof typeof FIELD_SELECTORS, baseParams: any = {}): any {
   return {
     ...baseParams,
     fields: FIELD_SELECTORS[operation],

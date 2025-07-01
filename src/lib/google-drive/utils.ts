@@ -529,20 +529,17 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'text/plain': 'text-gray-600 dark:text-gray-400',
     'text/markdown': 'text-slate-600 dark:text-slate-400',
     'application/msword': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      'text-blue-600 dark:text-blue-400',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'text-blue-600 dark:text-blue-400',
     'application/rtf': 'text-blue-600 dark:text-blue-400',
 
     // Spreadsheets
     'application/vnd.ms-excel': 'text-green-600 dark:text-green-400',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-      'text-green-600 dark:text-green-400',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'text-green-600 dark:text-green-400',
     'text/csv': 'text-green-600 dark:text-green-400',
 
     // Presentations
     'application/vnd.ms-powerpoint': 'text-orange-600 dark:text-orange-400',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-      'text-orange-600 dark:text-orange-400',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'text-orange-600 dark:text-orange-400',
 
     // Images
     'image/jpeg': 'text-purple-600 dark:text-purple-400',
@@ -1208,21 +1205,16 @@ export function getFileActions(
     canMove: !trashed && capabilities?.canMoveItemWithinDrive !== false,
     canExport:
       !trashed &&
-      (mimeType.includes('application/vnd.google-apps.document') ||
-        mimeType.includes('application/vnd.google-apps.spreadsheet') ||
-        mimeType.includes('application/vnd.google-apps.presentation') ||
-        mimeType.includes('application/vnd.google-apps.drawing')), // Allow export for non-trashed files
+      ['document', 'spreadsheet', 'presentation', 'drawing'].some(type =>
+        mimeType.includes(`application/vnd.google-apps.${type}`),
+      ), // Allow export for non-trashed files
   }
 }
 
 /**
  * Format Google Drive file dates with user timezone
  */
-export const formatDriveFileDate = (
-  dateString: string,
-  timezone?: string,
-  showRelative: boolean = true,
-): string => {
+export const formatDriveFileDate = (dateString: string, timezone?: string, showRelative: boolean = true): string => {
   if (!dateString) return 'Unknown'
 
   try {
@@ -1330,8 +1322,7 @@ export function getFileCategory(mimeType: string): string {
   if (mimeType.includes('spreadsheet') || mimeType === 'text/csv') return 'spreadsheet'
   if (mimeType.includes('presentation')) return 'presentation'
   if (mimeType.includes('document') || mimeType.startsWith('text/')) return 'document'
-  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive'))
-    return 'archive'
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive')) return 'archive'
   if (
     mimeType.includes('javascript') ||
     mimeType.includes('json') ||

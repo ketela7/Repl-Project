@@ -98,7 +98,6 @@ export const sidebarItems: SidebarData = {
           title: 'Storage Analytics',
           url: '/dashboard/analytics',
           icon: BarChart3,
-          comingSoon: true,
         },
         {
           title: 'Activity',
