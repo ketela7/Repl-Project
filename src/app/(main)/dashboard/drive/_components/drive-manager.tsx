@@ -147,7 +147,7 @@ export function DriveManager() {
   const [selectedFileForDetails, setSelectedFileForDetails] = useState<DriveItem | null>(null)
 
   // Progress states
-  const [operationsProgress, setOperationsProgress] = useState<{
+  const [operationsProgress] = useState<{
     isRunning: boolean
     current: number
     total: number

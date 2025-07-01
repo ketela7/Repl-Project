@@ -57,7 +57,7 @@ export async function copyFileLink(
         ? `${baseUrl}/api/drive/download/${fileId}`
         : `https://drive.google.com/file/d/${fileId}/view`
 
-    const success = await copyToClipboard(link, `${fileName} link`)
+    const success = await copyToClipboard(link)
     if (success) {
       successToast.generic(`${fileName} link copied to clipboard`)
     }
@@ -84,7 +84,7 @@ export async function copyFileIds(fileIds: string[]): Promise<boolean> {
  * Copy folder structure as text
  */
 export async function copyFolderStructure(structure: string): Promise<boolean> {
-  const success = await copyToClipboard(structure, 'folder structure')
+  const success = await copyToClipboard(structure)
   if (success) {
     successToast.generic('Folder structure copied to clipboard')
   }

@@ -19,12 +19,7 @@ import {
   buildSearchQuery,
   getMimeTypeFromFileName,
 } from './utils'
-import {
-  getOptimizedRequestParams,
-  DriveApiBatcher,
-  performanceMonitor,
-  requestDeduplicator,
-} from './performance'
+import { getOptimizedRequestParams, performanceMonitor, requestDeduplicator } from './performance'
 
 export class GoogleDriveService {
   public drive: drive_v3.Drive
@@ -432,83 +427,83 @@ export class GoogleDriveService {
       spaces: response.data.spaces || [],
       properties: response.data.properties || {},
       appProperties: response.data.appProperties || {},
-      imageMediaMetadata: response.data.imageMediaMetadata
-        ? {
-            ...(response.data.imageMediaMetadata.width !== undefined && {
-              width: response.data.imageMediaMetadata.width,
-            }),
-            ...(response.data.imageMediaMetadata.height !== undefined && {
-              height: response.data.imageMediaMetadata.height,
-            }),
-            ...(response.data.imageMediaMetadata.rotation !== undefined && {
-              rotation: response.data.imageMediaMetadata.rotation,
-            }),
-            ...(response.data.imageMediaMetadata.location && {
-              location: {
-                ...(response.data.imageMediaMetadata.location.latitude !== undefined && {
-                  latitude: response.data.imageMediaMetadata.location.latitude,
-                }),
-                ...(response.data.imageMediaMetadata.location.longitude !== undefined && {
-                  longitude: response.data.imageMediaMetadata.location.longitude,
-                }),
-                ...(response.data.imageMediaMetadata.location.altitude !== undefined && {
-                  altitude: response.data.imageMediaMetadata.location.altitude,
-                }),
-              },
-            }),
-            ...(response.data.imageMediaMetadata.time && {
-              time: response.data.imageMediaMetadata.time,
-            }),
-            ...(response.data.imageMediaMetadata.cameraMake && {
-              cameraMake: response.data.imageMediaMetadata.cameraMake,
-            }),
-            ...(response.data.imageMediaMetadata.cameraModel && {
-              cameraModel: response.data.imageMediaMetadata.cameraModel,
-            }),
-            ...(response.data.imageMediaMetadata.exposureTime !== undefined && {
-              exposureTime: response.data.imageMediaMetadata.exposureTime,
-            }),
-            ...(response.data.imageMediaMetadata.aperture !== undefined && {
-              aperture: response.data.imageMediaMetadata.aperture,
-            }),
-            ...(response.data.imageMediaMetadata.flashUsed !== undefined && {
-              flashUsed: response.data.imageMediaMetadata.flashUsed,
-            }),
-            ...(response.data.imageMediaMetadata.focalLength !== undefined && {
-              focalLength: response.data.imageMediaMetadata.focalLength,
-            }),
-            ...(response.data.imageMediaMetadata.isoSpeed !== undefined && {
-              isoSpeed: response.data.imageMediaMetadata.isoSpeed,
-            }),
-            ...(response.data.imageMediaMetadata.meteringMode && {
-              meteringMode: response.data.imageMediaMetadata.meteringMode,
-            }),
-            ...(response.data.imageMediaMetadata.sensor && {
-              sensor: response.data.imageMediaMetadata.sensor,
-            }),
-            ...(response.data.imageMediaMetadata.exposureMode && {
-              exposureMode: response.data.imageMediaMetadata.exposureMode,
-            }),
-            ...(response.data.imageMediaMetadata.colorSpace && {
-              colorSpace: response.data.imageMediaMetadata.colorSpace,
-            }),
-            ...(response.data.imageMediaMetadata.whiteBalance && {
-              whiteBalance: response.data.imageMediaMetadata.whiteBalance,
-            }),
-            ...(response.data.imageMediaMetadata.exposureBias !== undefined && {
-              exposureBias: response.data.imageMediaMetadata.exposureBias,
-            }),
-            ...(response.data.imageMediaMetadata.maxApertureValue !== undefined && {
-              maxApertureValue: response.data.imageMediaMetadata.maxApertureValue,
-            }),
-            ...(response.data.imageMediaMetadata.subjectDistance !== undefined && {
-              subjectDistance: response.data.imageMediaMetadata.subjectDistance,
-            }),
-            ...(response.data.imageMediaMetadata.lens && {
-              lens: response.data.imageMediaMetadata.lens,
-            }),
-          }
-        : undefined,
+      ...(response.data.imageMediaMetadata && {
+        imageMediaMetadata: {
+          ...(response.data.imageMediaMetadata.width !== undefined && {
+            width: response.data.imageMediaMetadata.width,
+          }),
+          ...(response.data.imageMediaMetadata.height !== undefined && {
+            height: response.data.imageMediaMetadata.height,
+          }),
+          ...(response.data.imageMediaMetadata.rotation !== undefined && {
+            rotation: response.data.imageMediaMetadata.rotation,
+          }),
+          ...(response.data.imageMediaMetadata.location && {
+            location: {
+              ...(response.data.imageMediaMetadata.location.latitude !== undefined && {
+                latitude: response.data.imageMediaMetadata.location.latitude,
+              }),
+              ...(response.data.imageMediaMetadata.location.longitude !== undefined && {
+                longitude: response.data.imageMediaMetadata.location.longitude,
+              }),
+              ...(response.data.imageMediaMetadata.location.altitude !== undefined && {
+                altitude: response.data.imageMediaMetadata.location.altitude,
+              }),
+            },
+          }),
+          ...(response.data.imageMediaMetadata.time && {
+            time: response.data.imageMediaMetadata.time,
+          }),
+          ...(response.data.imageMediaMetadata.cameraMake && {
+            cameraMake: response.data.imageMediaMetadata.cameraMake,
+          }),
+          ...(response.data.imageMediaMetadata.cameraModel && {
+            cameraModel: response.data.imageMediaMetadata.cameraModel,
+          }),
+          ...(response.data.imageMediaMetadata.exposureTime !== undefined && {
+            exposureTime: response.data.imageMediaMetadata.exposureTime,
+          }),
+          ...(response.data.imageMediaMetadata.aperture !== undefined && {
+            aperture: response.data.imageMediaMetadata.aperture,
+          }),
+          ...(response.data.imageMediaMetadata.flashUsed !== undefined && {
+            flashUsed: response.data.imageMediaMetadata.flashUsed,
+          }),
+          ...(response.data.imageMediaMetadata.focalLength !== undefined && {
+            focalLength: response.data.imageMediaMetadata.focalLength,
+          }),
+          ...(response.data.imageMediaMetadata.isoSpeed !== undefined && {
+            isoSpeed: response.data.imageMediaMetadata.isoSpeed,
+          }),
+          ...(response.data.imageMediaMetadata.meteringMode && {
+            meteringMode: response.data.imageMediaMetadata.meteringMode,
+          }),
+          ...(response.data.imageMediaMetadata.sensor && {
+            sensor: response.data.imageMediaMetadata.sensor,
+          }),
+          ...(response.data.imageMediaMetadata.exposureMode && {
+            exposureMode: response.data.imageMediaMetadata.exposureMode,
+          }),
+          ...(response.data.imageMediaMetadata.colorSpace && {
+            colorSpace: response.data.imageMediaMetadata.colorSpace,
+          }),
+          ...(response.data.imageMediaMetadata.whiteBalance && {
+            whiteBalance: response.data.imageMediaMetadata.whiteBalance,
+          }),
+          ...(response.data.imageMediaMetadata.exposureBias !== undefined && {
+            exposureBias: response.data.imageMediaMetadata.exposureBias,
+          }),
+          ...(response.data.imageMediaMetadata.maxApertureValue !== undefined && {
+            maxApertureValue: response.data.imageMediaMetadata.maxApertureValue,
+          }),
+          ...(response.data.imageMediaMetadata.subjectDistance !== undefined && {
+            subjectDistance: response.data.imageMediaMetadata.subjectDistance,
+          }),
+          ...(response.data.imageMediaMetadata.lens && {
+            lens: response.data.imageMediaMetadata.lens,
+          }),
+        },
+      }),
       videoMediaMetadata: response.data.videoMediaMetadata
         ? {
             ...(response.data.videoMediaMetadata.width !== undefined && {

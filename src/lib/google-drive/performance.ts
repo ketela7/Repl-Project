@@ -86,8 +86,8 @@ export class DriveApiBatcher {
   private readonly BATCH_DELAY = 100 // ms
   private readonly MAX_BATCH_SIZE = 100
 
-  constructor(drive: drive_v3.Drive) {
-    this.drive = drive
+  constructor() {
+    // Constructor implementation
   }
 
   /**

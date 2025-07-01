@@ -126,13 +126,9 @@ export async function retryDriveApiCall<T>(
   operation: () => Promise<T>,
   context: string = 'Drive API call',
 ): Promise<T> {
-  return retryOperation(
-    operation,
-    {
-      maxRetries: 3,
-      baseDelay: 2000, // Start with 2 seconds for API calls
-      maxDelay: 15000, // Max 15 seconds
-    },
-    context,
-  )
+  return retryOperation(operation, {
+    maxRetries: 3,
+    baseDelay: 2000, // Start with 2 seconds for API calls
+    maxDelay: 15000, // Max 15 seconds
+  })
 }
