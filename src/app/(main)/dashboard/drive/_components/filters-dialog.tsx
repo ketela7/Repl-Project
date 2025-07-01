@@ -45,7 +45,13 @@ import {
   BottomSheetTitle,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { SimpleDatePicker } from '@/components/ui/simple-date-picker'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -94,7 +100,9 @@ export function FiltersDialog({
   // Temporary state for filter changes (not applied until "Apply Filter" is clicked)
   const [tempActiveView, setTempActiveView] = useState(currentFilters?.activeView || 'all')
   const [tempFileTypeFilter, setTempFileTypeFilter] = useState(currentFilters?.fileTypeFilter || [])
-  const [tempAdvancedFilters, setTempAdvancedFilters] = useState<AdvancedFilters>(currentFilters?.advancedFilters || {})
+  const [tempAdvancedFilters, setTempAdvancedFilters] = useState<AdvancedFilters>(
+    currentFilters?.advancedFilters || {},
+  )
 
   const [showViewStatus, setShowViewStatus] = useState(false)
   const [showFileTypes, setShowFileTypes] = useState(false)
@@ -105,7 +113,9 @@ export function FiltersDialog({
   useEffect(() => {
     if (open) {
       setTempActiveView(currentFilters?.activeView || 'all')
-      setTempFileTypeFilter(Array.isArray(currentFilters?.fileTypeFilter) ? currentFilters.fileTypeFilter : [])
+      setTempFileTypeFilter(
+        Array.isArray(currentFilters?.fileTypeFilter) ? currentFilters.fileTypeFilter : [],
+      )
       setTempAdvancedFilters({
         sizeRange: {
           unit: 'MB',
@@ -283,7 +293,11 @@ export function FiltersDialog({
 
     // Remove folder from file type filter if size filters are applied (Google Drive API limitation)
     let updatedFileTypeFilter = tempFileTypeFilter
-    if (newHasSizeFilter && Array.isArray(tempFileTypeFilter) && tempFileTypeFilter.includes('folder')) {
+    if (
+      newHasSizeFilter &&
+      Array.isArray(tempFileTypeFilter) &&
+      tempFileTypeFilter.includes('folder')
+    ) {
       updatedFileTypeFilter = tempFileTypeFilter.filter((type: string) => type !== 'folder')
       setTempFileTypeFilter(updatedFileTypeFilter)
     }
@@ -320,7 +334,11 @@ export function FiltersDialog({
             className="h-auto w-full justify-between p-0"
           >
             <h3 className="text-sm font-semibold">View Status</h3>
-            {showViewStatus ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {showViewStatus ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
 
           {showViewStatus && (
@@ -340,7 +358,9 @@ export function FiltersDialog({
                       <Icon className="h-4 w-4 flex-shrink-0" />
                       <div className="min-w-0 flex-1 text-left">
                         <div className="truncate text-sm font-medium">{item.label}</div>
-                        <div className="text-muted-foreground truncate text-xs">{item.description}</div>
+                        <div className="text-muted-foreground truncate text-xs">
+                          {item.description}
+                        </div>
                       </div>
                     </div>
                   </Button>
@@ -360,7 +380,11 @@ export function FiltersDialog({
             className="h-auto w-full justify-between p-0"
           >
             <h3 className="text-sm font-semibold">File Types</h3>
-            {showFileTypes ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            {showFileTypes ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
           </Button>
 
           {showFileTypes && (
@@ -372,10 +396,12 @@ export function FiltersDialog({
                       Notice
                     </Badge>
                     <div className="flex-1">
-                      <p className="font-medium">Size filtering: Hanya akan menghasilkan file bukan folder</p>
+                      <p className="font-medium">
+                        Size filtering: Hanya akan menghasilkan file bukan folder
+                      </p>
                       <p className="mt-1 text-xs opacity-80">
-                        Google Drive API limitation: Filter ukuran hanya bekerja untuk file, bukan folder. Pemilihan
-                        folder dinonaktifkan ketika filter ukuran aktif.
+                        Google Drive API limitation: Filter ukuran hanya bekerja untuk file, bukan
+                        folder. Pemilihan folder dinonaktifkan ketika filter ukuran aktif.
                       </p>
                     </div>
                   </div>
@@ -386,7 +412,11 @@ export function FiltersDialog({
                   const Icon = filter.icon
                   const currentFilter = tempFileTypeFilter || []
                   const isArray = Array.isArray(currentFilter)
-                  const currentArray = isArray ? currentFilter : currentFilter ? [currentFilter] : []
+                  const currentArray = isArray
+                    ? currentFilter
+                    : currentFilter
+                      ? [currentFilter]
+                      : []
                   const isActive = currentArray.includes(filter.id)
 
                   // Disable folder selection when size filters are active
@@ -404,8 +434,12 @@ export function FiltersDialog({
                         }
                       }}
                     >
-                      <Icon className={`mr-2 h-4 w-4 ${filter.color} ${isDisabled ? 'opacity-50' : ''}`} />
-                      <span className={`text-sm ${isDisabled ? 'opacity-50' : ''}`}>{filter.label}</span>
+                      <Icon
+                        className={`mr-2 h-4 w-4 ${filter.color} ${isDisabled ? 'opacity-50' : ''}`}
+                      />
+                      <span className={`text-sm ${isDisabled ? 'opacity-50' : ''}`}>
+                        {filter.label}
+                      </span>
                     </Button>
                   )
                 })}
@@ -708,7 +742,9 @@ export function FiltersDialog({
                     <SelectItem value="1000">1000 items (max)</SelectItem>
                   </SelectContent>
                 </Select>
-                <div className="text-muted-foreground text-xs">Higher values may increase loading time</div>
+                <div className="text-muted-foreground text-xs">
+                  Higher values may increase loading time
+                </div>
               </div>
             </div>
           )}
@@ -741,7 +777,12 @@ export function FiltersDialog({
                   </div>
                 </BottomSheetTitle>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)} className="h-8 w-8 p-0">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+                className="h-8 w-8 p-0"
+              >
                 <X className="h-4 w-4" />
               </Button>
             </div>
