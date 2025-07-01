@@ -31,7 +31,7 @@ export function mapUserInfo(user: any): UserInfo | undefined {
  */
 function mapImageLocation(locationData: any) {
   if (!locationData) return undefined
-  
+
   return {
     ...(locationData.latitude !== undefined && { latitude: locationData.latitude }),
     ...(locationData.longitude !== undefined && { longitude: locationData.longitude }),
@@ -68,7 +68,9 @@ function mapExposureSettings(imageData: any) {
   return {
     ...(imageData.exposureTime !== undefined && { exposureTime: imageData.exposureTime }),
     ...(imageData.aperture !== undefined && { aperture: imageData.aperture }),
-    ...(imageData.maxApertureValue !== undefined && { maxApertureValue: imageData.maxApertureValue }),
+    ...(imageData.maxApertureValue !== undefined && {
+      maxApertureValue: imageData.maxApertureValue,
+    }),
     ...(imageData.exposureBias !== undefined && { exposureBias: imageData.exposureBias }),
     ...(imageData.exposureMode && { exposureMode: imageData.exposureMode }),
   }

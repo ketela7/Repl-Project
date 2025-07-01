@@ -29,6 +29,7 @@ import {
 } from './file-detail-mappers'
 import { validateListFilesOptions } from './validation-utils'
 import { validateFileName, handleDriveApiError } from './file-validation'
+import { getOptimizedFields } from './field-optimization'
 import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
 import { getOptimizedRequestParams, performanceMonitor, requestDeduplicator } from './performance'
 
@@ -99,7 +100,12 @@ export class GoogleDriveService {
       supportsAllDrives: includeTeamDriveItems,
     }
 
-    const requestParams = getOptimizedRequestParams(operation, baseParams)
+    // Use optimized fields based on operation type
+    const optimizedFields = getOptimizedFields('LIST_STANDARD')
+    const requestParams = {
+      ...getOptimizedRequestParams(operation, baseParams),
+      fields: `nextPageToken,incompleteSearch,files(${optimizedFields})`,
+    }
     // Log query for debugging in development only
     if (process.env.NODE_ENV === 'development') {
       console.info('[Drive API] - Query:', searchQuery)
@@ -123,9 +129,7 @@ export class GoogleDriveService {
 
       const files = response.data.files?.map(convertGoogleDriveFile) ?? []
 
-      if (process.env.NODE_ENV === 'development') {
-        console.info(`[Drive API] - Result: ${files.length} items`)
-      }
+      console.info(`[Drive API] - Result: ${files.length} items`)
 
       return {
         files,
@@ -188,10 +192,17 @@ export class GoogleDriveService {
   }
 
   async getFileDetails(fileId: string, fields?: string): Promise<DetailedDriveFile> {
+    const startTime = Date.now()
+    const optimizedFields = fields || getOptimizedFields('FILE_DETAILS')
+
     const response = await this.drive.files.get({
       fileId,
-      fields: fields || '*',
+      fields: optimizedFields, // Use optimized fields instead of '*'
     })
+
+    // Track performance improvement
+    const responseTime = Date.now() - startTime
+    fieldOptimizationMonitor.trackRequest('getFileDetails', responseTime, optimizedFields.split(',').length)
 
     const file = convertGoogleDriveFile(response.data)
     const responseData = response.data
@@ -420,11 +431,11 @@ export class GoogleDriveService {
       // Validate filename using helper function
       validateFileName(newName)
 
+      const optimizedFields = getOptimizedFields('LIST_DETAILED')
       const response = await this.drive.files.update({
         fileId,
         requestBody: { name: newName.trim() },
-        fields:
-          'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
+        fields: optimizedFields,
       })
 
       return convertGoogleDriveFile(response.data)
