@@ -1910,7 +1910,6 @@ export function DriveToolbar({
         isOpen={isOperationsOpen}
         onClose={() => setIsOperationsOpen(false)}
         selectedItems={selectedItems}
-        onRefreshAfterOp={handleOperationComplete}
       />
 
       {/* Filters Dialog */}

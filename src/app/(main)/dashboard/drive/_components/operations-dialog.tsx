@@ -37,7 +37,6 @@ interface OperationsDialogProps {
   onClose?: () => void
   onOpenChange?: (open: boolean) => void
   selectedItems: any[]
-  _onRefreshAfterOp?: () => void
 }
 
 function OperationsDialog({
@@ -46,7 +45,6 @@ function OperationsDialog({
   onClose,
   onOpenChange,
   selectedItems,
-  _onRefreshAfterOp,
 }: OperationsDialogProps) {
   const isMobile = useIsMobile()
   const folderCount = selectedItems.filter(item => item.isFolder).length
@@ -447,7 +445,6 @@ function OperationsDialog({
       <ItemsShareDialog
         isOpen={isShareDialogOpen}
         onClose={handleShareClose}
-        _onConfirm={handleShareComplete}
         selectedItems={selectedItems}
       />
 

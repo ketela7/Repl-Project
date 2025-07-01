@@ -50,7 +50,12 @@ interface ItemsMoveDialogProps {
   }>
 }
 
-function ItemsMoveDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems }: ItemsMoveDialogProps) {
+function ItemsMoveDialog({
+  isOpen,
+  onClose,
+  onConfirm: _onConfirm,
+  selectedItems,
+}: ItemsMoveDialogProps) {
   const [showDestinationSelector, setShowDestinationSelector] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)

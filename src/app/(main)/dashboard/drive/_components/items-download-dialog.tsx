@@ -55,7 +55,7 @@ const DOWNLOAD_MODES = [
 function ItemsDownloadDialog({
   isOpen,
   onClose,
-  onConfirm,
+  onConfirm: _onConfirm,
   selectedItems,
 }: ItemsDownloadDialogProps) {
   const [selectedMode, setSelectedMode] = useState('direct')
@@ -145,6 +145,7 @@ function ItemsDownloadDialog({
           }
 
           const file = downloadableFiles[i]
+          if (!file) continue
 
           try {
             setProgress(prev => ({

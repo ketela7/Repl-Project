@@ -37,7 +37,7 @@ interface ItemsTrashDialogProps {
   }>
 }
 
-function ItemsTrashDialog({ isOpen, onClose, _onConfirm, selectedItems }: ItemsTrashDialogProps) {
+function ItemsTrashDialog({ isOpen, onClose, selectedItems }: ItemsTrashDialogProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)

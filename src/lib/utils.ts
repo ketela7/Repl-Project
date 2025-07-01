@@ -89,7 +89,7 @@ export function formatFileTime(dateString: string, timezone?: string): string {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      timeZone: timezone || 'UTC',
+      timeZone: timezone ?? 'UTC',
     }).format(date)
   } catch {
     return 'Invalid date'

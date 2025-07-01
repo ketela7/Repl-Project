@@ -42,7 +42,6 @@ interface ItemsUntrashDialogProps {
 function ItemsUntrashDialog({
   isOpen,
   onClose,
-  _onConfirm,
   selectedItems,
 }: ItemsUntrashDialogProps) {
   const [isProcessing, setIsProcessing] = useState(false)

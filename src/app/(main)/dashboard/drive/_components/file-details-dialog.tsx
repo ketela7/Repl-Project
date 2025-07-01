@@ -301,18 +301,10 @@ export function FileDetailsDialog({
     if (!fileDetails?.capabilities) return null
 
     const capabilities = fileDetails.capabilities
-    const importantActions = [
-      { key: 'canEdit', label: 'Edit', icon: FileText },
-      { key: 'canShare', label: 'Share', icon: Share2 },
-      { key: 'canCopy', label: 'Copy', icon: Copy },
-      { key: 'canDownload', label: 'Download', icon: Download },
-      { key: 'canDelete', label: 'Delete', icon: Lock },
-      { key: 'canRename', label: 'Rename', icon: FileText },
-    ]
 
-    const allCapabilities = Object.entries(capabilities).filter(([key, value]) => value === true)
+    const allCapabilities = Object.entries(capabilities).filter(([_key, value]) => value === true)
     const deniedCapabilities = Object.entries(capabilities).filter(
-      ([key, value]) => value === false,
+      ([_key, value]) => value === false,
     )
 
     return (
@@ -322,7 +314,7 @@ export function FileDetailsDialog({
             Allowed Capabilities ({allCapabilities.length})
           </h4>
           <div className="flex flex-wrap gap-1">
-            {allCapabilities.map(([key, value]) => (
+            {allCapabilities.map(([key, _value]) => (
               <Badge
                 key={key}
                 variant="outline"
@@ -343,7 +335,7 @@ export function FileDetailsDialog({
               Restricted Capabilities ({deniedCapabilities.length})
             </h4>
             <div className="flex flex-wrap gap-1">
-              {deniedCapabilities.slice(0, 10).map(([key, value]) => (
+              {deniedCapabilities.slice(0, 10).map(([key, _value]) => (
                 <Badge key={key} variant="outline" className="border-red-200 text-xs text-red-700">
                   {key
                     .replace('can', '')

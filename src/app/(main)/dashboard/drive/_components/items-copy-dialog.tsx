@@ -47,7 +47,12 @@ interface ItemsCopyDialogProps {
   }>
 }
 
-function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCopyDialogProps) {
+function ItemsCopyDialog({
+  isOpen,
+  onClose,
+  onConfirm: _onConfirm,
+  selectedItems,
+}: ItemsCopyDialogProps) {
   const [showDestinationSelector, setShowDestinationSelector] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -135,6 +140,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         }
 
         const item = selectedItems[i]
+        if (!item) continue
 
         try {
           setProgress(prev => ({

@@ -21,7 +21,7 @@ export function formatDateToUserTimezone(
   timezone?: string,
   options?: Intl.DateTimeFormatOptions,
 ): string {
-  const userTimezone = timezone || getUserTimezone()
+  const userTimezone = timezone ?? getUserTimezone()
   const dateObj = typeof date === 'string' ? new Date(date) : date
 
   const defaultOptions: Intl.DateTimeFormatOptions = {
@@ -142,7 +142,7 @@ export function getSupportedTimezones(): string[] {
  * Get timezone display name
  */
 export function getTimezoneDisplayName(timezone?: string): string {
-  const tz = timezone || getUserTimezone()
+  const tz = timezone ?? getUserTimezone()
   try {
     const now = new Date()
     const timeZoneName = new Intl.DateTimeFormat('en-US', {
@@ -152,7 +152,7 @@ export function getTimezoneDisplayName(timezone?: string): string {
       .formatToParts(now)
       .find(part => part.type === 'timeZoneName')?.value
 
-    return timeZoneName || tz
+    return timeZoneName ?? tz
   } catch {
     return tz
   }

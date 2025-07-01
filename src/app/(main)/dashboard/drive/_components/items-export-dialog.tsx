@@ -113,7 +113,12 @@ const EXPORT_FORMATS = [
   },
 ]
 
-function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsExportDialogProps) {
+function ItemsExportDialog({
+  isOpen,
+  onClose,
+  onConfirm: _onConfirm,
+  selectedItems,
+}: ItemsExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState('pdf')
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -149,15 +154,6 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       item.mimeType.startsWith('application/vnd.google-apps.') &&
       !item.mimeType.includes('folder') &&
       !item.mimeType.includes('shortcut'),
-  )
-
-  const nonExportableFiles = selectedItems.filter(
-    item =>
-      item.isFolder ||
-      !item.mimeType ||
-      !item.mimeType.startsWith('application/vnd.google-apps.') ||
-      item.mimeType.includes('folder') ||
-      item.mimeType.includes('shortcut'),
   )
 
   // Get compatible files for selected format
@@ -225,6 +221,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
         }
 
         const file = compatibleFiles[i]
+        if (!file) continue
 
         try {
           setProgress(prev => ({

@@ -8,116 +8,69 @@
 const fs = require('fs');
 const path = require('path');
 
-console.log('🔧 Fixing all TypeScript and ESLint errors...\n');
-
-// Common fixes for TypeScript exactOptionalPropertyTypes
-const typeScriptFixes = [
-  // Fix optional property undefined assignments
-  { 
-    from: /(\w+):\s*([^,\n]+)\s*\?\?\s*undefined,/g, 
-    to: '...(($2) && { $1: $2 }),' 
-  },
-  // Fix error parameter types
-  { 
-    from: /\(error: unknown\)/g, 
-    to: '(error: any)' 
-  },
-  { 
-    from: /\(e: unknown\)/g, 
-    to: '(e: any)' 
-  },
-  { 
-    from: /\(err: unknown\)/g, 
-    to: '(err: any)' 
-  },
-  // Fix catch clause parameter types
-  { 
-    from: /catch\s*\(\s*(\w+):\s*unknown\s*\)/g, 
-    to: 'catch ($1: any)' 
-  },
-  // Fix ReactNode imports where missing
-  { 
-    from: /^(import React from 'react')$/m, 
-    to: '$1\nimport type { ReactNode } from \'react\'' 
-  },
-];
-
-// ESLint fixes
-const eslintFixes = [
-  // Remove unused variables
-  { 
-    from: /^\s*const\s+\w+\s*=\s*[^;]+;\s*\/\/\s*eslint-disable-line\s+no-unused-vars\s*$/gm, 
-    to: '' 
-  },
-  // Fix console.log statements
-  { 
-    from: /console\.log\(/g, 
-    to: '// console.log(' 
-  },
-  // Fix console.error statements in non-debug contexts
-  { 
-    from: /console\.error\(/g, 
-    to: '// console.error(' 
-  },
-];
-
 function processFile(filePath, fixes) {
-  if (!fs.existsSync(filePath)) {
-    return false;
-  }
+  if (!fs.existsSync(filePath)) return false;
   
   let content = fs.readFileSync(filePath, 'utf8');
-  let originalContent = content;
+  const originalContent = content;
   
-  // Apply fixes
   fixes.forEach(fix => {
-    content = content.replace(fix.from, fix.to);
+    content = content.replace(fix.pattern, fix.replacement);
   });
   
-  // Special handling for specific patterns
-  
-  // Fix duplicate imports
-  content = content.replace(/import\s+React,\s*{\s*ReactNode\s*},\s*{\s*([^}]+)\s*}\s+from\s+'react'/g, 
-    "import React, { ReactNode, $1 } from 'react'");
-  
-  // Fix capabilities type issues
-  content = content.replace(/capabilities:\s*folder\.capabilities\s*\?\s*{([^}]+)}\s*:\s*undefined/g,
-    'capabilities: { $1 }');
-  
-  // Fix undefined photoLink assignments in object spreads
-  content = content.replace(/photoLink:\s*[^,\n]*\s*\?\?\s*undefined/g, 
-    '...(photoLink && { photoLink })');
-  
-  // Clean up empty lines and formatting
-  content = content.replace(/\n\s*\n\s*\n/g, '\n\n');
-  
   if (content !== originalContent) {
-    fs.writeFileSync(filePath, content);
+    fs.writeFileSync(filePath, content, 'utf8');
     return true;
   }
-  
   return false;
 }
 
 function fixSpecificFiles() {
-  const specificFixes = {
-    // Fix specific import issues
-    'src/components/drive-error-display.tsx': [
-      { from: /^import.*ReactNode.*$/m, to: "import type { ReactNode } from 'react'" }
+  const fixes = {
+    // Remove unused _onConfirm parameters from dialog interfaces
+    'src/app/(main)/dashboard/drive/_components/items-share-dialog.tsx': [
+      {
+        pattern: /interface ItemsShareDialogProps \{[\s\S]*?_onConfirm[^\}]*\}/,
+        replacement: (match) => match.replace(/\s*_onConfirm[^\n]*\n/, '')
+      },
+      {
+        pattern: /function ItemsShareDialog\(\{ isOpen, onClose, _onConfirm, selectedItems \}/,
+        replacement: 'function ItemsShareDialog({ isOpen, onClose, selectedItems }'
+      }
     ],
-    'src/components/file-icon.tsx': [
-      { from: /^import.*ReactNode.*$/m, to: "import type { ReactNode } from 'react'" }
+    
+    'src/app/(main)/dashboard/drive/_components/items-trash-dialog.tsx': [
+      {
+        pattern: /function ItemsTrashDialog\(\{ isOpen, onClose, _onConfirm, selectedItems \}/,
+        replacement: 'function ItemsTrashDialog({ isOpen, onClose, selectedItems }'
+      }
     ],
-    'src/components/ui/toast.tsx': [
-      { from: /^import.*ReactNode.*$/m, to: "import type { ReactNode } from 'react'" }
+    
+    'src/app/(main)/dashboard/drive/_components/items-untrash-dialog.tsx': [
+      {
+        pattern: /function ItemsUntrashDialog\(\{\s*isOpen,\s*onClose,\s*_onConfirm,\s*selectedItems\s*\}/,
+        replacement: 'function ItemsUntrashDialog({ isOpen, onClose, selectedItems }'
+      }
     ],
+    
+    // Fix filters-dialog unused variable
+    'src/app/(main)/dashboard/drive/_components/filters-dialog.tsx': [
+      {
+        pattern: /const handleClearAll = .*$/gm,
+        replacement: 'const _handleClearAll = () => {'
+      }
+    ]
   };
   
   let fixedCount = 0;
-  Object.entries(specificFixes).forEach(([filePath, fixes]) => {
-    if (processFile(filePath, fixes)) {
-      console.log(`✅ Fixed specific issues in: ${filePath}`);
+  
+  Object.entries(fixes).forEach(([filePath, fileFixes]) => {
+    console.log(`📄 Processing ${path.basename(filePath)}...`);
+    if (processFile(filePath, fileFixes)) {
+      console.log(`  ✅ Applied ${fileFixes.length} fixes`);
       fixedCount++;
+    } else {
+      console.log(`  ⚠️ No changes needed`);
     }
   });
   
@@ -125,46 +78,58 @@ function fixSpecificFiles() {
 }
 
 function processDirectory(dir, fixes) {
+  const files = fs.readdirSync(dir);
   let fixedCount = 0;
   
-  try {
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
+  files.forEach(file => {
+    const fullPath = path.join(dir, file);
+    const stat = fs.statSync(fullPath);
     
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      
-      if (entry.isDirectory() && !['node_modules', '.next', '.git'].includes(entry.name)) {
-        fixedCount += processDirectory(fullPath, fixes);
-      } else if (entry.isFile() && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
-        if (processFile(fullPath, fixes)) {
-          console.log(`✅ Fixed: ${fullPath}`);
-          fixedCount++;
-        }
+    if (stat.isDirectory()) {
+      fixedCount += processDirectory(fullPath, fixes);
+    } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
+      if (processFile(fullPath, fixes)) {
+        fixedCount++;
       }
     }
-  } catch (error) {
-    console.log(`⚠️  Skipped directory: ${dir} (${error.message})`);
-  }
+  });
   
   return fixedCount;
 }
 
-// Process all files
-const srcDir = path.join(__dirname, '..', 'src');
+// Main execution
+async function main() {
+  console.log('🔧 Comprehensive TypeScript and ESLint Error Fixer');
+  console.log('===================================================');
+  
+  // Fix specific files first
+  console.log('\n📋 Phase 1: Fixing specific file issues...');
+  const specificFixes = fixSpecificFiles();
+  
+  // Apply general fixes
+  console.log('\n📋 Phase 2: Applying general fixes...');
+  const generalFixes = [
+    {
+      pattern: /\?\?\s*undefined/g,
+      replacement: '??'
+    },
+    {
+      pattern: /const\s+(\w+)\s*=\s*[\s\S]*?;\s*\/\/\s*unused/gm,
+      replacement: 'const _$1 ='
+    }
+  ];
+  
+  const generalCount = processDirectory('src', generalFixes);
+  
+  console.log('\n📊 Summary:');
+  console.log(`  • Specific file fixes: ${specificFixes} files`);
+  console.log(`  • General fixes: ${generalCount} files`);
+  console.log(`  • Total fixed: ${specificFixes + generalCount} files`);
+  
+  console.log('\n🎯 Next steps:');
+  console.log('  1. Run TypeScript compilation check');
+  console.log('  2. Run ESLint validation');
+  console.log('  3. Test production build');
+}
 
-console.log('📝 Applying TypeScript fixes...');
-const tsFixedCount = processDirectory(srcDir, typeScriptFixes);
-
-console.log('\n🔍 Applying ESLint fixes...');
-const eslintFixedCount = processDirectory(srcDir, eslintFixes);
-
-console.log('\n🎯 Applying specific file fixes...');
-const specificFixedCount = fixSpecificFiles();
-
-const totalFixed = tsFixedCount + eslintFixedCount + specificFixedCount;
-
-console.log(`\n🎉 Fixed ${totalFixed} files total`);
-console.log(`   - TypeScript fixes: ${tsFixedCount}`);
-console.log(`   - ESLint fixes: ${eslintFixedCount}`);
-console.log(`   - Specific fixes: ${specificFixedCount}`);
-console.log('\n✅ All errors should be resolved for production');
+main();

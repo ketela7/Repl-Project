@@ -43,9 +43,9 @@ export class GoogleDriveService {
     }
 
     return {
-      id: user.permissionId || 'unknown',
-      name: user.displayName || 'Unknown User',
-      email: user.emailAddress || '',
+      id: user.permissionId ?? 'unknown',
+      name: user.displayName ?? 'Unknown User',
+      email: user.emailAddress ?? '',
       ...(user.photoLink && { picture: user.photoLink }),
       ...(about.storageQuota && {
         storageQuota: {
@@ -164,7 +164,7 @@ export class GoogleDriveService {
         })
       })
 
-      const files = response.data.files?.map(convertGoogleDriveFile) || []
+      const files = response.data.files?.map(convertGoogleDriveFile) ?? []
 
       if (process.env.NODE_ENV === 'development') {
         console.info(`[Drive API] - Result: ${files.length} items`)

@@ -90,7 +90,12 @@ const RENAME_MODES = [
   },
 ]
 
-function ItemsRenameDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems }: ItemsRenameDialogProps) {
+function ItemsRenameDialog({
+  isOpen,
+  onClose,
+  onConfirm: _onConfirm,
+  selectedItems,
+}: ItemsRenameDialogProps) {
   const [selectedMode, setSelectedMode] = useState('prefix')
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
