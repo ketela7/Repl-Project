@@ -1,51 +1,214 @@
 # Contributing to Google Drive Pro
 
-## Development Rules
+## Quick Start for Contributors
 
-### Environment Variables
+### Code Quality Requirements
 
-- **❌ Jangan gunakan NEXT*PUBLIC***: Hanya gunakan variabel rahasia (private env) secara aman
-- **Server-side only**: Semua konfigurasi harus ditangani dengan aman di server
-- **Private secrets only**: Gunakan Replit secrets atau server environment variables eksklusif
+**Before submitting any code, run these commands:**
+
+```bash
+# Check code quality (required before commits)
+npm run lint
+
+# Auto-fix common issues
+npx eslint src --fix
+
+# Type check
+npm run type-check
+```
+
+## ESLint Rules - Code Quality Standards
+
+### Mandatory Checks Before Contribution
+
+1. **No ESLint Errors**: All ESLint errors must be fixed
+2. **No Unused Imports**: Remove all unused imports and variables
+3. **TypeScript Strict**: All TypeScript errors must be resolved
+4. **Security Rules**: Follow security best practices
+
+### Quick ESLint Commands
+
+```bash
+# Fast lint check (development)
+npm run lint:fast
+
+# Full lint with all rules  
+npm run lint
+
+# Auto-fix unused imports and formatting
+npm run lint:fix
+```
+
+### Core ESLint Rules You Must Follow
+
+#### 1. Clean Code Rules
+- ✅ Remove unused imports: `unused-imports/no-unused-imports`
+- ✅ Remove unused variables: `unused-imports/no-unused-vars`
+- ✅ Use const instead of let: `prefer-const`
+- ✅ No console.log in production: `no-console`
+
+#### 2. TypeScript Rules
+- ✅ Avoid `any` type: `@typescript-eslint/no-explicit-any`
+- ✅ Use optional chaining: `@typescript-eslint/prefer-optional-chain`
+- ✅ Use nullish coalescing: `@typescript-eslint/prefer-nullish-coalescing`
+
+#### 3. Security Rules
+- ✅ No unsafe regex: `security/detect-unsafe-regex`
+- ✅ No eval expressions: `security/detect-eval-with-expression`
+- ✅ Validate user input: `security/detect-object-injection`
+
+#### 4. React Rules
+- ✅ Accessible components: `jsx-a11y/alt-text`, `jsx-a11y/aria-props`
+- ✅ Proper React patterns: No React.FC, use functional components
 
 ### File Naming Convention
 
-- **📁 Penamaan sederhana**: Gunakan kebab-case tanpa awalan/akhiran yang tidak perlu
-- **Contoh benar**: `drive-manager.tsx`, `drive-toolbar.tsx`, `file-list.tsx`
-- **Contoh salah**: `optimized-drive-manager.tsx`, `drive-clean.tsx`, `enhanced-file-list.tsx`
+- **Files**: kebab-case (`drive-manager.tsx`, `file-list.tsx`)
+- **Components**: PascalCase (`DriveManager`, `FileList`)
+- **Variables**: camelCase (`fileName`, `fileList`)
+- **Constants**: UPPER_CASE (`API_BASE_URL`, `MAX_FILES`)
 
-### Code Quality Standards
+### Environment Variables
 
-#### 🧼 Cleanup Requirements
+- **❌ Never use NEXT_PUBLIC_**: All config must be server-side only
+- **✅ Use Replit secrets**: For API keys and sensitive data
+- **✅ Server-side only**: Handle all configuration securely on server
 
-- **Import unused**: Hapus semua import yang tidak digunakan
-- **Duplikasi kode**: Refactor kode yang berulang
-- **Fungsi tidak terpakai**: Hapus fungsi/komponen yang tidak digunakan
-- **ESLint + Prettier**: Auto-fix dengan ESLint
+## Development Workflow
 
-#### TypeScript Requirements
+### Pre-Commit Checklist
 
-- **Strict Mode**: Selalu gunakan TypeScript strict mode
-- **Type Safety**: Hindari `any` types kecuali legacy API
-- **Interface Definitions**: Definisikan interface untuk semua struktur data
-- **JSDoc Comments**: Dokumentasi untuk fungsi public dan logika kompleks
+Before submitting any contribution, ensure you complete ALL steps:
 
-#### Code Style
+```bash
+# 1. Run ESLint check (REQUIRED)
+npm run lint
 
-- **Naming Convention**: kebab-case untuk file, camelCase untuk variabel
-- **Component Structure**: Pola React functional component
-- **Error Handling**: Try-catch komprehensif untuk operasi async
+# 2. Fix any ESLint errors
+npx eslint src --fix
 
-### Quality Assurance
+# 3. Check TypeScript (REQUIRED)
+npm run type-check
 
-- **Clean Project Start**: Always ensure project is clean when starting work
-- **Double Check & Retest**: Double check and retest code before committing, ensure it follows project rules and works correctly
-- **Rapid Development**: Always improve development process for faster completion
-- **Professional Standards**: Work like a professional coder with thorough planning and execution
-- **No Errors**: Ensure zero errors in production-ready code
-- **Well Structured**: Maintain clean, organized project structure only when safe
-- **Real-time Documentation**: Always update API documentation, routes, and project structure in real time
-- **README Updates**: Update README.md for any project changes to ensure public understanding
+# 4. Test your changes
+npm run dev
+```
+
+### Available Lint Workflows
+
+The project includes optimized lint workflows to handle timeout issues:
+
+- **Quick Lint**: `npm run lint:fast` - Fast development checks  
+- **Optimized Lint**: Use the "Optimized Lint" workflow - development with relaxed warnings
+- **Lint Strict**: `npm run lint` - Full production-ready linting
+
+### ESLint Error Fixes
+
+Common ESLint errors and how to fix them:
+
+#### Unused Imports
+```javascript
+// ❌ Wrong - unused import
+import { useState, useEffect } from 'react'
+
+function MyComponent() {
+  return <div>Hello</div>
+}
+
+// ✅ Correct - remove unused imports
+function MyComponent() {
+  return <div>Hello</div>
+}
+```
+
+#### TypeScript `any` Usage
+```typescript
+// ❌ Wrong - avoid any
+const data: any = fetchData()
+
+// ✅ Correct - define proper types
+interface UserData {
+  id: string
+  name: string
+}
+const data: UserData = fetchData()
+```
+
+#### Security Issues
+```javascript
+// ❌ Wrong - potential injection
+const regex = new RegExp(userInput)
+
+// ✅ Correct - validate input
+const regex = /^[a-zA-Z0-9]+$/
+if (regex.test(userInput)) {
+  // safe to use
+}
+```
+
+## Architecture Rules
+
+### Component Structure
+
+- **Extend existing components** instead of creating new ones
+- **Single responsibility** - one clear purpose per component
+- **TypeScript interfaces** for all props
+- **Error boundaries** for error handling
+
+### API Guidelines
+
+- All API routes in `src/app/api/`
+- Use NextAuth middleware for protected routes
+- Consistent error response format
+- Input validation on all endpoints
+
+### Performance Requirements
+
+- Initial page load < 2 seconds
+- Code splitting with lazy loading
+- Bundle size monitoring
+- Mobile-first responsive design
+
+## Quality Standards
+
+### Testing Requirements
+
+- 70% minimum code coverage for new features
+- Unit tests for all utility functions
+- Integration tests for critical user flows
+- Component testing for UI interactions
+
+### Documentation
+
+- Update README.md for project changes
+- Document all API endpoints
+- JSDoc comments for complex functions
+- Maintain architecture decision records
+
+## Troubleshooting
+
+### ESLint Issues
+
+If ESLint workflows fail or timeout:
+
+1. Run `npm run lint:fast` for faster checks
+2. Use `npm run lint:fix` to auto-fix issues
+3. Use the "Quick Lint" workflow for optimized processing
+4. Check `scripts/optimized-lint-workflow.js` for configuration
+
+### TypeScript Errors
+
+Common TypeScript fixes:
+- Add proper type annotations
+- Use `as const` for literal types
+- Define interfaces for complex objects
+- Avoid `any` types when possible
+
+---
+
+**Last Updated**: July 1, 2025  
+**Version**: 2.0  
+**Focus**: Simple ESLint rules for clean code contributions
 
 ## Architecture Guidelines
 
