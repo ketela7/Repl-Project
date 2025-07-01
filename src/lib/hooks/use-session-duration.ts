@@ -19,25 +19,41 @@ export function useSessionDuration() {
 
     // Check if remember me preference is stored in localStorage
     const storedRememberMe = localStorage.getItem('nextauth-remember-me')
-    
+
     if (storedRememberMe) {
       const rememberMe = JSON.parse(storedRememberMe)
-      
+
       // Only update if the session's remember me preference doesn't match
       if (session.rememberMe !== rememberMe) {
         // Update session with remember me preference
         update({ rememberMe })
-          .then(() => {
+          .then(async () => {
+            // Update cookie duration via API
+            try {
+              await fetch('/api/auth/session-duration', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ rememberMe }),
+              })
+              console.log(`Session duration updated: ${rememberMe ? '30 days' : '1 day'}`)
+            } catch (error) {
+              console.error('Failed to update session duration:', error)
+            }
+
             // Clear the localStorage flag after successful update
             localStorage.removeItem('nextauth-remember-me')
           })
-          .catch(console.error)
+          .catch(error => {
+            console.error('Session update failed:', error)
+          })
       }
     }
   }, [session, update])
 
   return {
     isRememberMe: session?.rememberMe || false,
-    sessionDuration: session?.rememberMe ? '30 days' : '1 day'
+    sessionDuration: session?.rememberMe ? '30 days' : '1 day',
   }
 }

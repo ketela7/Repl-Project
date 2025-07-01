@@ -15,7 +15,7 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
   const router = useRouter()
   const [isServerOnline, setIsServerOnline] = useState(true)
   const [hasStoredSession, setHasStoredSession] = useState(false)
-  
+
   // Handle session duration based on remember me preference
   useSessionDuration()
 

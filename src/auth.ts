@@ -91,10 +91,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.exp = Math.floor(Date.now() / 1000) + sessionDuration
       }
 
-      // Set initial remember me state from localStorage during account creation
-      if (account && !token.rememberMe) {
+      // Set initial remember me state and expiration during account creation
+      if (account && token.exp === undefined) {
         // Default to false if not set; will be updated by client-side session update
         token.rememberMe = false
+        // Set initial expiration to 1 day (default)
+        token.exp = Math.floor(Date.now() / 1000) + 24 * 60 * 60
       }
 
       return token
@@ -127,11 +129,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days (actual duration controlled by JWT exp)
+    maxAge: 24 * 60 * 60, // Default: 1 day (will be overridden for remember me)
     updateAge: 24 * 60 * 60, // Update session only once per day to reduce database calls
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days (actual duration controlled by token.exp)
+    maxAge: 24 * 60 * 60, // Default: 1 day (will be overridden for remember me)
   },
   cookies: {
     sessionToken: {
@@ -141,7 +143,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 24 * 60 * 60, // 30 days for persistent sessions
+        maxAge: 24 * 60 * 60, // Default: 1 day (will be extended for remember me)
       },
     },
     state: {

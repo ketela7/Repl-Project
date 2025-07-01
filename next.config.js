@@ -43,13 +43,13 @@ const nextConfig = {
 
   // Production TypeScript compilation
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: process.env.NODE_ENV === 'production',
     tsconfigPath: './tsconfig.json',
   },
 
   // Enable ESLint for production builds
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: process.env.NODE_ENV === 'production',
   },
 
   allowedDevOrigins: ['127.0.0.1', 'localhost', '*.pike.replit.dev', '*.sisko.replit.dev'],
