@@ -45,9 +45,39 @@ function runCommand(cmd, timeout = 30000) {
 }
 
 function cleanUnusedImports() {
-  console.log('🧹 Cleaning unused imports...')
+  console.log('🧹 Cleaning unused imports with individual ESLint...')
   
-  // Manual cleanup for critical files
+  // Individual file processing (user preference for better performance)
+  const targetFiles = [
+    'src/app/page.tsx',
+    'src/app/layout.tsx', 
+    'src/components/file-icon.tsx',
+    'src/lib/utils.ts',
+    'src/auth.ts'
+  ]
+  
+  let cleaned = 0
+  for (const file of targetFiles) {
+    if (fs.existsSync(file)) {
+      try {
+        // Individual ESLint command (FASTEST approach)
+        runCommand(`npx eslint "${file}" --fix --quiet --max-warnings 0`, 8000)
+        console.log(`✅ Cleaned: ${path.basename(file)}`)
+        cleaned++
+      } catch (error) {
+        // Try unused imports only rule as fallback
+        try {
+          runCommand(`npx eslint "${file}" --fix --quiet --rule "unused-imports/no-unused-imports: error"`, 5000)
+          console.log(`✅ Cleaned: ${path.basename(file)} (imports only)`)
+          cleaned++
+        } catch (e) {
+          console.log(`⚠️  ${path.basename(file)} - may need manual review`)
+        }
+      }
+    }
+  }
+  
+  // Manual cleanup for critical files as fallback
   const criticalFiles = [
     'src/app/(main)/dashboard/drive/_components/drive-data-view.tsx',
     'src/app/(main)/dashboard/drive/_components/drive-manager.tsx'

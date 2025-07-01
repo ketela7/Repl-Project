@@ -153,4 +153,7 @@ Changelog:
 
 ```
 Preferred communication style: Simple, everyday language.
+ESLint processing: Individual file processing for better performance and results.
+Script management: Keep only essential scripts, remove redundant ones.
+Development approach: File-by-file processing to prevent system timeouts.
 ```
