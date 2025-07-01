@@ -611,7 +611,9 @@ function ItemsDownloadDialog({
         </DialogHeaderComponent>
 
         {/* Dynamic Content */}
-        {renderContent()}
+        <div key={`download-content-${isProcessing ? 'processing' : isCompleted ? 'completed' : 'initial'}`}>
+          {renderContent()}
+        </div>
 
         <DialogFooterComponent className="flex gap-2">
           <Button variant="outline" onClick={handleClose} disabled={isProcessing}>
