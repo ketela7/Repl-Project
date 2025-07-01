@@ -460,11 +460,6 @@ export function DriveToolbar({
 
   // Optimized bulk operation handlers
 
-  const handleOperationComplete = () => {
-    onDeselectAll()
-    onRefreshAfterOp()
-  }
-
   // Actions Dialog State
   const [isOperationsOpen, setIsOperationsOpen] = useState(false)
   const [isFiltersDialogOpen, setIsFiltersDialogOpen] = useState(false)
@@ -1201,7 +1196,7 @@ export function DriveToolbar({
                                   ...filters.advancedFilters,
                                   createdDateRange: {
                                     ...filters.advancedFilters.createdDateRange,
-                                    from: e.target.value ? new Date(e.target.value) : undefined,
+                                    ...(e.target.value ? { from: new Date(e.target.value) } : {}),
                                   },
                                 },
                               })
@@ -1221,7 +1216,7 @@ export function DriveToolbar({
                                   ...filters.advancedFilters,
                                   createdDateRange: {
                                     ...filters.advancedFilters.createdDateRange,
-                                    to: e.target.value ? new Date(e.target.value) : undefined,
+                                    ...(e.target.value ? { to: new Date(e.target.value) } : {}),
                                   },
                                 },
                               })
@@ -1249,7 +1244,7 @@ export function DriveToolbar({
                                   ...filters.advancedFilters,
                                   modifiedDateRange: {
                                     ...filters.advancedFilters.modifiedDateRange,
-                                    from: e.target.value ? new Date(e.target.value) : undefined,
+                                    ...(e.target.value ? { from: new Date(e.target.value) } : {}),
                                   },
                                 },
                               })
@@ -1269,7 +1264,7 @@ export function DriveToolbar({
                                   ...filters.advancedFilters,
                                   modifiedDateRange: {
                                     ...filters.advancedFilters.modifiedDateRange,
-                                    to: e.target.value ? new Date(e.target.value) : undefined,
+                                    ...(e.target.value ? { to: new Date(e.target.value) } : {}),
                                   },
                                 },
                               })
@@ -1922,7 +1917,7 @@ export function DriveToolbar({
         hasActiveFilters={
           filters.activeView !== 'all' ||
           filters.fileTypeFilter.length > 0 ||
-          (filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) ||
+          !!(filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) ||
           (filters.advancedFilters.sizeRange?.max && filters.advancedFilters.sizeRange.max > 0) ||
           !!filters.advancedFilters.createdDateRange?.from ||
           !!filters.advancedFilters.modifiedDateRange?.from ||

@@ -170,9 +170,7 @@ function OperationsDialog({
     setIsTrashDialogOpen(false)
   }
 
-  const handleShareComplete = () => {
-    setIsShareDialogOpen(false)
-  }
+
 
   const handleRenameComplete = () => {
     setIsRenameDialogOpen(false)

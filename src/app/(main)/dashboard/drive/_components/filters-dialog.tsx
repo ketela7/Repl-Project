@@ -310,13 +310,8 @@ export function FiltersDialog({
     })
   }
 
-  const handleClearAll = () => {
-    setTempActiveView('all')
-    setTempFileTypeFilter([])
-    setTempAdvancedFilters({
-      pageSize: 50, // Reset to default
-    })
-    // Apply the clear immediately to reset the data view
+  // Apply the clear immediately to reset the data view
+  const applyFilterClear = () => {
     onFilterChange({
       activeView: 'all',
       fileTypeFilter: [],

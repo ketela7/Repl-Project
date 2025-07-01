@@ -32,8 +32,8 @@ export function DriveGridSkeleton() {
                 <Skeleton className="h-4 w-4 flex-shrink-0 rounded" />
                 <Skeleton className="h-4 w-4 flex-shrink-0 rounded" />
                 <div className="flex-1 space-y-1">
-                  <Skeleton className="h-4 rounded" style={{ width: pattern.main }} />
-                  <Skeleton className="h-3 rounded" style={{ width: pattern.sub }} />
+                  <Skeleton className="h-4 rounded" style={{ width: pattern?.main || '70%' }} />
+                  <Skeleton className="h-3 rounded" style={{ width: pattern?.sub || '40%' }} />
                 </div>
                 <Skeleton className="h-4 w-16 rounded" />
                 <Skeleton className="h-4 w-4 rounded" />

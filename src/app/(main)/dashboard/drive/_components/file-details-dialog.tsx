@@ -966,22 +966,22 @@ export function FileDetailsDialog({
                 Ownership & Sharing
               </h3>
 
-              {fileDetails.owners && fileDetails.owners.length > 0 && (
+              {fileDetails.owners && fileDetails.owners.length > 0 && fileDetails.owners[0] && (
                 <div className="mb-4">
                   <span className="font-medium">Owner:</span>
                   <div className="mt-2 flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={fileDetails.owners[0].photoLink} />
+                      <AvatarImage src={fileDetails.owners[0]?.photoLink} />
                       <AvatarFallback>
-                        {getInitials(fileDetails.owners[0].displayName)}
+                        {getInitials(fileDetails.owners[0]?.displayName || 'Unknown')}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">
-                        {fileDetails.owners[0].displayName}
+                        {fileDetails.owners[0]?.displayName || 'Unknown'}
                       </span>
                       <span className="text-muted-foreground text-xs">
-                        {fileDetails.owners[0].emailAddress}
+                        {fileDetails.owners[0]?.emailAddress || ''}
                       </span>
                     </div>
                   </div>
