@@ -18,7 +18,6 @@ interface NextAuthFormProps {
 }
 
 export function NextAuthForm({ isReauth = false }: NextAuthFormProps) {
-
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {

@@ -222,7 +222,7 @@ export function DriveDataView({
         {
           key: 'delete',
           label: 'Delete',
-          icon: Triangle,
+          icon: 
           condition: item.canDelete === true,
           destructive: true,
         },

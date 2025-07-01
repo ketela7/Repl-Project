@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, useRef  } from 'react'
-import { ChevronUp, ChevronDown, RefreshCw } from 'lucide-react'
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { RefreshCw } from 'lucide-react'
 
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 import { normalizeFileSize, getFileActions } from '@/lib/google-drive/utils'
