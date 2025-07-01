@@ -29,12 +29,12 @@ const nextConfig = {
   // Production TypeScript compilation
   typescript: {
     ignoreBuildErrors: true,
-  //  tsconfigPath: './tsconfig.json',
+    tsconfigPath: './tsconfig.json',
   },
 
   // Enable ESLint for production builds
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
 
   allowedDevOrigins: ['127.0.0.1', 'localhost', '*.pike.replit.dev', '*.sisko.replit.dev'],
@@ -73,7 +73,7 @@ const nextConfig = {
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()',
+            value: 'camera=(), geolocation=()',
           },
         ],
       },
@@ -86,7 +86,7 @@ const nextConfig = {
 
   // Development optimizations
   onDemandEntries: {
-    maxInactiveAge: 60 * 1000,
+  //  maxInactiveAge: 60 * 1000,
     pagesBufferLength: 2,
   },
 

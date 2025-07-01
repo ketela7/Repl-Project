@@ -2,14 +2,6 @@
 
 ## Development Rules
 
-### Priority Order (Tinggi ke Rendah)
-
-1. 🔴 **Bug atau kesalahan logika** - Prioritas tertinggi
-2. 🟠 **Struktur & arsitektur** - Konsistensi arsitektur Next.js App Router
-3. 🟡 **Redundansi & kode tak terpakai** - Import unused, duplikasi, refactor
-4. 🔵 **Inkonistensi UI/UX** - Desain dan pengalaman pengguna
-5. ⚪ **Hal minor** - Whitespace, komentar, typo
-
 ### Environment Variables
 
 - **❌ Jangan gunakan NEXT*PUBLIC***: Hanya gunakan variabel rahasia (private env) secara aman
@@ -29,7 +21,7 @@
 - **Import unused**: Hapus semua import yang tidak digunakan
 - **Duplikasi kode**: Refactor kode yang berulang
 - **Fungsi tidak terpakai**: Hapus fungsi/komponen yang tidak digunakan
-- **ESLint + Prettier**: Auto-fix dengan `npx eslint --fix`
+- **ESLint + Prettier**: Auto-fix dengan ESLint
 
 #### TypeScript Requirements
 
