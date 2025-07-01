@@ -130,8 +130,8 @@ export class GoogleDriveService {
       }
     } else if (parentId || mimeType) {
       searchQuery = buildSearchQuery({
-        parentId,
-        mimeType,
+        ...(parentId && { parentId }),
+        ...(mimeType && { mimeType }),
         trashed: false,
       })
     } else {
@@ -179,7 +179,7 @@ export class GoogleDriveService {
 
       return {
         files,
-        nextPageToken: response.data.nextPageToken,
+        ...(response.data.nextPageToken && { nextPageToken: response.data.nextPageToken }),
         incompleteSearch: response.data.incompleteSearch || false,
       }
     } catch (error: any) {
@@ -213,7 +213,7 @@ export class GoogleDriveService {
 
           return {
             files: retryFiles,
-            nextPageToken: retryResponse.data.nextPageToken,
+            ...(retryResponse.data.nextPageToken && { nextPageToken: retryResponse.data.nextPageToken }),
             incompleteSearch: retryResponse.data.incompleteSearch || false,
           }
         }
@@ -434,82 +434,133 @@ export class GoogleDriveService {
       appProperties: response.data.appProperties || {},
       imageMediaMetadata: response.data.imageMediaMetadata
         ? {
-            width: response.data.imageMediaMetadata.width,
-            height: response.data.imageMediaMetadata.height,
-            rotation: response.data.imageMediaMetadata.rotation,
-            location: response.data.imageMediaMetadata.location
-              ? {
-                  latitude: response.data.imageMediaMetadata.location.latitude,
-                  longitude: response.data.imageMediaMetadata.location.longitude,
-                  altitude: response.data.imageMediaMetadata.location.altitude,
-                }
-              : undefined,
-            time: response.data.imageMediaMetadata.time,
-            cameraMake: response.data.imageMediaMetadata.cameraMake,
-            cameraModel: response.data.imageMediaMetadata.cameraModel,
-            exposureTime: response.data.imageMediaMetadata.exposureTime,
-            aperture: response.data.imageMediaMetadata.aperture,
-            flashUsed: response.data.imageMediaMetadata.flashUsed,
-            focalLength: response.data.imageMediaMetadata.focalLength,
-            isoSpeed: response.data.imageMediaMetadata.isoSpeed,
-            meteringMode: response.data.imageMediaMetadata.meteringMode,
-            sensor: response.data.imageMediaMetadata.sensor,
-            exposureMode: response.data.imageMediaMetadata.exposureMode,
-            colorSpace: response.data.imageMediaMetadata.colorSpace,
-            whiteBalance: response.data.imageMediaMetadata.whiteBalance,
-            exposureBias: response.data.imageMediaMetadata.exposureBias,
-            maxApertureValue: response.data.imageMediaMetadata.maxApertureValue,
-            subjectDistance: response.data.imageMediaMetadata.subjectDistance,
-            lens: response.data.imageMediaMetadata.lens,
+            ...(response.data.imageMediaMetadata.width !== undefined && { width: response.data.imageMediaMetadata.width }),
+            ...(response.data.imageMediaMetadata.height !== undefined && { height: response.data.imageMediaMetadata.height }),
+            ...(response.data.imageMediaMetadata.rotation !== undefined && { rotation: response.data.imageMediaMetadata.rotation }),
+            ...(response.data.imageMediaMetadata.location && {
+              location: {
+                ...(response.data.imageMediaMetadata.location.latitude !== undefined && { latitude: response.data.imageMediaMetadata.location.latitude }),
+                ...(response.data.imageMediaMetadata.location.longitude !== undefined && { longitude: response.data.imageMediaMetadata.location.longitude }),
+                ...(response.data.imageMediaMetadata.location.altitude !== undefined && { altitude: response.data.imageMediaMetadata.location.altitude }),
+              }
+            }),
+            ...(response.data.imageMediaMetadata.time && {
+              time: response.data.imageMediaMetadata.time,
+            }),
+            ...(response.data.imageMediaMetadata.cameraMake && {
+              cameraMake: response.data.imageMediaMetadata.cameraMake,
+            }),
+            ...(response.data.imageMediaMetadata.cameraModel && {
+              cameraModel: response.data.imageMediaMetadata.cameraModel,
+            }),
+            ...(response.data.imageMediaMetadata.exposureTime !== undefined && {
+              exposureTime: response.data.imageMediaMetadata.exposureTime,
+            }),
+            ...(response.data.imageMediaMetadata.aperture !== undefined && {
+              aperture: response.data.imageMediaMetadata.aperture,
+            }),
+            ...(response.data.imageMediaMetadata.flashUsed !== undefined && {
+              flashUsed: response.data.imageMediaMetadata.flashUsed,
+            }),
+            ...(response.data.imageMediaMetadata.focalLength !== undefined && {
+              focalLength: response.data.imageMediaMetadata.focalLength,
+            }),
+            ...(response.data.imageMediaMetadata.isoSpeed !== undefined && {
+              isoSpeed: response.data.imageMediaMetadata.isoSpeed,
+            }),
+            ...(response.data.imageMediaMetadata.meteringMode && {
+              meteringMode: response.data.imageMediaMetadata.meteringMode,
+            }),
+            ...(response.data.imageMediaMetadata.sensor && {
+              sensor: response.data.imageMediaMetadata.sensor,
+            }),
+            ...(response.data.imageMediaMetadata.exposureMode && {
+              exposureMode: response.data.imageMediaMetadata.exposureMode,
+            }),
+            ...(response.data.imageMediaMetadata.colorSpace && {
+              colorSpace: response.data.imageMediaMetadata.colorSpace,
+            }),
+            ...(response.data.imageMediaMetadata.whiteBalance && {
+              whiteBalance: response.data.imageMediaMetadata.whiteBalance,
+            }),
+            ...(response.data.imageMediaMetadata.exposureBias !== undefined && {
+              exposureBias: response.data.imageMediaMetadata.exposureBias,
+            }),
+            ...(response.data.imageMediaMetadata.maxApertureValue !== undefined && {
+              maxApertureValue: response.data.imageMediaMetadata.maxApertureValue,
+            }),
+            ...(response.data.imageMediaMetadata.subjectDistance !== undefined && {
+              subjectDistance: response.data.imageMediaMetadata.subjectDistance,
+            }),
+            ...(response.data.imageMediaMetadata.lens && {
+              lens: response.data.imageMediaMetadata.lens,
+            }),
           }
         : undefined,
       videoMediaMetadata: response.data.videoMediaMetadata
         ? {
-            width: response.data.videoMediaMetadata.width,
-            height: response.data.videoMediaMetadata.height,
-            durationMillis: response.data.videoMediaMetadata.durationMillis,
+            ...(response.data.videoMediaMetadata.width !== undefined && {
+              width: response.data.videoMediaMetadata.width,
+            }),
+            ...(response.data.videoMediaMetadata.height !== undefined && {
+              height: response.data.videoMediaMetadata.height,
+            }),
+            ...(response.data.videoMediaMetadata.durationMillis && {
+              durationMillis: response.data.videoMediaMetadata.durationMillis,
+            }),
           }
         : undefined,
       exportLinks: response.data.exportLinks || {},
       shortcutDetails: response.data.shortcutDetails
         ? {
-            targetId: response.data.shortcutDetails.targetId,
-            targetMimeType: response.data.shortcutDetails.targetMimeType,
-            targetResourceKey: response.data.shortcutDetails.targetResourceKey,
+            ...(response.data.shortcutDetails.targetId && {
+              targetId: response.data.shortcutDetails.targetId,
+            }),
+            ...(response.data.shortcutDetails.targetMimeType && {
+              targetMimeType: response.data.shortcutDetails.targetMimeType,
+            }),
+            ...(response.data.shortcutDetails.targetResourceKey && {
+              targetResourceKey: response.data.shortcutDetails.targetResourceKey,
+            }),
           }
         : undefined,
       contentRestrictions:
         response.data.contentRestrictions?.map(restriction => ({
           readOnly: restriction.readOnly || false,
           ...(restriction.reason && { reason: restriction.reason }),
-          restrictingUser: restriction.restrictingUser
-            ? {
-                displayName: restriction.restrictingUser.displayName || '',
-                emailAddress: restriction.restrictingUser.emailAddress || '',
-                ...(restriction.restrictingUser.photoLink && {
-                  photoLink: restriction.restrictingUser.photoLink,
-                }),
-              }
-            : undefined,
+          ...(restriction.restrictingUser && {
+            restrictingUser: {
+              displayName: restriction.restrictingUser.displayName || '',
+              emailAddress: restriction.restrictingUser.emailAddress || '',
+              ...(restriction.restrictingUser.photoLink && {
+                photoLink: restriction.restrictingUser.photoLink,
+              }),
+            }
+          }),
           ...(restriction.restrictionTime && { restrictionTime: restriction.restrictionTime }),
           ...(restriction.type && { type: restriction.type }),
         })) || [],
       ...(response.data.resourceKey && { resourceKey: response.data.resourceKey }),
       linkShareMetadata: response.data.linkShareMetadata
         ? {
-            securityUpdateEligible: response.data.linkShareMetadata.securityUpdateEligible,
-            securityUpdateEnabled: response.data.linkShareMetadata.securityUpdateEnabled,
+            ...(response.data.linkShareMetadata.securityUpdateEligible !== undefined && {
+              securityUpdateEligible: response.data.linkShareMetadata.securityUpdateEligible,
+            }),
+            ...(response.data.linkShareMetadata.securityUpdateEnabled !== undefined && {
+              securityUpdateEnabled: response.data.linkShareMetadata.securityUpdateEnabled,
+            }),
           }
         : undefined,
       labelInfo: response.data.labelInfo
         ? {
-            labels:
-              response.data.labelInfo.labels?.map(label => ({
+            ...(response.data.labelInfo.labels && {
+              labels: response.data.labelInfo.labels.map(label => ({
                 ...(label.id && { id: label.id }),
                 ...(label.revisionId && { revisionId: label.revisionId }),
                 ...(label.kind && { kind: label.kind }),
                 ...(label.fields && { fields: label.fields }),
-              })) || undefined,
+              })),
+            }),
           }
         : undefined,
       capabilities: response.data.capabilities || {},
@@ -518,7 +569,7 @@ export class GoogleDriveService {
 
   async getFolders(parentId?: string): Promise<DriveFolder[]> {
     const query = buildSearchQuery({
-      parentId,
+      ...(parentId && { parentId }),
       mimeType: 'application/vnd.google-apps.folder',
       trashed: false,
     })

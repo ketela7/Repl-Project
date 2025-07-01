@@ -100,7 +100,6 @@ export function DriveManager() {
   const [needsReauth, setNeedsReauth] = useState(false)
 
   // UI state
-  const isMobile = useIsMobile()
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
   const { timezone, isLoading: timezoneLoading } = useTimezoneContext()
   const [searchQuery, setSearchQuery] = useState('')

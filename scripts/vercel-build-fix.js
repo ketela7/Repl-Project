@@ -86,6 +86,11 @@ function fixExactOptionalPropertyTypes() {
         {
           pattern: /removeParents: currentParentId,/g,
           replacement: '...(currentParentId && { removeParents: currentParentId }),'
+        },
+        // Fix buildSearchQuery parentId issue
+        {
+          pattern: /parentId,\s*mimeType:/g,
+          replacement: '...(parentId && { parentId }),\n      mimeType:'
         }
       ]
     },

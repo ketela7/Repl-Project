@@ -6,7 +6,14 @@ Your Vercel build was failing due to TypeScript `exactOptionalPropertyTypes` err
 
 ## 🔧 Fixes Applied
 
-### 1. File Thumbnail Preview Component
+### 1. Unused Variable Fix
+**File**: `src/app/(main)/dashboard/drive/_components/drive-manager.tsx`
+
+**Issue**: `'isMobile' is declared but its value is never read`
+
+**Fix**: Removed unused `const isMobile = useIsMobile()` declaration
+
+### 2. File Thumbnail Preview Component
 **File**: `src/app/(main)/dashboard/drive/_components/drive-data-view.tsx`
 
 **Before** (causing error):
@@ -29,10 +36,12 @@ Your Vercel build was failing due to TypeScript `exactOptionalPropertyTypes` err
 >
 ```
 
-### 2. Google Drive Service File
+### 3. Google Drive Service File - Comprehensive exactOptionalPropertyTypes Fixes
 **File**: `src/lib/google-drive/service.ts`
 
-**Upload File Metadata** - Fixed optional properties:
+**Multiple sections fixed for TypeScript strict mode compliance:**
+
+#### A. Upload File Metadata - Fixed optional properties:
 ```typescript
 // Before
 const fileMetadata = {
@@ -90,6 +99,64 @@ const updateParams: any = {
   fields: '...'
 }
 const response = await this.drive.files.update(updateParams)
+```
+
+#### C. Image Metadata Properties - Fixed optional camera/location data:
+```typescript
+// Fixed all undefined properties in imageMediaMetadata using conditional spreading:
+...(response.data.imageMediaMetadata.time && { time: response.data.imageMediaMetadata.time }),
+...(response.data.imageMediaMetadata.cameraMake && { cameraMake: response.data.imageMediaMetadata.cameraMake }),
+...(response.data.imageMediaMetadata.exposureTime !== undefined && { exposureTime: response.data.imageMediaMetadata.exposureTime }),
+// ... and 15+ more camera/EXIF properties
+```
+
+#### D. Video Metadata Properties - Fixed optional video dimensions:
+```typescript
+// Before
+videoMediaMetadata: response.data.videoMediaMetadata ? {
+  width: response.data.videoMediaMetadata.width,  // ❌ Could be undefined
+  height: response.data.videoMediaMetadata.height,  // ❌ Could be undefined
+  durationMillis: response.data.videoMediaMetadata.durationMillis,  // ❌ Could be undefined
+} : undefined,
+
+// After  
+videoMediaMetadata: response.data.videoMediaMetadata ? {
+  ...(response.data.videoMediaMetadata.width !== undefined && { width: response.data.videoMediaMetadata.width }),  // ✅
+  ...(response.data.videoMediaMetadata.height !== undefined && { height: response.data.videoMediaMetadata.height }),  // ✅
+  ...(response.data.videoMediaMetadata.durationMillis && { durationMillis: response.data.videoMediaMetadata.durationMillis }),  // ✅
+} : undefined,
+```
+
+#### E. Shortcut Details - Fixed target properties:
+```typescript
+// Fixed targetId, targetMimeType, targetResourceKey using conditional spreading
+```
+
+#### F. Link Share Metadata - Fixed security update properties:
+```typescript
+// Fixed securityUpdateEligible and securityUpdateEnabled boolean properties
+```
+
+#### G. Label Info - Fixed labels array handling:
+```typescript
+// Fixed labels array and fields mapping with proper conditional spreading
+```
+
+#### H. Search Query Parameters - Fixed parentId in buildSearchQuery:
+```typescript
+// Before
+const query = buildSearchQuery({
+  parentId,  // ❌ Could be undefined
+  mimeType: 'application/vnd.google-apps.folder',
+  trashed: false,
+})
+
+// After
+const query = buildSearchQuery({
+  ...(parentId && { parentId }),  // ✅ Only passes if defined
+  mimeType: 'application/vnd.google-apps.folder', 
+  trashed: false,
+})
 ```
 
 ## 🛠️ Development Tools Created
