@@ -373,7 +373,7 @@ export async function GET(request: NextRequest) {
 
     // If fileId is provided, return single file metadata (used by breadcrumb)
     if (fileId) {
-      const fileMetadata = await driveService.getFileMetadata(fileId, [
+      const fileMetadata = await driveService!.getFileMetadata(fileId, [
         'id',
         'name',
         'parents',
@@ -401,7 +401,7 @@ export async function GET(request: NextRequest) {
     const filters: FileFilter = {
       fileType: searchParams.get('fileType') || 'all',
       viewStatus: searchParams.get('viewStatus') || 'all',
-      ...(searchParams.get('sortBy') && { sortBy: searchParams.get('sortBy') }),
+      ...(searchParams.get('sortBy') && { sortBy: searchParams.get('sortBy')! }),
       sortOrder: searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc',
       ...(searchParams.get('search') && { search: searchParams.get('search') }),
       ...(searchParams.get('createdAfter') && { createdAfter: searchParams.get('createdAfter') }),
@@ -440,13 +440,13 @@ export async function GET(request: NextRequest) {
       // No parent constraint needed - search globally
     }
 
-    const sortKey = getSortKey(filters.sortBy)
+    const sortKey = getSortKey(filters.sortBy || 'modified')
     const orderBy = `${sortKey} ${filters.sortOrder}`
 
     const cacheKey = driveCache.generateDriveKey({
       parentId: folderId,
       userId: session.user?.email,
-      pageToken,
+      ...(pageToken && { pageToken }),
       query: query,
       pageSize,
     })
@@ -466,9 +466,9 @@ export async function GET(request: NextRequest) {
     // })
 
     // Pass the complete query to the Drive service
-    const result = await driveService.listFiles({
+    const result = await driveService!.listFiles({
       query,
-      pageToken,
+      ...(pageToken && { pageToken }),
       pageSize,
       orderBy,
     })

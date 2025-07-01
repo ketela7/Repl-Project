@@ -168,7 +168,7 @@ export function DriveDestinationSelector({
   const navigateBack = (index: number) => {
     const newPath = currentPath.slice(0, index + 1)
     setCurrentPath(newPath)
-    loadFolders(newPath[newPath.length - 1].id)
+    loadFolders(newPath[newPath.length - 1]?.id)
   }
 
   // Filter folders based on search

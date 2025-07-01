@@ -1,9 +1,5 @@
 'use client'
 
-import type { ReactNode } from 'react'
-import type { ReactNode } from 'react'
-import type { ReactNode } from 'react'
-import type { ReactNode } from 'react'
 import {
   FileText,
   Folder,
@@ -114,5 +110,11 @@ export function FileIcon({
 
 // Helper function that can be used in both client and server components
 export function getFileIcon(mimeType: string, fileName?: string, className?: string) {
-  return <FileIcon mimeType={mimeType} fileName={fileName} className={className} />
+  return (
+    <FileIcon
+      mimeType={mimeType}
+      {...(fileName && { fileName })}
+      {...(className && { className })}
+    />
+  )
 }

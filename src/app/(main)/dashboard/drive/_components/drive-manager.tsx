@@ -209,65 +209,7 @@ export function DriveManager() {
     setSortConfig({ key, direction })
   }
 
-
-
-  const sortedItems = useMemo(() => {
-    if (!sortConfig) {
-      return [...items].sort((a, b) => {
-        const aIsFolder = a.mimeType === 'application/vnd.google-apps.folder'
-        const bIsFolder = b.mimeType === 'application/vnd.google-apps.folder'
-        if (aIsFolder && !bIsFolder) return -1
-        if (!aIsFolder && bIsFolder) return 1
-        return 0
-      })
-    }
-
-    return [...items].sort((a, b) => {
-      const { key, direction } = sortConfig
-      let aValue: any, bValue: any
-      const aIsFolder = a.mimeType === 'application/vnd.google-apps.folder'
-      const bIsFolder = b.mimeType === 'application/vnd.google-apps.folder'
-
-      switch (key) {
-        case 'name':
-          aValue = (a.name || '').toLowerCase()
-          bValue = (b.name || '').toLowerCase()
-          break
-        case 'size':
-          aValue = aIsFolder ? 0 : normalizeFileSize((a as any).size)
-          bValue = bIsFolder ? 0 : normalizeFileSize((b as any).size)
-          break
-        case 'modifiedTime':
-          aValue = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0
-          bValue = b.modifiedTime ? new Date(b.modifiedTime).getTime() : 0
-          break
-        case 'createdTime':
-          aValue = a.createdTime ? new Date(a.createdTime).getTime() : 0
-          bValue = b.createdTime ? new Date(b.createdTime).getTime() : 0
-          break
-        case 'mimeType':
-          aValue = aIsFolder ? 'folder' : (a.mimeType || '').toLowerCase()
-          bValue = bIsFolder ? 'folder' : (b.mimeType || '').toLowerCase()
-          break
-        case 'owners':
-          aValue = (a.owners?.[0]?.emailAddress || '').toLowerCase()
-          bValue = (b.owners?.[0]?.emailAddress || '').toLowerCase()
-          break
-        default:
-          return 0
-      }
-
-      if (aValue === null || aValue === undefined || aValue === '' || aValue === '-')
-        aValue = key === 'size' ? 0 : ''
-      if (bValue === null || bValue === undefined || bValue === '' || bValue === '-')
-        bValue = key === 'size' ? 0 : ''
-
-      if (aValue < bValue) return direction === 'asc' ? -1 : 1
-      if (aValue > bValue) return direction === 'asc' ? 1 : -1
-      return 0
-    })
-  }, [items, sortConfig])
-  // Sorting End
+  // Sorting logic is handled in sortedDisplayItems
 
   // Selected items with details for operations - using getFileActions for consistency
   const selectedItemsWithDetails = useMemo(() => {

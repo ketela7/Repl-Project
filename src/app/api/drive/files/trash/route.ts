@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
 
     for (const id of fileIds) {
       try {
-        const result = await driveService.moveToTrash(id)
+        const result = await driveService!.moveToTrash(id)
         results.push({ fileId: id, success: true, result })
       } catch (error: any) {
         errors.push({

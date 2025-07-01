@@ -52,8 +52,8 @@ function generateRenamedFileName(
         const regexMatch = pattern.match(/^\/(.+)\/(.*)\/([gimuy]*)$/)
         if (regexMatch) {
           const [, regPattern, replacement, flags] = regexMatch
-          const regex = new RegExp(regPattern, flags)
-          return originalName.replace(regex, replacement)
+          const regex = flags ? new RegExp(regPattern, flags) : new RegExp(regPattern)
+          return originalName.replace(regex, replacement || "")
         }
         return originalName
       } catch (error) {
@@ -133,8 +133,8 @@ export async function POST(request: NextRequest) {
         // Use throttling and retry like Download Operations
         const result = await throttledDriveRequest(async () => {
           return await retryDriveApiCall(async () => {
-            return await driveService.renameFile(id, finalName)
-          }, `Rename file ${id}`)
+            return await driveService!.renameFile(id, finalName)
+          })
         })
 
         // // // // // console.log(`[Rename API] Success for file ${id}:`, result)

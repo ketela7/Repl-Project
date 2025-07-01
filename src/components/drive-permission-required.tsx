@@ -25,7 +25,7 @@ export function DrivePermissionRequired({
 
     try {
       // Sign out first, then redirect to login
-      const response = await fetch('/api/auth/signout', {
+      await fetch('/api/auth/signout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       })

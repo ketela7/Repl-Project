@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
     // Fetch folders with retry mechanism
     const foldersResult = await retryDriveApiCall(async () => {
       return await throttledDriveRequest(async () => {
-        return await driveService.drive.files.list({
+        return await driveService!.drive.files.list({
           q: query,
           fields: 'files(id,name,parents,shared,capabilities,owners,webViewLink,modifiedTime)',
           orderBy: 'name',
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
           includeItemsFromAllDrives: true,
         })
       })
-    }, 'List folders')
+    })
 
     const folders = foldersResult.data.files || []
 
@@ -81,12 +81,12 @@ export async function GET(request: NextRequest) {
       try {
         const sharedDrivesResult = await retryDriveApiCall(async () => {
           return await throttledDriveRequest(async () => {
-            return await driveService.drive.drives.list({
+            return await driveService!.drive.drives.list({
               fields: 'drives(id,name,capabilities)',
               pageSize: 50,
             })
           })
-        }, 'List shared drives')
+        })
 
         sharedDrives = (sharedDrivesResult.data.drives || []).map((drive: any) => ({
           id: drive.id,
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     // Create folder with retry mechanism
     const folderResult = await retryDriveApiCall(async () => {
       return await throttledDriveRequest(async () => {
-        return await driveService.drive.files.create({
+        return await driveService!.drive.files.create({
           requestBody: {
             name: name.trim(),
             mimeType: 'application/vnd.google-apps.folder',
@@ -155,7 +155,7 @@ export async function POST(request: NextRequest) {
           fields: 'id,name,parents,webViewLink,createdTime',
         })
       })
-    }, 'Create folder')
+    })
 
     const folder = folderResult.data
 

@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       try {
         // Apply each permission to the file
         for (const permission of sharePermissions) {
-          await driveService.shareFile(id, {
+          await driveService!.shareFile(id, {
             role: permission.role,
             type: permission.type,
             emailAddress: permission.emailAddress,
@@ -73,13 +73,13 @@ export async function POST(request: NextRequest) {
         }
 
         // Get the file details to generate share link
-        const fileDetails = await driveService.drive.files.get({
+        const fileDetails = await driveService!.drive.files.get({
           fileId: id,
           fields: 'id,name,mimeType,webViewLink',
         })
 
         const shareLink =
-          fileDetails.data.webViewLink || `https://drive.google.com/file/d/${id}/view`
+          fileDetails.data?.webViewLink || `https://drive.google.com/file/d/${id}/view`
 
         results.push({
           fileId: id,
@@ -104,7 +104,7 @@ export async function POST(request: NextRequest) {
       total: fileIds.length,
       type: isBulkOperation ? 'bulk' : 'single',
       operation: 'share',
-      shareLink: results.length > 0 ? results[0].shareLink : undefined,
+      shareLink: results.length > 0 ? results[0]?.shareLink : undefined,
       results,
       errors: errors.length > 0 ? errors : undefined,
     }

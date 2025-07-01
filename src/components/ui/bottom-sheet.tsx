@@ -39,7 +39,7 @@ interface BottomSheetFooterProps {
 
 const BottomSheet = ({ children, open, onOpenChange, trigger }: BottomSheetProps) => {
   return (
-    <Drawer.Root open={open} onOpenChange={onOpenChange}>
+    <Drawer.Root open={open || false} {...(onOpenChange && { onOpenChange })}>
       {trigger && <Drawer.Trigger asChild>{trigger}</Drawer.Trigger>}
       {children}
     </Drawer.Root>

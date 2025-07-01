@@ -91,8 +91,8 @@ export function DataTable<TData, TValue>({
         collisionDetection={closestCenter}
         modifiers={[restrictToVerticalAxis]}
         onDragEnd={handleDragEnd}
-        sensors={sensors}
-        id={sortableId}
+        {...(sensors && { sensors })}
+        {...(sortableId && { id: sortableId })}
       >
         {tableContent}
       </DndContext>

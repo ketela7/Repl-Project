@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       // Use minimal fields to reduce API load and improve error handling
       const response = await throttledDriveRequest(async () => {
         return await retryDriveApiCall(async () => {
-          return await driveService.drive.files.get({
+          return await driveService!.drive.files.get({
             fileId: folderId,
             fields: 'id,name,mimeType,trashed,capabilities(canAddChildren)',
           })

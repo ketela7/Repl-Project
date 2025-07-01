@@ -122,9 +122,7 @@ export async function retryOperation<T>(
 /**
  * Specialized retry for Google Drive API calls
  */
-export async function retryDriveApiCall<T>(
-  operation: () => Promise<T>,
-): Promise<T> {
+export async function retryDriveApiCall<T>(operation: () => Promise<T>): Promise<T> {
   return retryOperation(operation, {
     maxRetries: 3,
     baseDelay: 2000, // Start with 2 seconds for API calls
