@@ -317,7 +317,7 @@ export function DriveManager() {
             'modifiedBefore',
             (filters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
           )
-        if (filters.advancedFilters.owner?.trim())
+        if (filters.advancedFilters.owner && (filters.advancedFilters.owner as string).trim())
           params.append('owner', (filters.advancedFilters.owner as string).trim())
 
         // Add size filtering parameters (Google Drive API specification - values in bytes)
