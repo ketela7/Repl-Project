@@ -21,13 +21,14 @@ export async function POST(request: NextRequest) {
 
     const idsToProcess = fileId ? [fileId] : fileIds
 
-    // Get file details for all requested files
+    // Get file details for all requested files - use comprehensive fields for Details Operations
+    const detailsFields = fields || '*' // Request ALL fields for comprehensive details
     const results = await Promise.all(
       idsToProcess.map(async (id: string) => {
         try {
-          return await driveService.getFileDetails(id, fields)
+          return await driveService.getFileDetails(id, detailsFields)
         } catch (error) {
-          // // // // // console.error(`Failed to get details for file ${id}:`, error)
+          console.error(`Failed to get details for file ${id}:`, error)
           return null
         }
       }),

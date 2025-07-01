@@ -18,8 +18,11 @@ export const FIELD_SETS = {
   // Extended fields for detailed views
   LIST_DETAILED: `${BASE_FIELDS},size,createdTime,modifiedTime,webViewLink,thumbnailLink,parents,owners,shared,trashed`,
 
-  // Complete fields for file details page
-  FILE_DETAILS: `${BASE_FIELDS},size,createdTime,modifiedTime,webViewLink,webContentLink,thumbnailLink,parents,owners,shared,trashed,description,properties,appProperties,capabilities,permissions`,
+  // Complete fields for file details page - comprehensive technical details
+  FILE_DETAILS: `${BASE_FIELDS},size,quotaBytesUsed,createdTime,modifiedTime,viewedByMeTime,sharedWithMeTime,webViewLink,webContentLink,thumbnailLink,iconLink,parents,owners,lastModifyingUser,sharingUser,shared,trashed,starred,viewed,ownedByMe,viewedByMe,description,properties,appProperties,capabilities,permissions,copyRequiresWriterPermission,writersCanShare,folderColorRgb,originalFilename,fullFileExtension,fileExtension,md5Checksum,sha1Checksum,sha256Checksum,headRevisionId,isAppAuthorized,hasAugmentedPermissions,spaces,version,teamDriveId,driveId,hasVisitedTeamDrive,exportLinks,shortcutDetails,contentRestrictions,resourceKey,linkShareMetadata,labelInfo,imageMediaMetadata,videoMediaMetadata`,
+
+  // Ultra-comprehensive for Details Operations - ALL possible fields
+  DETAILS_COMPLETE: '*', // Request all available fields for comprehensive details
 
   // Fields for download operations
   DOWNLOAD: `${BASE_FIELDS},webContentLink,size,mimeType`,
