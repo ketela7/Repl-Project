@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     if (response) return response
 
     // Get about information which includes storage quota
-    const aboutResponse = await driveService.about.get({
+    const aboutResponse = await driveService.drive.about.get({
       fields: 'storageQuota,user',
     })
 
@@ -27,55 +27,55 @@ export async function GET(request: NextRequest) {
       starredResponse,
     ] = await Promise.all([
       // All files count and basic stats
-      driveService.files.list({
+      driveService.drive.files.list({
         q: 'trashed=false',
         fields: 'files(id,name,size,mimeType,createdTime,modifiedTime,shared,starred)',
         pageSize: 1000,
       }),
       // Google Docs
-      driveService.files.list({
+      driveService.drive.files.list({
         q: "trashed=false and mimeType='application/vnd.google-apps.document'",
         fields: 'files(id)',
         pageSize: 1000,
       }),
       // Google Sheets
-      driveService.files.list({
+      driveService.drive.files.list({
         q: "trashed=false and mimeType='application/vnd.google-apps.spreadsheet'",
         fields: 'files(id)',
         pageSize: 1000,
       }),
       // Google Slides
-      driveService.files.list({
+      driveService.drive.files.list({
         q: "trashed=false and mimeType='application/vnd.google-apps.presentation'",
         fields: 'files(id)',
         pageSize: 1000,
       }),
       // Images
-      driveService.files.list({
+      driveService.drive.files.list({
         q: "trashed=false and (mimeType contains 'image/')",
         fields: 'files(id,size)',
         pageSize: 1000,
       }),
       // Videos
-      driveService.files.list({
+      driveService.drive.files.list({
         q: "trashed=false and (mimeType contains 'video/')",
         fields: 'files(id,size)',
         pageSize: 1000,
       }),
       // PDFs
-      driveService.files.list({
+      driveService.drive.files.list({
         q: "trashed=false and mimeType='application/pdf'",
         fields: 'files(id,size)',
         pageSize: 1000,
       }),
       // Shared files
-      driveService.files.list({
+      driveService.drive.files.list({
         q: 'trashed=false and sharedWithMe=true',
         fields: 'files(id)',
         pageSize: 1000,
       }),
       // Starred files
-      driveService.files.list({
+      driveService.drive.files.list({
         q: 'trashed=false and starred=true',
         fields: 'files(id)',
         pageSize: 1000,
