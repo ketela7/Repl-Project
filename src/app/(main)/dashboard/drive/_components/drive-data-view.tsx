@@ -402,33 +402,17 @@ export function DriveDataView({
                     </CopyableCell>
                   )}
                   {visibleColumns.owners && (
-                    <TableCell
-                      className="hover:bg-muted/50 group cursor-pointer transition-colors"
-                      onClick={async e => {
-                        e.stopPropagation()
-                        const email = item.owners?.[0]?.emailAddress
-                        if (email) {
-                          try {
-                            await navigator.clipboard.writeText(email)
-                            // Show toast notification
-                            const { successToast } = await import('@/components/ui/toast')
-                            successToast.copied()
-                          } catch (err) {
-                            const { errorToast } = await import('@/lib/utils')
-                            errorToast.generic('Failed to copy email')
-                            // // // // // console.error('Failed to copy email:', err)
-                          }
-                        }
-                      }}
-                      title={`Click to copy: ${item.owners?.[0]?.emailAddress || 'No email available'}`}
+                    <CopyableCell
+                      value={item.owners?.[0]?.emailAddress || 'Unknown'}
+                      label="Owner email"
                     >
                       <div className="flex items-center gap-2">
-                        <span>{item.owners?.[0]?.emailAddress || 'Unknown'}</span>
-                        {item.owners?.[0]?.emailAddress && (
-                          <CopyIcon className="text-muted-foreground h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                        )}
+                        <span className="text-sm">{item.owners?.[0]?.displayName || 'Unknown'}</span>
+                        <span className="text-muted-foreground text-xs">
+                          ({item.owners?.[0]?.emailAddress || 'No email'})
+                        </span>
                       </div>
-                    </TableCell>
+                    </CopyableCell>
                   )}
                   {visibleColumns.mimeType && (
                     <CopyableCell value={item.mimeType} label="MIME type">
