@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/select";
 
 interface SimpleDatePickerProps {
-  date: Date | undefined;
+  date?: Date | undefined;
   onDateChange: (date: Date | undefined) => void;
   placeholder?: string;
   label?: string;
@@ -239,3 +239,5 @@ export function SimpleDatePicker({
     </div>
   );
 }
+
+export default SimpleDatePicker;
