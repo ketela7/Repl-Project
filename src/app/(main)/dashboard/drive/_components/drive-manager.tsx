@@ -298,18 +298,18 @@ export function DriveManager() {
         if (filters.fileTypeFilter?.length > 0)
           params.append('fileType', filters.fileTypeFilter.join(','))
         if (filters.advancedFilters.createdDateRange?.from)
-          params.append('createdAfter', filters.advancedFilters.createdDateRange.from.toISOString())
+          params.append('createdAfter', (filters.advancedFilters.createdDateRange.from as Date).toISOString())
         if (filters.advancedFilters.createdDateRange?.to)
-          params.append('createdBefore', filters.advancedFilters.createdDateRange.to.toISOString())
+          params.append('createdBefore', (filters.advancedFilters.createdDateRange.to as Date).toISOString())
         if (filters.advancedFilters.modifiedDateRange?.from)
           params.append(
             'modifiedAfter',
-            filters.advancedFilters.modifiedDateRange.from.toISOString(),
+            (filters.advancedFilters.modifiedDateRange.from as Date).toISOString(),
           )
         if (filters.advancedFilters.modifiedDateRange?.to)
           params.append(
             'modifiedBefore',
-            filters.advancedFilters.modifiedDateRange.to.toISOString(),
+            (filters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
           )
         if (filters.advancedFilters.owner?.trim())
           params.append('owner', filters.advancedFilters.owner.trim())
