@@ -62,7 +62,6 @@ interface DriveDataViewProps {
     direction: 'asc' | 'desc'
   } | null
   onSelectItem: (id: string) => void
-  onSelectModeChange: (isSelectMode: boolean) => void
   onFolderClick: (id: string) => void
   onColumnsChange: (columns: any) => void
   onItemAction: (action: string, item: DriveItem) => void
@@ -141,7 +140,6 @@ export function DriveDataView({
   visibleColumns,
   sortConfig,
   onSelectItem,
-  onSelectModeChange,
   onFolderClick,
   onColumnsChange,
   onItemAction,
