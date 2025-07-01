@@ -6,7 +6,12 @@ import { PlusCircle, Mail, ChevronRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -19,7 +24,10 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { type NavGroup, type NavMainItem } from '@/app/(main)/dashboard/_components/sidebar/sidebar-items'
+import {
+  type NavGroup,
+  type NavMainItem,
+} from '@/app/(main)/dashboard/_components/sidebar/sidebar-items'
 
 interface NavMainProps {
   readonly items: readonly NavGroup[]
@@ -39,7 +47,12 @@ const NavItemExpanded = ({
   isSubmenuOpen: (subItems?: NavMainItem['subItems']) => boolean
 }) => {
   return (
-    <Collapsible key={item.title} asChild defaultOpen={isSubmenuOpen(item.subItems)} className="group/collapsible">
+    <Collapsible
+      key={item.title}
+      asChild
+      defaultOpen={isSubmenuOpen(item.subItems)}
+      className="group/collapsible"
+    >
       <SidebarMenuItem>
         <CollapsibleTrigger asChild>
           {item.subItems ? (
@@ -73,7 +86,11 @@ const NavItemExpanded = ({
             <SidebarMenuSub>
               {item.subItems.map(subItem => (
                 <SidebarMenuSubItem key={subItem.title}>
-                  <SidebarMenuSubButton aria-disabled={subItem.comingSoon} isActive={isActive(subItem.url)} asChild>
+                  <SidebarMenuSubButton
+                    aria-disabled={subItem.comingSoon}
+                    isActive={isActive(subItem.url)}
+                    asChild
+                  >
                     <Link href={subItem.url} target={subItem.newTab ? '_blank' : undefined}>
                       {subItem.icon && <subItem.icon />}
                       <span>{subItem.title}</span>
@@ -184,7 +201,12 @@ export function NavMain({ items }: NavMainProps) {
                 state === 'collapsed' && !isMobile ? (
                   <NavItemCollapsed key={item.title} item={item} isActive={isItemActive} />
                 ) : (
-                  <NavItemExpanded key={item.title} item={item} isActive={isItemActive} isSubmenuOpen={isSubmenuOpen} />
+                  <NavItemExpanded
+                    key={item.title}
+                    item={item}
+                    isActive={isItemActive}
+                    isSubmenuOpen={isSubmenuOpen}
+                  />
                 ),
               )}
             </SidebarMenu>

@@ -198,7 +198,7 @@ export function DriveDestinationSelector({
   return (
     <div className={cn('flex h-full min-h-0 w-full flex-col', className)}>
       {/* Main Content - No extra headers, dialogs handle titles */}
-      <Card className="from-background to-muted/20 mx-auto min-h-0 w-full flex-1 border-0 bg-gradient-to-br shadow-sm">
+      <Card className="from-background to-muted/20 mx-auto max-h-[500px] min-h-0 w-full flex-1 border-0 bg-gradient-to-br shadow-sm">
         <CardContent className="flex h-full flex-col p-3">
           <Tabs
             value={activeTab}
@@ -223,8 +223,11 @@ export function DriveDestinationSelector({
               </TabsTrigger>
             </TabsList>
 
-            {/* Browse Tab Content - Flexible Height */}
-            <TabsContent value="browse" className="mt-0 flex min-h-0 flex-1 flex-col space-y-2">
+            {/* Browse Tab Content - Stable Height */}
+            <TabsContent
+              value="browse"
+              className="mt-0 flex max-h-[420px] min-h-0 flex-1 flex-col space-y-2"
+            >
               {/* Breadcrumb Navigation - Compact */}
               <Card className="border-muted/50 bg-muted/20 flex-shrink-0">
                 <CardContent className="p-2">
@@ -274,21 +277,23 @@ export function DriveDestinationSelector({
                 )}
               </div>
 
-              {/* Folder List - Flexible Height */}
+              {/* Folder List - Stable Height */}
               <Card className="border-muted/50 min-h-0 flex-1">
                 <CardContent className="h-full p-0">
-                  <ScrollArea className="h-full">
-                    <div className="space-y-1 p-3">
+                  <ScrollArea className="h-full max-h-[400px]">
+                    <div className="min-h-[300px] space-y-1 p-3">
                       {isLoadingFolders ? (
-                        <div className="flex flex-col items-center justify-center space-y-3 py-12">
+                        <div className="flex min-h-[250px] flex-col items-center justify-center space-y-3">
                           <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
                           <div className="space-y-1 text-center">
                             <p className="text-xs font-medium">Loading folders...</p>
-                            <p className="text-muted-foreground text-xs">Please wait while we fetch your folders</p>
+                            <p className="text-muted-foreground text-xs">
+                              Please wait while we fetch your folders
+                            </p>
                           </div>
                         </div>
                       ) : filteredFolders.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center space-y-3 py-12">
+                        <div className="flex min-h-[250px] flex-col items-center justify-center space-y-3">
                           <div className="bg-muted/50 rounded-full p-3">
                             <Folder className="text-muted-foreground h-5 w-5" />
                           </div>
@@ -297,7 +302,9 @@ export function DriveDestinationSelector({
                               {searchQuery ? 'No folders found' : 'No folders available'}
                             </p>
                             <p className="text-muted-foreground text-xs">
-                              {searchQuery ? 'Try adjusting your search terms' : 'This location is empty'}
+                              {searchQuery
+                                ? 'Try adjusting your search terms'
+                                : 'This location is empty'}
                             </p>
                           </div>
                         </div>
@@ -318,7 +325,9 @@ export function DriveDestinationSelector({
                                 <Folder
                                   className={cn(
                                     'h-4 w-4 transition-colors',
-                                    selectedFolderId === folder.id ? 'text-blue-600' : 'text-blue-500',
+                                    selectedFolderId === folder.id
+                                      ? 'text-blue-600'
+                                      : 'text-blue-500',
                                   )}
                                 />
                               </div>
@@ -340,7 +349,10 @@ export function DriveDestinationSelector({
                                   )}
                                 </div>
                                 {folder.path && (
-                                  <p className="text-muted-foreground truncate text-xs opacity-70" title={folder.path}>
+                                  <p
+                                    className="text-muted-foreground truncate text-xs opacity-70"
+                                    title={folder.path}
+                                  >
                                     {folder.path}
                                   </p>
                                 )}
@@ -391,7 +403,9 @@ export function DriveDestinationSelector({
                               <p className="text-muted-foreground text-xs">
                                 Showing first 50 of {filteredFolders.length} folders
                               </p>
-                              <p className="text-muted-foreground mt-1 text-xs">Use search to find specific folders</p>
+                              <p className="text-muted-foreground mt-1 text-xs">
+                                Use search to find specific folders
+                              </p>
                             </div>
                           )}
                         </>
@@ -403,7 +417,10 @@ export function DriveDestinationSelector({
             </TabsContent>
 
             {/* URL Tab Content - Flexible Height */}
-            <TabsContent value="url" className="mt-0 flex min-h-0 flex-1 flex-col space-y-4 overflow-y-auto">
+            <TabsContent
+              value="url"
+              className="mt-0 flex min-h-0 flex-1 flex-col space-y-4 overflow-y-auto"
+            >
               <div className="space-y-4">
                 {/* Input Section - Compact */}
                 <div className="space-y-3">
@@ -430,14 +447,19 @@ export function DriveDestinationSelector({
                   {/* Format Examples - Compact */}
                   <Card className="border-muted/50 bg-muted/20">
                     <CardContent className="p-3">
-                      <p className="text-muted-foreground mb-2 text-xs font-medium">Supported formats:</p>
+                      <p className="text-muted-foreground mb-2 text-xs font-medium">
+                        Supported formats:
+                      </p>
                       <div className="space-y-1">
                         {[
                           'Full URLs: drive.google.com/drive/folders/FOLDER_ID',
                           'Sharing links: drive.google.com/folders/FOLDER_ID?usp=sharing',
                           'Direct folder IDs: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
                         ].map((example, index) => (
-                          <div key={index} className="text-muted-foreground flex items-start gap-2 text-xs">
+                          <div
+                            key={index}
+                            className="text-muted-foreground flex items-start gap-2 text-xs"
+                          >
                             <div className="bg-muted-foreground mt-1.5 h-0.5 w-0.5 flex-shrink-0 rounded-full" />
                             <span className="leading-relaxed break-all">{example}</span>
                           </div>
@@ -513,10 +535,12 @@ export function DriveDestinationSelector({
                               <AlertCircle className="h-3 w-3 text-red-600 dark:text-red-400" />
                             </div>
                             <div>
-                              <h4 className="text-xs font-medium text-red-800 dark:text-red-200">Invalid URL Format</h4>
+                              <h4 className="text-xs font-medium text-red-800 dark:text-red-200">
+                                Invalid URL Format
+                              </h4>
                               <p className="mt-0.5 text-xs text-red-700 dark:text-red-300">
-                                Please check the URL format and try again. Make sure it&apos;s a valid Google Drive
-                                folder URL or ID.
+                                Please check the URL format and try again. Make sure it&apos;s a
+                                valid Google Drive folder URL or ID.
                               </p>
                             </div>
                           </div>
@@ -561,7 +585,9 @@ export function DriveDestinationSelector({
                                       : 'text-red-800 dark:text-red-200',
                                   )}
                                 >
-                                  {validationResult.isValid ? 'Folder Access Confirmed' : 'Access Validation Failed'}
+                                  {validationResult.isValid
+                                    ? 'Folder Access Confirmed'
+                                    : 'Access Validation Failed'}
                                 </h4>
                                 <p
                                   className={cn(

@@ -79,7 +79,10 @@ export function handleApiError(error: any): NextResponse {
     }
 
     if (error.message.includes('quota')) {
-      return NextResponse.json({ error: 'Google Drive quota exceeded. Please try again later.' }, { status: 429 })
+      return NextResponse.json(
+        { error: 'Google Drive quota exceeded. Please try again later.' },
+        { status: 429 },
+      )
     }
 
     return NextResponse.json({ error: error.message }, { status: 400 })
