@@ -40,15 +40,12 @@ function isRetryableError(error: any): boolean {
   }
 
   // Google API specific errors
-  if (
+  return (
     error.message?.includes('Rate Limit Exceeded') ||
     error.message?.includes('Backend Error') ||
-    error.message?.includes('Internal error')
-  ) {
-    return true
-  }
-
-  return false
+    error.message?.includes('Internal error') ||
+    false
+  )
 }
 
 /**
@@ -79,11 +76,13 @@ export async function retryOperation<T>(operation: () => Promise<T>, config: Par
   for (let attempt = 0; attempt <= finalConfig.maxRetries; attempt++) {
     try {
       if (process.env.NODE_ENV === 'development' && attempt > 0) {
+        console.debug(`[Retry] Attempt ${attempt + 1}/${finalConfig.maxRetries + 1}`)
       }
 
       const result = await operation()
 
       if (attempt > 0 && process.env.NODE_ENV === 'development') {
+        console.debug(`[Retry] Success after ${attempt + 1} attempts`)
       }
 
       return result
