@@ -566,7 +566,7 @@ export function DriveManager() {
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
-    const sorted = [...items].sort((a, b) => {
+    const sorted = [...displayItems].sort((a, b) => {
       if (!sortConfig) return 0
 
       let aValue: any
@@ -617,7 +617,7 @@ export function DriveManager() {
         canExport: actions.canExport,
       }
     })
-  }, [items, sortConfig, filters.activeView])
+  }, [displayItems, sortConfig, filters.activeView])
 
   const handleSelectAll = useCallback(() => {
     if (selectedItems.size === sortedDisplayItems.length) {
