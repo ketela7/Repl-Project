@@ -13,6 +13,22 @@ import {
   DriveUserInfo,
   DriveFileMetadata,
 } from './types'
+import { DetailedDriveFile } from './detailed-file-types'
+import {
+  mapUserInfo,
+  mapImageMetadata,
+  mapVideoMetadata,
+  mapShortcutDetails,
+  mapContentRestrictions,
+  mapLinkShareMetadata,
+  mapLabelInfo,
+  mapBasicProperties,
+  mapChecksums,
+  mapBooleanProperties,
+  mapCollectionProperties,
+} from './file-detail-mappers'
+import { validateListFilesOptions } from './validation-utils'
+import { validateFileName, handleDriveApiError } from './file-validation'
 import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
 import { getOptimizedRequestParams, performanceMonitor, requestDeduplicator } from './performance'
 
@@ -64,62 +80,17 @@ export class GoogleDriveService {
       includeTeamDriveItems = true,
     } = options
 
-    // Validate and sanitize pageSize
-    const validPageSize = Math.min(Math.max(pageSize, 1), 1000)
+    // Validate and process all options using helper functions
+    const { validPageSize, validPageToken, searchQuery, operationType } = validateListFilesOptions({
+      pageSize,
+      pageToken,
+      query,
+      parentId,
+      mimeType,
+    })
 
-    // Validate and sanitize pageToken
-    let validPageToken: string | undefined = pageToken
-    if (pageToken) {
-      try {
-        // Try to decode if it appears to be URL encoded
-        if (pageToken.includes('%')) {
-          validPageToken = decodeURIComponent(pageToken)
-        }
-
-        // Basic validation for pageToken format
-        if (typeof validPageToken !== 'string' || validPageToken.length === 0 || validPageToken.length > 2048) {
-          validPageToken = undefined
-        } else {
-          // Additional validation: pageToken should not contain certain invalid characters
-          const invalidChars = /[<>"'&\x00-\x1f\x7f-\x9f\s]/
-          if (invalidChars.test(validPageToken)) {
-            validPageToken = undefined
-          }
-        }
-      } catch (error) {
-        validPageToken = undefined
-      }
-    }
-
-    // Use the query parameter directly if provided, otherwise build one
-    let searchQuery = ''
-
-    if (query) {
-      // If query is already formatted (contains operators), use it directly
-      if (query.includes('=') || query.includes('and') || query.includes('or') || query.includes('in')) {
-        searchQuery = query
-      } else {
-        // Otherwise treat it as a search term and build proper query
-        searchQuery = buildSearchQuery({
-          name: query,
-          ...(parentId && { parentId }),
-          ...(mimeType && { mimeType }),
-          trashed: false,
-        })
-      }
-    } else if (parentId || mimeType) {
-      searchQuery = buildSearchQuery({
-        ...(parentId && { parentId }),
-        ...(mimeType && { mimeType }),
-        trashed: false,
-      })
-    } else {
-      // Default to non-trashed files only
-      searchQuery = 'trashed=false'
-    }
-
-    // Use optimized request parameters based on operation type
-    const operation = pageSize === 1 ? 'EXISTS_CHECK' : 'LIST_STANDARD'
+    // Use operation type from validation
+    const operation = operationType
     const baseParams = {
       q: searchQuery,
       pageSize: validPageSize,
@@ -216,347 +187,58 @@ export class GoogleDriveService {
     return convertGoogleDriveFile(result.data)
   }
 
-  async getFileDetails(
-    fileId: string,
-    fields?: string,
-  ): Promise<
-    DriveFile & {
-      description?: string
-      lastModifyingUser?: {
-        displayName: string
-        emailAddress: string
-        photoLink?: string
-      }
-      sharingUser?: {
-        displayName: string
-        emailAddress: string
-        photoLink?: string
-      }
-      version?: string
-      md5Checksum?: string
-      sha1Checksum?: string
-      sha256Checksum?: string
-      quotaBytesUsed?: string
-      starred?: boolean
-      viewed?: boolean
-      explicitlyTrashed?: boolean
-      folderColorRgb?: string
-      fullFileExtension?: string
-      fileExtension?: string
-      originalFilename?: string
-      headRevisionId?: string
-      isAppAuthorized?: boolean
-      copyRequiresWriterPermission?: boolean
-      writersCanShare?: boolean
-      hasAugmentedPermissions?: boolean
-      ownedByMe?: boolean
-      id?: string
-      teamDriveId?: string
-      spaces?: string[]
-      properties?: Record<string, string>
-      appProperties?: Record<string, string>
-      imageMediaMetadata?: {
-        width?: number
-        height?: number
-        rotation?: number
-        location?: {
-          latitude?: number
-          longitude?: number
-          altitude?: number
-        }
-        time?: string
-        cameraMake?: string
-        cameraModel?: string
-        exposureTime?: number
-        aperture?: number
-        flashUsed?: boolean
-        focalLength?: number
-        isoSpeed?: number
-        meteringMode?: string
-        sensor?: string
-        exposureMode?: string
-        colorSpace?: string
-        whiteBalance?: string
-        exposureBias?: number
-        maxApertureValue?: number
-        subjectDistance?: number
-        lens?: string
-      }
-      videoMediaMetadata?: {
-        width?: number
-        height?: number
-        durationMillis?: string
-      }
-      exportLinks?: Record<string, string>
-      shortcutDetails?: {
-        targetId?: string
-        targetMimeType?: string
-        targetResourceKey?: string
-      }
-      contentRestrictions?: Array<{
-        readOnly?: boolean
-        reason?: string
-        restrictingUser?: {
-          displayName: string
-          emailAddress: string
-          photoLink?: string
-        }
-        restrictionTime?: string
-        type?: string
-      }>
-      resourceKey?: string
-      linkShareMetadata?: {
-        securityUpdateEligible?: boolean
-        securityUpdateEnabled?: boolean
-      }
-      labelInfo?: {
-        labels?: Array<{
-          id?: string
-          revisionId?: string
-          kind?: string
-          fields?: Record<string, any>
-        }>
-      }
-      capabilities?: {
-        canAcceptOwnership?: boolean
-        canAddChildren?: boolean
-        canAddFolderFromAnotherDrive?: boolean
-        canAddMyDriveParent?: boolean
-        canChangeCopyRequiresWriterPermission?: boolean
-        canChangeSecurityUpdateEnabled?: boolean
-        canChangeViewersCanCopyContent?: boolean
-        canComment?: boolean
-        canCopy?: boolean
-        canCreateGoogleWorkspaceTeamDrive?: boolean
-        canDelete?: boolean
-        canDeleteChildren?: boolean
-        canDownload?: boolean
-        canEdit?: boolean
-        canListChildren?: boolean
-        canModifyContent?: boolean
-        canModifyContentRestriction?: boolean
-        canModifyLabels?: boolean
-        canMoveChildrenOutOfDrive?: boolean
-        canMoveChildrenOutOfTeamDrive?: boolean
-        canMoveChildrenWithinDrive?: boolean
-        canMoveChildrenWithinTeamDrive?: boolean
-        canMoveItemIntoTeamDrive?: boolean
-        canMoveItemOutOfDrive?: boolean
-        canMoveItemOutOfTeamDrive?: boolean
-        canMoveItemWithinDrive?: boolean
-        canMoveItemWithinTeamDrive?: boolean
-        canMoveTeamDriveItem?: boolean
-        canReadDrive?: boolean
-        canReadLabels?: boolean
-        canReadRevisions?: boolean
-        canReadTeamDrive?: boolean
-        canRemoveChildren?: boolean
-        canRemoveMyDriveParent?: boolean
-        canRename?: boolean
-        canShare?: boolean
-        canTrash?: boolean
-        canTrashChildren?: boolean
-        canUntrash?: boolean
-      }
-    }
-  > {
+  async getFileDetails(fileId: string, fields?: string): Promise<DetailedDriveFile> {
     const response = await this.drive.files.get({
       fileId,
       fields: fields || '*',
     })
 
     const file = convertGoogleDriveFile(response.data)
+    const responseData = response.data
 
     return {
       ...file,
-      ...(response.data.description && { description: response.data.description }),
-      ...(response.data.lastModifyingUser && {
-        lastModifyingUser: {
-          displayName: response.data.lastModifyingUser.displayName || '',
-          emailAddress: response.data.lastModifyingUser.emailAddress || '',
-          ...(response.data.lastModifyingUser.photoLink && {
-            photoLink: response.data.lastModifyingUser.photoLink,
-          }),
-        },
-      }),
-      ...(response.data.sharingUser && {
-        sharingUser: {
-          displayName: response.data.sharingUser.displayName || '',
-          emailAddress: response.data.sharingUser.emailAddress || '',
-          ...(response.data.sharingUser.photoLink && {
-            photoLink: response.data.sharingUser.photoLink,
-          }),
-        },
-      }),
-      ...(response.data.version && { version: response.data.version }),
-      ...(response.data.md5Checksum && { md5Checksum: response.data.md5Checksum }),
-      ...(response.data.sha1Checksum && { sha1Checksum: response.data.sha1Checksum }),
-      ...(response.data.sha256Checksum && { sha256Checksum: response.data.sha256Checksum }),
-      ...(response.data.quotaBytesUsed && { quotaBytesUsed: response.data.quotaBytesUsed }),
-      starred: response.data.starred || false,
-      viewed: response.data.viewedByMe || false,
-      explicitlyTrashed: response.data.explicitlyTrashed || false,
-      ...(response.data.folderColorRgb && { folderColorRgb: response.data.folderColorRgb }),
-      ...(response.data.fullFileExtension && {
-        fullFileExtension: response.data.fullFileExtension,
-      }),
-      ...(response.data.fileExtension && { fileExtension: response.data.fileExtension }),
-      ...(response.data.originalFilename && { originalFilename: response.data.originalFilename }),
-      ...(response.data.headRevisionId && { headRevisionId: response.data.headRevisionId }),
-      isAppAuthorized: response.data.isAppAuthorized || false,
-      copyRequiresWriterPermission: response.data.copyRequiresWriterPermission || false,
-      writersCanShare: response.data.writersCanShare || true,
-      hasAugmentedPermissions: response.data.hasAugmentedPermissions || false,
-      ownedByMe: response.data.ownedByMe || false,
+      // User information
+      lastModifyingUser: mapUserInfo(responseData.lastModifyingUser),
+      sharingUser: mapUserInfo(responseData.sharingUser),
 
-      ...(response.data.teamDriveId && { teamDriveId: response.data.teamDriveId }),
-      spaces: response.data.spaces || [],
-      properties: response.data.properties || {},
-      appProperties: response.data.appProperties || {},
-      ...(response.data.imageMediaMetadata && {
-        imageMediaMetadata: {
-          ...(response.data.imageMediaMetadata.width !== undefined && {
-            width: response.data.imageMediaMetadata.width,
-          }),
-          ...(response.data.imageMediaMetadata.height !== undefined && {
-            height: response.data.imageMediaMetadata.height,
-          }),
-          ...(response.data.imageMediaMetadata.rotation !== undefined && {
-            rotation: response.data.imageMediaMetadata.rotation,
-          }),
-          ...(response.data.imageMediaMetadata.location && {
-            location: {
-              ...(response.data.imageMediaMetadata.location.latitude !== undefined && {
-                latitude: response.data.imageMediaMetadata.location.latitude,
-              }),
-              ...(response.data.imageMediaMetadata.location.longitude !== undefined && {
-                longitude: response.data.imageMediaMetadata.location.longitude,
-              }),
-              ...(response.data.imageMediaMetadata.location.altitude !== undefined && {
-                altitude: response.data.imageMediaMetadata.location.altitude,
-              }),
-            },
-          }),
-          ...(response.data.imageMediaMetadata.time && {
-            time: response.data.imageMediaMetadata.time,
-          }),
-          ...(response.data.imageMediaMetadata.cameraMake && {
-            cameraMake: response.data.imageMediaMetadata.cameraMake,
-          }),
-          ...(response.data.imageMediaMetadata.cameraModel && {
-            cameraModel: response.data.imageMediaMetadata.cameraModel,
-          }),
-          ...(response.data.imageMediaMetadata.exposureTime !== undefined && {
-            exposureTime: response.data.imageMediaMetadata.exposureTime,
-          }),
-          ...(response.data.imageMediaMetadata.aperture !== undefined && {
-            aperture: response.data.imageMediaMetadata.aperture,
-          }),
-          ...(response.data.imageMediaMetadata.flashUsed !== undefined && {
-            flashUsed: response.data.imageMediaMetadata.flashUsed,
-          }),
-          ...(response.data.imageMediaMetadata.focalLength !== undefined && {
-            focalLength: response.data.imageMediaMetadata.focalLength,
-          }),
-          ...(response.data.imageMediaMetadata.isoSpeed !== undefined && {
-            isoSpeed: response.data.imageMediaMetadata.isoSpeed,
-          }),
-          ...(response.data.imageMediaMetadata.meteringMode && {
-            meteringMode: response.data.imageMediaMetadata.meteringMode,
-          }),
-          ...(response.data.imageMediaMetadata.sensor && {
-            sensor: response.data.imageMediaMetadata.sensor,
-          }),
-          ...(response.data.imageMediaMetadata.exposureMode && {
-            exposureMode: response.data.imageMediaMetadata.exposureMode,
-          }),
-          ...(response.data.imageMediaMetadata.colorSpace && {
-            colorSpace: response.data.imageMediaMetadata.colorSpace,
-          }),
-          ...(response.data.imageMediaMetadata.whiteBalance && {
-            whiteBalance: response.data.imageMediaMetadata.whiteBalance,
-          }),
-          ...(response.data.imageMediaMetadata.exposureBias !== undefined && {
-            exposureBias: response.data.imageMediaMetadata.exposureBias,
-          }),
-          ...(response.data.imageMediaMetadata.maxApertureValue !== undefined && {
-            maxApertureValue: response.data.imageMediaMetadata.maxApertureValue,
-          }),
-          ...(response.data.imageMediaMetadata.subjectDistance !== undefined && {
-            subjectDistance: response.data.imageMediaMetadata.subjectDistance,
-          }),
-          ...(response.data.imageMediaMetadata.lens && {
-            lens: response.data.imageMediaMetadata.lens,
-          }),
-        },
+      // Basic file properties
+      ...mapBasicProperties(responseData),
+
+      // Checksums and storage info
+      ...mapChecksums(responseData),
+
+      // Boolean properties with defaults
+      ...mapBooleanProperties(responseData),
+
+      // Array and object properties
+      ...mapCollectionProperties(responseData),
+
+      // Media metadata
+      ...(responseData.imageMediaMetadata && {
+        imageMediaMetadata: mapImageMetadata(responseData.imageMediaMetadata),
       }),
-      ...(response.data.videoMediaMetadata && {
-        videoMediaMetadata: {
-          ...(response.data.videoMediaMetadata.width !== undefined && {
-            width: response.data.videoMediaMetadata.width,
-          }),
-          ...(response.data.videoMediaMetadata.height !== undefined && {
-            height: response.data.videoMediaMetadata.height,
-          }),
-          ...(response.data.videoMediaMetadata.durationMillis && {
-            durationMillis: response.data.videoMediaMetadata.durationMillis,
-          }),
-        },
+      ...(responseData.videoMediaMetadata && {
+        videoMediaMetadata: mapVideoMetadata(responseData.videoMediaMetadata),
       }),
-      exportLinks: response.data.exportLinks || {},
-      ...(response.data.shortcutDetails && {
-        shortcutDetails: {
-          ...(response.data.shortcutDetails.targetId && {
-            targetId: response.data.shortcutDetails.targetId,
-          }),
-          ...(response.data.shortcutDetails.targetMimeType && {
-            targetMimeType: response.data.shortcutDetails.targetMimeType,
-          }),
-          ...(response.data.shortcutDetails.targetResourceKey && {
-            targetResourceKey: response.data.shortcutDetails.targetResourceKey,
-          }),
-        },
+
+      // Shortcut details
+      ...(responseData.shortcutDetails && {
+        shortcutDetails: mapShortcutDetails(responseData.shortcutDetails),
       }),
-      contentRestrictions:
-        response.data.contentRestrictions?.map(restriction => ({
-          readOnly: restriction.readOnly || false,
-          ...(restriction.reason && { reason: restriction.reason }),
-          ...(restriction.restrictingUser && {
-            restrictingUser: {
-              displayName: restriction.restrictingUser.displayName || '',
-              emailAddress: restriction.restrictingUser.emailAddress || '',
-              ...(restriction.restrictingUser.photoLink && {
-                photoLink: restriction.restrictingUser.photoLink,
-              }),
-            },
-          }),
-          ...(restriction.restrictionTime && { restrictionTime: restriction.restrictionTime }),
-          ...(restriction.type && { type: restriction.type }),
-        })) || [],
-      ...(response.data.resourceKey && { resourceKey: response.data.resourceKey }),
-      ...(response.data.linkShareMetadata && {
-        linkShareMetadata: {
-          ...(response.data.linkShareMetadata.securityUpdateEligible !== undefined && {
-            securityUpdateEligible: response.data.linkShareMetadata.securityUpdateEligible,
-          }),
-          ...(response.data.linkShareMetadata.securityUpdateEnabled !== undefined && {
-            securityUpdateEnabled: response.data.linkShareMetadata.securityUpdateEnabled,
-          }),
-        },
+
+      // Content restrictions
+      contentRestrictions: mapContentRestrictions(responseData.contentRestrictions),
+
+      // Link sharing metadata
+      ...(responseData.linkShareMetadata && {
+        linkShareMetadata: mapLinkShareMetadata(responseData.linkShareMetadata),
       }),
-      ...(response.data.labelInfo && {
-        labelInfo: {
-          ...(response.data.labelInfo.labels && {
-            labels: response.data.labelInfo.labels.map(label => ({
-              ...(label.id && { id: label.id }),
-              ...(label.revisionId && { revisionId: label.revisionId }),
-              ...(label.kind && { kind: label.kind }),
-              ...(label.fields && { fields: label.fields }),
-            })),
-          }),
-        },
+
+      // Label information
+      ...(responseData.labelInfo && {
+        labelInfo: mapLabelInfo(responseData.labelInfo),
       }),
-      capabilities: response.data.capabilities || {},
     }
   }
 
@@ -735,22 +417,8 @@ export class GoogleDriveService {
   // Unified rename operation for both files and folders
   async renameFile(fileId: string, newName: string): Promise<DriveFile> {
     try {
-      // Validate filename before sending to API
-      if (!newName || newName.trim().length === 0) {
-        throw new Error('Filename cannot be empty')
-      }
-
-      if (newName.length > 255) {
-        throw new Error('Filename is too long (maximum 255 characters)')
-      }
-
-      // Check for invalid characters in filename
-      const invalidChars = /[<>:"/\\|?*\x00-\x1f]/
-      if (invalidChars.test(newName)) {
-        throw new Error('Filename contains invalid characters: < > : " / \\ | ? *')
-      }
-
-      // // // // // console.log(`[Rename Debug] Attempting to rename file ${fileId} to "${newName}"`)
+      // Validate filename using helper function
+      validateFileName(newName)
 
       const response = await this.drive.files.update({
         fileId,
@@ -759,52 +427,10 @@ export class GoogleDriveService {
           'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
       })
 
-      // // // // // console.log(`[Rename Debug] API Response:`, response.data)
-
-      // // // // // console.log(`[Rename Debug] Converted file:`, convertedFile)
-
       return convertGoogleDriveFile(response.data)
     } catch (error: any) {
-      // Handle Google Drive API specific errors
-      if (error.response?.status) {
-        const status = error.response.status
-        const errorData = error.response.data?.error
-
-        switch (status) {
-          case 400:
-            if (errorData?.message?.includes('Invalid value')) {
-              throw new Error('Invalid filename provided')
-            }
-            throw new Error(errorData?.message || 'Bad request - invalid parameters')
-          case 401:
-            throw new Error('Authentication expired - please re-login to Google Drive')
-          case 403:
-            if (errorData?.message?.includes('insufficient permission')) {
-              throw new Error("Permission denied - you don't have write access to this file")
-            }
-            throw new Error('Access forbidden - check your Google Drive permissions')
-          case 404:
-            throw new Error('File not found - it may have been deleted or moved')
-          case 409:
-            throw new Error('A file with this name already exists in the same location')
-          case 429:
-            throw new Error('Too many requests - please wait and try again')
-          case 500:
-          case 502:
-          case 503:
-            throw new Error('Google Drive server error - please try again later')
-          default:
-            throw new Error(errorData?.message || `Google Drive API error (${status})`)
-        }
-      }
-
-      // Handle network and other errors
-      if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
-        throw new Error('Network connection failed - check your internet connection')
-      }
-
-      // Re-throw with original message if it's already informative
-      throw error
+      // Handle errors using centralized error handler
+      handleDriveApiError(error)
     }
   }
 
