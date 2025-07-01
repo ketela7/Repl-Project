@@ -305,9 +305,9 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
         'File Operations': [] as string[],
         'Content Management': [] as string[],
         'Sharing & Permissions': [] as string[],
-        'Organization': [] as string[],
+        Organization: [] as string[],
         'Drive Management': [] as string[],
-        'Other': [] as string[]
+        Other: [] as string[],
       }
 
       caps.forEach(([key]) => {
@@ -316,13 +316,24 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
           .replace(/([A-Z])/g, ' $1')
           .trim()
 
-        if (key.includes('Edit') || key.includes('Delete') || key.includes('Copy') || key.includes('Download') || key.includes('Rename')) {
+        if (
+          key.includes('Edit') ||
+          key.includes('Delete') ||
+          key.includes('Copy') ||
+          key.includes('Download') ||
+          key.includes('Rename')
+        ) {
           groups['File Operations'].push(cleanKey)
         } else if (key.includes('Content') || key.includes('Comment') || key.includes('ModifyContent')) {
           groups['Content Management'].push(cleanKey)
         } else if (key.includes('Share') || key.includes('Permission') || key.includes('Owner')) {
           groups['Sharing & Permissions'].push(cleanKey)
-        } else if (key.includes('Move') || key.includes('Parent') || key.includes('Children') || key.includes('Trash')) {
+        } else if (
+          key.includes('Move') ||
+          key.includes('Parent') ||
+          key.includes('Children') ||
+          key.includes('Trash')
+        ) {
           groups['Organization'].push(cleanKey)
         } else if (key.includes('Drive') || key.includes('TeamDrive')) {
           groups['Drive Management'].push(cleanKey)
@@ -340,8 +351,8 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
     const renderCapabilityGroup = (groupName: string, capabilities: string[], isAllowed: boolean) => {
       if (capabilities.length === 0) return null
 
-      const colorClasses = isAllowed 
-        ? 'border-green-200 text-green-700 bg-green-50' 
+      const colorClasses = isAllowed
+        ? 'border-green-200 text-green-700 bg-green-50'
         : 'border-red-200 text-red-700 bg-red-50'
 
       return (
@@ -349,13 +360,9 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
           <h5 className={`text-xs font-medium ${isAllowed ? 'text-green-600' : 'text-red-600'}`}>
             {groupName} ({capabilities.length})
           </h5>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1">
-            {capabilities.map((capability) => (
-              <Badge 
-                key={capability} 
-                variant="outline" 
-                className={`text-xs justify-start ${colorClasses}`}
-              >
+          <div className="grid grid-cols-1 gap-1 md:grid-cols-2 lg:grid-cols-3">
+            {capabilities.map(capability => (
+              <Badge key={capability} variant="outline" className={`justify-start text-xs ${colorClasses}`}>
                 {capability}
               </Badge>
             ))}
@@ -373,8 +380,8 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
               Allowed Capabilities ({allCapabilities.length})
             </h4>
             <div className="space-y-3 pl-4">
-              {Object.entries(allowedGroups).map(([groupName, capabilities]) => 
-                renderCapabilityGroup(groupName, capabilities, true)
+              {Object.entries(allowedGroups).map(([groupName, capabilities]) =>
+                renderCapabilityGroup(groupName, capabilities, true),
               )}
             </div>
           </div>
@@ -387,8 +394,8 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
               Restricted Capabilities ({deniedCapabilities.length})
             </h4>
             <div className="space-y-3 pl-4">
-              {Object.entries(restrictedGroups).map(([groupName, capabilities]) => 
-                renderCapabilityGroup(groupName, capabilities, false)
+              {Object.entries(restrictedGroups).map(([groupName, capabilities]) =>
+                renderCapabilityGroup(groupName, capabilities, false),
               )}
             </div>
           </div>
