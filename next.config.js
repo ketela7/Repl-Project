@@ -28,7 +28,7 @@ const nextConfig = {
 
   // Production TypeScript compilation
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
     tsconfigPath: './tsconfig.json',
   },
 
