@@ -1171,15 +1171,12 @@ export function getMimeTypeFromFileName(fileName: string): string {
 /**
  * Get available actions for a file based on its capabilities and current view
  */
-export function getFileActions(
-  fileInfo: {
-    capabilities?: any
-    trashed?: boolean
-    mimeType?: string
-    itemType?: 'file' | 'folder'
-  },
-  _activeView: string,
-): {
+export function getFileActions(fileInfo: {
+  capabilities?: any
+  trashed?: boolean
+  mimeType?: string
+  itemType?: 'file' | 'folder'
+}): {
   canCopy: boolean
   canDelete: boolean
   canDownload: boolean

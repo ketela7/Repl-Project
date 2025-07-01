@@ -592,54 +592,38 @@ export class GoogleDriveService {
 
   // Get file permissions
   async getFilePermissions(fileId: string): Promise<any[]> {
-    try {
-      const response = await this.drive.permissions.list({
-        fileId,
-        fields: 'permissions(id, type, role, emailAddress, domain, displayName)',
-      })
+    const response = await this.drive.permissions.list({
+      fileId,
+      fields: 'permissions(id, type, role, emailAddress, domain, displayName)',
+    })
 
-      return response.data.permissions || []
-    } catch (error) {
-      throw error
-    }
+    return response.data.permissions || []
   }
 
   // Remove file permission
   async removeFilePermission(fileId: string, permissionId: string): Promise<void> {
-    try {
-      await this.drive.permissions.delete({
-        fileId,
-        permissionId,
-      })
-    } catch (error) {
-      throw error
-    }
+    await this.drive.permissions.delete({
+      fileId,
+      permissionId,
+    })
   }
 
   // Create permission (for enhanced sharing)
   async createPermission(fileId: string, permissionData: any): Promise<any> {
-    try {
-      const response = await this.drive.permissions.create({
-        fileId,
-        requestBody: permissionData,
-        sendNotificationEmail: false,
-      })
-      return response.data
-    } catch (error) {
-      throw error
-    }
+    const response = await this.drive.permissions.create({
+      fileId,
+      requestBody: permissionData,
+      sendNotificationEmail: false,
+    })
+    return response.data
   }
 
   // Delete permission (for enhanced sharing)
   async deletePermission(fileId: string, permissionId: string): Promise<void> {
-    try {
-      await this.drive.permissions.delete({
-        fileId,
-        permissionId,
-      })
-    } catch (error) {
-      throw error
-    }
+    await this.drive.permissions.delete({
+      fileId,
+      permissionId,
+    })
   }
 
   // Send notification email (for enhanced sharing)

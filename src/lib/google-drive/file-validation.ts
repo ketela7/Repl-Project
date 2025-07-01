@@ -16,7 +16,7 @@ export function validateFileName(fileName: string): void {
   }
 
   // Check for invalid characters in filename
-  const invalidChars = /[<>:"/\\|?*\u0000-\u001f]/
+  const invalidChars = /[<>:"/\\|?*]/
   if (invalidChars.test(fileName)) {
     throw new Error('Filename contains invalid characters: < > : " / \\ | ? *')
   }

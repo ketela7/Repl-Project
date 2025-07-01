@@ -33,7 +33,7 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     await navigator.clipboard.writeText(text)
     successToast.copied()
     return true
-  } catch (error) {
+  } catch (_error) {
     errorToast.generic('Failed to copy to clipboard', {
       description: 'Please try copying manually',
       duration: 4000,
@@ -62,7 +62,7 @@ export async function copyFileLink(
       successToast.generic(`${fileName} link copied to clipboard`)
     }
     return success
-  } catch (error) {
+  } catch (_error) {
     errorToast.generic(`Failed to copy ${fileName} link`)
     return false
   }
@@ -101,7 +101,7 @@ export async function readFromClipboard(): Promise<string | null> {
     }
 
     return await navigator.clipboard.readText()
-  } catch (error) {
+  } catch (_error) {
     errorToast.generic('Failed to read from clipboard')
     return null
   }

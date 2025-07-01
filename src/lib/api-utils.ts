@@ -50,7 +50,7 @@ export async function initDriveService(): Promise<AuthResult> {
       session,
       driveService,
     }
-  } catch (error) {
+  } catch (_error) {
     return {
       success: false,
       response: NextResponse.json({ error: 'Authentication failed' }, { status: 500 }),
@@ -100,36 +100,15 @@ export async function getFileIdFromParams(params: Promise<{ fileId: string }>): 
  * Validate request body for specific operations
  */
 export function validateShareRequest(body: any): boolean {
-  // Check for new format with items array
-  if (body.items && Array.isArray(body.items) && body.items.length > 0) {
-    return true
-  }
-
-  // Check for legacy format with fileId
-  if (body.fileId) {
-    return true
-  }
-
-  return false
+  // Check for new format with items array or legacy format with fileId
+  return (body.items && Array.isArray(body.items) && body.items.length > 0) || !!body.fileId
 }
 
 export function validateDownloadRequest(body: any): boolean {
   // New format for download and other operations
-  if (body.items && Array.isArray(body.items) && body.items.length > 0) {
-    return true
-  }
-
-  return false
+  return !!(body.items && Array.isArray(body.items) && body.items.length > 0)
 }
 
 export function validateRenameRequest(body: any): boolean {
-  if (body.items && Array.isArray(body.items) && body.items.length > 0) {
-    return true
-  }
-
-  if (body.fileId && body.newName) {
-    return true
-  }
-
-  return false
+  return (body.items && Array.isArray(body.items) && body.items.length > 0) || !!(body.fileId && body.newName)
 }
