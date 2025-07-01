@@ -140,7 +140,9 @@ interface DriveToolbarProps {
 
   // Table columns
   visibleColumns: VisibleColumns
-  setVisibleColumns: (_columns: VisibleColumns | ((_prev: VisibleColumns) => VisibleColumns)) => void
+  setVisibleColumns: (
+    _columns: VisibleColumns | ((_prev: VisibleColumns) => VisibleColumns),
+  ) => void
 
   // Loading states
   loading: boolean
@@ -483,13 +485,20 @@ export function DriveToolbar({
       images: items.filter(f => f.mimeType?.includes('image')).length,
       videos: items.filter(f => f.mimeType?.includes('video')).length,
       documents: items.filter(
-        f => f.mimeType?.includes('document') || f.mimeType?.includes('text') || f.mimeType?.includes('pdf'),
+        f =>
+          f.mimeType?.includes('document') ||
+          f.mimeType?.includes('text') ||
+          f.mimeType?.includes('pdf'),
       ).length,
       spreadsheets: items.filter(
-        f => f.mimeType?.includes('spreadsheet') || f.mimeType?.includes('excel') || f.mimeType?.includes('csv'),
+        f =>
+          f.mimeType?.includes('spreadsheet') ||
+          f.mimeType?.includes('excel') ||
+          f.mimeType?.includes('csv'),
       ).length,
-      presentations: items.filter(f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint'))
-        .length,
+      presentations: items.filter(
+        f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint'),
+      ).length,
       audio: items.filter(f => f.mimeType?.startsWith('audio/')).length,
       archives: items.filter(
         f =>
@@ -515,10 +524,16 @@ export function DriveToolbar({
           f.mimeType?.includes('figma'),
       ).length,
       database: items.filter(
-        f => f.mimeType?.includes('database') || f.mimeType?.includes('sql') || f.mimeType?.includes('sqlite'),
+        f =>
+          f.mimeType?.includes('database') ||
+          f.mimeType?.includes('sql') ||
+          f.mimeType?.includes('sqlite'),
       ).length,
       ebooks: items.filter(
-        f => f.mimeType?.includes('epub') || f.mimeType?.includes('mobi') || f.mimeType?.includes('kindle'),
+        f =>
+          f.mimeType?.includes('epub') ||
+          f.mimeType?.includes('mobi') ||
+          f.mimeType?.includes('kindle'),
       ).length,
       fonts: items.filter(
         f =>
@@ -576,7 +591,8 @@ export function DriveToolbar({
             onClick={() => {
               const searchExpanded = document.querySelector('#search-expanded') as HTMLElement
               if (searchExpanded) {
-                searchExpanded.style.display = searchExpanded.style.display === 'none' ? 'block' : 'none'
+                searchExpanded.style.display =
+                  searchExpanded.style.display === 'none' ? 'block' : 'none'
                 if (searchExpanded.style.display === 'block') {
                   setTimeout(() => {
                     const input = searchExpanded.querySelector('input') as HTMLInputElement
@@ -878,7 +894,9 @@ export function DriveToolbar({
                     <CollapsibleContent className="mt-2 ml-2 space-y-2">
                       <div className="grid grid-cols-3 gap-2">
                         <Button
-                          variant={filters.fileTypeFilter.includes('folder') ? 'default' : 'outline'}
+                          variant={
+                            filters.fileTypeFilter.includes('folder') ? 'default' : 'outline'
+                          }
                           size="sm"
                           onClick={() => {
                             const newTypes = filters.fileTypeFilter.includes('folder')
@@ -941,7 +959,9 @@ export function DriveToolbar({
                           return (
                             <Button
                               key={filter.type}
-                              variant={filters.fileTypeFilter.includes(filter.type) ? 'default' : 'outline'}
+                              variant={
+                                filters.fileTypeFilter.includes(filter.type) ? 'default' : 'outline'
+                              }
                               size="sm"
                               onClick={() => {
                                 const newTypes = filters.fileTypeFilter.includes(filter.type)
@@ -974,7 +994,9 @@ export function DriveToolbar({
                         <label className="text-muted-foreground text-xs font-medium">Sort By</label>
                         <div className="grid grid-cols-2 gap-2">
                           <Button
-                            variant={filters.advancedFilters.sortBy === 'name' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortBy === 'name' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -989,7 +1011,9 @@ export function DriveToolbar({
                             Name
                           </Button>
                           <Button
-                            variant={filters.advancedFilters.sortBy === 'modified' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortBy === 'modified' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1004,7 +1028,9 @@ export function DriveToolbar({
                             Modified
                           </Button>
                           <Button
-                            variant={filters.advancedFilters.sortBy === 'created' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortBy === 'created' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1019,7 +1045,9 @@ export function DriveToolbar({
                             Created
                           </Button>
                           <Button
-                            variant={filters.advancedFilters.sortBy === 'size' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortBy === 'size' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1037,10 +1065,14 @@ export function DriveToolbar({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">Sort Order</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          Sort Order
+                        </label>
                         <div className="grid grid-cols-2 gap-2">
                           <Button
-                            variant={filters.advancedFilters.sortOrder === 'asc' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortOrder === 'asc' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1055,7 +1087,9 @@ export function DriveToolbar({
                             Ascending
                           </Button>
                           <Button
-                            variant={filters.advancedFilters.sortOrder === 'desc' ? 'default' : 'outline'}
+                            variant={
+                              filters.advancedFilters.sortOrder === 'desc' ? 'default' : 'outline'
+                            }
                             size="sm"
                             onClick={() => {
                               onFilterChange({
@@ -1085,7 +1119,9 @@ export function DriveToolbar({
                     <CollapsibleContent className="mt-3 ml-2 space-y-4">
                       {/* Size Range */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">File Size Range</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          File Size Range
+                        </label>
                         <div className="grid grid-cols-3 gap-2">
                           <Input
                             type="number"
@@ -1152,13 +1188,17 @@ export function DriveToolbar({
 
                       {/* Date Ranges */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">Created Date Range</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          Created Date Range
+                        </label>
                         <div className="grid grid-cols-2 gap-2">
                           <Input
                             type="date"
                             value={
                               filters.advancedFilters.createdDateRange?.from
-                                ? (filters.advancedFilters.createdDateRange.from as Date).toISOString().split('T')[0]
+                                ? (filters.advancedFilters.createdDateRange.from as Date)
+                                    .toISOString()
+                                    .split('T')[0]
                                 : ''
                             }
                             onChange={e =>
@@ -1178,7 +1218,9 @@ export function DriveToolbar({
                             type="date"
                             value={
                               filters.advancedFilters.createdDateRange?.to
-                                ? (filters.advancedFilters.createdDateRange.to as Date).toISOString().split('T')[0]
+                                ? (filters.advancedFilters.createdDateRange.to as Date)
+                                    .toISOString()
+                                    .split('T')[0]
                                 : ''
                             }
                             onChange={e =>
@@ -1198,13 +1240,17 @@ export function DriveToolbar({
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">Modified Date Range</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          Modified Date Range
+                        </label>
                         <div className="grid grid-cols-2 gap-2">
                           <Input
                             type="date"
                             value={
                               filters.advancedFilters.modifiedDateRange?.from
-                                ? (filters.advancedFilters.modifiedDateRange.from as Date).toISOString().split('T')[0]
+                                ? (filters.advancedFilters.modifiedDateRange.from as Date)
+                                    .toISOString()
+                                    .split('T')[0]
                                 : ''
                             }
                             onChange={e =>
@@ -1224,7 +1270,9 @@ export function DriveToolbar({
                             type="date"
                             value={
                               filters.advancedFilters.modifiedDateRange?.to
-                                ? (filters.advancedFilters.modifiedDateRange.to as Date).toISOString().split('T')[0]
+                                ? (filters.advancedFilters.modifiedDateRange.to as Date)
+                                    .toISOString()
+                                    .split('T')[0]
                                 : ''
                             }
                             onChange={e =>
@@ -1245,7 +1293,9 @@ export function DriveToolbar({
 
                       {/* Owner */}
                       <div className="space-y-2">
-                        <label className="text-muted-foreground text-xs font-medium">Owner Email</label>
+                        <label className="text-muted-foreground text-xs font-medium">
+                          Owner Email
+                        </label>
                         <Input
                           type="email"
                           placeholder="Enter owner email"
@@ -1264,10 +1314,20 @@ export function DriveToolbar({
 
                       {/* Apply and Clear Filters */}
                       <div className="flex gap-2">
-                        <Button variant="default" size="sm" onClick={onApplyFilters} className="flex-1 text-xs">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={onApplyFilters}
+                          className="flex-1 text-xs"
+                        >
                           Apply Filters
                         </Button>
-                        <Button variant="outline" size="sm" onClick={onClearFilters} className="flex-1 text-xs">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={onClearFilters}
+                          className="flex-1 text-xs"
+                        >
                           Clear All
                         </Button>
                       </div>
@@ -1718,7 +1778,11 @@ export function DriveToolbar({
       </div>
 
       {/* Search Expanded - Hidden by default */}
-      <div id="search-expanded" style={{ display: 'none' }} className="bg-muted/30 border-t p-3 md:p-4">
+      <div
+        id="search-expanded"
+        style={{ display: 'none' }}
+        className="bg-muted/30 border-t p-3 md:p-4"
+      >
         <div className="flex items-center gap-2 md:gap-4">
           <div className="relative flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />

@@ -27,7 +27,11 @@ export function validatePageToken(pageToken: string | undefined): string | undef
     }
 
     // Basic validation for pageToken format
-    if (typeof validPageToken !== 'string' || validPageToken.length === 0 || validPageToken.length > 2048) {
+    if (
+      typeof validPageToken !== 'string' ||
+      validPageToken.length === 0 ||
+      validPageToken.length > 2048
+    ) {
       return undefined
     }
 
@@ -53,7 +57,12 @@ export function buildSearchQueryForListFiles(
 ): string {
   if (query) {
     // If query is already formatted (contains operators), use it directly
-    if (query.includes('=') || query.includes('and') || query.includes('or') || query.includes('in')) {
+    if (
+      query.includes('=') ||
+      query.includes('and') ||
+      query.includes('or') ||
+      query.includes('in')
+    ) {
       return query
     }
 

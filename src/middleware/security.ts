@@ -33,7 +33,10 @@ export function securityMiddleware() {
 
   // HSTS for production
   if (process.env.NODE_ENV === 'production') {
-    response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload')
+    response.headers.set(
+      'Strict-Transport-Security',
+      'max-age=31536000; includeSubDomains; preload',
+    )
   }
 
   return response

@@ -1,12 +1,48 @@
 'use client'
 
 import { Command } from 'lucide-react'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 import { NextAuthForm } from './_components/nextauth-form'
 import { SearchParamsHandler } from './_components/search-params-handler'
 
 export default function LoginV1() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (status === 'authenticated' && session) {
+      router.push('/dashboard/drive')
+    }
+  }, [status, session, router])
+
+  // Show loading while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="flex h-dvh items-center justify-center">
+        <div className="text-center">
+          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2"></div>
+          <p className="text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // If already authenticated, show redirecting message
+  if (status === 'authenticated') {
+    return (
+      <div className="flex h-dvh items-center justify-center">
+        <div className="text-center">
+          <div className="border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2"></div>
+          <p className="text-muted-foreground">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex h-dvh">
       <div className="bg-primary hidden lg:block lg:w-1/3">
@@ -26,12 +62,15 @@ export default function LoginV1() {
           <div className="space-y-4 text-center">
             <div className="text-foreground font-medium tracking-tight">Login</div>
             <div className="text-muted-foreground mx-auto max-w-xl">
-              Welcome back. Enter your email and password, let&apos;s hope you remember them this time.
+              Welcome back. Enter your email and password, let&apos;s hope you remember them this
+              time.
             </div>
           </div>
           <div className="space-y-4">
             <Suspense fallback={<div className="text-center">Loading...</div>}>
-              <SearchParamsHandler>{isReauth => <NextAuthForm isReauth={isReauth} />}</SearchParamsHandler>
+              <SearchParamsHandler>
+                {isReauth => <NextAuthForm isReauth={isReauth} />}
+              </SearchParamsHandler>
             </Suspense>
             <p className="text-muted-foreground text-center text-xs font-medium">
               Sign in with your Google account to access the Google Drive management system.
