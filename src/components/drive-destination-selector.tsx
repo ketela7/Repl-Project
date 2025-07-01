@@ -335,8 +335,8 @@ export function DriveDestinationSelector({
                                 />
                               </div>
 
-                              {/* Folder Info - Better constraint handling */}
-                              <div className="min-w-0 flex-1 overflow-hidden">
+                              {/* Folder Info - Strict width constraint to ensure buttons are always visible */}
+                              <div className="max-w-[calc(100%-95px)] min-w-0 flex-1 overflow-hidden">
                                 <div className="flex items-center gap-1 overflow-hidden">
                                   <h4
                                     className="min-w-0 flex-1 truncate text-xs font-medium"
@@ -363,8 +363,8 @@ export function DriveDestinationSelector({
                                 )}
                               </div>
 
-                              {/* Action Buttons - Compact and fixed width */}
-                              <div className="flex w-[60px] flex-shrink-0 items-center justify-end gap-1">
+                              {/* Action Buttons - Always visible with sufficient reserved space */}
+                              <div className="ml-2 flex w-[75px] flex-shrink-0 items-center justify-end gap-1">
                                 <Button
                                   size="sm"
                                   variant="ghost"
