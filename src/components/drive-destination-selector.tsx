@@ -240,9 +240,7 @@ export function DriveDestinationSelector({
                     key={folder.id}
                     className={cn(
                       'flex min-w-0 cursor-pointer items-center gap-2 rounded-md border p-2 transition-colors',
-                      selectedFolderId === folder.id
-                        ? 'bg-primary/10 border-primary'
-                        : 'hover:bg-muted/50',
+                      selectedFolderId === folder.id ? 'bg-primary/10 border-primary' : 'hover:bg-muted/50',
                     )}
                   >
                     <Folder className="h-4 w-4 flex-shrink-0 text-blue-500" />
@@ -250,11 +248,7 @@ export function DriveDestinationSelector({
                       <div className="truncate font-mono text-xs" title={folder.name}>
                         {folder.name}
                       </div>
-                      {folder.path && (
-                        <div className="text-muted-foreground truncate text-[10px]">
-                          {folder.path}
-                        </div>
-                      )}
+                      {folder.path && <div className="text-muted-foreground truncate text-[10px]">{folder.path}</div>}
                     </div>
                     {folder.isShared && (
                       <Badge variant="secondary" className="flex-shrink-0 px-1 py-0 text-[10px]">
@@ -275,9 +269,7 @@ export function DriveDestinationSelector({
                         onClick={() => handleFolderSelect(folder)}
                         className={cn(
                           'h-6 px-2 text-[10px]',
-                          selectedFolderId === folder.id
-                            ? 'bg-primary text-primary-foreground'
-                            : '',
+                          selectedFolderId === folder.id ? 'bg-primary text-primary-foreground' : '',
                         )}
                       >
                         {selectedFolderId === folder.id ? (
@@ -327,9 +319,7 @@ export function DriveDestinationSelector({
                 <div className="flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/20">
                   <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600 dark:text-green-400" />
                   <div className="flex-1 space-y-2">
-                    <div className="text-sm text-green-800 dark:text-green-200">
-                      Valid format detected
-                    </div>
+                    <div className="text-sm text-green-800 dark:text-green-200">Valid format detected</div>
                     <div className="rounded border bg-green-100 p-2 font-mono text-xs dark:bg-green-900/30">
                       Folder ID: {parsedResult.folderId}
                     </div>

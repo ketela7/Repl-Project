@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
     // For multiple files, return array of results
     return NextResponse.json({
       success: true,
-      results: results,
+      results,
       operation: 'details',
     })
   } catch (error: any) {

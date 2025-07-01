@@ -13,12 +13,7 @@ import {
   DriveUserInfo,
   DriveFileMetadata,
 } from './types'
-import {
-  convertGoogleDriveFile,
-  convertGoogleDriveFolder,
-  buildSearchQuery,
-  getMimeTypeFromFileName,
-} from './utils'
+import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
 import { getOptimizedRequestParams, performanceMonitor, requestDeduplicator } from './performance'
 
 export class GoogleDriveService {
@@ -82,11 +77,7 @@ export class GoogleDriveService {
         }
 
         // Basic validation for pageToken format
-        if (
-          typeof validPageToken !== 'string' ||
-          validPageToken.length === 0 ||
-          validPageToken.length > 2048
-        ) {
+        if (typeof validPageToken !== 'string' || validPageToken.length === 0 || validPageToken.length > 2048) {
           validPageToken = undefined
         } else {
           // Additional validation: pageToken should not contain certain invalid characters
@@ -105,12 +96,7 @@ export class GoogleDriveService {
 
     if (query) {
       // If query is already formatted (contains operators), use it directly
-      if (
-        query.includes('=') ||
-        query.includes('and') ||
-        query.includes('or') ||
-        query.includes('in')
-      ) {
+      if (query.includes('=') || query.includes('and') || query.includes('or') || query.includes('in')) {
         searchQuery = query
       } else {
         // Otherwise treat it as a search term and build proper query
@@ -658,10 +644,7 @@ export class GoogleDriveService {
   /**
    * Get file metadata with specific fields
    */
-  async getFileMetadata(
-    fileId: string,
-    fields: string[],
-  ): Promise<DriveFileMetadata & { id: string }> {
+  async getFileMetadata(fileId: string, fields: string[]): Promise<DriveFileMetadata & { id: string }> {
     const response = await this.drive.files.get({
       fileId,
       fields: fields.join(','),
@@ -778,10 +761,9 @@ export class GoogleDriveService {
 
       // // // // // console.log(`[Rename Debug] API Response:`, response.data)
 
-      const convertedFile = convertGoogleDriveFile(response.data)
       // // // // // console.log(`[Rename Debug] Converted file:`, convertedFile)
 
-      return convertedFile
+      return convertGoogleDriveFile(response.data)
     } catch (error: any) {
       // Handle Google Drive API specific errors
       if (error.response?.status) {
@@ -832,11 +814,7 @@ export class GoogleDriveService {
   }
 
   // Unified move operation for both files and folders with error recovery
-  async moveFile(
-    fileId: string,
-    newParentId: string,
-    currentParentId?: string,
-  ): Promise<DriveFile> {
+  async moveFile(fileId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
     try {
       // According to Drive API docs, we should get current parents if not provided
       if (!currentParentId) {
@@ -874,11 +852,7 @@ export class GoogleDriveService {
   }
 
   // Alias for clarity - same operation works for both files and folders
-  async moveFolder(
-    folderId: string,
-    newParentId: string,
-    currentParentId?: string,
-  ): Promise<DriveFile> {
+  async moveFolder(folderId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
     return this.moveFile(folderId, newParentId, currentParentId)
   }
 
@@ -908,10 +882,7 @@ export class GoogleDriveService {
     const originalFolder = await this.getFile(folderId)
 
     // Create new folder with the specified metadata
-    const newFolder = await this.createFolder(
-      metadata.name || `${originalFolder.name} - Copy`,
-      metadata.parents?.[0],
-    )
+    const newFolder = await this.createFolder(metadata.name || `${originalFolder.name} - Copy`, metadata.parents?.[0])
 
     // Note: For full folder copying with contents, we would need recursive copying
     // This creates an empty copy of the folder structure

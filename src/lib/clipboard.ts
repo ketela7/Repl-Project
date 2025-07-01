@@ -100,8 +100,7 @@ export async function readFromClipboard(): Promise<string | null> {
       throw new Error('Clipboard API not supported')
     }
 
-    const text = await navigator.clipboard.readText()
-    return text
+    return await navigator.clipboard.readText()
   } catch (error) {
     errorToast.generic('Failed to read from clipboard')
     return null

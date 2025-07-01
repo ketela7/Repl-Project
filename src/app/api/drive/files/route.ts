@@ -45,9 +45,7 @@ function buildDriveQuery(filters: FileFilter): string {
     case 'recent':
       // Recent view - recently modified files on 30 days ago
       //conditions.push('trashed=false')
-      conditions.push(
-        `modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`,
-      )
+      conditions.push(`modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`)
     //break
     //case 'all':
     //default:
@@ -76,39 +74,33 @@ function buildDriveQuery(filters: FileFilter): string {
 
           case 'document':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/vnd.google-apps.document'",
-                  "mimeType = 'application/pdf'",
-                  "mimeType = 'text/plain'",
-                  "mimeType = 'application/msword'",
-                  "mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'application/vnd.google-apps.document'",
+                "mimeType = 'application/pdf'",
+                "mimeType = 'text/plain'",
+                "mimeType = 'application/msword'",
+                "mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'",
+              ].join(' or ')})`,
             )
             break
 
           case 'spreadsheet':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/vnd.google-apps.spreadsheet'",
-                  "mimeType = 'application/vnd.ms-excel'",
-                  "mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'application/vnd.google-apps.spreadsheet'",
+                "mimeType = 'application/vnd.ms-excel'",
+                "mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'",
+              ].join(' or ')})`,
             )
             break
 
           case 'presentation':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/vnd.google-apps.presentation'",
-                  "mimeType = 'application/vnd.ms-powerpoint'",
-                  "mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'application/vnd.google-apps.presentation'",
+                "mimeType = 'application/vnd.ms-powerpoint'",
+                "mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'",
+              ].join(' or ')})`,
             )
             break
 
@@ -126,40 +118,36 @@ function buildDriveQuery(filters: FileFilter): string {
 
           case 'archive':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/zip'",
-                  "mimeType = 'application/x-zip-compressed'",
-                  "mimeType = 'application/x-rar-compressed'",
-                  "mimeType = 'application/vnd.rar'",
-                  "mimeType = 'application/x-7z-compressed'",
-                  "mimeType = 'application/x-tar'",
-                  "mimeType = 'application/gzip'",
-                  "mimeType = 'application/x-bzip2'",
-                  "mimeType = 'application/x-xz'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'application/zip'",
+                "mimeType = 'application/x-zip-compressed'",
+                "mimeType = 'application/x-rar-compressed'",
+                "mimeType = 'application/vnd.rar'",
+                "mimeType = 'application/x-7z-compressed'",
+                "mimeType = 'application/x-tar'",
+                "mimeType = 'application/gzip'",
+                "mimeType = 'application/x-bzip2'",
+                "mimeType = 'application/x-xz'",
+              ].join(' or ')})`,
             )
             break
 
           case 'code':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'text/javascript'",
-                  "mimeType = 'application/javascript'",
-                  "mimeType = 'text/x-python'",
-                  "mimeType = 'text/x-c'",
-                  "mimeType = 'text/x-c++'",
-                  "mimeType = 'text/x-java-source'",
-                  "mimeType = 'application/json'",
-                  "mimeType = 'application/xml'",
-                  "mimeType = 'text/html'",
-                  "mimeType = 'text/css'",
-                  "mimeType contains 'text/x-'",
-                  "mimeType contains 'application/x-'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'text/javascript'",
+                "mimeType = 'application/javascript'",
+                "mimeType = 'text/x-python'",
+                "mimeType = 'text/x-c'",
+                "mimeType = 'text/x-c++'",
+                "mimeType = 'text/x-java-source'",
+                "mimeType = 'application/json'",
+                "mimeType = 'application/xml'",
+                "mimeType = 'text/html'",
+                "mimeType = 'text/css'",
+                "mimeType contains 'text/x-'",
+                "mimeType contains 'application/x-'",
+              ].join(' or ')})`,
             )
             break
 
@@ -201,98 +189,80 @@ function buildDriveQuery(filters: FileFilter): string {
 
           case 'text':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'text/plain'",
-                  "mimeType = 'text/markdown'",
-                  "mimeType = 'text/csv'",
-                  "mimeType = 'text/tab-separated-values'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'text/plain'",
+                "mimeType = 'text/markdown'",
+                "mimeType = 'text/csv'",
+                "mimeType = 'text/tab-separated-values'",
+              ].join(' or ')})`,
             )
             break
 
           case 'design':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/vnd.google-apps.drawing'",
-                  "mimeType = 'image/svg+xml'",
-                  "mimeType = 'application/postscript'",
-                  "mimeType = 'application/illustrator'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'application/vnd.google-apps.drawing'",
+                "mimeType = 'image/svg+xml'",
+                "mimeType = 'application/postscript'",
+                "mimeType = 'application/illustrator'",
+              ].join(' or ')})`,
             )
             break
 
           case 'database':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/x-sqlite3'",
-                  "mimeType = 'application/vnd.ms-access'",
-                  "mimeType = 'application/x-dbf'",
-                  "mimeType contains 'database'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'application/x-sqlite3'",
+                "mimeType = 'application/vnd.ms-access'",
+                "mimeType = 'application/x-dbf'",
+                "mimeType contains 'database'",
+              ].join(' or ')})`,
             )
             break
 
           case 'ebook':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'application/epub+zip'",
-                  "mimeType = 'application/x-mobipocket-ebook'",
-                  "mimeType = 'application/vnd.amazon.ebook'",
-                  "mimeType = 'application/x-fictionbook+xml'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'application/epub+zip'",
+                "mimeType = 'application/x-mobipocket-ebook'",
+                "mimeType = 'application/vnd.amazon.ebook'",
+                "mimeType = 'application/x-fictionbook+xml'",
+              ].join(' or ')})`,
             )
             break
 
           case 'font':
             typeConditions.push(
-              '(' +
-                [
-                  "mimeType = 'font/ttf'",
-                  "mimeType = 'font/otf'",
-                  "mimeType = 'font/woff'",
-                  "mimeType = 'font/woff2'",
-                  "mimeType = 'application/font-woff'",
-                ].join(' or ') +
-                ')',
+              `(${[
+                "mimeType = 'font/ttf'",
+                "mimeType = 'font/otf'",
+                "mimeType = 'font/woff'",
+                "mimeType = 'font/woff2'",
+                "mimeType = 'application/font-woff'",
+              ].join(' or ')})`,
             )
             break
 
           case 'calendar':
-            typeConditions.push(
-              '(' +
-                ["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ') +
-                ')',
-            )
+            typeConditions.push(`(${["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ')})`)
             break
 
           case 'contact':
-            typeConditions.push(
-              '(' + ["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ') + ')',
-            )
+            typeConditions.push(`(${["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ')})`)
             break
 
           case 'other':
             typeConditions.push(
-              '(' +
-                [
-                  "not mimeType contains 'application/vnd.google-apps'",
-                  "not mimeType contains 'image/'",
-                  "not mimeType contains 'video/'",
-                  "not mimeType contains 'audio/'",
-                  "not mimeType contains 'text/'",
-                  "not mimeType contains 'application/pdf'",
-                  "not mimeType contains 'zip'",
-                  "not mimeType contains 'archive'",
-                ].join(' and ') +
-                ')',
+              `(${[
+                "not mimeType contains 'application/vnd.google-apps'",
+                "not mimeType contains 'image/'",
+                "not mimeType contains 'video/'",
+                "not mimeType contains 'audio/'",
+                "not mimeType contains 'text/'",
+                "not mimeType contains 'application/pdf'",
+                "not mimeType contains 'zip'",
+                "not mimeType contains 'archive'",
+              ].join(' and ')})`,
             )
             break
         }
@@ -373,12 +343,7 @@ export async function GET(request: NextRequest) {
 
     // If fileId is provided, return single file metadata (used by breadcrumb)
     if (fileId) {
-      const fileMetadata = await driveService!.getFileMetadata(fileId, [
-        'id',
-        'name',
-        'parents',
-        'mimeType',
-      ])
+      const fileMetadata = await driveService!.getFileMetadata(fileId, ['id', 'name', 'parents', 'mimeType'])
 
       // Ensure id is always included in response
       const response = {
@@ -447,7 +412,7 @@ export async function GET(request: NextRequest) {
       parentId: folderId,
       userId: session.user?.email,
       ...(pageToken && { pageToken }),
-      query: query,
+      query,
       pageSize,
     })
 

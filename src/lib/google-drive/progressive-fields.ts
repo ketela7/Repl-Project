@@ -108,11 +108,7 @@ export const PROGRESSIVE_FIELD_CONFIG = {
 /**
  * Generate cache key for progressive loading
  */
-export function generateProgressiveKey(
-  fileId: string,
-  userId: string,
-  stage: LoadingStage,
-): string {
+export function generateProgressiveKey(fileId: string, userId: string, stage: LoadingStage): string {
   return `file-details:${stage}:${userId}:${fileId}`
 }
 

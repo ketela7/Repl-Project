@@ -40,18 +40,14 @@ export const FIELD_SELECTORS = {
   FOLDER_STRUCTURE: 'files(id, name, parents, mimeType)',
 
   // Fields for search results
-  SEARCH_RESULTS:
-    'nextPageToken, files(id, name, mimeType, size, modifiedTime, parents, webViewLink)',
+  SEARCH_RESULTS: 'nextPageToken, files(id, name, mimeType, size, modifiedTime, parents, webViewLink)',
 } as const
 
 /**
  * Performance-optimized request parameters
  */
-export function getOptimizedRequestParams(
-  operation: keyof typeof FIELD_SELECTORS,
-  baseParams: any = {},
-): any {
-  const optimizedParams = {
+export function getOptimizedRequestParams(operation: keyof typeof FIELD_SELECTORS, baseParams: any = {}): any {
+  return {
     ...baseParams,
     fields: FIELD_SELECTORS[operation],
 
@@ -65,8 +61,6 @@ export function getOptimizedRequestParams(
     // Respect user's pageSize choice, with Google Drive API limit of 1000
     pageSize: Math.min(baseParams.pageSize || 50, 1000),
   }
-
-  return optimizedParams
 }
 
 /**

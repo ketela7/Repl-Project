@@ -199,9 +199,7 @@ export function DriveManager() {
     !!(filters.advancedFilters.owner && String(filters.advancedFilters.owner).trim())
 
   // Sorting Start
-  const handleSort = (
-    key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners',
-  ) => {
+  const handleSort = (key: 'name' | 'id' | 'size' | 'modifiedTime' | 'createdTime' | 'mimeType' | 'owners') => {
     let direction: 'asc' | 'desc' = 'asc'
     if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc'
@@ -293,30 +291,16 @@ export function DriveManager() {
         if (actualFolderId) params.append('folderId', actualFolderId)
         if (searchQuery) params.append('search', searchQuery)
         if (pageToken) params.append('pageToken', pageToken)
-        if (filters.activeView && filters.activeView !== 'all')
-          params.append('viewStatus', filters.activeView)
-        if (filters.fileTypeFilter?.length > 0)
-          params.append('fileType', filters.fileTypeFilter.join(','))
+        if (filters.activeView && filters.activeView !== 'all') params.append('viewStatus', filters.activeView)
+        if (filters.fileTypeFilter?.length > 0) params.append('fileType', filters.fileTypeFilter.join(','))
         if (filters.advancedFilters.createdDateRange?.from)
-          params.append(
-            'createdAfter',
-            (filters.advancedFilters.createdDateRange.from as Date).toISOString(),
-          )
+          params.append('createdAfter', (filters.advancedFilters.createdDateRange.from as Date).toISOString())
         if (filters.advancedFilters.createdDateRange?.to)
-          params.append(
-            'createdBefore',
-            (filters.advancedFilters.createdDateRange.to as Date).toISOString(),
-          )
+          params.append('createdBefore', (filters.advancedFilters.createdDateRange.to as Date).toISOString())
         if (filters.advancedFilters.modifiedDateRange?.from)
-          params.append(
-            'modifiedAfter',
-            (filters.advancedFilters.modifiedDateRange.from as Date).toISOString(),
-          )
+          params.append('modifiedAfter', (filters.advancedFilters.modifiedDateRange.from as Date).toISOString())
         if (filters.advancedFilters.modifiedDateRange?.to)
-          params.append(
-            'modifiedBefore',
-            (filters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
-          )
+          params.append('modifiedBefore', (filters.advancedFilters.modifiedDateRange.to as Date).toISOString())
         if (filters.advancedFilters.owner && (filters.advancedFilters.owner as string).trim())
           params.append('owner', (filters.advancedFilters.owner as string).trim())
 
@@ -356,10 +340,7 @@ export function DriveManager() {
 
         const newItems = (data.files || data || []).map((item: any) => ({
           ...item,
-          itemType:
-            item.mimeType === 'application/vnd.google-apps.folder'
-              ? ('folder' as const)
-              : ('file' as const),
+          itemType: item.mimeType === 'application/vnd.google-apps.folder' ? ('folder' as const) : ('file' as const),
         }))
 
         // // // // // console.log('[DriveManager] Received items:', newItems.length, 'items for folder:', folderId)
@@ -373,11 +354,7 @@ export function DriveManager() {
         setHasAccess(true)
         setDriveAccessError(null)
       } catch (error: any) {
-        if (
-          error.message?.includes('Authentication') ||
-          error.message?.includes('401') ||
-          error.status === 401
-        ) {
+        if (error.message?.includes('Authentication') || error.message?.includes('401') || error.status === 401) {
           setNeedsReauth(true)
           setDriveAccessError(error)
           window.location.href = '/auth/v1/login'
@@ -661,9 +638,7 @@ export function DriveManager() {
             onRefreshAfterOp={handleRefresh}
             filters={filters}
             onFilterChange={handleFilter as any}
-            onApplyFilters={() =>
-              fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
-            }
+            onApplyFilters={() => fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)}
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
             items={items}
@@ -1005,10 +980,7 @@ export function DriveManager() {
           </div>
           {operationsProgress.type === 'bulk' && operationsProgress.total > 0 && (
             <>
-              <Progress
-                value={(operationsProgress.current / operationsProgress.total) * 100}
-                className="mt-2 w-64"
-              />
+              <Progress value={(operationsProgress.current / operationsProgress.total) * 100} className="mt-2 w-64" />
               <div className="text-muted-foreground mt-1 text-xs">
                 {operationsProgress.current} of {operationsProgress.total}
               </div>
