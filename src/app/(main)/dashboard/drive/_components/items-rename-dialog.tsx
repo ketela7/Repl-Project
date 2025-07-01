@@ -17,13 +17,7 @@ import { toast } from 'sonner'
 
 import { RegexHelpDialog } from './regex-help-dialog'
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -90,12 +84,7 @@ const RENAME_MODES = [
   },
 ]
 
-function ItemsRenameDialog({
-  isOpen,
-  onClose,
-  onConfirm: _onConfirm,
-  selectedItems,
-}: ItemsRenameDialogProps) {
+function ItemsRenameDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems }: ItemsRenameDialogProps) {
   const [selectedMode, setSelectedMode] = useState('prefix')
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -131,9 +120,7 @@ function ItemsRenameDialog({
   const [numberingPadding, setNumberingPadding] = useState(2)
 
   // Preview states
-  const [previews, setPreviews] = useState<
-    Array<{ original: string; preview: string; valid: boolean }>
-  >([])
+  const [previews, setPreviews] = useState<Array<{ original: string; preview: string; valid: boolean }>>([])
   const [showRegexHelp, setShowRegexHelp] = useState(false)
 
   const isMobile = useIsMobile()
@@ -329,9 +316,7 @@ function ItemsRenameDialog({
           if (!response.ok) {
             const errorData = await response.json().catch(() => ({}))
             throw new Error(
-              errorData.error ||
-                errorData.message ||
-                `Server error ${response.status}: ${response.statusText}`,
+              errorData.error || errorData.message || `Server error ${response.status}: ${response.statusText}`,
             )
           }
 
@@ -344,8 +329,7 @@ function ItemsRenameDialog({
             // Extract detailed error from API response
             let errorMessage = 'Unknown error'
             if (result.errors && result.errors.length > 0) {
-              errorMessage =
-                result.errors[0].error || result.errors[0].message || 'Operation failed'
+              errorMessage = result.errors[0].error || result.errors[0].message || 'Operation failed'
             } else if (result.error) {
               errorMessage = result.error
             } else if (result.message) {
@@ -495,9 +479,7 @@ function ItemsRenameDialog({
                     key={mode.id}
                     className={cn(
                       'flex cursor-pointer items-start space-x-3 rounded-lg border p-4 transition-colors',
-                      selectedMode === mode.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:bg-muted/50',
+                      selectedMode === mode.id ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50',
                     )}
                     onClick={() => setSelectedMode(mode.id)}
                   >
@@ -612,8 +594,8 @@ function ItemsRenameDialog({
                     <div className="text-sm text-amber-800 dark:text-amber-200">
                       <div className="font-medium">Advanced Feature</div>
                       <div className="text-amber-700 dark:text-amber-300">
-                        Use regular expressions for complex pattern matching. Click &quot;Help &amp;
-                        Examples&quot; for guidance.
+                        Use regular expressions for complex pattern matching. Click &quot;Help &amp; Examples&quot; for
+                        guidance.
                       </div>
                     </div>
                   </div>
@@ -650,10 +632,7 @@ function ItemsRenameDialog({
                 {previews.slice(0, 5).map((preview, index) => (
                   <div
                     key={`preview-${preview.original}-${index}`}
-                    className={cn(
-                      'text-sm',
-                      preview.valid ? 'text-foreground' : 'text-muted-foreground line-through',
-                    )}
+                    className={cn('text-sm', preview.valid ? 'text-foreground' : 'text-muted-foreground line-through')}
                   >
                     <span className="text-muted-foreground">{preview.original}</span>
                     <span className="mx-2">→</span>
@@ -663,9 +642,7 @@ function ItemsRenameDialog({
                   </div>
                 ))}
                 {previews.length > 5 && (
-                  <div className="text-muted-foreground text-xs">
-                    ... and {previews.length - 5} more items
-                  </div>
+                  <div className="text-muted-foreground text-xs">... and {previews.length - 5} more items</div>
                 )}
               </div>
             </div>
@@ -681,9 +658,7 @@ function ItemsRenameDialog({
           {/* Processing Header */}
           <div className="text-center">
             <div className="text-lg font-semibold text-blue-600">Renaming Files...</div>
-            <div className="text-muted-foreground text-sm">
-              Please wait while we process your rename operation
-            </div>
+            <div className="text-muted-foreground text-sm">Please wait while we process your rename operation</div>
           </div>
 
           {/* Progress Display */}
@@ -703,13 +678,9 @@ function ItemsRenameDialog({
               <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-900 dark:bg-blue-950/50">
                 <div className="flex items-center gap-2">
                   <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                  <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                    Currently renaming:
-                  </span>
+                  <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Currently renaming:</span>
                 </div>
-                <div className="truncate text-sm text-blue-700 dark:text-blue-300">
-                  {progress.currentFile}
-                </div>
+                <div className="truncate text-sm text-blue-700 dark:text-blue-300">{progress.currentFile}</div>
               </div>
             )}
 
@@ -747,17 +718,13 @@ function ItemsRenameDialog({
               <div className="space-y-2">
                 <XCircle className="mx-auto h-12 w-12 text-orange-500" />
                 <div className="text-lg font-semibold text-orange-600">Operation Cancelled</div>
-                <div className="text-muted-foreground text-sm">
-                  Rename operation was cancelled by user
-                </div>
+                <div className="text-muted-foreground text-sm">Rename operation was cancelled by user</div>
               </div>
             ) : wasSuccessful ? (
               <div className="space-y-2">
                 <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
                 <div className="text-lg font-semibold text-green-600">Rename Completed!</div>
-                <div className="text-muted-foreground text-sm">
-                  Your files have been successfully renamed
-                </div>
+                <div className="text-muted-foreground text-sm">Your files have been successfully renamed</div>
               </div>
             ) : (
               <div className="space-y-2">
@@ -787,18 +754,14 @@ function ItemsRenameDialog({
           {/* Error Details */}
           {hasErrors && (
             <div className="space-y-3">
-              <Label className="text-sm font-medium text-red-600">
-                Issues found during rename:
-              </Label>
+              <Label className="text-sm font-medium text-red-600">Issues found during rename:</Label>
               <div className="max-h-40 space-y-2 overflow-y-auto rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/50">
                 {progress.errors.map((error, index) => (
                   <div key={`error-${error.file}-${index}`} className="space-y-1 text-sm">
                     <div className="flex items-start gap-2">
                       <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
                       <div className="space-y-1">
-                        <div className="font-medium text-red-800 dark:text-red-200">
-                          {error.file}
-                        </div>
+                        <div className="font-medium text-red-800 dark:text-red-200">{error.file}</div>
                         <div className="text-red-700 dark:text-red-300">{error.error}</div>
                         {/* Provide helpful suggestions based on error type */}
                         {error.error.includes('Authentication') && (
@@ -880,12 +843,7 @@ function ItemsRenameDialog({
                 </>
               )}
               {isProcessing && (
-                <Button
-                  onClick={handleCancel}
-                  variant="outline"
-                  disabled={isCancelled}
-                  className="flex-1"
-                >
+                <Button onClick={handleCancel} variant="outline" disabled={isCancelled} className="flex-1">
                   {isCancelled ? 'Cancelling...' : 'Cancel Operation'}
                 </Button>
               )}
@@ -928,12 +886,7 @@ function ItemsRenameDialog({
         <DialogFooter>
           <div className="flex w-full gap-2">
             {isProcessing ? (
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                disabled={isCancelled}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={handleCancel} disabled={isCancelled} className="flex-1">
                 {isCancelled ? 'Cancelling...' : 'Cancel Operation'}
               </Button>
             ) : (
