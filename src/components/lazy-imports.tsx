@@ -46,3 +46,24 @@ export const DriveToolbar = lazy(() =>
     default: mod.DriveToolbar,
   })),
 )
+
+// Additional heavy components that need lazy loading
+export const CreateFolderDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/create-folder-dialog'))
+
+export const DriveConnectionCard = lazy(() => import('@/app/(main)/dashboard/drive/_components/drive-connection-card'))
+
+export const DriveDataView = lazy(() => import('@/app/(main)/dashboard/drive/_components/drive-data-view'))
+
+export const DriveSkeleton = lazy(() => import('@/app/(main)/dashboard/drive/_components/drive-skeleton'))
+
+export const FileBreadcrumb = lazy(() => import('@/app/(main)/dashboard/drive/_components/file-breadcrumb'))
+
+export const FileDetailsDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/file-details-dialog'))
+
+export const FilePreviewDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/file-preview-dialog'))
+
+export const FileUploadDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/file-upload-dialog'))
+
+export const FiltersDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/filters-dialog'))
+
+export const RegexHelpDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/regex-help-dialog'))

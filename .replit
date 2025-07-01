@@ -44,10 +44,6 @@ args = "Optimized Lint"
 task = "workflow.run"
 args = "Quick Lint"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Auto Fix ESLint"
-
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -130,14 +126,6 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/optimized-lint-workflow.js quick"
-
-[[workflows.workflow]]
-name = "Auto Fix ESLint"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx eslint src --fix --ext .ts,.tsx,.js,.jsx --max-warnings 100"
 
 [nix]
 channel = "stable-24_05"

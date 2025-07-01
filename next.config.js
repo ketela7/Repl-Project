@@ -10,13 +10,28 @@ const nextConfig = {
     optimizePackageImports: [
       'lucide-react',
       '@radix-ui/react-icons',
+      '@radix-ui/react-alert-dialog',
+      '@radix-ui/react-avatar',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-collapsible',
+      '@radix-ui/react-context-menu',
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-label',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-progress',
+      '@radix-ui/react-radio-group',
+      '@radix-ui/react-scroll-area',
       '@radix-ui/react-select',
+      '@radix-ui/react-separator',
+      '@radix-ui/react-slider',
+      '@radix-ui/react-slot',
+      '@radix-ui/react-switch',
       '@radix-ui/react-tabs',
-      '@tanstack/react-query',
+      '@radix-ui/react-tooltip',
       '@tanstack/react-table',
-      'recharts',
+      'date-fns',
+      'zod'
     ],
     optimisticClientCache: true,
     useWasmBinary: false,
@@ -100,32 +115,70 @@ const nextConfig = {
       },
     }
 
-    // Optimize chunk splitting for better performance
+    // Aggressive chunk splitting for performance optimization
     config.optimization = {
       ...config.optimization,
       splitChunks: {
         chunks: 'all',
+        minSize: 20000,
+        maxSize: 250000, // Limit chunk size to 250KB
         cacheGroups: {
           default: {
             minChunks: 2,
             priority: -20,
             reuseExistingChunk: true,
           },
+          // Split Google APIs into separate chunk
+          googleapis: {
+            test: /[\\/]node_modules[\\/](googleapis)[\\/]/,
+            name: 'googleapis',
+            priority: 30,
+            chunks: 'all',
+          },
+          // Split NextAuth into separate chunk
+          nextauth: {
+            test: /[\\/]node_modules[\\/](next-auth|@auth)[\\/]/,
+            name: 'nextauth',
+            priority: 25,
+            chunks: 'all',
+          },
+          // Split Radix UI components
+          radix: {
+            test: /[\\/]node_modules[\\/](@radix-ui)[\\/]/,
+            name: 'radix-ui',
+            priority: 20,
+            chunks: 'all',
+          },
+          // Split React table
+          table: {
+            test: /[\\/]node_modules[\\/](@tanstack[\\/]react-table)[\\/]/,
+            name: 'react-table',
+            priority: 15,
+            chunks: 'all',
+          },
+          // Split utility libraries
+          utils: {
+            test: /[\\/]node_modules[\\/](date-fns|zod|clsx|class-variance-authority)[\\/]/,
+            name: 'utils',
+            priority: 10,
+            chunks: 'all',
+          },
+          // General vendor chunk for remaining packages
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             priority: -10,
             chunks: 'all',
-          },
-          // Group UI components together
-          ui: {
-            test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
-            name: 'ui-components',
-            priority: 10,
-            chunks: 'all',
-          },
+          }
         },
       },
+    }
+
+    // Enable tree shaking for specific modules
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      // Ensure lodash uses ES modules for tree shaking
+      'lodash': 'lodash-es'
     }
 
     return config
