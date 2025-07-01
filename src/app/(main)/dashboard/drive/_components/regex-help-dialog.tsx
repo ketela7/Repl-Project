@@ -103,9 +103,7 @@ function RegexHelpDialog({ isOpen, onClose }: RegexHelpDialogProps) {
               <h3 className="font-semibold">Quick Start</h3>
             </div>
             <div className="rounded-lg bg-blue-50 p-4 text-sm dark:bg-blue-950/30">
-              <p className="mb-2">
-                Regular expressions (regex) allow advanced pattern-based renaming:
-              </p>
+              <p className="mb-2">Regular expressions (regex) allow advanced pattern-based renaming:</p>
               <ul className="text-muted-foreground list-inside list-disc space-y-1">
                 <li>
                   <strong>Pattern:</strong> What to find in the filename
@@ -153,10 +151,7 @@ function RegexHelpDialog({ isOpen, onClose }: RegexHelpDialogProps) {
                       <Badge variant="outline" className="border-red-200 bg-red-50 text-red-700">
                         Pattern: {example.pattern}
                       </Badge>
-                      <Badge
-                        variant="outline"
-                        className="border-green-200 bg-green-50 text-green-700"
-                      >
+                      <Badge variant="outline" className="border-green-200 bg-green-50 text-green-700">
                         Replace:{' '}
                         {typeof example.replacement === 'function'
                           ? example.replacement('example')
@@ -165,13 +160,9 @@ function RegexHelpDialog({ isOpen, onClose }: RegexHelpDialogProps) {
                     </div>
 
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="text-muted-foreground">
-                        {example.example.split(' → ')[0]}
-                      </span>
+                      <span className="text-muted-foreground">{example.example.split(' → ')[0]}</span>
                       <ArrowRight className="text-muted-foreground h-3 w-3" />
-                      <span className="font-medium text-green-600">
-                        {example.example.split(' → ')[1]}
-                      </span>
+                      <span className="font-medium text-green-600">{example.example.split(' → ')[1]}</span>
                     </div>
                   </div>
                 </div>

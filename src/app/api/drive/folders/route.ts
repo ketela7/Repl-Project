@@ -129,10 +129,7 @@ export async function POST(request: NextRequest) {
     const { name, parentId = 'root' } = body
 
     if (!name) {
-      return NextResponse.json(
-        { success: false, error: 'Folder name is required' },
-        { status: 400 },
-      )
+      return NextResponse.json({ success: false, error: 'Folder name is required' }, { status: 400 })
     }
 
     const authResult = await initDriveService()
