@@ -12,11 +12,11 @@ export const FIELD_SETS = {
   // Minimal fields for basic listing (fastest)
   LIST_BASIC: `${BASE_FIELDS},parents,trashed`,
 
-  // Essential fields for file management operations
-  LIST_STANDARD: `${BASE_FIELDS},size,modifiedTime,parents,trashed,shared`,
+  // Essential fields for file management operations - now includes owners and createdTime
+  LIST_STANDARD: `${BASE_FIELDS},size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
 
-  // Extended fields for detailed views
-  LIST_DETAILED: `${BASE_FIELDS},size,createdTime,modifiedTime,webViewLink,thumbnailLink,parents,owners,shared,trashed`,
+  // Extended fields for detailed views  
+  LIST_DETAILED: `${BASE_FIELDS},size,createdTime,modifiedTime,webViewLink,thumbnailLink,parents,owners(displayName,emailAddress,photoLink),shared,trashed,starred,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
 
   // Complete fields for file details page - comprehensive technical details
   FILE_DETAILS: `${BASE_FIELDS},size,quotaBytesUsed,createdTime,modifiedTime,viewedByMeTime,sharedWithMeTime,webViewLink,webContentLink,thumbnailLink,iconLink,parents,owners,lastModifyingUser,sharingUser,shared,trashed,starred,viewed,ownedByMe,viewedByMe,description,properties,appProperties,capabilities,permissions,copyRequiresWriterPermission,writersCanShare,folderColorRgb,originalFilename,fullFileExtension,fileExtension,md5Checksum,sha1Checksum,sha256Checksum,headRevisionId,isAppAuthorized,hasAugmentedPermissions,spaces,version,teamDriveId,driveId,hasVisitedTeamDrive,exportLinks,shortcutDetails,contentRestrictions,resourceKey,linkShareMetadata,labelInfo,imageMediaMetadata,videoMediaMetadata`,
