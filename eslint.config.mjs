@@ -61,7 +61,7 @@ export default [
       'react-hooks/exhaustive-deps': 'off',
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
-        'warn',
+        'error',
         {
           vars: 'all',
           varsIgnorePattern: '^_',
@@ -187,7 +187,7 @@ export default [
           singleQuote: true,
           trailingComma: 'all',
           tabWidth: 2,
-          printWidth: 100,
+          printWidth: 120,
           bracketSpacing: true,
           bracketSameLine: false,
           arrowParens: 'avoid',

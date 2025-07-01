@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef  } from 'react'
 import { ChevronUp, ChevronDown, RefreshCw } from 'lucide-react'
 
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'

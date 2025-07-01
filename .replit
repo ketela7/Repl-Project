@@ -55,10 +55,6 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run lint"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run lint:fix && echo '✅ Code linting completed successfully'"
-
 [[workflows.workflow]]
 name = "Format"
 mode = "sequential"
@@ -66,10 +62,6 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run format"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format:fix && echo '✅ Code formatting completed successfully'"
 
 [[workflows.workflow]]
 name = "Full Check"
@@ -226,3 +218,4 @@ args = "eslint src --ext .ts,.tsx,.js,.jsx --max-warnings 0"
 
 [nix]
 channel = "stable-24_05"
+packages = ["nix-output-monitor"]
