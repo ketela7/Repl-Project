@@ -6,7 +6,7 @@ import { successToast, errorToast } from '@/components/ui/toast'
 /**
  * Copy text to clipboard with automatic toast feedback
  */
-export async function copyToClipboard(text: string, label?: string): Promise<boolean> {
+export async function copyToClipboard(text: string): Promise<boolean> {
   try {
     if (!navigator.clipboard) {
       // Fallback for older browsers

@@ -101,7 +101,7 @@ export function DriveManager() {
 
   // UI state
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid')
-  const { timezone, isLoading: timezoneLoading } = useTimezoneContext()
+  const { timezone } = useTimezoneContext()
   const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState(initialFilters)
 

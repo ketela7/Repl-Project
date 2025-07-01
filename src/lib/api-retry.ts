@@ -78,7 +78,6 @@ function sleep(ms: number): Promise<void> {
 export async function retryOperation<T>(
   operation: () => Promise<T>,
   config: Partial<RetryConfig> = {},
-  context: string = 'operation',
 ): Promise<T> {
   const finalConfig = { ...DEFAULT_CONFIG, ...config }
   let lastError: any

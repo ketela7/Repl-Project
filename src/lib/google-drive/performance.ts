@@ -76,7 +76,6 @@ export function getOptimizedRequestParams(
  * Reduces API calls by combining multiple requests
  */
 export class DriveApiBatcher {
-  private drive: drive_v3.Drive
   private requests: Array<{
     id: string
     request: any

@@ -28,11 +28,9 @@ import {
 
 export class GoogleDriveService {
   public drive: drive_v3.Drive
-  private batcher: DriveApiBatcher
 
   constructor(accessToken: string) {
     this.drive = createDriveClient(accessToken)
-    this.batcher = new DriveApiBatcher(this.drive)
   }
 
   async getUserInfo(): Promise<DriveUserInfo> {
@@ -54,14 +52,14 @@ export class GoogleDriveService {
       name: user.displayName || 'Unknown User',
       email: user.emailAddress || '',
       ...(user.photoLink && { picture: user.photoLink }),
-      storageQuota: about.storageQuota
-        ? {
-            limit: about.storageQuota.limit!,
-            usage: about.storageQuota.usage!,
-            usageInDrive: about.storageQuota.usageInDrive!,
-            usageInDriveTrash: about.storageQuota.usageInDriveTrash!,
-          }
-        : undefined,
+      ...(about.storageQuota && {
+        storageQuota: {
+          limit: about.storageQuota.limit!,
+          usage: about.storageQuota.usage!,
+          usageInDrive: about.storageQuota.usageInDrive!,
+          usageInDriveTrash: about.storageQuota.usageInDriveTrash!,
+        },
+      }),
     }
   }
 
@@ -123,8 +121,8 @@ export class GoogleDriveService {
         // Otherwise treat it as a search term and build proper query
         searchQuery = buildSearchQuery({
           name: query,
-          parentId,
-          mimeType,
+          ...(parentId && { parentId }),
+          ...(mimeType && { mimeType }),
           trashed: false,
         })
       }
@@ -213,7 +211,9 @@ export class GoogleDriveService {
 
           return {
             files: retryFiles,
-            ...(retryResponse.data.nextPageToken && { nextPageToken: retryResponse.data.nextPageToken }),
+            ...(retryResponse.data.nextPageToken && {
+              nextPageToken: retryResponse.data.nextPageToken,
+            }),
             incompleteSearch: retryResponse.data.incompleteSearch || false,
           }
         }
@@ -389,24 +389,24 @@ export class GoogleDriveService {
     return {
       ...file,
       ...(response.data.description && { description: response.data.description }),
-      lastModifyingUser: response.data.lastModifyingUser
-        ? {
-            displayName: response.data.lastModifyingUser.displayName || '',
-            emailAddress: response.data.lastModifyingUser.emailAddress || '',
-            ...(response.data.lastModifyingUser.photoLink && {
-              photoLink: response.data.lastModifyingUser.photoLink,
-            }),
-          }
-        : undefined,
-      sharingUser: response.data.sharingUser
-        ? {
-            displayName: response.data.sharingUser.displayName || '',
-            emailAddress: response.data.sharingUser.emailAddress || '',
-            ...(response.data.sharingUser.photoLink && {
-              photoLink: response.data.sharingUser.photoLink,
-            }),
-          }
-        : undefined,
+      ...(response.data.lastModifyingUser && {
+        lastModifyingUser: {
+          displayName: response.data.lastModifyingUser.displayName || '',
+          emailAddress: response.data.lastModifyingUser.emailAddress || '',
+          ...(response.data.lastModifyingUser.photoLink && {
+            photoLink: response.data.lastModifyingUser.photoLink,
+          }),
+        },
+      }),
+      ...(response.data.sharingUser && {
+        sharingUser: {
+          displayName: response.data.sharingUser.displayName || '',
+          emailAddress: response.data.sharingUser.emailAddress || '',
+          ...(response.data.sharingUser.photoLink && {
+            photoLink: response.data.sharingUser.photoLink,
+          }),
+        },
+      }),
       ...(response.data.version && { version: response.data.version }),
       ...(response.data.md5Checksum && { md5Checksum: response.data.md5Checksum }),
       ...(response.data.sha1Checksum && { sha1Checksum: response.data.sha1Checksum }),
@@ -434,15 +434,27 @@ export class GoogleDriveService {
       appProperties: response.data.appProperties || {},
       imageMediaMetadata: response.data.imageMediaMetadata
         ? {
-            ...(response.data.imageMediaMetadata.width !== undefined && { width: response.data.imageMediaMetadata.width }),
-            ...(response.data.imageMediaMetadata.height !== undefined && { height: response.data.imageMediaMetadata.height }),
-            ...(response.data.imageMediaMetadata.rotation !== undefined && { rotation: response.data.imageMediaMetadata.rotation }),
+            ...(response.data.imageMediaMetadata.width !== undefined && {
+              width: response.data.imageMediaMetadata.width,
+            }),
+            ...(response.data.imageMediaMetadata.height !== undefined && {
+              height: response.data.imageMediaMetadata.height,
+            }),
+            ...(response.data.imageMediaMetadata.rotation !== undefined && {
+              rotation: response.data.imageMediaMetadata.rotation,
+            }),
             ...(response.data.imageMediaMetadata.location && {
               location: {
-                ...(response.data.imageMediaMetadata.location.latitude !== undefined && { latitude: response.data.imageMediaMetadata.location.latitude }),
-                ...(response.data.imageMediaMetadata.location.longitude !== undefined && { longitude: response.data.imageMediaMetadata.location.longitude }),
-                ...(response.data.imageMediaMetadata.location.altitude !== undefined && { altitude: response.data.imageMediaMetadata.location.altitude }),
-              }
+                ...(response.data.imageMediaMetadata.location.latitude !== undefined && {
+                  latitude: response.data.imageMediaMetadata.location.latitude,
+                }),
+                ...(response.data.imageMediaMetadata.location.longitude !== undefined && {
+                  longitude: response.data.imageMediaMetadata.location.longitude,
+                }),
+                ...(response.data.imageMediaMetadata.location.altitude !== undefined && {
+                  altitude: response.data.imageMediaMetadata.location.altitude,
+                }),
+              },
             }),
             ...(response.data.imageMediaMetadata.time && {
               time: response.data.imageMediaMetadata.time,
@@ -535,7 +547,7 @@ export class GoogleDriveService {
               ...(restriction.restrictingUser.photoLink && {
                 photoLink: restriction.restrictingUser.photoLink,
               }),
-            }
+            },
           }),
           ...(restriction.restrictionTime && { restrictionTime: restriction.restrictionTime }),
           ...(restriction.type && { type: restriction.type }),
