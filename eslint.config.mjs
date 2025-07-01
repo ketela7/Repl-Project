@@ -32,7 +32,7 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
-        project: './tsconfig.json',
+        // Removed project reference for faster linting - only enable for type-aware rules when needed
       },
       globals: {
         ...globals.browser,
@@ -131,16 +131,18 @@ export default [
       'react/display-name': 'off',
       'react/prop-types': 'off',
 
-      // TypeScript Specific Rules
+      // TypeScript Specific Rules (non-type-aware only)
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-non-null-assertion': 'warn',
-      '@typescript-eslint/prefer-nullish-coalescing': 'error',
-      '@typescript-eslint/prefer-optional-chain': 'error',
       '@typescript-eslint/prefer-as-const': 'error',
-      '@typescript-eslint/no-unnecessary-condition': 'warn',
-      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-      '@typescript-eslint/prefer-string-starts-ends-with': 'error',
-      '@typescript-eslint/prefer-includes': 'error',
+      
+      // Explicitly disabled type-aware rules (may be enabled by next/core-web-vitals):
+      '@typescript-eslint/prefer-nullish-coalescing': 'off',
+      '@typescript-eslint/prefer-optional-chain': 'off', 
+      '@typescript-eslint/no-unnecessary-condition': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
+      '@typescript-eslint/prefer-string-starts-ends-with': 'off',
+      '@typescript-eslint/prefer-includes': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { 
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
