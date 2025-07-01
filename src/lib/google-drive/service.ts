@@ -548,28 +548,28 @@ export class GoogleDriveService {
           ...(restriction.type && { type: restriction.type }),
         })) || [],
       ...(response.data.resourceKey && { resourceKey: response.data.resourceKey }),
-      linkShareMetadata: response.data.linkShareMetadata
-        ? {
-            ...(response.data.linkShareMetadata.securityUpdateEligible !== undefined && {
-              securityUpdateEligible: response.data.linkShareMetadata.securityUpdateEligible,
-            }),
-            ...(response.data.linkShareMetadata.securityUpdateEnabled !== undefined && {
-              securityUpdateEnabled: response.data.linkShareMetadata.securityUpdateEnabled,
-            }),
-          }
-        : undefined,
-      labelInfo: response.data.labelInfo
-        ? {
-            ...(response.data.labelInfo.labels && {
-              labels: response.data.labelInfo.labels.map(label => ({
-                ...(label.id && { id: label.id }),
-                ...(label.revisionId && { revisionId: label.revisionId }),
-                ...(label.kind && { kind: label.kind }),
-                ...(label.fields && { fields: label.fields }),
-              })),
-            }),
-          }
-        : undefined,
+      ...(response.data.linkShareMetadata && {
+        linkShareMetadata: {
+          ...(response.data.linkShareMetadata.securityUpdateEligible !== undefined && {
+            securityUpdateEligible: response.data.linkShareMetadata.securityUpdateEligible,
+          }),
+          ...(response.data.linkShareMetadata.securityUpdateEnabled !== undefined && {
+            securityUpdateEnabled: response.data.linkShareMetadata.securityUpdateEnabled,
+          }),
+        },
+      }),
+      ...(response.data.labelInfo && {
+        labelInfo: {
+          ...(response.data.labelInfo.labels && {
+            labels: response.data.labelInfo.labels.map(label => ({
+              ...(label.id && { id: label.id }),
+              ...(label.revisionId && { revisionId: label.revisionId }),
+              ...(label.kind && { kind: label.kind }),
+              ...(label.fields && { fields: label.fields }),
+            })),
+          }),
+        },
+      }),
       capabilities: response.data.capabilities || {},
     }
   }
