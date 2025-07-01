@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -15,7 +14,6 @@ import {
   FolderOpen,
   Users,
   Shield,
-  ArrowLeft,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,7 +21,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 
 interface DriveFolder {
@@ -198,7 +196,7 @@ export function DriveDestinationSelector({
   }, [])
 
   return (
-    <div className={cn('w-full max-w-3xl mx-auto', className)}>
+    <div className={cn('w-full max-w-none mx-auto px-4 sm:px-6 lg:px-8', className)}>
       {/* Header Section */}
       <div className="space-y-4 mb-6">
         <div className="text-center space-y-2">
@@ -215,21 +213,21 @@ export function DriveDestinationSelector({
       </div>
 
       {/* Main Content Card */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-background to-muted/20">
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-background to-muted/20 max-w-4xl mx-auto">
         <CardContent className="p-6">
           <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'browse' | 'url')}>
             {/* Enhanced Tab List */}
-            <TabsList className="grid w-full grid-cols-2 mb-8 h-12 p-1 bg-muted/50">
+            <TabsList className="bg-muted/50 mb-8 grid h-12 w-full grid-cols-2 p-1">
               <TabsTrigger
                 value="browse"
-                className="flex items-center gap-2 h-10 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                className="flex h-10 items-center gap-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
               >
                 <Folder className="h-4 w-4" />
                 Browse Folders
               </TabsTrigger>
               <TabsTrigger
                 value="url"
-                className="flex items-center gap-2 h-10 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
+                className="flex h-10 items-center gap-2 text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm"
               >
                 <Link className="h-4 w-4" />
                 Paste URL/ID
@@ -237,16 +235,16 @@ export function DriveDestinationSelector({
             </TabsList>
 
             {/* Browse Tab Content */}
-            <TabsContent value="browse" className="space-y-6 mt-0">
+            <TabsContent value="browse" className="mt-0 space-y-6">
               {/* Breadcrumb Navigation */}
               <Card className="border-muted/50 bg-muted/20">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 text-sm">
-                    <Home className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                    <Home className="h-4 w-4 flex-shrink-0 text-blue-500" />
                     <div className="flex items-center gap-1 overflow-x-auto">
                       {currentPath.map((folder, index) => (
-                        <div key={folder.id} className="flex items-center gap-1 flex-shrink-0">
-                          {index > 0 && <ChevronRight className="h-3 w-3 text-muted-foreground" />}
+                        <div key={folder.id} className="flex flex-shrink-0 items-center gap-1">
+                          {index > 0 && <ChevronRight className="text-muted-foreground h-3 w-3" />}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -254,8 +252,8 @@ export function DriveDestinationSelector({
                             className={cn(
                               'h-7 px-3 text-sm transition-colors',
                               index === currentPath.length - 1
-                                ? 'bg-background shadow-sm font-medium text-foreground'
-                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                                ? 'bg-background text-foreground font-medium shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
                             )}
                           >
                             <span className="max-w-32 truncate">{folder.name}</span>
@@ -270,16 +268,16 @@ export function DriveDestinationSelector({
               {/* Search Section */}
               <div className="space-y-3">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
                   <Input
                     placeholder="Search folders by name..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
-                    className="pl-10 h-11 bg-background border-muted-foreground/20 focus:border-blue-500 focus:ring-blue-200"
+                    className="bg-background border-muted-foreground/20 h-11 pl-10 focus:border-blue-500 focus:ring-blue-200"
                   />
                 </div>
                 {searchQuery && (
-                  <div className="text-muted-foreground text-xs px-1">
+                  <div className="text-muted-foreground px-1 text-xs">
                     {filteredFolders.length} folder{filteredFolders.length !== 1 ? 's' : ''} found
                   </div>
                 )}
@@ -289,25 +287,25 @@ export function DriveDestinationSelector({
               <Card className="border-muted/50">
                 <CardContent className="p-0">
                   <ScrollArea className="h-[400px]">
-                    <div className="p-4 space-y-2">
+                    <div className="space-y-2 p-4">
                       {isLoadingFolders ? (
-                        <div className="flex flex-col items-center justify-center py-16 space-y-4">
+                        <div className="flex flex-col items-center justify-center space-y-4 py-16">
                           <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                          <div className="text-center space-y-1">
+                          <div className="space-y-1 text-center">
                             <p className="text-sm font-medium">Loading folders...</p>
-                            <p className="text-xs text-muted-foreground">Please wait while we fetch your folders</p>
+                            <p className="text-muted-foreground text-xs">Please wait while we fetch your folders</p>
                           </div>
                         </div>
                       ) : filteredFolders.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-16 space-y-4">
-                          <div className="p-4 rounded-full bg-muted/50">
-                            <Folder className="h-8 w-8 text-muted-foreground" />
+                        <div className="flex flex-col items-center justify-center space-y-4 py-16">
+                          <div className="bg-muted/50 rounded-full p-4">
+                            <Folder className="text-muted-foreground h-8 w-8" />
                           </div>
-                          <div className="text-center space-y-1">
-                            <p className="text-sm font-medium text-muted-foreground">
+                          <div className="space-y-1 text-center">
+                            <p className="text-muted-foreground text-sm font-medium">
                               {searchQuery ? 'No folders found' : 'No folders available'}
                             </p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-muted-foreground text-xs">
                               {searchQuery ? 'Try adjusting your search terms' : 'This location is empty'}
                             </p>
                           </div>
@@ -318,10 +316,10 @@ export function DriveDestinationSelector({
                             <div
                               key={folder.id}
                               className={cn(
-                                'group relative flex items-center gap-4 p-4 rounded-lg border transition-all duration-200 hover:shadow-md',
+                                'group relative flex items-center gap-4 rounded-lg border p-4 transition-all duration-200 hover:shadow-md',
                                 selectedFolderId === folder.id
                                   ? 'border-blue-200 bg-blue-50 shadow-sm ring-2 ring-blue-200/50 dark:border-blue-800 dark:bg-blue-950/30'
-                                  : 'border-muted hover:border-muted-foreground/30 hover:bg-muted/30'
+                                  : 'border-muted hover:border-muted-foreground/30 hover:bg-muted/30',
                               )}
                             >
                               {/* Folder Icon */}
@@ -329,21 +327,21 @@ export function DriveDestinationSelector({
                                 <Folder
                                   className={cn(
                                     'h-6 w-6 transition-colors',
-                                    selectedFolderId === folder.id ? 'text-blue-600' : 'text-blue-500'
+                                    selectedFolderId === folder.id ? 'text-blue-600' : 'text-blue-500',
                                   )}
                                 />
                               </div>
 
                               {/* Folder Info */}
-                              <div className="flex-1 min-w-0 space-y-1">
+                              <div className="min-w-0 flex-1 space-y-1">
                                 <div className="flex items-center gap-3">
-                                  <h4 className="font-medium text-sm truncate" title={folder.name}>
+                                  <h4 className="truncate text-sm font-medium" title={folder.name}>
                                     {folder.name}
                                   </h4>
                                   {folder.isShared && (
                                     <Badge
                                       variant="outline"
-                                      className="flex items-center gap-1 px-2 py-0.5 text-xs border-green-200 bg-green-50 text-green-700"
+                                      className="flex items-center gap-1 border-green-200 bg-green-50 px-2 py-0.5 text-xs text-green-700"
                                     >
                                       <Users className="h-3 w-3" />
                                       Shared
@@ -351,7 +349,7 @@ export function DriveDestinationSelector({
                                   )}
                                 </div>
                                 {folder.path && (
-                                  <p className="text-xs text-muted-foreground truncate" title={folder.path}>
+                                  <p className="text-muted-foreground truncate text-xs" title={folder.path}>
                                     {folder.path}
                                   </p>
                                 )}
@@ -366,9 +364,9 @@ export function DriveDestinationSelector({
                                     e.stopPropagation()
                                     navigateToFolder(folder)
                                   }}
-                                  className="h-8 px-3 text-xs opacity-70 group-hover:opacity-100 transition-opacity"
+                                  className="h-8 px-3 text-xs opacity-70 transition-opacity group-hover:opacity-100"
                                 >
-                                  <FolderOpen className="h-3 w-3 mr-1" />
+                                  <FolderOpen className="mr-1 h-3 w-3" />
                                   Open
                                 </Button>
                                 <Button
@@ -380,13 +378,13 @@ export function DriveDestinationSelector({
                                   className={cn(
                                     'h-8 px-4 text-xs transition-all',
                                     selectedFolderId === folder.id
-                                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                      : 'bg-primary hover:bg-primary/90 text-primary-foreground'
+                                      ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                      : 'bg-primary hover:bg-primary/90 text-primary-foreground',
                                   )}
                                 >
                                   {selectedFolderId === folder.id ? (
                                     <>
-                                      <Check className="h-3 w-3 mr-1" />
+                                      <Check className="mr-1 h-3 w-3" />
                                       Selected
                                     </>
                                   ) : (
@@ -398,13 +396,11 @@ export function DriveDestinationSelector({
                           ))}
 
                           {filteredFolders.length > 50 && (
-                            <div className="text-center py-4 border-t border-muted">
-                              <p className="text-xs text-muted-foreground">
+                            <div className="border-muted border-t py-4 text-center">
+                              <p className="text-muted-foreground text-xs">
                                 Showing first 50 of {filteredFolders.length} folders
                               </p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                Use search to find specific folders
-                              </p>
+                              <p className="text-muted-foreground mt-1 text-xs">Use search to find specific folders</p>
                             </div>
                           )}
                         </>
@@ -416,7 +412,7 @@ export function DriveDestinationSelector({
             </TabsContent>
 
             {/* URL Tab Content */}
-            <TabsContent value="url" className="space-y-6 mt-0">
+            <TabsContent value="url" className="mt-0 space-y-6">
               <div className="space-y-6">
                 {/* Input Section */}
                 <div className="space-y-4">
@@ -436,22 +432,22 @@ export function DriveDestinationSelector({
                       'h-12 text-sm transition-all duration-200',
                       parsedResult.isValid && 'border-green-500 focus:border-green-600',
                       urlInput && !parsedResult.isValid && 'border-red-500 focus:border-red-600',
-                      !urlInput && 'border-muted-foreground/20'
+                      !urlInput && 'border-muted-foreground/20',
                     )}
                   />
 
                   {/* Format Examples */}
                   <Card className="border-muted/50 bg-muted/20">
                     <CardContent className="p-4">
-                      <p className="text-xs font-medium text-muted-foreground mb-3">Supported formats:</p>
+                      <p className="text-muted-foreground mb-3 text-xs font-medium">Supported formats:</p>
                       <div className="space-y-2">
                         {[
                           'Full URLs: https://drive.google.com/drive/folders/FOLDER_ID',
                           'Sharing links: https://drive.google.com/drive/folders/FOLDER_ID?usp=sharing',
                           'Direct folder IDs: 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
                         ].map((example, index) => (
-                          <div key={index} className="flex items-start gap-2 text-xs text-muted-foreground">
-                            <div className="h-1 w-1 rounded-full bg-muted-foreground mt-2 flex-shrink-0" />
+                          <div key={index} className="text-muted-foreground flex items-start gap-2 text-xs">
+                            <div className="bg-muted-foreground mt-2 h-1 w-1 flex-shrink-0 rounded-full" />
                             <span className="leading-relaxed">{example}</span>
                           </div>
                         ))}
@@ -467,7 +463,7 @@ export function DriveDestinationSelector({
                       <Card className="border-green-200 bg-green-50/50 dark:border-green-800 dark:bg-green-950/20">
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
-                            <div className="p-1 rounded-full bg-green-100 dark:bg-green-900/50 flex-shrink-0">
+                            <div className="flex-shrink-0 rounded-full bg-green-100 p-1 dark:bg-green-900/50">
                               <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
                             </div>
                             <div className="flex-1 space-y-3">
@@ -475,20 +471,20 @@ export function DriveDestinationSelector({
                                 <h4 className="text-sm font-medium text-green-800 dark:text-green-200">
                                   Valid Format Detected
                                 </h4>
-                                <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                                <p className="mt-1 text-xs text-green-700 dark:text-green-300">
                                   The URL has been successfully parsed
                                 </p>
                               </div>
 
                               <Card className="border-green-200 bg-white/60 dark:border-green-700 dark:bg-green-900/20">
                                 <CardContent className="p-3">
-                                  <div className="flex items-center gap-2 mb-2">
+                                  <div className="mb-2 flex items-center gap-2">
                                     <Shield className="h-3 w-3 text-green-600" />
                                     <span className="text-xs font-medium text-green-800 dark:text-green-200">
                                       Extracted Folder ID
                                     </span>
                                   </div>
-                                  <code className="text-xs font-mono text-green-700 dark:text-green-300 break-all block">
+                                  <code className="block font-mono text-xs break-all text-green-700 dark:text-green-300">
                                     {parsedResult.folderId}
                                   </code>
                                 </CardContent>
@@ -499,16 +495,16 @@ export function DriveDestinationSelector({
                                   size="sm"
                                   onClick={() => validateFolderId(parsedResult.folderId!)}
                                   disabled={isValidating}
-                                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                                  className="w-full bg-green-600 text-white hover:bg-green-700"
                                 >
                                   {isValidating ? (
                                     <>
-                                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                       Validating access...
                                     </>
                                   ) : (
                                     <>
-                                      <ExternalLink className="h-4 w-4 mr-2" />
+                                      <ExternalLink className="mr-2 h-4 w-4" />
                                       Validate Folder Access
                                     </>
                                   )}
@@ -522,15 +518,14 @@ export function DriveDestinationSelector({
                       <Card className="border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20">
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
-                            <div className="p-1 rounded-full bg-red-100 dark:bg-red-900/50 flex-shrink-0">
+                            <div className="flex-shrink-0 rounded-full bg-red-100 p-1 dark:bg-red-900/50">
                               <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
                             </div>
                             <div>
-                              <h4 className="text-sm font-medium text-red-800 dark:text-red-200">
-                                Invalid URL Format
-                              </h4>
-                              <p className="text-xs text-red-700 dark:text-red-300 mt-1">
-                                Please check the URL format and try again. Make sure it&apos;s a valid Google Drive folder URL or ID.
+                              <h4 className="text-sm font-medium text-red-800 dark:text-red-200">Invalid URL Format</h4>
+                              <p className="mt-1 text-xs text-red-700 dark:text-red-300">
+                                Please check the URL format and try again. Make sure it&apos;s a valid Google Drive
+                                folder URL or ID.
                               </p>
                             </div>
                           </div>
@@ -545,17 +540,17 @@ export function DriveDestinationSelector({
                           'border transition-all duration-200',
                           validationResult.isValid
                             ? 'border-blue-200 bg-blue-50/50 dark:border-blue-800 dark:bg-blue-950/20'
-                            : 'border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20'
+                            : 'border-red-200 bg-red-50/50 dark:border-red-800 dark:bg-red-950/20',
                         )}
                       >
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
                             <div
                               className={cn(
-                                'p-1 rounded-full flex-shrink-0',
+                                'flex-shrink-0 rounded-full p-1',
                                 validationResult.isValid
                                   ? 'bg-blue-100 dark:bg-blue-900/50'
-                                  : 'bg-red-100 dark:bg-red-900/50'
+                                  : 'bg-red-100 dark:bg-red-900/50',
                               )}
                             >
                               {validationResult.isValid ? (
@@ -572,17 +567,17 @@ export function DriveDestinationSelector({
                                     'text-sm font-medium',
                                     validationResult.isValid
                                       ? 'text-blue-800 dark:text-blue-200'
-                                      : 'text-red-800 dark:text-red-200'
+                                      : 'text-red-800 dark:text-red-200',
                                   )}
                                 >
                                   {validationResult.isValid ? 'Folder Access Confirmed' : 'Access Validation Failed'}
                                 </h4>
                                 <p
                                   className={cn(
-                                    'text-xs mt-1',
+                                    'mt-1 text-xs',
                                     validationResult.isValid
                                       ? 'text-blue-700 dark:text-blue-300'
-                                      : 'text-red-700 dark:text-red-300'
+                                      : 'text-red-700 dark:text-red-300',
                                   )}
                                 >
                                   {validationResult.isValid
@@ -594,7 +589,7 @@ export function DriveDestinationSelector({
                               {validationResult.isValid && (
                                 <Card className="border-blue-200 bg-white/60 dark:border-blue-700 dark:bg-blue-900/20">
                                   <CardContent className="p-3">
-                                    <div className="flex items-center gap-2 mb-3">
+                                    <div className="mb-3 flex items-center gap-2">
                                       <Folder className="h-4 w-4 text-blue-600" />
                                       <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
                                         {validationResult.folderName}
@@ -603,9 +598,9 @@ export function DriveDestinationSelector({
                                     <Button
                                       size="sm"
                                       onClick={handleUrlSelect}
-                                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                                      className="w-full bg-blue-600 text-white hover:bg-blue-700"
                                     >
-                                      <Check className="h-4 w-4 mr-2" />
+                                      <Check className="mr-2 h-4 w-4" />
                                       Select This Folder
                                     </Button>
                                   </CardContent>
