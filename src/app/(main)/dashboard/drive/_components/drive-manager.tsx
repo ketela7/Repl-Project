@@ -220,9 +220,9 @@ export function DriveManager() {
       // Use getFileActions for consistent capability checking
       const actions = getFileActions(
         {
-          capabilities: item?.capabilities,
-          trashed: item?.trashed,
-          mimeType: item?.mimeType,
+          ...(item?.capabilities && { capabilities: item.capabilities }),
+          ...(typeof item?.trashed === 'boolean' && { trashed: item.trashed }),
+          ...(item?.mimeType && { mimeType: item.mimeType }),
           itemType: itemIsFolder ? 'folder' : 'file',
         },
         filters.activeView,
