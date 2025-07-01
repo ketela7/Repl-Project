@@ -196,9 +196,9 @@ export function DriveDestinationSelector({
   }, [])
 
   return (
-    <div className={cn('w-full h-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8', className)}>
+    <div className={cn('w-full max-w-none mx-auto px-4 sm:px-6 lg:px-8', className)}>
       {/* Header Section */}
-      <div className="space-y-4 mb-4 flex-shrink-0">
+      <div className="space-y-4 mb-6">
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
             <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/30">
@@ -213,8 +213,8 @@ export function DriveDestinationSelector({
       </div>
 
       {/* Main Content Card */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-background to-muted/20 max-w-4xl mx-auto flex-1 flex flex-col min-h-0">
-        <CardContent className="p-4 sm:p-6 flex-1 flex flex-col min-h-0">
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-background to-muted/20 max-w-4xl mx-auto">
+        <CardContent className="p-6">
           <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'browse' | 'url')}>
             {/* Enhanced Tab List */}
             <TabsList className="bg-muted/50 mb-8 grid h-12 w-full grid-cols-2 p-1">
@@ -284,9 +284,9 @@ export function DriveDestinationSelector({
               </div>
 
               {/* Folder List */}
-              <Card className="border-muted/50 flex-1 flex flex-col min-h-0">
-                <CardContent className="p-0 flex-1 flex flex-col min-h-0">
-                  <ScrollArea className="flex-1">
+              <Card className="border-muted/50">
+                <CardContent className="p-0">
+                  <ScrollArea className="h-[400px]">
                     <div className="space-y-2 p-4">
                       {isLoadingFolders ? (
                         <div className="flex flex-col items-center justify-center space-y-4 py-16">
