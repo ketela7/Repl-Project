@@ -32,7 +32,7 @@ export function validatePageToken(pageToken: string | undefined): string | undef
     }
 
     // Additional validation: pageToken should not contain invalid characters
-    const invalidChars = /[<>"'&\x00-\x1f\x7f-\x9f\s]/
+    const invalidChars = /[<>"'&\u0000-\u001f\u007f-\u009f\s]/
     if (invalidChars.test(validPageToken)) {
       return undefined
     }

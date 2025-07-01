@@ -29,7 +29,7 @@ import {
 } from './file-detail-mappers'
 import { validateListFilesOptions } from './validation-utils'
 import { validateFileName, handleDriveApiError } from './file-validation'
-import { getOptimizedFields } from './field-optimization'
+import { getOptimizedFields, fieldOptimizationMonitor } from './field-optimization'
 import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
 import { getOptimizedRequestParams, performanceMonitor, requestDeduplicator } from './performance'
 
