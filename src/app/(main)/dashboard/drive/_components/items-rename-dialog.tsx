@@ -162,20 +162,20 @@ function ItemsRenameDialog({
       try {
         switch (selectedMode) {
           case 'prefix':
-            if (renameText.trim()) {
-              newName = `${renameText.trim()}${item.name}`
+            if ((renameText as string).trim()) {
+              newName = `${(renameText as string).trim()}${item.name}`
             }
             break
 
           case 'suffix':
-            if (renameText.trim()) {
+            if ((renameText as string).trim()) {
               const lastDotIndex = item.name.lastIndexOf('.')
               if (lastDotIndex > 0) {
                 const nameWithoutExt = item.name.substring(0, lastDotIndex)
                 const extension = item.name.substring(lastDotIndex)
-                newName = `${nameWithoutExt}${renameText.trim()}${extension}`
+                newName = `${nameWithoutExt}${(renameText as string).trim()}${extension}`
               } else {
-                newName = `${item.name}${renameText.trim()}`
+                newName = `${item.name}${(renameText as string).trim()}`
               }
             }
             break
@@ -205,21 +205,21 @@ function ItemsRenameDialog({
             break
 
           case 'replace':
-            if (findText.trim()) {
-              newName = item.name.replace(new RegExp(findText.trim(), 'g'), replaceText)
+            if ((findText as string).trim()) {
+              newName = item.name.replace(new RegExp((findText as string).trim(), 'g'), replaceText)
             }
             break
 
           case 'regex':
-            if (regexPattern.trim()) {
-              const regex = new RegExp(regexPattern.trim(), 'g')
+            if ((regexPattern as string).trim()) {
+              const regex = new RegExp((regexPattern as string).trim(), 'g')
               newName = item.name.replace(regex, regexReplace)
             }
             break
         }
 
         // Validate filename
-        if (!newName.trim() || newName === item.name) {
+        if (!(newName as string).trim() || newName === item.name) {
           valid = false
         }
       } catch (err) {

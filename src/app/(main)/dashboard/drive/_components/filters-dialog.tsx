@@ -145,7 +145,7 @@ export function FiltersDialog({
     tempAdvancedFilters.createdDateRange?.to ||
     tempAdvancedFilters.modifiedDateRange?.from ||
     tempAdvancedFilters.modifiedDateRange?.to ||
-    (tempAdvancedFilters.owner && tempAdvancedFilters.owner.trim().length > 0) ||
+    (tempAdvancedFilters.owner && (tempAdvancedFilters.owner as string).trim().length > 0) ||
     (tempAdvancedFilters.pageSize && tempAdvancedFilters.pageSize !== 50)
 
   // Basic Menu Items

@@ -36,7 +36,7 @@ export function CreateFolderDialog({
   const actualParentId = parentFolderId
 
   const handleCreate = async () => {
-    if (!folderName.trim()) {
+    if (!(folderName as string).trim()) {
       toast.error('Please enter a folder name')
       return
     }
@@ -50,7 +50,7 @@ export function CreateFolderDialog({
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: folderName.trim(),
+          name: (folderName as string).trim(),
           parentId: actualParentId,
         }),
       })
@@ -127,7 +127,7 @@ export function CreateFolderDialog({
           <Button variant="outline" onClick={handleClose} disabled={creating}>
             Cancel
           </Button>
-          <Button onClick={handleCreate} disabled={!folderName.trim() || creating}>
+          <Button onClick={handleCreate} disabled={!(folderName as string).trim() || creating}>
             {creating ? (
               <>
                 <FolderPlus className="mr-2 h-4 w-4 animate-pulse" />

@@ -189,7 +189,7 @@ export function DriveManager() {
   const hasActiveFilters: boolean =
     filters.activeView !== 'all' ||
     filters.fileTypeFilter.length > 0 ||
-    searchQuery.trim() !== '' ||
+    (searchQuery as string).trim() !== '' ||
     !!filters.advancedFilters.sizeRange.min ||
     !!filters.advancedFilters.sizeRange.max ||
     !!filters.advancedFilters.createdDateRange.from ||
@@ -400,7 +400,7 @@ export function DriveManager() {
   const handleSearchSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault()
-      fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+      fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
     },
     [fetchFiles, currentFolderId, searchQuery],
   )
@@ -494,7 +494,7 @@ export function DriveManager() {
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true)
-    fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+    fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
   }, [fetchFiles, currentFolderId, searchQuery])
 
   const handleClientSideFilter = useCallback((filteredItems: any[]) => {
@@ -528,7 +528,7 @@ export function DriveManager() {
         sizeStr !== '-' &&
         sizeStr !== 'undefined' &&
         sizeStr !== 'null' &&
-        sizeStr.trim() !== ''
+        (sizeStr as string).trim() !== ''
       ) {
         const parsed = parseInt(sizeStr, 10)
         if (!isNaN(parsed)) {
@@ -644,7 +644,7 @@ export function DriveManager() {
             onSearchChange={setSearchQuery}
             onSearchSubmit={e => {
               e.preventDefault()
-              fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+              fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
             }}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
@@ -664,7 +664,7 @@ export function DriveManager() {
             filters={filters}
             onFilterChange={handleFilter as any}
             onApplyFilters={() =>
-              fetchFiles(currentFolderId || undefined, searchQuery.trim() || undefined)
+              fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
             }
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
@@ -691,13 +691,13 @@ export function DriveManager() {
                 // [icon home] Drive
                 // // // // // console.log('[DriveManager] Navigating to root (My Drive)')
                 setCurrentFolderId(null)
-                fetchFiles(undefined, searchQuery.trim() || undefined)
+                fetchFiles(undefined, (searchQuery as string).trim() || undefined)
               }
             }}
             onBackToRoot={() => {
               // // // // // console.log('[DriveManager] Back to root called')
               setCurrentFolderId(null)
-              fetchFiles(undefined, searchQuery.trim() || undefined)
+              fetchFiles(undefined, (searchQuery as string).trim() || undefined)
             }}
           />
 
@@ -790,7 +790,7 @@ export function DriveManager() {
             onLoadMore={() =>
               fetchFiles(
                 currentFolderId || undefined,
-                searchQuery.trim() || undefined,
+                (searchQuery as string).trim() || undefined,
                 nextPageToken || undefined,
               )
             }

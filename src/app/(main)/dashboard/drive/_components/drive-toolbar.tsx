@@ -1187,8 +1187,10 @@ export function DriveToolbar({
                             type="date"
                             value={
                               filters.advancedFilters.createdDateRange?.from
-                                ?.toISOString()
-                                .split('T')[0] || ''
+                                ? (filters.advancedFilters.createdDateRange.from as Date)
+                                    .toISOString()
+                                    .split('T')[0]
+                                : ''
                             }
                             onChange={e =>
                               onFilterChange({
@@ -1207,8 +1209,10 @@ export function DriveToolbar({
                             type="date"
                             value={
                               filters.advancedFilters.createdDateRange?.to
-                                ?.toISOString()
-                                .split('T')[0] || ''
+                                ? (filters.advancedFilters.createdDateRange.to as Date)
+                                    .toISOString()
+                                    .split('T')[0]
+                                : ''
                             }
                             onChange={e =>
                               onFilterChange({
@@ -1235,8 +1239,10 @@ export function DriveToolbar({
                             type="date"
                             value={
                               filters.advancedFilters.modifiedDateRange?.from
-                                ?.toISOString()
-                                .split('T')[0] || ''
+                                ? (filters.advancedFilters.modifiedDateRange.from as Date)
+                                    .toISOString()
+                                    .split('T')[0]
+                                : ''
                             }
                             onChange={e =>
                               onFilterChange({
@@ -1255,8 +1261,10 @@ export function DriveToolbar({
                             type="date"
                             value={
                               filters.advancedFilters.modifiedDateRange?.to
-                                ?.toISOString()
-                                .split('T')[0] || ''
+                                ? (filters.advancedFilters.modifiedDateRange.to as Date)
+                                    .toISOString()
+                                    .split('T')[0]
+                                : ''
                             }
                             onChange={e =>
                               onFilterChange({
@@ -1886,7 +1894,7 @@ export function DriveToolbar({
             variant="default"
             size="sm"
             onClick={e => onSearchSubmit(e)}
-            disabled={!searchQuery.trim()}
+            disabled={!(searchQuery as string).trim()}
             className="h-10 px-4"
           >
             {refreshing ? (
@@ -1921,7 +1929,7 @@ export function DriveToolbar({
           (filters.advancedFilters.sizeRange?.max && filters.advancedFilters.sizeRange.max > 0) ||
           !!filters.advancedFilters.createdDateRange?.from ||
           !!filters.advancedFilters.modifiedDateRange?.from ||
-          !!filters.advancedFilters.owner?.trim() ||
+          !!(filters.advancedFilters.owner && (filters.advancedFilters.owner as string).trim()) ||
           (filters.advancedFilters.pageSize && filters.advancedFilters.pageSize !== 50)
         }
         onClearFilters={onClearFilters}

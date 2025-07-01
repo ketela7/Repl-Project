@@ -320,7 +320,7 @@ export function FileDetailsDialog({
                 variant="outline"
                 className="border-green-200 text-xs text-green-700"
               >
-                {key
+                {(key as string)
                   .replace('can', '')
                   .replace(/([A-Z])/g, ' $1')
                   .trim()}
@@ -337,7 +337,7 @@ export function FileDetailsDialog({
             <div className="flex flex-wrap gap-1">
               {deniedCapabilities.slice(0, 10).map(([key, _value]) => (
                 <Badge key={key} variant="outline" className="border-red-200 text-xs text-red-700">
-                  {key
+                  {(key as string)
                     .replace('can', '')
                     .replace(/([A-Z])/g, ' $1')
                     .trim()}

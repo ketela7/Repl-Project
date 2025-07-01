@@ -74,7 +74,8 @@ function ItemsDeleteDialog({
   const fileCount = selectedItems.filter(item => !item.isFolder).length
   const folderCount = selectedItems.filter(item => item.isFolder).length
 
-  const isConfirmationValid = confirmationText.trim() === 'CONFIRM DELETE' && acknowledgeWarning
+  const isConfirmationValid =
+    (confirmationText as string).trim() === 'CONFIRM DELETE' && acknowledgeWarning
 
   const handleCancel = () => {
     isCancelledRef.current = true
