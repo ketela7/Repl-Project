@@ -686,8 +686,8 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems
 
       {/* Destination Selector Dialog */}
       <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
-        <DialogContent className="max-h-[80vh] max-w-2xl">
-          <DialogHeader>
+        <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col">
+          <DialogHeader className="flex-shrink-0">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
                 <ArrowLeft className="h-4 w-4" />
@@ -702,13 +702,15 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems
             </div>
           </DialogHeader>
 
-          <DriveDestinationSelector
-            onSelect={handleDestinationSelect}
-            selectedFolderId={selectedFolderId}
-            className="py-4"
-          />
+          <div className="min-h-0 flex-1 py-2">
+            <DriveDestinationSelector
+              onSelect={handleDestinationSelect}
+              selectedFolderId={selectedFolderId}
+              className="h-full"
+            />
+          </div>
 
-          <DialogFooter className="flex-col gap-2 sm:flex-row">
+          <DialogFooter className="flex-shrink-0 flex-col gap-2 border-t pt-4 sm:flex-row">
             <div className="flex-1 text-left">
               <div className="text-muted-foreground text-sm">
                 Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
