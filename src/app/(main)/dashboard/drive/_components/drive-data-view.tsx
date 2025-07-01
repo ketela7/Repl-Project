@@ -82,7 +82,7 @@ const useCopyToClipboard = () => {
     } catch (err) {
       const { errorToast } = await import('@/lib/utils')
       errorToast.generic(`Failed to copy ${label.toLowerCase()}`)
-      // // // // // console.error(`Failed to copy ${label.toLowerCase()}:`, err)
+      console.error(`Failed to copy ${label.toLowerCase()}:`, err)
     }
   }, [])
 }
