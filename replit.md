@@ -1,173 +1,135 @@
-# Google Drive Pro - Professional Drive Management Application
+# Google Drive Pro - Professional Drive Management
 
 ## Overview
 
-Google Drive Pro is a professional-grade Google Drive management application built with Next.js 14 using the App Router. It provides enterprise-level file operations, intuitive user interactions, and advanced Google Drive API integration for efficient document management. The application features comprehensive file operations, bulk actions, advanced search, and mobile-optimized interfaces.
+Google Drive Pro is a professional-grade Google Drive management application built with Next.js 15, TypeScript, and modern React patterns. It provides enterprise-level file operations with an intuitive user interface for efficient document management. The application leverages Google Drive API for comprehensive file operations including bulk operations, advanced filtering, and collaborative features.
 
 ## System Architecture
 
 ### Frontend Architecture
-- **Framework**: Next.js 14 with App Router for modern React development
-- **Styling**: Tailwind CSS with shadcn/ui component library for consistent design
-- **UI Components**: Radix UI primitives for accessible, customizable components
-- **State Management**: React hooks with optimized caching strategies
-- **Performance**: Code splitting, lazy loading, and bundle optimization for fast loading
+- **Framework**: Next.js 15 with App Router for modern React server components
+- **UI Library**: Radix UI primitives with shadcn/ui component system
+- **Styling**: Tailwind CSS with CSS variables for theming
+- **State Management**: React Query (TanStack Query) for server state management
+- **Authentication**: NextAuth.js v5 for Google OAuth integration
+- **Type Safety**: TypeScript with strict mode enabled for comprehensive type checking
 
 ### Backend Architecture
-- **API Routes**: Next.js App Router API routes with static routing structure
-- **Authentication**: NextAuth.js with Google OAuth provider for secure authentication
-- **Google Drive Integration**: Direct Google Drive API v3 integration with proper token management
-- **Error Handling**: Comprehensive error boundary system with retry mechanisms
-
-### Key Design Decisions
-- **Static API Routing**: Migrated from dynamic routing `/api/drive/files/[fileId]/operation` to static routing `/api/drive/files/operation` for better performance and caching
-- **Server-side Environment Variables**: All sensitive configuration handled server-side only (no NEXT_PUBLIC_ variables)
-- **TypeScript Strict Mode**: Type safety throughout the application with comprehensive interface definitions
-- **Mobile-first Design**: Responsive design with touch-optimized interactions for mobile devices
+- **API Routes**: Next.js API routes with route handlers
+- **Authentication**: Server-side session management with NextAuth.js
+- **Google Integration**: googleapis library for Google Drive API operations
+- **Error Handling**: Centralized error handling with retry mechanisms
+- **Performance**: Request deduplication, throttling, and caching strategies
 
 ## Key Components
 
-### Core Components
-- **DriveManager**: Main file management interface with advanced operations
-- **DriveDataView**: Optimized data table with sorting, filtering, and bulk operations
-- **DriveToolbar**: Floating action toolbar with context-sensitive operations
-- **FileIcon**: Dynamic file type icons with mime-type detection
-- **ErrorBoundary**: Comprehensive error handling with user-friendly fallbacks
+### Authentication System
+- Google OAuth 2.0 integration with drive scope permissions
+- Session management with automatic token refresh
+- Protected route middleware for secure access
+- Fallback handling for authentication failures
 
-### Dialog Components (Lazy Loaded)
-- **OperationsDialog**: Centralized operations management
-- **ItemsMoveDialog**: File/folder moving operations
-- **ItemsCopyDialog**: File/folder copying operations
-- **ItemsDeleteDialog**: Permanent deletion confirmation
-- **ItemsTrashDialog**: Move to trash operations
-- **ItemsShareDialog**: File sharing and permissions
-- **ItemsRenameDialog**: Bulk renaming operations
-- **ItemsExportDialog**: File export in various formats
+### Drive Management
+- **File Operations**: Create, read, update, delete operations with bulk support
+- **Folder Management**: Hierarchical folder navigation and operations
+- **Search & Filtering**: Advanced search with multiple filter criteria
+- **Drag & Drop**: Sortable file interface with @dnd-kit integration
+- **Real-time Updates**: Optimistic updates with error rollback
 
-### Provider Components
-- **AuthProvider**: NextAuth.js session management
-- **ThemeProvider**: Dark/light theme switching
-- **TimezoneProvider**: Automatic timezone detection and formatting
+### Performance Optimizations
+- **Lazy Loading**: Component-level code splitting with React.lazy
+- **Caching**: In-memory cache for API responses (60-minute TTL)
+- **Throttling**: API request throttling (25 requests/second)
+- **Retry Logic**: Exponential backoff for failed requests
+- **Bundle Optimization**: Tree shaking and package optimization
+
+### Mobile Responsiveness
+- Mobile-first design approach
+- Touch-optimized interactions
+- Responsive data tables with horizontal scrolling
+- Safe area support for modern mobile devices
 
 ## Data Flow
 
 ### Authentication Flow
-1. User initiates Google OAuth login through NextAuth.js
-2. Google returns access and refresh tokens
-3. Tokens stored in JWT session for API access
-4. Session automatically refreshed using refresh tokens
+1. User initiates Google OAuth through NextAuth.js
+2. Google redirects with authorization code
+3. NextAuth exchanges code for access/refresh tokens
+4. Tokens stored in session for API requests
+5. Session validated on protected routes
 
-### File Operations Flow
-1. User selects files/folders in the interface
-2. Operations trigger API calls to `/api/drive/files/{operation}`
-3. Google Drive Service handles API communication with error handling
-4. Results cached and UI updated with optimistic updates
-5. Toast notifications provide user feedback
+### Drive Operations
+1. UI components trigger operations through API routes
+2. API routes authenticate using session tokens
+3. GoogleDriveService handles API communication
+4. Response cached and returned to client
+5. UI updates optimistically with error handling
 
-### API Request Flow
-- **Request Throttling**: 25 requests/second limit to prevent rate limiting
-- **Request Deduplication**: Prevents duplicate identical API calls
-- **Caching**: 10-minute TTL for file listings and metadata
-- **Error Handling**: Automatic retry with exponential backoff
+### Error Handling
+1. Errors classified by type (network, auth, quota, etc.)
+2. Retryable errors automatically retried with backoff
+3. User-friendly error messages displayed
+4. Fallback UI components for error states
 
 ## External Dependencies
 
 ### Core Dependencies
-- **Next.js**: Web framework with App Router
-- **NextAuth.js**: Authentication provider integration
-- **Google APIs**: Direct integration with Google Drive API v3
-- **Tailwind CSS**: Utility-first CSS framework
-- **shadcn/ui**: Component library built on Radix UI
-
-### UI Libraries
-- **Radix UI**: Headless UI primitives for accessibility
-- **Lucide React**: Modern icon library
-- **Sonner**: Toast notification system
-- **TanStack Table**: Advanced data table functionality
+- **Next.js**: Full-stack React framework
+- **NextAuth.js**: Authentication solution
+- **googleapis**: Google APIs client library
+- **Radix UI**: Accessible component primitives
+- **TanStack Table**: Data table functionality
+- **@dnd-kit**: Drag and drop functionality
 
 ### Development Tools
-- **TypeScript**: Type safety and developer experience
-- **ESLint**: Code linting and formatting
-- **Jest**: Testing framework with React Testing Library
+- **TypeScript**: Static type checking
+- **ESLint**: Code linting with custom rules
 - **Prettier**: Code formatting
+- **Jest**: Testing framework with React Testing Library
+- **Tailwind CSS**: Utility-first CSS framework
+
+### Google Services Integration
+- **Google Drive API**: File and folder operations
+- **Google OAuth 2.0**: User authentication
+- **Google Fonts**: Web font delivery
 
 ## Deployment Strategy
 
 ### Environment Configuration
-- **Replit Deployment**: Optimized for Replit hosting environment
-- **Environment Variables**: Server-side secrets management
-- **Performance Optimization**: Bundle splitting and lazy loading
-- **Security**: CSP headers, HSTS, and XSS protection
+- Server-side environment variables for secrets
+- No NEXT_PUBLIC_ variables to maintain security
+- Replit secrets integration for development
+- Production environment variable validation
 
 ### Build Optimization
-- **TypeScript Compilation**: Fast incremental builds
-- **Bundle Analysis**: Optimized package imports and tree shaking
-- **Caching Strategy**: Aggressive caching for static assets
-- **Mobile Optimization**: Touch-friendly interfaces and reduced bundle size
+- TypeScript strict mode compilation
+- ESLint validation with error limits
+- Bundle analysis for size optimization
+- Production-ready security headers
 
-### Monitoring and Error Handling
-- **Error Boundaries**: React error boundaries for graceful degradation
-- **API Monitoring**: Request success/failure tracking
-- **Performance Metrics**: Bundle size and loading time optimization
-- **User Feedback**: Comprehensive toast notification system
+### Performance Monitoring
+- Build size analysis scripts
+- Code quality checks with coverage thresholds
+- Dependency analysis for unused packages
+- Production readiness verification scripts
+
+### Development Configuration
+- **Strict Development Mode**: Automated ESLint processing with timeout protection
+- **Per-Directory Processing**: Individual directory processing to avoid 60-second system timeouts
+- **Auto-fix Focus**: Unused imports/variables cleanup for clean development workflow
+- **Fast Development Workflows**: Optimized ESLint and TypeScript checking workflows
 
 ## Changelog
 
-```
-Changelog:
-- June 28, 2025. Initial setup
-- June 28, 2025. Fixed operation dialog UI layout issues with many files - improved Copy/Move/Trash/Untrash dialogs with compact design, scrollable previews, and better text truncation
-- June 28, 2025. Enhanced DriveDestinationSelector with mobile-friendly compact layout
-- June 28, 2025. Enhanced all operation dialogs with comprehensive user feedback - added loading states, success/error messages, and partial completion warnings for Move, Copy, Trash, Share, Rename, Export, Delete, Restore, and Download operations
-- June 28, 2025. Updated download operations to use direct browser downloads instead of blob mechanism - simplified download process for better browser compatibility and reduced memory usage
-- June 28, 2025. Updated operation button labels and function names for consistency - "Restore from Trash" → "Untrash", "Permanent Delete" → "Delete", updated corresponding function names
-- June 29, 2025. Implemented direct streaming downloads with _blank opening - extended existing download route to stream files directly from Google Drive API without using Google Drive download URLs, follows "extend over create" principle
-- June 29, 2025. Fixed driveService API access pattern - corrected all API calls to use driveService.drive.files instead of driveService.files for proper Google Drive API integration
-- June 29, 2025. Fixed download empty tab issue - implemented direct window.open() calls with full domain URLs instead of relative paths, simplified download system with proper Node.js to Web Stream conversion for browser compatibility
-- June 29, 2025. Completed ItemsRenameDialog alignment with ItemsDownloadDialog pattern - restructured with init-process-end flow in renderContent, implemented identical loading states and progress tracking, updated handleRenameComplete to match handleDownloadComplete pattern, added comprehensive error handling and cancellation support
-- June 29, 2025. Enhanced error handling system with detailed user-friendly messages - replaced "Unknown error" with specific error descriptions and actionable suggestions, added filename validation, improved Google Drive API error mapping, implemented helpful error suggestions for authentication, permissions, filename issues, and network problems
-- June 29, 2025. Fixed Move operation folder validation - created dedicated `/api/drive/folders/validate` endpoint with improved error handling for access denied scenarios, updated DriveDestinationSelector to use new validation system, resolved "Folder not found or access denied" issues when pasting valid folder URLs/IDs
-- June 29, 2025. Completed naming consistency improvements - updated all "Restore from Trash" references to "Untrash Items", "Permanent Delete" to "Delete Permanently", and "can be restored" to "can be untrashed" throughout the application for clearer user understanding
-- June 29, 2025. Fixed Operations dialog declaration consistency - removed all "Bulk" references from dialog descriptions, updated button labels to be generic (Move, Copy, Share, etc.), changed descriptions to show actual item counts for both single and multiple selections, unified all dialogs to handle operations as arrays regardless of selection size
-- June 29, 2025. Fixed Copy/Move folder selection workflow - reverted automatic tab switching behavior, URL/ID selection now works like Browse Folder button to show folder contents immediately after selection
-- June 29, 2025. Enhanced Copy/Move progress display - "Confirm Destination" button now triggers operation immediately and shows progress, changed button text to "Confirm & Move/Copy" for clarity, eliminated extra step of returning to main dialog before starting operation
-- June 29, 2025. Added comprehensive completion results display - operations now show complete results summary with success/failed/skipped counts, error details, and "Close & Refresh" button that automatically refreshes the page to display updated file listings
-- June 29, 2025. Completed all 9 operations with standardized init-process-end flow - Share, Export, Trash, Delete, and Untrash operations now follow identical pattern to Download/Rename/Move/Copy with comprehensive progress tracking, cancellation support, and completion results display
-- June 29, 2025. Fixed share operation API validation and request handling - updated validation logic to accept items array format, properly handled accessLevel and linkAccess parameters, added share link generation in API responses
-- June 29, 2025. Added comprehensive export functionality to share operation - users can now export successful share links in multiple formats (CSV, TXT, JSON) with structured data, automatic file naming with dates, and proper error handling. CSV format uses "name,sharelink" structure, TXT uses "name: sharelink" format, and JSON includes metadata with export date and file IDs
-- June 29, 2025. Fixed inconsistent "skipped" logic across all operations - replaced misleading skipped counters with accurate "processed" counters, removed non-functional skipped logic where items are either successful or failed, implemented proper progress tracking that shows meaningful statistics during operations
-- June 29, 2025. Fixed critical grid view event propagation bug where dropdown menu clicks triggered card onClick events causing both preview and details dialogs to open simultaneously - added stopPropagation wrapper around dropdown menu container
-- June 29, 2025. Added comprehensive copy functionality to table data view - all cells (name, size, MIME type, modified time, created time, owners) now have copy icons that appear on hover with proper toast notifications and event handling to prevent row selection conflicts
-- June 30, 2025. Major code optimization of drive-data-view.tsx - created reusable CopyableCell component to eliminate 150+ lines of duplicate code across table cells, added memoized handlers and table headers for better performance, implemented proper component composition following React best practices
-- June 30, 2025. Media preview optimization - removed isPreviewable function and simplified preview logic to use getPreviewUrl directly, improved renderPreviewContent with perfect iframe sizing that matches preview container, removed file description for clean appearance, implemented minimal floating controls with only fullscreen/miniscreen and close buttons
-- June 30, 2025. Refactored toast utilities architecture - moved src/lib/toast.ts to src/components/ui/toast.tsx for better organization following UI component structure, updated all import references, maintained consistent toast functionality while improving project structure alignment
-- June 30, 2025. Major code cleanup - removed dead code files including unused optimization utilities (loading-optimization.tsx, search-optimizer.ts, use-progressive-file-details.ts, bundle-optimizer.ts, check-drive-access API), unused components (additional-icons.tsx, drag-column.tsx, drive-error-boundary.tsx, file-category-badges.tsx), and unused utilities (actions.ts, api-performance.ts), cleaned up lazy imports removing DataTable and ChartComponents, improved codebase maintainability
-- June 30, 2025. Production readiness optimization - enabled React Strict Mode, configured production security headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy), optimized webpack chunk splitting for UI components, enabled production source maps for debugging, created comprehensive production readiness script and deployment guide
-- June 30, 2025. Removed unused API endpoints - deleted /api/drive/files/essential and /api/drive/files/extended endpoints that were only used in testing scripts, updated test script to remove references to deleted endpoints, improved codebase cleanliness for production
-- June 30, 2025. Fixed all TypeScript and ESLint errors for production - resolved 195+ TypeScript exactOptionalPropertyTypes errors, fixed import syntax issues, corrected capabilities type assignments, applied comprehensive error fixing across 24 files, achieved zero compilation errors for production deployment
-- June 30, 2025. Major dependency cleanup - removed 339 unused packages including @radix-ui/react-menubar, @radix-ui/react-navigation-menu, axios, recharts, uuid, jscpd, and other unused dependencies, deleted corresponding unused UI component files, reduced bundle size significantly while maintaining all core functionality
-- June 30, 2025. Optimized unused imports cleanup using ESLint - leveraged existing unused-imports plugin configuration instead of custom scripts, used ESLint auto-fix capabilities for efficient cleanup, resolved "never read variable" compilation errors systematically, demonstrated proper use of ESLint configuration for maintenance tasks
-- July 1, 2025. Vercel build deployment tool created - developed comprehensive scripts/vercel-build-fix.js to handle exactOptionalPropertyTypes TypeScript errors, fixed Google Drive service optional property issues using conditional spreading, created VERCEL_DEPLOYMENT.md guide, established Vercel Ready workflow for automated build preparation
-- July 1, 2025. Completed final Vercel build fixes - resolved all remaining exactOptionalPropertyTypes errors in Google Drive service (nextPageToken, imageMediaMetadata location, contentRestrictions restrictingUser), removed unused useIsMobile import from drive-manager.tsx, achieved zero TypeScript compilation errors for successful Vercel deployment
-- July 1, 2025. Completed comprehensive unused variables cleanup - removed unused variables in drive-manager.tsx (timezoneLoading), api-retry.ts (context parameter), clipboard.ts (label parameter), google-drive/performance.ts (drive property), google-drive/service.ts (batcher property), fixed all remaining exactOptionalPropertyTypes errors (storageQuota, lastModifyingUser, sharingUser), achieved production-ready build status
-- July 1, 2025. Configured automatic unused variable detection system - enhanced ESLint configuration with unused-imports plugin for automatic detection, created auto-fix script (scripts/auto-fix-unused.js) for systematic cleanup, fixed exactOptionalPropertyTypes errors in Google Drive service using conditional spreading pattern, resolved build manifest corruption issues by clearing .next cache
-- July 1, 2025. Major TypeScript compilation fix progress - systematically resolved duplicate import errors, unused variable declarations, and exactOptionalPropertyTypes issues across UI components (context-menu, dropdown-menu, bottom-sheet, file-icon, simple-date-picker, slider, sonner), fixed API route driveService null assertion errors, corrected retryDriveApiCall function call signatures, implementing comprehensive conditional spreading pattern for TypeScript strict mode compliance
-- July 1, 2025. Completed critical TypeScript fixes for Vercel deployment - resolved property mismatch errors (_onConfirm parameters), fixed unused variable warnings in dialog components, added null safety checks for array access operations, updated operations-dialog.tsx to use correct property names, achieved TypeScript strict mode compliance for production deployment
-- July 1, 2025. Fixed remaining TypeScript compilation errors using individual file processing approach - resolved drive-skeleton.tsx pattern undefined access, fixed exactOptionalPropertyTypes errors in drive-toolbar.tsx with conditional spreading, added null safety for file-details-dialog.tsx owners array access, removed unused variables across multiple dialog components, successfully avoided system timeouts by processing files individually as per user preference
-- July 1, 2025. Fixed critical Vercel deployment error in drive-manager.tsx - resolved exactOptionalPropertyTypes error at line 222 by implementing conditional spreading pattern for capabilities, trashed, and mimeType properties, ensuring properties are only included when they have defined values, verified fix with test script showing successful TypeScript strict mode compliance
-- July 1, 2025. Fixed second Vercel deployment error in drive-manager.tsx - resolved TypeScript type inference issue where date range properties were treated as 'never' type, added explicit type assertions (as Date) for createdDateRange and modifiedDateRange toISOString() calls, verified fix with test script confirming Date methods are accessible
-- July 1, 2025. Fixed third Vercel deployment error in drive-manager.tsx - resolved TypeScript type inference issue where owner property was treated as 'never' type preventing trim() method access, added explicit type assertion (as string) for owner.trim() calls, completed all TypeScript strict mode fixes for successful Vercel deployment
-- July 1, 2025. Completed final TypeScript fix for drive-manager.tsx owner property - fixed both the if condition check and append statement to use proper type assertions, resolved all remaining 'never' type inference issues preventing Vercel builds, achieved complete TypeScript strict mode compliance across all components using individual file processing approach to avoid system timeouts
-- July 1, 2025. Fixed all remaining TypeScript type assertion errors across components - resolved trim() method access issues in drive-toolbar.tsx (searchQuery, owner properties), create-folder-dialog.tsx (folderName validation), items-rename-dialog.tsx (renameText, findText, regexPattern, newName validation), items-delete-dialog.tsx (confirmationText validation), filters-dialog.tsx (owner property), file-details-dialog.tsx (key string operations), and drive-manager.tsx (searchQuery usage), implemented systematic type assertions `(variable as string).trim()` and `(variable as Date).toISOString()` patterns for TypeScript strict mode compliance
-- July 1, 2025. Fixed critical Vercel build failure - removed unused handleSearchSubmit function from drive-manager.tsx that was causing "declared but never read" TypeScript error, created missing production-ready.js and vercel-build-fix.js scripts for workflow functionality, achieved successful build preparation for Vercel deployment
-- July 1, 2025. Fixed React key error in single item operations - resolved issue where onItemAction was passing array of IDs instead of full item objects to dialog components, created getSelectedItemObjects() helper function to properly convert selected IDs to complete item objects with id/name/isFolder properties, updated all dialog calls (Move, Copy, Share, Rename, Trash, Delete, Export, Download) to use proper object mapping, eliminated "Each child in a list should have a unique key prop" console errors
-```
+- July 01, 2025. Initial setup
+- July 1, 2025. Configured strict development mode with ESLint per-directory processing - created dev-strict-mode.js script to handle 60-second timeout limitations, implemented individual directory processing for src/app, src/components, src/lib, src/types, and src/middleware, added timeout protection (45s per directory), created Dev Strict Mode and Lint Fast Fix workflows for automated unused imports/variables cleanup, optimized development workflow for fast iteration with clean code standards
 
 ## User Preferences
 
 ```
 Preferred communication style: Simple, everyday language.
-ESLint processing: Individual file processing for better performance and results.
-Script management: Keep only essential scripts, remove redundant ones.
-Development approach: File-by-file processing to prevent system timeouts.
+ESLint processing: Individual directory processing to avoid 60-second timeouts.
+Development approach: Per-directory ESLint processing with timeout protection.
+Strict development mode: Automated unused imports/variables cleanup.
+Script management: Focus on essential development workflow scripts.
 ```

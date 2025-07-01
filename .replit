@@ -32,6 +32,14 @@ args = "Lint Strict"
 task = "workflow.run"
 args = "Vercel Ready"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Dev Strict Mode"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Lint Fast Fix"
+
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -227,6 +235,22 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "node scripts/vercel-build-fix.js full"
+
+[[workflows.workflow]]
+name = "Dev Strict Mode"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/dev-strict-mode.js"
+
+[[workflows.workflow]]
+name = "Lint Fast Fix"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx eslint src --fix --ext .ts,.tsx,.js,.jsx --max-warnings 10 --quiet"
 
 [nix]
 channel = "stable-24_05"
