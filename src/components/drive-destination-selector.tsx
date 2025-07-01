@@ -196,25 +196,25 @@ export function DriveDestinationSelector({
   }, [])
 
   return (
-    <div className={cn('mx-auto w-full max-w-none px-4 sm:px-6 lg:px-8', className)}>
+    <div className={cn('w-full h-full flex flex-col mx-auto px-4 sm:px-6 lg:px-8', className)}>
       {/* Header Section */}
-      <div className="mb-6 space-y-4">
-        <div className="space-y-2 text-center">
+      <div className="space-y-4 mb-4 flex-shrink-0">
+        <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
-            <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/30">
+            <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/30">
               <FolderOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           <h2 className="text-xl font-semibold tracking-tight">Select Destination Folder</h2>
-          <p className="text-muted-foreground mx-auto max-w-md text-sm">
+          <p className="text-muted-foreground text-sm max-w-md mx-auto">
             Choose where you want to save your files in Google Drive
           </p>
         </div>
       </div>
 
       {/* Main Content Card */}
-      <Card className="from-background to-muted/20 mx-auto max-w-4xl border-0 bg-gradient-to-br shadow-lg">
-        <CardContent className="p-6">
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-background to-muted/20 max-w-4xl mx-auto flex-1 flex flex-col min-h-0">
+        <CardContent className="p-4 sm:p-6 flex-1 flex flex-col min-h-0">
           <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'browse' | 'url')}>
             {/* Enhanced Tab List */}
             <TabsList className="bg-muted/50 mb-8 grid h-12 w-full grid-cols-2 p-1">
@@ -284,9 +284,9 @@ export function DriveDestinationSelector({
               </div>
 
               {/* Folder List */}
-              <Card className="border-muted/50">
-                <CardContent className="p-0">
-                  <ScrollArea className="h-[400px]">
+              <Card className="border-muted/50 flex-1 flex flex-col min-h-0">
+                <CardContent className="p-0 flex-1 flex flex-col min-h-0">
+                  <ScrollArea className="flex-1">
                     <div className="space-y-2 p-4">
                       {isLoadingFolders ? (
                         <div className="flex flex-col items-center justify-center space-y-4 py-16">
