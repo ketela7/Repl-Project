@@ -555,10 +555,10 @@ export class GoogleDriveService {
   async uploadFile(options: DriveUploadOptions): Promise<DriveFile> {
     const { file, metadata, parentId } = options
 
-    const fileMetadata = {
+    const fileMetadata: any = {
       name: metadata.name || file.name,
-      parents: parentId ? [parentId] : metadata.parents,
-      description: metadata.description,
+      ...(parentId ? { parents: [parentId] } : metadata.parents && { parents: metadata.parents }),
+      ...(metadata.description && { description: metadata.description }),
       // Don't include mimeType in metadata as it should be in media object
     }
 
@@ -621,11 +621,11 @@ export class GoogleDriveService {
       parents: response.data.parents || [],
       shared: response.data.shared || false,
       trashed: response.data.trashed || false,
-      webViewLink: response.data.webViewLink,
-      webContentLink: response.data.webContentLink,
-      thumbnailLink: response.data.thumbnailLink,
-      iconLink: response.data.iconLink,
-      description: response.data.description,
+      ...(response.data.webViewLink && { webViewLink: response.data.webViewLink }),
+      ...(response.data.webContentLink && { webContentLink: response.data.webContentLink }),
+      ...(response.data.thumbnailLink && { thumbnailLink: response.data.thumbnailLink }),
+      ...(response.data.iconLink && { iconLink: response.data.iconLink }),
+      ...(response.data.description && { description: response.data.description }),
       starred: response.data.starred || false,
       explicitlyTrashed: response.data.explicitlyTrashed || false,
       exportLinks: response.data.exportLinks || {},
@@ -786,13 +786,15 @@ export class GoogleDriveService {
         currentParentId = fileInfo.parents?.[0]
       }
 
-      const response = await this.drive.files.update({
+      const updateParams: any = {
         fileId,
         addParents: newParentId,
-        removeParents: currentParentId,
+        ...(currentParentId && { removeParents: currentParentId }),
         fields:
           'id, name, mimeType, size, createdTime, modifiedTime, webViewLink, webContentLink, thumbnailLink, parents, owners, shared, trashed',
-      })
+      }
+
+      const response = await this.drive.files.update(updateParams)
 
       const result = await response
       return convertGoogleDriveFile(result.data)

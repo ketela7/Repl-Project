@@ -28,6 +28,10 @@ args = "Type Check Watch"
 task = "workflow.run"
 args = "Lint Strict"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Vercel Ready"
+
 [[workflows.workflow]]
 name = "Server"
 author = "agent"
@@ -215,6 +219,14 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "eslint src --ext .ts,.tsx,.js,.jsx --max-warnings 0"
+
+[[workflows.workflow]]
+name = "Vercel Ready"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/vercel-build-fix.js full"
 
 [nix]
 channel = "stable-24_05"

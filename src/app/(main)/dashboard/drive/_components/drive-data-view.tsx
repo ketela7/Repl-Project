@@ -310,7 +310,7 @@ export function DriveDataView({
                 <div className="mb-2 flex items-start justify-between">
                   <div className={`flex items-center ${isSelectMode ? 'ml-6' : ''}`}>
                     <FileThumbnailPreview
-                      thumbnailLink={item.thumbnailLink}
+                      {...(item.thumbnailLink && { thumbnailLink: item.thumbnailLink })}
                       fileName={item.name}
                       mimeType={item.mimeType}
                       modifiedTime={item.modifiedTime}
@@ -380,7 +380,7 @@ export function DriveDataView({
                   {visibleColumns.name && (
                     <CopyableCell value={item.name} label="File name">
                       <FileThumbnailPreview
-                        thumbnailLink={item.thumbnailLink}
+                        {...(item.thumbnailLink && { thumbnailLink: item.thumbnailLink })}
                         fileName={item.name}
                         mimeType={item.mimeType}
                         modifiedTime={item.modifiedTime}
