@@ -396,15 +396,6 @@ export function DriveManager() {
     [filters],
   )
 
-  // Search submit handler
-  const handleSearchSubmit = useCallback(
-    (e: React.FormEvent) => {
-      e.preventDefault()
-      fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
-    },
-    [fetchFiles, currentFolderId, searchQuery],
-  )
-
   // Effects for initial load and dependencies
   useEffect(() => {
     fetchFiles()
