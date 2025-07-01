@@ -14,7 +14,7 @@ export function WebVitalsMonitor() {
     initWebVitals()
 
     // Track route changes if using Next.js router
-    const handleRouteChange = (_url: string) => {
+    const handleRouteChange = () => {
       // Mark when new route starts loading
       if (typeof window !== 'undefined' && 'performance' in window) {
         window.performance.mark('route-change-start')

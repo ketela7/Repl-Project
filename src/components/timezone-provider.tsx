@@ -7,7 +7,7 @@ import { useTimezone } from '@/lib/hooks/use-timezone'
 interface TimezoneContextType {
   timezone: string
   isLoading: boolean
-  setTimezone: (timezone: string) => void
+  setTimezone: (tz: string) => void
 }
 
 const TimezoneContext = createContext<TimezoneContextType | null>(null)

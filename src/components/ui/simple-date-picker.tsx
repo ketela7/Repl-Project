@@ -26,7 +26,7 @@ import {
 
 interface SimpleDatePickerProps {
   date?: Date | undefined;
-  onDateChange: (_date: Date | undefined) => void;
+  onDateChange: (date: Date | undefined) => void;
   placeholder?: string;
   label?: string;
   className?: string;

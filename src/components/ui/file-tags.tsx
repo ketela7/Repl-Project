@@ -12,9 +12,9 @@ interface FileTagsProps {
   autoTags?: string[];
   manualTags?: string[];
   suggestions?: string[];
-  onAddTag?: (tag: string) => void;
-  onRemoveTag?: (tag: string) => void;
-  onAcceptSuggestion?: (tag: string) => void;
+  onAddTag?: (tagName: string) => void;
+  onRemoveTag?: (tagName: string) => void;
+  onAcceptSuggestion?: (tagName: string) => void;
   editable?: boolean;
   className?: string;
 }
