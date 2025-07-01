@@ -1,7 +1,20 @@
 'use client'
 
 import { useCallback, useMemo } from 'react'
-import { MoreVertical, Eye, Download, Edit, Move, Copy, Share, RefreshCw, Trash2, CopyIcon, Info, FileDown } from 'lucide-react'
+import {
+  MoreVertical,
+  Eye,
+  Download,
+  Edit,
+  Move,
+  Copy,
+  Share,
+  RefreshCw,
+  Trash2,
+  CopyIcon,
+  Info,
+  FileDown,
+} from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -171,8 +184,6 @@ export function DriveDataView({
     },
     [isSelectMode, onSelectItem, onFolderClick, onItemAction],
   )
-
-  
 
   // Memoized table headers for performance
   const tableHeaders = useMemo(
