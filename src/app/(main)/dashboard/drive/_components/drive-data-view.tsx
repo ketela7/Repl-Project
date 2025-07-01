@@ -172,15 +172,7 @@ export function DriveDataView({
     [isSelectMode, onSelectItem, onFolderClick, onItemAction],
   )
 
-  const handleSelectAll = useCallback(() => {
-    items.forEach(item => {
-      if (selectedItems.has(item.id)) {
-        onSelectItem(item.id)
-      } else {
-        onSelectItem(item.id)
-      }
-    })
-  }, [items, selectedItems, onSelectItem])
+  
 
   // Memoized table headers for performance
   const tableHeaders = useMemo(
