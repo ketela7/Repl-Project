@@ -456,7 +456,16 @@ export function DriveToolbar({
 }: DriveToolbarProps) {
   const isMobile = useIsMobile()
 
-  // Optimized bulk operation handlers
+  // Optimized column handlers to prevent heavy re-renders
+  const handleColumnToggle = useCallback(
+    (column: keyof VisibleColumns) => {
+      setVisibleColumns(prev => ({
+        ...prev,
+        [column]: !prev[column],
+      }))
+    },
+    [setVisibleColumns]
+  )
 
   // Actions Dialog State
   const [isOperationsOpen, setIsOperationsOpen] = useState(false)
@@ -1633,138 +1642,65 @@ export function DriveToolbar({
                     <ChevronDown className="h-4 w-4" />
                   </CollapsibleTrigger>
                   <CollapsibleContent className="ml-4 space-y-1">
-                    <DropdownMenuItem
-                      onClick={e => {
-                        e.preventDefault()
-                        setVisibleColumns(prev => ({
-                          ...prev,
-                          name: !prev.name,
-                        }))
-                      }}
-                      className="cursor-pointer"
-                    >
+                    {/* Name Column */}
+                    <div className="hover:bg-accent flex w-full items-center rounded-md p-2 cursor-pointer">
                       <Checkbox
                         checked={visibleColumns.name}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={checked => {
-                          setVisibleColumns(prev => ({
-                            ...prev,
-                            name: !!checked,
-                          }))
-                        }}
+                        onCheckedChange={() => handleColumnToggle('name')}
                       />
                       <span className="text-xs">Name</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={e => {
-                        e.preventDefault()
-                        setVisibleColumns(prev => ({
-                          ...prev,
-                          size: !prev.size,
-                        }))
-                      }}
-                      className="cursor-pointer"
-                    >
+                    </div>
+                    
+                    {/* Size Column */}
+                    <div className="hover:bg-accent flex w-full items-center rounded-md p-2 cursor-pointer">
                       <Checkbox
                         checked={visibleColumns.size}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={checked => {
-                          setVisibleColumns(prev => ({
-                            ...prev,
-                            size: !!checked,
-                          }))
-                        }}
+                        onCheckedChange={() => handleColumnToggle('size')}
                       />
                       <span className="text-xs">Size</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={e => {
-                        e.preventDefault()
-                        setVisibleColumns(prev => ({
-                          ...prev,
-                          mimeType: !prev.mimeType,
-                        }))
-                      }}
-                      className="cursor-pointer"
-                    >
+                    </div>
+                    
+                    {/* MIME Type Column */}
+                    <div className="hover:bg-accent flex w-full items-center rounded-md p-2 cursor-pointer">
                       <Checkbox
                         checked={visibleColumns.mimeType}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={checked => {
-                          setVisibleColumns(prev => ({
-                            ...prev,
-                            mimeType: !!checked,
-                          }))
-                        }}
+                        onCheckedChange={() => handleColumnToggle('mimeType')}
                       />
                       <span className="text-xs">MIME Type</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={e => {
-                        e.preventDefault()
-                        setVisibleColumns(prev => ({
-                          ...prev,
-                          owners: !prev.owners,
-                        }))
-                      }}
-                      className="cursor-pointer"
-                    >
+                    </div>
+                    
+                    {/* Owner Column */}
+                    <div className="hover:bg-accent flex w-full items-center rounded-md p-2 cursor-pointer">
                       <Checkbox
                         checked={visibleColumns.owners}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={checked => {
-                          setVisibleColumns(prev => ({
-                            ...prev,
-                            owners: !!checked,
-                          }))
-                        }}
+                        onCheckedChange={() => handleColumnToggle('owners')}
                       />
                       <span className="text-xs">Owner</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={e => {
-                        e.preventDefault()
-                        setVisibleColumns(prev => ({
-                          ...prev,
-                          createdTime: !prev.createdTime,
-                        }))
-                      }}
-                      className="cursor-pointer"
-                    >
+                    </div>
+                    
+                    {/* Created Column */}
+                    <div className="hover:bg-accent flex w-full items-center rounded-md p-2 cursor-pointer">
                       <Checkbox
                         checked={visibleColumns.createdTime}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={checked => {
-                          setVisibleColumns(prev => ({
-                            ...prev,
-                            createdTime: !!checked,
-                          }))
-                        }}
+                        onCheckedChange={() => handleColumnToggle('createdTime')}
                       />
                       <span className="text-xs">Created</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={e => {
-                        e.preventDefault()
-                        setVisibleColumns(prev => ({
-                          ...prev,
-                          modifiedTime: !prev.modifiedTime,
-                        }))
-                      }}
-                      className="cursor-pointer"
-                    >
+                    </div>
+                    
+                    {/* Modified Column */}
+                    <div className="hover:bg-accent flex w-full items-center rounded-md p-2 cursor-pointer">
                       <Checkbox
                         checked={visibleColumns.modifiedTime}
                         className="mr-2 h-3 w-3"
-                        onCheckedChange={checked => {
-                          setVisibleColumns(prev => ({
-                            ...prev,
-                            modifiedTime: !!checked,
-                          }))
-                        }}
+                        onCheckedChange={() => handleColumnToggle('modifiedTime')}
                       />
                       <span className="text-xs">Modified</span>
-                    </DropdownMenuItem>
+                    </div>
                   </CollapsibleContent>
                 </Collapsible>
               </>
