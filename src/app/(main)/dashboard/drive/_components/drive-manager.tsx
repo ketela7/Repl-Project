@@ -6,7 +6,7 @@ import { RefreshCw } from 'lucide-react'
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 import { normalizeFileSize, getFileActions } from '@/lib/google-drive/utils'
 import { errorToast } from '@/lib/utils'
-import { useIsMobile } from '@/lib/hooks/use-mobile'
+
 import { useTimezoneContext } from '@/components/timezone-provider'
 import { Progress } from '@/components/ui/progress'
 import { DriveErrorDisplay } from '@/components/drive-error-display'
