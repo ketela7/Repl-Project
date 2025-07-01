@@ -121,11 +121,13 @@ const CopyableCell = ({
     <TableCell className={className}>
       <div className="flex items-center gap-2">
         <div className="flex min-w-0 flex-1 items-center space-x-3">{children}</div>
-        <CopyIcon
+        <div
           className="text-muted-foreground/60 hover:text-muted-foreground h-3 w-3 flex-shrink-0 cursor-pointer transition-colors"
           onClick={handleClick}
           title={title || `Click to copy: ${value}`}
-        />
+        >
+          <CopyIcon className="h-3 w-3" />
+        </div>
       </div>
     </TableCell>
   )
