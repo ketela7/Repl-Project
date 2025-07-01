@@ -30,7 +30,7 @@ import { cn } from '@/lib/utils'
 interface ItemsUntrashDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
+  _onConfirm: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -42,7 +42,7 @@ interface ItemsUntrashDialogProps {
 function ItemsUntrashDialog({
   isOpen,
   onClose,
-  onConfirm,
+  _onConfirm,
   selectedItems,
 }: ItemsUntrashDialogProps) {
   const [isProcessing, setIsProcessing] = useState(false)
@@ -120,6 +120,7 @@ function ItemsUntrashDialog({
         }
 
         const item = selectedItems[i]
+        if (!item) continue
 
         try {
           setProgress(prev => ({

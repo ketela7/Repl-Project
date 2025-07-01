@@ -50,7 +50,7 @@ interface ItemsMoveDialogProps {
   }>
 }
 
-function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMoveDialogProps) {
+function ItemsMoveDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems }: ItemsMoveDialogProps) {
   const [showDestinationSelector, setShowDestinationSelector] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -138,6 +138,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         }
 
         const item = selectedItems[i]
+        if (!item) continue
 
         try {
           setProgress(prev => ({

@@ -37,7 +37,7 @@ interface OperationsDialogProps {
   onClose?: () => void
   onOpenChange?: (open: boolean) => void
   selectedItems: any[]
-  onRefreshAfterOp?: () => void
+  _onRefreshAfterOp?: () => void
 }
 
 function OperationsDialog({
@@ -46,7 +46,7 @@ function OperationsDialog({
   onClose,
   onOpenChange,
   selectedItems,
-  onRefreshAfterOp,
+  _onRefreshAfterOp,
 }: OperationsDialogProps) {
   const isMobile = useIsMobile()
   const folderCount = selectedItems.filter(item => item.isFolder).length
@@ -385,7 +385,10 @@ function OperationsDialog({
     <>
       {/* Main Operations Dialog */}
       {isMobile ? (
-        <BottomSheet open={dialogOpen} onOpenChange={onOpenChange || onClose}>
+        <BottomSheet
+          open={dialogOpen}
+          {...((onOpenChange || onClose) && { onOpenChange: onOpenChange || onClose })}
+        >
           <BottomSheetContent>
             <BottomSheetHeader>
               <BottomSheetTitle className="text-lg font-semibold">Operations</BottomSheetTitle>
@@ -400,7 +403,10 @@ function OperationsDialog({
           </BottomSheetContent>
         </BottomSheet>
       ) : (
-        <Dialog open={dialogOpen} onOpenChange={onOpenChange || onClose}>
+        <Dialog
+          open={dialogOpen}
+          {...((onOpenChange || onClose) && { onOpenChange: onOpenChange || onClose })}
+        >
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold">Operations</DialogTitle>
@@ -434,14 +440,14 @@ function OperationsDialog({
       <ItemsTrashDialog
         isOpen={isTrashDialogOpen}
         onClose={handleTrashClose}
-        onConfirm={handleTrashComplete}
+        _onConfirm={handleTrashComplete}
         selectedItems={selectedItems}
       />
 
       <ItemsShareDialog
         isOpen={isShareDialogOpen}
         onClose={handleShareClose}
-        onConfirm={handleShareComplete}
+        _onConfirm={handleShareComplete}
         selectedItems={selectedItems}
       />
 
@@ -476,7 +482,7 @@ function OperationsDialog({
       <ItemsUntrashDialog
         isOpen={isUntrashDialogOpen}
         onClose={handleUntrashClose}
-        onConfirm={handleUntrashComplete}
+        _onConfirm={handleUntrashComplete}
         selectedItems={selectedItems}
       />
     </>

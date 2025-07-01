@@ -1927,7 +1927,7 @@ export function DriveToolbar({
           (filters.advancedFilters.sizeRange?.max && filters.advancedFilters.sizeRange.max > 0) ||
           !!filters.advancedFilters.createdDateRange?.from ||
           !!filters.advancedFilters.modifiedDateRange?.from ||
-          !!(filters.advancedFilters.owner && filters.advancedFilters.owner.trim()) ||
+          !!filters.advancedFilters.owner?.trim() ||
           (filters.advancedFilters.pageSize && filters.advancedFilters.pageSize !== 50)
         }
         onClearFilters={onClearFilters}

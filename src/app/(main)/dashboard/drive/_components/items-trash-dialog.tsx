@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils'
 interface ItemsTrashDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
+  _onConfirm: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -37,7 +37,7 @@ interface ItemsTrashDialogProps {
   }>
 }
 
-function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTrashDialogProps) {
+function ItemsTrashDialog({ isOpen, onClose, _onConfirm, selectedItems }: ItemsTrashDialogProps) {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
@@ -122,6 +122,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
         }
 
         const item = selectedItems[i]
+        if (!item) continue
 
         try {
           setProgress(prev => ({

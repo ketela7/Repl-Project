@@ -57,7 +57,7 @@ import { cn } from '@/lib/utils'
 interface ItemsShareDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
+  _onConfirm: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -73,7 +73,7 @@ interface ShareResult {
   error?: string
 }
 
-function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsShareDialogProps) {
+function ItemsShareDialog({ isOpen, onClose, _onConfirm, selectedItems }: ItemsShareDialogProps) {
   const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
   const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>(
     'anyoneWithLink',
@@ -157,6 +157,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
         }
 
         const item = selectedItems[i]
+        if (!item) continue
 
         try {
           setProgress(prev => ({

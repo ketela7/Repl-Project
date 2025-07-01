@@ -359,9 +359,8 @@ export function DriveManager() {
         // // // // // console.log('[DriveManager] Received items:', newItems.length, 'items for folder:', folderId)
         // // // // // console.log('[DriveManager] Items preview:', newItems.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
         setItems(prev => {
-          const result = pageToken ? [...prev, ...newItems] : newItems
           // // // // // console.log('[DriveManager] Setting items to:', result.length, 'items')
-          return result
+          return pageToken ? [...prev, ...newItems] : newItems
         })
 
         setNextPageToken(data.nextPageToken || null)
@@ -512,7 +511,8 @@ export function DriveManager() {
       return items
     }
 
-    const filtered = items.filter(item => {
+    // // // // // console.log('[DriveManager] Size filtered items:', filtered.length)
+    return items.filter(item => {
       if (item.mimeType === 'application/vnd.google-apps.folder') return true
 
       const sizeStr = (item as any).size
@@ -553,16 +553,12 @@ export function DriveManager() {
       if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit)) return false
       return true
     })
-
-    // // // // // console.log('[DriveManager] Size filtered items:', filtered.length)
-    return filtered
   }, [items, filters.advancedFilters.sizeRange])
 
   const displayItems = useMemo(() => {
     // // // // // console.log('[DriveManager] Display items calculation - filteredItems:', filteredItems.length, 'sizeFilteredItems:', sizeFilteredItems.length)
-    const result = filteredItems.length > 0 ? filteredItems : sizeFilteredItems
     // // // // // console.log('[DriveManager] Display items calculated:', result.length, 'items')
-    return result
+    return filteredItems.length > 0 ? filteredItems : sizeFilteredItems
   }, [filteredItems, sizeFilteredItems])
 
   const sortedDisplayItems = useMemo(() => {
