@@ -79,10 +79,7 @@ export function handleApiError(error: any): NextResponse {
     }
 
     if (error.message.includes('quota')) {
-      return NextResponse.json(
-        { error: 'Google Drive quota exceeded. Please try again later.' },
-        { status: 429 },
-      )
+      return NextResponse.json({ error: 'Google Drive quota exceeded. Please try again later.' }, { status: 429 })
     }
 
     return NextResponse.json({ error: error.message }, { status: 400 })
@@ -113,8 +110,5 @@ export function validateDownloadRequest(body: any): boolean {
 }
 
 export function validateRenameRequest(body: any): boolean {
-  return (
-    (body.items && Array.isArray(body.items) && body.items.length > 0) ||
-    !!(body.fileId && body.newName)
-  )
+  return (body.items && Array.isArray(body.items) && body.items.length > 0) || !!(body.fileId && body.newName)
 }

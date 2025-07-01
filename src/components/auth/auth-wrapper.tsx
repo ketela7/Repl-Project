@@ -80,10 +80,7 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
             <p className="text-muted-foreground text-sm">Verifying your Google Drive access...</p>
           </div>
           <div className="bg-muted mx-auto h-1 w-48 overflow-hidden rounded-full">
-            <div
-              className="bg-primary h-full animate-pulse rounded-full"
-              style={{ width: '60%' }}
-            ></div>
+            <div className="bg-primary h-full animate-pulse rounded-full" style={{ width: '60%' }}></div>
           </div>
         </div>
       </div>

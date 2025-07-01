@@ -135,10 +135,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   cookies: {
     sessionToken: {
-      name:
-        process.env.NODE_ENV === 'production'
-          ? '__Secure-next-auth.session-token'
-          : 'next-auth.session-token',
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
       options: {
         httpOnly: true,
         sameSite: 'lax',
@@ -158,10 +155,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
     pkceCodeVerifier: {
-      name:
-        process.env.NODE_ENV === 'production'
-          ? '__Secure-authjs.pkce.code_verifier'
-          : 'authjs.pkce.code_verifier',
+      name: process.env.NODE_ENV === 'production' ? '__Secure-authjs.pkce.code_verifier' : 'authjs.pkce.code_verifier',
       options: {
         httpOnly: true,
         sameSite: 'lax',
