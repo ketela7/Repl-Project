@@ -1,16 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { withAuth } from 'next-auth/middleware'
+import { securityMiddleware, isProtectedRoute } from '@/middleware/security'
 
 export default withAuth(
   function middleware(request: NextRequest) {
-    // Add security headers
-    const response = NextResponse.next()
-    
-    response.headers.set('X-Frame-Options', 'DENY')
-    response.headers.set('X-Content-Type-Options', 'nosniff')
-    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
-    
-    return response
+    // Apply security headers using the existing security middleware
+    return securityMiddleware()
   },
   {
     callbacks: {
@@ -20,8 +15,13 @@ export default withAuth(
           return true
         }
         
-        // Require token for protected routes
-        return !!token
+        // Check if route requires protection
+        if (isProtectedRoute(req.nextUrl.pathname)) {
+          return !!token
+        }
+        
+        // Allow access to public routes
+        return true
       },
     },
   }
