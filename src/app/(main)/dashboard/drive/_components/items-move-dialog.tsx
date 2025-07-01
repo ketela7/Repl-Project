@@ -1,16 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import {
-  Move,
-  Loader2,
-  Folder,
-  ArrowLeft,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  SkipForward,
-} from 'lucide-react'
+import { Move, Loader2, Folder, ArrowLeft, CheckCircle, XCircle, AlertTriangle, SkipForward } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -50,12 +41,7 @@ interface ItemsMoveDialogProps {
   }>
 }
 
-function ItemsMoveDialog({
-  isOpen,
-  onClose,
-  onConfirm: _onConfirm,
-  selectedItems,
-}: ItemsMoveDialogProps) {
+function ItemsMoveDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems }: ItemsMoveDialogProps) {
   const [showDestinationSelector, setShowDestinationSelector] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -212,9 +198,7 @@ function ItemsMoveDialog({
       // Show results only if not cancelled
       if (!isCancelledRef.current) {
         if (successCount > 0) {
-          toast.success(
-            `Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`,
-          )
+          toast.success(`Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`)
         }
         if (failedCount > 0) {
           toast.error(`Failed to move ${failedCount} item${failedCount > 1 ? 's' : ''}`)
@@ -327,10 +311,7 @@ function ItemsMoveDialog({
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
                 {selectedItems.slice(0, 5).map(item => (
-                  <div
-                    key={item.id}
-                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
-                  >
+                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={item.name}>
                       {item.name}
@@ -374,8 +355,7 @@ function ItemsMoveDialog({
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage =
-        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -549,10 +529,7 @@ function ItemsMoveDialog({
             <BottomSheetFooter className={cn('grid gap-4')}>
               {!isProcessing && !isCompleted && (
                 <>
-                  <Button
-                    onClick={handleMove}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
+                  <Button onClick={handleMove} className={cn('touch-target min-h-[44px] active:scale-95')}>
                     <Move className="mr-2 h-4 w-4" />
                     Move to {selectedFolderName}
                   </Button>
@@ -578,18 +555,12 @@ function ItemsMoveDialog({
               {isCompleted && (
                 <>
                   {progress.success > 0 || progress.failed > 0 ? (
-                    <Button
-                      onClick={handleCloseAndRefresh}
-                      className={cn('touch-target min-h-[44px] active:scale-95')}
-                    >
+                    <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Refresh Now
                     </Button>
                   ) : (
-                    <Button
-                      onClick={handleClose}
-                      className={cn('touch-target min-h-[44px] active:scale-95')}
-                    >
+                    <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
                       <CheckCircle className="mr-2 h-4 w-4" />
                       Close
                     </Button>
@@ -614,12 +585,7 @@ function ItemsMoveDialog({
           <DialogContent className="max-h-[80vh] max-w-2xl">
             <DialogHeader>
               <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBackToMainDialog}
-                  className="h-8 w-8 p-1"
-                >
+                <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
                 <div>
@@ -641,19 +607,14 @@ function ItemsMoveDialog({
             <DialogFooter className="flex-col gap-2 sm:flex-row">
               <div className="flex-1 text-left">
                 <div className="text-muted-foreground text-sm">
-                  Selected:{' '}
-                  <span className="text-foreground font-medium">{selectedFolderName}</span>
+                  Selected: <span className="text-foreground font-medium">{selectedFolderName}</span>
                 </div>
               </div>
               <Button onClick={handleConfirmDestinationAndMove} className="w-full sm:w-auto">
                 <Move className="mr-2 h-4 w-4" />
                 Confirm & Move
               </Button>
-              <Button
-                variant="outline"
-                onClick={handleBackToMainDialog}
-                className="w-full sm:w-auto"
-              >
+              <Button variant="outline" onClick={handleBackToMainDialog} className="w-full sm:w-auto">
                 Back
               </Button>
             </DialogFooter>
@@ -681,14 +642,21 @@ function ItemsMoveDialog({
 
           <div className="space-y-4 py-4">{renderContent()}</div>
 
-          <DialogFooter className="flex flex-col gap-2 sm:flex-row">
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
             {!isProcessing && !isCompleted && (
               <>
-                <Button onClick={handleMove} className="w-full sm:w-auto">
-                  <Move className="mr-2 h-4 w-4" />
-                  Move to {selectedFolderName}
+                <Button
+                  onClick={handleMove}
+                  className="w-full text-xs sm:w-auto sm:max-w-[200px]"
+                  title={`Move to ${selectedFolderName}`}
+                >
+                  <Move className="mr-1 h-3 w-3" />
+                  <span className="truncate">
+                    Move to{' '}
+                    {selectedFolderName.length > 12 ? `${selectedFolderName.substring(0, 12)}...` : selectedFolderName}
+                  </span>
                 </Button>
-                <Button variant="outline" onClick={handleClose} className="w-full sm:w-auto">
+                <Button variant="outline" onClick={handleClose} className="w-full text-xs sm:w-auto">
                   Cancel
                 </Button>
               </>
@@ -728,12 +696,7 @@ function ItemsMoveDialog({
         <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col">
           <DialogHeader className="flex-shrink-0">
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBackToMainDialog}
-                className="h-8 w-8 p-1"
-              >
+              <Button variant="ghost" size="sm" onClick={handleBackToMainDialog} className="h-8 w-8 p-1">
                 <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>

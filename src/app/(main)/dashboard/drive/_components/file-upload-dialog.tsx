@@ -26,12 +26,7 @@ interface FileUploadDialogProps {
   currentFolderId?: string | null
 }
 
-export function FileUploadDialog({
-  isOpen,
-  onClose,
-  onUploadComplete,
-  currentFolderId,
-}: FileUploadDialogProps) {
+export function FileUploadDialog({ isOpen, onClose, onUploadComplete, currentFolderId }: FileUploadDialogProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [fileName, setFileName] = useState('')
   const [description, setDescription] = useState('')
@@ -79,9 +74,7 @@ export function FileUploadDialog({
 
         // Handle reauthentication needed
         if (errorData.needsReauth || response.status === 401 || response.status === 403) {
-          toast.error(
-            errorData.error || 'Google Drive access expired. Please reconnect your account.',
-          )
+          toast.error(errorData.error || 'Google Drive access expired. Please reconnect your account.')
           window.location.reload()
           return
         }
