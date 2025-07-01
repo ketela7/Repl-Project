@@ -25,7 +25,11 @@ interface FileBreadcrumbProps {
   loading?: boolean
 }
 
-export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalLoading }: FileBreadcrumbProps) {
+export function FileBreadcrumb({
+  currentFolderId,
+  onNavigate,
+  loading: externalLoading,
+}: FileBreadcrumbProps) {
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -82,7 +86,11 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
       // Traverse up to root
       // // // // // console.log('[Breadcrumb] Starting parent traversal, current folder parents:', currentFolder.parents)
 
-      while (currentFolder.parents && currentFolder.parents.length > 0 && currentFolder.parents[0] !== 'root') {
+      while (
+        currentFolder.parents &&
+        currentFolder.parents.length > 0 &&
+        currentFolder.parents[0] !== 'root'
+      ) {
         const parentId = currentFolder.parents[0]
         // // // // // console.log('[Breadcrumb] Processing parent ID:', parentId)
 
