@@ -11,8 +11,8 @@ export function DriveConnectionCard() {
 
   const handleConnect = () => {
     setConnecting(true)
-    // Request additional Google Drive permissions
-    window.location.href = '/api/auth/reauth-drive'
+    // Direct OAuth flow without intermediate page
+    window.location.href = '/api/auth/signin/google?callbackUrl=/dashboard/drive'
   }
 
   return (
@@ -22,9 +22,9 @@ export function DriveConnectionCard() {
           <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
             <HardDrive className="text-primary h-8 w-8" />
           </div>
-          <CardTitle className="text-2xl">Grant Google Drive Access</CardTitle>
+          <CardTitle className="text-2xl">Connect to Google Drive</CardTitle>
           <CardDescription className="text-base">
-            Grant permission to access your Google Drive files and folders
+            Securely connect to manage your Google Drive files and folders
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -53,20 +53,19 @@ export function DriveConnectionCard() {
 
           <div className="space-y-4 text-center">
             <p className="text-muted-foreground text-sm">
-              Click the button below to grant Google Drive access. You&rsquo;ll be redirected to Google to authorize
-              permissions.
+              You'll be redirected to Google to securely authorize access to your Drive files.
             </p>
 
             <Button onClick={handleConnect} disabled={connecting} size="lg" className="w-full">
               {connecting ? (
                 <>
-                  <HardDrive className="mr-2 h-4 w-4 animate-pulse" />
-                  Connecting...
+                  <Shield className="mr-2 h-4 w-4 animate-pulse" />
+                  Connecting to Google...
                 </>
               ) : (
                 <>
-                  <HardDrive className="mr-2 h-4 w-4" />
-                  Grant Drive Access
+                  <Shield className="mr-2 h-4 w-4" />
+                  Connect Drive
                 </>
               )}
             </Button>

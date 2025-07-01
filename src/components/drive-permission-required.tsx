@@ -26,12 +26,12 @@ export function DrivePermissionRequired({ error, onRetry, compact = false }: Dri
         headers: { 'Content-Type': 'application/json' },
       })
 
-      // Redirect to login with reauth parameter
-      window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive'
+      // Direct OAuth flow for Google Drive permissions
+      window.location.href = '/api/auth/signin/google?callbackUrl=/dashboard/drive'
     } catch (error) {
       console.error('Error during reauth:', error)
-      // Fallback: direct redirect to login
-      window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive'
+      // Fallback: direct OAuth flow
+      window.location.href = '/api/auth/signin/google?callbackUrl=/dashboard/drive'
     }
   }
 
@@ -71,8 +71,8 @@ export function DrivePermissionRequired({ error, onRetry, compact = false }: Dri
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-100">
             <AlertTriangle className="h-8 w-8 text-orange-600" />
           </div>
-          <CardTitle className="text-xl">Google Drive Access Required</CardTitle>
-          <CardDescription>We need permission to access your Google Drive to manage your files</CardDescription>
+          <CardTitle className="text-xl">Drive Access Required</CardTitle>
+          <CardDescription>Reconnect to continue managing your Google Drive files</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
@@ -103,13 +103,13 @@ export function DrivePermissionRequired({ error, onRetry, compact = false }: Dri
             <Button onClick={handleReconnect} disabled={connecting} className="flex-1">
               {connecting ? (
                 <>
-                  <HardDrive className="mr-2 h-4 w-4 animate-pulse" />
-                  Connecting...
+                  <Shield className="mr-2 h-4 w-4 animate-pulse" />
+                  Reconnecting...
                 </>
               ) : (
                 <>
                   <Shield className="mr-2 h-4 w-4" />
-                  Grant Access
+                  Reconnect Drive
                 </>
               )}
             </Button>
