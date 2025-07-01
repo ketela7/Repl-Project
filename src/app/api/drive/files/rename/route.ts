@@ -44,7 +44,8 @@ function generateRenamedFileName(
     case 'replace':
       if (!pattern.includes('|')) return originalName
       const [oldText, newText] = pattern.split('|')
-      return originalName.replace(new RegExp(oldText, 'g'), newText)
+      if (!oldText) return originalName
+      return originalName.replace(new RegExp(oldText, 'g'), newText || '')
 
     case 'regex':
       try {
@@ -52,8 +53,9 @@ function generateRenamedFileName(
         const regexMatch = pattern.match(/^\/(.+)\/(.*)\/([gimuy]*)$/)
         if (regexMatch) {
           const [, regPattern, replacement, flags] = regexMatch
+          if (!regPattern) return originalName
           const regex = flags ? new RegExp(regPattern, flags) : new RegExp(regPattern)
-          return originalName.replace(regex, replacement || "")
+          return originalName.replace(regex, replacement || '')
         }
         return originalName
       } catch (error) {

@@ -403,20 +403,20 @@ export async function GET(request: NextRequest) {
       viewStatus: searchParams.get('viewStatus') || 'all',
       ...(searchParams.get('sortBy') && { sortBy: searchParams.get('sortBy')! }),
       sortOrder: searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc',
-      ...(searchParams.get('search') && { search: searchParams.get('search') }),
-      ...(searchParams.get('createdAfter') && { createdAfter: searchParams.get('createdAfter') }),
+      ...(searchParams.get('search') && { search: searchParams.get('search')! }),
+      ...(searchParams.get('createdAfter') && { createdAfter: searchParams.get('createdAfter')! }),
       ...(searchParams.get('createdBefore') && {
-        createdBefore: searchParams.get('createdBefore'),
+        createdBefore: searchParams.get('createdBefore')!,
       }),
       ...(searchParams.get('modifiedAfter') && {
-        modifiedAfter: searchParams.get('modifiedAfter'),
+        modifiedAfter: searchParams.get('modifiedAfter')!,
       }),
       ...(searchParams.get('modifiedBefore') && {
-        modifiedBefore: searchParams.get('modifiedBefore'),
+        modifiedBefore: searchParams.get('modifiedBefore')!,
       }),
-      ...(searchParams.get('owner') && { owner: searchParams.get('owner') }),
-      ...(searchParams.get('sizeMin') && { sizeMin: searchParams.get('sizeMin') }),
-      ...(searchParams.get('sizeMax') && { sizeMax: searchParams.get('sizeMax') }),
+      ...(searchParams.get('owner') && { owner: searchParams.get('owner')! }),
+      ...(searchParams.get('sizeMin') && { sizeMin: searchParams.get('sizeMin')! }),
+      ...(searchParams.get('sizeMax') && { sizeMax: searchParams.get('sizeMax')! }),
     }
 
     const baseQuery = buildDriveQuery(filters)

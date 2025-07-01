@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 import { driveCache } from '@/lib/cache'
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // Clear the entire cache
     driveCache.clear()

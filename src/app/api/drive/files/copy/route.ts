@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return authResult.response!
     }
 
-    const { driveService } = authResult
+    const driveService = authResult.driveService!
     const body = await request.json()
 
     // Handle both single and bulk operations
@@ -28,14 +28,6 @@ export async function POST(request: NextRequest) {
 
     for (const id of fileIds) {
       try {
-        let copyName = undefined
-
-        // For bulk operations with name prefix
-        if (isBulkOperation && namePrefix) {
-          const originalItem = items.find((item: any) => item.id === id)
-          copyName = `${namePrefix} ${originalItem?.name || 'Copy'}`
-        }
-
         const result = await driveService.copyFile(id, targetFolderId)
         results.push({ fileId: id, success: true, result })
       } catch (error: any) {

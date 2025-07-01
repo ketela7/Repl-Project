@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { RefreshCw } from 'lucide-react'
 
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
-import { normalizeFileSize, getFileActions } from '@/lib/google-drive/utils'
+import { getFileActions } from '@/lib/google-drive/utils'
 import { errorToast } from '@/lib/utils'
 
 import { useTimezoneContext } from '@/components/timezone-provider'

@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return authResult.response!
     }
 
-    const { driveService } = authResult
+    const driveService = authResult.driveService!
     const body = await request.json()
 
     // Handle both single and bulk operations
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
         // Check if it's a Google Workspace file that can be exported
         if (isGoogleWorkspaceFile(mimeType)) {
           const exportMimeType = getExportMimeType(exportFormat, mimeType)
-          const exportResult = await driveService.exportFile(id, exportMimeType)
+          await driveService.exportFile(id, exportMimeType)
 
           results.push({
             fileId: id,

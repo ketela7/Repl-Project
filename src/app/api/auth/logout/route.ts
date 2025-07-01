@@ -14,6 +14,7 @@ export async function POST() {
 export async function GET() {
   try {
     await signOut({ redirectTo: '/' })
+    return NextResponse.redirect('/')
   } catch (error) {
     return NextResponse.redirect('/?error=logout_failed')
   }

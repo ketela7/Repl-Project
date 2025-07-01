@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       return authResult.response!
     }
 
-    const { driveService } = authResult
+    const driveService = authResult.driveService!
 
     // Get file metadata first
     const metadata = await throttledDriveRequest(async () => {
@@ -32,6 +32,10 @@ export async function GET(request: NextRequest) {
     })
 
     const { name: fileName, mimeType, size } = metadata.data
+
+    if (!fileName || !mimeType) {
+      return NextResponse.json({ error: 'File metadata incomplete' }, { status: 500 })
+    }
 
     // Handle Google Workspace files (export)
     if (isGoogleWorkspaceFile(mimeType)) {

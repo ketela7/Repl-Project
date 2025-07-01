@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
       return authResult.response!
     }
 
-    const { driveService } = authResult
+    const driveService = authResult.driveService!
     const body = await request.json()
 
     // Handle both single and bulk operations
