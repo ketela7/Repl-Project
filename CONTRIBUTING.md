@@ -11,7 +11,7 @@
 npm run lint
 
 # Auto-fix common issues
-npx eslint src --fix
+npx eslint target --fix
 
 # Type check
 npm run type-check
@@ -85,7 +85,7 @@ Before submitting any contribution, ensure you complete ALL steps:
 npm run lint
 
 # 2. Fix any ESLint errors
-npx eslint src --fix
+npx eslint target_dir --fix
 
 # 3. Check TypeScript (REQUIRED)
 npm run type-check
