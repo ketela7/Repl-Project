@@ -298,9 +298,15 @@ export function DriveManager() {
         if (filters.fileTypeFilter?.length > 0)
           params.append('fileType', filters.fileTypeFilter.join(','))
         if (filters.advancedFilters.createdDateRange?.from)
-          params.append('createdAfter', (filters.advancedFilters.createdDateRange.from as Date).toISOString())
+          params.append(
+            'createdAfter',
+            (filters.advancedFilters.createdDateRange.from as Date).toISOString(),
+          )
         if (filters.advancedFilters.createdDateRange?.to)
-          params.append('createdBefore', (filters.advancedFilters.createdDateRange.to as Date).toISOString())
+          params.append(
+            'createdBefore',
+            (filters.advancedFilters.createdDateRange.to as Date).toISOString(),
+          )
         if (filters.advancedFilters.modifiedDateRange?.from)
           params.append(
             'modifiedAfter',
@@ -312,7 +318,7 @@ export function DriveManager() {
             (filters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
           )
         if (filters.advancedFilters.owner?.trim())
-          params.append('owner', filters.advancedFilters.owner.trim())
+          params.append('owner', (filters.advancedFilters.owner as string).trim())
 
         // Add size filtering parameters (Google Drive API specification - values in bytes)
         if (filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) {
