@@ -261,7 +261,10 @@ function ItemsTrashDialog({ isOpen, onClose, selectedItems }: ItemsTrashDialogPr
           {/* Stats - Compact */}
           <div className="flex flex-shrink-0 justify-center gap-1">
             {fileCount > 0 && (
-              <Badge variant="secondary" className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100">
+              <Badge
+                variant="secondary"
+                className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100"
+              >
                 {fileCount} file{fileCount > 1 ? 's' : ''}
               </Badge>
             )}
@@ -281,7 +284,10 @@ function ItemsTrashDialog({ isOpen, onClose, selectedItems }: ItemsTrashDialogPr
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
                 {selectedItems.slice(0, 5).map(item => (
-                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                  <div
+                    key={item.id}
+                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                  >
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={item.name}>
                       {item.name}
@@ -315,7 +321,8 @@ function ItemsTrashDialog({ isOpen, onClose, selectedItems }: ItemsTrashDialogPr
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage =
+        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -490,7 +497,9 @@ function ItemsTrashDialog({ isOpen, onClose, selectedItems }: ItemsTrashDialogPr
               <>
                 <Button
                   onClick={handleTrash}
-                  className={cn('touch-target min-h-[44px] bg-red-600 text-white hover:bg-red-700 active:scale-95')}
+                  className={cn(
+                    'touch-target min-h-[44px] bg-red-600 text-white hover:bg-red-700 active:scale-95',
+                  )}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Move to Trash
@@ -517,12 +526,18 @@ function ItemsTrashDialog({ isOpen, onClose, selectedItems }: ItemsTrashDialogPr
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleCloseAndRefresh}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>
