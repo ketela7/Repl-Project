@@ -29,6 +29,7 @@ export function DrivePermissionRequired({ error, onRetry, compact = false }: Dri
       // Redirect to login with reauth parameter
       window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive'
     } catch (error) {
+      console.error('Error during reauth:', error)
       // Fallback: direct redirect to login
       window.location.href = '/auth/v1/login?reauth=drive&callbackUrl=/dashboard/drive'
     }

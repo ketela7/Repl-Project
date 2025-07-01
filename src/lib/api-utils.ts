@@ -50,7 +50,8 @@ export async function initDriveService(): Promise<AuthResult> {
       session,
       driveService,
     }
-  } catch (_error) {
+  } catch (error) {
+    console.error('Authentication failed:', error)
     return {
       success: false,
       response: NextResponse.json({ error: 'Authentication failed' }, { status: 500 }),

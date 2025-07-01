@@ -627,8 +627,9 @@ export class GoogleDriveService {
   }
 
   // Send notification email (for enhanced sharing)
-  async sendNotificationEmail(_fileId: string, _emailData: any): Promise<void> {
+  async sendNotificationEmail(fileId: string, emailData: any): Promise<void> {
     // Note: This would typically use the Gmail API or similar service
     // For now, we'll just log the action
+    console.log('Notification email would be sent for file:', fileId, 'with data:', emailData)
   }
 }

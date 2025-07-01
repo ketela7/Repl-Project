@@ -81,6 +81,9 @@ export enum LoadingStage {
   COMPLETE = 'complete',
 }
 
+// Export individual constants for use without enum
+export const { BASIC, ESSENTIAL, EXTENDED, COMPLETE } = LoadingStage
+
 /**
  * Field configuration for each stage
  */

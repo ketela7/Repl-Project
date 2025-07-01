@@ -90,6 +90,7 @@ export async function retryOperation<T>(operation: () => Promise<T>, config: Par
       lastError = error
 
       if (process.env.NODE_ENV === 'development') {
+        console.log('Retrying API operation:', { attempt, error })
       }
 
       // Don't retry if not retryable or on last attempt
@@ -99,6 +100,7 @@ export async function retryOperation<T>(operation: () => Promise<T>, config: Par
 
       const delay = calculateDelay(attempt, finalConfig)
       if (process.env.NODE_ENV === 'development') {
+        console.log('Waiting before retry:', { delay })
       }
 
       await sleep(delay)
@@ -107,6 +109,7 @@ export async function retryOperation<T>(operation: () => Promise<T>, config: Par
 
   // All retries exhausted
   if (process.env.NODE_ENV === 'development') {
+    console.error('All retries exhausted:', lastError)
   }
 
   throw lastError
