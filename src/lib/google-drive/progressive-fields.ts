@@ -82,10 +82,10 @@ export enum LoadingStage {
 }
 
 // Export individual constants for use without enum - currently used in configuration
-export const BASIC = LoadingStage.BASIC;
-export const ESSENTIAL = LoadingStage.ESSENTIAL;
-export const EXTENDED = LoadingStage.EXTENDED;
-export const COMPLETE = LoadingStage.COMPLETE;
+export const BASIC = LoadingStage.BASIC
+export const ESSENTIAL = LoadingStage.ESSENTIAL
+export const EXTENDED = LoadingStage.EXTENDED
+export const COMPLETE = LoadingStage.COMPLETE
 
 /**
  * Field configuration for each stage

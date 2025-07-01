@@ -127,11 +127,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days
+    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days (actual duration controlled by JWT exp)
     updateAge: 24 * 60 * 60, // Update session only once per day to reduce database calls
   },
   jwt: {
-    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days JWT token lifetime
+    maxAge: 30 * 24 * 60 * 60, // Maximum 30 days (actual duration controlled by token.exp)
   },
   cookies: {
     sessionToken: {

@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
+import { useSessionDuration } from '@/lib/hooks/use-session-duration'
 
 interface AuthWrapperProps {
   children: ReactNode
@@ -14,6 +15,9 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
   const router = useRouter()
   const [isServerOnline, setIsServerOnline] = useState(true)
   const [hasStoredSession, setHasStoredSession] = useState(false)
+  
+  // Handle session duration based on remember me preference
+  useSessionDuration()
 
   // Check if user has stored session data (indicating they were previously logged in)
   useEffect(() => {
