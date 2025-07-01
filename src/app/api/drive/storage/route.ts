@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     if (response) return response
 
     // Get about information which includes storage quota
-    const aboutResponse = await driveService.files.about({
+    const aboutResponse = await driveService.about.get({
       fields: 'storageQuota,user',
     })
 
@@ -150,7 +150,9 @@ export async function GET(request: NextRequest) {
     // Parse storage quota information
     const quotaLimit = storageQuota?.limit ? parseInt(storageQuota.limit) : null
     const quotaUsage = storageQuota?.usage ? parseInt(storageQuota.usage) : totalUsedBytes
-    const quotaUsageInDrive = storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : totalUsedBytes
+    const quotaUsageInDrive = storageQuota?.usageInDrive
+      ? parseInt(storageQuota.usageInDrive)
+      : totalUsedBytes
 
     // Calculate storage analytics
     const storageAnalytics = {
@@ -158,7 +160,9 @@ export async function GET(request: NextRequest) {
         limit: quotaLimit,
         used: quotaUsage,
         usedInDrive: quotaUsageInDrive,
-        usedInDriveTrash: storageQuota?.usageInDriveTrash ? parseInt(storageQuota.usageInDriveTrash) : 0,
+        usedInDriveTrash: storageQuota?.usageInDriveTrash
+          ? parseInt(storageQuota.usageInDriveTrash)
+          : 0,
         available: quotaLimit ? quotaLimit - quotaUsage : null,
         usagePercentage: quotaLimit ? Math.round((quotaUsage / quotaLimit) * 100) : null,
       },

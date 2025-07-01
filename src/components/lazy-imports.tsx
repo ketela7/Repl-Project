@@ -19,15 +19,25 @@ export const OperationsDialog = lazy(() =>
   })),
 )
 
-export const ItemsMoveDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-move-dialog'))
+export const ItemsMoveDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-move-dialog'),
+)
 
-export const ItemsCopyDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-copy-dialog'))
+export const ItemsCopyDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-copy-dialog'),
+)
 
-export const ItemsDeleteDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-delete-dialog'))
+export const ItemsDeleteDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-delete-dialog'),
+)
 
-export const ItemsTrashDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-trash-dialog'))
+export const ItemsTrashDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-trash-dialog'),
+)
 
-export const ItemsShareDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-share-dialog'))
+export const ItemsShareDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-share-dialog'),
+)
 
 export const ItemsRenameDialog = lazy(() =>
   import('@/app/(main)/dashboard/drive/_components/items-rename-dialog').then(mod => ({
@@ -35,11 +45,17 @@ export const ItemsRenameDialog = lazy(() =>
   })),
 )
 
-export const ItemsExportDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-export-dialog'))
+export const ItemsExportDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-export-dialog'),
+)
 
-export const ItemsDownloadDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-download-dialog'))
+export const ItemsDownloadDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-download-dialog'),
+)
 
-export const ItemsUntrashDialog = lazy(() => import('@/app/(main)/dashboard/drive/_components/items-untrash-dialog'))
+export const ItemsUntrashDialog = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/items-untrash-dialog'),
+)
 
 export const DriveToolbar = lazy(() =>
   import('@/app/(main)/dashboard/drive/_components/drive-toolbar').then(mod => ({
