@@ -396,6 +396,13 @@ export function DriveManager() {
     [filters],
   )
 
+  // Helper function to convert selected IDs to full objects
+  const getSelectedItemObjects = () => {
+    return Array.from(selectedItems)
+      .map(id => displayItems.find(item => item.id === id))
+      .filter(Boolean)
+  }
+
   // Effects for initial load and dependencies
   useEffect(() => {
     fetchFiles()
@@ -818,7 +825,7 @@ export function DriveManager() {
             closeDialog('move')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
+          selectedItems={getSelectedItemObjects()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('move')
@@ -835,7 +842,7 @@ export function DriveManager() {
             closeDialog('copy')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
+          selectedItems={getSelectedItemObjects()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('copy')
@@ -852,7 +859,7 @@ export function DriveManager() {
             closeDialog('share')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
+          selectedItems={getSelectedItemObjects()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('share')
@@ -869,7 +876,7 @@ export function DriveManager() {
             closeDialog('rename')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
+          selectedItems={getSelectedItemObjects()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('rename')
@@ -886,7 +893,7 @@ export function DriveManager() {
             closeDialog('trash')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
+          selectedItems={getSelectedItemObjects()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('trash')
@@ -903,7 +910,7 @@ export function DriveManager() {
             closeDialog('delete')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
+          selectedItems={getSelectedItemObjects()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('delete')
@@ -937,7 +944,7 @@ export function DriveManager() {
             closeDialog('download')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
+          selectedItems={getSelectedItemObjects()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('download')
@@ -953,7 +960,7 @@ export function DriveManager() {
             closeDialog('export')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
+          selectedItems={getSelectedItemObjects()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('export')

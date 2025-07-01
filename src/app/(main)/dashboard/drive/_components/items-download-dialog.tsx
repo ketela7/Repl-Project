@@ -611,7 +611,9 @@ function ItemsDownloadDialog({
         </DialogHeaderComponent>
 
         {/* Dynamic Content */}
-        <div key={`download-content-${isProcessing ? 'processing' : isCompleted ? 'completed' : 'initial'}`}>
+        <div
+          key={`download-content-${isProcessing ? 'processing' : isCompleted ? 'completed' : 'initial'}`}
+        >
           {renderContent()}
         </div>
 
