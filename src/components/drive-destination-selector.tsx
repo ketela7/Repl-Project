@@ -196,24 +196,24 @@ export function DriveDestinationSelector({
   }, [])
 
   return (
-    <div className={cn('w-full max-w-none mx-auto px-4 sm:px-6 lg:px-8', className)}>
+    <div className={cn('mx-auto w-full max-w-none px-4 sm:px-6 lg:px-8', className)}>
       {/* Header Section */}
-      <div className="space-y-4 mb-6">
-        <div className="text-center space-y-2">
+      <div className="mb-6 space-y-4">
+        <div className="space-y-2 text-center">
           <div className="flex items-center justify-center gap-2">
-            <div className="p-2 rounded-full bg-blue-100 dark:bg-blue-900/30">
+            <div className="rounded-full bg-blue-100 p-2 dark:bg-blue-900/30">
               <FolderOpen className="h-5 w-5 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
           <h2 className="text-xl font-semibold tracking-tight">Select Destination Folder</h2>
-          <p className="text-muted-foreground text-sm max-w-md mx-auto">
+          <p className="text-muted-foreground mx-auto max-w-md text-sm">
             Choose where you want to save your files in Google Drive
           </p>
         </div>
       </div>
 
       {/* Main Content Card */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-background to-muted/20 max-w-4xl mx-auto">
+      <Card className="from-background to-muted/20 mx-auto max-w-4xl border-0 bg-gradient-to-br shadow-lg">
         <CardContent className="p-6">
           <Tabs value={activeTab} onValueChange={value => setActiveTab(value as 'browse' | 'url')}>
             {/* Enhanced Tab List */}
