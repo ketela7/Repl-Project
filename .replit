@@ -34,11 +34,15 @@ args = "Vercel Ready"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Dev Strict Mode"
+args = "Lint Fast Fix"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Lint Fast Fix"
+args = "Optimized Lint"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Quick Lint"
 
 [[workflows.workflow]]
 name = "Server"
@@ -49,31 +53,6 @@ mode = "parallel"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Dev Fast"
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev:fast"
-waitForPort = 5000
-
-[[workflows.workflow]]
-name = "Lint"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run lint"
-
-[[workflows.workflow]]
-name = "Format"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format"
 
 [[workflows.workflow]]
 name = "Full Check"
@@ -91,118 +70,6 @@ args = "npm run lint"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run format"
-
-[[workflows.workflow]]
-name = "Test:Watch"
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx jest --watchAll"
-
-[[workflows.workflow]]
-name = "Test:RealTime"
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node scripts/test-realtime-api.js && echo '✅ Test Realtime Completed'"
-
-[[workflows.workflow]]
-name = "Build"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run build"
-
-[[workflows.workflow]]
-name = "Production"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run start"
-
-[[workflows.workflow]]
-name = "Preview"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run preview"
-
-[[workflows.workflow]]
-name = "Update Dependencies"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx npm-check-updates -u"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm install"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm audit fix"
-
-[[workflows.workflow]]
-name = "Clean"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run clean"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "rm -rf ~/.{npm,nvm,yarn,bun} .cache tsconfig.tsbuildinfo"
-
-[[workflows.workflow]]
-name = "Reset Project"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "rm -rf node_modules package-lock.json .next"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm install"
-
-[[workflows.workflow]]
-name = "Check Duplicates"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npx jscpd src"
-
-[[workflows.workflow]]
-name = "Bundle Analyze"
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run build:analyze"
-
-[[workflows.workflow]]
-name = "Quick Format"
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run format:fix && echo '✅ Format completed successfully'"
-
-[[workflows.workflow]]
-name = "Quick Lint"
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run lint:fix && echo '✅ Lint completed successfully'"
 
 [[workflows.workflow]]
 name = "Production Ready"
@@ -237,20 +104,28 @@ task = "shell.exec"
 args = "node scripts/vercel-build-fix.js full"
 
 [[workflows.workflow]]
-name = "Dev Strict Mode"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node scripts/dev-strict-mode.js"
-
-[[workflows.workflow]]
 name = "Lint Fast Fix"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npx eslint src --fix --ext .ts,.tsx,.js,.jsx --max-warnings 10 --quiet"
+
+[[workflows.workflow]]
+name = "Optimized Lint"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/optimized-lint-workflow.js development"
+
+[[workflows.workflow]]
+name = "Quick Lint"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/optimized-lint-workflow.js quick"
 
 [nix]
 channel = "stable-24_05"
