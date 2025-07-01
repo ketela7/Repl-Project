@@ -1002,3 +1002,5 @@ export function DriveManager() {
     </div>
   )
 }
+
+export default DriveManager

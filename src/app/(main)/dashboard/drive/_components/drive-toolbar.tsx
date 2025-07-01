@@ -1809,3 +1809,5 @@ export function DriveToolbar({
     </div>
   )
 }
+
+export default DriveToolbar

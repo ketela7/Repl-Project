@@ -933,3 +933,4 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
 }
 
 export { ItemsRenameDialog }
+export default ItemsRenameDialog

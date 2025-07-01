@@ -57,3 +57,5 @@ export function BreadcrumbSkeleton() {
     </div>
   )
 }
+
+export default DriveGridSkeleton

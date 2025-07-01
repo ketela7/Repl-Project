@@ -147,3 +147,5 @@ export function FilePreviewDialog({ open, onOpenChange, file }: FilePreviewDialo
     </Dialog>
   )
 }
+
+export default FilePreviewDialog

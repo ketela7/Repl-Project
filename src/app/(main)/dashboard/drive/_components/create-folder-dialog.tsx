@@ -138,3 +138,5 @@ export function CreateFolderDialog({ isOpen, onClose, onFolderCreated, parentFol
     </Dialog>
   )
 }
+
+export default CreateFolderDialog
