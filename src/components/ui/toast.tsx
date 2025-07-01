@@ -1,8 +1,8 @@
 /**
  * Enhanced toast notification utilities for better user feedback
  */
+import React from 'react'
 import { toast } from 'sonner'
-import type { ReactNode } from 'react'
 import { CheckCircle, XCircle, AlertTriangle, Info, Copy, Download, Trash2, FolderPlus, Share2, Upload } from 'lucide-react'
 
 export interface ToastAction {

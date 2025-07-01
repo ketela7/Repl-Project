@@ -124,7 +124,6 @@ export async function retryOperation<T>(
  */
 export async function retryDriveApiCall<T>(
   operation: () => Promise<T>,
-  context: string = 'Drive API call',
 ): Promise<T> {
   return retryOperation(operation, {
     maxRetries: 3,

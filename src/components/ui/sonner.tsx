@@ -13,7 +13,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
 
   return (
     <Sonner
-      theme={theme as ToasterProps["theme"]}
+      theme={theme !== undefined ? theme as ToasterProps["theme"] : "system"}
       className="toaster group"
       position={isMobile ? "bottom-center" : "top-right"}
       expand={true}

@@ -3,8 +3,6 @@
  * Based on: https://developers.google.com/workspace/drive/api/guides/performance
  */
 
-import { drive_v3 } from 'googleapis'
-
 export interface BatchRequest {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE'
   url: string

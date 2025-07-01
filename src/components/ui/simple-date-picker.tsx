@@ -127,7 +127,7 @@ export function SimpleDatePicker({
               </Button>
               
               <div className="flex items-center gap-2">
-                <Select value={months[currentMonth]} onValueChange={handleMonthChange}>
+                <Select value={months[currentMonth] || undefined} onValueChange={handleMonthChange}>
                   <SelectTrigger className="w-32 h-8">
                     <SelectValue />
                   </SelectTrigger>

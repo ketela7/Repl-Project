@@ -504,33 +504,33 @@ export class GoogleDriveService {
           }),
         },
       }),
-      videoMediaMetadata: response.data.videoMediaMetadata
-        ? {
-            ...(response.data.videoMediaMetadata.width !== undefined && {
-              width: response.data.videoMediaMetadata.width,
-            }),
-            ...(response.data.videoMediaMetadata.height !== undefined && {
-              height: response.data.videoMediaMetadata.height,
-            }),
-            ...(response.data.videoMediaMetadata.durationMillis && {
-              durationMillis: response.data.videoMediaMetadata.durationMillis,
-            }),
-          }
-        : undefined,
+      ...(response.data.videoMediaMetadata && {
+        videoMediaMetadata: {
+          ...(response.data.videoMediaMetadata.width !== undefined && {
+            width: response.data.videoMediaMetadata.width,
+          }),
+          ...(response.data.videoMediaMetadata.height !== undefined && {
+            height: response.data.videoMediaMetadata.height,
+          }),
+          ...(response.data.videoMediaMetadata.durationMillis && {
+            durationMillis: response.data.videoMediaMetadata.durationMillis,
+          }),
+        },
+      }),
       exportLinks: response.data.exportLinks || {},
-      shortcutDetails: response.data.shortcutDetails
-        ? {
-            ...(response.data.shortcutDetails.targetId && {
-              targetId: response.data.shortcutDetails.targetId,
-            }),
-            ...(response.data.shortcutDetails.targetMimeType && {
-              targetMimeType: response.data.shortcutDetails.targetMimeType,
-            }),
-            ...(response.data.shortcutDetails.targetResourceKey && {
-              targetResourceKey: response.data.shortcutDetails.targetResourceKey,
-            }),
-          }
-        : undefined,
+      ...(response.data.shortcutDetails && {
+        shortcutDetails: {
+          ...(response.data.shortcutDetails.targetId && {
+            targetId: response.data.shortcutDetails.targetId,
+          }),
+          ...(response.data.shortcutDetails.targetMimeType && {
+            targetMimeType: response.data.shortcutDetails.targetMimeType,
+          }),
+          ...(response.data.shortcutDetails.targetResourceKey && {
+            targetResourceKey: response.data.shortcutDetails.targetResourceKey,
+          }),
+        },
+      }),
       contentRestrictions:
         response.data.contentRestrictions?.map(restriction => ({
           readOnly: restriction.readOnly || false,

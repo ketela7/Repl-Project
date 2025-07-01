@@ -209,16 +209,7 @@ export function DriveManager() {
     setSortConfig({ key, direction })
   }
 
-  const getSortIcon = (columnKey: string) => {
-    if (!sortConfig || sortConfig.key !== columnKey) {
-      return <ChevronsUpDown className="h-4 w-4" />
-    }
-    return sortConfig.direction === 'asc' ? (
-      <ChevronUp className="h-4 w-4" />
-    ) : (
-      <ChevronDown className="h-4 w-4" />
-    )
-  }
+
 
   const sortedItems = useMemo(() => {
     if (!sortConfig) {
