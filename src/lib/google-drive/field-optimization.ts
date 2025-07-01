@@ -15,7 +15,7 @@ export const FIELD_SETS = {
   // Essential fields for file management operations - now includes owners and createdTime
   LIST_STANDARD: `${BASE_FIELDS},size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
 
-  // Extended fields for detailed views  
+  // Extended fields for detailed views
   LIST_DETAILED: `${BASE_FIELDS},size,createdTime,modifiedTime,webViewLink,thumbnailLink,parents,owners(displayName,emailAddress,photoLink),shared,trashed,starred,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
 
   // Complete fields for file details page - comprehensive technical details
@@ -61,7 +61,10 @@ export interface FieldContext {
   includeCapabilities?: boolean
 }
 
-export function getDynamicFields(baseOperation: keyof typeof FIELD_SETS, context: FieldContext = {}): string {
+export function getDynamicFields(
+  baseOperation: keyof typeof FIELD_SETS,
+  context: FieldContext = {},
+): string {
   const fields = FIELD_SETS[baseOperation].split(',')
 
   // Add optional fields based on context
@@ -128,7 +131,8 @@ class FieldOptimizationMonitor {
     }
 
     const newCount = existing.requestCount + 1
-    const newAvgTime = (existing.averageResponseTime * existing.requestCount + responseTime) / newCount
+    const newAvgTime =
+      (existing.averageResponseTime * existing.requestCount + responseTime) / newCount
 
     // Estimate fields saved (assuming full field set would be ~30 fields)
     const estimatedFullFields = 30
