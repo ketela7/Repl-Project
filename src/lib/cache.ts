@@ -14,13 +14,13 @@ class MemoryCache {
   private maxSize = 20000 // Increased cache size for better performance
 
   set<T>(key: string, data: T, ttlMinutes: number = 60): void {
-    // Increased default TTL
     // Clean up old entries if cache is getting too large
     if (this.cache.size >= this.maxSize) {
       this.cleanup()
     }
 
-    const ttl = ttlMinutes * 60 * 1000 // Convert to milliseconds
+    // Support both minutes (>= 1) and milliseconds (< 1) for testing
+    const ttl = ttlMinutes >= 1 ? ttlMinutes * 60 * 1000 : ttlMinutes
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
@@ -28,17 +28,17 @@ class MemoryCache {
     })
   }
 
-  get<T>(key: string): T | null {
+  get<T>(key: string): T | undefined {
     const entry = this.cache.get(key)
 
     if (!entry) {
-      return null
+      return undefined
     }
 
     // Check if entry has expired
     if (Date.now() - entry.timestamp > entry.ttl) {
       this.cache.delete(key)
-      return null
+      return undefined
     }
 
     return entry.data as T

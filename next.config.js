@@ -63,6 +63,8 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    domains: ['lh3.googleusercontent.com', 'drive.google.com', 'docs.google.com'],
+  
   },
 
   // Production TypeScript compilation

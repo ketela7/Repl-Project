@@ -13,6 +13,53 @@ export function formatFileSize(bytes: string | number): string {
   return `${(size / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
 }
 
+export function getFileExtension(fileName: string): string {
+  if (!fileName || fileName === '.') return ''
+  
+  const parts = fileName.split('.')
+  if (parts.length < 2) return ''
+  
+  // Handle hidden files like .hidden
+  if (fileName.startsWith('.') && parts.length === 2) {
+    return parts[1] || ''
+  }
+  
+  const lastPart = parts[parts.length - 1]
+  return lastPart ? lastPart.toLowerCase() : ''
+}
+
+export function getFileTypeCategory(fileName: string, mimeType?: string): string {
+  // Handle Google Apps files by MIME type
+  if (mimeType) {
+    if (mimeType.includes('vnd.google-apps.folder')) return 'folder'
+    if (mimeType.includes('vnd.google-apps.document') || 
+        mimeType.includes('vnd.google-apps.spreadsheet') ||
+        mimeType.includes('vnd.google-apps.presentation')) return 'document'
+    if (mimeType.includes('image/')) return 'image'
+    if (mimeType.includes('video/')) return 'video'
+    if (mimeType.includes('audio/')) return 'audio'
+    if (mimeType.includes('application/pdf') || 
+        mimeType.includes('text/') ||
+        mimeType.includes('application/msword') ||
+        mimeType.includes('application/vnd.openxmlformats')) return 'document'
+  }
+
+  // Fallback to file extension
+  const extension = getFileExtension(fileName)
+  
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']
+  const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv']
+  const audioExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma']
+  const documentExtensions = ['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'ppt', 'pptx']
+
+  if (imageExtensions.includes(extension)) return 'image'
+  if (videoExtensions.includes(extension)) return 'video'
+  if (audioExtensions.includes(extension)) return 'audio'
+  if (documentExtensions.includes(extension)) return 'document'
+  
+  return 'other'
+}
+
 // File size utilities
 export function normalizeFileSize(size: any): number {
   if (size === null || size === undefined || size === '' || size === '-') return 0
@@ -960,12 +1007,38 @@ export function isValidFolderId(id: string): boolean {
   return /^[a-zA-Z0-9_-]{10,50}$/.test(id)
 }
 
-export function isImageFile(mimeType: string): boolean {
-  return mimeType.startsWith('image/')
+export function isImageFile(fileNameOrMimeType: string, mimeType?: string): boolean {
+  // If second parameter provided, first is filename
+  if (mimeType) {
+    return mimeType.startsWith('image/')
+  }
+  
+  // Check if first parameter is MIME type
+  if (fileNameOrMimeType.includes('/')) {
+    return fileNameOrMimeType.startsWith('image/')
+  }
+  
+  // Treat as filename and check extension
+  const extension = getFileExtension(fileNameOrMimeType)
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'tiff', 'ico']
+  return imageExtensions.includes(extension)
 }
 
-export function isVideoFile(mimeType: string): boolean {
-  return mimeType.startsWith('video/')
+export function isVideoFile(fileNameOrMimeType: string, mimeType?: string): boolean {
+  // If second parameter provided, first is filename
+  if (mimeType) {
+    return mimeType.startsWith('video/')
+  }
+  
+  // Check if first parameter is MIME type
+  if (fileNameOrMimeType.includes('/')) {
+    return fileNameOrMimeType.startsWith('video/')
+  }
+  
+  // Treat as filename and check extension
+  const extension = getFileExtension(fileNameOrMimeType)
+  const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'mp3v', 'mpeg', 'mpg']
+  return videoExtensions.includes(extension)
 }
 
 export function isAudioFile(mimeType: string): boolean {

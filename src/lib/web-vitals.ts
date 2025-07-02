@@ -111,30 +111,34 @@ export function getPerformanceSummary() {
     return { message: 'No performance metrics collected yet' }
   }
 
-  return performanceMetrics.reduce((acc, metric) => {
-    if (!acc[metric.name]) {
-      acc[metric.name] = { latest: metric, count: 0, averageValue: 0 }
-    }
-    const entry = acc[metric.name]
-    if (entry) {
-      entry.latest = metric
-      entry.count += 1
-      entry.averageValue = (entry.averageValue + metric.value) / 2
-    }
-    return acc
-  }, {} as Record<string, { latest: VitalMetric; count: number; averageValue: number }>)
+  return performanceMetrics.reduce(
+    (acc, metric) => {
+      if (!acc[metric.name]) {
+        acc[metric.name] = { latest: metric, count: 0, averageValue: 0 }
+      }
+      const entry = acc[metric.name]
+      if (entry) {
+        entry.latest = metric
+        entry.count += 1
+        entry.averageValue = (entry.averageValue + metric.value) / 2
+      }
+      return acc
+    },
+    {} as Record<string, { latest: VitalMetric; count: number; averageValue: number }>,
+  )
 }
 
 // Performance monitoring hook for React components
 export function usePerformanceMonitor(componentName: string) {
-  if (typeof window === 'undefined') return { 
-    markStart: () => {
-      // No-op in server environment
-    }, 
-    markEnd: () => {
-      // No-op in server environment
-    } 
-  }
+  if (typeof window === 'undefined')
+    return {
+      markStart: () => {
+        // No-op in server environment
+      },
+      markEnd: () => {
+        // No-op in server environment
+      },
+    }
 
   let startTime = 0
 
@@ -147,10 +151,11 @@ export function usePerformanceMonitor(componentName: string) {
 
       if (duration > 100) {
         // Only log slow components
+        const rating = duration > 500 ? 'poor' : duration > 200 ? 'needs-improvement' : 'good'
         sendToAnalytics({
           name: `Component-${componentName}`,
           value: duration,
-          rating: duration > 500 ? 'poor' : duration > 200 ? 'needs-improvement' : 'good',
+          rating,
           timestamp: Date.now(),
         })
       }
@@ -160,10 +165,11 @@ export function usePerformanceMonitor(componentName: string) {
 
 // Track route change performance
 export function trackRouteChange(route: string, duration: number) {
+  const rating = duration > 1000 ? 'poor' : duration > 500 ? 'needs-improvement' : 'good'
   sendToAnalytics({
     name: `Route-${route}`,
     value: duration,
-    rating: duration > 1000 ? 'poor' : duration > 500 ? 'needs-improvement' : 'good',
+    rating,
     timestamp: Date.now(),
   })
 }
