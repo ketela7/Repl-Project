@@ -29,9 +29,9 @@ export function DataTable<TData, TValue>({
   const tableContent = (
     <Table>
       <TableHeader className="bg-muted sticky top-0 z-10">
-        {table.getHeaderGroups().map(headerGroup => (
+        {table.getHeaderGroups().map((headerGroup: any) => (
           <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map(header => {
+            {headerGroup.headers.map((header: any) => {
               return (
                 <TableHead key={header.id} colSpan={header.colSpan}>
                   {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -45,14 +45,14 @@ export function DataTable<TData, TValue>({
         {table.getRowModel().rows.length ? (
           dndEnabled ? (
             <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
-              {table.getRowModel().rows.map(row => (
+              {table.getRowModel().rows.map((row: any) => (
                 <DraggableRow key={row.id} row={row} />
               ))}
             </SortableContext>
           ) : (
-            table.getRowModel().rows.map(row => (
+            table.getRowModel().rows.map((row: any) => (
               <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                {row.getVisibleCells().map(cell => (
+                {row.getVisibleCells().map((cell: any) => (
                   <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                 ))}
               </TableRow>

@@ -27,7 +27,7 @@ export async function GET() {
           try {
             const message = `data: ${JSON.stringify({ type, data, timestamp: Date.now() })}\n\n`
             controller.enqueue(encoder.encode(message))
-          } catch (error) {
+          } catch {
             isStreamClosed = true
           }
         }
@@ -37,7 +37,7 @@ export async function GET() {
             isStreamClosed = true
             try {
               controller.close()
-            } catch (error) {
+            } catch {
               // Stream already closed
             }
           }

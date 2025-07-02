@@ -300,7 +300,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
     const deniedCapabilities = Object.entries(capabilities).filter(([_key, value]) => value === false)
 
     // Group capabilities by category for better organization
-    const groupCapabilities = (caps: [string, boolean][]) => {
+    const groupCapabilities = (_ignored: [string, boolean][]) => {
       const groups = {
         'File Operations': [] as string[],
         'Content Management': [] as string[],

@@ -20,7 +20,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 
-import { type NavGroup, type NavMainItem } from './sidebar-items'
+
 
 
 interface NavMainProps {

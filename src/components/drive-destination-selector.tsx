@@ -318,7 +318,7 @@ export function DriveDestinationSelector({
                               <div className="ml-2 flex w-[75px] flex-shrink-0 items-center justify-end gap-1">
                                 <Button
                                   size="sm"
-                                  onClick={e => {
+                                  onClick={(e: any) => {
                                     e.stopPropagation()
                                     handleFolderSelect(folder)
                                   }}
@@ -338,7 +338,7 @@ export function DriveDestinationSelector({
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  onClick={e => {
+                                  onClick={(e: any) => {
                                     e.stopPropagation()
                                     navigateToFolder(folder)
                                   }}

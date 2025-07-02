@@ -88,7 +88,7 @@ export default function PerformancePage() {
     return <Activity className="h-4 w-4" />
   }
 
-  const getProgressValue = (name: string, value: number) => {
+  const getProgressValue = (_ignored: string, value: number) => {
     const thresholds = {
       LCP: 4000,
       FCP: 3000,
