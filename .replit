@@ -13,7 +13,7 @@ runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
-mode = "sequential"
+mode = "parallel"
 author = "agent"
 
 [[workflows.workflow.tasks]]
@@ -31,6 +31,14 @@ args = "Linter & Formatter"
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Code Standards Enforcer"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Final Code Quality Check"
 
 
 [[workflows.workflow]]
@@ -79,5 +87,21 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Code Standards Enforcer"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/enforce-code-standards.js"
+
+[[workflows.workflow]]
+name = "Final Code Quality Check"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run type-check && echo \"✅ TypeScript check passed\" && npm run lint:fast && echo \"✅ ESLint check passed\""
 
 

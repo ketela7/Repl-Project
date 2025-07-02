@@ -1,4 +1,3 @@
-
 import { enhancedErrorHandler, AppError, ErrorSeverity } from '../enhanced-error-handler'
 
 describe('Enhanced Error Handler', () => {
@@ -15,7 +14,7 @@ describe('Enhanced Error Handler', () => {
   describe('AppError', () => {
     it('should create AppError with default values', () => {
       const error = new AppError('Test error')
-      
+
       expect(error.message).toBe('Test error')
       expect(error.statusCode).toBe(500)
       expect(error.severity).toBe(ErrorSeverity.HIGH)
@@ -24,7 +23,7 @@ describe('Enhanced Error Handler', () => {
 
     it('should create AppError with custom values', () => {
       const error = new AppError('Custom error', 400, ErrorSeverity.LOW, false)
-      
+
       expect(error.message).toBe('Custom error')
       expect(error.statusCode).toBe(400)
       expect(error.severity).toBe(ErrorSeverity.LOW)
@@ -77,7 +76,7 @@ describe('Enhanced Error Handler', () => {
 
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('[HIGH]'),
-        expect.stringContaining('High severity')
+        expect.stringContaining('High severity'),
       )
     })
   })

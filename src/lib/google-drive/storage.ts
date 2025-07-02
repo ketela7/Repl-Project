@@ -245,7 +245,7 @@ export class StorageAnalyzer {
         supportsAllDrives: true,
         includeItemsFromAllDrives: true,
       }
-      
+
       if (pageToken) {
         listParams.pageToken = pageToken
       }

@@ -59,7 +59,7 @@ interface StorageData {
     importFormats: Record<string, string[]>
     exportFormats: Record<string, string[]>
     folderColorPalette: string[]
-    driveThemes: any[]
+    driveThemes: Array<Record<string, unknown>>
     appInstalled: boolean
   }
   user: {
@@ -346,8 +346,9 @@ export function EnhancedStorageAnalytics() {
       } else {
         setError(result.error || 'Failed to fetch storage data')
       }
-    } catch (err: any) {
-      setError(err.message || 'Network error occurred')
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Network error occurred'
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }

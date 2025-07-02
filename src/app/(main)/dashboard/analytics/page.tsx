@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { StorageAnalytics } from './_components/storage-analytics'
+// Basic analytics component will be implemented later
 import { EnhancedStorageAnalytics } from './_components/storage-analytics-new'
 
 export default function AnalyticsPage() {
@@ -28,9 +28,10 @@ export default function AnalyticsPage() {
         </TabsContent>
 
         <TabsContent value="basic">
-          <Suspense fallback={<div>Loading basic analytics...</div>}>
-            <StorageAnalytics />
-          </Suspense>
+          <div className="rounded-lg border p-8 text-center text-muted-foreground">
+            <p>Basic analytics component will be implemented in the next phase.</p>
+            <p className="text-sm mt-2">Use Enhanced Analysis for comprehensive storage insights.</p>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

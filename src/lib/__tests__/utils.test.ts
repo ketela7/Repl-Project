@@ -1,6 +1,4 @@
-
 import { cn } from '../utils'
-import { type ClassValue } from 'clsx'
 
 describe('Utils', () => {
   describe('cn (className utility)', () => {
@@ -38,9 +36,9 @@ describe('Utils', () => {
 
     it('should handle objects with conditional classes', () => {
       const result = cn({
-        'active': true,
-        'disabled': false,
-        'visible': true
+        active: true,
+        disabled: false,
+        visible: true,
       })
       expect(result).toContain('active')
       expect(result).toContain('visible')
@@ -58,10 +56,10 @@ describe('Utils', () => {
       const result = cn(
         'base',
         ['array1', 'array2'],
-        { 'conditional': true, 'false-conditional': false },
+        { conditional: true, 'false-conditional': false },
         undefined,
         null,
-        'final'
+        'final',
       )
       expect(result).toContain('base')
       expect(result).toContain('array1')

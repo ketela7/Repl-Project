@@ -88,11 +88,11 @@ export class GoogleDriveService {
       parentId,
       mimeType,
     }
-    
+
     if (pageToken) {
       validationParams.pageToken = pageToken
     }
-    
+
     const { validPageSize, validPageToken, searchQuery, operationType } = validateListFilesOptions(validationParams)
 
     // Use operation type from validation
