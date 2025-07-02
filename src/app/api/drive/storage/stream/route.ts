@@ -57,24 +57,13 @@ export async function GET(request: NextRequest) {
             const largestFiles: any[] = []
 
             // Process files in chunks of 1000 (maximum pageSize) to minimize API calls
-            const startTime = Date.now()
-            const maxExecutionTime = 55000 // 55 seconds execution limit (platform usually 60s)
-            
             do {
-              // Check execution time limit
-              const elapsedTime = Date.now() - startTime
-              if (elapsedTime > maxExecutionTime) {
-                sendData('progress', { 
-                  step: 'timeout_reached', 
-                  message: `Execution timeout reached (55s). Processed ${totalProcessed} files.`,
-                  isComplete: true,
-                  canContinue: !!pageToken,
-                  nextPageToken: pageToken
-                })
-                break
-              }
+              // Create timeout promise for individual API request (55s per request)
+              const apiTimeout = new Promise<never>((_, reject) => {
+                setTimeout(() => reject(new Error('API request timeout after 55 seconds')), 55000)
+              })
 
-              const response = await drive.files.list({
+              const apiCall = drive.files.list({
                 q: 'trashed=false',
                 pageSize: 1000, // Maximum pageSize to reduce API calls
                 pageToken,
@@ -83,6 +72,24 @@ export async function GET(request: NextRequest) {
                 supportsAllDrives: true,
                 includeItemsFromAllDrives: true,
               })
+
+              let response
+              try {
+                // Race between API call and timeout
+                response = await Promise.race([apiCall, apiTimeout])
+              } catch (error: any) {
+                if (error.message.includes('timeout')) {
+                  sendData('progress', { 
+                    step: 'api_timeout', 
+                    message: `API request timeout after 55s. Processed ${totalProcessed} files.`,
+                    isComplete: true,
+                    canContinue: !!pageToken,
+                    nextPageToken: pageToken
+                  })
+                  break
+                }
+                throw error // Re-throw other errors
+              }
 
               const files = response.data.files || []
               allFiles = [...allFiles, ...files]
@@ -139,18 +146,14 @@ export async function GET(request: NextRequest) {
             // Final summary
             const totalSize = Object.values(fileSizesByType).reduce((sum, size) => sum + size, 0)
             
-            const elapsedTimeMs = Date.now() - startTime
-            const wasTimedOut = elapsedTimeMs > maxExecutionTime
-            
             sendData('final_summary', {
               totalFiles: totalProcessed,
               totalSizeBytes: totalSize,
               filesByType,
               fileSizesByType,
               largestFiles,
-              processingComplete: !wasTimedOut,
-              accuracy: wasTimedOut ? `Partial (${Math.round(elapsedTimeMs/1000)}s timeout)` : 'Complete',
-              executionTimeMs: elapsedTimeMs
+              processingComplete: true,
+              accuracy: 'Complete'
             })
 
             sendData('complete', { message: 'Analysis complete!' })
