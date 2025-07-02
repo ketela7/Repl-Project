@@ -443,7 +443,7 @@ export function DriveToolbar({
   onCreateFolder,
   selectedItems,
   onDeselectAll,
-  onRefreshAfterOp,
+
   filters,
   onFilterChange,
   onApplyFilters,
@@ -1794,16 +1794,16 @@ export function DriveToolbar({
         onFilterChange={onFilterChange}
         onApplyFilters={onApplyFilters}
         currentFilters={filters}
-        hasActiveFilters={
+        hasActiveFilters={Boolean(
           filters.activeView !== 'all' ||
           filters.fileTypeFilter.length > 0 ||
-          !!(filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) ||
+          (filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) ||
           (filters.advancedFilters.sizeRange?.max && filters.advancedFilters.sizeRange.max > 0) ||
-          !!filters.advancedFilters.createdDateRange?.from ||
-          !!filters.advancedFilters.modifiedDateRange?.from ||
-          !!(filters.advancedFilters.owner && (filters.advancedFilters.owner as string).trim()) ||
+          filters.advancedFilters.createdDateRange?.from ||
+          filters.advancedFilters.modifiedDateRange?.from ||
+          (filters.advancedFilters.owner && (filters.advancedFilters.owner as string).trim()) ||
           (filters.advancedFilters.pageSize && filters.advancedFilters.pageSize !== 50)
-        }
+        )}
         onClearFilters={onClearFilters}
       />
     </div>

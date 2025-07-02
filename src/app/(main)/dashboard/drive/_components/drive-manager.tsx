@@ -373,11 +373,21 @@ export function DriveManager() {
     [filters],
   )
 
-  // Helper function to convert selected IDs to full objects
+  // Helper function to convert selected IDs to full objects  
   const getSelectedItemObjects = () => {
     return Array.from(selectedItems)
       .map(id => displayItems.find(item => item.id === id))
-      .filter(Boolean)
+      .filter((item): item is DriveItem => Boolean(item))
+  }
+
+  // Helper function to convert selected items to simplified dialog format
+  const getSelectedItemsForDialog = () => {
+    return getSelectedItemObjects().map(item => ({
+      id: item.id,
+      name: item.name || 'Unnamed',
+      isFolder: Boolean(item.isFolder || item.mimeType === 'application/vnd.google-apps.folder'),
+      mimeType: item.mimeType
+    }))
   }
 
   // Effects for initial load and dependencies
@@ -896,7 +906,7 @@ export function DriveManager() {
             closeDialog('delete')
             setSelectedItems(new Set())
           }}
-          selectedItems={getSelectedItemObjects()}
+          selectedItems={getSelectedItemsForDialog()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('delete')
@@ -913,8 +923,7 @@ export function DriveManager() {
             closeDialog('untrash')
             setSelectedItems(new Set())
           }}
-          selectedItems={Array.from(selectedItems)}
-          allItems={displayItems}
+          selectedItems={getSelectedItemsForDialog()}
           onComplete={() => {
             closeDialog('untrash')
             setSelectedItems(new Set())
@@ -930,7 +939,7 @@ export function DriveManager() {
             closeDialog('download')
             setSelectedItems(new Set())
           }}
-          selectedItems={getSelectedItemObjects()}
+          selectedItems={getSelectedItemsForDialog()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('download')
@@ -946,7 +955,7 @@ export function DriveManager() {
             closeDialog('export')
             setSelectedItems(new Set())
           }}
-          selectedItems={getSelectedItemObjects()}
+          selectedItems={getSelectedItemsForDialog()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('export')

@@ -1,10 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 import { initDriveService, handleApiError } from '@/lib/api-utils'
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const { driveService, response } = await initDriveService()
     if (response) return response
+    if (!driveService) throw new Error('Drive service not available')
 
     // Get comprehensive about information including storage quota and system capabilities
     const aboutResponse = await driveService.drive.about.get({
@@ -19,12 +20,12 @@ export async function GET(request: NextRequest) {
     // Get file statistics by querying files with specific criteria
     const [
       allFilesResponse,
-      documentsResponse,
-      spreadsheetsResponse,
-      presentationsResponse,
-      imagesResponse,
-      videosResponse,
-      pdfsResponse,
+      ,
+      ,
+      ,
+      ,
+      ,
+      ,
       sharedResponse,
       starredResponse,
     ] = await Promise.all([

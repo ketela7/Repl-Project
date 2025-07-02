@@ -122,9 +122,10 @@ export function FiltersDialog({
   }, [open, currentFilters])
 
   // Check if size filters are applied (Google Drive API limitation: size filters only work for files)
-  const hasSizeFilter =
+  const hasSizeFilter = Boolean(
     (tempAdvancedFilters.sizeRange?.min && tempAdvancedFilters.sizeRange.min > 0) ||
     (tempAdvancedFilters.sizeRange?.max && tempAdvancedFilters.sizeRange.max > 0)
+  )
 
   // Calculate if there are active temp filters to show Clear All button
   const hasTempActiveFilters =
@@ -296,18 +297,7 @@ export function FiltersDialog({
     })
   }
 
-  // Apply the clear immediately to reset the data view
-  const applyFilterClear = () => {
-    onFilterChange({
-      activeView: 'all',
-      fileTypeFilter: [],
-      advancedFilters: {
-        pageSize: 50, // Reset to default
-      },
-    })
-    onClearFilters()
-    onOpenChange(false)
-  }
+
 
   const renderContent = () => (
     <>

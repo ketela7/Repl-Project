@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     const totalTime = Date.now() - startTime
 
     // Add performance metrics
-    analytics.processing.totalProcessingTimeMs = totalTime
+    analytics.processing.processingTimeMs = totalTime
 
     return NextResponse.json({
       success: true,
