@@ -12,8 +12,8 @@ export const FIELD_SETS = {
   // Minimal fields for basic listing (fastest)
   LIST_BASIC: `${BASE_FIELDS},parents,trashed`,
 
-  // Essential fields for file management operations - now includes owners and createdTime
-  LIST_STANDARD: `${BASE_FIELDS},size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
+  // Essential fields for file management operations - now includes owners, createdTime, and thumbnailLink for preview functionality
+  LIST_STANDARD: `${BASE_FIELDS},size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,thumbnailLink,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
 
   // Extended fields for detailed views
   LIST_DETAILED: `${BASE_FIELDS},size,createdTime,modifiedTime,webViewLink,thumbnailLink,parents,owners(displayName,emailAddress,photoLink),shared,trashed,starred,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,

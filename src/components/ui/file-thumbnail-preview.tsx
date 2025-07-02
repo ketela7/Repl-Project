@@ -25,7 +25,7 @@ function formatDriveFileDate(dateString: string): string {
       minute: '2-digit',
       timeZone: userTimezone,
     });
-  } catch (error) {
+  } catch (_error) {
     return 'Invalid date';
   }
 }
@@ -57,6 +57,18 @@ export function FileThumbnailPreview({
   // Don't show preview if no thumbnail available
   if (!thumbnailLink) {
     return <>{children}</>;
+  }
+
+  // Debug: Log thumbnail information in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('FileThumbnailPreview:', {
+      fileName,
+      thumbnailLink: thumbnailLink ? 'Available' : 'Missing',
+      mimeType,
+      isVisible,
+      thumbnailLoaded,
+      thumbnailError
+    });
   }
 
   const handleMouseEnter = (e: React.MouseEvent) => {
@@ -177,7 +189,13 @@ export function FileThumbnailPreview({
                     aspectRatio: '16/10'
                   }}
                   onLoad={() => setThumbnailLoaded(true)}
-                  onError={() => {
+                  onError={(e) => {
+                    console.warn('Thumbnail load error:', {
+                      fileName,
+                      thumbnailLink,
+                      error: e,
+                      src: e.currentTarget.src
+                    });
                     setThumbnailError(true);
                     setThumbnailLoaded(false);
                   }}
@@ -187,12 +205,13 @@ export function FileThumbnailPreview({
                 <div className="w-full h-[140px] bg-gradient-to-br from-muted to-muted/60 rounded-lg flex items-center justify-center text-muted-foreground">
                   <div className="text-center space-y-2">
                     <div className="opacity-60 mx-auto">
-                      {mimeType?.startsWith('video/') ? <Video className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
-                       mimeType?.startsWith('image/') ? <Image className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
-                       mimeType?.includes('pdf') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
-                       mimeType?.includes('document') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
-                       mimeType?.includes('presentation') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> :
-                       mimeType?.includes('spreadsheet') ? <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" /> : <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />}
+                      {mimeType?.startsWith('video/') ? (
+                        <Video className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />
+                       ) : mimeType?.startsWith('image/') ? (
+                        <Image className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />
+                       ) : (
+                        <FileText className="h-6 w-6 sm:h-8 sm:w-8" aria-hidden="true" />
+                       )}
                     </div>
                     <div className="text-xs font-medium">Preview unavailable</div>
                   </div>
