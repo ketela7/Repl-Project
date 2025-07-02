@@ -42,6 +42,9 @@ const customJestConfig = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/coverage/', '<rootDir>/dist/'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(next-auth|@auth/core)/)',
+  ],
   // Performance optimizations for fast development
   maxWorkers: 1,
   cache: true,

@@ -1,4 +1,4 @@
-import { cache } from '../cache'
+import { driveCache as cache } from '../cache'
 
 describe('Cache', () => {
   beforeEach(() => {

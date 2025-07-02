@@ -9,6 +9,7 @@ import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from 'web-vitals'
 const PERFORMANCE_THRESHOLDS = {
   LCP: { good: 2500, poor: 4000 }, // Largest Contentful Paint
   FID: { good: 100, poor: 300 }, // First Input Delay
+  INP: { good: 200, poor: 500 }, // Interaction to Next Paint
   CLS: { good: 0.1, poor: 0.25 }, // Cumulative Layout Shift
   FCP: { good: 1800, poor: 3000 }, // First Contentful Paint
   TTFB: { good: 800, poor: 1800 }, // Time to First Byte
@@ -78,9 +79,9 @@ export function initWebVitals() {
 
   onINP((metric: Metric) => {
     sendToAnalytics({
-      name: 'FID',
+      name: 'INP',
       value: metric.value,
-      rating: getRating('FID', metric.value),
+      rating: getRating('INP', metric.value),
       timestamp: Date.now(),
     })
   })
