@@ -1,8 +1,6 @@
 'use client'
 
 import { Suspense } from 'react'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-// Basic analytics component will be implemented later
 import { StorageAnalytics } from './_components/storage-analytics'
 
 export default function AnalyticsPage() {
@@ -15,25 +13,9 @@ export default function AnalyticsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="enhanced" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="enhanced">Enhanced Analysis</TabsTrigger>
-          <TabsTrigger value="basic">Basic Analysis</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="enhanced">
-          <Suspense fallback={<div>Loading enhanced analytics...</div>}>
-            <StorageAnalytics />
-          </Suspense>
-        </TabsContent>
-
-        <TabsContent value="basic">
-          <div className="rounded-lg border p-8 text-center text-muted-foreground">
-            <p>Basic analytics component will be implemented in the next phase.</p>
-            <p className="text-sm mt-2">Use Enhanced Analysis for comprehensive storage insights.</p>
-          </div>
-        </TabsContent>
-      </Tabs>
+      <Suspense fallback={<div>Loading analytics...</div>}>
+        <StorageAnalytics />
+      </Suspense>
     </div>
   )
 }

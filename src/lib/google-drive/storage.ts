@@ -164,14 +164,14 @@ export class StorageAnalyzer {
    * Fast analysis - limited sample for quick results
    */
   private async getFastAnalysis() {
-    const sampleSize = 2000 // Sample first 2000 files for fast estimate
+    const sampleSize = 500 // Much smaller sample for very fast results
 
     const files = await this.getPaginatedFiles(sampleSize)
     const analysis = this.analyzeFiles(files)
 
     return {
       ...analysis,
-      estimatedAccuracy: Math.min(100, (files.length / 5000) * 100), // Estimate based on typical Drive sizes
+      estimatedAccuracy: Math.min(100, (files.length / 2000) * 100), // Estimate based on sample
     }
   }
 
@@ -192,11 +192,11 @@ export class StorageAnalyzer {
    * Progressive analysis - smart strategy based on Drive size
    */
   private async getProgressiveAnalysis() {
-    // Start with a reasonable sample
-    let files = await this.getPaginatedFiles(5000)
+    // Start with a much smaller sample for faster results
+    let files = await this.getPaginatedFiles(1000)
 
     // If we hit the limit, estimate total and decide strategy
-    if (files.length === 5000) {
+    if (files.length === 1000) {
       // Try to get a rough count estimate (faster query)
       const estimatedTotal = await this.estimateTotalFiles()
 

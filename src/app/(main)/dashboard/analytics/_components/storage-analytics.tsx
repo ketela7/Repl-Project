@@ -331,7 +331,7 @@ export function StorageAnalytics() {
   const [meta, setMeta] = useState<AnalyticsMeta | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [strategy, setStrategy] = useState<'fast' | 'complete' | 'progressive'>('progressive')
+  const [strategy, setStrategy] = useState<'fast' | 'complete' | 'progressive'>('fast')
 
   const fetchStorageData = async (selectedStrategy: 'fast' | 'complete' | 'progressive' = strategy) => {
     try {
@@ -345,7 +345,18 @@ export function StorageAnalytics() {
         setData(result.data)
         setMeta(result.meta)
       } else {
-        setError(result.error || 'Failed to fetch storage data')
+        // Handle timeout errors with better suggestions
+        if (response.status === 408 && result.suggestion === 'fast') {
+          setError('Analysis timeout. Switching to Fast analysis for better performance.')
+          // Auto-retry with fast strategy
+          if (selectedStrategy !== 'fast') {
+            setStrategy('fast')
+            setTimeout(() => fetchStorageData('fast'), 1000)
+            return
+          }
+        } else {
+          setError(result.error || 'Failed to fetch storage data')
+        }
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Network error occurred'
@@ -434,7 +445,7 @@ export function StorageAnalytics() {
               disabled={loading}
             >
               <Clock className="mr-2 h-4 w-4" />
-              Fast (~2k files)
+              Fast (~500 files)
             </Button>
             <Button
               variant={strategy === 'progressive' ? 'default' : 'outline'}
