@@ -57,16 +57,19 @@ export async function GET(request: NextRequest) {
             const largestFiles: any[] = []
 
             // Process files in chunks of 1000 (maximum pageSize) to minimize API calls
-            let loopCount = 0
-            const maxLoops = 50 // Safety limit to prevent infinite loops
+            const startTime = Date.now()
+            const maxExecutionTime = 55000 // 55 seconds execution limit (platform usually 60s)
             
             do {
-              loopCount++
-              if (loopCount > maxLoops) {
+              // Check execution time limit
+              const elapsedTime = Date.now() - startTime
+              if (elapsedTime > maxExecutionTime) {
                 sendData('progress', { 
-                  step: 'safety_stop', 
-                  message: `Safety limit reached (${maxLoops} API calls). Analysis stopped.`,
-                  isComplete: true
+                  step: 'timeout_reached', 
+                  message: `Execution timeout reached (55s). Processed ${totalProcessed} files.`,
+                  isComplete: true,
+                  canContinue: !!pageToken,
+                  nextPageToken: pageToken
                 })
                 break
               }
@@ -128,23 +131,16 @@ export async function GET(request: NextRequest) {
                 processed: totalProcessed
               })
 
-              // Small delay to prevent overwhelming the client (reduced since we use larger pageSize)
+              // Small delay to prevent overwhelming the client and rate limiting
               await new Promise(resolve => setTimeout(resolve, 50))
-
-              // Stop after 10,000 files to prevent timeout
-              if (totalProcessed >= 10000) {
-                sendData('progress', { 
-                  step: 'limit_reached', 
-                  message: `Analyzed ${totalProcessed} files (sample limit reached)`,
-                  isComplete: true
-                })
-                break
-              }
 
             } while (pageToken)
 
             // Final summary
             const totalSize = Object.values(fileSizesByType).reduce((sum, size) => sum + size, 0)
+            
+            const elapsedTimeMs = Date.now() - startTime
+            const wasTimedOut = elapsedTimeMs > maxExecutionTime
             
             sendData('final_summary', {
               totalFiles: totalProcessed,
@@ -152,8 +148,9 @@ export async function GET(request: NextRequest) {
               filesByType,
               fileSizesByType,
               largestFiles,
-              processingComplete: true,
-              accuracy: totalProcessed >= 10000 ? 'Sample (10k+ files)' : 'Complete'
+              processingComplete: !wasTimedOut,
+              accuracy: wasTimedOut ? `Partial (${Math.round(elapsedTimeMs/1000)}s timeout)` : 'Complete',
+              executionTimeMs: elapsedTimeMs
             })
 
             sendData('complete', { message: 'Analysis complete!' })
