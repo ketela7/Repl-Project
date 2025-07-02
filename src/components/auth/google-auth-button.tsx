@@ -32,7 +32,7 @@ export function GoogleAuthButton({ className, onClick }: GoogleAuthButtonProps) 
 
       // Note: Success toast will be shown after redirect in the dashboard
       loadingToast.dismiss(loadingId)
-    } catch (error) {
+    } catch {
       loadingToast.error('Failed to sign in with Google', loadingId)
       errorToast.generic('Sign in failed', {
         description: 'Please try again or check your connection',

@@ -1,6 +1,19 @@
 import NextAuth from 'next-auth'
 import Google from 'next-auth/providers/google'
 
+// Validate required environment variables
+function validateEnvVars() {
+  const required = ['NEXTAUTH_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']
+  const missing = required.filter(key => !process.env[key])
+  
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`)
+  }
+}
+
+// Validate on module load
+validateEnvVars()
+
 declare module 'next-auth' {
   interface Session {
     accessToken?: string
@@ -168,6 +181,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   trustHost: true,
-  secret: process.env.NEXTAUTH_SECRET!,
+  secret: process.env.NEXTAUTH_SECRET || '',
   debug: process.env.NODE_ENV === 'development',
 })

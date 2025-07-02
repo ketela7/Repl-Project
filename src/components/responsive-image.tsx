@@ -114,22 +114,22 @@ export function Avatar({
 }
 
 // File thumbnail responsive image
-export function Thumbnail({ 
-  src, 
-  alt, 
+export function Thumbnail({
+  src,
+  alt,
   className,
   onLoad,
   onError,
   width = 320,
-  height = 200
-}: { 
-  src: string; 
-  alt: string; 
-  className?: string;
-  onLoad?: () => void;
-  onError?: () => void;
-  width?: number;
-  height?: number;
+  height = 200,
+}: {
+  src: string
+  alt: string
+  className?: string
+  onLoad?: () => void
+  onError?: () => void
+  width?: number
+  height?: number
 }) {
   return (
     <ResponsiveImage
