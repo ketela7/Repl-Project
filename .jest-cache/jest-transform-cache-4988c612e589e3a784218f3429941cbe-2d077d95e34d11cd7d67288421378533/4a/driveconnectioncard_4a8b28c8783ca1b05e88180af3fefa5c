@@ -1,0 +1,562 @@
+214260c7db69747c32aabc24dd3f38a8
+'use client';
+"use strict";
+
+/* istanbul ignore next */
+function cov_kipkkgflf() {
+  var path = "/home/runner/workspace/src/app/(main)/dashboard/drive/_components/drive-connection-card.tsx";
+  var hash = "0a14012f670af4d9f177ded242b702dc123d429d";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/app/(main)/dashboard/drive/_components/drive-connection-card.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 3,
+          column: 0
+        },
+        end: {
+          line: 5,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 7,
+          column: 4
+        },
+        end: {
+          line: 10,
+          column: 7
+        }
+      },
+      "2": {
+        start: {
+          line: 7,
+          column: 24
+        },
+        end: {
+          line: 10,
+          column: 7
+        }
+      },
+      "3": {
+        start: {
+          line: 12,
+          column: 0
+        },
+        end: {
+          line: 19,
+          column: 3
+        }
+      },
+      "4": {
+        start: {
+          line: 14,
+          column: 8
+        },
+        end: {
+          line: 14,
+          column: 35
+        }
+      },
+      "5": {
+        start: {
+          line: 17,
+          column: 8
+        },
+        end: {
+          line: 17,
+          column: 24
+        }
+      },
+      "6": {
+        start: {
+          line: 20,
+          column: 20
+        },
+        end: {
+          line: 20,
+          column: 48
+        }
+      },
+      "7": {
+        start: {
+          line: 21,
+          column: 15
+        },
+        end: {
+          line: 21,
+          column: 31
+        }
+      },
+      "8": {
+        start: {
+          line: 22,
+          column: 21
+        },
+        end: {
+          line: 22,
+          column: 44
+        }
+      },
+      "9": {
+        start: {
+          line: 23,
+          column: 16
+        },
+        end: {
+          line: 23,
+          column: 62
+        }
+      },
+      "10": {
+        start: {
+          line: 24,
+          column: 14
+        },
+        end: {
+          line: 24,
+          column: 58
+        }
+      },
+      "11": {
+        start: {
+          line: 26,
+          column: 40
+        },
+        end: {
+          line: 26,
+          column: 67
+        }
+      },
+      "12": {
+        start: {
+          line: 27,
+          column: 26
+        },
+        end: {
+          line: 31,
+          column: 5
+        }
+      },
+      "13": {
+        start: {
+          line: 28,
+          column: 8
+        },
+        end: {
+          line: 28,
+          column: 28
+        }
+      },
+      "14": {
+        start: {
+          line: 30,
+          column: 8
+        },
+        end: {
+          line: 30,
+          column: 86
+        }
+      },
+      "15": {
+        start: {
+          line: 32,
+          column: 4
+        },
+        end: {
+          line: 162,
+          column: 7
+        }
+      },
+      "16": {
+        start: {
+          line: 164,
+          column: 17
+        },
+        end: {
+          line: 164,
+          column: 36
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "_export",
+        decl: {
+          start: {
+            line: 6,
+            column: 9
+          },
+          end: {
+            line: 6,
+            column: 16
+          }
+        },
+        loc: {
+          start: {
+            line: 6,
+            column: 30
+          },
+          end: {
+            line: 11,
+            column: 1
+          }
+        },
+        line: 6
+      },
+      "1": {
+        name: "(anonymous_1)",
+        decl: {
+          start: {
+            line: 13,
+            column: 25
+          },
+          end: {
+            line: 13,
+            column: 26
+          }
+        },
+        loc: {
+          start: {
+            line: 13,
+            column: 36
+          },
+          end: {
+            line: 15,
+            column: 5
+          }
+        },
+        line: 13
+      },
+      "2": {
+        name: "(anonymous_2)",
+        decl: {
+          start: {
+            line: 16,
+            column: 13
+          },
+          end: {
+            line: 16,
+            column: 14
+          }
+        },
+        loc: {
+          start: {
+            line: 16,
+            column: 24
+          },
+          end: {
+            line: 18,
+            column: 5
+          }
+        },
+        line: 16
+      },
+      "3": {
+        name: "DriveConnectionCard",
+        decl: {
+          start: {
+            line: 25,
+            column: 9
+          },
+          end: {
+            line: 25,
+            column: 28
+          }
+        },
+        loc: {
+          start: {
+            line: 25,
+            column: 31
+          },
+          end: {
+            line: 163,
+            column: 1
+          }
+        },
+        line: 25
+      },
+      "4": {
+        name: "(anonymous_4)",
+        decl: {
+          start: {
+            line: 27,
+            column: 26
+          },
+          end: {
+            line: 27,
+            column: 27
+          }
+        },
+        loc: {
+          start: {
+            line: 27,
+            column: 30
+          },
+          end: {
+            line: 31,
+            column: 5
+          }
+        },
+        line: 27
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 140,
+            column: 46
+          },
+          end: {
+            line: 154,
+            column: 38
+          }
+        },
+        type: "cond-expr",
+        locations: [{
+          start: {
+            line: 140,
+            column: 73
+          },
+          end: {
+            line: 147,
+            column: 38
+          }
+        }, {
+          start: {
+            line: 147,
+            column: 55
+          },
+          end: {
+            line: 154,
+            column: 38
+          }
+        }],
+        line: 140
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0
+    },
+    b: {
+      "0": [0, 0]
+    },
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/app/(main)/dashboard/drive/_components/drive-connection-card.tsx"],
+      sourcesContent: ["'use client'\n\nimport { useState } from 'react'\nimport { HardDrive, Shield, Upload, Search, Folder } from 'lucide-react'\n\nimport { Button } from '@/components/ui/button'\nimport { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'\n\nexport function DriveConnectionCard() {\n  const [connecting, setConnecting] = useState(false)\n\n  const handleConnect = () => {\n    setConnecting(true)\n    // Direct OAuth flow without intermediate page\n    window.location.href = '/api/auth/signin/google?callbackUrl=/dashboard/drive'\n  }\n\n  return (\n    <div className=\"flex min-h-[60vh] items-center justify-center\">\n      <Card className=\"mx-auto max-w-lg\">\n        <CardHeader className=\"text-center\">\n          <div className=\"bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full\">\n            <HardDrive className=\"text-primary h-8 w-8\" />\n          </div>\n          <CardTitle className=\"text-2xl\">Connect to Google Drive</CardTitle>\n          <CardDescription className=\"text-base\">\n            Securely connect to manage your Google Drive files and folders\n          </CardDescription>\n        </CardHeader>\n        <CardContent className=\"space-y-6\">\n          <div className=\"grid grid-cols-2 gap-4\">\n            <div className=\"space-y-2 text-center\">\n              <Upload className=\"text-muted-foreground mx-auto h-8 w-8 opacity-60\" />\n              <p className=\"text-sm font-medium\">Upload Files</p>\n              <p className=\"text-muted-foreground text-xs\">Coming soon</p>\n            </div>\n            <div className=\"space-y-2 text-center\">\n              <Folder className=\"text-muted-foreground mx-auto h-8 w-8\" />\n              <p className=\"text-sm font-medium\">Organize Folders</p>\n              <p className=\"text-muted-foreground text-xs\">Create and manage folder structure</p>\n            </div>\n            <div className=\"space-y-2 text-center\">\n              <Search className=\"text-muted-foreground mx-auto h-8 w-8\" />\n              <p className=\"text-sm font-medium\">Search Files</p>\n              <p className=\"text-muted-foreground text-xs\">Find files quickly with search</p>\n            </div>\n            <div className=\"space-y-2 text-center\">\n              <Shield className=\"text-muted-foreground mx-auto h-8 w-8\" />\n              <p className=\"text-sm font-medium\">Secure Access</p>\n              <p className=\"text-muted-foreground text-xs\">Protected with OAuth 2.0</p>\n            </div>\n          </div>\n\n          <div className=\"space-y-4 text-center\">\n            <p className=\"text-muted-foreground text-sm\">\n              You'll be redirected to Google to securely authorize access to your Drive files.\n            </p>\n\n            <Button onClick={handleConnect} disabled={connecting} size=\"lg\" className=\"w-full\">\n              {connecting ? (\n                <>\n                  <Shield className=\"mr-2 h-4 w-4 animate-pulse\" />\n                  Connecting to Google...\n                </>\n              ) : (\n                <>\n                  <Shield className=\"mr-2 h-4 w-4\" />\n                  Connect Drive\n                </>\n              )}\n            </Button>\n          </div>\n        </CardContent>\n      </Card>\n    </div>\n  )\n}\n\nexport default DriveConnectionCard\n"],
+      names: ["DriveConnectionCard", "connecting", "setConnecting", "useState", "handleConnect", "window", "location", "href", "div", "className", "Card", "CardHeader", "HardDrive", "CardTitle", "CardDescription", "CardContent", "Upload", "p", "Folder", "Search", "Shield", "Button", "onClick", "disabled", "size"],
+      mappings: "AAAA;;;;;;;;;;;;IAQgBA,mBAAmB;eAAnBA;;IAsEhB,OAAkC;eAAlC;;;;uBA5EyB;6BACiC;wBAEnC;sBACmD;AAEnE,SAASA;IACd,MAAM,CAACC,YAAYC,cAAc,GAAGC,IAAAA,eAAQ,EAAC;IAE7C,MAAMC,gBAAgB;QACpBF,cAAc;QACd,8CAA8C;QAC9CG,OAAOC,QAAQ,CAACC,IAAI,GAAG;IACzB;IAEA,qBACE,qBAACC;QAAIC,WAAU;kBACb,cAAA,sBAACC,UAAI;YAACD,WAAU;;8BACd,sBAACE,gBAAU;oBAACF,WAAU;;sCACpB,qBAACD;4BAAIC,WAAU;sCACb,cAAA,qBAACG,sBAAS;gCAACH,WAAU;;;sCAEvB,qBAACI,eAAS;4BAACJ,WAAU;sCAAW;;sCAChC,qBAACK,qBAAe;4BAACL,WAAU;sCAAY;;;;8BAIzC,sBAACM,iBAAW;oBAACN,WAAU;;sCACrB,sBAACD;4BAAIC,WAAU;;8CACb,sBAACD;oCAAIC,WAAU;;sDACb,qBAACO,mBAAM;4CAACP,WAAU;;sDAClB,qBAACQ;4CAAER,WAAU;sDAAsB;;sDACnC,qBAACQ;4CAAER,WAAU;sDAAgC;;;;8CAE/C,sBAACD;oCAAIC,WAAU;;sDACb,qBAACS,mBAAM;4CAACT,WAAU;;sDAClB,qBAACQ;4CAAER,WAAU;sDAAsB;;sDACnC,qBAACQ;4CAAER,WAAU;sDAAgC;;;;8CAE/C,sBAACD;oCAAIC,WAAU;;sDACb,qBAACU,mBAAM;4CAACV,WAAU;;sDAClB,qBAACQ;4CAAER,WAAU;sDAAsB;;sDACnC,qBAACQ;4CAAER,WAAU;sDAAgC;;;;8CAE/C,sBAACD;oCAAIC,WAAU;;sDACb,qBAACW,mBAAM;4CAACX,WAAU;;sDAClB,qBAACQ;4CAAER,WAAU;sDAAsB;;sDACnC,qBAACQ;4CAAER,WAAU;sDAAgC;;;;;;sCAIjD,sBAACD;4BAAIC,WAAU;;8CACb,qBAACQ;oCAAER,WAAU;8CAAgC;;8CAI7C,qBAACY,cAAM;oCAACC,SAASlB;oCAAemB,UAAUtB;oCAAYuB,MAAK;oCAAKf,WAAU;8CACvER,2BACC;;0DACE,qBAACmB,mBAAM;gDAACX,WAAU;;4CAA+B;;uDAInD;;0DACE,qBAACW,mBAAM;gDAACX,WAAU;;4CAAiB;;;;;;;;;;;AAUrD;MAEA,WAAeT"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "0a14012f670af4d9f177ded242b702dc123d429d"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_kipkkgflf = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_kipkkgflf();
+cov_kipkkgflf().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function _export(target, all) {
+  /* istanbul ignore next */
+  cov_kipkkgflf().f[0]++;
+  cov_kipkkgflf().s[1]++;
+  for (var name in all) {
+    /* istanbul ignore next */
+    cov_kipkkgflf().s[2]++;
+    Object.defineProperty(target, name, {
+      enumerable: true,
+      get: all[name]
+    });
+  }
+}
+/* istanbul ignore next */
+cov_kipkkgflf().s[3]++;
+_export(exports, {
+  DriveConnectionCard: function () {
+    /* istanbul ignore next */
+    cov_kipkkgflf().f[1]++;
+    cov_kipkkgflf().s[4]++;
+    return DriveConnectionCard;
+  },
+  default: function () {
+    /* istanbul ignore next */
+    cov_kipkkgflf().f[2]++;
+    cov_kipkkgflf().s[5]++;
+    return _default;
+  }
+});
+const _jsxruntime =
+/* istanbul ignore next */
+(cov_kipkkgflf().s[6]++, require("react/jsx-runtime"));
+const _react =
+/* istanbul ignore next */
+(cov_kipkkgflf().s[7]++, require("react"));
+const _lucidereact =
+/* istanbul ignore next */
+(cov_kipkkgflf().s[8]++, require("lucide-react"));
+const _button =
+/* istanbul ignore next */
+(cov_kipkkgflf().s[9]++, require("../../../../../components/ui/button"));
+const _card =
+/* istanbul ignore next */
+(cov_kipkkgflf().s[10]++, require("../../../../../components/ui/card"));
+function DriveConnectionCard() {
+  /* istanbul ignore next */
+  cov_kipkkgflf().f[3]++;
+  const [connecting, setConnecting] =
+  /* istanbul ignore next */
+  (cov_kipkkgflf().s[11]++, (0, _react.useState)(false));
+  /* istanbul ignore next */
+  cov_kipkkgflf().s[12]++;
+  const handleConnect = () => {
+    /* istanbul ignore next */
+    cov_kipkkgflf().f[4]++;
+    cov_kipkkgflf().s[13]++;
+    setConnecting(true);
+    // Direct OAuth flow without intermediate page
+    /* istanbul ignore next */
+    cov_kipkkgflf().s[14]++;
+    window.location.href = '/api/auth/signin/google?callbackUrl=/dashboard/drive';
+  };
+  /* istanbul ignore next */
+  cov_kipkkgflf().s[15]++;
+  return /*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+    className: "flex min-h-[60vh] items-center justify-center",
+    children: /*#__PURE__*/(0, _jsxruntime.jsxs)(_card.Card, {
+      className: "mx-auto max-w-lg",
+      children: [/*#__PURE__*/(0, _jsxruntime.jsxs)(_card.CardHeader, {
+        className: "text-center",
+        children: [/*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+          className: "bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full",
+          children: /*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.HardDrive, {
+            className: "text-primary h-8 w-8"
+          })
+        }), /*#__PURE__*/(0, _jsxruntime.jsx)(_card.CardTitle, {
+          className: "text-2xl",
+          children: "Connect to Google Drive"
+        }), /*#__PURE__*/(0, _jsxruntime.jsx)(_card.CardDescription, {
+          className: "text-base",
+          children: "Securely connect to manage your Google Drive files and folders"
+        })]
+      }), /*#__PURE__*/(0, _jsxruntime.jsxs)(_card.CardContent, {
+        className: "space-y-6",
+        children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+          className: "grid grid-cols-2 gap-4",
+          children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+            className: "space-y-2 text-center",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Upload, {
+              className: "text-muted-foreground mx-auto h-8 w-8 opacity-60"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "text-sm font-medium",
+              children: "Upload Files"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "text-muted-foreground text-xs",
+              children: "Coming soon"
+            })]
+          }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+            className: "space-y-2 text-center",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Folder, {
+              className: "text-muted-foreground mx-auto h-8 w-8"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "text-sm font-medium",
+              children: "Organize Folders"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "text-muted-foreground text-xs",
+              children: "Create and manage folder structure"
+            })]
+          }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+            className: "space-y-2 text-center",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Search, {
+              className: "text-muted-foreground mx-auto h-8 w-8"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "text-sm font-medium",
+              children: "Search Files"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "text-muted-foreground text-xs",
+              children: "Find files quickly with search"
+            })]
+          }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+            className: "space-y-2 text-center",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Shield, {
+              className: "text-muted-foreground mx-auto h-8 w-8"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "text-sm font-medium",
+              children: "Secure Access"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "text-muted-foreground text-xs",
+              children: "Protected with OAuth 2.0"
+            })]
+          })]
+        }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+          className: "space-y-4 text-center",
+          children: [/*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+            className: "text-muted-foreground text-sm",
+            children: "You'll be redirected to Google to securely authorize access to your Drive files."
+          }), /*#__PURE__*/(0, _jsxruntime.jsx)(_button.Button, {
+            onClick: handleConnect,
+            disabled: connecting,
+            size: "lg",
+            className: "w-full",
+            children: connecting ?
+            /* istanbul ignore next */
+            (/*#__PURE__*/cov_kipkkgflf().b[0][0]++, (0, _jsxruntime.jsxs)(_jsxruntime.Fragment, {
+              children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Shield, {
+                className: "mr-2 h-4 w-4 animate-pulse"
+              }), "Connecting to Google..."]
+            })) :
+            /* istanbul ignore next */
+            (/*#__PURE__*/cov_kipkkgflf().b[0][1]++, (0, _jsxruntime.jsxs)(_jsxruntime.Fragment, {
+              children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Shield, {
+                className: "mr-2 h-4 w-4"
+              }), "Connect Drive"]
+            }))
+          })]
+        })]
+      })]
+    })
+  });
+}
+const _default =
+/* istanbul ignore next */
+(cov_kipkkgflf().s[16]++, DriveConnectionCard);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3Zfa2lwa2tnZmxmIiwiYWN0dWFsQ292ZXJhZ2UiLCJzIiwiRHJpdmVDb25uZWN0aW9uQ2FyZCIsImYiLCJkZWZhdWx0IiwiX2RlZmF1bHQiLCJjb25uZWN0aW5nIiwic2V0Q29ubmVjdGluZyIsIl9yZWFjdCIsInVzZVN0YXRlIiwiaGFuZGxlQ29ubmVjdCIsIndpbmRvdyIsImxvY2F0aW9uIiwiaHJlZiIsIl9qc3hydW50aW1lIiwianN4IiwiY2xhc3NOYW1lIiwianN4cyIsIl9jYXJkIiwiQ2FyZCIsIkNhcmRIZWFkZXIiLCJfbHVjaWRlcmVhY3QiLCJIYXJkRHJpdmUiLCJDYXJkVGl0bGUiLCJDYXJkRGVzY3JpcHRpb24iLCJDYXJkQ29udGVudCIsIlVwbG9hZCIsIkZvbGRlciIsIlNlYXJjaCIsIlNoaWVsZCIsIl9idXR0b24iLCJCdXR0b24iLCJvbkNsaWNrIiwiZGlzYWJsZWQiLCJzaXplIiwiYiIsIkZyYWdtZW50Il0sInNvdXJjZXMiOlsiL2hvbWUvcnVubmVyL3dvcmtzcGFjZS9zcmMvYXBwLyhtYWluKS9kYXNoYm9hcmQvZHJpdmUvX2NvbXBvbmVudHMvZHJpdmUtY29ubmVjdGlvbi1jYXJkLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyIndXNlIGNsaWVudCdcblxuaW1wb3J0IHsgdXNlU3RhdGUgfSBmcm9tICdyZWFjdCdcbmltcG9ydCB7IEhhcmREcml2ZSwgU2hpZWxkLCBVcGxvYWQsIFNlYXJjaCwgRm9sZGVyIH0gZnJvbSAnbHVjaWRlLXJlYWN0J1xuXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJ1xuaW1wb3J0IHsgQ2FyZCwgQ2FyZENvbnRlbnQsIENhcmREZXNjcmlwdGlvbiwgQ2FyZEhlYWRlciwgQ2FyZFRpdGxlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2NhcmQnXG5cbmV4cG9ydCBmdW5jdGlvbiBEcml2ZUNvbm5lY3Rpb25DYXJkKCkge1xuICBjb25zdCBbY29ubmVjdGluZywgc2V0Q29ubmVjdGluZ10gPSB1c2VTdGF0ZShmYWxzZSlcblxuICBjb25zdCBoYW5kbGVDb25uZWN0ID0gKCkgPT4ge1xuICAgIHNldENvbm5lY3RpbmcodHJ1ZSlcbiAgICAvLyBEaXJlY3QgT0F1dGggZmxvdyB3aXRob3V0IGludGVybWVkaWF0ZSBwYWdlXG4gICAgd2luZG93LmxvY2F0aW9uLmhyZWYgPSAnL2FwaS9hdXRoL3NpZ25pbi9nb29nbGU/Y2FsbGJhY2tVcmw9L2Rhc2hib2FyZC9kcml2ZSdcbiAgfVxuXG4gIHJldHVybiAoXG4gICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IG1pbi1oLVs2MHZoXSBpdGVtcy1jZW50ZXIganVzdGlmeS1jZW50ZXJcIj5cbiAgICAgIDxDYXJkIGNsYXNzTmFtZT1cIm14LWF1dG8gbWF4LXctbGdcIj5cbiAgICAgICAgPENhcmRIZWFkZXIgY2xhc3NOYW1lPVwidGV4dC1jZW50ZXJcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImJnLXByaW1hcnkvMTAgbXgtYXV0byBtYi00IGZsZXggaC0xNiB3LTE2IGl0ZW1zLWNlbnRlciBqdXN0aWZ5LWNlbnRlciByb3VuZGVkLWZ1bGxcIj5cbiAgICAgICAgICAgIDxIYXJkRHJpdmUgY2xhc3NOYW1lPVwidGV4dC1wcmltYXJ5IGgtOCB3LThcIiAvPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxDYXJkVGl0bGUgY2xhc3NOYW1lPVwidGV4dC0yeGxcIj5Db25uZWN0IHRvIEdvb2dsZSBEcml2ZTwvQ2FyZFRpdGxlPlxuICAgICAgICAgIDxDYXJkRGVzY3JpcHRpb24gY2xhc3NOYW1lPVwidGV4dC1iYXNlXCI+XG4gICAgICAgICAgICBTZWN1cmVseSBjb25uZWN0IHRvIG1hbmFnZSB5b3VyIEdvb2dsZSBEcml2ZSBmaWxlcyBhbmQgZm9sZGVyc1xuICAgICAgICAgIDwvQ2FyZERlc2NyaXB0aW9uPlxuICAgICAgICA8L0NhcmRIZWFkZXI+XG4gICAgICAgIDxDYXJkQ29udGVudCBjbGFzc05hbWU9XCJzcGFjZS15LTZcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ3JpZC1jb2xzLTIgZ2FwLTRcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yIHRleHQtY2VudGVyXCI+XG4gICAgICAgICAgICAgIDxVcGxvYWQgY2xhc3NOYW1lPVwidGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG14LWF1dG8gaC04IHctOCBvcGFjaXR5LTYwXCIgLz5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bVwiPlVwbG9hZCBGaWxlczwvcD5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1tdXRlZC1mb3JlZ3JvdW5kIHRleHQteHNcIj5Db21pbmcgc29vbjwvcD5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTIgdGV4dC1jZW50ZXJcIj5cbiAgICAgICAgICAgICAgPEZvbGRlciBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmQgbXgtYXV0byBoLTggdy04XCIgLz5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bVwiPk9yZ2FuaXplIEZvbGRlcnM8L3A+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZCB0ZXh0LXhzXCI+Q3JlYXRlIGFuZCBtYW5hZ2UgZm9sZGVyIHN0cnVjdHVyZTwvcD5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTIgdGV4dC1jZW50ZXJcIj5cbiAgICAgICAgICAgICAgPFNlYXJjaCBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmQgbXgtYXV0byBoLTggdy04XCIgLz5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1zbSBmb250LW1lZGl1bVwiPlNlYXJjaCBGaWxlczwvcD5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwidGV4dC1tdXRlZC1mb3JlZ3JvdW5kIHRleHQteHNcIj5GaW5kIGZpbGVzIHF1aWNrbHkgd2l0aCBzZWFyY2g8L3A+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic3BhY2UteS0yIHRleHQtY2VudGVyXCI+XG4gICAgICAgICAgICAgIDxTaGllbGQgY2xhc3NOYW1lPVwidGV4dC1tdXRlZC1mb3JlZ3JvdW5kIG14LWF1dG8gaC04IHctOFwiIC8+XG4gICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtc20gZm9udC1tZWRpdW1cIj5TZWN1cmUgQWNjZXNzPC9wPlxuICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmQgdGV4dC14c1wiPlByb3RlY3RlZCB3aXRoIE9BdXRoIDIuMDwvcD5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTQgdGV4dC1jZW50ZXJcIj5cbiAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZCB0ZXh0LXNtXCI+XG4gICAgICAgICAgICAgIFlvdSdsbCBiZSByZWRpcmVjdGVkIHRvIEdvb2dsZSB0byBzZWN1cmVseSBhdXRob3JpemUgYWNjZXNzIHRvIHlvdXIgRHJpdmUgZmlsZXMuXG4gICAgICAgICAgICA8L3A+XG5cbiAgICAgICAgICAgIDxCdXR0b24gb25DbGljaz17aGFuZGxlQ29ubmVjdH0gZGlzYWJsZWQ9e2Nvbm5lY3Rpbmd9IHNpemU9XCJsZ1wiIGNsYXNzTmFtZT1cInctZnVsbFwiPlxuICAgICAgICAgICAgICB7Y29ubmVjdGluZyA/IChcbiAgICAgICAgICAgICAgICA8PlxuICAgICAgICAgICAgICAgICAgPFNoaWVsZCBjbGFzc05hbWU9XCJtci0yIGgtNCB3LTQgYW5pbWF0ZS1wdWxzZVwiIC8+XG4gICAgICAgICAgICAgICAgICBDb25uZWN0aW5nIHRvIEdvb2dsZS4uLlxuICAgICAgICAgICAgICAgIDwvPlxuICAgICAgICAgICAgICApIDogKFxuICAgICAgICAgICAgICAgIDw+XG4gICAgICAgICAgICAgICAgICA8U2hpZWxkIGNsYXNzTmFtZT1cIm1yLTIgaC00IHctNFwiIC8+XG4gICAgICAgICAgICAgICAgICBDb25uZWN0IERyaXZlXG4gICAgICAgICAgICAgICAgPC8+XG4gICAgICAgICAgICAgICl9XG4gICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9DYXJkQ29udGVudD5cbiAgICAgIDwvQ2FyZD5cbiAgICA8L2Rpdj5cbiAgKVxufVxuXG5leHBvcnQgZGVmYXVsdCBEcml2ZUNvbm5lY3Rpb25DYXJkXG4iXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBOEVrQztJQUFBQSxhQUFBLFlBQUFBLENBQUE7TUFBQSxPQUFBQyxjQUFBO0lBQUE7RUFBQTtFQUFBLE9BQUFBLGNBQUE7QUFBQTtBQUFBRCxhQUFBO0FBQUFBLGFBQUEsR0FBQUUsQ0FBQTs7Ozs7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

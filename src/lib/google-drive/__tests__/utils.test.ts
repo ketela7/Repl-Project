@@ -46,9 +46,9 @@ describe('Google Drive Utils', () => {
     })
 
     it('should identify image files by mime type', () => {
-      expect(isImageFile('', 'image/jpeg')).toBe(true)
-      expect(isImageFile('', 'image/png')).toBe(true)
-      expect(isImageFile('', 'application/pdf')).toBe(false)
+      expect(isImageFile('image/jpeg')).toBe(true)
+      expect(isImageFile('image/png')).toBe(true)
+      expect(isImageFile('application/pdf')).toBe(false)
     })
   })
 
@@ -61,9 +61,9 @@ describe('Google Drive Utils', () => {
     })
 
     it('should identify video files by mime type', () => {
-      expect(isVideoFile('', 'video/mp4')).toBe(true)
-      expect(isVideoFile('', 'video/quicktime')).toBe(true)
-      expect(isVideoFile('', 'image/jpeg')).toBe(false)
+      expect(isVideoFile('video/mp4')).toBe(true)
+      expect(isVideoFile('video/quicktime')).toBe(true)
+      expect(isVideoFile('image/jpeg')).toBe(false)
     })
   })
 

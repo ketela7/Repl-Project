@@ -1,0 +1,1805 @@
+b6285595e2e81337829e5dc530985992
+/**
+ * Google Drive API Field Optimization
+ * Optimizes API requests by requesting only necessary fields for each operation
+ * This significantly improves request performance and reduces bandwidth usage
+ */ // Base fields always needed for file identification and basic operations
+"use strict";
+
+/* istanbul ignore next */
+function cov_2opze6uzjl() {
+  var path = "/home/runner/workspace/src/lib/google-drive/field-optimization.ts";
+  var hash = "6bb888d64206aa37467b7e4e356ac4638bd23dfc";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/lib/google-drive/field-optimization.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 7,
+          column: 0
+        },
+        end: {
+          line: 9,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 11,
+          column: 4
+        },
+        end: {
+          line: 14,
+          column: 7
+        }
+      },
+      "2": {
+        start: {
+          line: 11,
+          column: 24
+        },
+        end: {
+          line: 14,
+          column: 7
+        }
+      },
+      "3": {
+        start: {
+          line: 16,
+          column: 0
+        },
+        end: {
+          line: 35,
+          column: 3
+        }
+      },
+      "4": {
+        start: {
+          line: 18,
+          column: 8
+        },
+        end: {
+          line: 18,
+          column: 26
+        }
+      },
+      "5": {
+        start: {
+          line: 21,
+          column: 8
+        },
+        end: {
+          line: 21,
+          column: 32
+        }
+      },
+      "6": {
+        start: {
+          line: 24,
+          column: 8
+        },
+        end: {
+          line: 24,
+          column: 40
+        }
+      },
+      "7": {
+        start: {
+          line: 27,
+          column: 8
+        },
+        end: {
+          line: 27,
+          column: 32
+        }
+      },
+      "8": {
+        start: {
+          line: 30,
+          column: 8
+        },
+        end: {
+          line: 30,
+          column: 34
+        }
+      },
+      "9": {
+        start: {
+          line: 33,
+          column: 8
+        },
+        end: {
+          line: 33,
+          column: 38
+        }
+      },
+      "10": {
+        start: {
+          line: 36,
+          column: 20
+        },
+        end: {
+          line: 36,
+          column: 38
+        }
+      },
+      "11": {
+        start: {
+          line: 37,
+          column: 19
+        },
+        end: {
+          line: 60,
+          column: 1
+        }
+      },
+      "12": {
+        start: {
+          line: 62,
+          column: 4
+        },
+        end: {
+          line: 62,
+          column: 33
+        }
+      },
+      "13": {
+        start: {
+          line: 65,
+          column: 19
+        },
+        end: {
+          line: 65,
+          column: 55
+        }
+      },
+      "14": {
+        start: {
+          line: 67,
+          column: 4
+        },
+        end: {
+          line: 69,
+          column: 5
+        }
+      },
+      "15": {
+        start: {
+          line: 68,
+          column: 8
+        },
+        end: {
+          line: 68,
+          column: 37
+        }
+      },
+      "16": {
+        start: {
+          line: 70,
+          column: 4
+        },
+        end: {
+          line: 72,
+          column: 5
+        }
+      },
+      "17": {
+        start: {
+          line: 71,
+          column: 8
+        },
+        end: {
+          line: 71,
+          column: 30
+        }
+      },
+      "18": {
+        start: {
+          line: 73,
+          column: 4
+        },
+        end: {
+          line: 75,
+          column: 5
+        }
+      },
+      "19": {
+        start: {
+          line: 74,
+          column: 8
+        },
+        end: {
+          line: 74,
+          column: 35
+        }
+      },
+      "20": {
+        start: {
+          line: 76,
+          column: 4
+        },
+        end: {
+          line: 79,
+          column: 5
+        }
+      },
+      "21": {
+        start: {
+          line: 77,
+          column: 8
+        },
+        end: {
+          line: 77,
+          column: 72
+        }
+      },
+      "22": {
+        start: {
+          line: 77,
+          column: 45
+        },
+        end: {
+          line: 77,
+          column: 72
+        }
+      },
+      "23": {
+        start: {
+          line: 78,
+          column: 8
+        },
+        end: {
+          line: 78,
+          column: 70
+        }
+      },
+      "24": {
+        start: {
+          line: 78,
+          column: 44
+        },
+        end: {
+          line: 78,
+          column: 70
+        }
+      },
+      "25": {
+        start: {
+          line: 80,
+          column: 4
+        },
+        end: {
+          line: 82,
+          column: 5
+        }
+      },
+      "26": {
+        start: {
+          line: 81,
+          column: 8
+        },
+        end: {
+          line: 81,
+          column: 36
+        }
+      },
+      "27": {
+        start: {
+          line: 83,
+          column: 4
+        },
+        end: {
+          line: 83,
+          column: 28
+        }
+      },
+      "28": {
+        start: {
+          line: 85,
+          column: 25
+        },
+        end: {
+          line: 96,
+          column: 1
+        }
+      },
+      "29": {
+        start: {
+          line: 99,
+          column: 25
+        },
+        end: {
+          line: 104,
+          column: 9
+        }
+      },
+      "30": {
+        start: {
+          line: 105,
+          column: 25
+        },
+        end: {
+          line: 105,
+          column: 50
+        }
+      },
+      "31": {
+        start: {
+          line: 106,
+          column: 27
+        },
+        end: {
+          line: 106,
+          column: 107
+        }
+      },
+      "32": {
+        start: {
+          line: 108,
+          column: 36
+        },
+        end: {
+          line: 108,
+          column: 38
+        }
+      },
+      "33": {
+        start: {
+          line: 109,
+          column: 28
+        },
+        end: {
+          line: 109,
+          column: 73
+        }
+      },
+      "34": {
+        start: {
+          line: 110,
+          column: 8
+        },
+        end: {
+          line: 115,
+          column: 11
+        }
+      },
+      "35": {
+        start: {
+          line: 118,
+          column: 8
+        },
+        end: {
+          line: 118,
+          column: 48
+        }
+      },
+      "36": {
+        start: {
+          line: 121,
+          column: 8
+        },
+        end: {
+          line: 129,
+          column: 11
+        }
+      },
+      "37": {
+        start: {
+          line: 121,
+          column: 72
+        },
+        end: {
+          line: 125,
+          column: 13
+        }
+      },
+      "38": {
+        start: {
+          line: 132,
+          column: 8
+        },
+        end: {
+          line: 132,
+          column: 33
+        }
+      },
+      "39": {
+        start: {
+          line: 135,
+          column: 33
+        },
+        end: {
+          line: 135,
+          column: 63
+        }
+      },
+      "40": {
+        start: {
+          line: 137,
+          column: 4
+        },
+        end: {
+          line: 147,
+          column: 7
+        }
+      },
+      "41": {
+        start: {
+          line: 138,
+          column: 26
+        },
+        end: {
+          line: 138,
+          column: 42
+        }
+      },
+      "42": {
+        start: {
+          line: 139,
+          column: 22
+        },
+        end: {
+          line: 139,
+          column: 30
+        }
+      },
+      "43": {
+        start: {
+          line: 140,
+          column: 8
+        },
+        end: {
+          line: 145,
+          column: 9
+        }
+      },
+      "44": {
+        start: {
+          line: 141,
+          column: 12
+        },
+        end: {
+          line: 143,
+          column: 13
+        }
+      },
+      "45": {
+        start: {
+          line: 142,
+          column: 16
+        },
+        end: {
+          line: 142,
+          column: 29
+        }
+      },
+      "46": {
+        start: {
+          line: 144,
+          column: 12
+        },
+        end: {
+          line: 144,
+          column: 36
+        }
+      },
+      "47": {
+        start: {
+          line: 146,
+          column: 8
+        },
+        end: {
+          line: 146,
+          column: 20
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "_export",
+        decl: {
+          start: {
+            line: 10,
+            column: 9
+          },
+          end: {
+            line: 10,
+            column: 16
+          }
+        },
+        loc: {
+          start: {
+            line: 10,
+            column: 30
+          },
+          end: {
+            line: 15,
+            column: 1
+          }
+        },
+        line: 10
+      },
+      "1": {
+        name: "(anonymous_1)",
+        decl: {
+          start: {
+            line: 17,
+            column: 16
+          },
+          end: {
+            line: 17,
+            column: 17
+          }
+        },
+        loc: {
+          start: {
+            line: 17,
+            column: 27
+          },
+          end: {
+            line: 19,
+            column: 5
+          }
+        },
+        line: 17
+      },
+      "2": {
+        name: "(anonymous_2)",
+        decl: {
+          start: {
+            line: 20,
+            column: 22
+          },
+          end: {
+            line: 20,
+            column: 23
+          }
+        },
+        loc: {
+          start: {
+            line: 20,
+            column: 33
+          },
+          end: {
+            line: 22,
+            column: 5
+          }
+        },
+        line: 20
+      },
+      "3": {
+        name: "(anonymous_3)",
+        decl: {
+          start: {
+            line: 23,
+            column: 30
+          },
+          end: {
+            line: 23,
+            column: 31
+          }
+        },
+        loc: {
+          start: {
+            line: 23,
+            column: 41
+          },
+          end: {
+            line: 25,
+            column: 5
+          }
+        },
+        line: 23
+      },
+      "4": {
+        name: "(anonymous_4)",
+        decl: {
+          start: {
+            line: 26,
+            column: 22
+          },
+          end: {
+            line: 26,
+            column: 23
+          }
+        },
+        loc: {
+          start: {
+            line: 26,
+            column: 33
+          },
+          end: {
+            line: 28,
+            column: 5
+          }
+        },
+        line: 26
+      },
+      "5": {
+        name: "(anonymous_5)",
+        decl: {
+          start: {
+            line: 29,
+            column: 24
+          },
+          end: {
+            line: 29,
+            column: 25
+          }
+        },
+        loc: {
+          start: {
+            line: 29,
+            column: 35
+          },
+          end: {
+            line: 31,
+            column: 5
+          }
+        },
+        line: 29
+      },
+      "6": {
+        name: "(anonymous_6)",
+        decl: {
+          start: {
+            line: 32,
+            column: 28
+          },
+          end: {
+            line: 32,
+            column: 29
+          }
+        },
+        loc: {
+          start: {
+            line: 32,
+            column: 39
+          },
+          end: {
+            line: 34,
+            column: 5
+          }
+        },
+        line: 32
+      },
+      "7": {
+        name: "getOptimizedFields",
+        decl: {
+          start: {
+            line: 61,
+            column: 9
+          },
+          end: {
+            line: 61,
+            column: 27
+          }
+        },
+        loc: {
+          start: {
+            line: 61,
+            column: 39
+          },
+          end: {
+            line: 63,
+            column: 1
+          }
+        },
+        line: 61
+      },
+      "8": {
+        name: "getDynamicFields",
+        decl: {
+          start: {
+            line: 64,
+            column: 9
+          },
+          end: {
+            line: 64,
+            column: 25
+          }
+        },
+        loc: {
+          start: {
+            line: 64,
+            column: 55
+          },
+          end: {
+            line: 84,
+            column: 1
+          }
+        },
+        line: 64
+      },
+      "9": {
+        name: "(anonymous_9)",
+        decl: {
+          start: {
+            line: 98,
+            column: 4
+          },
+          end: {
+            line: 98,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 98,
+            column: 54
+          },
+          end: {
+            line: 116,
+            column: 5
+          }
+        },
+        line: 98
+      },
+      "10": {
+        name: "(anonymous_10)",
+        decl: {
+          start: {
+            line: 117,
+            column: 4
+          },
+          end: {
+            line: 117,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 117,
+            column: 17
+          },
+          end: {
+            line: 119,
+            column: 5
+          }
+        },
+        line: 117
+      },
+      "11": {
+        name: "(anonymous_11)",
+        decl: {
+          start: {
+            line: 120,
+            column: 4
+          },
+          end: {
+            line: 120,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 120,
+            column: 22
+          },
+          end: {
+            line: 130,
+            column: 5
+          }
+        },
+        line: 120
+      },
+      "12": {
+        name: "(anonymous_12)",
+        decl: {
+          start: {
+            line: 121,
+            column: 56
+          },
+          end: {
+            line: 121,
+            column: 57
+          }
+        },
+        loc: {
+          start: {
+            line: 121,
+            column: 72
+          },
+          end: {
+            line: 125,
+            column: 13
+          }
+        },
+        line: 121
+      },
+      "13": {
+        name: "(anonymous_13)",
+        decl: {
+          start: {
+            line: 131,
+            column: 4
+          },
+          end: {
+            line: 131,
+            column: 5
+          }
+        },
+        loc: {
+          start: {
+            line: 131,
+            column: 17
+          },
+          end: {
+            line: 133,
+            column: 5
+          }
+        },
+        line: 131
+      },
+      "14": {
+        name: "validateRequiredFields",
+        decl: {
+          start: {
+            line: 136,
+            column: 9
+          },
+          end: {
+            line: 136,
+            column: 31
+          }
+        },
+        loc: {
+          start: {
+            line: 136,
+            column: 58
+          },
+          end: {
+            line: 148,
+            column: 1
+          }
+        },
+        line: 136
+      },
+      "15": {
+        name: "(anonymous_15)",
+        decl: {
+          start: {
+            line: 137,
+            column: 32
+          },
+          end: {
+            line: 137,
+            column: 33
+          }
+        },
+        loc: {
+          start: {
+            line: 137,
+            column: 41
+          },
+          end: {
+            line: 147,
+            column: 5
+          }
+        },
+        line: 137
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 64,
+            column: 41
+          },
+          end: {
+            line: 64,
+            column: 53
+          }
+        },
+        type: "default-arg",
+        locations: [{
+          start: {
+            line: 64,
+            column: 51
+          },
+          end: {
+            line: 64,
+            column: 53
+          }
+        }],
+        line: 64
+      },
+      "1": {
+        loc: {
+          start: {
+            line: 67,
+            column: 4
+          },
+          end: {
+            line: 69,
+            column: 5
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 67,
+            column: 4
+          },
+          end: {
+            line: 69,
+            column: 5
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 67
+      },
+      "2": {
+        loc: {
+          start: {
+            line: 67,
+            column: 8
+          },
+          end: {
+            line: 67,
+            column: 67
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 67,
+            column: 8
+          },
+          end: {
+            line: 67,
+            column: 30
+          }
+        }, {
+          start: {
+            line: 67,
+            column: 34
+          },
+          end: {
+            line: 67,
+            column: 67
+          }
+        }],
+        line: 67
+      },
+      "3": {
+        loc: {
+          start: {
+            line: 70,
+            column: 4
+          },
+          end: {
+            line: 72,
+            column: 5
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 70,
+            column: 4
+          },
+          end: {
+            line: 72,
+            column: 5
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 70
+      },
+      "4": {
+        loc: {
+          start: {
+            line: 70,
+            column: 8
+          },
+          end: {
+            line: 70,
+            column: 56
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 70,
+            column: 8
+          },
+          end: {
+            line: 70,
+            column: 26
+          }
+        }, {
+          start: {
+            line: 70,
+            column: 30
+          },
+          end: {
+            line: 70,
+            column: 56
+          }
+        }],
+        line: 70
+      },
+      "5": {
+        loc: {
+          start: {
+            line: 73,
+            column: 4
+          },
+          end: {
+            line: 75,
+            column: 5
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 73,
+            column: 4
+          },
+          end: {
+            line: 75,
+            column: 5
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 73
+      },
+      "6": {
+        loc: {
+          start: {
+            line: 73,
+            column: 8
+          },
+          end: {
+            line: 73,
+            column: 66
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 73,
+            column: 8
+          },
+          end: {
+            line: 73,
+            column: 31
+          }
+        }, {
+          start: {
+            line: 73,
+            column: 35
+          },
+          end: {
+            line: 73,
+            column: 66
+          }
+        }],
+        line: 73
+      },
+      "7": {
+        loc: {
+          start: {
+            line: 76,
+            column: 4
+          },
+          end: {
+            line: 79,
+            column: 5
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 76,
+            column: 4
+          },
+          end: {
+            line: 79,
+            column: 5
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 76
+      },
+      "8": {
+        loc: {
+          start: {
+            line: 77,
+            column: 8
+          },
+          end: {
+            line: 77,
+            column: 72
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 77,
+            column: 8
+          },
+          end: {
+            line: 77,
+            column: 72
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 77
+      },
+      "9": {
+        loc: {
+          start: {
+            line: 78,
+            column: 8
+          },
+          end: {
+            line: 78,
+            column: 70
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 78,
+            column: 8
+          },
+          end: {
+            line: 78,
+            column: 70
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 78
+      },
+      "10": {
+        loc: {
+          start: {
+            line: 80,
+            column: 4
+          },
+          end: {
+            line: 82,
+            column: 5
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 80,
+            column: 4
+          },
+          end: {
+            line: 82,
+            column: 5
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 80
+      },
+      "11": {
+        loc: {
+          start: {
+            line: 80,
+            column: 8
+          },
+          end: {
+            line: 80,
+            column: 71
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 80,
+            column: 8
+          },
+          end: {
+            line: 80,
+            column: 35
+          }
+        }, {
+          start: {
+            line: 80,
+            column: 39
+          },
+          end: {
+            line: 80,
+            column: 71
+          }
+        }],
+        line: 80
+      },
+      "12": {
+        loc: {
+          start: {
+            line: 99,
+            column: 25
+          },
+          end: {
+            line: 104,
+            column: 9
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 99,
+            column: 25
+          },
+          end: {
+            line: 99,
+            column: 52
+          }
+        }, {
+          start: {
+            line: 99,
+            column: 56
+          },
+          end: {
+            line: 104,
+            column: 9
+          }
+        }],
+        line: 99
+      },
+      "13": {
+        loc: {
+          start: {
+            line: 141,
+            column: 12
+          },
+          end: {
+            line: 143,
+            column: 13
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 141,
+            column: 12
+          },
+          end: {
+            line: 143,
+            column: 13
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 141
+      },
+      "14": {
+        loc: {
+          start: {
+            line: 141,
+            column: 16
+          },
+          end: {
+            line: 141,
+            column: 53
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 141,
+            column: 16
+          },
+          end: {
+            line: 141,
+            column: 31
+          }
+        }, {
+          start: {
+            line: 141,
+            column: 35
+          },
+          end: {
+            line: 141,
+            column: 53
+          }
+        }],
+        line: 141
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "17": 0,
+      "18": 0,
+      "19": 0,
+      "20": 0,
+      "21": 0,
+      "22": 0,
+      "23": 0,
+      "24": 0,
+      "25": 0,
+      "26": 0,
+      "27": 0,
+      "28": 0,
+      "29": 0,
+      "30": 0,
+      "31": 0,
+      "32": 0,
+      "33": 0,
+      "34": 0,
+      "35": 0,
+      "36": 0,
+      "37": 0,
+      "38": 0,
+      "39": 0,
+      "40": 0,
+      "41": 0,
+      "42": 0,
+      "43": 0,
+      "44": 0,
+      "45": 0,
+      "46": 0,
+      "47": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0
+    },
+    b: {
+      "0": [0],
+      "1": [0, 0],
+      "2": [0, 0],
+      "3": [0, 0],
+      "4": [0, 0],
+      "5": [0, 0],
+      "6": [0, 0],
+      "7": [0, 0],
+      "8": [0, 0],
+      "9": [0, 0],
+      "10": [0, 0],
+      "11": [0, 0],
+      "12": [0, 0],
+      "13": [0, 0],
+      "14": [0, 0]
+    },
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/lib/google-drive/field-optimization.ts"],
+      sourcesContent: ["/**\n * Google Drive API Field Optimization\n * Optimizes API requests by requesting only necessary fields for each operation\n * This significantly improves request performance and reduces bandwidth usage\n */\n\n// Base fields always needed for file identification and basic operations\nconst BASE_FIELDS = 'id,name,mimeType'\n\n// Optimized field sets for different use cases\nexport const FIELD_SETS = {\n  // Minimal fields for basic listing (fastest)\n  LIST_BASIC: `${BASE_FIELDS},parents,trashed`,\n\n  // Essential fields for file management operations - now includes owners, createdTime, and thumbnailLink for preview functionality\n  LIST_STANDARD: `${BASE_FIELDS},size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,thumbnailLink,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,\n\n  // Extended fields for detailed views\n  LIST_DETAILED: `${BASE_FIELDS},size,createdTime,modifiedTime,webViewLink,thumbnailLink,parents,owners(displayName,emailAddress,photoLink),shared,trashed,starred,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,\n\n  // Complete fields for file details page - comprehensive technical details\n  FILE_DETAILS: `${BASE_FIELDS},size,quotaBytesUsed,createdTime,modifiedTime,viewedByMeTime,sharedWithMeTime,webViewLink,webContentLink,thumbnailLink,iconLink,parents,owners,lastModifyingUser,sharingUser,shared,trashed,starred,viewed,ownedByMe,viewedByMe,description,properties,appProperties,capabilities,permissions,copyRequiresWriterPermission,writersCanShare,folderColorRgb,originalFilename,fullFileExtension,fileExtension,md5Checksum,sha1Checksum,sha256Checksum,headRevisionId,isAppAuthorized,hasAugmentedPermissions,spaces,version,teamDriveId,driveId,hasVisitedTeamDrive,exportLinks,shortcutDetails,contentRestrictions,resourceKey,linkShareMetadata,labelInfo,imageMediaMetadata,videoMediaMetadata`,\n\n  // Ultra-comprehensive for Details Operations - ALL possible fields\n  DETAILS_COMPLETE: '*', // Request all available fields for comprehensive details\n\n  // Fields for download operations\n  DOWNLOAD: `${BASE_FIELDS},webContentLink,size,mimeType`,\n\n  // Fields for sharing operations\n  SHARE: `${BASE_FIELDS},shared,permissions,capabilities`,\n\n  // Fields for move/copy operations\n  MOVE_COPY: `${BASE_FIELDS},parents,capabilities`,\n\n  // Fields for search operations\n  SEARCH: `${BASE_FIELDS},size,modifiedTime,parents,trashed,thumbnailLink`,\n\n  // Fields for folder structure\n  FOLDER_STRUCTURE: `${BASE_FIELDS},parents,trashed`,\n\n  // Fields for drive info\n  DRIVE_INFO: 'storageQuota,user',\n} as const\n\n/**\n * Get optimized fields for specific operations\n */\nexport function getOptimizedFields(operation: keyof typeof FIELD_SETS): string {\n  return FIELD_SETS[operation]\n}\n\n/**\n * Dynamic field optimization based on UI context\n */\nexport interface FieldContext {\n  showThumbnails?: boolean\n  showOwners?: boolean\n  showPermissions?: boolean\n  showDetails?: boolean\n  includeCapabilities?: boolean\n}\n\nexport function getDynamicFields(baseOperation: keyof typeof FIELD_SETS, context: FieldContext = {}): string {\n  const fields = FIELD_SETS[baseOperation].split(',')\n\n  // Add optional fields based on context\n  if (context.showThumbnails && !fields.includes('thumbnailLink')) {\n    fields.push('thumbnailLink')\n  }\n\n  if (context.showOwners && !fields.includes('owners')) {\n    fields.push('owners')\n  }\n\n  if (context.showPermissions && !fields.includes('permissions')) {\n    fields.push('permissions')\n  }\n\n  if (context.showDetails) {\n    if (!fields.includes('description')) fields.push('description')\n    if (!fields.includes('properties')) fields.push('properties')\n  }\n\n  if (context.includeCapabilities && !fields.includes('capabilities')) {\n    fields.push('capabilities')\n  }\n\n  return fields.join(',')\n}\n\n/**\n * Field optimization for different view modes\n */\nexport const VIEW_MODE_FIELDS = {\n  // Grid view with thumbnails\n  GRID: getDynamicFields('LIST_STANDARD', { showThumbnails: true }),\n\n  // List view without thumbnails\n  LIST: FIELD_SETS.LIST_STANDARD,\n\n  // Compact view - minimal data\n  COMPACT: FIELD_SETS.LIST_BASIC,\n\n  // Detailed view - comprehensive data\n  DETAILED: FIELD_SETS.LIST_DETAILED,\n} as const\n\n/**\n * Monitoring for field optimization performance\n */\ninterface FieldOptimizationMetrics {\n  requestCount: number\n  averageResponseTime: number\n  dataSaved: number\n  fieldsSaved: number\n}\n\nclass FieldOptimizationMonitor {\n  private metrics: Map<string, FieldOptimizationMetrics> = new Map()\n\n  trackRequest(operation: string, responseTime: number, fieldsUsed: number) {\n    const existing = this.metrics.get(operation) || {\n      requestCount: 0,\n      averageResponseTime: 0,\n      dataSaved: 0,\n      fieldsSaved: 0,\n    }\n\n    const newCount = existing.requestCount + 1\n    const newAvgTime = (existing.averageResponseTime * existing.requestCount + responseTime) / newCount\n\n    // Estimate fields saved (assuming full field set would be ~30 fields)\n    const estimatedFullFields = 30\n    const fieldsSaved = Math.max(0, estimatedFullFields - fieldsUsed)\n\n    this.metrics.set(operation, {\n      requestCount: newCount,\n      averageResponseTime: newAvgTime,\n      dataSaved: existing.dataSaved + fieldsSaved * 100, // Rough bytes estimate\n      fieldsSaved: existing.fieldsSaved + fieldsSaved,\n    })\n  }\n\n  getMetrics(): Record<string, FieldOptimizationMetrics> {\n    return Object.fromEntries(this.metrics)\n  }\n\n  getTotalSavings(): {\n    requestsOptimized: number\n    estimatedDataSaved: number\n    fieldsSaved: number\n  } {\n    return Array.from(this.metrics.values()).reduce(\n      (acc, metric) => ({\n        requestsOptimized: acc.requestsOptimized + metric.requestCount,\n        estimatedDataSaved: acc.estimatedDataSaved + metric.dataSaved,\n        fieldsSaved: acc.fieldsSaved + metric.fieldsSaved,\n      }),\n      { requestsOptimized: 0, estimatedDataSaved: 0, fieldsSaved: 0 },\n    )\n  }\n}\n\nexport const fieldOptimizationMonitor = new FieldOptimizationMonitor()\n\n/**\n * Utility to validate if required fields are present in response\n */\nexport function validateRequiredFields(response: any, requiredFields: string[]): boolean {\n  return requiredFields.every(field => {\n    const fieldPath = field.split('.')\n    let current = response\n\n    for (const path of fieldPath) {\n      if (current == null || !(path in current)) {\n        return false\n      }\n      current = current[path]\n    }\n\n    return true\n  })\n}\n"],
+      names: ["FIELD_SETS", "VIEW_MODE_FIELDS", "fieldOptimizationMonitor", "getDynamicFields", "getOptimizedFields", "validateRequiredFields", "BASE_FIELDS", "LIST_BASIC", "LIST_STANDARD", "LIST_DETAILED", "FILE_DETAILS", "DETAILS_COMPLETE", "DOWNLOAD", "SHARE", "MOVE_COPY", "SEARCH", "FOLDER_STRUCTURE", "DRIVE_INFO", "operation", "baseOperation", "context", "fields", "split", "showThumbnails", "includes", "push", "showOwners", "showPermissions", "showDetails", "includeCapabilities", "join", "GRID", "LIST", "COMPACT", "DETAILED", "FieldOptimizationMonitor", "trackRequest", "responseTime", "fieldsUsed", "existing", "metrics", "get", "requestCount", "averageResponseTime", "dataSaved", "fieldsSaved", "newCount", "newAvgTime", "estimatedFullFields", "Math", "max", "set", "getMetrics", "Object", "fromEntries", "getTotalSavings", "Array", "from", "values", "reduce", "acc", "metric", "requestsOptimized", "estimatedDataSaved", "Map", "response", "requiredFields", "every", "field", "fieldPath", "current", "path"],
+      mappings: "AAAA;;;;CAIC,GAED,yEAAyE;;;;;;;;;;;;IAI5DA,UAAU;eAAVA;;IAoFAC,gBAAgB;eAAhBA;;IAsEAC,wBAAwB;eAAxBA;;IArGGC,gBAAgB;eAAhBA;;IAfAC,kBAAkB;eAAlBA;;IAyHAC,sBAAsB;eAAtBA;;;AAlKhB,MAAMC,cAAc;AAGb,MAAMN,aAAa;IACxB,6CAA6C;IAC7CO,YAAY,GAAGD,YAAY,gBAAgB,CAAC;IAE5C,kIAAkI;IAClIE,eAAe,GAAGF,YAAY,sNAAsN,CAAC;IAErP,qCAAqC;IACrCG,eAAe,GAAGH,YAAY,oPAAoP,CAAC;IAEnR,0EAA0E;IAC1EI,cAAc,GAAGJ,YAAY,8pBAA8pB,CAAC;IAE5rB,mEAAmE;IACnEK,kBAAkB;IAElB,iCAAiC;IACjCC,UAAU,GAAGN,YAAY,6BAA6B,CAAC;IAEvD,gCAAgC;IAChCO,OAAO,GAAGP,YAAY,gCAAgC,CAAC;IAEvD,kCAAkC;IAClCQ,WAAW,GAAGR,YAAY,qBAAqB,CAAC;IAEhD,+BAA+B;IAC/BS,QAAQ,GAAGT,YAAY,gDAAgD,CAAC;IAExE,8BAA8B;IAC9BU,kBAAkB,GAAGV,YAAY,gBAAgB,CAAC;IAElD,wBAAwB;IACxBW,YAAY;AACd;AAKO,SAASb,mBAAmBc,SAAkC;IACnE,OAAOlB,UAAU,CAACkB,UAAU;AAC9B;AAaO,SAASf,iBAAiBgB,aAAsC,EAAEC,UAAwB,CAAC,CAAC;IACjG,MAAMC,SAASrB,UAAU,CAACmB,cAAc,CAACG,KAAK,CAAC;IAE/C,uCAAuC;IACvC,IAAIF,QAAQG,cAAc,IAAI,CAACF,OAAOG,QAAQ,CAAC,kBAAkB;QAC/DH,OAAOI,IAAI,CAAC;IACd;IAEA,IAAIL,QAAQM,UAAU,IAAI,CAACL,OAAOG,QAAQ,CAAC,WAAW;QACpDH,OAAOI,IAAI,CAAC;IACd;IAEA,IAAIL,QAAQO,eAAe,IAAI,CAACN,OAAOG,QAAQ,CAAC,gBAAgB;QAC9DH,OAAOI,IAAI,CAAC;IACd;IAEA,IAAIL,QAAQQ,WAAW,EAAE;QACvB,IAAI,CAACP,OAAOG,QAAQ,CAAC,gBAAgBH,OAAOI,IAAI,CAAC;QACjD,IAAI,CAACJ,OAAOG,QAAQ,CAAC,eAAeH,OAAOI,IAAI,CAAC;IAClD;IAEA,IAAIL,QAAQS,mBAAmB,IAAI,CAACR,OAAOG,QAAQ,CAAC,iBAAiB;QACnEH,OAAOI,IAAI,CAAC;IACd;IAEA,OAAOJ,OAAOS,IAAI,CAAC;AACrB;AAKO,MAAM7B,mBAAmB;IAC9B,4BAA4B;IAC5B8B,MAAM5B,iBAAiB,iBAAiB;QAAEoB,gBAAgB;IAAK;IAE/D,+BAA+B;IAC/BS,MAAMhC,WAAWQ,aAAa;IAE9B,8BAA8B;IAC9ByB,SAASjC,WAAWO,UAAU;IAE9B,qCAAqC;IACrC2B,UAAUlC,WAAWS,aAAa;AACpC;AAYA,MAAM0B;IAGJC,aAAalB,SAAiB,EAAEmB,YAAoB,EAAEC,UAAkB,EAAE;QACxE,MAAMC,WAAW,IAAI,CAACC,OAAO,CAACC,GAAG,CAACvB,cAAc;YAC9CwB,cAAc;YACdC,qBAAqB;YACrBC,WAAW;YACXC,aAAa;QACf;QAEA,MAAMC,WAAWP,SAASG,YAAY,GAAG;QACzC,MAAMK,aAAa,AAACR,CAAAA,SAASI,mBAAmB,GAAGJ,SAASG,YAAY,GAAGL,YAAW,IAAKS;QAE3F,sEAAsE;QACtE,MAAME,sBAAsB;QAC5B,MAAMH,cAAcI,KAAKC,GAAG,CAAC,GAAGF,sBAAsBV;QAEtD,IAAI,CAACE,OAAO,CAACW,GAAG,CAACjC,WAAW;YAC1BwB,cAAcI;YACdH,qBAAqBI;YACrBH,WAAWL,SAASK,SAAS,GAAGC,cAAc;YAC9CA,aAAaN,SAASM,WAAW,GAAGA;QACtC;IACF;IAEAO,aAAuD;QACrD,OAAOC,OAAOC,WAAW,CAAC,IAAI,CAACd,OAAO;IACxC;IAEAe,kBAIE;QACA,OAAOC,MAAMC,IAAI,CAAC,IAAI,CAACjB,OAAO,CAACkB,MAAM,IAAIC,MAAM,CAC7C,CAACC,KAAKC,SAAY,CAAA;gBAChBC,mBAAmBF,IAAIE,iBAAiB,GAAGD,OAAOnB,YAAY;gBAC9DqB,oBAAoBH,IAAIG,kBAAkB,GAAGF,OAAOjB,SAAS;gBAC7DC,aAAae,IAAIf,WAAW,GAAGgB,OAAOhB,WAAW;YACnD,CAAA,GACA;YAAEiB,mBAAmB;YAAGC,oBAAoB;YAAGlB,aAAa;QAAE;IAElE;;aA1CQL,UAAiD,IAAIwB;;AA2C/D;AAEO,MAAM9D,2BAA2B,IAAIiC;AAKrC,SAAS9B,uBAAuB4D,QAAa,EAAEC,cAAwB;IAC5E,OAAOA,eAAeC,KAAK,CAACC,CAAAA;QAC1B,MAAMC,YAAYD,MAAM9C,KAAK,CAAC;QAC9B,IAAIgD,UAAUL;QAEd,KAAK,MAAMM,QAAQF,UAAW;YAC5B,IAAIC,WAAW,QAAQ,CAAEC,CAAAA,QAAQD,OAAM,GAAI;gBACzC,OAAO;YACT;YACAA,UAAUA,OAAO,CAACC,KAAK;QACzB;QAEA,OAAO;IACT;AACF"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "6bb888d64206aa37467b7e4e356ac4638bd23dfc"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_2opze6uzjl = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_2opze6uzjl();
+cov_2opze6uzjl().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function _export(target, all) {
+  /* istanbul ignore next */
+  cov_2opze6uzjl().f[0]++;
+  cov_2opze6uzjl().s[1]++;
+  for (var name in all) {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().s[2]++;
+    Object.defineProperty(target, name, {
+      enumerable: true,
+      get: all[name]
+    });
+  }
+}
+/* istanbul ignore next */
+cov_2opze6uzjl().s[3]++;
+_export(exports, {
+  FIELD_SETS: function () {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[1]++;
+    cov_2opze6uzjl().s[4]++;
+    return FIELD_SETS;
+  },
+  VIEW_MODE_FIELDS: function () {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[2]++;
+    cov_2opze6uzjl().s[5]++;
+    return VIEW_MODE_FIELDS;
+  },
+  fieldOptimizationMonitor: function () {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[3]++;
+    cov_2opze6uzjl().s[6]++;
+    return fieldOptimizationMonitor;
+  },
+  getDynamicFields: function () {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[4]++;
+    cov_2opze6uzjl().s[7]++;
+    return getDynamicFields;
+  },
+  getOptimizedFields: function () {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[5]++;
+    cov_2opze6uzjl().s[8]++;
+    return getOptimizedFields;
+  },
+  validateRequiredFields: function () {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[6]++;
+    cov_2opze6uzjl().s[9]++;
+    return validateRequiredFields;
+  }
+});
+const BASE_FIELDS =
+/* istanbul ignore next */
+(cov_2opze6uzjl().s[10]++, 'id,name,mimeType');
+const FIELD_SETS =
+/* istanbul ignore next */
+(cov_2opze6uzjl().s[11]++, {
+  // Minimal fields for basic listing (fastest)
+  LIST_BASIC: `${BASE_FIELDS},parents,trashed`,
+  // Essential fields for file management operations - now includes owners, createdTime, and thumbnailLink for preview functionality
+  LIST_STANDARD: `${BASE_FIELDS},size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,thumbnailLink,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
+  // Extended fields for detailed views
+  LIST_DETAILED: `${BASE_FIELDS},size,createdTime,modifiedTime,webViewLink,thumbnailLink,parents,owners(displayName,emailAddress,photoLink),shared,trashed,starred,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
+  // Complete fields for file details page - comprehensive technical details
+  FILE_DETAILS: `${BASE_FIELDS},size,quotaBytesUsed,createdTime,modifiedTime,viewedByMeTime,sharedWithMeTime,webViewLink,webContentLink,thumbnailLink,iconLink,parents,owners,lastModifyingUser,sharingUser,shared,trashed,starred,viewed,ownedByMe,viewedByMe,description,properties,appProperties,capabilities,permissions,copyRequiresWriterPermission,writersCanShare,folderColorRgb,originalFilename,fullFileExtension,fileExtension,md5Checksum,sha1Checksum,sha256Checksum,headRevisionId,isAppAuthorized,hasAugmentedPermissions,spaces,version,teamDriveId,driveId,hasVisitedTeamDrive,exportLinks,shortcutDetails,contentRestrictions,resourceKey,linkShareMetadata,labelInfo,imageMediaMetadata,videoMediaMetadata`,
+  // Ultra-comprehensive for Details Operations - ALL possible fields
+  DETAILS_COMPLETE: '*',
+  // Fields for download operations
+  DOWNLOAD: `${BASE_FIELDS},webContentLink,size,mimeType`,
+  // Fields for sharing operations
+  SHARE: `${BASE_FIELDS},shared,permissions,capabilities`,
+  // Fields for move/copy operations
+  MOVE_COPY: `${BASE_FIELDS},parents,capabilities`,
+  // Fields for search operations
+  SEARCH: `${BASE_FIELDS},size,modifiedTime,parents,trashed,thumbnailLink`,
+  // Fields for folder structure
+  FOLDER_STRUCTURE: `${BASE_FIELDS},parents,trashed`,
+  // Fields for drive info
+  DRIVE_INFO: 'storageQuota,user'
+});
+function getOptimizedFields(operation) {
+  /* istanbul ignore next */
+  cov_2opze6uzjl().f[7]++;
+  cov_2opze6uzjl().s[12]++;
+  return FIELD_SETS[operation];
+}
+function getDynamicFields(baseOperation, context =
+/* istanbul ignore next */
+(cov_2opze6uzjl().b[0][0]++, {})) {
+  /* istanbul ignore next */
+  cov_2opze6uzjl().f[8]++;
+  const fields =
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().s[13]++, FIELD_SETS[baseOperation].split(','));
+  // Add optional fields based on context
+  /* istanbul ignore next */
+  cov_2opze6uzjl().s[14]++;
+  if (
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().b[2][0]++, context.showThumbnails) &&
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().b[2][1]++, !fields.includes('thumbnailLink'))) {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().b[1][0]++;
+    cov_2opze6uzjl().s[15]++;
+    fields.push('thumbnailLink');
+  } else
+  /* istanbul ignore next */
+  {
+    cov_2opze6uzjl().b[1][1]++;
+  }
+  cov_2opze6uzjl().s[16]++;
+  if (
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().b[4][0]++, context.showOwners) &&
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().b[4][1]++, !fields.includes('owners'))) {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().b[3][0]++;
+    cov_2opze6uzjl().s[17]++;
+    fields.push('owners');
+  } else
+  /* istanbul ignore next */
+  {
+    cov_2opze6uzjl().b[3][1]++;
+  }
+  cov_2opze6uzjl().s[18]++;
+  if (
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().b[6][0]++, context.showPermissions) &&
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().b[6][1]++, !fields.includes('permissions'))) {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().b[5][0]++;
+    cov_2opze6uzjl().s[19]++;
+    fields.push('permissions');
+  } else
+  /* istanbul ignore next */
+  {
+    cov_2opze6uzjl().b[5][1]++;
+  }
+  cov_2opze6uzjl().s[20]++;
+  if (context.showDetails) {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().b[7][0]++;
+    cov_2opze6uzjl().s[21]++;
+    if (!fields.includes('description')) {
+      /* istanbul ignore next */
+      cov_2opze6uzjl().b[8][0]++;
+      cov_2opze6uzjl().s[22]++;
+      fields.push('description');
+    } else
+    /* istanbul ignore next */
+    {
+      cov_2opze6uzjl().b[8][1]++;
+    }
+    cov_2opze6uzjl().s[23]++;
+    if (!fields.includes('properties')) {
+      /* istanbul ignore next */
+      cov_2opze6uzjl().b[9][0]++;
+      cov_2opze6uzjl().s[24]++;
+      fields.push('properties');
+    } else
+    /* istanbul ignore next */
+    {
+      cov_2opze6uzjl().b[9][1]++;
+    }
+  } else
+  /* istanbul ignore next */
+  {
+    cov_2opze6uzjl().b[7][1]++;
+  }
+  cov_2opze6uzjl().s[25]++;
+  if (
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().b[11][0]++, context.includeCapabilities) &&
+  /* istanbul ignore next */
+  (cov_2opze6uzjl().b[11][1]++, !fields.includes('capabilities'))) {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().b[10][0]++;
+    cov_2opze6uzjl().s[26]++;
+    fields.push('capabilities');
+  } else
+  /* istanbul ignore next */
+  {
+    cov_2opze6uzjl().b[10][1]++;
+  }
+  cov_2opze6uzjl().s[27]++;
+  return fields.join(',');
+}
+const VIEW_MODE_FIELDS =
+/* istanbul ignore next */
+(cov_2opze6uzjl().s[28]++, {
+  // Grid view with thumbnails
+  GRID: getDynamicFields('LIST_STANDARD', {
+    showThumbnails: true
+  }),
+  // List view without thumbnails
+  LIST: FIELD_SETS.LIST_STANDARD,
+  // Compact view - minimal data
+  COMPACT: FIELD_SETS.LIST_BASIC,
+  // Detailed view - comprehensive data
+  DETAILED: FIELD_SETS.LIST_DETAILED
+});
+class FieldOptimizationMonitor {
+  trackRequest(operation, responseTime, fieldsUsed) {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[9]++;
+    const existing =
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().s[29]++,
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().b[12][0]++, this.metrics.get(operation)) ||
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().b[12][1]++, {
+      requestCount: 0,
+      averageResponseTime: 0,
+      dataSaved: 0,
+      fieldsSaved: 0
+    }));
+    const newCount =
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().s[30]++, existing.requestCount + 1);
+    const newAvgTime =
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().s[31]++, (existing.averageResponseTime * existing.requestCount + responseTime) / newCount);
+    // Estimate fields saved (assuming full field set would be ~30 fields)
+    const estimatedFullFields =
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().s[32]++, 30);
+    const fieldsSaved =
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().s[33]++, Math.max(0, estimatedFullFields - fieldsUsed));
+    /* istanbul ignore next */
+    cov_2opze6uzjl().s[34]++;
+    this.metrics.set(operation, {
+      requestCount: newCount,
+      averageResponseTime: newAvgTime,
+      dataSaved: existing.dataSaved + fieldsSaved * 100,
+      fieldsSaved: existing.fieldsSaved + fieldsSaved
+    });
+  }
+  getMetrics() {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[10]++;
+    cov_2opze6uzjl().s[35]++;
+    return Object.fromEntries(this.metrics);
+  }
+  getTotalSavings() {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[11]++;
+    cov_2opze6uzjl().s[36]++;
+    return Array.from(this.metrics.values()).reduce((acc, metric) => {
+      /* istanbul ignore next */
+      cov_2opze6uzjl().f[12]++;
+      cov_2opze6uzjl().s[37]++;
+      return {
+        requestsOptimized: acc.requestsOptimized + metric.requestCount,
+        estimatedDataSaved: acc.estimatedDataSaved + metric.dataSaved,
+        fieldsSaved: acc.fieldsSaved + metric.fieldsSaved
+      };
+    }, {
+      requestsOptimized: 0,
+      estimatedDataSaved: 0,
+      fieldsSaved: 0
+    });
+  }
+  constructor() {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[13]++;
+    cov_2opze6uzjl().s[38]++;
+    this.metrics = new Map();
+  }
+}
+const fieldOptimizationMonitor =
+/* istanbul ignore next */
+(cov_2opze6uzjl().s[39]++, new FieldOptimizationMonitor());
+function validateRequiredFields(response, requiredFields) {
+  /* istanbul ignore next */
+  cov_2opze6uzjl().f[14]++;
+  cov_2opze6uzjl().s[40]++;
+  return requiredFields.every(field => {
+    /* istanbul ignore next */
+    cov_2opze6uzjl().f[15]++;
+    const fieldPath =
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().s[41]++, field.split('.'));
+    let current =
+    /* istanbul ignore next */
+    (cov_2opze6uzjl().s[42]++, response);
+    /* istanbul ignore next */
+    cov_2opze6uzjl().s[43]++;
+    for (const path of fieldPath) {
+      /* istanbul ignore next */
+      cov_2opze6uzjl().s[44]++;
+      if (
+      /* istanbul ignore next */
+      (cov_2opze6uzjl().b[14][0]++, current == null) ||
+      /* istanbul ignore next */
+      (cov_2opze6uzjl().b[14][1]++, !(path in current))) {
+        /* istanbul ignore next */
+        cov_2opze6uzjl().b[13][0]++;
+        cov_2opze6uzjl().s[45]++;
+        return false;
+      } else
+      /* istanbul ignore next */
+      {
+        cov_2opze6uzjl().b[13][1]++;
+      }
+      cov_2opze6uzjl().s[46]++;
+      current = current[path];
+    }
+    /* istanbul ignore next */
+    cov_2opze6uzjl().s[47]++;
+    return true;
+  });
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJGSUVMRF9TRVRTIiwiY292XzJvcHplNnV6amwiLCJmIiwicyIsIlZJRVdfTU9ERV9GSUVMRFMiLCJmaWVsZE9wdGltaXphdGlvbk1vbml0b3IiLCJnZXREeW5hbWljRmllbGRzIiwiZ2V0T3B0aW1pemVkRmllbGRzIiwidmFsaWRhdGVSZXF1aXJlZEZpZWxkcyIsIkJBU0VfRklFTERTIiwiTElTVF9CQVNJQyIsIkxJU1RfU1RBTkRBUkQiLCJMSVNUX0RFVEFJTEVEIiwiRklMRV9ERVRBSUxTIiwiREVUQUlMU19DT01QTEVURSIsIkRPV05MT0FEIiwiU0hBUkUiLCJNT1ZFX0NPUFkiLCJTRUFSQ0giLCJGT0xERVJfU1RSVUNUVVJFIiwiRFJJVkVfSU5GTyIsIm9wZXJhdGlvbiIsImJhc2VPcGVyYXRpb24iLCJjb250ZXh0IiwiYiIsImZpZWxkcyIsInNwbGl0Iiwic2hvd1RodW1ibmFpbHMiLCJpbmNsdWRlcyIsInB1c2giLCJzaG93T3duZXJzIiwic2hvd1Blcm1pc3Npb25zIiwic2hvd0RldGFpbHMiLCJpbmNsdWRlQ2FwYWJpbGl0aWVzIiwiam9pbiIsIkdSSUQiLCJMSVNUIiwiQ09NUEFDVCIsIkRFVEFJTEVEIiwiRmllbGRPcHRpbWl6YXRpb25Nb25pdG9yIiwidHJhY2tSZXF1ZXN0IiwicmVzcG9uc2VUaW1lIiwiZmllbGRzVXNlZCIsImV4aXN0aW5nIiwibWV0cmljcyIsImdldCIsInJlcXVlc3RDb3VudCIsImF2ZXJhZ2VSZXNwb25zZVRpbWUiLCJkYXRhU2F2ZWQiLCJmaWVsZHNTYXZlZCIsIm5ld0NvdW50IiwibmV3QXZnVGltZSIsImVzdGltYXRlZEZ1bGxGaWVsZHMiLCJNYXRoIiwibWF4Iiwic2V0IiwiZ2V0TWV0cmljcyIsIk9iamVjdCIsImZyb21FbnRyaWVzIiwiZ2V0VG90YWxTYXZpbmdzIiwiQXJyYXkiLCJmcm9tIiwidmFsdWVzIiwicmVkdWNlIiwiYWNjIiwibWV0cmljIiwicmVxdWVzdHNPcHRpbWl6ZWQiLCJlc3RpbWF0ZWREYXRhU2F2ZWQiLCJNYXAiLCJyZXNwb25zZSIsInJlcXVpcmVkRmllbGRzIiwiZXZlcnkiLCJmaWVsZCIsImZpZWxkUGF0aCIsImN1cnJlbnQiLCJwYXRoIl0sInNvdXJjZXMiOlsiL2hvbWUvcnVubmVyL3dvcmtzcGFjZS9zcmMvbGliL2dvb2dsZS1kcml2ZS9maWVsZC1vcHRpbWl6YXRpb24udHMiXSwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBHb29nbGUgRHJpdmUgQVBJIEZpZWxkIE9wdGltaXphdGlvblxuICogT3B0aW1pemVzIEFQSSByZXF1ZXN0cyBieSByZXF1ZXN0aW5nIG9ubHkgbmVjZXNzYXJ5IGZpZWxkcyBmb3IgZWFjaCBvcGVyYXRpb25cbiAqIFRoaXMgc2lnbmlmaWNhbnRseSBpbXByb3ZlcyByZXF1ZXN0IHBlcmZvcm1hbmNlIGFuZCByZWR1Y2VzIGJhbmR3aWR0aCB1c2FnZVxuICovXG5cbi8vIEJhc2UgZmllbGRzIGFsd2F5cyBuZWVkZWQgZm9yIGZpbGUgaWRlbnRpZmljYXRpb24gYW5kIGJhc2ljIG9wZXJhdGlvbnNcbmNvbnN0IEJBU0VfRklFTERTID0gJ2lkLG5hbWUsbWltZVR5cGUnXG5cbi8vIE9wdGltaXplZCBmaWVsZCBzZXRzIGZvciBkaWZmZXJlbnQgdXNlIGNhc2VzXG5leHBvcnQgY29uc3QgRklFTERfU0VUUyA9IHtcbiAgLy8gTWluaW1hbCBmaWVsZHMgZm9yIGJhc2ljIGxpc3RpbmcgKGZhc3Rlc3QpXG4gIExJU1RfQkFTSUM6IGAke0JBU0VfRklFTERTfSxwYXJlbnRzLHRyYXNoZWRgLFxuXG4gIC8vIEVzc2VudGlhbCBmaWVsZHMgZm9yIGZpbGUgbWFuYWdlbWVudCBvcGVyYXRpb25zIC0gbm93IGluY2x1ZGVzIG93bmVycywgY3JlYXRlZFRpbWUsIGFuZCB0aHVtYm5haWxMaW5rIGZvciBwcmV2aWV3IGZ1bmN0aW9uYWxpdHlcbiAgTElTVF9TVEFOREFSRDogYCR7QkFTRV9GSUVMRFN9LHNpemUsY3JlYXRlZFRpbWUsbW9kaWZpZWRUaW1lLHBhcmVudHMsb3duZXJzKGRpc3BsYXlOYW1lLGVtYWlsQWRkcmVzcyksdHJhc2hlZCxzaGFyZWQsdGh1bWJuYWlsTGluayxjYXBhYmlsaXRpZXMoY2FuRWRpdCxjYW5TaGFyZSxjYW5EZWxldGUsY2FuRG93bmxvYWQsY2FuQ29weSxjYW5UcmFzaCxjYW5VbnRyYXNoLGNhblJlbmFtZSxjYW5Nb3ZlSXRlbVdpdGhpbkRyaXZlKWAsXG5cbiAgLy8gRXh0ZW5kZWQgZmllbGRzIGZvciBkZXRhaWxlZCB2aWV3c1xuICBMSVNUX0RFVEFJTEVEOiBgJHtCQVNFX0ZJRUxEU30sc2l6ZSxjcmVhdGVkVGltZSxtb2RpZmllZFRpbWUsd2ViVmlld0xpbmssdGh1bWJuYWlsTGluayxwYXJlbnRzLG93bmVycyhkaXNwbGF5TmFtZSxlbWFpbEFkZHJlc3MscGhvdG9MaW5rKSxzaGFyZWQsdHJhc2hlZCxzdGFycmVkLGNhcGFiaWxpdGllcyhjYW5FZGl0LGNhblNoYXJlLGNhbkRlbGV0ZSxjYW5Eb3dubG9hZCxjYW5Db3B5LGNhblRyYXNoLGNhblVudHJhc2gsY2FuUmVuYW1lLGNhbk1vdmVJdGVtV2l0aGluRHJpdmUpYCxcblxuICAvLyBDb21wbGV0ZSBmaWVsZHMgZm9yIGZpbGUgZGV0YWlscyBwYWdlIC0gY29tcHJlaGVuc2l2ZSB0ZWNobmljYWwgZGV0YWlsc1xuICBGSUxFX0RFVEFJTFM6IGAke0JBU0VfRklFTERTfSxzaXplLHF1b3RhQnl0ZXNVc2VkLGNyZWF0ZWRUaW1lLG1vZGlmaWVkVGltZSx2aWV3ZWRCeU1lVGltZSxzaGFyZWRXaXRoTWVUaW1lLHdlYlZpZXdMaW5rLHdlYkNvbnRlbnRMaW5rLHRodW1ibmFpbExpbmssaWNvbkxpbmsscGFyZW50cyxvd25lcnMsbGFzdE1vZGlmeWluZ1VzZXIsc2hhcmluZ1VzZXIsc2hhcmVkLHRyYXNoZWQsc3RhcnJlZCx2aWV3ZWQsb3duZWRCeU1lLHZpZXdlZEJ5TWUsZGVzY3JpcHRpb24scHJvcGVydGllcyxhcHBQcm9wZXJ0aWVzLGNhcGFiaWxpdGllcyxwZXJtaXNzaW9ucyxjb3B5UmVxdWlyZXNXcml0ZXJQZXJtaXNzaW9uLHdyaXRlcnNDYW5TaGFyZSxmb2xkZXJDb2xvclJnYixvcmlnaW5hbEZpbGVuYW1lLGZ1bGxGaWxlRXh0ZW5zaW9uLGZpbGVFeHRlbnNpb24sbWQ1Q2hlY2tzdW0sc2hhMUNoZWNrc3VtLHNoYTI1NkNoZWNrc3VtLGhlYWRSZXZpc2lvbklkLGlzQXBwQXV0aG9yaXplZCxoYXNBdWdtZW50ZWRQZXJtaXNzaW9ucyxzcGFjZXMsdmVyc2lvbix0ZWFtRHJpdmVJZCxkcml2ZUlkLGhhc1Zpc2l0ZWRUZWFtRHJpdmUsZXhwb3J0TGlua3Msc2hvcnRjdXREZXRhaWxzLGNvbnRlbnRSZXN0cmljdGlvbnMscmVzb3VyY2VLZXksbGlua1NoYXJlTWV0YWRhdGEsbGFiZWxJbmZvLGltYWdlTWVkaWFNZXRhZGF0YSx2aWRlb01lZGlhTWV0YWRhdGFgLFxuXG4gIC8vIFVsdHJhLWNvbXByZWhlbnNpdmUgZm9yIERldGFpbHMgT3BlcmF0aW9ucyAtIEFMTCBwb3NzaWJsZSBmaWVsZHNcbiAgREVUQUlMU19DT01QTEVURTogJyonLCAvLyBSZXF1ZXN0IGFsbCBhdmFpbGFibGUgZmllbGRzIGZvciBjb21wcmVoZW5zaXZlIGRldGFpbHNcblxuICAvLyBGaWVsZHMgZm9yIGRvd25sb2FkIG9wZXJhdGlvbnNcbiAgRE9XTkxPQUQ6IGAke0JBU0VfRklFTERTfSx3ZWJDb250ZW50TGluayxzaXplLG1pbWVUeXBlYCxcblxuICAvLyBGaWVsZHMgZm9yIHNoYXJpbmcgb3BlcmF0aW9uc1xuICBTSEFSRTogYCR7QkFTRV9GSUVMRFN9LHNoYXJlZCxwZXJtaXNzaW9ucyxjYXBhYmlsaXRpZXNgLFxuXG4gIC8vIEZpZWxkcyBmb3IgbW92ZS9jb3B5IG9wZXJhdGlvbnNcbiAgTU9WRV9DT1BZOiBgJHtCQVNFX0ZJRUxEU30scGFyZW50cyxjYXBhYmlsaXRpZXNgLFxuXG4gIC8vIEZpZWxkcyBmb3Igc2VhcmNoIG9wZXJhdGlvbnNcbiAgU0VBUkNIOiBgJHtCQVNFX0ZJRUxEU30sc2l6ZSxtb2RpZmllZFRpbWUscGFyZW50cyx0cmFzaGVkLHRodW1ibmFpbExpbmtgLFxuXG4gIC8vIEZpZWxkcyBmb3IgZm9sZGVyIHN0cnVjdHVyZVxuICBGT0xERVJfU1RSVUNUVVJFOiBgJHtCQVNFX0ZJRUxEU30scGFyZW50cyx0cmFzaGVkYCxcblxuICAvLyBGaWVsZHMgZm9yIGRyaXZlIGluZm9cbiAgRFJJVkVfSU5GTzogJ3N0b3JhZ2VRdW90YSx1c2VyJyxcbn0gYXMgY29uc3RcblxuLyoqXG4gKiBHZXQgb3B0aW1pemVkIGZpZWxkcyBmb3Igc3BlY2lmaWMgb3BlcmF0aW9uc1xuICovXG5leHBvcnQgZnVuY3Rpb24gZ2V0T3B0aW1pemVkRmllbGRzKG9wZXJhdGlvbjoga2V5b2YgdHlwZW9mIEZJRUxEX1NFVFMpOiBzdHJpbmcge1xuICByZXR1cm4gRklFTERfU0VUU1tvcGVyYXRpb25dXG59XG5cbi8qKlxuICogRHluYW1pYyBmaWVsZCBvcHRpbWl6YXRpb24gYmFzZWQgb24gVUkgY29udGV4dFxuICovXG5leHBvcnQgaW50ZXJmYWNlIEZpZWxkQ29udGV4dCB7XG4gIHNob3dUaHVtYm5haWxzPzogYm9vbGVhblxuICBzaG93T3duZXJzPzogYm9vbGVhblxuICBzaG93UGVybWlzc2lvbnM/OiBib29sZWFuXG4gIHNob3dEZXRhaWxzPzogYm9vbGVhblxuICBpbmNsdWRlQ2FwYWJpbGl0aWVzPzogYm9vbGVhblxufVxuXG5leHBvcnQgZnVuY3Rpb24gZ2V0RHluYW1pY0ZpZWxkcyhiYXNlT3BlcmF0aW9uOiBrZXlvZiB0eXBlb2YgRklFTERfU0VUUywgY29udGV4dDogRmllbGRDb250ZXh0ID0ge30pOiBzdHJpbmcge1xuICBjb25zdCBmaWVsZHMgPSBGSUVMRF9TRVRTW2Jhc2VPcGVyYXRpb25dLnNwbGl0KCcsJylcblxuICAvLyBBZGQgb3B0aW9uYWwgZmllbGRzIGJhc2VkIG9uIGNvbnRleHRcbiAgaWYgKGNvbnRleHQuc2hvd1RodW1ibmFpbHMgJiYgIWZpZWxkcy5pbmNsdWRlcygndGh1bWJuYWlsTGluaycpKSB7XG4gICAgZmllbGRzLnB1c2goJ3RodW1ibmFpbExpbmsnKVxuICB9XG5cbiAgaWYgKGNvbnRleHQuc2hvd093bmVycyAmJiAhZmllbGRzLmluY2x1ZGVzKCdvd25lcnMnKSkge1xuICAgIGZpZWxkcy5wdXNoKCdvd25lcnMnKVxuICB9XG5cbiAgaWYgKGNvbnRleHQuc2hvd1Blcm1pc3Npb25zICYmICFmaWVsZHMuaW5jbHVkZXMoJ3Blcm1pc3Npb25zJykpIHtcbiAgICBmaWVsZHMucHVzaCgncGVybWlzc2lvbnMnKVxuICB9XG5cbiAgaWYgKGNvbnRleHQuc2hvd0RldGFpbHMpIHtcbiAgICBpZiAoIWZpZWxkcy5pbmNsdWRlcygnZGVzY3JpcHRpb24nKSkgZmllbGRzLnB1c2goJ2Rlc2NyaXB0aW9uJylcbiAgICBpZiAoIWZpZWxkcy5pbmNsdWRlcygncHJvcGVydGllcycpKSBmaWVsZHMucHVzaCgncHJvcGVydGllcycpXG4gIH1cblxuICBpZiAoY29udGV4dC5pbmNsdWRlQ2FwYWJpbGl0aWVzICYmICFmaWVsZHMuaW5jbHVkZXMoJ2NhcGFiaWxpdGllcycpKSB7XG4gICAgZmllbGRzLnB1c2goJ2NhcGFiaWxpdGllcycpXG4gIH1cblxuICByZXR1cm4gZmllbGRzLmpvaW4oJywnKVxufVxuXG4vKipcbiAqIEZpZWxkIG9wdGltaXphdGlvbiBmb3IgZGlmZmVyZW50IHZpZXcgbW9kZXNcbiAqL1xuZXhwb3J0IGNvbnN0IFZJRVdfTU9ERV9GSUVMRFMgPSB7XG4gIC8vIEdyaWQgdmlldyB3aXRoIHRodW1ibmFpbHNcbiAgR1JJRDogZ2V0RHluYW1pY0ZpZWxkcygnTElTVF9TVEFOREFSRCcsIHsgc2hvd1RodW1ibmFpbHM6IHRydWUgfSksXG5cbiAgLy8gTGlzdCB2aWV3IHdpdGhvdXQgdGh1bWJuYWlsc1xuICBMSVNUOiBGSUVMRF9TRVRTLkxJU1RfU1RBTkRBUkQsXG5cbiAgLy8gQ29tcGFjdCB2aWV3IC0gbWluaW1hbCBkYXRhXG4gIENPTVBBQ1Q6IEZJRUxEX1NFVFMuTElTVF9CQVNJQyxcblxuICAvLyBEZXRhaWxlZCB2aWV3IC0gY29tcHJlaGVuc2l2ZSBkYXRhXG4gIERFVEFJTEVEOiBGSUVMRF9TRVRTLkxJU1RfREVUQUlMRUQsXG59IGFzIGNvbnN0XG5cbi8qKlxuICogTW9uaXRvcmluZyBmb3IgZmllbGQgb3B0aW1pemF0aW9uIHBlcmZvcm1hbmNlXG4gKi9cbmludGVyZmFjZSBGaWVsZE9wdGltaXphdGlvbk1ldHJpY3Mge1xuICByZXF1ZXN0Q291bnQ6IG51bWJlclxuICBhdmVyYWdlUmVzcG9uc2VUaW1lOiBudW1iZXJcbiAgZGF0YVNhdmVkOiBudW1iZXJcbiAgZmllbGRzU2F2ZWQ6IG51bWJlclxufVxuXG5jbGFzcyBGaWVsZE9wdGltaXphdGlvbk1vbml0b3Ige1xuICBwcml2YXRlIG1ldHJpY3M6IE1hcDxzdHJpbmcsIEZpZWxkT3B0aW1pemF0aW9uTWV0cmljcz4gPSBuZXcgTWFwKClcblxuICB0cmFja1JlcXVlc3Qob3BlcmF0aW9uOiBzdHJpbmcsIHJlc3BvbnNlVGltZTogbnVtYmVyLCBmaWVsZHNVc2VkOiBudW1iZXIpIHtcbiAgICBjb25zdCBleGlzdGluZyA9IHRoaXMubWV0cmljcy5nZXQob3BlcmF0aW9uKSB8fCB7XG4gICAgICByZXF1ZXN0Q291bnQ6IDAsXG4gICAgICBhdmVyYWdlUmVzcG9uc2VUaW1lOiAwLFxuICAgICAgZGF0YVNhdmVkOiAwLFxuICAgICAgZmllbGRzU2F2ZWQ6IDAsXG4gICAgfVxuXG4gICAgY29uc3QgbmV3Q291bnQgPSBleGlzdGluZy5yZXF1ZXN0Q291bnQgKyAxXG4gICAgY29uc3QgbmV3QXZnVGltZSA9IChleGlzdGluZy5hdmVyYWdlUmVzcG9uc2VUaW1lICogZXhpc3RpbmcucmVxdWVzdENvdW50ICsgcmVzcG9uc2VUaW1lKSAvIG5ld0NvdW50XG5cbiAgICAvLyBFc3RpbWF0ZSBmaWVsZHMgc2F2ZWQgKGFzc3VtaW5nIGZ1bGwgZmllbGQgc2V0IHdvdWxkIGJlIH4zMCBmaWVsZHMpXG4gICAgY29uc3QgZXN0aW1hdGVkRnVsbEZpZWxkcyA9IDMwXG4gICAgY29uc3QgZmllbGRzU2F2ZWQgPSBNYXRoLm1heCgwLCBlc3RpbWF0ZWRGdWxsRmllbGRzIC0gZmllbGRzVXNlZClcblxuICAgIHRoaXMubWV0cmljcy5zZXQob3BlcmF0aW9uLCB7XG4gICAgICByZXF1ZXN0Q291bnQ6IG5ld0NvdW50LFxuICAgICAgYXZlcmFnZVJlc3BvbnNlVGltZTogbmV3QXZnVGltZSxcbiAgICAgIGRhdGFTYXZlZDogZXhpc3RpbmcuZGF0YVNhdmVkICsgZmllbGRzU2F2ZWQgKiAxMDAsIC8vIFJvdWdoIGJ5dGVzIGVzdGltYXRlXG4gICAgICBmaWVsZHNTYXZlZDogZXhpc3RpbmcuZmllbGRzU2F2ZWQgKyBmaWVsZHNTYXZlZCxcbiAgICB9KVxuICB9XG5cbiAgZ2V0TWV0cmljcygpOiBSZWNvcmQ8c3RyaW5nLCBGaWVsZE9wdGltaXphdGlvbk1ldHJpY3M+IHtcbiAgICByZXR1cm4gT2JqZWN0LmZyb21FbnRyaWVzKHRoaXMubWV0cmljcylcbiAgfVxuXG4gIGdldFRvdGFsU2F2aW5ncygpOiB7XG4gICAgcmVxdWVzdHNPcHRpbWl6ZWQ6IG51bWJlclxuICAgIGVzdGltYXRlZERhdGFTYXZlZDogbnVtYmVyXG4gICAgZmllbGRzU2F2ZWQ6IG51bWJlclxuICB9IHtcbiAgICByZXR1cm4gQXJyYXkuZnJvbSh0aGlzLm1ldHJpY3MudmFsdWVzKCkpLnJlZHVjZShcbiAgICAgIChhY2MsIG1ldHJpYykgPT4gKHtcbiAgICAgICAgcmVxdWVzdHNPcHRpbWl6ZWQ6IGFjYy5yZXF1ZXN0c09wdGltaXplZCArIG1ldHJpYy5yZXF1ZXN0Q291bnQsXG4gICAgICAgIGVzdGltYXRlZERhdGFTYXZlZDogYWNjLmVzdGltYXRlZERhdGFTYXZlZCArIG1ldHJpYy5kYXRhU2F2ZWQsXG4gICAgICAgIGZpZWxkc1NhdmVkOiBhY2MuZmllbGRzU2F2ZWQgKyBtZXRyaWMuZmllbGRzU2F2ZWQsXG4gICAgICB9KSxcbiAgICAgIHsgcmVxdWVzdHNPcHRpbWl6ZWQ6IDAsIGVzdGltYXRlZERhdGFTYXZlZDogMCwgZmllbGRzU2F2ZWQ6IDAgfSxcbiAgICApXG4gIH1cbn1cblxuZXhwb3J0IGNvbnN0IGZpZWxkT3B0aW1pemF0aW9uTW9uaXRvciA9IG5ldyBGaWVsZE9wdGltaXphdGlvbk1vbml0b3IoKVxuXG4vKipcbiAqIFV0aWxpdHkgdG8gdmFsaWRhdGUgaWYgcmVxdWlyZWQgZmllbGRzIGFyZSBwcmVzZW50IGluIHJlc3BvbnNlXG4gKi9cbmV4cG9ydCBmdW5jdGlvbiB2YWxpZGF0ZVJlcXVpcmVkRmllbGRzKHJlc3BvbnNlOiBhbnksIHJlcXVpcmVkRmllbGRzOiBzdHJpbmdbXSk6IGJvb2xlYW4ge1xuICByZXR1cm4gcmVxdWlyZWRGaWVsZHMuZXZlcnkoZmllbGQgPT4ge1xuICAgIGNvbnN0IGZpZWxkUGF0aCA9IGZpZWxkLnNwbGl0KCcuJylcbiAgICBsZXQgY3VycmVudCA9IHJlc3BvbnNlXG5cbiAgICBmb3IgKGNvbnN0IHBhdGggb2YgZmllbGRQYXRoKSB7XG4gICAgICBpZiAoY3VycmVudCA9PSBudWxsIHx8ICEocGF0aCBpbiBjdXJyZW50KSkge1xuICAgICAgICByZXR1cm4gZmFsc2VcbiAgICAgIH1cbiAgICAgIGN1cnJlbnQgPSBjdXJyZW50W3BhdGhdXG4gICAgfVxuXG4gICAgcmV0dXJuIHRydWVcbiAgfSlcbn1cbiJdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7R0FBQSxDQU1BOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7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

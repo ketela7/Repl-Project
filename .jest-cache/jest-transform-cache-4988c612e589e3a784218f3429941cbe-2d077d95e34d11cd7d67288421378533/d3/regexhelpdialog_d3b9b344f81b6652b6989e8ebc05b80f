@@ -1,0 +1,1051 @@
+9680cc3fb358cf57f71304e1cc7238f7
+'use client';
+"use strict";
+
+/* istanbul ignore next */
+function cov_1o2xhmbpad() {
+  var path = "/home/runner/workspace/src/app/(main)/dashboard/drive/_components/regex-help-dialog.tsx";
+  var hash = "f492c7d81ddee9548cd7e27244a97aa013380615";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/app/(main)/dashboard/drive/_components/regex-help-dialog.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 3,
+          column: 0
+        },
+        end: {
+          line: 5,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 7,
+          column: 4
+        },
+        end: {
+          line: 10,
+          column: 7
+        }
+      },
+      "2": {
+        start: {
+          line: 7,
+          column: 24
+        },
+        end: {
+          line: 10,
+          column: 7
+        }
+      },
+      "3": {
+        start: {
+          line: 12,
+          column: 0
+        },
+        end: {
+          line: 19,
+          column: 3
+        }
+      },
+      "4": {
+        start: {
+          line: 14,
+          column: 8
+        },
+        end: {
+          line: 14,
+          column: 31
+        }
+      },
+      "5": {
+        start: {
+          line: 17,
+          column: 8
+        },
+        end: {
+          line: 17,
+          column: 24
+        }
+      },
+      "6": {
+        start: {
+          line: 20,
+          column: 20
+        },
+        end: {
+          line: 20,
+          column: 48
+        }
+      },
+      "7": {
+        start: {
+          line: 21,
+          column: 21
+        },
+        end: {
+          line: 21,
+          column: 44
+        }
+      },
+      "8": {
+        start: {
+          line: 22,
+          column: 16
+        },
+        end: {
+          line: 22,
+          column: 33
+        }
+      },
+      "9": {
+        start: {
+          line: 23,
+          column: 16
+        },
+        end: {
+          line: 23,
+          column: 62
+        }
+      },
+      "10": {
+        start: {
+          line: 24,
+          column: 16
+        },
+        end: {
+          line: 24,
+          column: 62
+        }
+      },
+      "11": {
+        start: {
+          line: 25,
+          column: 15
+        },
+        end: {
+          line: 25,
+          column: 60
+        }
+      },
+      "12": {
+        start: {
+          line: 26,
+          column: 19
+        },
+        end: {
+          line: 26,
+          column: 68
+        }
+      },
+      "13": {
+        start: {
+          line: 27,
+          column: 23
+        },
+        end: {
+          line: 76,
+          column: 1
+        }
+      },
+      "14": {
+        start: {
+          line: 71,
+          column: 30
+        },
+        end: {
+          line: 71,
+          column: 49
+        }
+      },
+      "15": {
+        start: {
+          line: 77,
+          column: 25
+        },
+        end: {
+          line: 138,
+          column: 1
+        }
+      },
+      "16": {
+        start: {
+          line: 140,
+          column: 28
+        },
+        end: {
+          line: 143,
+          column: 5
+        }
+      },
+      "17": {
+        start: {
+          line: 141,
+          column: 8
+        },
+        end: {
+          line: 141,
+          column: 44
+        }
+      },
+      "18": {
+        start: {
+          line: 142,
+          column: 8
+        },
+        end: {
+          line: 142,
+          column: 54
+        }
+      },
+      "19": {
+        start: {
+          line: 144,
+          column: 4
+        },
+        end: {
+          line: 462,
+          column: 7
+        }
+      },
+      "20": {
+        start: {
+          line: 146,
+          column: 30
+        },
+        end: {
+          line: 146,
+          column: 48
+        }
+      },
+      "21": {
+        start: {
+          line: 234,
+          column: 97
+        },
+        end: {
+          line: 312,
+          column: 49
+        }
+      },
+      "22": {
+        start: {
+          line: 256,
+          column: 73
+        },
+        end: {
+          line: 256,
+          column: 133
+        }
+      },
+      "23": {
+        start: {
+          line: 331,
+          column: 96
+        },
+        end: {
+          line: 353,
+          column: 49
+        }
+      },
+      "24": {
+        start: {
+          line: 464,
+          column: 17
+        },
+        end: {
+          line: 464,
+          column: 32
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "_export",
+        decl: {
+          start: {
+            line: 6,
+            column: 9
+          },
+          end: {
+            line: 6,
+            column: 16
+          }
+        },
+        loc: {
+          start: {
+            line: 6,
+            column: 30
+          },
+          end: {
+            line: 11,
+            column: 1
+          }
+        },
+        line: 6
+      },
+      "1": {
+        name: "(anonymous_1)",
+        decl: {
+          start: {
+            line: 13,
+            column: 21
+          },
+          end: {
+            line: 13,
+            column: 22
+          }
+        },
+        loc: {
+          start: {
+            line: 13,
+            column: 32
+          },
+          end: {
+            line: 15,
+            column: 5
+          }
+        },
+        line: 13
+      },
+      "2": {
+        name: "(anonymous_2)",
+        decl: {
+          start: {
+            line: 16,
+            column: 13
+          },
+          end: {
+            line: 16,
+            column: 14
+          }
+        },
+        loc: {
+          start: {
+            line: 16,
+            column: 24
+          },
+          end: {
+            line: 18,
+            column: 5
+          }
+        },
+        line: 16
+      },
+      "3": {
+        name: "(anonymous_3)",
+        decl: {
+          start: {
+            line: 71,
+            column: 21
+          },
+          end: {
+            line: 71,
+            column: 22
+          }
+        },
+        loc: {
+          start: {
+            line: 71,
+            column: 30
+          },
+          end: {
+            line: 71,
+            column: 49
+          }
+        },
+        line: 71
+      },
+      "4": {
+        name: "RegexHelpDialog",
+        decl: {
+          start: {
+            line: 139,
+            column: 9
+          },
+          end: {
+            line: 139,
+            column: 24
+          }
+        },
+        loc: {
+          start: {
+            line: 139,
+            column: 46
+          },
+          end: {
+            line: 463,
+            column: 1
+          }
+        },
+        line: 139
+      },
+      "5": {
+        name: "(anonymous_5)",
+        decl: {
+          start: {
+            line: 140,
+            column: 28
+          },
+          end: {
+            line: 140,
+            column: 29
+          }
+        },
+        loc: {
+          start: {
+            line: 140,
+            column: 36
+          },
+          end: {
+            line: 143,
+            column: 5
+          }
+        },
+        line: 140
+      },
+      "6": {
+        name: "(anonymous_6)",
+        decl: {
+          start: {
+            line: 146,
+            column: 22
+          },
+          end: {
+            line: 146,
+            column: 23
+          }
+        },
+        loc: {
+          start: {
+            line: 146,
+            column: 30
+          },
+          end: {
+            line: 146,
+            column: 48
+          }
+        },
+        line: 146
+      },
+      "7": {
+        name: "(anonymous_7)",
+        decl: {
+          start: {
+            line: 234,
+            column: 65
+          },
+          end: {
+            line: 234,
+            column: 66
+          }
+        },
+        loc: {
+          start: {
+            line: 234,
+            column: 97
+          },
+          end: {
+            line: 312,
+            column: 49
+          }
+        },
+        line: 234
+      },
+      "8": {
+        name: "(anonymous_8)",
+        decl: {
+          start: {
+            line: 256,
+            column: 69
+          },
+          end: {
+            line: 256,
+            column: 70
+          }
+        },
+        loc: {
+          start: {
+            line: 256,
+            column: 73
+          },
+          end: {
+            line: 256,
+            column: 133
+          }
+        },
+        line: 256
+      },
+      "9": {
+        name: "(anonymous_9)",
+        decl: {
+          start: {
+            line: 331,
+            column: 67
+          },
+          end: {
+            line: 331,
+            column: 68
+          }
+        },
+        loc: {
+          start: {
+            line: 331,
+            column: 96
+          },
+          end: {
+            line: 353,
+            column: 49
+          }
+        },
+        line: 331
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 146,
+            column: 30
+          },
+          end: {
+            line: 146,
+            column: 48
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 146,
+            column: 30
+          },
+          end: {
+            line: 146,
+            column: 35
+          }
+        }, {
+          start: {
+            line: 146,
+            column: 39
+          },
+          end: {
+            line: 146,
+            column: 48
+          }
+        }],
+        line: 146
+      },
+      "1": {
+        loc: {
+          start: {
+            line: 288,
+            column: 72
+          },
+          end: {
+            line: 288,
+            column: 168
+          }
+        },
+        type: "cond-expr",
+        locations: [{
+          start: {
+            line: 288,
+            column: 116
+          },
+          end: {
+            line: 288,
+            column: 146
+          }
+        }, {
+          start: {
+            line: 288,
+            column: 149
+          },
+          end: {
+            line: 288,
+            column: 168
+          }
+        }],
+        line: 288
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0,
+      "17": 0,
+      "18": 0,
+      "19": 0,
+      "20": 0,
+      "21": 0,
+      "22": 0,
+      "23": 0,
+      "24": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    b: {
+      "0": [0, 0],
+      "1": [0, 0]
+    },
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/app/(main)/dashboard/drive/_components/regex-help-dialog.tsx"],
+      sourcesContent: ["'use client'\n\nimport { Code2, Info, CheckCircle, XCircle, ArrowRight, Copy } from 'lucide-react'\nimport { toast } from 'sonner'\n\nimport { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'\nimport { Button } from '@/components/ui/button'\nimport { Badge } from '@/components/ui/badge'\nimport { Separator } from '@/components/ui/separator'\n\ninterface RegexHelpDialogProps {\n  isOpen: boolean\n  onClose: () => void\n}\n\nconst REGEX_EXAMPLES = [\n  {\n    name: 'Remove Numbers',\n    pattern: '\\\\d+',\n    replacement: '',\n    description: 'Remove all numbers from filenames',\n    example: 'document123.pdf \u2192 document.pdf',\n    icon: '\uD83D\uDD22',\n  },\n  {\n    name: 'Replace Spaces with Underscores',\n    pattern: ' ',\n    replacement: '_',\n    description: 'Replace all spaces with underscores',\n    example: 'my file.txt \u2192 my_file.txt',\n    icon: '\uD83D\uDD04',\n  },\n  {\n    name: 'Remove Special Characters',\n    pattern: '[^a-zA-Z0-9._-]',\n    replacement: '',\n    description: 'Keep only letters, numbers, dots, underscores, and hyphens',\n    example: 'file@#$.txt \u2192 file.txt',\n    icon: '\uD83E\uDDF9',\n  },\n  {\n    name: 'Add Prefix to Extension',\n    pattern: '(.*)\\\\.(.*)$',\n    replacement: '$1_backup.$2',\n    description: 'Add \"_backup\" before file extension',\n    example: 'document.pdf \u2192 document_backup.pdf',\n    icon: '\uD83D\uDCBE',\n  },\n  {\n    name: 'Extract Date Pattern',\n    pattern: '.*?(\\\\d{4}-\\\\d{2}-\\\\d{2}).*',\n    replacement: 'Date_$1',\n    description: 'Extract date in YYYY-MM-DD format',\n    example: 'report_2024-01-15_final.pdf \u2192 Date_2024-01-15',\n    icon: '\uD83D\uDCC5',\n  },\n  {\n    name: 'Lowercase Everything',\n    pattern: '([A-Z])',\n    replacement: (match: string) => match.toLowerCase(),\n    description: 'Convert all uppercase letters to lowercase',\n    example: 'MyFile.PDF \u2192 myfile.pdf',\n    icon: '\uD83D\uDD24',\n  },\n]\n\nconst REGEX_CHEATSHEET = [\n  { symbol: '.', meaning: 'Any single character', example: 'a.c matches abc, axc' },\n  { symbol: '*', meaning: 'Zero or more of previous', example: 'ab* matches a, ab, abb' },\n  { symbol: '+', meaning: 'One or more of previous', example: 'ab+ matches ab, abb' },\n  { symbol: '?', meaning: 'Zero or one of previous', example: 'ab? matches a, ab' },\n  { symbol: '^', meaning: 'Start of string', example: '^abc matches abc at start' },\n  { symbol: '$', meaning: 'End of string', example: 'abc$ matches abc at end' },\n  { symbol: '\\\\d', meaning: 'Any digit (0-9)', example: '\\\\d+ matches 123' },\n  { symbol: '\\\\w', meaning: 'Any word character', example: '\\\\w+ matches hello' },\n  { symbol: '\\\\s', meaning: 'Any whitespace', example: '\\\\s+ matches spaces' },\n  { symbol: '[abc]', meaning: 'Any character in brackets', example: '[abc] matches a or b or c' },\n  { symbol: '[^abc]', meaning: 'Any character NOT in brackets', example: '[^abc] matches x, y, z' },\n  { symbol: '()', meaning: 'Capture group', example: '(\\\\d+) captures numbers' },\n]\n\nfunction RegexHelpDialog({ isOpen, onClose }: RegexHelpDialogProps) {\n  const copyToClipboard = (text: string) => {\n    navigator.clipboard.writeText(text)\n    toast.success('Copied to clipboard!')\n  }\n\n  return (\n    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>\n      <DialogContent className=\"max-h-[90vh] overflow-y-auto sm:max-w-4xl\">\n        <DialogHeader>\n          <DialogTitle className=\"flex items-center gap-2\">\n            <Code2 className=\"h-5 w-5 text-blue-600\" />\n            Regular Expression Guide for File Renaming\n          </DialogTitle>\n        </DialogHeader>\n\n        <div className=\"space-y-6\">\n          {/* Quick Start */}\n          <div className=\"space-y-3\">\n            <div className=\"flex items-center gap-2\">\n              <Info className=\"h-4 w-4 text-blue-600\" />\n              <h3 className=\"font-semibold\">Quick Start</h3>\n            </div>\n            <div className=\"rounded-lg bg-blue-50 p-4 text-sm dark:bg-blue-950/30\">\n              <p className=\"mb-2\">Regular expressions (regex) allow advanced pattern-based renaming:</p>\n              <ul className=\"text-muted-foreground list-inside list-disc space-y-1\">\n                <li>\n                  <strong>Pattern:</strong> What to find in the filename\n                </li>\n                <li>\n                  <strong>Replacement:</strong> What to replace it with\n                </li>\n                <li>\n                  <strong>$1, $2, etc.:</strong> Use captured groups from pattern\n                </li>\n              </ul>\n            </div>\n          </div>\n\n          <Separator />\n\n          {/* Common Examples */}\n          <div className=\"space-y-3\">\n            <h3 className=\"flex items-center gap-2 font-semibold\">\n              <CheckCircle className=\"h-4 w-4 text-green-600\" />\n              Common Examples\n            </h3>\n            <div className=\"grid gap-3\">\n              {REGEX_EXAMPLES.map((example, index) => (\n                <div key={index} className=\"space-y-2 rounded-lg border p-4\">\n                  <div className=\"flex items-center justify-between\">\n                    <div className=\"flex items-center gap-2\">\n                      <span className=\"text-lg\">{example.icon}</span>\n                      <span className=\"font-medium\">{example.name}</span>\n                    </div>\n                    <Button\n                      variant=\"ghost\"\n                      size=\"sm\"\n                      onClick={() => copyToClipboard(`${example.pattern}|${example.replacement}`)}\n                      className=\"h-8 w-8 p-0\"\n                    >\n                      <Copy className=\"h-3 w-3\" />\n                    </Button>\n                  </div>\n\n                  <div className=\"space-y-2 text-sm\">\n                    <p className=\"text-muted-foreground\">{example.description}</p>\n\n                    <div className=\"flex items-center gap-2 font-mono text-xs\">\n                      <Badge variant=\"outline\" className=\"border-red-200 bg-red-50 text-red-700\">\n                        Pattern: {example.pattern}\n                      </Badge>\n                      <Badge variant=\"outline\" className=\"border-green-200 bg-green-50 text-green-700\">\n                        Replace:{' '}\n                        {typeof example.replacement === 'function'\n                          ? example.replacement('example')\n                          : example.replacement}\n                      </Badge>\n                    </div>\n\n                    <div className=\"flex items-center gap-2 text-xs\">\n                      <span className=\"text-muted-foreground\">{example.example.split(' \u2192 ')[0]}</span>\n                      <ArrowRight className=\"text-muted-foreground h-3 w-3\" />\n                      <span className=\"font-medium text-green-600\">{example.example.split(' \u2192 ')[1]}</span>\n                    </div>\n                  </div>\n                </div>\n              ))}\n            </div>\n          </div>\n\n          <Separator />\n\n          {/* Regex Cheatsheet */}\n          <div className=\"space-y-3\">\n            <h3 className=\"flex items-center gap-2 font-semibold\">\n              <Code2 className=\"h-4 w-4 text-purple-600\" />\n              Regex Cheatsheet\n            </h3>\n            <div className=\"grid gap-2 text-sm\">\n              {REGEX_CHEATSHEET.map((item, index) => (\n                <div key={index} className=\"hover:bg-muted/50 flex items-start gap-4 rounded p-2\">\n                  <Badge variant=\"secondary\" className=\"min-w-16 justify-center font-mono\">\n                    {item.symbol}\n                  </Badge>\n                  <div className=\"flex-1\">\n                    <div className=\"font-medium\">{item.meaning}</div>\n                    <div className=\"text-muted-foreground text-xs\">{item.example}</div>\n                  </div>\n                </div>\n              ))}\n            </div>\n          </div>\n\n          <Separator />\n\n          {/* Tips and Warnings */}\n          <div className=\"space-y-3\">\n            <h3 className=\"flex items-center gap-2 font-semibold\">\n              <Info className=\"h-4 w-4 text-orange-600\" />\n              Tips & Warnings\n            </h3>\n            <div className=\"space-y-3\">\n              <div className=\"rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/30\">\n                <div className=\"flex items-start gap-2\">\n                  <CheckCircle className=\"mt-0.5 h-4 w-4 text-green-600\" />\n                  <div className=\"text-sm\">\n                    <div className=\"font-medium text-green-800 dark:text-green-200\">Tips:</div>\n                    <ul className=\"mt-1 list-inside list-disc space-y-1 text-green-700 dark:text-green-300\">\n                      <li>Test your regex on a few files first</li>\n                      <li>Use the preview to verify results before applying</li>\n                      <li>Escape special characters with backslash (\\)</li>\n                      <li>Use parentheses () to capture groups for $1, $2, etc.</li>\n                    </ul>\n                  </div>\n                </div>\n              </div>\n\n              <div className=\"rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/30\">\n                <div className=\"flex items-start gap-2\">\n                  <XCircle className=\"mt-0.5 h-4 w-4 text-red-600\" />\n                  <div className=\"text-sm\">\n                    <div className=\"font-medium text-red-800 dark:text-red-200\">Warnings:</div>\n                    <ul className=\"mt-1 list-inside list-disc space-y-1 text-red-700 dark:text-red-300\">\n                      <li>Invalid regex patterns will be ignored</li>\n                      <li>Be careful with broad patterns like .* (matches everything)</li>\n                      <li>Always check the preview before confirming</li>\n                      <li>Backup important files before bulk operations</li>\n                    </ul>\n                  </div>\n                </div>\n              </div>\n            </div>\n          </div>\n        </div>\n\n        <div className=\"flex justify-end pt-4\">\n          <Button onClick={onClose}>Close Guide</Button>\n        </div>\n      </DialogContent>\n    </Dialog>\n  )\n}\n\nexport { RegexHelpDialog }\nexport default RegexHelpDialog\n"],
+      names: ["RegexHelpDialog", "REGEX_EXAMPLES", "name", "pattern", "replacement", "description", "example", "icon", "match", "toLowerCase", "REGEX_CHEATSHEET", "symbol", "meaning", "isOpen", "onClose", "copyToClipboard", "text", "navigator", "clipboard", "writeText", "toast", "success", "Dialog", "open", "onOpenChange", "DialogContent", "className", "DialogHeader", "DialogTitle", "Code2", "div", "Info", "h3", "p", "ul", "li", "strong", "Separator", "CheckCircle", "map", "index", "span", "Button", "variant", "size", "onClick", "Copy", "Badge", "split", "ArrowRight", "item", "XCircle"],
+      mappings: "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"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "f492c7d81ddee9548cd7e27244a97aa013380615"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_1o2xhmbpad = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_1o2xhmbpad();
+cov_1o2xhmbpad().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+function _export(target, all) {
+  /* istanbul ignore next */
+  cov_1o2xhmbpad().f[0]++;
+  cov_1o2xhmbpad().s[1]++;
+  for (var name in all) {
+    /* istanbul ignore next */
+    cov_1o2xhmbpad().s[2]++;
+    Object.defineProperty(target, name, {
+      enumerable: true,
+      get: all[name]
+    });
+  }
+}
+/* istanbul ignore next */
+cov_1o2xhmbpad().s[3]++;
+_export(exports, {
+  RegexHelpDialog: function () {
+    /* istanbul ignore next */
+    cov_1o2xhmbpad().f[1]++;
+    cov_1o2xhmbpad().s[4]++;
+    return RegexHelpDialog;
+  },
+  default: function () {
+    /* istanbul ignore next */
+    cov_1o2xhmbpad().f[2]++;
+    cov_1o2xhmbpad().s[5]++;
+    return _default;
+  }
+});
+const _jsxruntime =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[6]++, require("react/jsx-runtime"));
+const _lucidereact =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[7]++, require("lucide-react"));
+const _sonner =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[8]++, require("sonner"));
+const _dialog =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[9]++, require("../../../../../components/ui/dialog"));
+const _button =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[10]++, require("../../../../../components/ui/button"));
+const _badge =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[11]++, require("../../../../../components/ui/badge"));
+const _separator =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[12]++, require("../../../../../components/ui/separator"));
+const REGEX_EXAMPLES =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[13]++, [{
+  name: 'Remove Numbers',
+  pattern: '\\d+',
+  replacement: '',
+  description: 'Remove all numbers from filenames',
+  example: 'document123.pdf → document.pdf',
+  icon: '🔢'
+}, {
+  name: 'Replace Spaces with Underscores',
+  pattern: ' ',
+  replacement: '_',
+  description: 'Replace all spaces with underscores',
+  example: 'my file.txt → my_file.txt',
+  icon: '🔄'
+}, {
+  name: 'Remove Special Characters',
+  pattern: '[^a-zA-Z0-9._-]',
+  replacement: '',
+  description: 'Keep only letters, numbers, dots, underscores, and hyphens',
+  example: 'file@#$.txt → file.txt',
+  icon: '🧹'
+}, {
+  name: 'Add Prefix to Extension',
+  pattern: '(.*)\\.(.*)$',
+  replacement: '$1_backup.$2',
+  description: 'Add "_backup" before file extension',
+  example: 'document.pdf → document_backup.pdf',
+  icon: '💾'
+}, {
+  name: 'Extract Date Pattern',
+  pattern: '.*?(\\d{4}-\\d{2}-\\d{2}).*',
+  replacement: 'Date_$1',
+  description: 'Extract date in YYYY-MM-DD format',
+  example: 'report_2024-01-15_final.pdf → Date_2024-01-15',
+  icon: '📅'
+}, {
+  name: 'Lowercase Everything',
+  pattern: '([A-Z])',
+  replacement: match => {
+    /* istanbul ignore next */
+    cov_1o2xhmbpad().f[3]++;
+    cov_1o2xhmbpad().s[14]++;
+    return match.toLowerCase();
+  },
+  description: 'Convert all uppercase letters to lowercase',
+  example: 'MyFile.PDF → myfile.pdf',
+  icon: '🔤'
+}]);
+const REGEX_CHEATSHEET =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[15]++, [{
+  symbol: '.',
+  meaning: 'Any single character',
+  example: 'a.c matches abc, axc'
+}, {
+  symbol: '*',
+  meaning: 'Zero or more of previous',
+  example: 'ab* matches a, ab, abb'
+}, {
+  symbol: '+',
+  meaning: 'One or more of previous',
+  example: 'ab+ matches ab, abb'
+}, {
+  symbol: '?',
+  meaning: 'Zero or one of previous',
+  example: 'ab? matches a, ab'
+}, {
+  symbol: '^',
+  meaning: 'Start of string',
+  example: '^abc matches abc at start'
+}, {
+  symbol: '$',
+  meaning: 'End of string',
+  example: 'abc$ matches abc at end'
+}, {
+  symbol: '\\d',
+  meaning: 'Any digit (0-9)',
+  example: '\\d+ matches 123'
+}, {
+  symbol: '\\w',
+  meaning: 'Any word character',
+  example: '\\w+ matches hello'
+}, {
+  symbol: '\\s',
+  meaning: 'Any whitespace',
+  example: '\\s+ matches spaces'
+}, {
+  symbol: '[abc]',
+  meaning: 'Any character in brackets',
+  example: '[abc] matches a or b or c'
+}, {
+  symbol: '[^abc]',
+  meaning: 'Any character NOT in brackets',
+  example: '[^abc] matches x, y, z'
+}, {
+  symbol: '()',
+  meaning: 'Capture group',
+  example: '(\\d+) captures numbers'
+}]);
+function RegexHelpDialog({
+  isOpen,
+  onClose
+}) {
+  /* istanbul ignore next */
+  cov_1o2xhmbpad().f[4]++;
+  cov_1o2xhmbpad().s[16]++;
+  const copyToClipboard = text => {
+    /* istanbul ignore next */
+    cov_1o2xhmbpad().f[5]++;
+    cov_1o2xhmbpad().s[17]++;
+    navigator.clipboard.writeText(text);
+    /* istanbul ignore next */
+    cov_1o2xhmbpad().s[18]++;
+    _sonner.toast.success('Copied to clipboard!');
+  };
+  /* istanbul ignore next */
+  cov_1o2xhmbpad().s[19]++;
+  return /*#__PURE__*/(0, _jsxruntime.jsx)(_dialog.Dialog, {
+    open: isOpen,
+    onOpenChange: open => {
+      /* istanbul ignore next */
+      cov_1o2xhmbpad().f[6]++;
+      cov_1o2xhmbpad().s[20]++;
+      return /* istanbul ignore next */(cov_1o2xhmbpad().b[0][0]++, !open) &&
+      /* istanbul ignore next */
+      (cov_1o2xhmbpad().b[0][1]++, onClose());
+    },
+    children: /*#__PURE__*/(0, _jsxruntime.jsxs)(_dialog.DialogContent, {
+      className: "max-h-[90vh] overflow-y-auto sm:max-w-4xl",
+      children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_dialog.DialogHeader, {
+        children: /*#__PURE__*/(0, _jsxruntime.jsxs)(_dialog.DialogTitle, {
+          className: "flex items-center gap-2",
+          children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Code2, {
+            className: "h-5 w-5 text-blue-600"
+          }), "Regular Expression Guide for File Renaming"]
+        })
+      }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+        className: "space-y-6",
+        children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+          className: "space-y-3",
+          children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+            className: "flex items-center gap-2",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Info, {
+              className: "h-4 w-4 text-blue-600"
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("h3", {
+              className: "font-semibold",
+              children: "Quick Start"
+            })]
+          }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+            className: "rounded-lg bg-blue-50 p-4 text-sm dark:bg-blue-950/30",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+              className: "mb-2",
+              children: "Regular expressions (regex) allow advanced pattern-based renaming:"
+            }), /*#__PURE__*/(0, _jsxruntime.jsxs)("ul", {
+              className: "text-muted-foreground list-inside list-disc space-y-1",
+              children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("li", {
+                children: [/*#__PURE__*/(0, _jsxruntime.jsx)("strong", {
+                  children: "Pattern:"
+                }), " What to find in the filename"]
+              }), /*#__PURE__*/(0, _jsxruntime.jsxs)("li", {
+                children: [/*#__PURE__*/(0, _jsxruntime.jsx)("strong", {
+                  children: "Replacement:"
+                }), " What to replace it with"]
+              }), /*#__PURE__*/(0, _jsxruntime.jsxs)("li", {
+                children: [/*#__PURE__*/(0, _jsxruntime.jsx)("strong", {
+                  children: "$1, $2, etc.:"
+                }), " Use captured groups from pattern"]
+              })]
+            })]
+          })]
+        }), /*#__PURE__*/(0, _jsxruntime.jsx)(_separator.Separator, {}), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+          className: "space-y-3",
+          children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("h3", {
+            className: "flex items-center gap-2 font-semibold",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.CheckCircle, {
+              className: "h-4 w-4 text-green-600"
+            }), "Common Examples"]
+          }), /*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+            className: "grid gap-3",
+            children: REGEX_EXAMPLES.map((example, index) => {
+              /* istanbul ignore next */
+              cov_1o2xhmbpad().f[7]++;
+              cov_1o2xhmbpad().s[21]++;
+              return /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                className: "space-y-2 rounded-lg border p-4",
+                children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                  className: "flex items-center justify-between",
+                  children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                    className: "flex items-center gap-2",
+                    children: [/*#__PURE__*/(0, _jsxruntime.jsx)("span", {
+                      className: "text-lg",
+                      children: example.icon
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)("span", {
+                      className: "font-medium",
+                      children: example.name
+                    })]
+                  }), /*#__PURE__*/(0, _jsxruntime.jsx)(_button.Button, {
+                    variant: "ghost",
+                    size: "sm",
+                    onClick: () => {
+                      /* istanbul ignore next */
+                      cov_1o2xhmbpad().f[8]++;
+                      cov_1o2xhmbpad().s[22]++;
+                      return copyToClipboard(`${example.pattern}|${example.replacement}`);
+                    },
+                    className: "h-8 w-8 p-0",
+                    children: /*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Copy, {
+                      className: "h-3 w-3"
+                    })
+                  })]
+                }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                  className: "space-y-2 text-sm",
+                  children: [/*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+                    className: "text-muted-foreground",
+                    children: example.description
+                  }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                    className: "flex items-center gap-2 font-mono text-xs",
+                    children: [/*#__PURE__*/(0, _jsxruntime.jsxs)(_badge.Badge, {
+                      variant: "outline",
+                      className: "border-red-200 bg-red-50 text-red-700",
+                      children: ["Pattern: ", example.pattern]
+                    }), /*#__PURE__*/(0, _jsxruntime.jsxs)(_badge.Badge, {
+                      variant: "outline",
+                      className: "border-green-200 bg-green-50 text-green-700",
+                      children: ["Replace:", ' ', typeof example.replacement === 'function' ?
+                      /* istanbul ignore next */
+                      (cov_1o2xhmbpad().b[1][0]++, example.replacement('example')) :
+                      /* istanbul ignore next */
+                      (cov_1o2xhmbpad().b[1][1]++, example.replacement)]
+                    })]
+                  }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                    className: "flex items-center gap-2 text-xs",
+                    children: [/*#__PURE__*/(0, _jsxruntime.jsx)("span", {
+                      className: "text-muted-foreground",
+                      children: example.example.split(' → ')[0]
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.ArrowRight, {
+                      className: "text-muted-foreground h-3 w-3"
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)("span", {
+                      className: "font-medium text-green-600",
+                      children: example.example.split(' → ')[1]
+                    })]
+                  })]
+                })]
+              }, index);
+            })
+          })]
+        }), /*#__PURE__*/(0, _jsxruntime.jsx)(_separator.Separator, {}), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+          className: "space-y-3",
+          children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("h3", {
+            className: "flex items-center gap-2 font-semibold",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Code2, {
+              className: "h-4 w-4 text-purple-600"
+            }), "Regex Cheatsheet"]
+          }), /*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+            className: "grid gap-2 text-sm",
+            children: REGEX_CHEATSHEET.map((item, index) => {
+              /* istanbul ignore next */
+              cov_1o2xhmbpad().f[9]++;
+              cov_1o2xhmbpad().s[23]++;
+              return /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                className: "hover:bg-muted/50 flex items-start gap-4 rounded p-2",
+                children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_badge.Badge, {
+                  variant: "secondary",
+                  className: "min-w-16 justify-center font-mono",
+                  children: item.symbol
+                }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                  className: "flex-1",
+                  children: [/*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+                    className: "font-medium",
+                    children: item.meaning
+                  }), /*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+                    className: "text-muted-foreground text-xs",
+                    children: item.example
+                  })]
+                })]
+              }, index);
+            })
+          })]
+        }), /*#__PURE__*/(0, _jsxruntime.jsx)(_separator.Separator, {}), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+          className: "space-y-3",
+          children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("h3", {
+            className: "flex items-center gap-2 font-semibold",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.Info, {
+              className: "h-4 w-4 text-orange-600"
+            }), "Tips & Warnings"]
+          }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+            className: "space-y-3",
+            children: [/*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+              className: "rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950/30",
+              children: /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                className: "flex items-start gap-2",
+                children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.CheckCircle, {
+                  className: "mt-0.5 h-4 w-4 text-green-600"
+                }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                  className: "text-sm",
+                  children: [/*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+                    className: "font-medium text-green-800 dark:text-green-200",
+                    children: "Tips:"
+                  }), /*#__PURE__*/(0, _jsxruntime.jsxs)("ul", {
+                    className: "mt-1 list-inside list-disc space-y-1 text-green-700 dark:text-green-300",
+                    children: [/*#__PURE__*/(0, _jsxruntime.jsx)("li", {
+                      children: "Test your regex on a few files first"
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)("li", {
+                      children: "Use the preview to verify results before applying"
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)("li", {
+                      children: "Escape special characters with backslash (\\)"
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)("li", {
+                      children: "Use parentheses () to capture groups for $1, $2, etc."
+                    })]
+                  })]
+                })]
+              })
+            }), /*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+              className: "rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/30",
+              children: /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                className: "flex items-start gap-2",
+                children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_lucidereact.XCircle, {
+                  className: "mt-0.5 h-4 w-4 text-red-600"
+                }), /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+                  className: "text-sm",
+                  children: [/*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+                    className: "font-medium text-red-800 dark:text-red-200",
+                    children: "Warnings:"
+                  }), /*#__PURE__*/(0, _jsxruntime.jsxs)("ul", {
+                    className: "mt-1 list-inside list-disc space-y-1 text-red-700 dark:text-red-300",
+                    children: [/*#__PURE__*/(0, _jsxruntime.jsx)("li", {
+                      children: "Invalid regex patterns will be ignored"
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)("li", {
+                      children: "Be careful with broad patterns like .* (matches everything)"
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)("li", {
+                      children: "Always check the preview before confirming"
+                    }), /*#__PURE__*/(0, _jsxruntime.jsx)("li", {
+                      children: "Backup important files before bulk operations"
+                    })]
+                  })]
+                })]
+              })
+            })]
+          })]
+        })]
+      }), /*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+        className: "flex justify-end pt-4",
+        children: /*#__PURE__*/(0, _jsxruntime.jsx)(_button.Button, {
+          onClick: onClose,
+          children: "Close Guide"
+        })
+      })]
+    })
+  });
+}
+const _default =
+/* istanbul ignore next */
+(cov_1o2xhmbpad().s[24]++, RegexHelpDialog);
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMW8yeGhtYnBhZCIsImFjdHVhbENvdmVyYWdlIiwicyIsIlJlZ2V4SGVscERpYWxvZyIsImYiLCJkZWZhdWx0IiwiX2RlZmF1bHQiLCJSRUdFWF9FWEFNUExFUyIsIm5hbWUiLCJwYXR0ZXJuIiwicmVwbGFjZW1lbnQiLCJkZXNjcmlwdGlvbiIsImV4YW1wbGUiLCJpY29uIiwibWF0Y2giLCJ0b0xvd2VyQ2FzZSIsIlJFR0VYX0NIRUFUU0hFRVQiLCJzeW1ib2wiLCJtZWFuaW5nIiwiaXNPcGVuIiwib25DbG9zZSIsImNvcHlUb0NsaXBib2FyZCIsInRleHQiLCJuYXZpZ2F0b3IiLCJjbGlwYm9hcmQiLCJ3cml0ZVRleHQiLCJfc29ubmVyIiwidG9hc3QiLCJzdWNjZXNzIiwiX2pzeHJ1bnRpbWUiLCJqc3giLCJfZGlhbG9nIiwiRGlhbG9nIiwib3BlbiIsIm9uT3BlbkNoYW5nZSIsImIiLCJqc3hzIiwiRGlhbG9nQ29udGVudCIsImNsYXNzTmFtZSIsIkRpYWxvZ0hlYWRlciIsIkRpYWxvZ1RpdGxlIiwiX2x1Y2lkZXJlYWN0IiwiQ29kZTIiLCJJbmZvIiwiX3NlcGFyYXRvciIsIlNlcGFyYXRvciIsIkNoZWNrQ2lyY2xlIiwibWFwIiwiaW5kZXgiLCJfYnV0dG9uIiwiQnV0dG9uIiwidmFyaWFudCIsInNpemUiLCJvbkNsaWNrIiwiQ29weSIsIl9iYWRnZSIsIkJhZGdlIiwic3BsaXQiLCJBcnJvd1JpZ2h0IiwiaXRlbSIsIlhDaXJjbGUiXSwic291cmNlcyI6WyIvaG9tZS9ydW5uZXIvd29ya3NwYWNlL3NyYy9hcHAvKG1haW4pL2Rhc2hib2FyZC9kcml2ZS9fY29tcG9uZW50cy9yZWdleC1oZWxwLWRpYWxvZy50c3giXSwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBjbGllbnQnXG5cbmltcG9ydCB7IENvZGUyLCBJbmZvLCBDaGVja0NpcmNsZSwgWENpcmNsZSwgQXJyb3dSaWdodCwgQ29weSB9IGZyb20gJ2x1Y2lkZS1yZWFjdCdcbmltcG9ydCB7IHRvYXN0IH0gZnJvbSAnc29ubmVyJ1xuXG5pbXBvcnQgeyBEaWFsb2csIERpYWxvZ0NvbnRlbnQsIERpYWxvZ0hlYWRlciwgRGlhbG9nVGl0bGUgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvZGlhbG9nJ1xuaW1wb3J0IHsgQnV0dG9uIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2J1dHRvbidcbmltcG9ydCB7IEJhZGdlIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL2JhZGdlJ1xuaW1wb3J0IHsgU2VwYXJhdG9yIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3NlcGFyYXRvcidcblxuaW50ZXJmYWNlIFJlZ2V4SGVscERpYWxvZ1Byb3BzIHtcbiAgaXNPcGVuOiBib29sZWFuXG4gIG9uQ2xvc2U6ICgpID0+IHZvaWRcbn1cblxuY29uc3QgUkVHRVhfRVhBTVBMRVMgPSBbXG4gIHtcbiAgICBuYW1lOiAnUmVtb3ZlIE51bWJlcnMnLFxuICAgIHBhdHRlcm46ICdcXFxcZCsnLFxuICAgIHJlcGxhY2VtZW50OiAnJyxcbiAgICBkZXNjcmlwdGlvbjogJ1JlbW92ZSBhbGwgbnVtYmVycyBmcm9tIGZpbGVuYW1lcycsXG4gICAgZXhhbXBsZTogJ2RvY3VtZW50MTIzLnBkZiDihpIgZG9jdW1lbnQucGRmJyxcbiAgICBpY29uOiAn8J+UoicsXG4gIH0sXG4gIHtcbiAgICBuYW1lOiAnUmVwbGFjZSBTcGFjZXMgd2l0aCBVbmRlcnNjb3JlcycsXG4gICAgcGF0dGVybjogJyAnLFxuICAgIHJlcGxhY2VtZW50OiAnXycsXG4gICAgZGVzY3JpcHRpb246ICdSZXBsYWNlIGFsbCBzcGFjZXMgd2l0aCB1bmRlcnNjb3JlcycsXG4gICAgZXhhbXBsZTogJ215IGZpbGUudHh0IOKGkiBteV9maWxlLnR4dCcsXG4gICAgaWNvbjogJ/CflIQnLFxuICB9LFxuICB7XG4gICAgbmFtZTogJ1JlbW92ZSBTcGVjaWFsIENoYXJhY3RlcnMnLFxuICAgIHBhdHRlcm46ICdbXmEtekEtWjAtOS5fLV0nLFxuICAgIHJlcGxhY2VtZW50OiAnJyxcbiAgICBkZXNjcmlwdGlvbjogJ0tlZXAgb25seSBsZXR0ZXJzLCBudW1iZXJzLCBkb3RzLCB1bmRlcnNjb3JlcywgYW5kIGh5cGhlbnMnLFxuICAgIGV4YW1wbGU6ICdmaWxlQCMkLnR4dCDihpIgZmlsZS50eHQnLFxuICAgIGljb246ICfwn6e5JyxcbiAgfSxcbiAge1xuICAgIG5hbWU6ICdBZGQgUHJlZml4IHRvIEV4dGVuc2lvbicsXG4gICAgcGF0dGVybjogJyguKilcXFxcLiguKikkJyxcbiAgICByZXBsYWNlbWVudDogJyQxX2JhY2t1cC4kMicsXG4gICAgZGVzY3JpcHRpb246ICdBZGQgXCJfYmFja3VwXCIgYmVmb3JlIGZpbGUgZXh0ZW5zaW9uJyxcbiAgICBleGFtcGxlOiAnZG9jdW1lbnQucGRmIOKGkiBkb2N1bWVudF9iYWNrdXAucGRmJyxcbiAgICBpY29uOiAn8J+SvicsXG4gIH0sXG4gIHtcbiAgICBuYW1lOiAnRXh0cmFjdCBEYXRlIFBhdHRlcm4nLFxuICAgIHBhdHRlcm46ICcuKj8oXFxcXGR7NH0tXFxcXGR7Mn0tXFxcXGR7Mn0pLionLFxuICAgIHJlcGxhY2VtZW50OiAnRGF0ZV8kMScsXG4gICAgZGVzY3JpcHRpb246ICdFeHRyYWN0IGRhdGUgaW4gWVlZWS1NTS1ERCBmb3JtYXQnLFxuICAgIGV4YW1wbGU6ICdyZXBvcnRfMjAyNC0wMS0xNV9maW5hbC5wZGYg4oaSIERhdGVfMjAyNC0wMS0xNScsXG4gICAgaWNvbjogJ/Cfk4UnLFxuICB9LFxuICB7XG4gICAgbmFtZTogJ0xvd2VyY2FzZSBFdmVyeXRoaW5nJyxcbiAgICBwYXR0ZXJuOiAnKFtBLVpdKScsXG4gICAgcmVwbGFjZW1lbnQ6IChtYXRjaDogc3RyaW5nKSA9PiBtYXRjaC50b0xvd2VyQ2FzZSgpLFxuICAgIGRlc2NyaXB0aW9uOiAnQ29udmVydCBhbGwgdXBwZXJjYXNlIGxldHRlcnMgdG8gbG93ZXJjYXNlJyxcbiAgICBleGFtcGxlOiAnTXlGaWxlLlBERiDihpIgbXlmaWxlLnBkZicsXG4gICAgaWNvbjogJ/CflKQnLFxuICB9LFxuXVxuXG5jb25zdCBSRUdFWF9DSEVBVFNIRUVUID0gW1xuICB7IHN5bWJvbDogJy4nLCBtZWFuaW5nOiAnQW55IHNpbmdsZSBjaGFyYWN0ZXInLCBleGFtcGxlOiAnYS5jIG1hdGNoZXMgYWJjLCBheGMnIH0sXG4gIHsgc3ltYm9sOiAnKicsIG1lYW5pbmc6ICdaZXJvIG9yIG1vcmUgb2YgcHJldmlvdXMnLCBleGFtcGxlOiAnYWIqIG1hdGNoZXMgYSwgYWIsIGFiYicgfSxcbiAgeyBzeW1ib2w6ICcrJywgbWVhbmluZzogJ09uZSBvciBtb3JlIG9mIHByZXZpb3VzJywgZXhhbXBsZTogJ2FiKyBtYXRjaGVzIGFiLCBhYmInIH0sXG4gIHsgc3ltYm9sOiAnPycsIG1lYW5pbmc6ICdaZXJvIG9yIG9uZSBvZiBwcmV2aW91cycsIGV4YW1wbGU6ICdhYj8gbWF0Y2hlcyBhLCBhYicgfSxcbiAgeyBzeW1ib2w6ICdeJywgbWVhbmluZzogJ1N0YXJ0IG9mIHN0cmluZycsIGV4YW1wbGU6ICdeYWJjIG1hdGNoZXMgYWJjIGF0IHN0YXJ0JyB9LFxuICB7IHN5bWJvbDogJyQnLCBtZWFuaW5nOiAnRW5kIG9mIHN0cmluZycsIGV4YW1wbGU6ICdhYmMkIG1hdGNoZXMgYWJjIGF0IGVuZCcgfSxcbiAgeyBzeW1ib2w6ICdcXFxcZCcsIG1lYW5pbmc6ICdBbnkgZGlnaXQgKDAtOSknLCBleGFtcGxlOiAnXFxcXGQrIG1hdGNoZXMgMTIzJyB9LFxuICB7IHN5bWJvbDogJ1xcXFx3JywgbWVhbmluZzogJ0FueSB3b3JkIGNoYXJhY3RlcicsIGV4YW1wbGU6ICdcXFxcdysgbWF0Y2hlcyBoZWxsbycgfSxcbiAgeyBzeW1ib2w6ICdcXFxccycsIG1lYW5pbmc6ICdBbnkgd2hpdGVzcGFjZScsIGV4YW1wbGU6ICdcXFxccysgbWF0Y2hlcyBzcGFjZXMnIH0sXG4gIHsgc3ltYm9sOiAnW2FiY10nLCBtZWFuaW5nOiAnQW55IGNoYXJhY3RlciBpbiBicmFja2V0cycsIGV4YW1wbGU6ICdbYWJjXSBtYXRjaGVzIGEgb3IgYiBvciBjJyB9LFxuICB7IHN5bWJvbDogJ1teYWJjXScsIG1lYW5pbmc6ICdBbnkgY2hhcmFjdGVyIE5PVCBpbiBicmFja2V0cycsIGV4YW1wbGU6ICdbXmFiY10gbWF0Y2hlcyB4LCB5LCB6JyB9LFxuICB7IHN5bWJvbDogJygpJywgbWVhbmluZzogJ0NhcHR1cmUgZ3JvdXAnLCBleGFtcGxlOiAnKFxcXFxkKykgY2FwdHVyZXMgbnVtYmVycycgfSxcbl1cblxuZnVuY3Rpb24gUmVnZXhIZWxwRGlhbG9nKHsgaXNPcGVuLCBvbkNsb3NlIH06IFJlZ2V4SGVscERpYWxvZ1Byb3BzKSB7XG4gIGNvbnN0IGNvcHlUb0NsaXBib2FyZCA9ICh0ZXh0OiBzdHJpbmcpID0+IHtcbiAgICBuYXZpZ2F0b3IuY2xpcGJvYXJkLndyaXRlVGV4dCh0ZXh0KVxuICAgIHRvYXN0LnN1Y2Nlc3MoJ0NvcGllZCB0byBjbGlwYm9hcmQhJylcbiAgfVxuXG4gIHJldHVybiAoXG4gICAgPERpYWxvZyBvcGVuPXtpc09wZW59IG9uT3BlbkNoYW5nZT17b3BlbiA9PiAhb3BlbiAmJiBvbkNsb3NlKCl9PlxuICAgICAgPERpYWxvZ0NvbnRlbnQgY2xhc3NOYW1lPVwibWF4LWgtWzkwdmhdIG92ZXJmbG93LXktYXV0byBzbTptYXgtdy00eGxcIj5cbiAgICAgICAgPERpYWxvZ0hlYWRlcj5cbiAgICAgICAgICA8RGlhbG9nVGl0bGUgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cbiAgICAgICAgICAgIDxDb2RlMiBjbGFzc05hbWU9XCJoLTUgdy01IHRleHQtYmx1ZS02MDBcIiAvPlxuICAgICAgICAgICAgUmVndWxhciBFeHByZXNzaW9uIEd1aWRlIGZvciBGaWxlIFJlbmFtaW5nXG4gICAgICAgICAgPC9EaWFsb2dUaXRsZT5cbiAgICAgICAgPC9EaWFsb2dIZWFkZXI+XG5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTZcIj5cbiAgICAgICAgICB7LyogUXVpY2sgU3RhcnQgKi99XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTNcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cbiAgICAgICAgICAgICAgPEluZm8gY2xhc3NOYW1lPVwiaC00IHctNCB0ZXh0LWJsdWUtNjAwXCIgLz5cbiAgICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZvbnQtc2VtaWJvbGRcIj5RdWljayBTdGFydDwvaDM+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwicm91bmRlZC1sZyBiZy1ibHVlLTUwIHAtNCB0ZXh0LXNtIGRhcms6YmctYmx1ZS05NTAvMzBcIj5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwibWItMlwiPlJlZ3VsYXIgZXhwcmVzc2lvbnMgKHJlZ2V4KSBhbGxvdyBhZHZhbmNlZCBwYXR0ZXJuLWJhc2VkIHJlbmFtaW5nOjwvcD5cbiAgICAgICAgICAgICAgPHVsIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZCBsaXN0LWluc2lkZSBsaXN0LWRpc2Mgc3BhY2UteS0xXCI+XG4gICAgICAgICAgICAgICAgPGxpPlxuICAgICAgICAgICAgICAgICAgPHN0cm9uZz5QYXR0ZXJuOjwvc3Ryb25nPiBXaGF0IHRvIGZpbmQgaW4gdGhlIGZpbGVuYW1lXG4gICAgICAgICAgICAgICAgPC9saT5cbiAgICAgICAgICAgICAgICA8bGk+XG4gICAgICAgICAgICAgICAgICA8c3Ryb25nPlJlcGxhY2VtZW50Ojwvc3Ryb25nPiBXaGF0IHRvIHJlcGxhY2UgaXQgd2l0aFxuICAgICAgICAgICAgICAgIDwvbGk+XG4gICAgICAgICAgICAgICAgPGxpPlxuICAgICAgICAgICAgICAgICAgPHN0cm9uZz4kMSwgJDIsIGV0Yy46PC9zdHJvbmc+IFVzZSBjYXB0dXJlZCBncm91cHMgZnJvbSBwYXR0ZXJuXG4gICAgICAgICAgICAgICAgPC9saT5cbiAgICAgICAgICAgICAgPC91bD5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgPFNlcGFyYXRvciAvPlxuXG4gICAgICAgICAgey8qIENvbW1vbiBFeGFtcGxlcyAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktM1wiPlxuICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yIGZvbnQtc2VtaWJvbGRcIj5cbiAgICAgICAgICAgICAgPENoZWNrQ2lyY2xlIGNsYXNzTmFtZT1cImgtNCB3LTQgdGV4dC1ncmVlbi02MDBcIiAvPlxuICAgICAgICAgICAgICBDb21tb24gRXhhbXBsZXNcbiAgICAgICAgICAgIDwvaDM+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImdyaWQgZ2FwLTNcIj5cbiAgICAgICAgICAgICAge1JFR0VYX0VYQU1QTEVTLm1hcCgoZXhhbXBsZSwgaW5kZXgpID0+IChcbiAgICAgICAgICAgICAgICA8ZGl2IGtleT17aW5kZXh9IGNsYXNzTmFtZT1cInNwYWNlLXktMiByb3VuZGVkLWxnIGJvcmRlciBwLTRcIj5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIganVzdGlmeS1iZXR3ZWVuXCI+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1jZW50ZXIgZ2FwLTJcIj5cbiAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0ZXh0LWxnXCI+e2V4YW1wbGUuaWNvbn08L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiZm9udC1tZWRpdW1cIj57ZXhhbXBsZS5uYW1lfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICAgIDxCdXR0b25cbiAgICAgICAgICAgICAgICAgICAgICB2YXJpYW50PVwiZ2hvc3RcIlxuICAgICAgICAgICAgICAgICAgICAgIHNpemU9XCJzbVwiXG4gICAgICAgICAgICAgICAgICAgICAgb25DbGljaz17KCkgPT4gY29weVRvQ2xpcGJvYXJkKGAke2V4YW1wbGUucGF0dGVybn18JHtleGFtcGxlLnJlcGxhY2VtZW50fWApfVxuICAgICAgICAgICAgICAgICAgICAgIGNsYXNzTmFtZT1cImgtOCB3LTggcC0wXCJcbiAgICAgICAgICAgICAgICAgICAgPlxuICAgICAgICAgICAgICAgICAgICAgIDxDb3B5IGNsYXNzTmFtZT1cImgtMyB3LTNcIiAvPlxuICAgICAgICAgICAgICAgICAgICA8L0J1dHRvbj5cbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktMiB0ZXh0LXNtXCI+XG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPntleGFtcGxlLmRlc2NyaXB0aW9ufTwvcD5cblxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yIGZvbnQtbW9ubyB0ZXh0LXhzXCI+XG4gICAgICAgICAgICAgICAgICAgICAgPEJhZGdlIHZhcmlhbnQ9XCJvdXRsaW5lXCIgY2xhc3NOYW1lPVwiYm9yZGVyLXJlZC0yMDAgYmctcmVkLTUwIHRleHQtcmVkLTcwMFwiPlxuICAgICAgICAgICAgICAgICAgICAgICAgUGF0dGVybjoge2V4YW1wbGUucGF0dGVybn1cbiAgICAgICAgICAgICAgICAgICAgICA8L0JhZGdlPlxuICAgICAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwib3V0bGluZVwiIGNsYXNzTmFtZT1cImJvcmRlci1ncmVlbi0yMDAgYmctZ3JlZW4tNTAgdGV4dC1ncmVlbi03MDBcIj5cbiAgICAgICAgICAgICAgICAgICAgICAgIFJlcGxhY2U6eycgJ31cbiAgICAgICAgICAgICAgICAgICAgICAgIHt0eXBlb2YgZXhhbXBsZS5yZXBsYWNlbWVudCA9PT0gJ2Z1bmN0aW9uJ1xuICAgICAgICAgICAgICAgICAgICAgICAgICA/IGV4YW1wbGUucmVwbGFjZW1lbnQoJ2V4YW1wbGUnKVxuICAgICAgICAgICAgICAgICAgICAgICAgICA6IGV4YW1wbGUucmVwbGFjZW1lbnR9XG4gICAgICAgICAgICAgICAgICAgICAgPC9CYWRnZT5cbiAgICAgICAgICAgICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGl0ZW1zLWNlbnRlciBnYXAtMiB0ZXh0LXhzXCI+XG4gICAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidGV4dC1tdXRlZC1mb3JlZ3JvdW5kXCI+e2V4YW1wbGUuZXhhbXBsZS5zcGxpdCgnIOKGkiAnKVswXX08L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgICAgPEFycm93UmlnaHQgY2xhc3NOYW1lPVwidGV4dC1tdXRlZC1mb3JlZ3JvdW5kIGgtMyB3LTNcIiAvPlxuICAgICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtIHRleHQtZ3JlZW4tNjAwXCI+e2V4YW1wbGUuZXhhbXBsZS5zcGxpdCgnIOKGkiAnKVsxXX08L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICkpfVxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgICA8U2VwYXJhdG9yIC8+XG5cbiAgICAgICAgICB7LyogUmVnZXggQ2hlYXRzaGVldCAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktM1wiPlxuICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yIGZvbnQtc2VtaWJvbGRcIj5cbiAgICAgICAgICAgICAgPENvZGUyIGNsYXNzTmFtZT1cImgtNCB3LTQgdGV4dC1wdXJwbGUtNjAwXCIgLz5cbiAgICAgICAgICAgICAgUmVnZXggQ2hlYXRzaGVldFxuICAgICAgICAgICAgPC9oMz5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZ3JpZCBnYXAtMiB0ZXh0LXNtXCI+XG4gICAgICAgICAgICAgIHtSRUdFWF9DSEVBVFNIRUVULm1hcCgoaXRlbSwgaW5kZXgpID0+IChcbiAgICAgICAgICAgICAgICA8ZGl2IGtleT17aW5kZXh9IGNsYXNzTmFtZT1cImhvdmVyOmJnLW11dGVkLzUwIGZsZXggaXRlbXMtc3RhcnQgZ2FwLTQgcm91bmRlZCBwLTJcIj5cbiAgICAgICAgICAgICAgICAgIDxCYWRnZSB2YXJpYW50PVwic2Vjb25kYXJ5XCIgY2xhc3NOYW1lPVwibWluLXctMTYganVzdGlmeS1jZW50ZXIgZm9udC1tb25vXCI+XG4gICAgICAgICAgICAgICAgICAgIHtpdGVtLnN5bWJvbH1cbiAgICAgICAgICAgICAgICAgIDwvQmFkZ2U+XG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXgtMVwiPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtXCI+e2l0ZW0ubWVhbmluZ308L2Rpdj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJ0ZXh0LW11dGVkLWZvcmVncm91bmQgdGV4dC14c1wiPntpdGVtLmV4YW1wbGV9PC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgKSl9XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgIDxTZXBhcmF0b3IgLz5cblxuICAgICAgICAgIHsvKiBUaXBzIGFuZCBXYXJuaW5ncyAqL31cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktM1wiPlxuICAgICAgICAgICAgPGgzIGNsYXNzTmFtZT1cImZsZXggaXRlbXMtY2VudGVyIGdhcC0yIGZvbnQtc2VtaWJvbGRcIj5cbiAgICAgICAgICAgICAgPEluZm8gY2xhc3NOYW1lPVwiaC00IHctNCB0ZXh0LW9yYW5nZS02MDBcIiAvPlxuICAgICAgICAgICAgICBUaXBzICYgV2FybmluZ3NcbiAgICAgICAgICAgIDwvaDM+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNwYWNlLXktM1wiPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJvdW5kZWQtbGcgYm9yZGVyIGJvcmRlci1ncmVlbi0yMDAgYmctZ3JlZW4tNTAgcC0zIGRhcms6Ym9yZGVyLWdyZWVuLTgwMCBkYXJrOmJnLWdyZWVuLTk1MC8zMFwiPlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZmxleCBpdGVtcy1zdGFydCBnYXAtMlwiPlxuICAgICAgICAgICAgICAgICAgPENoZWNrQ2lyY2xlIGNsYXNzTmFtZT1cIm10LTAuNSBoLTQgdy00IHRleHQtZ3JlZW4tNjAwXCIgLz5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwidGV4dC1zbVwiPlxuICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZvbnQtbWVkaXVtIHRleHQtZ3JlZW4tODAwIGRhcms6dGV4dC1ncmVlbi0yMDBcIj5UaXBzOjwvZGl2PlxuICAgICAgICAgICAgICAgICAgICA8dWwgY2xhc3NOYW1lPVwibXQtMSBsaXN0LWluc2lkZSBsaXN0LWRpc2Mgc3BhY2UteS0xIHRleHQtZ3JlZW4tNzAwIGRhcms6dGV4dC1ncmVlbi0zMDBcIj5cbiAgICAgICAgICAgICAgICAgICAgICA8bGk+VGVzdCB5b3VyIHJlZ2V4IG9uIGEgZmV3IGZpbGVzIGZpcnN0PC9saT5cbiAgICAgICAgICAgICAgICAgICAgICA8bGk+VXNlIHRoZSBwcmV2aWV3IHRvIHZlcmlmeSByZXN1bHRzIGJlZm9yZSBhcHBseWluZzwvbGk+XG4gICAgICAgICAgICAgICAgICAgICAgPGxpPkVzY2FwZSBzcGVjaWFsIGNoYXJhY3RlcnMgd2l0aCBiYWNrc2xhc2ggKFxcKTwvbGk+XG4gICAgICAgICAgICAgICAgICAgICAgPGxpPlVzZSBwYXJlbnRoZXNlcyAoKSB0byBjYXB0dXJlIGdyb3VwcyBmb3IgJDEsICQyLCBldGMuPC9saT5cbiAgICAgICAgICAgICAgICAgICAgPC91bD5cbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJvdW5kZWQtbGcgYm9yZGVyIGJvcmRlci1yZWQtMjAwIGJnLXJlZC01MCBwLTMgZGFyazpib3JkZXItcmVkLTgwMCBkYXJrOmJnLXJlZC05NTAvMzBcIj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImZsZXggaXRlbXMtc3RhcnQgZ2FwLTJcIj5cbiAgICAgICAgICAgICAgICAgIDxYQ2lyY2xlIGNsYXNzTmFtZT1cIm10LTAuNSBoLTQgdy00IHRleHQtcmVkLTYwMFwiIC8+XG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInRleHQtc21cIj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmb250LW1lZGl1bSB0ZXh0LXJlZC04MDAgZGFyazp0ZXh0LXJlZC0yMDBcIj5XYXJuaW5nczo8L2Rpdj5cbiAgICAgICAgICAgICAgICAgICAgPHVsIGNsYXNzTmFtZT1cIm10LTEgbGlzdC1pbnNpZGUgbGlzdC1kaXNjIHNwYWNlLXktMSB0ZXh0LXJlZC03MDAgZGFyazp0ZXh0LXJlZC0zMDBcIj5cbiAgICAgICAgICAgICAgICAgICAgICA8bGk+SW52YWxpZCByZWdleCBwYXR0ZXJucyB3aWxsIGJlIGlnbm9yZWQ8L2xpPlxuICAgICAgICAgICAgICAgICAgICAgIDxsaT5CZSBjYXJlZnVsIHdpdGggYnJvYWQgcGF0dGVybnMgbGlrZSAuKiAobWF0Y2hlcyBldmVyeXRoaW5nKTwvbGk+XG4gICAgICAgICAgICAgICAgICAgICAgPGxpPkFsd2F5cyBjaGVjayB0aGUgcHJldmlldyBiZWZvcmUgY29uZmlybWluZzwvbGk+XG4gICAgICAgICAgICAgICAgICAgICAgPGxpPkJhY2t1cCBpbXBvcnRhbnQgZmlsZXMgYmVmb3JlIGJ1bGsgb3BlcmF0aW9uczwvbGk+XG4gICAgICAgICAgICAgICAgICAgIDwvdWw+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJmbGV4IGp1c3RpZnktZW5kIHB0LTRcIj5cbiAgICAgICAgICA8QnV0dG9uIG9uQ2xpY2s9e29uQ2xvc2V9PkNsb3NlIEd1aWRlPC9CdXR0b24+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9EaWFsb2dDb250ZW50PlxuICAgIDwvRGlhbG9nPlxuICApXG59XG5cbmV4cG9ydCB7IFJlZ2V4SGVscERpYWxvZyB9XG5leHBvcnQgZGVmYXVsdCBSZWdleEhlbHBEaWFsb2dcbiJdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7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

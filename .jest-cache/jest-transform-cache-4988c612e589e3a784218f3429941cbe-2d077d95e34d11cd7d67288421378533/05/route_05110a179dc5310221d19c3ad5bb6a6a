@@ -1,0 +1,439 @@
+b4ca94c424a903e34cde122a606d7dab
+"use strict";
+
+/* istanbul ignore next */
+function cov_1xtbne3cn1() {
+  var path = "/home/runner/workspace/src/app/api/drive/user/route.ts";
+  var hash = "f23c59a81177ae84085073addd4af36e505dfa20";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/app/api/drive/user/route.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 2,
+          column: 0
+        },
+        end: {
+          line: 4,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 5,
+          column: 0
+        },
+        end: {
+          line: 10,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 8,
+          column: 8
+        },
+        end: {
+          line: 8,
+          column: 19
+        }
+      },
+      "3": {
+        start: {
+          line: 11,
+          column: 16
+        },
+        end: {
+          line: 11,
+          column: 38
+        }
+      },
+      "4": {
+        start: {
+          line: 12,
+          column: 14
+        },
+        end: {
+          line: 12,
+          column: 41
+        }
+      },
+      "5": {
+        start: {
+          line: 13,
+          column: 17
+        },
+        end: {
+          line: 13,
+          column: 64
+        }
+      },
+      "6": {
+        start: {
+          line: 15,
+          column: 4
+        },
+        end: {
+          line: 41,
+          column: 5
+        }
+      },
+      "7": {
+        start: {
+          line: 16,
+          column: 24
+        },
+        end: {
+          line: 16,
+          column: 47
+        }
+      },
+      "8": {
+        start: {
+          line: 17,
+          column: 8
+        },
+        end: {
+          line: 23,
+          column: 9
+        }
+      },
+      "9": {
+        start: {
+          line: 18,
+          column: 12
+        },
+        end: {
+          line: 22,
+          column: 15
+        }
+      },
+      "10": {
+        start: {
+          line: 24,
+          column: 28
+        },
+        end: {
+          line: 24,
+          column: 47
+        }
+      },
+      "11": {
+        start: {
+          line: 25,
+          column: 8
+        },
+        end: {
+          line: 31,
+          column: 9
+        }
+      },
+      "12": {
+        start: {
+          line: 26,
+          column: 12
+        },
+        end: {
+          line: 30,
+          column: 15
+        }
+      },
+      "13": {
+        start: {
+          line: 32,
+          column: 29
+        },
+        end: {
+          line: 32,
+          column: 73
+        }
+      },
+      "14": {
+        start: {
+          line: 33,
+          column: 25
+        },
+        end: {
+          line: 33,
+          column: 57
+        }
+      },
+      "15": {
+        start: {
+          line: 34,
+          column: 8
+        },
+        end: {
+          line: 34,
+          column: 51
+        }
+      },
+      "16": {
+        start: {
+          line: 36,
+          column: 8
+        },
+        end: {
+          line: 40,
+          column: 11
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 7,
+            column: 9
+          },
+          end: {
+            line: 7,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 7,
+            column: 20
+          },
+          end: {
+            line: 9,
+            column: 5
+          }
+        },
+        line: 7
+      },
+      "1": {
+        name: "GET",
+        decl: {
+          start: {
+            line: 14,
+            column: 15
+          },
+          end: {
+            line: 14,
+            column: 18
+          }
+        },
+        loc: {
+          start: {
+            line: 14,
+            column: 29
+          },
+          end: {
+            line: 42,
+            column: 1
+          }
+        },
+        line: 14
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 17,
+            column: 8
+          },
+          end: {
+            line: 23,
+            column: 9
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 17,
+            column: 8
+          },
+          end: {
+            line: 23,
+            column: 9
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 17
+      },
+      "1": {
+        loc: {
+          start: {
+            line: 25,
+            column: 8
+          },
+          end: {
+            line: 31,
+            column: 9
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 25,
+            column: 8
+          },
+          end: {
+            line: 31,
+            column: 9
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 25
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0,
+      "14": 0,
+      "15": 0,
+      "16": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0
+    },
+    b: {
+      "0": [0, 0],
+      "1": [0, 0]
+    },
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/app/api/drive/user/route.ts"],
+      sourcesContent: ["import { NextRequest, NextResponse } from 'next/server'\n\nimport { auth } from '@/auth'\nimport { GoogleDriveService } from '@/lib/google-drive/service'\n\nexport async function GET(_request: NextRequest) {\n  try {\n    const session = await auth()\n\n    if (!session?.user) {\n      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })\n    }\n\n    const accessToken = session.accessToken\n    if (!accessToken) {\n      return NextResponse.json({ error: 'Google Drive access not found' }, { status: 400 })\n    }\n\n    const driveService = new GoogleDriveService(accessToken)\n    const userInfo = await driveService.getUserInfo()\n\n    return NextResponse.json(userInfo)\n  } catch (error) {\n    return NextResponse.json({ error: 'Failed to fetch user info' }, { status: 500 })\n  }\n}\n"],
+      names: ["GET", "_request", "session", "auth", "user", "NextResponse", "json", "error", "status", "accessToken", "driveService", "GoogleDriveService", "userInfo", "getUserInfo"],
+      mappings: ";;;;+BAKsBA;;;eAAAA;;;wBALoB;sBAErB;yBACc;AAE5B,eAAeA,IAAIC,QAAqB;IAC7C,IAAI;QACF,MAAMC,UAAU,MAAMC,IAAAA,UAAI;QAE1B,IAAI,CAACD,SAASE,MAAM;YAClB,OAAOC,oBAAY,CAACC,IAAI,CAAC;gBAAEC,OAAO;YAAe,GAAG;gBAAEC,QAAQ;YAAI;QACpE;QAEA,MAAMC,cAAcP,QAAQO,WAAW;QACvC,IAAI,CAACA,aAAa;YAChB,OAAOJ,oBAAY,CAACC,IAAI,CAAC;gBAAEC,OAAO;YAAgC,GAAG;gBAAEC,QAAQ;YAAI;QACrF;QAEA,MAAME,eAAe,IAAIC,2BAAkB,CAACF;QAC5C,MAAMG,WAAW,MAAMF,aAAaG,WAAW;QAE/C,OAAOR,oBAAY,CAACC,IAAI,CAACM;IAC3B,EAAE,OAAOL,OAAO;QACd,OAAOF,oBAAY,CAACC,IAAI,CAAC;YAAEC,OAAO;QAA4B,GAAG;YAAEC,QAAQ;QAAI;IACjF;AACF"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "f23c59a81177ae84085073addd4af36e505dfa20"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_1xtbne3cn1 = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_1xtbne3cn1();
+cov_1xtbne3cn1().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_1xtbne3cn1().s[1]++;
+Object.defineProperty(exports, "GET", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_1xtbne3cn1().f[0]++;
+    cov_1xtbne3cn1().s[2]++;
+    return GET;
+  }
+});
+const _server =
+/* istanbul ignore next */
+(cov_1xtbne3cn1().s[3]++, require("next/server"));
+const _auth =
+/* istanbul ignore next */
+(cov_1xtbne3cn1().s[4]++, require("../../../../auth"));
+const _service =
+/* istanbul ignore next */
+(cov_1xtbne3cn1().s[5]++, require("../../../../lib/google-drive/service"));
+async function GET(_request) {
+  /* istanbul ignore next */
+  cov_1xtbne3cn1().f[1]++;
+  cov_1xtbne3cn1().s[6]++;
+  try {
+    const session =
+    /* istanbul ignore next */
+    (cov_1xtbne3cn1().s[7]++, await (0, _auth.auth)());
+    /* istanbul ignore next */
+    cov_1xtbne3cn1().s[8]++;
+    if (!session?.user) {
+      /* istanbul ignore next */
+      cov_1xtbne3cn1().b[0][0]++;
+      cov_1xtbne3cn1().s[9]++;
+      return _server.NextResponse.json({
+        error: 'Unauthorized'
+      }, {
+        status: 401
+      });
+    } else
+    /* istanbul ignore next */
+    {
+      cov_1xtbne3cn1().b[0][1]++;
+    }
+    const accessToken =
+    /* istanbul ignore next */
+    (cov_1xtbne3cn1().s[10]++, session.accessToken);
+    /* istanbul ignore next */
+    cov_1xtbne3cn1().s[11]++;
+    if (!accessToken) {
+      /* istanbul ignore next */
+      cov_1xtbne3cn1().b[1][0]++;
+      cov_1xtbne3cn1().s[12]++;
+      return _server.NextResponse.json({
+        error: 'Google Drive access not found'
+      }, {
+        status: 400
+      });
+    } else
+    /* istanbul ignore next */
+    {
+      cov_1xtbne3cn1().b[1][1]++;
+    }
+    const driveService =
+    /* istanbul ignore next */
+    (cov_1xtbne3cn1().s[13]++, new _service.GoogleDriveService(accessToken));
+    const userInfo =
+    /* istanbul ignore next */
+    (cov_1xtbne3cn1().s[14]++, await driveService.getUserInfo());
+    /* istanbul ignore next */
+    cov_1xtbne3cn1().s[15]++;
+    return _server.NextResponse.json(userInfo);
+  } catch (error) {
+    /* istanbul ignore next */
+    cov_1xtbne3cn1().s[16]++;
+    return _server.NextResponse.json({
+      error: 'Failed to fetch user info'
+    }, {
+      status: 500
+    });
+  }
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMXh0Ym5lM2NuMSIsImFjdHVhbENvdmVyYWdlIiwicyIsIkdFVCIsIl9yZXF1ZXN0IiwiZiIsInNlc3Npb24iLCJfYXV0aCIsImF1dGgiLCJ1c2VyIiwiYiIsIl9zZXJ2ZXIiLCJOZXh0UmVzcG9uc2UiLCJqc29uIiwiZXJyb3IiLCJzdGF0dXMiLCJhY2Nlc3NUb2tlbiIsImRyaXZlU2VydmljZSIsIl9zZXJ2aWNlIiwiR29vZ2xlRHJpdmVTZXJ2aWNlIiwidXNlckluZm8iLCJnZXRVc2VySW5mbyJdLCJzb3VyY2VzIjpbIi9ob21lL3J1bm5lci93b3Jrc3BhY2Uvc3JjL2FwcC9hcGkvZHJpdmUvdXNlci9yb3V0ZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBOZXh0UmVxdWVzdCwgTmV4dFJlc3BvbnNlIH0gZnJvbSAnbmV4dC9zZXJ2ZXInXG5cbmltcG9ydCB7IGF1dGggfSBmcm9tICdAL2F1dGgnXG5pbXBvcnQgeyBHb29nbGVEcml2ZVNlcnZpY2UgfSBmcm9tICdAL2xpYi9nb29nbGUtZHJpdmUvc2VydmljZSdcblxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIEdFVChfcmVxdWVzdDogTmV4dFJlcXVlc3QpIHtcbiAgdHJ5IHtcbiAgICBjb25zdCBzZXNzaW9uID0gYXdhaXQgYXV0aCgpXG5cbiAgICBpZiAoIXNlc3Npb24/LnVzZXIpIHtcbiAgICAgIHJldHVybiBOZXh0UmVzcG9uc2UuanNvbih7IGVycm9yOiAnVW5hdXRob3JpemVkJyB9LCB7IHN0YXR1czogNDAxIH0pXG4gICAgfVxuXG4gICAgY29uc3QgYWNjZXNzVG9rZW4gPSBzZXNzaW9uLmFjY2Vzc1Rva2VuXG4gICAgaWYgKCFhY2Nlc3NUb2tlbikge1xuICAgICAgcmV0dXJuIE5leHRSZXNwb25zZS5qc29uKHsgZXJyb3I6ICdHb29nbGUgRHJpdmUgYWNjZXNzIG5vdCBmb3VuZCcgfSwgeyBzdGF0dXM6IDQwMCB9KVxuICAgIH1cblxuICAgIGNvbnN0IGRyaXZlU2VydmljZSA9IG5ldyBHb29nbGVEcml2ZVNlcnZpY2UoYWNjZXNzVG9rZW4pXG4gICAgY29uc3QgdXNlckluZm8gPSBhd2FpdCBkcml2ZVNlcnZpY2UuZ2V0VXNlckluZm8oKVxuXG4gICAgcmV0dXJuIE5leHRSZXNwb25zZS5qc29uKHVzZXJJbmZvKVxuICB9IGNhdGNoIChlcnJvcikge1xuICAgIHJldHVybiBOZXh0UmVzcG9uc2UuanNvbih7IGVycm9yOiAnRmFpbGVkIHRvIGZldGNoIHVzZXIgaW5mbycgfSwgeyBzdGF0dXM6IDUwMCB9KVxuICB9XG59XG4iXSwibWFwcGluZ3MiOiI7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7SUFPSTtJQUFBQSxjQUFBLFlBQUFBLENBQUE7TUFBQSxPQUFBQyxjQUFBO0lBQUE7RUFBQTtFQUFBLE9BQUFBLGNBQUE7QUFBQTtBQUFBRCxjQUFBO0FBQUFBLGNBQUEsR0FBQUUsQ0FBQTs7Ozs7OytCQUZrQjs7Ozs7O1dBQUFDLEdBQUE7Ozs7O2tDQUxvQjs7O2tDQUVyQjs7O2tDQUNjO0FBRTVCLGVBQWVBLElBQUlDLFFBQXFCO0VBQUE7RUFBQUosY0FBQSxHQUFBSyxDQUFBO0VBQUFMLGNBQUEsR0FBQUUsQ0FBQTtFQUM3QyxJQUFJO0lBQ0YsTUFBTUksT0FBQTtJQUFBO0lBQUEsQ0FBQU4sY0FBQSxHQUFBRSxDQUFBLE9BQVUsTUFBTSxJQUFBSyxLQUFBLENBQUFDLElBQUk7SUFBQTtJQUFBUixjQUFBLEdBQUFFLENBQUE7SUFFMUIsSUFBSSxDQUFDSSxPQUFBLEVBQVNHLElBQUEsRUFBTTtNQUFBO01BQUFULGNBQUEsR0FBQVUsQ0FBQTtNQUFBVixjQUFBLEdBQUFFLENBQUE7TUFDbEIsT0FBT1MsT0FBQSxDQUFBQyxZQUFZLENBQUNDLElBQUksQ0FBQztRQUFFQyxLQUFBLEVBQU87TUFBZSxHQUFHO1FBQUVDLE1BQUEsRUFBUTtNQUFJO0lBQ3BFO0lBQUE7SUFBQTtNQUFBZixjQUFBLEdBQUFVLENBQUE7SUFBQTtJQUVBLE1BQU1NLFdBQUE7SUFBQTtJQUFBLENBQUFoQixjQUFBLEdBQUFFLENBQUEsUUFBY0ksT0FBQSxDQUFRVSxXQUFXO0lBQUE7SUFBQWhCLGNBQUEsR0FBQUUsQ0FBQTtJQUN2QyxJQUFJLENBQUNjLFdBQUEsRUFBYTtNQUFBO01BQUFoQixjQUFBLEdBQUFVLENBQUE7TUFBQVYsY0FBQSxHQUFBRSxDQUFBO01BQ2hCLE9BQU9TLE9BQUEsQ0FBQUMsWUFBWSxDQUFDQyxJQUFJLENBQUM7UUFBRUMsS0FBQSxFQUFPO01BQWdDLEdBQUc7UUFBRUMsTUFBQSxFQUFRO01BQUk7SUFDckY7SUFBQTtJQUFBO01BQUFmLGNBQUEsR0FBQVUsQ0FBQTtJQUFBO0lBRUEsTUFBTU8sWUFBQTtJQUFBO0lBQUEsQ0FBQWpCLGNBQUEsR0FBQUUsQ0FBQSxRQUFlLElBQUlnQixRQUFBLENBQUFDLGtCQUFrQixDQUFDSCxXQUFBO0lBQzVDLE1BQU1JLFFBQUE7SUFBQTtJQUFBLENBQUFwQixjQUFBLEdBQUFFLENBQUEsUUFBVyxNQUFNZSxZQUFBLENBQWFJLFdBQVc7SUFBQTtJQUFBckIsY0FBQSxHQUFBRSxDQUFBO0lBRS9DLE9BQU9TLE9BQUEsQ0FBQUMsWUFBWSxDQUFDQyxJQUFJLENBQUNPLFFBQUE7RUFDM0IsRUFBRSxPQUFPTixLQUFBLEVBQU87SUFBQTtJQUFBZCxjQUFBLEdBQUFFLENBQUE7SUFDZCxPQUFPUyxPQUFBLENBQUFDLFlBQVksQ0FBQ0MsSUFBSSxDQUFDO01BQUVDLEtBQUEsRUFBTztJQUE0QixHQUFHO01BQUVDLE1BQUEsRUFBUTtJQUFJO0VBQ2pGO0FBQ0YiLCJpZ25vcmVMaXN0IjpbXX0=

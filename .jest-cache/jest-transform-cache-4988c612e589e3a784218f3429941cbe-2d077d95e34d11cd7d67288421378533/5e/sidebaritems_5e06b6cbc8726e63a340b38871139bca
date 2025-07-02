@@ -1,0 +1,224 @@
+faba8143b6361cc8d5593cb333152bbb
+/**
+ * Type definitions and data for sidebar navigation items
+ */"use strict";
+
+/* istanbul ignore next */
+function cov_1svpm3yjx7() {
+  var path = "/home/runner/workspace/src/app/(main)/dashboard/_components/sidebar/sidebar-items.tsx";
+  var hash = "15e31e55c5205ea72f584c1d0b84db533e066fc3";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/app/(main)/dashboard/_components/sidebar/sidebar-items.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 4,
+          column: 0
+        },
+        end: {
+          line: 6,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 7,
+          column: 0
+        },
+        end: {
+          line: 12,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 10,
+          column: 8
+        },
+        end: {
+          line: 10,
+          column: 28
+        }
+      },
+      "3": {
+        start: {
+          line: 13,
+          column: 21
+        },
+        end: {
+          line: 13,
+          column: 44
+        }
+      },
+      "4": {
+        start: {
+          line: 14,
+          column: 21
+        },
+        end: {
+          line: 110,
+          column: 1
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 9,
+            column: 9
+          },
+          end: {
+            line: 9,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 9,
+            column: 20
+          },
+          end: {
+            line: 11,
+            column: 5
+          }
+        },
+        line: 9
+      }
+    },
+    branchMap: {},
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0
+    },
+    f: {
+      "0": 0
+    },
+    b: {},
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/app/(main)/dashboard/_components/sidebar/sidebar-items.tsx"],
+      sourcesContent: ["/**\n * Type definitions and data for sidebar navigation items\n */\nimport { LucideIcon } from 'lucide-react'\nimport {\n  Home,\n  FolderOpen,\n  Search,\n  Upload,\n  Share2,\n  Trash2,\n  Settings,\n  BarChart3,\n  Users,\n  Archive,\n  Cloud,\n  Download,\n} from 'lucide-react'\n\nexport interface NavMainItem {\n  title: string\n  url: string\n  icon?: LucideIcon\n  comingSoon?: boolean\n  newTab?: boolean\n  subItems?: NavMainItem[]\n}\n\nexport interface NavGroup {\n  id: string\n  label?: string\n  items?: NavMainItem[]\n}\n\nexport interface SidebarData {\n  navMain: NavGroup[]\n}\n\nexport const sidebarItems: SidebarData = {\n  navMain: [\n    {\n      id: 'main',\n      label: 'Main',\n      items: [\n        {\n          title: 'Dashboard',\n          url: '/dashboard',\n          icon: Home,\n        },\n        {\n          title: 'Drive Manager',\n          url: '/dashboard/drive',\n          icon: FolderOpen,\n        },\n        {\n          title: 'Search',\n          url: '/dashboard/search',\n          icon: Search,\n          comingSoon: true,\n        },\n      ],\n    },\n    {\n      id: 'operations',\n      label: 'Operations',\n      items: [\n        {\n          title: 'Upload',\n          url: '/dashboard/upload',\n          icon: Upload,\n          comingSoon: true,\n        },\n        {\n          title: 'Share & Export',\n          url: '/dashboard/share',\n          icon: Share2,\n          comingSoon: true,\n        },\n        {\n          title: 'Trash',\n          url: '/dashboard/trash',\n          icon: Trash2,\n          comingSoon: true,\n        },\n        {\n          title: 'Archive',\n          url: '/dashboard/archive',\n          icon: Archive,\n          comingSoon: true,\n        },\n      ],\n    },\n    {\n      id: 'analytics',\n      label: 'Analytics',\n      items: [\n        {\n          title: 'Storage Analytics',\n          url: '/dashboard/analytics',\n          icon: BarChart3,\n        },\n        {\n          title: 'Activity',\n          url: '/dashboard/activity',\n          icon: Cloud,\n          comingSoon: true,\n        },\n        {\n          title: 'Downloads',\n          url: '/dashboard/downloads',\n          icon: Download,\n          comingSoon: true,\n        },\n      ],\n    },\n    {\n      id: 'management',\n      label: 'Management',\n      items: [\n        {\n          title: 'Team',\n          url: '/dashboard/team',\n          icon: Users,\n          comingSoon: true,\n        },\n        {\n          title: 'Settings',\n          url: '/dashboard/settings',\n          icon: Settings,\n          comingSoon: true,\n        },\n      ],\n    },\n  ],\n}\n"],
+      names: ["sidebarItems", "navMain", "id", "label", "items", "title", "url", "icon", "Home", "FolderOpen", "Search", "comingSoon", "Upload", "Share2", "Trash2", "Archive", "BarChart3", "Cloud", "Download", "Users", "Settings"],
+      mappings: "AAAA;;CAEC;;;;+BAoCYA;;;eAAAA;;;6BArBN;AAqBA,MAAMA,eAA4B;IACvCC,SAAS;QACP;YACEC,IAAI;YACJC,OAAO;YACPC,OAAO;gBACL;oBACEC,OAAO;oBACPC,KAAK;oBACLC,MAAMC,iBAAI;gBACZ;gBACA;oBACEH,OAAO;oBACPC,KAAK;oBACLC,MAAME,uBAAU;gBAClB;gBACA;oBACEJ,OAAO;oBACPC,KAAK;oBACLC,MAAMG,mBAAM;oBACZC,YAAY;gBACd;aACD;QACH;QACA;YACET,IAAI;YACJC,OAAO;YACPC,OAAO;gBACL;oBACEC,OAAO;oBACPC,KAAK;oBACLC,MAAMK,mBAAM;oBACZD,YAAY;gBACd;gBACA;oBACEN,OAAO;oBACPC,KAAK;oBACLC,MAAMM,mBAAM;oBACZF,YAAY;gBACd;gBACA;oBACEN,OAAO;oBACPC,KAAK;oBACLC,MAAMO,mBAAM;oBACZH,YAAY;gBACd;gBACA;oBACEN,OAAO;oBACPC,KAAK;oBACLC,MAAMQ,oBAAO;oBACbJ,YAAY;gBACd;aACD;QACH;QACA;YACET,IAAI;YACJC,OAAO;YACPC,OAAO;gBACL;oBACEC,OAAO;oBACPC,KAAK;oBACLC,MAAMS,sBAAS;gBACjB;gBACA;oBACEX,OAAO;oBACPC,KAAK;oBACLC,MAAMU,kBAAK;oBACXN,YAAY;gBACd;gBACA;oBACEN,OAAO;oBACPC,KAAK;oBACLC,MAAMW,qBAAQ;oBACdP,YAAY;gBACd;aACD;QACH;QACA;YACET,IAAI;YACJC,OAAO;YACPC,OAAO;gBACL;oBACEC,OAAO;oBACPC,KAAK;oBACLC,MAAMY,kBAAK;oBACXR,YAAY;gBACd;gBACA;oBACEN,OAAO;oBACPC,KAAK;oBACLC,MAAMa,qBAAQ;oBACdT,YAAY;gBACd;aACD;QACH;KACD;AACH"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "15e31e55c5205ea72f584c1d0b84db533e066fc3"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_1svpm3yjx7 = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_1svpm3yjx7();
+cov_1svpm3yjx7().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_1svpm3yjx7().s[1]++;
+Object.defineProperty(exports, "sidebarItems", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_1svpm3yjx7().f[0]++;
+    cov_1svpm3yjx7().s[2]++;
+    return sidebarItems;
+  }
+});
+const _lucidereact =
+/* istanbul ignore next */
+(cov_1svpm3yjx7().s[3]++, require("lucide-react"));
+const sidebarItems =
+/* istanbul ignore next */
+(cov_1svpm3yjx7().s[4]++, {
+  navMain: [{
+    id: 'main',
+    label: 'Main',
+    items: [{
+      title: 'Dashboard',
+      url: '/dashboard',
+      icon: _lucidereact.Home
+    }, {
+      title: 'Drive Manager',
+      url: '/dashboard/drive',
+      icon: _lucidereact.FolderOpen
+    }, {
+      title: 'Search',
+      url: '/dashboard/search',
+      icon: _lucidereact.Search,
+      comingSoon: true
+    }]
+  }, {
+    id: 'operations',
+    label: 'Operations',
+    items: [{
+      title: 'Upload',
+      url: '/dashboard/upload',
+      icon: _lucidereact.Upload,
+      comingSoon: true
+    }, {
+      title: 'Share & Export',
+      url: '/dashboard/share',
+      icon: _lucidereact.Share2,
+      comingSoon: true
+    }, {
+      title: 'Trash',
+      url: '/dashboard/trash',
+      icon: _lucidereact.Trash2,
+      comingSoon: true
+    }, {
+      title: 'Archive',
+      url: '/dashboard/archive',
+      icon: _lucidereact.Archive,
+      comingSoon: true
+    }]
+  }, {
+    id: 'analytics',
+    label: 'Analytics',
+    items: [{
+      title: 'Storage Analytics',
+      url: '/dashboard/analytics',
+      icon: _lucidereact.BarChart3
+    }, {
+      title: 'Activity',
+      url: '/dashboard/activity',
+      icon: _lucidereact.Cloud,
+      comingSoon: true
+    }, {
+      title: 'Downloads',
+      url: '/dashboard/downloads',
+      icon: _lucidereact.Download,
+      comingSoon: true
+    }]
+  }, {
+    id: 'management',
+    label: 'Management',
+    items: [{
+      title: 'Team',
+      url: '/dashboard/team',
+      icon: _lucidereact.Users,
+      comingSoon: true
+    }, {
+      title: 'Settings',
+      url: '/dashboard/settings',
+      icon: _lucidereact.Settings,
+      comingSoon: true
+    }]
+  }]
+});
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMXN2cG0zeWp4NyIsInBhdGgiLCJoYXNoIiwiZ2xvYmFsIiwiRnVuY3Rpb24iLCJnY3YiLCJjb3ZlcmFnZURhdGEiLCJzdGF0ZW1lbnRNYXAiLCJzdGFydCIsImxpbmUiLCJjb2x1bW4iLCJlbmQiLCJmbk1hcCIsIm5hbWUiLCJkZWNsIiwibG9jIiwiYnJhbmNoTWFwIiwicyIsImYiLCJiIiwiaW5wdXRTb3VyY2VNYXAiLCJ2ZXJzaW9uIiwic291cmNlcyIsInNvdXJjZXNDb250ZW50IiwibmFtZXMiLCJtYXBwaW5ncyIsIl9jb3ZlcmFnZVNjaGVtYSIsImNvdmVyYWdlIiwiYWN0dWFsQ292ZXJhZ2UiLCJzaWRlYmFySXRlbXMiLCJuYXZNYWluIiwiaWQiLCJsYWJlbCIsIml0ZW1zIiwidGl0bGUiLCJ1cmwiLCJpY29uIiwiX2x1Y2lkZXJlYWN0IiwiSG9tZSIsIkZvbGRlck9wZW4iLCJTZWFyY2giLCJjb21pbmdTb29uIiwiVXBsb2FkIiwiU2hhcmUyIiwiVHJhc2gyIiwiQXJjaGl2ZSIsIkJhckNoYXJ0MyIsIkNsb3VkIiwiRG93bmxvYWQiLCJVc2VycyIsIlNldHRpbmdzIl0sInNvdXJjZXMiOlsiL2hvbWUvcnVubmVyL3dvcmtzcGFjZS9zcmMvYXBwLyhtYWluKS9kYXNoYm9hcmQvX2NvbXBvbmVudHMvc2lkZWJhci9zaWRlYmFyLWl0ZW1zLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIFR5cGUgZGVmaW5pdGlvbnMgYW5kIGRhdGEgZm9yIHNpZGViYXIgbmF2aWdhdGlvbiBpdGVtc1xuICovXG5pbXBvcnQgeyBMdWNpZGVJY29uIH0gZnJvbSAnbHVjaWRlLXJlYWN0J1xuaW1wb3J0IHtcbiAgSG9tZSxcbiAgRm9sZGVyT3BlbixcbiAgU2VhcmNoLFxuICBVcGxvYWQsXG4gIFNoYXJlMixcbiAgVHJhc2gyLFxuICBTZXR0aW5ncyxcbiAgQmFyQ2hhcnQzLFxuICBVc2VycyxcbiAgQXJjaGl2ZSxcbiAgQ2xvdWQsXG4gIERvd25sb2FkLFxufSBmcm9tICdsdWNpZGUtcmVhY3QnXG5cbmV4cG9ydCBpbnRlcmZhY2UgTmF2TWFpbkl0ZW0ge1xuICB0aXRsZTogc3RyaW5nXG4gIHVybDogc3RyaW5nXG4gIGljb24/OiBMdWNpZGVJY29uXG4gIGNvbWluZ1Nvb24/OiBib29sZWFuXG4gIG5ld1RhYj86IGJvb2xlYW5cbiAgc3ViSXRlbXM/OiBOYXZNYWluSXRlbVtdXG59XG5cbmV4cG9ydCBpbnRlcmZhY2UgTmF2R3JvdXAge1xuICBpZDogc3RyaW5nXG4gIGxhYmVsPzogc3RyaW5nXG4gIGl0ZW1zPzogTmF2TWFpbkl0ZW1bXVxufVxuXG5leHBvcnQgaW50ZXJmYWNlIFNpZGViYXJEYXRhIHtcbiAgbmF2TWFpbjogTmF2R3JvdXBbXVxufVxuXG5leHBvcnQgY29uc3Qgc2lkZWJhckl0ZW1zOiBTaWRlYmFyRGF0YSA9IHtcbiAgbmF2TWFpbjogW1xuICAgIHtcbiAgICAgIGlkOiAnbWFpbicsXG4gICAgICBsYWJlbDogJ01haW4nLFxuICAgICAgaXRlbXM6IFtcbiAgICAgICAge1xuICAgICAgICAgIHRpdGxlOiAnRGFzaGJvYXJkJyxcbiAgICAgICAgICB1cmw6ICcvZGFzaGJvYXJkJyxcbiAgICAgICAgICBpY29uOiBIb21lLFxuICAgICAgICB9LFxuICAgICAgICB7XG4gICAgICAgICAgdGl0bGU6ICdEcml2ZSBNYW5hZ2VyJyxcbiAgICAgICAgICB1cmw6ICcvZGFzaGJvYXJkL2RyaXZlJyxcbiAgICAgICAgICBpY29uOiBGb2xkZXJPcGVuLFxuICAgICAgICB9LFxuICAgICAgICB7XG4gICAgICAgICAgdGl0bGU6ICdTZWFyY2gnLFxuICAgICAgICAgIHVybDogJy9kYXNoYm9hcmQvc2VhcmNoJyxcbiAgICAgICAgICBpY29uOiBTZWFyY2gsXG4gICAgICAgICAgY29taW5nU29vbjogdHJ1ZSxcbiAgICAgICAgfSxcbiAgICAgIF0sXG4gICAgfSxcbiAgICB7XG4gICAgICBpZDogJ29wZXJhdGlvbnMnLFxuICAgICAgbGFiZWw6ICdPcGVyYXRpb25zJyxcbiAgICAgIGl0ZW1zOiBbXG4gICAgICAgIHtcbiAgICAgICAgICB0aXRsZTogJ1VwbG9hZCcsXG4gICAgICAgICAgdXJsOiAnL2Rhc2hib2FyZC91cGxvYWQnLFxuICAgICAgICAgIGljb246IFVwbG9hZCxcbiAgICAgICAgICBjb21pbmdTb29uOiB0cnVlLFxuICAgICAgICB9LFxuICAgICAgICB7XG4gICAgICAgICAgdGl0bGU6ICdTaGFyZSAmIEV4cG9ydCcsXG4gICAgICAgICAgdXJsOiAnL2Rhc2hib2FyZC9zaGFyZScsXG4gICAgICAgICAgaWNvbjogU2hhcmUyLFxuICAgICAgICAgIGNvbWluZ1Nvb246IHRydWUsXG4gICAgICAgIH0sXG4gICAgICAgIHtcbiAgICAgICAgICB0aXRsZTogJ1RyYXNoJyxcbiAgICAgICAgICB1cmw6ICcvZGFzaGJvYXJkL3RyYXNoJyxcbiAgICAgICAgICBpY29uOiBUcmFzaDIsXG4gICAgICAgICAgY29taW5nU29vbjogdHJ1ZSxcbiAgICAgICAgfSxcbiAgICAgICAge1xuICAgICAgICAgIHRpdGxlOiAnQXJjaGl2ZScsXG4gICAgICAgICAgdXJsOiAnL2Rhc2hib2FyZC9hcmNoaXZlJyxcbiAgICAgICAgICBpY29uOiBBcmNoaXZlLFxuICAgICAgICAgIGNvbWluZ1Nvb246IHRydWUsXG4gICAgICAgIH0sXG4gICAgICBdLFxuICAgIH0sXG4gICAge1xuICAgICAgaWQ6ICdhbmFseXRpY3MnLFxuICAgICAgbGFiZWw6ICdBbmFseXRpY3MnLFxuICAgICAgaXRlbXM6IFtcbiAgICAgICAge1xuICAgICAgICAgIHRpdGxlOiAnU3RvcmFnZSBBbmFseXRpY3MnLFxuICAgICAgICAgIHVybDogJy9kYXNoYm9hcmQvYW5hbHl0aWNzJyxcbiAgICAgICAgICBpY29uOiBCYXJDaGFydDMsXG4gICAgICAgIH0sXG4gICAgICAgIHtcbiAgICAgICAgICB0aXRsZTogJ0FjdGl2aXR5JyxcbiAgICAgICAgICB1cmw6ICcvZGFzaGJvYXJkL2FjdGl2aXR5JyxcbiAgICAgICAgICBpY29uOiBDbG91ZCxcbiAgICAgICAgICBjb21pbmdTb29uOiB0cnVlLFxuICAgICAgICB9LFxuICAgICAgICB7XG4gICAgICAgICAgdGl0bGU6ICdEb3dubG9hZHMnLFxuICAgICAgICAgIHVybDogJy9kYXNoYm9hcmQvZG93bmxvYWRzJyxcbiAgICAgICAgICBpY29uOiBEb3dubG9hZCxcbiAgICAgICAgICBjb21pbmdTb29uOiB0cnVlLFxuICAgICAgICB9LFxuICAgICAgXSxcbiAgICB9LFxuICAgIHtcbiAgICAgIGlkOiAnbWFuYWdlbWVudCcsXG4gICAgICBsYWJlbDogJ01hbmFnZW1lbnQnLFxuICAgICAgaXRlbXM6IFtcbiAgICAgICAge1xuICAgICAgICAgIHRpdGxlOiAnVGVhbScsXG4gICAgICAgICAgdXJsOiAnL2Rhc2hib2FyZC90ZWFtJyxcbiAgICAgICAgICBpY29uOiBVc2VycyxcbiAgICAgICAgICBjb21pbmdTb29uOiB0cnVlLFxuICAgICAgICB9LFxuICAgICAgICB7XG4gICAgICAgICAgdGl0bGU6ICdTZXR0aW5ncycsXG4gICAgICAgICAgdXJsOiAnL2Rhc2hib2FyZC9zZXR0aW5ncycsXG4gICAgICAgICAgaWNvbjogU2V0dGluZ3MsXG4gICAgICAgICAgY29taW5nU29vbjogdHJ1ZSxcbiAgICAgICAgfSxcbiAgICAgIF0sXG4gICAgfSxcbiAgXSxcbn1cbiJdLCJtYXBwaW5ncyI6IkFBQUE7O0dBRUM7O0FBQUE7QUFBQSxTQUFBQSxlQUFBO0VBQUEsSUFBQUMsSUFBQTtFQUFBLElBQUFDLElBQUE7RUFBQSxJQUFBQyxNQUFBLE9BQUFDLFFBQUE7RUFBQSxJQUFBQyxHQUFBO0VBQUEsSUFBQUMsWUFBQTtJQUFBTCxJQUFBO0lBQUFNLFlBQUE7TUFBQTtRQUFBQyxLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO0lBQUE7SUFBQUUsS0FBQTtNQUFBO1FBQUFDLElBQUE7UUFBQUMsSUFBQTtVQUFBTixLQUFBO1lBQUFDLElBQUE7WUFBQUMsTUFBQTtVQUFBO1VBQUFDLEdBQUE7WUFBQUYsSUFBQTtZQUFBQyxNQUFBO1VBQUE7UUFBQTtRQUFBSyxHQUFBO1VBQUFQLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFELElBQUE7TUFBQTtJQUFBO0lBQUFPLFNBQUE7SUFBQUMsQ0FBQTtNQUFBO01BQUE7TUFBQTtNQUFBO01BQUE7SUFBQTtJQUFBQyxDQUFBO01BQUE7SUFBQTtJQUFBQyxDQUFBO0lBQUFDLGNBQUE7TUFBQUMsT0FBQTtNQUFBQyxPQUFBO01BQUFDLGNBQUE7TUFBQUMsS0FBQTtNQUFBQyxRQUFBO0lBQUE7SUFBQUMsZUFBQTtJQUFBeEIsSUFBQTtFQUFBO0VBQUEsSUFBQXlCLFFBQUEsR0FBQXhCLE1BQUEsQ0FBQUUsR0FBQSxNQUFBRixNQUFBLENBQUFFLEdBQUE7RUFBQSxLQUFBc0IsUUFBQSxDQUFBMUIsSUFBQSxLQUFBMEIsUUFBQSxDQUFBMUIsSUFBQSxFQUFBQyxJQUFBLEtBQUFBLElBQUE7SUFBQXlCLFFBQUEsQ0FBQTFCLElBQUEs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

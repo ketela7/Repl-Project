@@ -1,0 +1,348 @@
+3a41f2cd425950c8bd0e202e239c006a
+"use strict";
+
+/* istanbul ignore next */
+function cov_1ji2d8yxgp() {
+  var path = "/home/runner/workspace/src/components/data-table/draggable-row.tsx";
+  var hash = "c923d847edf63ff25ba5db4b290c2973f11a5140";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/components/data-table/draggable-row.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 2,
+          column: 0
+        },
+        end: {
+          line: 4,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 5,
+          column: 0
+        },
+        end: {
+          line: 10,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 8,
+          column: 8
+        },
+        end: {
+          line: 8,
+          column: 28
+        }
+      },
+      "3": {
+        start: {
+          line: 11,
+          column: 20
+        },
+        end: {
+          line: 11,
+          column: 48
+        }
+      },
+      "4": {
+        start: {
+          line: 12,
+          column: 18
+        },
+        end: {
+          line: 12,
+          column: 46
+        }
+      },
+      "5": {
+        start: {
+          line: 13,
+          column: 19
+        },
+        end: {
+          line: 13,
+          column: 48
+        }
+      },
+      "6": {
+        start: {
+          line: 14,
+          column: 20
+        },
+        end: {
+          line: 14,
+          column: 52
+        }
+      },
+      "7": {
+        start: {
+          line: 15,
+          column: 15
+        },
+        end: {
+          line: 15,
+          column: 37
+        }
+      },
+      "8": {
+        start: {
+          line: 17,
+          column: 62
+        },
+        end: {
+          line: 19,
+          column: 6
+        }
+      },
+      "9": {
+        start: {
+          line: 20,
+          column: 4
+        },
+        end: {
+          line: 32,
+          column: 7
+        }
+      },
+      "10": {
+        start: {
+          line: 29,
+          column: 66
+        },
+        end: {
+          line: 31,
+          column: 23
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 7,
+            column: 9
+          },
+          end: {
+            line: 7,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 7,
+            column: 20
+          },
+          end: {
+            line: 9,
+            column: 5
+          }
+        },
+        line: 7
+      },
+      "1": {
+        name: "DraggableRow",
+        decl: {
+          start: {
+            line: 16,
+            column: 9
+          },
+          end: {
+            line: 16,
+            column: 21
+          }
+        },
+        loc: {
+          start: {
+            line: 16,
+            column: 31
+          },
+          end: {
+            line: 33,
+            column: 1
+          }
+        },
+        line: 16
+      },
+      "2": {
+        name: "(anonymous_2)",
+        decl: {
+          start: {
+            line: 29,
+            column: 44
+          },
+          end: {
+            line: 29,
+            column: 45
+          }
+        },
+        loc: {
+          start: {
+            line: 29,
+            column: 66
+          },
+          end: {
+            line: 31,
+            column: 23
+          }
+        },
+        line: 29
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 21,
+            column: 22
+          },
+          end: {
+            line: 21,
+            column: 55
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 21,
+            column: 22
+          },
+          end: {
+            line: 21,
+            column: 41
+          }
+        }, {
+          start: {
+            line: 21,
+            column: 45
+          },
+          end: {
+            line: 21,
+            column: 55
+          }
+        }],
+        line: 21
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0
+    },
+    b: {
+      "0": [0, 0]
+    },
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/components/data-table/draggable-row.tsx"],
+      sourcesContent: ["import { useSortable } from '@dnd-kit/sortable'\nimport { CSS } from '@dnd-kit/utilities'\nimport { Row, flexRender } from '@tanstack/react-table'\n\nimport { TableCell, TableRow } from '@/components/ui/table'\n\nexport function DraggableRow<TData>({ row }: { row: Row<TData> }) {\n  const { transform, transition, setNodeRef, isDragging } = useSortable({\n    id: (row.original as { id: number }).id,\n  })\n  return (\n    <TableRow\n      data-state={row.getIsSelected() && 'selected'}\n      data-dragging={isDragging}\n      ref={setNodeRef}\n      className=\"relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80\"\n      style={{\n        transform: CSS.Transform.toString(transform),\n        transition,\n      }}\n    >\n      {row.getVisibleCells().map(cell => (\n        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>\n      ))}\n    </TableRow>\n  )\n}\n"],
+      names: ["DraggableRow", "row", "transform", "transition", "setNodeRef", "isDragging", "useSortable", "id", "original", "TableRow", "data-state", "getIsSelected", "data-dragging", "ref", "className", "style", "CSS", "Transform", "toString", "getVisibleCells", "map", "cell", "TableCell", "flexRender", "column", "columnDef", "getContext"],
+      mappings: ";;;;+BAMgBA;;;eAAAA;;;;0BANY;2BACR;4BACY;uBAEI;AAE7B,SAASA,aAAoB,EAAEC,GAAG,EAAuB;IAC9D,MAAM,EAAEC,SAAS,EAAEC,UAAU,EAAEC,UAAU,EAAEC,UAAU,EAAE,GAAGC,IAAAA,qBAAW,EAAC;QACpEC,IAAI,AAACN,IAAIO,QAAQ,CAAoBD,EAAE;IACzC;IACA,qBACE,qBAACE,eAAQ;QACPC,cAAYT,IAAIU,aAAa,MAAM;QACnCC,iBAAeP;QACfQ,KAAKT;QACLU,WAAU;QACVC,OAAO;YACLb,WAAWc,cAAG,CAACC,SAAS,CAACC,QAAQ,CAAChB;YAClCC;QACF;kBAECF,IAAIkB,eAAe,GAAGC,GAAG,CAACC,CAAAA,qBACzB,qBAACC,gBAAS;0BAAgBC,IAAAA,sBAAU,EAACF,KAAKG,MAAM,CAACC,SAAS,CAACJ,IAAI,EAAEA,KAAKK,UAAU;eAAhEL,KAAKd,EAAE;;AAI/B"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "c923d847edf63ff25ba5db4b290c2973f11a5140"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_1ji2d8yxgp = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_1ji2d8yxgp();
+cov_1ji2d8yxgp().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_1ji2d8yxgp().s[1]++;
+Object.defineProperty(exports, "DraggableRow", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_1ji2d8yxgp().f[0]++;
+    cov_1ji2d8yxgp().s[2]++;
+    return DraggableRow;
+  }
+});
+const _jsxruntime =
+/* istanbul ignore next */
+(cov_1ji2d8yxgp().s[3]++, require("react/jsx-runtime"));
+const _sortable =
+/* istanbul ignore next */
+(cov_1ji2d8yxgp().s[4]++, require("@dnd-kit/sortable"));
+const _utilities =
+/* istanbul ignore next */
+(cov_1ji2d8yxgp().s[5]++, require("@dnd-kit/utilities"));
+const _reacttable =
+/* istanbul ignore next */
+(cov_1ji2d8yxgp().s[6]++, require("@tanstack/react-table"));
+const _table =
+/* istanbul ignore next */
+(cov_1ji2d8yxgp().s[7]++, require("../ui/table"));
+function DraggableRow({
+  row
+}) {
+  /* istanbul ignore next */
+  cov_1ji2d8yxgp().f[1]++;
+  const {
+    transform,
+    transition,
+    setNodeRef,
+    isDragging
+  } =
+  /* istanbul ignore next */
+  (cov_1ji2d8yxgp().s[8]++, (0, _sortable.useSortable)({
+    id: row.original.id
+  }));
+  /* istanbul ignore next */
+  cov_1ji2d8yxgp().s[9]++;
+  return /*#__PURE__*/(0, _jsxruntime.jsx)(_table.TableRow, {
+    "data-state":
+    /* istanbul ignore next */
+    (cov_1ji2d8yxgp().b[0][0]++, row.getIsSelected()) &&
+    /* istanbul ignore next */
+    (cov_1ji2d8yxgp().b[0][1]++, 'selected'),
+    "data-dragging": isDragging,
+    ref: setNodeRef,
+    className: "relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80",
+    style: {
+      transform: _utilities.CSS.Transform.toString(transform),
+      transition
+    },
+    children: row.getVisibleCells().map(cell => {
+      /* istanbul ignore next */
+      cov_1ji2d8yxgp().f[2]++;
+      cov_1ji2d8yxgp().s[10]++;
+      return /*#__PURE__*/(0, _jsxruntime.jsx)(_table.TableCell, {
+        children: (0, _reacttable.flexRender)(cell.column.columnDef.cell, cell.getContext())
+      }, cell.id);
+    })
+  });
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMWppMmQ4eXhncCIsImFjdHVhbENvdmVyYWdlIiwicyIsIkRyYWdnYWJsZVJvdyIsInJvdyIsImYiLCJ0cmFuc2Zvcm0iLCJ0cmFuc2l0aW9uIiwic2V0Tm9kZVJlZiIsImlzRHJhZ2dpbmciLCJfc29ydGFibGUiLCJ1c2VTb3J0YWJsZSIsImlkIiwib3JpZ2luYWwiLCJfanN4cnVudGltZSIsImpzeCIsIl90YWJsZSIsIlRhYmxlUm93IiwiYiIsImdldElzU2VsZWN0ZWQiLCJyZWYiLCJjbGFzc05hbWUiLCJzdHlsZSIsIl91dGlsaXRpZXMiLCJDU1MiLCJUcmFuc2Zvcm0iLCJ0b1N0cmluZyIsImdldFZpc2libGVDZWxscyIsIm1hcCIsImNlbGwiLCJUYWJsZUNlbGwiLCJfcmVhY3R0YWJsZSIsImZsZXhSZW5kZXIiLCJjb2x1bW4iLCJjb2x1bW5EZWYiLCJnZXRDb250ZXh0Il0sInNvdXJjZXMiOlsiL2hvbWUvcnVubmVyL3dvcmtzcGFjZS9zcmMvY29tcG9uZW50cy9kYXRhLXRhYmxlL2RyYWdnYWJsZS1yb3cudHN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB7IHVzZVNvcnRhYmxlIH0gZnJvbSAnQGRuZC1raXQvc29ydGFibGUnXG5pbXBvcnQgeyBDU1MgfSBmcm9tICdAZG5kLWtpdC91dGlsaXRpZXMnXG5pbXBvcnQgeyBSb3csIGZsZXhSZW5kZXIgfSBmcm9tICdAdGFuc3RhY2svcmVhY3QtdGFibGUnXG5cbmltcG9ydCB7IFRhYmxlQ2VsbCwgVGFibGVSb3cgfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvdGFibGUnXG5cbmV4cG9ydCBmdW5jdGlvbiBEcmFnZ2FibGVSb3c8VERhdGE+KHsgcm93IH06IHsgcm93OiBSb3c8VERhdGE+IH0pIHtcbiAgY29uc3QgeyB0cmFuc2Zvcm0sIHRyYW5zaXRpb24sIHNldE5vZGVSZWYsIGlzRHJhZ2dpbmcgfSA9IHVzZVNvcnRhYmxlKHtcbiAgICBpZDogKHJvdy5vcmlnaW5hbCBhcyB7IGlkOiBudW1iZXIgfSkuaWQsXG4gIH0pXG4gIHJldHVybiAoXG4gICAgPFRhYmxlUm93XG4gICAgICBkYXRhLXN0YXRlPXtyb3cuZ2V0SXNTZWxlY3RlZCgpICYmICdzZWxlY3RlZCd9XG4gICAgICBkYXRhLWRyYWdnaW5nPXtpc0RyYWdnaW5nfVxuICAgICAgcmVmPXtzZXROb2RlUmVmfVxuICAgICAgY2xhc3NOYW1lPVwicmVsYXRpdmUgei0wIGRhdGEtW2RyYWdnaW5nPXRydWVdOnotMTAgZGF0YS1bZHJhZ2dpbmc9dHJ1ZV06b3BhY2l0eS04MFwiXG4gICAgICBzdHlsZT17e1xuICAgICAgICB0cmFuc2Zvcm06IENTUy5UcmFuc2Zvcm0udG9TdHJpbmcodHJhbnNmb3JtKSxcbiAgICAgICAgdHJhbnNpdGlvbixcbiAgICAgIH19XG4gICAgPlxuICAgICAge3Jvdy5nZXRWaXNpYmxlQ2VsbHMoKS5tYXAoY2VsbCA9PiAoXG4gICAgICAgIDxUYWJsZUNlbGwga2V5PXtjZWxsLmlkfT57ZmxleFJlbmRlcihjZWxsLmNvbHVtbi5jb2x1bW5EZWYuY2VsbCwgY2VsbC5nZXRDb250ZXh0KCkpfTwvVGFibGVDZWxsPlxuICAgICAgKSl9XG4gICAgPC9UYWJsZVJvdz5cbiAgKVxufVxuIl0sIm1hcHBpbmdzIjoiOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBTWdCO0lBQUFBLGNBQUEsWUFBQUEsQ0FBQTtNQUFBLE9BQUFDLGNBQUE7SUFBQTtFQUFBO0VBQUEsT0FBQUEsY0FBQTtBQUFBO0FBQUFELGNBQUE7QUFBQUEsY0FBQSxHQUFBRSxDQUFBOzs7Ozs7K0JBQUE7Ozs7OztXQUFBQyxZQUFBOzs7Ozs7OztrQ0FOWTs7O2tDQUNSOzs7a0NBQ1k7OztrQ0FFSTtBQUU3QixTQUFTQSxhQUFvQjtFQUFFQztBQUFHLENBQXVCO0VBQUE7RUFBQUosY0FBQSxHQUFBSyxDQUFBO0VBQzlELE1BQU07SUFBRUMsU0FBUztJQUFFQyxVQUFVO0lBQUVDLFVBQVU7SUFBRUM7RUFBVSxDQUFFO0VBQUE7RUFBQSxDQUFBVCxjQUFBLEdBQUFFLENBQUEsT0FBRyxJQUFBUSxTQUFBLENBQUFDLFdBQVcsRUFBQztJQUNwRUMsRUFBQSxFQUFJUixHQUFDLENBQUlTLFFBQVEsQ0FBb0JEO0VBQ3ZDO0VBQUE7RUFBQVosY0FBQSxHQUFBRSxDQUFBO0VBQ0Esb0JBQ0UsSUFBQVksV0FBQSxDQUFBQyxHQUFBLEVBQUNDLE1BQUEsQ0FBQUMsUUFBUTtJQUNQO0lBQVk7SUFBQSxDQUFBakIsY0FBQSxHQUFBa0IsQ0FBQSxVQUFBZCxHQUFBLENBQUllLGFBQWE7SUFBQTtJQUFBLENBQUFuQixjQUFBLEdBQUFrQixDQUFBLFVBQU07SUFDbkMsaUJBQWVULFVBQUE7SUFDZlcsR0FBQSxFQUFLWixVQUFBO0lBQ0xhLFNBQUEsRUFBVTtJQUNWQyxLQUFBLEVBQU87TUFDTGhCLFNBQUEsRUFBV2lCLFVBQUEsQ0FBQUMsR0FBRyxDQUFDQyxTQUFTLENBQUNDLFFBQVEsQ0FBQ3BCLFNBQUE7TUFDbENDO0lBQ0Y7Y0FFQ0gsR0FBQSxDQUFJdUIsZUFBZSxHQUFHQyxHQUFHLENBQUNDLElBQUEsSUFDekI7TUFBQTtNQUFBN0IsY0FBQSxHQUFBSyxDQUFBO01BQUFMLGNBQUEsR0FBQUUsQ0FBQTtNQUFBLE9BRHlCLGFBQ3pCLElBQUFZLFdBQUEsQ0FBQUMsR0FBQSxFQUFDQyxNQUFBLENBQUFjLFNBQVM7a0JBQWdCLElBQUFDLFdBQUEsQ0FBQUMsVUFBVSxFQUFDSCxJQUFBLENBQUtJLE1BQU0sQ0FBQ0MsU0FBUyxDQUFDTCxJQUFJLEVBQUVBLElBQUEsQ0FBS00sVUFBVTtTQUFoRU4sSUFBQSxDQUFLakIsRUFBRTtJQUFBOztBQUkvQiIsImlnbm9yZUxpc3QiOltdfQ==

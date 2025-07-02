@@ -821,7 +821,7 @@ export function DriveManager() {
             closeDialog('move')
             setSelectedItems(new Set())
           }}
-          selectedItems={getSelectedItemObjects()}
+          selectedItems={getSelectedItemsForDialog()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('move')
@@ -838,7 +838,7 @@ export function DriveManager() {
             closeDialog('copy')
             setSelectedItems(new Set())
           }}
-          selectedItems={getSelectedItemObjects()}
+          selectedItems={getSelectedItemsForDialog()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('copy')
@@ -855,7 +855,7 @@ export function DriveManager() {
             closeDialog('share')
             setSelectedItems(new Set())
           }}
-          selectedItems={getSelectedItemObjects()}
+          selectedItems={getSelectedItemsForDialog()}
           allItems={displayItems}
           onComplete={() => {
             closeDialog('share')
@@ -872,9 +872,8 @@ export function DriveManager() {
             closeDialog('rename')
             setSelectedItems(new Set())
           }}
-          selectedItems={getSelectedItemObjects()}
-          allItems={displayItems}
-          onComplete={() => {
+          selectedItems={getSelectedItemsForDialog()}
+          onConfirm={() => {
             closeDialog('rename')
             setSelectedItems(new Set())
             handleRefresh()
@@ -888,14 +887,10 @@ export function DriveManager() {
           onClose={() => {
             closeDialog('trash')
             setSelectedItems(new Set())
-          }}
-          selectedItems={getSelectedItemObjects()}
-          allItems={displayItems}
-          onComplete={() => {
-            closeDialog('trash')
-            setSelectedItems(new Set())
             handleRefresh()
           }}
+          selectedItems={getSelectedItemsForDialog()}
+          _onConfirm={() => {}}
         />
       )}
 
@@ -907,8 +902,7 @@ export function DriveManager() {
             setSelectedItems(new Set())
           }}
           selectedItems={getSelectedItemsForDialog()}
-          allItems={displayItems}
-          onComplete={() => {
+          onConfirm={() => {
             closeDialog('delete')
             setSelectedItems(new Set())
             handleRefresh()
@@ -922,13 +916,10 @@ export function DriveManager() {
           onClose={() => {
             closeDialog('untrash')
             setSelectedItems(new Set())
-          }}
-          selectedItems={getSelectedItemsForDialog()}
-          onComplete={() => {
-            closeDialog('untrash')
-            setSelectedItems(new Set())
             handleRefresh()
           }}
+          selectedItems={getSelectedItemsForDialog()}
+          _onConfirm={() => {}}
         />
       )}
 
@@ -940,8 +931,7 @@ export function DriveManager() {
             setSelectedItems(new Set())
           }}
           selectedItems={getSelectedItemsForDialog()}
-          allItems={displayItems}
-          onComplete={() => {
+          onConfirm={() => {
             closeDialog('download')
             setSelectedItems(new Set())
           }}
@@ -956,8 +946,7 @@ export function DriveManager() {
             setSelectedItems(new Set())
           }}
           selectedItems={getSelectedItemsForDialog()}
-          allItems={displayItems}
-          onComplete={() => {
+          onConfirm={() => {
             closeDialog('export')
             setSelectedItems(new Set())
             handleRefresh()

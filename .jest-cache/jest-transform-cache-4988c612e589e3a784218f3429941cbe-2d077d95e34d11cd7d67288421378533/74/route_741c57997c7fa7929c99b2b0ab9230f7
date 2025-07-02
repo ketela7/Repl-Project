@@ -1,0 +1,349 @@
+661ad5c00549ff7aa0ccd8f2c67228f9
+"use strict";
+
+/* istanbul ignore next */
+function cov_20n0jyre4s() {
+  var path = "/home/runner/workspace/src/app/api/auth/reauth-drive/route.ts";
+  var hash = "dfff5cc08aa99088cff7337657724045f4ddfa15";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/app/api/auth/reauth-drive/route.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 2,
+          column: 0
+        },
+        end: {
+          line: 4,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 5,
+          column: 0
+        },
+        end: {
+          line: 10,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 8,
+          column: 8
+        },
+        end: {
+          line: 8,
+          column: 19
+        }
+      },
+      "3": {
+        start: {
+          line: 11,
+          column: 16
+        },
+        end: {
+          line: 11,
+          column: 38
+        }
+      },
+      "4": {
+        start: {
+          line: 12,
+          column: 14
+        },
+        end: {
+          line: 12,
+          column: 41
+        }
+      },
+      "5": {
+        start: {
+          line: 14,
+          column: 4
+        },
+        end: {
+          line: 29,
+          column: 5
+        }
+      },
+      "6": {
+        start: {
+          line: 15,
+          column: 24
+        },
+        end: {
+          line: 15,
+          column: 47
+        }
+      },
+      "7": {
+        start: {
+          line: 16,
+          column: 8
+        },
+        end: {
+          line: 18,
+          column: 9
+        }
+      },
+      "8": {
+        start: {
+          line: 17,
+          column: 12
+        },
+        end: {
+          line: 17,
+          column: 89
+        }
+      },
+      "9": {
+        start: {
+          line: 22,
+          column: 25
+        },
+        end: {
+          line: 22,
+          column: 63
+        }
+      },
+      "10": {
+        start: {
+          line: 23,
+          column: 8
+        },
+        end: {
+          line: 23,
+          column: 53
+        }
+      },
+      "11": {
+        start: {
+          line: 24,
+          column: 8
+        },
+        end: {
+          line: 24,
+          column: 69
+        }
+      },
+      "12": {
+        start: {
+          line: 26,
+          column: 8
+        },
+        end: {
+          line: 26,
+          column: 66
+        }
+      },
+      "13": {
+        start: {
+          line: 28,
+          column: 8
+        },
+        end: {
+          line: 28,
+          column: 85
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 7,
+            column: 9
+          },
+          end: {
+            line: 7,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 7,
+            column: 20
+          },
+          end: {
+            line: 9,
+            column: 5
+          }
+        },
+        line: 7
+      },
+      "1": {
+        name: "GET",
+        decl: {
+          start: {
+            line: 13,
+            column: 15
+          },
+          end: {
+            line: 13,
+            column: 18
+          }
+        },
+        loc: {
+          start: {
+            line: 13,
+            column: 28
+          },
+          end: {
+            line: 30,
+            column: 1
+          }
+        },
+        line: 13
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 16,
+            column: 8
+          },
+          end: {
+            line: 18,
+            column: 9
+          }
+        },
+        type: "if",
+        locations: [{
+          start: {
+            line: 16,
+            column: 8
+          },
+          end: {
+            line: 18,
+            column: 9
+          }
+        }, {
+          start: {
+            line: undefined,
+            column: undefined
+          },
+          end: {
+            line: undefined,
+            column: undefined
+          }
+        }],
+        line: 16
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0,
+      "10": 0,
+      "11": 0,
+      "12": 0,
+      "13": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0
+    },
+    b: {
+      "0": [0, 0]
+    },
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/app/api/auth/reauth-drive/route.ts"],
+      sourcesContent: ["import { NextRequest, NextResponse } from 'next/server'\n\nimport { auth } from '@/auth'\n\nexport async function GET(request: NextRequest) {\n  try {\n    const session = await auth()\n\n    if (!session?.user) {\n      return NextResponse.redirect(new URL('/auth/v1/login', request.url))\n    }\n\n    // Simple approach: Sign out current session and redirect to login\n    // This will force a new OAuth flow with consent prompt\n\n    // Sign out and redirect to login with a special parameter\n    const loginUrl = new URL('/auth/v1/login', request.url)\n    loginUrl.searchParams.set('reauth', 'drive')\n    loginUrl.searchParams.set('callbackUrl', '/dashboard/drive')\n\n    // We'll handle the signOut in the client side, just redirect to login for now\n    return NextResponse.redirect(loginUrl.toString())\n  } catch (error) {\n    return NextResponse.redirect(new URL('/auth/v1/login', request.url))\n  }\n}\n"],
+      names: ["GET", "request", "session", "auth", "user", "NextResponse", "redirect", "URL", "url", "loginUrl", "searchParams", "set", "toString", "error"],
+      mappings: ";;;;+BAIsBA;;;eAAAA;;;wBAJoB;sBAErB;AAEd,eAAeA,IAAIC,OAAoB;IAC5C,IAAI;QACF,MAAMC,UAAU,MAAMC,IAAAA,UAAI;QAE1B,IAAI,CAACD,SAASE,MAAM;YAClB,OAAOC,oBAAY,CAACC,QAAQ,CAAC,IAAIC,IAAI,kBAAkBN,QAAQO,GAAG;QACpE;QAEA,kEAAkE;QAClE,uDAAuD;QAEvD,0DAA0D;QAC1D,MAAMC,WAAW,IAAIF,IAAI,kBAAkBN,QAAQO,GAAG;QACtDC,SAASC,YAAY,CAACC,GAAG,CAAC,UAAU;QACpCF,SAASC,YAAY,CAACC,GAAG,CAAC,eAAe;QAEzC,8EAA8E;QAC9E,OAAON,oBAAY,CAACC,QAAQ,CAACG,SAASG,QAAQ;IAChD,EAAE,OAAOC,OAAO;QACd,OAAOR,oBAAY,CAACC,QAAQ,CAAC,IAAIC,IAAI,kBAAkBN,QAAQO,GAAG;IACpE;AACF"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "dfff5cc08aa99088cff7337657724045f4ddfa15"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_20n0jyre4s = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_20n0jyre4s();
+cov_20n0jyre4s().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_20n0jyre4s().s[1]++;
+Object.defineProperty(exports, "GET", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_20n0jyre4s().f[0]++;
+    cov_20n0jyre4s().s[2]++;
+    return GET;
+  }
+});
+const _server =
+/* istanbul ignore next */
+(cov_20n0jyre4s().s[3]++, require("next/server"));
+const _auth =
+/* istanbul ignore next */
+(cov_20n0jyre4s().s[4]++, require("../../../../auth"));
+async function GET(request) {
+  /* istanbul ignore next */
+  cov_20n0jyre4s().f[1]++;
+  cov_20n0jyre4s().s[5]++;
+  try {
+    const session =
+    /* istanbul ignore next */
+    (cov_20n0jyre4s().s[6]++, await (0, _auth.auth)());
+    /* istanbul ignore next */
+    cov_20n0jyre4s().s[7]++;
+    if (!session?.user) {
+      /* istanbul ignore next */
+      cov_20n0jyre4s().b[0][0]++;
+      cov_20n0jyre4s().s[8]++;
+      return _server.NextResponse.redirect(new URL('/auth/v1/login', request.url));
+    } else
+    /* istanbul ignore next */
+    {
+      cov_20n0jyre4s().b[0][1]++;
+    }
+    // Simple approach: Sign out current session and redirect to login
+    // This will force a new OAuth flow with consent prompt
+    // Sign out and redirect to login with a special parameter
+    const loginUrl =
+    /* istanbul ignore next */
+    (cov_20n0jyre4s().s[9]++, new URL('/auth/v1/login', request.url));
+    /* istanbul ignore next */
+    cov_20n0jyre4s().s[10]++;
+    loginUrl.searchParams.set('reauth', 'drive');
+    /* istanbul ignore next */
+    cov_20n0jyre4s().s[11]++;
+    loginUrl.searchParams.set('callbackUrl', '/dashboard/drive');
+    // We'll handle the signOut in the client side, just redirect to login for now
+    /* istanbul ignore next */
+    cov_20n0jyre4s().s[12]++;
+    return _server.NextResponse.redirect(loginUrl.toString());
+  } catch (error) {
+    /* istanbul ignore next */
+    cov_20n0jyre4s().s[13]++;
+    return _server.NextResponse.redirect(new URL('/auth/v1/login', request.url));
+  }
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMjBuMGp5cmU0cyIsImFjdHVhbENvdmVyYWdlIiwicyIsIkdFVCIsInJlcXVlc3QiLCJmIiwic2Vzc2lvbiIsIl9hdXRoIiwiYXV0aCIsInVzZXIiLCJiIiwiX3NlcnZlciIsIk5leHRSZXNwb25zZSIsInJlZGlyZWN0IiwiVVJMIiwidXJsIiwibG9naW5VcmwiLCJzZWFyY2hQYXJhbXMiLCJzZXQiLCJ0b1N0cmluZyIsImVycm9yIl0sInNvdXJjZXMiOlsiL2hvbWUvcnVubmVyL3dvcmtzcGFjZS9zcmMvYXBwL2FwaS9hdXRoL3JlYXV0aC1kcml2ZS9yb3V0ZS50cyJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBOZXh0UmVxdWVzdCwgTmV4dFJlc3BvbnNlIH0gZnJvbSAnbmV4dC9zZXJ2ZXInXG5cbmltcG9ydCB7IGF1dGggfSBmcm9tICdAL2F1dGgnXG5cbmV4cG9ydCBhc3luYyBmdW5jdGlvbiBHRVQocmVxdWVzdDogTmV4dFJlcXVlc3QpIHtcbiAgdHJ5IHtcbiAgICBjb25zdCBzZXNzaW9uID0gYXdhaXQgYXV0aCgpXG5cbiAgICBpZiAoIXNlc3Npb24/LnVzZXIpIHtcbiAgICAgIHJldHVybiBOZXh0UmVzcG9uc2UucmVkaXJlY3QobmV3IFVSTCgnL2F1dGgvdjEvbG9naW4nLCByZXF1ZXN0LnVybCkpXG4gICAgfVxuXG4gICAgLy8gU2ltcGxlIGFwcHJvYWNoOiBTaWduIG91dCBjdXJyZW50IHNlc3Npb24gYW5kIHJlZGlyZWN0IHRvIGxvZ2luXG4gICAgLy8gVGhpcyB3aWxsIGZvcmNlIGEgbmV3IE9BdXRoIGZsb3cgd2l0aCBjb25zZW50IHByb21wdFxuXG4gICAgLy8gU2lnbiBvdXQgYW5kIHJlZGlyZWN0IHRvIGxvZ2luIHdpdGggYSBzcGVjaWFsIHBhcmFtZXRlclxuICAgIGNvbnN0IGxvZ2luVXJsID0gbmV3IFVSTCgnL2F1dGgvdjEvbG9naW4nLCByZXF1ZXN0LnVybClcbiAgICBsb2dpblVybC5zZWFyY2hQYXJhbXMuc2V0KCdyZWF1dGgnLCAnZHJpdmUnKVxuICAgIGxvZ2luVXJsLnNlYXJjaFBhcmFtcy5zZXQoJ2NhbGxiYWNrVXJsJywgJy9kYXNoYm9hcmQvZHJpdmUnKVxuXG4gICAgLy8gV2UnbGwgaGFuZGxlIHRoZSBzaWduT3V0IGluIHRoZSBjbGllbnQgc2lkZSwganVzdCByZWRpcmVjdCB0byBsb2dpbiBmb3Igbm93XG4gICAgcmV0dXJuIE5leHRSZXNwb25zZS5yZWRpcmVjdChsb2dpblVybC50b1N0cmluZygpKVxuICB9IGNhdGNoIChlcnJvcikge1xuICAgIHJldHVybiBOZXh0UmVzcG9uc2UucmVkaXJlY3QobmV3IFVSTCgnL2F1dGgvdjEvbG9naW4nLCByZXF1ZXN0LnVybCkpXG4gIH1cbn1cbiJdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7O0lBUVE7SUFBQUEsY0FBQSxZQUFBQSxDQUFBO01BQUEsT0FBQUMsY0FBQTtJQUFBO0VBQUE7RUFBQSxPQUFBQSxjQUFBO0FBQUE7QUFBQUQsY0FBQTtBQUFBQSxjQUFBLEdBQUFFLENBQUE7Ozs7OzsrQkFKYzs7Ozs7O1dBQUFDLEdBQUE7Ozs7O2tDQUpvQjs7O2tDQUVyQjtBQUVkLGVBQWVBLElBQUlDLE9BQW9CO0VBQUE7RUFBQUosY0FBQSxHQUFBSyxDQUFBO0VBQUFMLGNBQUEsR0FBQUUsQ0FBQTtFQUM1QyxJQUFJO0lBQ0YsTUFBTUksT0FBQTtJQUFBO0lBQUEsQ0FBQU4sY0FBQSxHQUFBRSxDQUFBLE9BQVUsTUFBTSxJQUFBSyxLQUFBLENBQUFDLElBQUk7SUFBQTtJQUFBUixjQUFBLEdBQUFFLENBQUE7SUFFMUIsSUFBSSxDQUFDSSxPQUFBLEVBQVNHLElBQUEsRUFBTTtNQUFBO01BQUFULGNBQUEsR0FBQVUsQ0FBQTtNQUFBVixjQUFBLEdBQUFFLENBQUE7TUFDbEIsT0FBT1MsT0FBQSxDQUFBQyxZQUFZLENBQUNDLFFBQVEsQ0FBQyxJQUFJQyxHQUFBLENBQUksa0JBQWtCVixPQUFBLENBQVFXLEdBQUc7SUFDcEU7SUFBQTtJQUFBO01BQUFmLGNBQUEsR0FBQVUsQ0FBQTtJQUFBO0lBRUE7SUFDQTtJQUVBO0lBQ0EsTUFBTU0sUUFBQTtJQUFBO0lBQUEsQ0FBQWhCLGNBQUEsR0FBQUUsQ0FBQSxPQUFXLElBQUlZLEdBQUEsQ0FBSSxrQkFBa0JWLE9BQUEsQ0FBUVcsR0FBRztJQUFBO0lBQUFmLGNBQUEsR0FBQUUsQ0FBQTtJQUN0RGMsUUFBQSxDQUFTQyxZQUFZLENBQUNDLEdBQUcsQ0FBQyxVQUFVO0lBQUE7SUFBQWxCLGNBQUEsR0FBQUUsQ0FBQTtJQUNwQ2MsUUFBQSxDQUFTQyxZQUFZLENBQUNDLEdBQUcsQ0FBQyxlQUFlO0lBRXpDO0lBQUE7SUFBQWxCLGNBQUEsR0FBQUUsQ0FBQTtJQUNBLE9BQU9TLE9BQUEsQ0FBQUMsWUFBWSxDQUFDQyxRQUFRLENBQUNHLFFBQUEsQ0FBU0csUUFBUTtFQUNoRCxFQUFFLE9BQU9DLEtBQUEsRUFBTztJQUFBO0lBQUFwQixjQUFBLEdBQUFFLENBQUE7SUFDZCxPQUFPUyxPQUFBLENBQUFDLFlBQVksQ0FBQ0MsUUFBUSxDQUFDLElBQUlDLEdBQUEsQ0FBSSxrQkFBa0JWLE9BQUEsQ0FBUVcsR0FBRztFQUNwRTtBQUNGIiwiaWdub3JlTGlzdCI6W119

@@ -1,0 +1,198 @@
+05c82cf86747fc36d04390a5776f79f7
+'use client';
+"use strict";
+
+/* istanbul ignore next */
+function cov_2jurnyo80q() {
+  var path = "/home/runner/workspace/src/components/providers/theme-provider.tsx";
+  var hash = "d1706f0e322eabefd142c4638152427be8bb6d75";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/components/providers/theme-provider.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 3,
+          column: 0
+        },
+        end: {
+          line: 5,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 6,
+          column: 0
+        },
+        end: {
+          line: 11,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 9,
+          column: 8
+        },
+        end: {
+          line: 9,
+          column: 35
+        }
+      },
+      "3": {
+        start: {
+          line: 12,
+          column: 20
+        },
+        end: {
+          line: 12,
+          column: 48
+        }
+      },
+      "4": {
+        start: {
+          line: 13,
+          column: 20
+        },
+        end: {
+          line: 13,
+          column: 42
+        }
+      },
+      "5": {
+        start: {
+          line: 15,
+          column: 4
+        },
+        end: {
+          line: 21,
+          column: 7
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 8,
+            column: 9
+          },
+          end: {
+            line: 8,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 8,
+            column: 20
+          },
+          end: {
+            line: 10,
+            column: 5
+          }
+        },
+        line: 8
+      },
+      "1": {
+        name: "CustomThemeProvider",
+        decl: {
+          start: {
+            line: 14,
+            column: 9
+          },
+          end: {
+            line: 14,
+            column: 28
+          }
+        },
+        loc: {
+          start: {
+            line: 14,
+            column: 43
+          },
+          end: {
+            line: 22,
+            column: 1
+          }
+        },
+        line: 14
+      }
+    },
+    branchMap: {},
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0
+    },
+    b: {},
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/components/providers/theme-provider.tsx"],
+      sourcesContent: ["'use client'\n\nimport { ThemeProvider } from 'next-themes'\nimport { ReactNode } from 'react'\n\ninterface ThemeProviderProps {\n  children: ReactNode\n}\n\nexport function CustomThemeProvider({ children }: ThemeProviderProps) {\n  return (\n    <ThemeProvider attribute=\"class\" defaultTheme=\"system\" enableSystem disableTransitionOnChange>\n      {children}\n    </ThemeProvider>\n  )\n}\n"],
+      names: ["CustomThemeProvider", "children", "ThemeProvider", "attribute", "defaultTheme", "enableSystem", "disableTransitionOnChange"],
+      mappings: "AAAA;;;;;+BASgBA;;;eAAAA;;;;4BAPc;AAOvB,SAASA,oBAAoB,EAAEC,QAAQ,EAAsB;IAClE,qBACE,qBAACC,yBAAa;QAACC,WAAU;QAAQC,cAAa;QAASC,YAAY;QAACC,yBAAyB;kBAC1FL;;AAGP"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "d1706f0e322eabefd142c4638152427be8bb6d75"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_2jurnyo80q = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_2jurnyo80q();
+cov_2jurnyo80q().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_2jurnyo80q().s[1]++;
+Object.defineProperty(exports, "CustomThemeProvider", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_2jurnyo80q().f[0]++;
+    cov_2jurnyo80q().s[2]++;
+    return CustomThemeProvider;
+  }
+});
+const _jsxruntime =
+/* istanbul ignore next */
+(cov_2jurnyo80q().s[3]++, require("react/jsx-runtime"));
+const _nextthemes =
+/* istanbul ignore next */
+(cov_2jurnyo80q().s[4]++, require("next-themes"));
+function CustomThemeProvider({
+  children
+}) {
+  /* istanbul ignore next */
+  cov_2jurnyo80q().f[1]++;
+  cov_2jurnyo80q().s[5]++;
+  return /*#__PURE__*/(0, _jsxruntime.jsx)(_nextthemes.ThemeProvider, {
+    attribute: "class",
+    defaultTheme: "system",
+    enableSystem: true,
+    disableTransitionOnChange: true,
+    children: children
+  });
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMmp1cm55bzgwcSIsImFjdHVhbENvdmVyYWdlIiwicyIsIkN1c3RvbVRoZW1lUHJvdmlkZXIiLCJjaGlsZHJlbiIsImYiLCJfanN4cnVudGltZSIsImpzeCIsIl9uZXh0dGhlbWVzIiwiVGhlbWVQcm92aWRlciIsImF0dHJpYnV0ZSIsImRlZmF1bHRUaGVtZSIsImVuYWJsZVN5c3RlbSIsImRpc2FibGVUcmFuc2l0aW9uT25DaGFuZ2UiXSwic291cmNlcyI6WyIvaG9tZS9ydW5uZXIvd29ya3NwYWNlL3NyYy9jb21wb25lbnRzL3Byb3ZpZGVycy90aGVtZS1wcm92aWRlci50c3giXSwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBjbGllbnQnXG5cbmltcG9ydCB7IFRoZW1lUHJvdmlkZXIgfSBmcm9tICduZXh0LXRoZW1lcydcbmltcG9ydCB7IFJlYWN0Tm9kZSB9IGZyb20gJ3JlYWN0J1xuXG5pbnRlcmZhY2UgVGhlbWVQcm92aWRlclByb3BzIHtcbiAgY2hpbGRyZW46IFJlYWN0Tm9kZVxufVxuXG5leHBvcnQgZnVuY3Rpb24gQ3VzdG9tVGhlbWVQcm92aWRlcih7IGNoaWxkcmVuIH06IFRoZW1lUHJvdmlkZXJQcm9wcykge1xuICByZXR1cm4gKFxuICAgIDxUaGVtZVByb3ZpZGVyIGF0dHJpYnV0ZT1cImNsYXNzXCIgZGVmYXVsdFRoZW1lPVwic3lzdGVtXCIgZW5hYmxlU3lzdGVtIGRpc2FibGVUcmFuc2l0aW9uT25DaGFuZ2U+XG4gICAgICB7Y2hpbGRyZW59XG4gICAgPC9UaGVtZVByb3ZpZGVyPlxuICApXG59XG4iXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7SUFXbUI7SUFBQUEsY0FBQSxZQUFBQSxDQUFBO01BQUEsT0FBQUMsY0FBQTtJQUFBO0VBQUE7RUFBQSxPQUFBQSxjQUFBO0FBQUE7QUFBQUQsY0FBQTtBQUFBQSxjQUFBLEdBQUFFLENBQUE7Ozs7OzsrQkFGSDs7Ozs7O1dBQUFDLG1CQUFBOzs7Ozs7OztrQ0FQYztBQU92QixTQUFTQSxvQkFBb0I7RUFBRUM7QUFBUSxDQUFzQjtFQUFBO0VBQUFKLGNBQUEsR0FBQUssQ0FBQTtFQUFBTCxjQUFBLEdBQUFFLENBQUE7RUFDbEUsb0JBQ0UsSUFBQUksV0FBQSxDQUFBQyxHQUFBLEVBQUNDLFdBQUEsQ0FBQUMsYUFBYTtJQUFDQyxTQUFBLEVBQVU7SUFBUUMsWUFBQSxFQUFhO0lBQVNDLFlBQVk7SUFBQ0MseUJBQXlCO2NBQzFGVDs7QUFHUCIsImlnbm9yZUxpc3QiOltdfQ==

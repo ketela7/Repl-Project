@@ -1,0 +1,359 @@
+fb6498699a7bd8303131a254e2e702c1
+'use client';
+"use strict";
+
+/* istanbul ignore next */
+function cov_r7py8ewjj() {
+  var path = "/home/runner/workspace/src/app/(main)/dashboard/_components/sidebar/theme-switcher.tsx";
+  var hash = "eb6ffb207a7e9f604262bf0d46d1727119ebb2ad";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/app/(main)/dashboard/_components/sidebar/theme-switcher.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 3,
+          column: 0
+        },
+        end: {
+          line: 5,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 6,
+          column: 0
+        },
+        end: {
+          line: 11,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 9,
+          column: 8
+        },
+        end: {
+          line: 9,
+          column: 29
+        }
+      },
+      "3": {
+        start: {
+          line: 12,
+          column: 20
+        },
+        end: {
+          line: 12,
+          column: 48
+        }
+      },
+      "4": {
+        start: {
+          line: 13,
+          column: 21
+        },
+        end: {
+          line: 13,
+          column: 44
+        }
+      },
+      "5": {
+        start: {
+          line: 14,
+          column: 20
+        },
+        end: {
+          line: 14,
+          column: 42
+        }
+      },
+      "6": {
+        start: {
+          line: 15,
+          column: 16
+        },
+        end: {
+          line: 15,
+          column: 62
+        }
+      },
+      "7": {
+        start: {
+          line: 17,
+          column: 40
+        },
+        end: {
+          line: 17,
+          column: 67
+        }
+      },
+      "8": {
+        start: {
+          line: 18,
+          column: 4
+        },
+        end: {
+          line: 22,
+          column: 7
+        }
+      },
+      "9": {
+        start: {
+          line: 20,
+          column: 21
+        },
+        end: {
+          line: 20,
+          column: 74
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 8,
+            column: 9
+          },
+          end: {
+            line: 8,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 8,
+            column: 20
+          },
+          end: {
+            line: 10,
+            column: 5
+          }
+        },
+        line: 8
+      },
+      "1": {
+        name: "ThemeSwitcher",
+        decl: {
+          start: {
+            line: 16,
+            column: 9
+          },
+          end: {
+            line: 16,
+            column: 22
+          }
+        },
+        loc: {
+          start: {
+            line: 16,
+            column: 25
+          },
+          end: {
+            line: 23,
+            column: 1
+          }
+        },
+        line: 16
+      },
+      "2": {
+        name: "(anonymous_2)",
+        decl: {
+          start: {
+            line: 20,
+            column: 17
+          },
+          end: {
+            line: 20,
+            column: 18
+          }
+        },
+        loc: {
+          start: {
+            line: 20,
+            column: 21
+          },
+          end: {
+            line: 20,
+            column: 74
+          }
+        },
+        line: 20
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 20,
+            column: 30
+          },
+          end: {
+            line: 20,
+            column: 73
+          }
+        },
+        type: "cond-expr",
+        locations: [{
+          start: {
+            line: 20,
+            column: 57
+          },
+          end: {
+            line: 20,
+            column: 64
+          }
+        }, {
+          start: {
+            line: 20,
+            column: 67
+          },
+          end: {
+            line: 20,
+            column: 73
+          }
+        }],
+        line: 20
+      },
+      "1": {
+        loc: {
+          start: {
+            line: 21,
+            column: 18
+          },
+          end: {
+            line: 21,
+            column: 161
+          }
+        },
+        type: "cond-expr",
+        locations: [{
+          start: {
+            line: 21,
+            column: 59
+          },
+          end: {
+            line: 21,
+            column: 101
+          }
+        }, {
+          start: {
+            line: 21,
+            column: 118
+          },
+          end: {
+            line: 21,
+            column: 161
+          }
+        }],
+        line: 21
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0,
+      "9": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0,
+      "2": 0
+    },
+    b: {
+      "0": [0, 0],
+      "1": [0, 0]
+    },
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/app/(main)/dashboard/_components/sidebar/theme-switcher.tsx"],
+      sourcesContent: ["'use client'\n\nimport { Moon, Sun } from 'lucide-react'\nimport { useTheme } from 'next-themes'\n\nimport { Button } from '@/components/ui/button'\n\nexport function ThemeSwitcher() {\n  const { resolvedTheme, setTheme } = useTheme()\n\n  return (\n    <Button size=\"icon\" onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}>\n      {resolvedTheme === 'dark' ? <Sun /> : <Moon />}\n    </Button>\n  )\n}\n"],
+      names: ["ThemeSwitcher", "resolvedTheme", "setTheme", "useTheme", "Button", "size", "onClick", "Sun", "Moon"],
+      mappings: "AAAA;;;;;+BAOgBA;;;eAAAA;;;;6BALU;4BACD;wBAEF;AAEhB,SAASA;IACd,MAAM,EAAEC,aAAa,EAAEC,QAAQ,EAAE,GAAGC,IAAAA,oBAAQ;IAE5C,qBACE,qBAACC,cAAM;QAACC,MAAK;QAAOC,SAAS,IAAMJ,SAASD,kBAAkB,SAAS,UAAU;kBAC9EA,kBAAkB,uBAAS,qBAACM,gBAAG,sBAAM,qBAACC,iBAAI;;AAGjD"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "eb6ffb207a7e9f604262bf0d46d1727119ebb2ad"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_r7py8ewjj = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_r7py8ewjj();
+cov_r7py8ewjj().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_r7py8ewjj().s[1]++;
+Object.defineProperty(exports, "ThemeSwitcher", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_r7py8ewjj().f[0]++;
+    cov_r7py8ewjj().s[2]++;
+    return ThemeSwitcher;
+  }
+});
+const _jsxruntime =
+/* istanbul ignore next */
+(cov_r7py8ewjj().s[3]++, require("react/jsx-runtime"));
+const _lucidereact =
+/* istanbul ignore next */
+(cov_r7py8ewjj().s[4]++, require("lucide-react"));
+const _nextthemes =
+/* istanbul ignore next */
+(cov_r7py8ewjj().s[5]++, require("next-themes"));
+const _button =
+/* istanbul ignore next */
+(cov_r7py8ewjj().s[6]++, require("../../../../../components/ui/button"));
+function ThemeSwitcher() {
+  /* istanbul ignore next */
+  cov_r7py8ewjj().f[1]++;
+  const {
+    resolvedTheme,
+    setTheme
+  } =
+  /* istanbul ignore next */
+  (cov_r7py8ewjj().s[7]++, (0, _nextthemes.useTheme)());
+  /* istanbul ignore next */
+  cov_r7py8ewjj().s[8]++;
+  return /*#__PURE__*/(0, _jsxruntime.jsx)(_button.Button, {
+    size: "icon",
+    onClick: () => {
+      /* istanbul ignore next */
+      cov_r7py8ewjj().f[2]++;
+      cov_r7py8ewjj().s[9]++;
+      return setTheme(resolvedTheme === 'dark' ?
+      /* istanbul ignore next */
+      (cov_r7py8ewjj().b[0][0]++, 'light') :
+      /* istanbul ignore next */
+      (cov_r7py8ewjj().b[0][1]++, 'dark'));
+    },
+    children: resolvedTheme === 'dark' ?
+    /* istanbul ignore next */
+    (/*#__PURE__*/cov_r7py8ewjj().b[1][0]++, (0, _jsxruntime.jsx)(_lucidereact.Sun, {})) :
+    /* istanbul ignore next */
+    (/*#__PURE__*/cov_r7py8ewjj().b[1][1]++, (0, _jsxruntime.jsx)(_lucidereact.Moon, {}))
+  });
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfcjdweThld2pqIiwiYWN0dWFsQ292ZXJhZ2UiLCJzIiwiVGhlbWVTd2l0Y2hlciIsImYiLCJyZXNvbHZlZFRoZW1lIiwic2V0VGhlbWUiLCJfbmV4dHRoZW1lcyIsInVzZVRoZW1lIiwiX2pzeHJ1bnRpbWUiLCJqc3giLCJfYnV0dG9uIiwiQnV0dG9uIiwic2l6ZSIsIm9uQ2xpY2siLCJiIiwiX2x1Y2lkZXJlYWN0IiwiU3VuIiwiTW9vbiJdLCJzb3VyY2VzIjpbIi9ob21lL3J1bm5lci93b3Jrc3BhY2Uvc3JjL2FwcC8obWFpbikvZGFzaGJvYXJkL19jb21wb25lbnRzL3NpZGViYXIvdGhlbWUtc3dpdGNoZXIudHN4Il0sInNvdXJjZXNDb250ZW50IjpbIid1c2UgY2xpZW50J1xuXG5pbXBvcnQgeyBNb29uLCBTdW4gfSBmcm9tICdsdWNpZGUtcmVhY3QnXG5pbXBvcnQgeyB1c2VUaGVtZSB9IGZyb20gJ25leHQtdGhlbWVzJ1xuXG5pbXBvcnQgeyBCdXR0b24gfSBmcm9tICdAL2NvbXBvbmVudHMvdWkvYnV0dG9uJ1xuXG5leHBvcnQgZnVuY3Rpb24gVGhlbWVTd2l0Y2hlcigpIHtcbiAgY29uc3QgeyByZXNvbHZlZFRoZW1lLCBzZXRUaGVtZSB9ID0gdXNlVGhlbWUoKVxuXG4gIHJldHVybiAoXG4gICAgPEJ1dHRvbiBzaXplPVwiaWNvblwiIG9uQ2xpY2s9eygpID0+IHNldFRoZW1lKHJlc29sdmVkVGhlbWUgPT09ICdkYXJrJyA/ICdsaWdodCcgOiAnZGFyaycpfT5cbiAgICAgIHtyZXNvbHZlZFRoZW1lID09PSAnZGFyaycgPyA8U3VuIC8+IDogPE1vb24gLz59XG4gICAgPC9CdXR0b24+XG4gIClcbn1cbiJdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7SUFPZ0I7SUFBQUEsYUFBQSxZQUFBQSxDQUFBO01BQUEsT0FBQUMsY0FBQTtJQUFBO0VBQUE7RUFBQSxPQUFBQSxjQUFBO0FBQUE7QUFBQUQsYUFBQTtBQUFBQSxhQUFBLEdBQUFFLENBQUE7Ozs7OzsrQkFBQTs7Ozs7O1dBQUFDLGFBQUE7Ozs7Ozs7O2lDQUxVOzs7aUNBQ0Q7OztpQ0FFRjtBQUVoQixTQUFTQSxjQUFBO0VBQUE7RUFBQUgsYUFBQSxHQUFBSSxDQUFBO0VBQ2QsTUFBTTtJQUFFQyxhQUFhO0lBQUVDO0VBQVEsQ0FBRTtFQUFBO0VBQUEsQ0FBQU4sYUFBQSxHQUFBRSxDQUFBLE9BQUcsSUFBQUssV0FBQSxDQUFBQyxRQUFRO0VBQUE7RUFBQVIsYUFBQSxHQUFBRSxDQUFBO0VBRTVDLG9CQUNFLElBQUFPLFdBQUEsQ0FBQUMsR0FBQSxFQUFDQyxPQUFBLENBQUFDLE1BQU07SUFBQ0MsSUFBQSxFQUFLO0lBQU9DLE9BQUEsRUFBU0EsQ0FBQSxLQUFNO01BQUE7TUFBQWQsYUFBQSxHQUFBSSxDQUFBO01BQUFKLGFBQUEsR0FBQUUsQ0FBQTtNQUFBLE9BQUFJLFFBQUEsQ0FBU0QsYUFBQSxLQUFrQjtNQUFBO01BQUEsQ0FBQUwsYUFBQSxHQUFBZSxDQUFBLFVBQVM7TUFBQTtNQUFBLENBQUFmLGFBQUEsR0FBQWUsQ0FBQSxVQUFVO0lBQUE7Y0FDOUVWLGFBQUEsS0FBa0I7SUFBQTtJQUFBLGNBQUFMLGFBQUEsR0FBQWUsQ0FBQSxVQUFTLElBQUFOLFdBQUEsQ0FBQUMsR0FBQSxFQUFDTSxZQUFBLENBQUFDLEdBQUc7SUFBQTtJQUFBLGNBQUFqQixhQUFBLEdBQUFlLENBQUEsVUFBTSxJQUFBTixXQUFBLENBQUFDLEdBQUEsRUFBQ00sWUFBQSxDQUFBRSxJQUFJOztBQUdqRCIsImlnbm9yZUxpc3QiOltdfQ==

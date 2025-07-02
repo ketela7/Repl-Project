@@ -1,0 +1,271 @@
+b9b332ba72780388668d1ffef5ed6cf3
+'use client';
+"use strict";
+
+/* istanbul ignore next */
+function cov_14h5npauwx() {
+  var path = "/home/runner/workspace/src/app/(main)/dashboard/analytics/page.tsx";
+  var hash = "410068b2aea28a9e42f2b82a6c7b0616856f9b11";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/app/(main)/dashboard/analytics/page.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 3,
+          column: 0
+        },
+        end: {
+          line: 5,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 6,
+          column: 0
+        },
+        end: {
+          line: 11,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 9,
+          column: 8
+        },
+        end: {
+          line: 9,
+          column: 29
+        }
+      },
+      "3": {
+        start: {
+          line: 12,
+          column: 20
+        },
+        end: {
+          line: 12,
+          column: 48
+        }
+      },
+      "4": {
+        start: {
+          line: 13,
+          column: 15
+        },
+        end: {
+          line: 13,
+          column: 31
+        }
+      },
+      "5": {
+        start: {
+          line: 14,
+          column: 14
+        },
+        end: {
+          line: 14,
+          column: 55
+        }
+      },
+      "6": {
+        start: {
+          line: 15,
+          column: 26
+        },
+        end: {
+          line: 15,
+          column: 68
+        }
+      },
+      "7": {
+        start: {
+          line: 16,
+          column: 34
+        },
+        end: {
+          line: 16,
+          column: 85
+        }
+      },
+      "8": {
+        start: {
+          line: 18,
+          column: 4
+        },
+        end: {
+          line: 70,
+          column: 7
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 8,
+            column: 9
+          },
+          end: {
+            line: 8,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 8,
+            column: 20
+          },
+          end: {
+            line: 10,
+            column: 5
+          }
+        },
+        line: 8
+      },
+      "1": {
+        name: "AnalyticsPage",
+        decl: {
+          start: {
+            line: 17,
+            column: 9
+          },
+          end: {
+            line: 17,
+            column: 22
+          }
+        },
+        loc: {
+          start: {
+            line: 17,
+            column: 25
+          },
+          end: {
+            line: 71,
+            column: 1
+          }
+        },
+        line: 17
+      }
+    },
+    branchMap: {},
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0,
+      "6": 0,
+      "7": 0,
+      "8": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0
+    },
+    b: {},
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/app/(main)/dashboard/analytics/page.tsx"],
+      sourcesContent: ["'use client'\n\nimport { Suspense } from 'react'\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'\nimport { StorageAnalytics } from './_components/storage-analytics'\nimport { EnhancedStorageAnalytics } from './_components/enhanced-storage-analytics'\n\nexport default function AnalyticsPage() {\n  return (\n    <div className=\"space-y-6\">\n      <div>\n        <h1 className=\"text-3xl font-bold tracking-tight\">Storage Analytics</h1>\n        <p className=\"text-muted-foreground\">\n          Comprehensive analysis of your Google Drive storage usage and file distribution\n        </p>\n      </div>\n\n      <Tabs defaultValue=\"enhanced\" className=\"space-y-4\">\n        <TabsList>\n          <TabsTrigger value=\"enhanced\">Enhanced Analysis</TabsTrigger>\n          <TabsTrigger value=\"basic\">Basic Analysis</TabsTrigger>\n        </TabsList>\n\n        <TabsContent value=\"enhanced\">\n          <Suspense fallback={<div>Loading enhanced analytics...</div>}>\n            <EnhancedStorageAnalytics />\n          </Suspense>\n        </TabsContent>\n\n        <TabsContent value=\"basic\">\n          <Suspense fallback={<div>Loading basic analytics...</div>}>\n            <StorageAnalytics />\n          </Suspense>\n        </TabsContent>\n      </Tabs>\n    </div>\n  )\n}\n"],
+      names: ["AnalyticsPage", "div", "className", "h1", "p", "Tabs", "defaultValue", "TabsList", "TabsTrigger", "value", "TabsContent", "Suspense", "fallback", "EnhancedStorageAnalytics", "StorageAnalytics"],
+      mappings: "AAAA;;;;;+BAOA;;;eAAwBA;;;;uBALC;sBACgC;kCACxB;0CACQ;AAE1B,SAASA;IACtB,qBACE,sBAACC;QAAIC,WAAU;;0BACb,sBAACD;;kCACC,qBAACE;wBAAGD,WAAU;kCAAoC;;kCAClD,qBAACE;wBAAEF,WAAU;kCAAwB;;;;0BAKvC,sBAACG,UAAI;gBAACC,cAAa;gBAAWJ,WAAU;;kCACtC,sBAACK,cAAQ;;0CACP,qBAACC,iBAAW;gCAACC,OAAM;0CAAW;;0CAC9B,qBAACD,iBAAW;gCAACC,OAAM;0CAAQ;;;;kCAG7B,qBAACC,iBAAW;wBAACD,OAAM;kCACjB,cAAA,qBAACE,eAAQ;4BAACC,wBAAU,qBAACX;0CAAI;;sCACvB,cAAA,qBAACY,kDAAwB;;;kCAI7B,qBAACH,iBAAW;wBAACD,OAAM;kCACjB,cAAA,qBAACE,eAAQ;4BAACC,wBAAU,qBAACX;0CAAI;;sCACvB,cAAA,qBAACa,kCAAgB;;;;;;;AAM7B"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "410068b2aea28a9e42f2b82a6c7b0616856f9b11"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_14h5npauwx = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_14h5npauwx();
+cov_14h5npauwx().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_14h5npauwx().s[1]++;
+Object.defineProperty(exports, "default", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_14h5npauwx().f[0]++;
+    cov_14h5npauwx().s[2]++;
+    return AnalyticsPage;
+  }
+});
+const _jsxruntime =
+/* istanbul ignore next */
+(cov_14h5npauwx().s[3]++, require("react/jsx-runtime"));
+const _react =
+/* istanbul ignore next */
+(cov_14h5npauwx().s[4]++, require("react"));
+const _tabs =
+/* istanbul ignore next */
+(cov_14h5npauwx().s[5]++, require("../../../../components/ui/tabs"));
+const _storageanalytics =
+/* istanbul ignore next */
+(cov_14h5npauwx().s[6]++, require("./_components/storage-analytics"));
+const _enhancedstorageanalytics =
+/* istanbul ignore next */
+(cov_14h5npauwx().s[7]++, require("./_components/enhanced-storage-analytics"));
+function AnalyticsPage() {
+  /* istanbul ignore next */
+  cov_14h5npauwx().f[1]++;
+  cov_14h5npauwx().s[8]++;
+  return /*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+    className: "space-y-6",
+    children: [/*#__PURE__*/(0, _jsxruntime.jsxs)("div", {
+      children: [/*#__PURE__*/(0, _jsxruntime.jsx)("h1", {
+        className: "text-3xl font-bold tracking-tight",
+        children: "Storage Analytics"
+      }), /*#__PURE__*/(0, _jsxruntime.jsx)("p", {
+        className: "text-muted-foreground",
+        children: "Comprehensive analysis of your Google Drive storage usage and file distribution"
+      })]
+    }), /*#__PURE__*/(0, _jsxruntime.jsxs)(_tabs.Tabs, {
+      defaultValue: "enhanced",
+      className: "space-y-4",
+      children: [/*#__PURE__*/(0, _jsxruntime.jsxs)(_tabs.TabsList, {
+        children: [/*#__PURE__*/(0, _jsxruntime.jsx)(_tabs.TabsTrigger, {
+          value: "enhanced",
+          children: "Enhanced Analysis"
+        }), /*#__PURE__*/(0, _jsxruntime.jsx)(_tabs.TabsTrigger, {
+          value: "basic",
+          children: "Basic Analysis"
+        })]
+      }), /*#__PURE__*/(0, _jsxruntime.jsx)(_tabs.TabsContent, {
+        value: "enhanced",
+        children: /*#__PURE__*/(0, _jsxruntime.jsx)(_react.Suspense, {
+          fallback: /*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+            children: "Loading enhanced analytics..."
+          }),
+          children: /*#__PURE__*/(0, _jsxruntime.jsx)(_enhancedstorageanalytics.EnhancedStorageAnalytics, {})
+        })
+      }), /*#__PURE__*/(0, _jsxruntime.jsx)(_tabs.TabsContent, {
+        value: "basic",
+        children: /*#__PURE__*/(0, _jsxruntime.jsx)(_react.Suspense, {
+          fallback: /*#__PURE__*/(0, _jsxruntime.jsx)("div", {
+            children: "Loading basic analytics..."
+          }),
+          children: /*#__PURE__*/(0, _jsxruntime.jsx)(_storageanalytics.StorageAnalytics, {})
+        })
+      })]
+    })]
+  });
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJBbmFseXRpY3NQYWdlIiwiY292XzE0aDVucGF1d3giLCJmIiwicyIsIl9qc3hydW50aW1lIiwianN4cyIsImNsYXNzTmFtZSIsImpzeCIsIl90YWJzIiwiVGFicyIsImRlZmF1bHRWYWx1ZSIsIlRhYnNMaXN0IiwiVGFic1RyaWdnZXIiLCJ2YWx1ZSIsIlRhYnNDb250ZW50IiwiX3JlYWN0IiwiU3VzcGVuc2UiLCJmYWxsYmFjayIsIl9lbmhhbmNlZHN0b3JhZ2VhbmFseXRpY3MiLCJFbmhhbmNlZFN0b3JhZ2VBbmFseXRpY3MiLCJfc3RvcmFnZWFuYWx5dGljcyIsIlN0b3JhZ2VBbmFseXRpY3MiXSwic291cmNlcyI6WyIvaG9tZS9ydW5uZXIvd29ya3NwYWNlL3NyYy9hcHAvKG1haW4pL2Rhc2hib2FyZC9hbmFseXRpY3MvcGFnZS50c3giXSwic291cmNlc0NvbnRlbnQiOlsiJ3VzZSBjbGllbnQnXG5cbmltcG9ydCB7IFN1c3BlbnNlIH0gZnJvbSAncmVhY3QnXG5pbXBvcnQgeyBUYWJzLCBUYWJzQ29udGVudCwgVGFic0xpc3QsIFRhYnNUcmlnZ2VyIH0gZnJvbSAnQC9jb21wb25lbnRzL3VpL3RhYnMnXG5pbXBvcnQgeyBTdG9yYWdlQW5hbHl0aWNzIH0gZnJvbSAnLi9fY29tcG9uZW50cy9zdG9yYWdlLWFuYWx5dGljcydcbmltcG9ydCB7IEVuaGFuY2VkU3RvcmFnZUFuYWx5dGljcyB9IGZyb20gJy4vX2NvbXBvbmVudHMvZW5oYW5jZWQtc3RvcmFnZS1hbmFseXRpY3MnXG5cbmV4cG9ydCBkZWZhdWx0IGZ1bmN0aW9uIEFuYWx5dGljc1BhZ2UoKSB7XG4gIHJldHVybiAoXG4gICAgPGRpdiBjbGFzc05hbWU9XCJzcGFjZS15LTZcIj5cbiAgICAgIDxkaXY+XG4gICAgICAgIDxoMSBjbGFzc05hbWU9XCJ0ZXh0LTN4bCBmb250LWJvbGQgdHJhY2tpbmctdGlnaHRcIj5TdG9yYWdlIEFuYWx5dGljczwvaDE+XG4gICAgICAgIDxwIGNsYXNzTmFtZT1cInRleHQtbXV0ZWQtZm9yZWdyb3VuZFwiPlxuICAgICAgICAgIENvbXByZWhlbnNpdmUgYW5hbHlzaXMgb2YgeW91ciBHb29nbGUgRHJpdmUgc3RvcmFnZSB1c2FnZSBhbmQgZmlsZSBkaXN0cmlidXRpb25cbiAgICAgICAgPC9wPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxUYWJzIGRlZmF1bHRWYWx1ZT1cImVuaGFuY2VkXCIgY2xhc3NOYW1lPVwic3BhY2UteS00XCI+XG4gICAgICAgIDxUYWJzTGlzdD5cbiAgICAgICAgICA8VGFic1RyaWdnZXIgdmFsdWU9XCJlbmhhbmNlZFwiPkVuaGFuY2VkIEFuYWx5c2lzPC9UYWJzVHJpZ2dlcj5cbiAgICAgICAgICA8VGFic1RyaWdnZXIgdmFsdWU9XCJiYXNpY1wiPkJhc2ljIEFuYWx5c2lzPC9UYWJzVHJpZ2dlcj5cbiAgICAgICAgPC9UYWJzTGlzdD5cblxuICAgICAgICA8VGFic0NvbnRlbnQgdmFsdWU9XCJlbmhhbmNlZFwiPlxuICAgICAgICAgIDxTdXNwZW5zZSBmYWxsYmFjaz17PGRpdj5Mb2FkaW5nIGVuaGFuY2VkIGFuYWx5dGljcy4uLjwvZGl2Pn0+XG4gICAgICAgICAgICA8RW5oYW5jZWRTdG9yYWdlQW5hbHl0aWNzIC8+XG4gICAgICAgICAgPC9TdXNwZW5zZT5cbiAgICAgICAgPC9UYWJzQ29udGVudD5cblxuICAgICAgICA8VGFic0NvbnRlbnQgdmFsdWU9XCJiYXNpY1wiPlxuICAgICAgICAgIDxTdXNwZW5zZSBmYWxsYmFjaz17PGRpdj5Mb2FkaW5nIGJhc2ljIGFuYWx5dGljcy4uLjwvZGl2Pn0+XG4gICAgICAgICAgICA8U3RvcmFnZUFuYWx5dGljcyAvPlxuICAgICAgICAgIDwvU3VzcGVuc2U+XG4gICAgICAgIDwvVGFic0NvbnRlbnQ+XG4gICAgICA8L1RhYnM+XG4gICAgPC9kaXY+XG4gIClcbn1cbiJdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7OytCQU9BOzs7Ozs7V0FBd0JBLGFBQUE7Ozs7Ozs7O2tDQUxDOzs7a0NBQ2dDOzs7a0NBQ3hCOzs7a0NBQ1E7QUFFMUIsU0FBU0EsY0FBQTtFQUFBO0VBQUFDLGNBQUEsR0FBQUMsQ0FBQTtFQUFBRCxjQUFBLEdBQUFFLENBQUE7RUFDdEIsb0JBQ0UsSUFBQUMsV0FBQSxDQUFBQyxJQUFBLEVBQUM7SUFBSUMsU0FBQSxFQUFVOzRCQUNiLElBQUFGLFdBQUEsQ0FBQUMsSUFBQSxFQUFDOzhCQUNDLElBQUFELFdBQUEsQ0FBQUcsR0FBQSxFQUFDO1FBQUdELFNBQUEsRUFBVTtrQkFBb0M7dUJBQ2xELElBQUFGLFdBQUEsQ0FBQUcsR0FBQSxFQUFDO1FBQUVELFNBQUEsRUFBVTtrQkFBd0I7O3FCQUt2QyxJQUFBRixXQUFBLENBQUFDLElBQUEsRUFBQ0csS0FBQSxDQUFBQyxJQUFJO01BQUNDLFlBQUEsRUFBYTtNQUFXSixTQUFBLEVBQVU7OEJBQ3RDLElBQUFGLFdBQUEsQ0FBQUMsSUFBQSxFQUFDRyxLQUFBLENBQUFHLFFBQVE7Z0NBQ1AsSUFBQVAsV0FBQSxDQUFBRyxHQUFBLEVBQUNDLEtBQUEsQ0FBQUksV0FBVztVQUFDQyxLQUFBLEVBQU07b0JBQVc7eUJBQzlCLElBQUFULFdBQUEsQ0FBQUcsR0FBQSxFQUFDQyxLQUFBLENBQUFJLFdBQVc7VUFBQ0MsS0FBQSxFQUFNO29CQUFROzt1QkFHN0IsSUFBQVQsV0FBQSxDQUFBRyxHQUFBLEVBQUNDLEtBQUEsQ0FBQU0sV0FBVztRQUFDRCxLQUFBLEVBQU07a0JBQ2pCLGlCQUFBVCxXQUFBLENBQUFHLEdBQUEsRUFBQ1EsTUFBQSxDQUFBQyxRQUFRO1VBQUNDLFFBQUEsZUFBVSxJQUFBYixXQUFBLENBQUFHLEdBQUEsRUFBQztzQkFBSTs7b0JBQ3ZCLGlCQUFBSCxXQUFBLENBQUFHLEdBQUEsRUFBQ1cseUJBQUEsQ0FBQUMsd0JBQXdCOzt1QkFJN0IsSUFBQWYsV0FBQSxDQUFBRyxHQUFBLEVBQUNDLEtBQUEsQ0FBQU0sV0FBVztRQUFDRCxLQUFBLEVBQU07a0JBQ2pCLGlCQUFBVCxXQUFBLENBQUFHLEdBQUEsRUFBQ1EsTUFBQSxDQUFBQyxRQUFRO1VBQUNDLFFBQUEsZUFBVSxJQUFBYixXQUFBLENBQUFHLEdBQUEsRUFBQztzQkFBSTs7b0JBQ3ZCLGlCQUFBSCxXQUFBLENBQUFHLEdBQUEsRUFBQ2EsaUJBQUEsQ0FBQUMsZ0JBQWdCOzs7OztBQU03QiIsImlnbm9yZUxpc3QiOltdfQ==

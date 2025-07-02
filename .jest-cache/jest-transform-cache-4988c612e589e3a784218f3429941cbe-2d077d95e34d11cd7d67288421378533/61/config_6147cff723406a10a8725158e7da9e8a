@@ -1,0 +1,268 @@
+09086b84e0c5b000a683db9f15d0cbd7
+/**
+ * Server-side configuration for environment variables
+ * Handles both Replit secrets and traditional environment variables
+ */"use strict";
+
+/* istanbul ignore next */
+function cov_14kqszhbny() {
+  var path = "/home/runner/workspace/src/lib/config.ts";
+  var hash = "d82aa61672658fd71f585a5b20a1bc7d99cda752";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/lib/config.ts",
+    statementMap: {
+      "0": {
+        start: {
+          line: 5,
+          column: 0
+        },
+        end: {
+          line: 7,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 8,
+          column: 0
+        },
+        end: {
+          line: 13,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 11,
+          column: 8
+        },
+        end: {
+          line: 11,
+          column: 22
+        }
+      },
+      "3": {
+        start: {
+          line: 14,
+          column: 15
+        },
+        end: {
+          line: 29,
+          column: 1
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 10,
+            column: 9
+          },
+          end: {
+            line: 10,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 10,
+            column: 20
+          },
+          end: {
+            line: 12,
+            column: 5
+          }
+        },
+        line: 10
+      }
+    },
+    branchMap: {
+      "0": {
+        loc: {
+          start: {
+            line: 25,
+            column: 17
+          },
+          end: {
+            line: 25,
+            column: 54
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 25,
+            column: 17
+          },
+          end: {
+            line: 25,
+            column: 37
+          }
+        }, {
+          start: {
+            line: 25,
+            column: 41
+          },
+          end: {
+            line: 25,
+            column: 54
+          }
+        }],
+        line: 25
+      },
+      "1": {
+        loc: {
+          start: {
+            line: 26,
+            column: 14
+          },
+          end: {
+            line: 26,
+            column: 40
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 26,
+            column: 14
+          },
+          end: {
+            line: 26,
+            column: 30
+          }
+        }, {
+          start: {
+            line: 26,
+            column: 34
+          },
+          end: {
+            line: 26,
+            column: 40
+          }
+        }],
+        line: 26
+      },
+      "2": {
+        loc: {
+          start: {
+            line: 27,
+            column: 17
+          },
+          end: {
+            line: 27,
+            column: 78
+          }
+        },
+        type: "binary-expr",
+        locations: [{
+          start: {
+            line: 27,
+            column: 17
+          },
+          end: {
+            line: 27,
+            column: 58
+          }
+        }, {
+          start: {
+            line: 27,
+            column: 62
+          },
+          end: {
+            line: 27,
+            column: 78
+          }
+        }],
+        line: 27
+      }
+    },
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0
+    },
+    f: {
+      "0": 0
+    },
+    b: {
+      "0": [0, 0],
+      "1": [0, 0],
+      "2": [0, 0]
+    },
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/lib/config.ts"],
+      sourcesContent: ["/**\n * Server-side configuration for environment variables\n * Handles both Replit secrets and traditional environment variables\n */\nexport const config = {\n  google: {\n    driveScopes: 'https://www.googleapis.com/auth/drive',\n    clientId: process.env.GOOGLE_CLIENT_ID!,\n    clientSecret: process.env.GOOGLE_CLIENT_SECRET!,\n  },\n  nextAuth: {\n    secret: process.env.NEXTAUTH_SECRET!,\n    url: process.env.NEXTAUTH_URL!,\n  },\n  app: {\n    nodeEnv: process.env.NODE_ENV || 'development',\n    port: process.env.PORT || '5000',\n    baseUrl: process.env.REPLIT_DOMAINS?.split(',')[0] || 'localhost:5000',\n  },\n}\n\n// Unused config functions removed\n"],
+      names: ["config", "google", "driveScopes", "clientId", "process", "env", "GOOGLE_CLIENT_ID", "clientSecret", "GOOGLE_CLIENT_SECRET", "nextAuth", "secret", "NEXTAUTH_SECRET", "url", "NEXTAUTH_URL", "app", "nodeEnv", "NODE_ENV", "port", "PORT", "baseUrl", "REPLIT_DOMAINS", "split"],
+      mappings: "AAAA;;;CAGC;;;;+BACYA;;;eAAAA;;;AAAN,MAAMA,SAAS;IACpBC,QAAQ;QACNC,aAAa;QACbC,UAAUC,QAAQC,GAAG,CAACC,gBAAgB;QACtCC,cAAcH,QAAQC,GAAG,CAACG,oBAAoB;IAChD;IACAC,UAAU;QACRC,QAAQN,QAAQC,GAAG,CAACM,eAAe;QACnCC,KAAKR,QAAQC,GAAG,CAACQ,YAAY;IAC/B;IACAC,KAAK;QACHC,SAASX,QAAQC,GAAG,CAACW,QAAQ,IAAI;QACjCC,MAAMb,QAAQC,GAAG,CAACa,IAAI,IAAI;QAC1BC,SAASf,QAAQC,GAAG,CAACe,cAAc,EAAEC,MAAM,IAAI,CAAC,EAAE,IAAI;IACxD;AACF,EAEA,kCAAkC"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "d82aa61672658fd71f585a5b20a1bc7d99cda752"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_14kqszhbny = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_14kqszhbny();
+cov_14kqszhbny().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_14kqszhbny().s[1]++;
+Object.defineProperty(exports, "config", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_14kqszhbny().f[0]++;
+    cov_14kqszhbny().s[2]++;
+    return config;
+  }
+});
+const config =
+/* istanbul ignore next */
+(cov_14kqszhbny().s[3]++, {
+  google: {
+    driveScopes: 'https://www.googleapis.com/auth/drive',
+    clientId: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET
+  },
+  nextAuth: {
+    secret: process.env.NEXTAUTH_SECRET,
+    url: process.env.NEXTAUTH_URL
+  },
+  app: {
+    nodeEnv:
+    /* istanbul ignore next */
+    (cov_14kqszhbny().b[0][0]++, process.env.NODE_ENV) ||
+    /* istanbul ignore next */
+    (cov_14kqszhbny().b[0][1]++, 'development'),
+    port:
+    /* istanbul ignore next */
+    (cov_14kqszhbny().b[1][0]++, process.env.PORT) ||
+    /* istanbul ignore next */
+    (cov_14kqszhbny().b[1][1]++, '5000'),
+    baseUrl:
+    /* istanbul ignore next */
+    (cov_14kqszhbny().b[2][0]++, process.env.REPLIT_DOMAINS?.split(',')[0]) ||
+    /* istanbul ignore next */
+    (cov_14kqszhbny().b[2][1]++, 'localhost:5000')
+  }
+}) // Unused config functions removed
+;
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJjb3ZfMTRrcXN6aGJueSIsInBhdGgiLCJoYXNoIiwiZ2xvYmFsIiwiRnVuY3Rpb24iLCJnY3YiLCJjb3ZlcmFnZURhdGEiLCJzdGF0ZW1lbnRNYXAiLCJzdGFydCIsImxpbmUiLCJjb2x1bW4iLCJlbmQiLCJmbk1hcCIsIm5hbWUiLCJkZWNsIiwibG9jIiwiYnJhbmNoTWFwIiwidHlwZSIsImxvY2F0aW9ucyIsInMiLCJmIiwiYiIsImlucHV0U291cmNlTWFwIiwidmVyc2lvbiIsInNvdXJjZXMiLCJzb3VyY2VzQ29udGVudCIsIm5hbWVzIiwibWFwcGluZ3MiLCJfY292ZXJhZ2VTY2hlbWEiLCJjb3ZlcmFnZSIsImFjdHVhbENvdmVyYWdlIiwiY29uZmlnIiwiZ29vZ2xlIiwiZHJpdmVTY29wZXMiLCJjbGllbnRJZCIsInByb2Nlc3MiLCJlbnYiLCJHT09HTEVfQ0xJRU5UX0lEIiwiY2xpZW50U2VjcmV0IiwiR09PR0xFX0NMSUVOVF9TRUNSRVQiLCJuZXh0QXV0aCIsInNlY3JldCIsIk5FWFRBVVRIX1NFQ1JFVCIsInVybCIsIk5FWFRBVVRIX1VSTCIsImFwcCIsIm5vZGVFbnYiLCJOT0RFX0VOViIsInBvcnQiLCJQT1JUIiwiYmFzZVVybCIsIlJFUExJVF9ET01BSU5TIiwic3BsaXQiXSwic291cmNlcyI6WyIvaG9tZS9ydW5uZXIvd29ya3NwYWNlL3NyYy9saWIvY29uZmlnLnRzIl0sInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogU2VydmVyLXNpZGUgY29uZmlndXJhdGlvbiBmb3IgZW52aXJvbm1lbnQgdmFyaWFibGVzXG4gKiBIYW5kbGVzIGJvdGggUmVwbGl0IHNlY3JldHMgYW5kIHRyYWRpdGlvbmFsIGVudmlyb25tZW50IHZhcmlhYmxlc1xuICovXG5leHBvcnQgY29uc3QgY29uZmlnID0ge1xuICBnb29nbGU6IHtcbiAgICBkcml2ZVNjb3BlczogJ2h0dHBzOi8vd3d3Lmdvb2dsZWFwaXMuY29tL2F1dGgvZHJpdmUnLFxuICAgIGNsaWVudElkOiBwcm9jZXNzLmVudi5HT09HTEVfQ0xJRU5UX0lEISxcbiAgICBjbGllbnRTZWNyZXQ6IHByb2Nlc3MuZW52LkdPT0dMRV9DTElFTlRfU0VDUkVUISxcbiAgfSxcbiAgbmV4dEF1dGg6IHtcbiAgICBzZWNyZXQ6IHByb2Nlc3MuZW52Lk5FWFRBVVRIX1NFQ1JFVCEsXG4gICAgdXJsOiBwcm9jZXNzLmVudi5ORVhUQVVUSF9VUkwhLFxuICB9LFxuICBhcHA6IHtcbiAgICBub2RlRW52OiBwcm9jZXNzLmVudi5OT0RFX0VOViB8fCAnZGV2ZWxvcG1lbnQnLFxuICAgIHBvcnQ6IHByb2Nlc3MuZW52LlBPUlQgfHwgJzUwMDAnLFxuICAgIGJhc2VVcmw6IHByb2Nlc3MuZW52LlJFUExJVF9ET01BSU5TPy5zcGxpdCgnLCcpWzBdIHx8ICdsb2NhbGhvc3Q6NTAwMCcsXG4gIH0sXG59XG5cbi8vIFVudXNlZCBjb25maWcgZnVuY3Rpb25zIHJlbW92ZWRcbiJdLCJtYXBwaW5ncyI6IkFBQUE7OztHQUdDOztBQUFBO0FBQUEsU0FBQUEsZUFBQTtFQUFBLElBQUFDLElBQUE7RUFBQSxJQUFBQyxJQUFBO0VBQUEsSUFBQUMsTUFBQSxPQUFBQyxRQUFBO0VBQUEsSUFBQUMsR0FBQTtFQUFBLElBQUFDLFlBQUE7SUFBQUwsSUFBQTtJQUFBTSxZQUFBO01BQUE7UUFBQUMsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7TUFBQTtRQUFBRixLQUFBO1VBQUFDLElBQUE7VUFBQUMsTUFBQTtRQUFBO1FBQUFDLEdBQUE7VUFBQUYsSUFBQTtVQUFBQyxNQUFBO1FBQUE7TUFBQTtNQUFBO1FBQUFGLEtBQUE7VUFBQUMsSUFBQTtVQUFBQyxNQUFBO1FBQUE7UUFBQUMsR0FBQTtVQUFBRixJQUFBO1VBQUFDLE1BQUE7UUFBQTtNQUFBO01BQUE7UUFBQUYsS0FBQTtVQUFBQyxJQUFBO1VBQUFDLE1BQUE7UUFBQTtRQUFBQyxHQUFBO1VBQUFGLElBQUE7VUFBQUMsTUFBQTtRQUFBO01BQUE7SUFBQTtJQUFBRSxLQUFBO01BQUE7UUFBQUMsSUFBQTtRQUFBQyxJQUFBO1VBQUFOLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFLLEdBQUE7VUFBQVAsS0FBQTtZQUFBQyxJQUFBO1lBQUFDLE1BQUE7VUFBQTtVQUFBQyxHQUFBO1lBQUFGLElBQUE7WUFBQUMsTUFBQTtVQUFBO1FBQUE7UUFBQUQsSUFBQTtNQUFBO0lBQUE7SUFBQU8sU0FBQTtNQUFBO1FBQUFELEdBQUE7VUFBQVAsS0FBQTtZQUFBQyxJQUFBO1lBQUFDLE1BQUE7VUFBQTtVQUFBQyxHQUFBO1lBQUFGLElBQUE7WUFBQUMsTUFBQTtVQUFBO1FBQUE7UUFBQU8sSUFBQTtRQUFBQyxTQUFBO1VBQUFWLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1VBQUFGLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFELElBQUE7TUFBQTtNQUFBO1FBQUFNLEdBQUE7VUFBQVAsS0FBQTtZQUFBQyxJQUFBO1lBQUFDLE1BQUE7VUFBQTtVQUFBQyxHQUFBO1lBQUFGLElBQUE7WUFBQUMsTUFBQTtVQUFBO1FBQUE7UUFBQU8sSUFBQTtRQUFBQyxTQUFBO1VBQUFWLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1VBQUFGLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFELElBQUE7TUFBQTtNQUFBO1FBQUFNLEdBQUE7VUFBQVAsS0FBQTtZQUFBQyxJQUFBO1lBQUFDLE1BQUE7VUFBQTtVQUFBQyxHQUFBO1lBQUFGLElBQUE7WUFBQUMsTUFBQTtVQUFBO1FBQUE7UUFBQU8sSUFBQTtRQUFBQyxTQUFBO1VBQUFWLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1VBQUFGLEtBQUE7WUFBQUMsSUFBQTtZQUFBQyxNQUFBO1VBQUE7VUFBQUMsR0FBQTtZQUFBRixJQUFBO1lBQUFDLE1BQUE7VUFBQTtRQUFBO1FBQUFELElBQUE7TUFBQTtJQUFBO0lBQUFVLENBQUE7TUFBQTtNQUFBO01BQUE7TUFBQTtJQUFBO0lBQUFDLENBQUE7TUFBQTtJQUFBO0lBQUFDLENBQUE7TUFBQTtNQUFBO01BQUE7SUFBQTtJQUFBQyxjQUFBO01BQUFDLE9BQUE7TUFBQUMsT0FBQTtNQUFBQyxjQUFBO01BQUFDLEtBQUE7TUFBQUMsUUFBQTtJQUFBO0lBQUFDLGVBQUE7SUFBQTFCLElBQUE7RUFBQTtFQUFBLElBQUEyQixRQUFBLEdBQUExQixNQUFBLENBQUFFLEdBQUEsTUFBQUYsTUFBQSxDQUFBRSxHQUFBO0VBQUEsS0FBQXdCLFFBQUEsQ0FBQTVCLElBQUEsS0FBQTRCLFFBQUEsQ0FBQTVCLElBQUEsRUFBQUMsSUFBQSxLQUFBQSxJQUFBO0lBQUEyQixRQUFBLENBQUE1QixJQUFBLElBQUFLLFlBQUE7RUFBQTtFQUFBLElBQUF3QixjQUFBLEdBQUFELFFBQUEsQ0FBQTVCLElBQUE7RUFBQTtJQUdHO0lBQUFELGNBQUEsWUFBQUEsQ0FBQTtNQUFBLE9BQUE4QixjQUFBO0lBQUE7RUFBQTtFQUFBLE9BQUFBLGNBQUE7QUFBQTtBQUFBOUIsY0FBQTtBQUFBQSxjQUFBLEdBQUFtQixDQUFBOzs7Ozs7K0JBRlM7Ozs7OztXQUFBWSxNQUFBOzs7QUFBTixNQUFNQSxNQUFBO0FBQUE7QUFBQSxDQUFBL0IsY0FBQSxHQUFBbUIsQ0FBQSxPQUFTO0VBQ3BCYSxNQUFBLEVBQVE7SUFDTkMsV0FBQSxFQUFhO0lBQ2JDLFFBQUEsRUFBVUMsT0FBQSxDQUFRQyxHQUFHLENBQUNDLGdCQUFnQjtJQUN0Q0MsWUFBQSxFQUFjSCxPQUFBLENBQVFDLEdBQUcsQ0FBQ0c7RUFDNUI7RUFDQUMsUUFBQSxFQUFVO0lBQ1JDLE1BQUEsRUFBUU4sT0FBQSxDQUFRQyxHQUFHLENBQUNNLGVBQWU7SUFDbkNDLEdBQUEsRUFBS1IsT0FBQSxDQUFRQyxHQUFHLENBQUNRO0VBQ25CO0VBQ0FDLEdBQUEsRUFBSztJQUNIQyxPQUFBO0lBQVM7SUFBQSxDQUFBOUMsY0FBQSxHQUFBcUIsQ0FBQSxVQUFBYyxPQUFBLENBQVFDLEdBQUcsQ0FBQ1csUUFBUTtJQUFBO0lBQUEsQ0FBQS9DLGNBQUEsR0FBQXFCLENBQUEsVUFBSTtJQUNqQzJCLElBQUE7SUFBTTtJQUFBLENBQUFoRCxjQUFBLEdBQUFxQixDQUFBLFVBQUFjLE9BQUEsQ0FBUUMsR0FBRyxDQUFDYSxJQUFJO0lBQUE7SUFBQSxDQUFBakQsY0FBQSxHQUFBcUIsQ0FBQSxVQUFJO0lBQzFCNkIsT0FBQTtJQUFTO0lBQUEsQ0FBQWxELGNBQUEsR0FBQXFCLENBQUEsVUFBQWMsT0FBQSxDQUFRQyxHQUFHLENBQUNlLGNBQWMsRUFBRUMsS0FBQSxDQUFNLElBQUksQ0FBQyxFQUFFO0lBQUE7SUFBQSxDQUFBcEQsY0FBQSxHQUFBcUIsQ0FBQSxVQUFJO0VBQ3hEO0FBQ0YsR0FFQTtBQUFBIiwiaWdub3JlTGlzdCI6W119

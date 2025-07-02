@@ -1,0 +1,194 @@
+22641faa3fb7643c933190d55f8fd9b8
+'use client';
+"use strict";
+
+/* istanbul ignore next */
+function cov_2qbv4tr5su() {
+  var path = "/home/runner/workspace/src/components/providers/auth-provider.tsx";
+  var hash = "1bcdef22ca6cba4f6f928b72e14c79b782bc72d4";
+  var global = new Function("return this")();
+  var gcv = "__coverage__";
+  var coverageData = {
+    path: "/home/runner/workspace/src/components/providers/auth-provider.tsx",
+    statementMap: {
+      "0": {
+        start: {
+          line: 3,
+          column: 0
+        },
+        end: {
+          line: 5,
+          column: 3
+        }
+      },
+      "1": {
+        start: {
+          line: 6,
+          column: 0
+        },
+        end: {
+          line: 11,
+          column: 3
+        }
+      },
+      "2": {
+        start: {
+          line: 9,
+          column: 8
+        },
+        end: {
+          line: 9,
+          column: 28
+        }
+      },
+      "3": {
+        start: {
+          line: 12,
+          column: 20
+        },
+        end: {
+          line: 12,
+          column: 48
+        }
+      },
+      "4": {
+        start: {
+          line: 13,
+          column: 15
+        },
+        end: {
+          line: 13,
+          column: 41
+        }
+      },
+      "5": {
+        start: {
+          line: 15,
+          column: 4
+        },
+        end: {
+          line: 17,
+          column: 7
+        }
+      }
+    },
+    fnMap: {
+      "0": {
+        name: "(anonymous_0)",
+        decl: {
+          start: {
+            line: 8,
+            column: 9
+          },
+          end: {
+            line: 8,
+            column: 10
+          }
+        },
+        loc: {
+          start: {
+            line: 8,
+            column: 20
+          },
+          end: {
+            line: 10,
+            column: 5
+          }
+        },
+        line: 8
+      },
+      "1": {
+        name: "AuthProvider",
+        decl: {
+          start: {
+            line: 14,
+            column: 9
+          },
+          end: {
+            line: 14,
+            column: 21
+          }
+        },
+        loc: {
+          start: {
+            line: 14,
+            column: 36
+          },
+          end: {
+            line: 18,
+            column: 1
+          }
+        },
+        line: 14
+      }
+    },
+    branchMap: {},
+    s: {
+      "0": 0,
+      "1": 0,
+      "2": 0,
+      "3": 0,
+      "4": 0,
+      "5": 0
+    },
+    f: {
+      "0": 0,
+      "1": 0
+    },
+    b: {},
+    inputSourceMap: {
+      version: 3,
+      sources: ["/home/runner/workspace/src/components/providers/auth-provider.tsx"],
+      sourcesContent: ["'use client'\n\nimport { SessionProvider } from 'next-auth/react'\nimport { ReactNode } from 'react'\n\ninterface AuthProviderProps {\n  children: ReactNode\n}\n\nexport function AuthProvider({ children }: AuthProviderProps) {\n  return <SessionProvider>{children}</SessionProvider>\n}\n"],
+      names: ["AuthProvider", "children", "SessionProvider"],
+      mappings: "AAAA;;;;;+BASgBA;;;eAAAA;;;;uBAPgB;AAOzB,SAASA,aAAa,EAAEC,QAAQ,EAAqB;IAC1D,qBAAO,qBAACC,sBAAe;kBAAED;;AAC3B"
+    },
+    _coverageSchema: "1a1c01bbd47fc00a2c39e90264f33305004495a9",
+    hash: "1bcdef22ca6cba4f6f928b72e14c79b782bc72d4"
+  };
+  var coverage = global[gcv] || (global[gcv] = {});
+  if (!coverage[path] || coverage[path].hash !== hash) {
+    coverage[path] = coverageData;
+  }
+  var actualCoverage = coverage[path];
+  {
+    // @ts-ignore
+    cov_2qbv4tr5su = function () {
+      return actualCoverage;
+    };
+  }
+  return actualCoverage;
+}
+cov_2qbv4tr5su();
+cov_2qbv4tr5su().s[0]++;
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/* istanbul ignore next */
+cov_2qbv4tr5su().s[1]++;
+Object.defineProperty(exports, "AuthProvider", {
+  enumerable: true,
+  get: function () {
+    /* istanbul ignore next */
+    cov_2qbv4tr5su().f[0]++;
+    cov_2qbv4tr5su().s[2]++;
+    return AuthProvider;
+  }
+});
+const _jsxruntime =
+/* istanbul ignore next */
+(cov_2qbv4tr5su().s[3]++, require("react/jsx-runtime"));
+const _react =
+/* istanbul ignore next */
+(cov_2qbv4tr5su().s[4]++, require("next-auth/react"));
+function AuthProvider({
+  children
+}) {
+  /* istanbul ignore next */
+  cov_2qbv4tr5su().f[1]++;
+  cov_2qbv4tr5su().s[5]++;
+  return /*#__PURE__*/(0, _jsxruntime.jsx)(_react.SessionProvider, {
+    children: children
+  });
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJuYW1lcyI6WyJBdXRoUHJvdmlkZXIiLCJjaGlsZHJlbiIsImNvdl8ycWJ2NHRyNXN1IiwiZiIsInMiLCJfanN4cnVudGltZSIsImpzeCIsIl9yZWFjdCIsIlNlc3Npb25Qcm92aWRlciJdLCJzb3VyY2VzIjpbIi9ob21lL3J1bm5lci93b3Jrc3BhY2Uvc3JjL2NvbXBvbmVudHMvcHJvdmlkZXJzL2F1dGgtcHJvdmlkZXIudHN4Il0sInNvdXJjZXNDb250ZW50IjpbIid1c2UgY2xpZW50J1xuXG5pbXBvcnQgeyBTZXNzaW9uUHJvdmlkZXIgfSBmcm9tICduZXh0LWF1dGgvcmVhY3QnXG5pbXBvcnQgeyBSZWFjdE5vZGUgfSBmcm9tICdyZWFjdCdcblxuaW50ZXJmYWNlIEF1dGhQcm92aWRlclByb3BzIHtcbiAgY2hpbGRyZW46IFJlYWN0Tm9kZVxufVxuXG5leHBvcnQgZnVuY3Rpb24gQXV0aFByb3ZpZGVyKHsgY2hpbGRyZW4gfTogQXV0aFByb3ZpZGVyUHJvcHMpIHtcbiAgcmV0dXJuIDxTZXNzaW9uUHJvdmlkZXI+e2NoaWxkcmVufTwvU2Vzc2lvblByb3ZpZGVyPlxufVxuIl0sIm1hcHBpbmdzIjoiQUFBQTs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7K0JBU2dCOzs7Ozs7V0FBQUEsWUFBQTs7Ozs7Ozs7a0NBUGdCO0FBT3pCLFNBQVNBLGFBQWE7RUFBRUM7QUFBUSxDQUFxQjtFQUFBO0VBQUFDLGNBQUEsR0FBQUMsQ0FBQTtFQUFBRCxjQUFBLEdBQUFFLENBQUE7RUFDMUQsb0JBQU8sSUFBQUMsV0FBQSxDQUFBQyxHQUFBLEVBQUNDLE1BQUEsQ0FBQUMsZUFBZTtjQUFFUDs7QUFDM0IiLCJpZ25vcmVMaXN0IjpbXX0=
