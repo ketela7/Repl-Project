@@ -3,7 +3,7 @@
  * Tracks LCP, FID, CLS, FCP, and TTFB metrics
  */
 
-import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from 'web-vitals'
+import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals'
 
 // Define performance thresholds
 const PERFORMANCE_THRESHOLDS = {
@@ -39,6 +39,8 @@ function sendToAnalytics(metric: VitalMetric) {
   // In production, send to your analytics service
   if (process.env.NODE_ENV === 'development') {
     const icon = metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '❌'
+    // Log web vitals metrics in development only
+    // eslint-disable-next-line no-console
     console.log(`${icon} ${metric.name}: ${metric.value}ms (${metric.rating})`)
   }
 
@@ -112,16 +114,26 @@ export function getPerformanceSummary() {
     if (!acc[metric.name]) {
       acc[metric.name] = { latest: metric, count: 0, averageValue: 0 }
     }
-    acc[metric.name].latest = metric
-    acc[metric.name].count += 1
-    acc[metric.name].averageValue = (acc[metric.name].averageValue + metric.value) / 2
+    const entry = acc[metric.name]
+    if (entry) {
+      entry.latest = metric
+      entry.count += 1
+      entry.averageValue = (entry.averageValue + metric.value) / 2
+    }
     return acc
-  }, {} as any)
+  }, {} as Record<string, { latest: VitalMetric; count: number; averageValue: number }>)
 }
 
 // Performance monitoring hook for React components
 export function usePerformanceMonitor(componentName: string) {
-  if (typeof window === 'undefined') return { markStart: () => {}, markEnd: () => {} }
+  if (typeof window === 'undefined') return { 
+    markStart: () => {
+      // No-op in server environment
+    }, 
+    markEnd: () => {
+      // No-op in server environment
+    } 
+  }
 
   let startTime = 0
 

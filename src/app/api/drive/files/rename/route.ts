@@ -45,7 +45,7 @@ function generateRenamedFileName(originalName: string, pattern: string, renameTy
           return originalName.replace(regex, replacement || '')
         }
         return originalName
-      } catch (error) {
+      } catch {
         return originalName
       }
 

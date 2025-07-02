@@ -58,7 +58,7 @@ export function AuthWrapper({ children, fallback }: AuthWrapperProps) {
           if (!fallback) {
             router.push('/auth/v1/login')
           }
-        } catch (error) {
+        } catch {
           setIsServerOnline(false)
           router.push('/server-offline')
         }

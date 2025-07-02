@@ -1,7 +1,7 @@
-import { DndContext, closestCenter, type UniqueIdentifier, type SensorDescriptor } from '@dnd-kit/core'
+import { DndContext, closestCenter } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { ColumnDef, flexRender, type Table as TanStackTable } from '@tanstack/react-table'
+import { ColumnDef, flexRender } from '@tanstack/react-table'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 

@@ -184,7 +184,7 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
           errorToast.generic(`Failed to untrash ${failedCount} item${failedCount > 1 ? 's' : ''}`)
         }
       }
-    } catch (err) {
+    } catch {
       if (abortControllerRef.current?.signal.aborted) {
         return
       }

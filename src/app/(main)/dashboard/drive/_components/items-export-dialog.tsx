@@ -302,7 +302,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
           toast.error(`Failed to export ${failedCount} file${failedCount > 1 ? 's' : ''}`)
         }
       }
-    } catch (err) {
+    } catch {
       if (abortControllerRef.current?.signal.aborted) {
         return
       }

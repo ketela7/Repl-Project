@@ -223,7 +223,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
           toast.error(`Failed to share ${failedCount} item${failedCount > 1 ? 's' : ''}`)
         }
       }
-    } catch (err) {
+    } catch {
       if (abortControllerRef.current?.signal.aborted) {
         return
       }
@@ -262,7 +262,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     }
   }
 
-  const handleExportData = (format: 'csv' | 'txt' | 'json') => {
+  const handleExportData = (_ignored: 'csv' | 'txt' | 'json') => {
     const successfulShares = progress.shareResults.filter(result => result.success && result.shareLink)
 
     if (successfulShares.length === 0) {

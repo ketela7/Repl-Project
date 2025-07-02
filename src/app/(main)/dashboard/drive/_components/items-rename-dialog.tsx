@@ -209,7 +209,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
         if (!(newName as string).trim() || newName === item.name) {
           valid = false
         }
-      } catch (err) {
+      } catch {
         valid = false
         newName = item.name
       }

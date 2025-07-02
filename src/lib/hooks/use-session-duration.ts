@@ -37,8 +37,10 @@ export function useSessionDuration() {
                 },
                 body: JSON.stringify({ rememberMe }),
               })
+              // eslint-disable-next-line no-console
               console.log(`Session duration updated: ${rememberMe ? '30 days' : '1 day'}`)
             } catch (error) {
+              // eslint-disable-next-line no-console
               console.error('Failed to update session duration:', error)
             }
 
@@ -46,6 +48,7 @@ export function useSessionDuration() {
             localStorage.removeItem('nextauth-remember-me')
           })
           .catch(error => {
+            // eslint-disable-next-line no-console
             console.error('Session update failed:', error)
           })
       }

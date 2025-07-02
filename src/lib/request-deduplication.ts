@@ -9,7 +9,7 @@ interface PendingRequest<T> {
 }
 
 class RequestDeduplicator {
-  private pendingRequests = new Map<string, PendingRequest<any>>()
+  private pendingRequests = new Map<string, PendingRequest<unknown>>()
   private maxAge = 5000 // 5 seconds max age for pending requests
 
   /**
@@ -23,7 +23,7 @@ class RequestDeduplicator {
     const existing = this.pendingRequests.get(key)
 
     if (existing) {
-      return existing.promise
+      return existing.promise as Promise<T>
     }
 
     const promise = requestFn().finally(() => {

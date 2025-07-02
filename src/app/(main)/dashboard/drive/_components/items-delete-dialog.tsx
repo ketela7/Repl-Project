@@ -187,7 +187,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
           toast.error(`Failed to delete ${failedCount} item${failedCount > 1 ? 's' : ''}`)
         }
       }
-    } catch (err) {
+    } catch {
       if (abortControllerRef.current?.signal.aborted) {
         return
       }

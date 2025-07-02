@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
 
     // We'll handle the signOut in the client side, just redirect to login for now
     return NextResponse.redirect(loginUrl.toString())
-  } catch (error) {
+  } catch {
     return NextResponse.redirect(new URL('/auth/v1/login', request.url))
   }
 }

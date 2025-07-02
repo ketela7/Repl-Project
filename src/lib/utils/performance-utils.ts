@@ -11,13 +11,15 @@ export const preloadCriticalComponents = () => {
         .then(() => {
           // Preload completed successfully
         })
-        .catch(() => {})
+        .catch(() => {
+          // Silently ignore preload errors
+        })
     })
   }
 }
 
 // Lazy load component with retry
-export const lazyWithRetry = (componentImport: () => Promise<any>) => {
+export const lazyWithRetry = (componentImport: () => Promise<unknown>) => {
   return new Promise((resolve, reject) => {
     const retry = (retries = 3) => {
       componentImport()
