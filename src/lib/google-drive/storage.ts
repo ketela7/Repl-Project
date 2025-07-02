@@ -71,9 +71,7 @@ export class StorageAnalyzer {
    * Get complete storage analytics with progressive loading strategy
    * Uses multiple approaches to balance completeness vs speed
    */
-  async getAnalytics(
-    strategy: 'fast' | 'complete' | 'progressive' = 'progressive',
-  ): Promise<StorageData> {
+  async getAnalytics(strategy: 'fast' | 'complete' | 'progressive' = 'progressive'): Promise<StorageData> {
     this.processingStats.startTime = Date.now()
 
     // Step 1: Get system information (fastest)
@@ -126,9 +124,7 @@ export class StorageAnalyzer {
     const quotaLimit = storageQuota?.limit ? parseInt(storageQuota.limit) : null
     const quotaUsage = storageQuota?.usage ? parseInt(storageQuota.usage) : 0
     const quotaUsageInDrive = storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : 0
-    const quotaUsageInDriveTrash = storageQuota?.usageInDriveTrash
-      ? parseInt(storageQuota.usageInDriveTrash)
-      : 0
+    const quotaUsageInDriveTrash = storageQuota?.usageInDriveTrash ? parseInt(storageQuota.usageInDriveTrash) : 0
 
     return {
       quota: {
@@ -251,8 +247,7 @@ export class StorageAnalyzer {
       const files = response.data.files || []
 
       // Skip files if we're continuing from a previous batch
-      const filesToAdd =
-        skipFiles > 0 ? files.slice(Math.max(0, skipFiles - filesCollected)) : files
+      const filesToAdd = skipFiles > 0 ? files.slice(Math.max(0, skipFiles - filesCollected)) : files
 
       allFiles.push(...filesToAdd)
       filesCollected += files.length
