@@ -44,6 +44,10 @@ global.Response =
     async json() {
       return JSON.parse(this.body || '{}')
     }
+
+    static json(data, options = {}) {
+      return new MockResponse(JSON.stringify(data), options)
+    }
   }
 
 // Mock Next.js router
@@ -75,6 +79,17 @@ jest.mock('next-auth/react', () => ({
   signIn: jest.fn(),
   signOut: jest.fn(),
   SessionProvider: ({ children }) => children,
+}))
+
+// Mock NextResponse for API testing
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: (data, options = {}) => ({
+      json: async () => data,
+      status: options.status || 200,
+      headers: new Map(),
+    }),
+  },
 }))
 
 // Mock environment variables
