@@ -6,7 +6,7 @@
  */
 
 import { useEffect } from 'react'
-import { initWebVitals } from '@/lib/webVitals'
+import { initWebVitals } from '@/lib/vitals'
 
 export function WebVitalsMonitor() {
   useEffect(() => {

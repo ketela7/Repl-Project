@@ -1,4 +1,4 @@
-import { enhancedErrorHandler, AppError, ErrorSeverity } from '../enhanced-error-handler'
+import { enhancedErrorHandler, AppError, ErrorSeverity } from '../errorHandler'
 
 describe('Enhanced Error Handler', () => {
   let consoleSpy: jest.SpyInstance
