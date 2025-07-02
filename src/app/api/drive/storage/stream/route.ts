@@ -93,13 +93,15 @@ export async function GET() {
               try {
                 // Use service function with retry + throttle built-in
                 const listOptions: any = {
-                  pageSize: 1000, // Maximum for efficiency
+                  pageSize: 1000, // Maximum for efficiency  
                   orderBy: 'modifiedTime desc',
                   includeTeamDriveItems: true,
+                  // Force use of LIST_STANDARD fields to get size data
+                  fields: 'nextPageToken,files(id,name,mimeType,size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,thumbnailLink,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive))',
                 }
                 
                 // Only add pageToken if it exists
-                if (pageToken) {
+                if (pageToken) {  
                   listOptions.pageToken = pageToken
                 }
                 
@@ -125,14 +127,31 @@ export async function GET() {
                   const sizeValue = file.size
                   let size = 0
                   
-                  // Debug logging for first few files
-                  if (totalProcessed < 10) {
-                    console.log(`[Storage Debug] File: ${file.name}, Size: ${sizeValue}, Type: ${typeof sizeValue}, MimeType: ${mimeType}`)
+                  // Debug logging for first few files per batch  
+                  const isFirstBatch = totalProcessed <= 10
+                  if (isFirstBatch) {
+                    console.log(`[Storage Debug] File: ${file.name}`)
+                    console.log(`[Storage Debug] - Size: "${sizeValue}" (${typeof sizeValue})`)
+                    console.log(`[Storage Debug] - MimeType: ${mimeType}`)
+                    console.log(`[Storage Debug] - Full file object:`, JSON.stringify(file, null, 2))
                   }
                   
-                  if (sizeValue && sizeValue !== 'null' && sizeValue !== 'undefined') {
-                    const parsed = parseInt(sizeValue.toString(), 10)
-                    size = isNaN(parsed) ? 0 : parsed
+                  // Parse file size properly - Google Drive API returns it as string
+                  if (sizeValue != null && sizeValue !== '' && sizeValue !== 'null' && sizeValue !== 'undefined') {
+                    if (typeof sizeValue === 'string') {
+                      const parsed = parseInt(sizeValue, 10)
+                      size = isNaN(parsed) ? 0 : parsed
+                    } else if (typeof sizeValue === 'number') {
+                      size = sizeValue
+                    }
+                    
+                    if (isFirstBatch) {
+                      console.log(`[Storage Debug] - Parsed size: ${size} bytes`)
+                    }
+                  } else {
+                    if (isFirstBatch) {
+                      console.log(`[Storage Debug] - No size data available`)
+                    }
                   }
                   
                   // Count by type
