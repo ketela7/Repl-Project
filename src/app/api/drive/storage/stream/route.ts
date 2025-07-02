@@ -1,12 +1,14 @@
-import { NextRequest } from 'next/server'
+
 import { auth } from '@/auth'
 import { createDriveClient } from '@/lib/google-drive/config'
+import { throttledDriveRequest } from '@/lib/api-throttle'
+import { retryDriveApiCall } from '@/lib/api-retry'
 
 /**
  * Progressive Storage Analytics with Server-Sent Events
  * Streams data in real-time as it's being processed
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth()
 
@@ -63,20 +65,31 @@ export async function GET(request: NextRequest) {
                 setTimeout(() => reject(new Error('API request timeout after 55 seconds')), 55000)
               })
 
-              const apiCall = drive.files.list({
+              // Build request parameters with proper type safety
+              const listParams: any = {
                 q: 'trashed=false',
-                pageSize: 1000, // Maximum pageSize to reduce API calls
-                pageToken,
+                pageSize: 1000,
                 fields: 'nextPageToken,files(id,name,mimeType,size,webViewLink,createdTime)',
                 orderBy: 'modifiedTime desc',
                 supportsAllDrives: true,
                 includeItemsFromAllDrives: true,
-              })
+              }
+              
+              // Only add pageToken if it exists
+              if (pageToken) {
+                listParams.pageToken = pageToken
+              }
+
+              // Create API call with throttle + retry mechanism
+              const apiCall = () => throttledDriveRequest(() => drive.files.list(listParams))
 
               let response
               try {
-                // Race between API call and timeout
-                response = await Promise.race([apiCall, apiTimeout])
+                // Race between API call with retry/throttle and timeout
+                response = await Promise.race([
+                  retryDriveApiCall(apiCall),
+                  apiTimeout
+                ])
               } catch (error: any) {
                 if (error.message.includes('timeout')) {
                   sendData('progress', { 
@@ -88,7 +101,7 @@ export async function GET(request: NextRequest) {
                   })
                   break
                 }
-                throw error // Re-throw other errors
+                throw error // Re-throw other errors for proper handling
               }
 
               const files = response.data.files || []

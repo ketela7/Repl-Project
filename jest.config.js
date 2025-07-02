@@ -27,6 +27,7 @@ const customJestConfig = {
     '!src/app/**/loading.tsx',
     '!src/app/**/not-found.tsx',
     '!src/app/**/error.tsx',
+    '!src/app/api/drive/storage/comprehensive/**', // Exclude deleted route
   ],
   coverageThreshold: {
     global: {
