@@ -75,7 +75,7 @@ export class GoogleDriveService {
       query,
       parentId,
       mimeType,
-      pageSize = 50,
+      pageSize = 1000,
       pageToken,
       orderBy = 'modifiedTime desc',
       includeTeamDriveItems = true,
@@ -114,6 +114,7 @@ export class GoogleDriveService {
     // Log query for debugging in development only
     if (process.env.NODE_ENV === 'development') {
       console.info('[Drive API] - Query:', searchQuery)
+      console.info('[Drive API] - PageSize:', validPageSize)
     }
 
     // Only add pageToken if it's valid

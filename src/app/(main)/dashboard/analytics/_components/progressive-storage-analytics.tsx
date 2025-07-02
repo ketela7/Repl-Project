@@ -304,7 +304,7 @@ export function ProgressiveStorageAnalytics() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Total Files</span>
-                  <span className="font-medium">{files.totalFiles.toLocaleString()}</span>
+                  <span className="font-medium">{files.totalFiles?.toLocaleString() || '0'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Total Size</span>
