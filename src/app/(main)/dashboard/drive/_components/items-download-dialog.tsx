@@ -4,7 +4,13 @@ import { useState, useRef } from 'react'
 import { Download, FileText, AlertTriangle, CheckCircle, XCircle, SkipForward } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
@@ -46,7 +52,12 @@ const DOWNLOAD_MODES = [
   },
 ]
 
-function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems }: ItemsDownloadDialogProps) {
+function ItemsDownloadDialog({
+  isOpen,
+  onClose,
+  onConfirm: _onConfirm,
+  selectedItems,
+}: ItemsDownloadDialogProps) {
   const [selectedMode, setSelectedMode] = useState('direct')
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -291,7 +302,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
                     key={mode.id}
                     className={cn(
                       'flex cursor-pointer items-start space-x-3 rounded-lg border p-4 transition-colors',
-                      selectedMode === mode.id ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50',
+                      selectedMode === mode.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:bg-muted/50',
                     )}
                     onClick={() => setSelectedMode(mode.id)}
                   >
@@ -317,10 +330,12 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
               <div className="flex items-start gap-3">
                 <AlertTriangle className="mt-0.5 h-5 w-5 text-orange-600" />
                 <div className="space-y-1">
-                  <div className="font-medium text-orange-800 dark:text-orange-200">Folders will be skipped</div>
+                  <div className="font-medium text-orange-800 dark:text-orange-200">
+                    Folders will be skipped
+                  </div>
                   <div className="text-sm text-orange-700 dark:text-orange-300">
-                    {skippedFolders.length} folder{skippedFolders.length > 1 ? 's' : ''} cannot be downloaded and will
-                    be automatically skipped
+                    {skippedFolders.length} folder{skippedFolders.length > 1 ? 's' : ''} cannot be
+                    downloaded and will be automatically skipped
                   </div>
                 </div>
               </div>
@@ -335,11 +350,15 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
                 {downloadableFiles.slice(0, 5).map(file => (
                   <div key={file.id} className="text-muted-foreground text-sm">
                     {file.name}
-                    {(file as any).size && <span className="ml-2 text-xs">({(file as any).size})</span>}
+                    {(file as any).size && (
+                      <span className="ml-2 text-xs">({(file as any).size})</span>
+                    )}
                   </div>
                 ))}
                 {downloadableFiles.length > 5 && (
-                  <div className="text-muted-foreground text-xs">... and {downloadableFiles.length - 5} more files</div>
+                  <div className="text-muted-foreground text-xs">
+                    ... and {downloadableFiles.length - 5} more files
+                  </div>
                 )}
               </div>
             </div>
@@ -355,7 +374,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
           {/* Processing Header */}
           <div className="text-center">
             <div className="text-lg font-semibold text-blue-600">Downloading Files...</div>
-            <div className="text-muted-foreground text-sm">Please wait while we process your download</div>
+            <div className="text-muted-foreground text-sm">
+              Please wait while we process your download
+            </div>
           </div>
 
           {/* Progress Display */}
@@ -369,7 +390,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
               </div>
               <Progress value={(progress.current / progress.total) * 100} className="h-3" />
               {progress.currentFile && (
-                <div className="text-muted-foreground text-xs">Processing: {progress.currentFile}</div>
+                <div className="text-muted-foreground text-xs">
+                  Processing: {progress.currentFile}
+                </div>
               )}
             </div>
 
@@ -423,8 +446,8 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
               <>
                 <div className="text-lg font-semibold text-orange-600">Download Cancelled</div>
                 <div className="text-muted-foreground text-sm">
-                  Operation was stopped by user. {progress.success} of {progress.total} files were processed before
-                  cancellation
+                  Operation was stopped by user. {progress.success} of {progress.total} files were
+                  processed before cancellation
                 </div>
               </>
             ) : (
@@ -491,14 +514,18 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
                     <div
                       className={`font-medium ${isCancelled ? 'text-orange-800 dark:text-orange-200' : 'text-green-800 dark:text-green-200'}`}
                     >
-                      {isCancelled ? 'Download Operation Cancelled' : 'Download Operation Successful'}
+                      {isCancelled
+                        ? 'Download Operation Cancelled'
+                        : 'Download Operation Successful'}
                     </div>
                     <div
                       className={`text-sm ${isCancelled ? 'text-orange-700 dark:text-orange-300' : 'text-green-700 dark:text-green-300'}`}
                     >
                       {progress.success} file{progress.success > 1 ? 's' : ''}{' '}
                       {isCancelled ? 'processed before cancellation' : 'downloaded successfully'}
-                      {!isCancelled && selectedMode === 'exportLinks' ? ' and export file generated' : ''}
+                      {!isCancelled && selectedMode === 'exportLinks'
+                        ? ' and export file generated'
+                        : ''}
                     </div>
                   </div>
                 </div>
@@ -548,7 +575,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Download Files</h3>
-                  <p className="text-muted-foreground text-sm">Choose how you want to download the selected files</p>
+                  <p className="text-muted-foreground text-sm">
+                    Choose how you want to download the selected files
+                  </p>
                 </div>
               </>
             )}
@@ -559,7 +588,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Processing Download</h3>
-                  <p className="text-muted-foreground text-sm">Downloading your selected files...</p>
+                  <p className="text-muted-foreground text-sm">
+                    Downloading your selected files...
+                  </p>
                 </div>
               </>
             )}
@@ -570,7 +601,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold">Download Results</h3>
-                  <p className="text-muted-foreground text-sm">Review your download operation results</p>
+                  <p className="text-muted-foreground text-sm">
+                    Review your download operation results
+                  </p>
                 </div>
               </>
             )}
@@ -578,7 +611,9 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
         </DialogHeaderComponent>
 
         {/* Dynamic Content */}
-        <div key={`download-content-${isProcessing ? 'processing' : isCompleted ? 'completed' : 'initial'}`}>
+        <div
+          key={`download-content-${isProcessing ? 'processing' : isCompleted ? 'completed' : 'initial'}`}
+        >
           {renderContent()}
         </div>
 
@@ -593,7 +628,11 @@ function ItemsDownloadDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedI
             </Button>
           )}
           {!isCompleted && !isProcessing && (
-            <Button onClick={handleConfirm} disabled={downloadableFiles.length === 0} className="gap-2">
+            <Button
+              onClick={handleConfirm}
+              disabled={downloadableFiles.length === 0}
+              className="gap-2"
+            >
               <Download className="h-4 w-4" />
               Start Download
             </Button>

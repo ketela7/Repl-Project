@@ -18,7 +18,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Handle both single and bulk operations
-    const { fileId, items, permissions, accessLevel, linkAccess, notifyUsers = false, message } = body
+    const {
+      fileId,
+      items,
+      permissions,
+      accessLevel,
+      linkAccess,
+      notifyUsers = false,
+      message,
+    } = body
 
     // Determine operation type based on items array or single fileId
     const fileIds = items && items.length > 0 ? items.map((item: any) => item.id) : [fileId]
@@ -33,7 +41,12 @@ export async function POST(request: NextRequest) {
     if (!sharePermissions && accessLevel && linkAccess) {
       sharePermissions = [
         {
-          role: accessLevel === 'writer' ? 'writer' : accessLevel === 'commenter' ? 'commenter' : 'reader',
+          role:
+            accessLevel === 'writer'
+              ? 'writer'
+              : accessLevel === 'commenter'
+                ? 'commenter'
+                : 'reader',
           type: linkAccess === 'anyone' ? 'anyone' : linkAccess === 'domain' ? 'domain' : 'anyone',
         },
       ]
@@ -65,7 +78,8 @@ export async function POST(request: NextRequest) {
           fields: 'id,name,mimeType,webViewLink',
         })
 
-        const shareLink = fileDetails.data?.webViewLink || `https://drive.google.com/file/d/${id}/view`
+        const shareLink =
+          fileDetails.data?.webViewLink || `https://drive.google.com/file/d/${id}/view`
 
         results.push({
           fileId: id,

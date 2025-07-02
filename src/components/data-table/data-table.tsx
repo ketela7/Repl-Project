@@ -1,9 +1,21 @@
-import { DndContext, closestCenter, type UniqueIdentifier, type SensorDescriptor } from '@dnd-kit/core'
+import {
+  DndContext,
+  closestCenter,
+  type UniqueIdentifier,
+  type SensorDescriptor,
+} from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { ColumnDef, flexRender, type Table as TanStackTable } from '@tanstack/react-table'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
 import { DraggableRow } from './draggable-row'
 
@@ -12,7 +24,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   dataIds?: UniqueIdentifier[]
   dndEnabled?: boolean
-  handleDragEnd?: (event: any) => void
+  handleDragEnd?: () => void
   sensors?: SensorDescriptor<any>[]
   sortableId?: string
 }
@@ -34,7 +46,9 @@ export function DataTable<TData, TValue>({
             {headerGroup.headers.map(header => {
               return (
                 <TableHead key={header.id} colSpan={header.colSpan}>
-                  {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               )
             })}
@@ -53,7 +67,9 @@ export function DataTable<TData, TValue>({
             table.getRowModel().rows.map(row => (
               <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                 {row.getVisibleCells().map(cell => (
-                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  </TableCell>
                 ))}
               </TableRow>
             ))

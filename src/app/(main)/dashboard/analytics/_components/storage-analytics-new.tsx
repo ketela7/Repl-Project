@@ -262,7 +262,9 @@ function StorageByTypeChart({ fileStats }: { fileStats: ComprehensiveStorageData
                   </div>
                   <div className="flex items-center justify-between">
                     <Progress value={percentage} className="mr-2 flex-1" />
-                    <span className="min-w-[60px] text-right text-xs font-medium">{formatBytes(type.size)}</span>
+                    <span className="min-w-[60px] text-right text-xs font-medium">
+                      {formatBytes(type.size)}
+                    </span>
                   </div>
                 </div>
               )
@@ -274,7 +276,11 @@ function StorageByTypeChart({ fileStats }: { fileStats: ComprehensiveStorageData
   )
 }
 
-function LargestFilesList({ largestFiles }: { largestFiles: ComprehensiveStorageData['largestFiles'] }) {
+function LargestFilesList({
+  largestFiles,
+}: {
+  largestFiles: ComprehensiveStorageData['largestFiles']
+}) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -288,7 +294,10 @@ function LargestFilesList({ largestFiles }: { largestFiles: ComprehensiveStorage
               const Icon = getFileTypeIcon(file.mimeType)
 
               return (
-                <div key={file.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div
+                  key={file.id}
+                  className="flex items-center justify-between rounded-lg border p-3"
+                >
                   <div className="flex min-w-0 flex-1 items-center gap-3">
                     <Icon className="text-muted-foreground h-4 w-4 flex-shrink-0" />
                     <div className="min-w-0 flex-1">
@@ -321,7 +330,9 @@ export function EnhancedStorageAnalytics() {
   const [error, setError] = useState<string | null>(null)
   const [strategy, setStrategy] = useState<'fast' | 'complete' | 'progressive'>('progressive')
 
-  const fetchStorageData = async (selectedStrategy: 'fast' | 'complete' | 'progressive' = strategy) => {
+  const fetchStorageData = async (
+    selectedStrategy: 'fast' | 'complete' | 'progressive' = strategy,
+  ) => {
     try {
       setLoading(true)
       setError(null)
@@ -359,7 +370,9 @@ export function EnhancedStorageAnalytics() {
           <div>
             <p className="font-medium">Analyzing your Drive storage...</p>
             <p className="text-muted-foreground text-sm">
-              {strategy === 'complete' ? 'This may take a while for large drives' : 'Processing files...'}
+              {strategy === 'complete'
+                ? 'This may take a while for large drives'
+                : 'Processing files...'}
             </p>
           </div>
         </div>
@@ -443,8 +456,8 @@ export function EnhancedStorageAnalytics() {
             </Button>
           </div>
           <p className="text-muted-foreground mt-2 text-xs">
-            Current: {meta.accuracy}% accuracy • {data.processing.filesProcessed.toLocaleString()} files analyzed •{' '}
-            {formatDuration(meta.performanceMs)}
+            Current: {meta.accuracy}% accuracy • {data.processing.filesProcessed.toLocaleString()}{' '}
+            files analyzed • {formatDuration(meta.performanceMs)}
           </p>
         </CardContent>
       </Card>

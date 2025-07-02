@@ -23,7 +23,9 @@ export async function POST(request: NextRequest) {
 
     // Set cookie with new duration
     const cookieName =
-      process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token'
+      process.env.NODE_ENV === 'production'
+        ? '__Secure-next-auth.session-token'
+        : 'next-auth.session-token'
 
     // Get current session token from request
     const currentToken = request.cookies.get(cookieName)?.value

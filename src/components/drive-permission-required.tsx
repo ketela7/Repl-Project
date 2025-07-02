@@ -13,7 +13,11 @@ interface DrivePermissionRequiredProps {
   compact?: boolean
 }
 
-export function DrivePermissionRequired({ error, onRetry, compact = false }: DrivePermissionRequiredProps) {
+export function DrivePermissionRequired({
+  error,
+  onRetry,
+  compact = false,
+}: DrivePermissionRequiredProps) {
   const [connecting, setConnecting] = useState(false)
 
   const handleReconnect = async () => {
@@ -78,7 +82,9 @@ export function DrivePermissionRequired({ error, onRetry, compact = false }: Dri
           {error && (
             <Alert className="border-red-200 bg-red-50">
               <AlertTriangle className="h-4 w-4" />
-              <AlertDescription className="text-sm">{error.message || error.toString()}</AlertDescription>
+              <AlertDescription className="text-sm">
+                {error.message || error.toString()}
+              </AlertDescription>
             </Alert>
           )}
 

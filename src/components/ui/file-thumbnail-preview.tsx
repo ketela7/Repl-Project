@@ -25,7 +25,7 @@ function formatDriveFileDate(dateString: string): string {
       minute: '2-digit',
       timeZone: userTimezone,
     });
-  } catch (_error) {
+  } catch {
     return 'Invalid date';
   }
 }

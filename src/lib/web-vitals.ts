@@ -38,7 +38,8 @@ function getRating(name: string, value: number): 'good' | 'needs-improvement' | 
 function sendToAnalytics(metric: VitalMetric) {
   // In production, send to your analytics service
   if (process.env.NODE_ENV === 'development') {
-    const icon = metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '❌'
+    const icon =
+      metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '❌'
     console.log(`${icon} ${metric.name}: ${metric.value}ms (${metric.rating})`)
   }
 

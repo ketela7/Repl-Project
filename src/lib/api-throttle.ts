@@ -5,8 +5,8 @@
 
 interface ThrottleQueue {
   promise: Promise<any>
-  resolve: (_value: any) => void
-  reject: (_error: any) => void
+  resolve: (value: any) => void
+  reject: (error: any) => void
   requestFn: () => Promise<any>
   timestamp: number
 }

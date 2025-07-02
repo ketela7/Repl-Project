@@ -35,9 +35,9 @@ const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 type SidebarContextProps = {
   state: "expanded" | "collapsed"
   open: boolean
-  setOpen: (_isOpen: boolean) => void
+  setOpen: (isOpen: boolean) => void
   openMobile: boolean
-  setOpenMobile: (_isOpen: boolean) => void
+  setOpenMobile: (isOpen: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
 }
@@ -64,7 +64,7 @@ function SidebarProvider({
 }: React.ComponentProps<"div"> & {
   defaultOpen?: boolean
   open?: boolean
-  onOpenChange?: (_isOpen: boolean) => void
+  onOpenChange?: (isOpen: boolean) => void
 }) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
@@ -74,7 +74,7 @@ function SidebarProvider({
   const [_open, _setOpen] = React.useState(defaultOpen)
   const open = openProp ?? _open
   const setOpen = React.useCallback(
-    (value: boolean | ((_currentOpen: boolean) => boolean)) => {
+    (value: boolean | ((currentOpen: boolean) => boolean)) => {
       const openState = typeof value === "function" ? value(open) : value
       if (setOpenProp) {
         setOpenProp(openState)

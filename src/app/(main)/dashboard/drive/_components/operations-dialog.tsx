@@ -3,7 +3,13 @@
 import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen } from 'lucide-react'
 import { useState } from 'react'
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -33,7 +39,13 @@ interface OperationsDialogProps {
   selectedItems: any[]
 }
 
-function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems }: OperationsDialogProps) {
+function OperationsDialog({
+  isOpen,
+  open,
+  onClose,
+  onOpenChange,
+  selectedItems,
+}: OperationsDialogProps) {
   const isMobile = useIsMobile()
   const folderCount = selectedItems.filter(item => item.isFolder).length
   const fileCount = selectedItems.length - folderCount
@@ -367,7 +379,10 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems }
     <>
       {/* Main Operations Dialog */}
       {isMobile ? (
-        <BottomSheet open={dialogOpen} {...((onOpenChange || onClose) && { onOpenChange: onOpenChange || onClose })}>
+        <BottomSheet
+          open={dialogOpen}
+          {...((onOpenChange || onClose) && { onOpenChange: onOpenChange || onClose })}
+        >
           <BottomSheetContent>
             <BottomSheetHeader>
               <BottomSheetTitle className="text-lg font-semibold">Operations</BottomSheetTitle>
@@ -382,7 +397,10 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems }
           </BottomSheetContent>
         </BottomSheet>
       ) : (
-        <Dialog open={dialogOpen} {...((onOpenChange || onClose) && { onOpenChange: onOpenChange || onClose })}>
+        <Dialog
+          open={dialogOpen}
+          {...((onOpenChange || onClose) && { onOpenChange: onOpenChange || onClose })}
+        >
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle className="text-lg font-semibold">Operations</DialogTitle>
@@ -420,7 +438,11 @@ function OperationsDialog({ isOpen, open, onClose, onOpenChange, selectedItems }
         selectedItems={selectedItems}
       />
 
-      <ItemsShareDialog isOpen={isShareDialogOpen} onClose={handleShareClose} selectedItems={selectedItems} />
+      <ItemsShareDialog
+        isOpen={isShareDialogOpen}
+        onClose={handleShareClose}
+        selectedItems={selectedItems}
+      />
 
       <ItemsRenameDialog
         isOpen={isRenameDialogOpen}

@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
 
     // Get strategy from query parameters
     const { searchParams } = new URL(request.url)
-    const strategy = (searchParams.get('strategy') as 'fast' | 'complete' | 'progressive') || 'progressive'
+    const strategy =
+      (searchParams.get('strategy') as 'fast' | 'complete' | 'progressive') || 'progressive'
 
     // Create Drive client and analyzer
     const drive = createDriveClient(session.accessToken)

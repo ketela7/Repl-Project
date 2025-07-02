@@ -23,7 +23,7 @@ export function WebVitalsMonitor() {
 
     // Listen for route changes in development
     if (process.env.NODE_ENV === 'development') {
-      handleRouteChange(window.location.pathname)
+      handleRouteChange()
     }
   }, [])
 
