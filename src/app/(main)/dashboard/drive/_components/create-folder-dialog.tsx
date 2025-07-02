@@ -24,7 +24,12 @@ interface CreateFolderDialogProps {
   currentFolderId?: string | null
 }
 
-export function CreateFolderDialog({ isOpen, onClose, onFolderCreated, parentFolderId }: CreateFolderDialogProps) {
+export function CreateFolderDialog({
+  isOpen,
+  onClose,
+  onFolderCreated,
+  parentFolderId,
+}: CreateFolderDialogProps) {
   const [folderName, setFolderName] = useState('')
   const [creating, setCreating] = useState(false)
   // Rename parentFolderId to actualParentId to be used in the API call
@@ -55,7 +60,9 @@ export function CreateFolderDialog({ isOpen, onClose, onFolderCreated, parentFol
 
         // Handle reauthentication needed
         if (errorData.needsReauth || response.status === 401 || response.status === 403) {
-          toast.error(errorData.error || 'Google Drive access expired. Please reconnect your account.')
+          toast.error(
+            errorData.error || 'Google Drive access expired. Please reconnect your account.',
+          )
           // Trigger parent component to show connection card
           window.location.reload()
           return

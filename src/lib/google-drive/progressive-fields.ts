@@ -82,9 +82,14 @@ export enum LoadingStage {
 }
 
 // Export individual constants for use without enum - currently used in configuration
+// These are exported for external consumption but may not be used internally
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const BASIC = LoadingStage.BASIC
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const ESSENTIAL = LoadingStage.ESSENTIAL
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const EXTENDED = LoadingStage.EXTENDED
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const COMPLETE = LoadingStage.COMPLETE
 
 /**
@@ -114,7 +119,11 @@ export const PROGRESSIVE_FIELD_CONFIG = {
 /**
  * Generate cache key for progressive loading
  */
-export function generateProgressiveKey(fileId: string, userId: string, stage: LoadingStage): string {
+export function generateProgressiveKey(
+  fileId: string,
+  userId: string,
+  stage: LoadingStage,
+): string {
   return `file-details:${stage}:${userId}:${fileId}`
 }
 

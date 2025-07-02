@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 interface BottomSheetProps {
   children: React.ReactNode;
   open?: boolean;
-  onOpenChange?: (isOpen: boolean) => void;
+  onOpenChange?: (_isOpen: boolean) => void;
   trigger?: React.ReactNode;
 }
 
