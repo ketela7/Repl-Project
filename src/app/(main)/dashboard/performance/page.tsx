@@ -178,7 +178,7 @@ export default function PerformancePage() {
                 </div>
                 <Progress 
                   value={getProgressValue(metricName, data.latest.value)} 
-                  className="mb-2"
+                  className={`mb-2 ${getRatingColor(data.latest.rating)}`}
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Samples: {data.count}</span>

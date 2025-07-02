@@ -196,7 +196,7 @@ export function ProgressiveStorageAnalytics() {
           {!isLoading ? (
             <Button onClick={startAnalysis} className="flex items-center gap-2">
               <Play className="h-4 w-4" />
-              Start Analysis
+              {isComplete ? 'Restart Analysis' : 'Start Analysis'}
             </Button>
           ) : (
             <Button onClick={stopAnalysis} variant="destructive" className="flex items-center gap-2">
