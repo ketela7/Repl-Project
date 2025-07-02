@@ -77,6 +77,17 @@ export function ProgressiveStorageAnalytics() {
     const eventSource = new EventSource('/api/drive/storage/stream')
     eventSourceRef.current = eventSource
 
+    // Auto-close connection after 30 seconds to prevent hanging
+    const timeoutId = setTimeout(() => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close()
+        eventSourceRef.current = null
+        setIsLoading(false)
+        setConnectionStatus('disconnected')
+        setError('Analysis timeout after 30 seconds. Please try again.')
+      }
+    }, 30000)
+
     eventSource.onopen = () => {
       setConnectionStatus('connected')
     }
@@ -97,10 +108,6 @@ export function ProgressiveStorageAnalytics() {
             setQuota(data.data)
             break
             
-          case 'user_update':
-            setUser(data.data)
-            break
-            
           case 'files_update':
             setFiles(data.data)
             break
@@ -110,16 +117,20 @@ export function ProgressiveStorageAnalytics() {
             break
             
           case 'complete':
+            clearTimeout(timeoutId)
             setIsLoading(false)
             setIsComplete(true)
             setConnectionStatus('disconnected')
             setProgress({ step: 'complete', message: 'Analysis complete!' })
+            eventSource.close()
             break
             
           case 'error':
+            clearTimeout(timeoutId)
             setError(data.data.message)
             setIsLoading(false)
             setConnectionStatus('disconnected')
+            eventSource.close()
             break
         }
       } catch (err) {
@@ -128,9 +139,11 @@ export function ProgressiveStorageAnalytics() {
     }
 
     eventSource.onerror = () => {
+      clearTimeout(timeoutId)
       setConnectionStatus('disconnected')
       setIsLoading(false)
       setError('Connection lost. Please try again.')
+      eventSource.close()
     }
   }
 
@@ -269,32 +282,7 @@ export function ProgressiveStorageAnalytics() {
         </Card>
       )}
 
-      {/* User Info */}
-      {user && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5" />
-              Account Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-3">
-              {user.photoLink && (
-                <img 
-                  src={user.photoLink} 
-                  alt="Profile" 
-                  className="h-10 w-10 rounded-full"
-                />
-              )}
-              <div>
-                <p className="font-medium">{user.displayName}</p>
-                <p className="text-sm text-muted-foreground">{user.emailAddress}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+
 
       {/* Files Statistics */}
       {files && (

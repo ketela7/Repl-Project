@@ -45,7 +45,6 @@ export async function GET(request: NextRequest) {
             }
 
             sendData('quota_update', basicQuota)
-            sendData('user_update', aboutResponse.data.user)
 
             // Step 2: Start file analysis in chunks
             sendData('progress', { step: 'file_analysis', message: 'Analyzing files...' })
@@ -58,7 +57,20 @@ export async function GET(request: NextRequest) {
             const largestFiles: any[] = []
 
             // Process files in chunks of 1000 (maximum pageSize) to minimize API calls
+            let loopCount = 0
+            const maxLoops = 50 // Safety limit to prevent infinite loops
+            
             do {
+              loopCount++
+              if (loopCount > maxLoops) {
+                sendData('progress', { 
+                  step: 'safety_stop', 
+                  message: `Safety limit reached (${maxLoops} API calls). Analysis stopped.`,
+                  isComplete: true
+                })
+                break
+              }
+
               const response = await drive.files.list({
                 q: 'trashed=false',
                 pageSize: 1000, // Maximum pageSize to reduce API calls
@@ -147,12 +159,20 @@ export async function GET(request: NextRequest) {
             sendData('complete', { message: 'Analysis complete!' })
 
           } catch (error: any) {
-            sendData('error', { 
-              message: error.message || 'Analysis failed',
-              canRetry: true 
-            })
+            try {
+              sendData('error', { 
+                message: error.message || 'Analysis failed',
+                canRetry: true 
+              })
+            } catch {
+              // Controller might be closed already
+            }
           } finally {
-            controller.close()
+            try {
+              controller.close()
+            } catch {
+              // Controller already closed, ignore
+            }
           }
         }
 
