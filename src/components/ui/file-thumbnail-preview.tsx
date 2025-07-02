@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Video, Image, FileText } from 'lucide-react';
+import { Thumbnail } from '@/components/responsive-image';
 
 interface FileThumbnailPreviewProps {
   children: React.ReactNode;
@@ -174,7 +175,7 @@ export function FileThumbnailPreview({
             {/* Thumbnail container */}
             <div className="relative bg-gradient-to-br from-muted/20 to-muted/40 rounded-lg overflow-hidden shadow-inner">
               {!thumbnailError ? (
-                <img
+                <Thumbnail
                   src={thumbnailLink}
                   alt={`Preview of ${fileName}`}
                   className={`
@@ -183,23 +184,15 @@ export function FileThumbnailPreview({
                     transition-all duration-300 ease-out
                     ${thumbnailLoaded ? 'opacity-100' : 'opacity-0'}
                   `}
-                  style={{
-                    minHeight: '140px',
-                    maxHeight: '200px',
-                    aspectRatio: '16/10'
-                  }}
                   onLoad={() => setThumbnailLoaded(true)}
-                  onError={(e) => {
+                  onError={() => {
                     console.warn('Thumbnail load error:', {
                       fileName,
                       thumbnailLink,
-                      error: e,
-                      src: e.currentTarget.src
                     });
                     setThumbnailError(true);
                     setThumbnailLoaded(false);
                   }}
-                  loading="lazy"
                 />
               ) : (
                 <div className="w-full h-[140px] bg-gradient-to-br from-muted to-muted/60 rounded-lg flex items-center justify-center text-muted-foreground">

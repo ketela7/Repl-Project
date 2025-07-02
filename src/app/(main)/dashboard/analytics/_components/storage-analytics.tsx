@@ -25,6 +25,7 @@ import {
   Video,
   Zap,
 } from 'lucide-react'
+import { Avatar } from '@/components/responsive-image'
 
 interface StorageData {
   quota: {
@@ -555,10 +556,10 @@ export function StorageAnalytics() {
           <CardContent>
             <div className="flex items-center gap-4">
               {data.user.photoLink && (
-                <img
+                <Avatar
                   src={data.user.photoLink}
                   alt={data.user.displayName || 'User'}
-                  className="h-12 w-12 rounded-full"
+                  size={48}
                 />
               )}
               <div>

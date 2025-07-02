@@ -1,7 +1,7 @@
 'use client'
 
 /**
- * Optimized Image component using Next.js Image with performance optimizations
+ * Responsive Image component using Next.js Image with performance optimizations
  * Includes lazy loading, blur placeholder, and responsive sizing
  */
 
@@ -9,7 +9,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { cn } from '@/lib/utils'
 
-interface OptimizedImageProps {
+interface ResponsiveImageProps {
   src: string
   alt: string
   width?: number
@@ -18,11 +18,11 @@ interface OptimizedImageProps {
   priority?: boolean
   fill?: boolean
   sizes?: string
-  onLoad?: () => void
-  onError?: () => void
+  onLoad?: (() => void) | undefined
+  onError?: (() => void) | undefined
 }
 
-export function OptimizedImage({
+function ResponsiveImage({
   src,
   alt,
   width = 400,
@@ -33,7 +33,7 @@ export function OptimizedImage({
   sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
   onLoad,
   onError,
-}: OptimizedImageProps) {
+}: ResponsiveImageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
 
@@ -88,8 +88,8 @@ export function OptimizedImage({
   )
 }
 
-// Avatar-specific optimized image
-export function OptimizedAvatar({
+// Avatar-specific responsive image
+export function Avatar({
   src,
   alt,
   size = 40,
@@ -101,7 +101,7 @@ export function OptimizedAvatar({
   className?: string
 }) {
   return (
-    <OptimizedImage
+    <ResponsiveImage
       src={src}
       alt={alt}
       width={size}
@@ -113,17 +113,37 @@ export function OptimizedAvatar({
   )
 }
 
-// File thumbnail optimized image
-export function OptimizedThumbnail({ src, alt, className }: { src: string; alt: string; className?: string }) {
+// File thumbnail responsive image
+export function Thumbnail({ 
+  src, 
+  alt, 
+  className,
+  onLoad,
+  onError,
+  width = 320,
+  height = 200
+}: { 
+  src: string; 
+  alt: string; 
+  className?: string;
+  onLoad?: () => void;
+  onError?: () => void;
+  width?: number;
+  height?: number;
+}) {
   return (
-    <OptimizedImage
+    <ResponsiveImage
       src={src}
       alt={alt}
-      width={48}
-      height={48}
-      className={cn('rounded', className)}
-      sizes="48px"
+      width={width}
+      height={height}
+      className={cn('rounded-lg', className)}
+      sizes="(max-width: 640px) 280px, (max-width: 768px) 320px, 360px"
       priority={false}
+      onLoad={onLoad || (() => {})}
+      onError={onError || (() => {})}
     />
   )
 }
+
+export default ResponsiveImage
