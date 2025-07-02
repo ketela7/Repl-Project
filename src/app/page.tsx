@@ -1,15 +1,23 @@
-import { redirect } from 'next/navigation'
-import { auth } from '@/auth'
+'use client'
 
-export default async function HomePage() {
-  // Check if user is already authenticated
-  const session = await auth()
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
-  if (session) {
-    // User is authenticated, redirect to dashboard
-    redirect('/dashboard/drive')
-  } else {
-    // User is not authenticated, redirect to login
-    redirect('/auth/v1/login')
-  }
+export default function HomePage() {
+  const router = useRouter()
+
+  useEffect(() => {
+    // Simple client-side redirect to login
+    // This avoids SSR redirect issues on mobile
+    router.replace('/auth/v1/login')
+  }, [router])
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="text-center space-y-4">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+        <div className="text-muted-foreground">Redirecting to login...</div>
+      </div>
+    </div>
+  )
 }
