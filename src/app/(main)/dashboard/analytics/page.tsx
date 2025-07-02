@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
-import { StorageAnalytics } from './_components/storage-analytics'
+import { ProgressiveStorageAnalytics } from './_components/progressive-storage-analytics'
 
 export default function AnalyticsPage() {
   return (
@@ -9,12 +9,12 @@ export default function AnalyticsPage() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Storage Analytics</h1>
         <p className="text-muted-foreground">
-          Comprehensive analysis of your Google Drive storage usage and file distribution
+          Real-time analysis of your Google Drive storage usage and file distribution
         </p>
       </div>
 
       <Suspense fallback={<div>Loading analytics...</div>}>
-        <StorageAnalytics />
+        <ProgressiveStorageAnalytics />
       </Suspense>
     </div>
   )

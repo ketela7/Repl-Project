@@ -1,0 +1,175 @@
+import { NextRequest } from 'next/server'
+import { auth } from '@/auth'
+import { createDriveClient } from '@/lib/google-drive/config'
+
+/**
+ * Progressive Storage Analytics with Server-Sent Events
+ * Streams data in real-time as it's being processed
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const session = await auth()
+
+    if (!session?.accessToken) {
+      return new Response('Authentication required', { status: 401 })
+    }
+
+    const drive = createDriveClient(session.accessToken)
+
+    // Setup Server-Sent Events stream
+    const stream = new ReadableStream({
+      start(controller) {
+        const encoder = new TextEncoder()
+        
+        const sendData = (type: string, data: any) => {
+          const message = `data: ${JSON.stringify({ type, data, timestamp: Date.now() })}\n\n`
+          controller.enqueue(encoder.encode(message))
+        }
+
+        const loadProgressively = async () => {
+          try {
+            // Step 1: Send basic system info immediately (fastest)
+            sendData('progress', { step: 'system_info', message: 'Getting system information...' })
+            
+            const aboutResponse = await drive.about.get({
+              fields: 'storageQuota,user,maxUploadSize,canCreateDrives'
+            })
+            
+            const storageQuota = aboutResponse.data.storageQuota
+            const basicQuota = {
+              limit: storageQuota?.limit ? parseInt(storageQuota.limit) : null,
+              used: storageQuota?.usage ? parseInt(storageQuota.usage) : 0,
+              usedInDrive: storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : 0,
+              available: storageQuota?.limit ? parseInt(storageQuota.limit) - parseInt(storageQuota.usage || '0') : null,
+              usagePercentage: storageQuota?.limit ? Math.round((parseInt(storageQuota.usage || '0') / parseInt(storageQuota.limit)) * 100) : null,
+            }
+
+            sendData('quota_update', basicQuota)
+            sendData('user_update', aboutResponse.data.user)
+
+            // Step 2: Start file analysis in chunks
+            sendData('progress', { step: 'file_analysis', message: 'Analyzing files...' })
+            
+            let allFiles: any[] = []
+            let pageToken: string | undefined
+            let totalProcessed = 0
+            const filesByType: Record<string, number> = {}
+            const fileSizesByType: Record<string, number> = {}
+            const largestFiles: any[] = []
+
+            // Process files in chunks of 200 for smooth updates
+            do {
+              const response = await drive.files.list({
+                q: 'trashed=false',
+                pageSize: 200,
+                pageToken,
+                fields: 'nextPageToken,files(id,name,mimeType,size,webViewLink,createdTime)',
+                orderBy: 'modifiedTime desc',
+                supportsAllDrives: true,
+                includeItemsFromAllDrives: true,
+              })
+
+              const files = response.data.files || []
+              allFiles = [...allFiles, ...files]
+              pageToken = response.data.nextPageToken || undefined
+              totalProcessed += files.length
+
+              // Process this chunk
+              files.forEach(file => {
+                const mimeType = file.mimeType || 'unknown'
+                const size = file.size ? parseInt(file.size) : 0
+                
+                // Count by type
+                filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
+                fileSizesByType[mimeType] = (fileSizesByType[mimeType] || 0) + size
+
+                // Track largest files
+                if (size > 0) {
+                  largestFiles.push({
+                    name: file.name,
+                    size,
+                    mimeType,
+                    id: file.id,
+                    webViewLink: file.webViewLink
+                  })
+                  
+                  // Keep only top 20, sorted by size
+                  largestFiles.sort((a, b) => b.size - a.size)
+                  if (largestFiles.length > 20) {
+                    largestFiles.splice(20)
+                  }
+                }
+              })
+
+              // Send incremental update
+              sendData('files_update', {
+                totalFiles: totalProcessed,
+                filesByType: { ...filesByType },
+                fileSizesByType: { ...fileSizesByType },
+                largestFiles: [...largestFiles],
+                hasMore: !!pageToken
+              })
+
+              sendData('progress', { 
+                step: 'file_analysis', 
+                message: `Processed ${totalProcessed} files...`,
+                processed: totalProcessed
+              })
+
+              // Small delay to prevent overwhelming the client
+              await new Promise(resolve => setTimeout(resolve, 100))
+
+              // Stop after 10,000 files to prevent timeout
+              if (totalProcessed >= 10000) {
+                sendData('progress', { 
+                  step: 'limit_reached', 
+                  message: `Analyzed ${totalProcessed} files (sample limit reached)`,
+                  isComplete: true
+                })
+                break
+              }
+
+            } while (pageToken)
+
+            // Final summary
+            const totalSize = Object.values(fileSizesByType).reduce((sum, size) => sum + size, 0)
+            
+            sendData('final_summary', {
+              totalFiles: totalProcessed,
+              totalSizeBytes: totalSize,
+              filesByType,
+              fileSizesByType,
+              largestFiles,
+              processingComplete: true,
+              accuracy: totalProcessed >= 10000 ? 'Sample (10k+ files)' : 'Complete'
+            })
+
+            sendData('complete', { message: 'Analysis complete!' })
+
+          } catch (error: any) {
+            sendData('error', { 
+              message: error.message || 'Analysis failed',
+              canRetry: true 
+            })
+          } finally {
+            controller.close()
+          }
+        }
+
+        loadProgressively()
+      }
+    })
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
+
+  } catch (error: any) {
+    console.error('Storage stream error:', error)
+    return new Response('Failed to start analysis stream', { status: 500 })
+  }
+}

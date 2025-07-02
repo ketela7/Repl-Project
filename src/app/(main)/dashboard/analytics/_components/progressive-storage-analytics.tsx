@@ -1,0 +1,387 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { RefreshCw, HardDrive, Files, TrendingUp, Users, Play, Pause } from 'lucide-react'
+
+interface QuotaData {
+  limit: number | null
+  used: number
+  usedInDrive: number
+  available: number | null
+  usagePercentage: number | null
+}
+
+interface FilesData {
+  totalFiles: number
+  filesByType: Record<string, number>
+  fileSizesByType: Record<string, number>
+  largestFiles: Array<{
+    name: string
+    size: number
+    mimeType: string
+    id: string
+    webViewLink?: string
+  }>
+  hasMore: boolean
+}
+
+interface UserData {
+  displayName?: string
+  emailAddress?: string
+  photoLink?: string
+}
+
+interface ProgressData {
+  step: string
+  message: string
+  processed?: number
+  isComplete?: boolean
+}
+
+export function ProgressiveStorageAnalytics() {
+  const [quota, setQuota] = useState<QuotaData | null>(null)
+  const [files, setFiles] = useState<FilesData | null>(null)
+  const [user, setUser] = useState<UserData | null>(null)
+  const [progress, setProgress] = useState<ProgressData | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isComplete, setIsComplete] = useState(false)
+  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected')
+  
+  const eventSourceRef = useRef<EventSource | null>(null)
+
+  const formatBytes = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const startAnalysis = () => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close()
+    }
+
+    setIsLoading(true)
+    setError(null)
+    setIsComplete(false)
+    setConnectionStatus('connecting')
+    setProgress({ step: 'initializing', message: 'Starting analysis...' })
+
+    const eventSource = new EventSource('/api/drive/storage/stream')
+    eventSourceRef.current = eventSource
+
+    eventSource.onopen = () => {
+      setConnectionStatus('connected')
+    }
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data)
+        
+        switch (data.type) {
+          case 'progress':
+            setProgress(data.data)
+            if (data.data.isComplete) {
+              setIsComplete(true)
+            }
+            break
+            
+          case 'quota_update':
+            setQuota(data.data)
+            break
+            
+          case 'user_update':
+            setUser(data.data)
+            break
+            
+          case 'files_update':
+            setFiles(data.data)
+            break
+            
+          case 'final_summary':
+            setFiles(data.data)
+            break
+            
+          case 'complete':
+            setIsLoading(false)
+            setIsComplete(true)
+            setConnectionStatus('disconnected')
+            setProgress({ step: 'complete', message: 'Analysis complete!' })
+            break
+            
+          case 'error':
+            setError(data.data.message)
+            setIsLoading(false)
+            setConnectionStatus('disconnected')
+            break
+        }
+      } catch (err) {
+        console.error('Failed to parse SSE data:', err)
+      }
+    }
+
+    eventSource.onerror = () => {
+      setConnectionStatus('disconnected')
+      setIsLoading(false)
+      setError('Connection lost. Please try again.')
+    }
+  }
+
+  const stopAnalysis = () => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close()
+      eventSourceRef.current = null
+    }
+    setIsLoading(false)
+    setConnectionStatus('disconnected')
+  }
+
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close()
+      }
+    }
+  }, [])
+
+  const getTopFileTypes = () => {
+    if (!files?.filesByType) return []
+    
+    return Object.entries(files.filesByType)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([type, count]) => ({
+        type: type.split('/')[1] || type,
+        count,
+        size: files.fileSizesByType[type] || 0
+      }))
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header with Controls */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold">Live Storage Analytics</h2>
+          <p className="text-muted-foreground">Real-time analysis of your Google Drive</p>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Badge variant={connectionStatus === 'connected' ? 'default' : 'secondary'}>
+            {connectionStatus === 'connected' ? 'Live' : 'Offline'}
+          </Badge>
+          
+          {!isLoading ? (
+            <Button onClick={startAnalysis} className="flex items-center gap-2">
+              <Play className="h-4 w-4" />
+              Start Analysis
+            </Button>
+          ) : (
+            <Button onClick={stopAnalysis} variant="destructive" className="flex items-center gap-2">
+              <Pause className="h-4 w-4" />
+              Stop
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Progress Indicator */}
+      {(isLoading || progress) && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">
+                  {progress?.message || 'Processing...'}
+                </span>
+                {isLoading && (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                )}
+              </div>
+              
+              {progress?.processed && (
+                <div className="space-y-1">
+                  <Progress value={Math.min(100, (progress.processed / 10000) * 100)} />
+                  <p className="text-xs text-muted-foreground">
+                    {progress.processed.toLocaleString()} files processed
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <Card className="border-destructive">
+          <CardContent className="pt-6">
+            <p className="text-destructive">{error}</p>
+            <Button onClick={startAnalysis} className="mt-2" variant="outline">
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Storage Quota */}
+      {quota && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <HardDrive className="h-5 w-5" />
+              Storage Overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {quota.limit && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Used</span>
+                    <span>{formatBytes(quota.used)}</span>
+                  </div>
+                  <Progress value={quota.usagePercentage || 0} />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>{formatBytes(quota.usedInDrive)} in Drive</span>
+                    <span>{quota.available ? formatBytes(quota.available) : '∞'} available</span>
+                  </div>
+                </div>
+              )}
+              
+              {!quota.limit && (
+                <div className="text-center py-4">
+                  <p className="text-lg font-medium">Unlimited Storage</p>
+                  <p className="text-muted-foreground">
+                    Using {formatBytes(quota.used)} total
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* User Info */}
+      {user && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5" />
+              Account Information
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-3">
+              {user.photoLink && (
+                <img 
+                  src={user.photoLink} 
+                  alt="Profile" 
+                  className="h-10 w-10 rounded-full"
+                />
+              )}
+              <div>
+                <p className="font-medium">{user.displayName}</p>
+                <p className="text-sm text-muted-foreground">{user.emailAddress}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Files Statistics */}
+      {files && (
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Files Summary */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Files className="h-5 w-5" />
+                Files Overview
+              </CardTitle>
+              <CardDescription>
+                {files.hasMore ? 'Sample data (more files available)' : 'Complete analysis'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span>Total Files</span>
+                  <span className="font-medium">{files.totalFiles.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Total Size</span>
+                  <span className="font-medium">
+                    {formatBytes(Object.values(files.fileSizesByType).reduce((sum, size) => sum + size, 0))}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Top File Types */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" />
+                Top File Types
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {getTopFileTypes().map(({ type, count, size }) => (
+                  <div key={type} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{type}</p>
+                      <p className="text-xs text-muted-foreground">{count} files</p>
+                    </div>
+                    <span className="text-sm">{formatBytes(size)}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Largest Files */}
+      {files?.largestFiles && files.largestFiles.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Largest Files</CardTitle>
+            <CardDescription>Top {files.largestFiles.length} largest files in your Drive</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-64">
+              <div className="space-y-2">
+                {files.largestFiles.map((file, index) => (
+                  <div key={file.id} className="flex items-center justify-between rounded-lg border p-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium" title={file.name}>
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {file.mimeType.split('/')[1]}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">{formatBytes(file.size)}</span>
+                      <Badge variant="secondary">#{index + 1}</Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  )
+}
