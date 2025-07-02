@@ -100,14 +100,21 @@ export function ProgressiveStorageAnalytics() {
             break
             
           case 'quota_update':
-            setQuota(data.data)
+            // API sends { user, quota } but we only need quota
+            if (data.data.quota) {
+              setQuota(data.data.quota)
+            } else {
+              setQuota(data.data)
+            }
             break
             
           case 'files_update':
+          case 'file_stats_update':
             setFiles(data.data)
             break
             
           case 'final_summary':
+          case 'analysis_complete':
             setFiles(data.data)
             break
             
