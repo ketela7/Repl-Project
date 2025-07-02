@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
 import {
   AlertTriangle,
   BarChart3,
@@ -469,64 +469,109 @@ export function EnhancedStorageAnalytics() {
       </div>
 
       {/* Detailed Analysis */}
-      <Tabs defaultValue="largest-files" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="largest-files">Largest Files</TabsTrigger>
-          <TabsTrigger value="file-types">File Types</TabsTrigger>
-          <TabsTrigger value="system-info">System Info</TabsTrigger>
-        </TabsList>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <LargestFilesList largestFiles={data.largestFiles} />
 
-        <TabsContent value="largest-files">
-          <LargestFilesList largestFiles={data.largestFiles} />
-        </TabsContent>
-
-        <TabsContent value="file-types">
-          <Card>
-            <CardHeader>
-              <CardTitle>File Type Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {Object.entries(data.fileStats.filesByType).map(([type, count]) => (
-                  <div key={type} className="rounded-lg border p-4 text-center">
-                    <div className="text-2xl font-bold">{(count as number).toLocaleString()}</div>
-                    <div className="text-muted-foreground text-sm capitalize">{type}</div>
+        {/* System Capabilities */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Drive Capabilities</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <div className="text-lg font-bold">
+                    {data.systemCapabilities.maxUploadSize
+                      ? formatBytes(data.systemCapabilities.maxUploadSize)
+                      : 'Unlimited'}
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="system-info">
-          <Card>
-            <CardHeader>
-              <CardTitle>System Capabilities</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <h4 className="mb-2 font-medium">Upload Limits</h4>
-                    <p className="text-sm">
-                      Max Upload:{' '}
-                      {data.systemCapabilities.maxUploadSize
-                        ? formatBytes(data.systemCapabilities.maxUploadSize)
-                        : 'No limit'}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="mb-2 font-medium">Account Info</h4>
-                    <p className="text-sm">
-                      {data.user.displayName} ({data.user.emailAddress})
-                    </p>
-                  </div>
+                  <p className="text-muted-foreground text-xs">Max Upload Size</p>
+                </div>
+                <div>
+                  <div className="text-lg font-bold">{data.systemCapabilities.canCreateDrives ? 'Yes' : 'No'}</div>
+                  <p className="text-muted-foreground text-xs">Can Create Drives</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+
+              <Separator />
+
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">App Installed:</span>
+                  <Badge variant={data.systemCapabilities.appInstalled ? 'default' : 'secondary'}>
+                    {data.systemCapabilities.appInstalled ? 'Yes' : 'No'}
+                  </Badge>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Color Themes:</span>
+                  <span className="font-medium">{data.systemCapabilities.folderColorPalette.length} colors</span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Drive Themes:</span>
+                  <span className="font-medium">{data.systemCapabilities.driveThemes.length} themes</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* File Statistics */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">File Statistics</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="text-center">
+              <div className="text-2xl font-bold">{data.fileStats.totalFiles.toLocaleString()}</div>
+              <p className="text-muted-foreground text-xs">Total Files</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">{data.fileStats.sharedFiles.toLocaleString()}</div>
+              <p className="text-muted-foreground text-xs">Shared Files</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">{data.fileStats.starredFiles.toLocaleString()}</div>
+              <p className="text-muted-foreground text-xs">Starred Files</p>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold">{data.fileStats.trashedFiles.toLocaleString()}</div>
+              <p className="text-muted-foreground text-xs">Trashed Files</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* User Profile */}
+      {data.user && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm font-medium">Account Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-4">
+              {data.user.photoLink && (
+                <img
+                  src={data.user.photoLink}
+                  alt={data.user.displayName || 'User'}
+                  className="h-12 w-12 rounded-full"
+                />
+              )}
+              <div>
+                <p className="font-medium">{data.user.displayName || 'Unknown User'}</p>
+                <p className="text-muted-foreground text-sm">{data.user.emailAddress}</p>
+                {data.user.permissionId && (
+                  <p className="text-muted-foreground text-xs">ID: {data.user.permissionId}</p>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }
