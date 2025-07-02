@@ -1,6 +1,6 @@
-import { enhancedErrorHandler, AppError, ErrorSeverity } from '../enhanced-error-handler'
+import { handleError, AppError, ErrorSeverity } from '../error-handler'
 
-describe('Enhanced Error Handler', () => {
+describe('Error Handler', () => {
   let consoleSpy: jest.SpyInstance
 
   beforeEach(() => {
@@ -31,10 +31,10 @@ describe('Enhanced Error Handler', () => {
     })
   })
 
-  describe('enhancedErrorHandler', () => {
+  describe('handleError', () => {
     it('should handle AppError correctly', () => {
       const appError = new AppError('App error', 400, ErrorSeverity.MEDIUM)
-      const result = enhancedErrorHandler(appError)
+      const result = handleError(appError)
 
       expect(result.success).toBe(false)
       expect(result.error).toBe('App error')
@@ -44,7 +44,7 @@ describe('Enhanced Error Handler', () => {
 
     it('should handle standard Error objects', () => {
       const error = new Error('Standard error')
-      const result = enhancedErrorHandler(error)
+      const result = handleError(error)
 
       expect(result.success).toBe(false)
       expect(result.error).toBe('Standard error')
@@ -53,7 +53,7 @@ describe('Enhanced Error Handler', () => {
     })
 
     it('should handle string errors', () => {
-      const result = enhancedErrorHandler('String error')
+      const result = handleError('String error')
 
       expect(result.success).toBe(false)
       expect(result.error).toBe('String error')
@@ -62,7 +62,7 @@ describe('Enhanced Error Handler', () => {
     })
 
     it('should handle unknown error types', () => {
-      const result = enhancedErrorHandler({ unknown: 'object' })
+      const result = handleError({ unknown: 'object' })
 
       expect(result.success).toBe(false)
       expect(result.error).toBe('An unknown error occurred')
@@ -72,7 +72,7 @@ describe('Enhanced Error Handler', () => {
 
     it('should log errors based on severity', () => {
       const highSeverityError = new AppError('High severity', 500, ErrorSeverity.HIGH)
-      enhancedErrorHandler(highSeverityError)
+      handleError(highSeverityError)
 
       expect(consoleSpy).toHaveBeenCalledWith(
         expect.stringContaining('[HIGH]'),

@@ -325,7 +325,7 @@ function LargestFilesList({ largestFiles }: { largestFiles: ComprehensiveStorage
   )
 }
 
-export function EnhancedStorageAnalytics() {
+export function StorageAnalytics() {
   const [data, setData] = useState<ComprehensiveStorageData | null>(null)
   const [meta, setMeta] = useState<AnalyticsMeta | null>(null)
   const [loading, setLoading] = useState(false)
