@@ -1,7 +1,7 @@
-import { DndContext, closestCenter } from '@dnd-kit/core'
+import { DndContext, closestCenter, type UniqueIdentifier, type SensorDescriptor } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { ColumnDef, flexRender } from '@tanstack/react-table'
+import { ColumnDef, flexRender, type Table as TanStackTable } from '@tanstack/react-table'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
@@ -29,9 +29,9 @@ export function DataTable<TData, TValue>({
   const tableContent = (
     <Table>
       <TableHeader className="bg-muted sticky top-0 z-10">
-        {table.getHeaderGroups().map(headerGroup => (
+        {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
-            {headerGroup.headers.map(header => {
+            {headerGroup.headers.map((header) => {
               return (
                 <TableHead key={header.id} colSpan={header.colSpan}>
                   {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
@@ -45,14 +45,14 @@ export function DataTable<TData, TValue>({
         {table.getRowModel().rows.length ? (
           dndEnabled ? (
             <SortableContext items={dataIds} strategy={verticalListSortingStrategy}>
-              {table.getRowModel().rows.map(row => (
+              {table.getRowModel().rows.map((row) => (
                 <DraggableRow key={row.id} row={row} />
               ))}
             </SortableContext>
           ) : (
-            table.getRowModel().rows.map(row => (
+            table.getRowModel().rows.map((row) => (
               <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                {row.getVisibleCells().map(cell => (
+                {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                 ))}
               </TableRow>

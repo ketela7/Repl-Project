@@ -242,7 +242,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
 
       const details = await fetchPromise
       setFileDetails(details)
-    } catch {
+    } catch (error: unknown) {
       if (process.env.NODE_ENV === 'development') {
       }
       setError(error instanceof Error ? error.message : 'Failed to fetch file details')
@@ -300,7 +300,7 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
     const deniedCapabilities = Object.entries(capabilities).filter(([_key, value]) => value === false)
 
     // Group capabilities by category for better organization
-    const groupCapabilities = (_ignored: [string, boolean][]) => {
+    const groupCapabilities = (caps: [string, boolean][]) => {
       const groups = {
         'File Operations': [] as string[],
         'Content Management': [] as string[],

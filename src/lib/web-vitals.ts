@@ -3,7 +3,7 @@
  * Tracks LCP, FID, CLS, FCP, and TTFB metrics
  */
 
-import { onCLS, onFCP, onINP, onLCP, onTTFB } from 'web-vitals'
+import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from 'web-vitals'
 
 // Define performance thresholds
 const PERFORMANCE_THRESHOLDS = {

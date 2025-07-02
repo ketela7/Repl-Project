@@ -129,7 +129,7 @@ export function DriveDestinationSelector({
   }
 
   // Validate parsed folder ID
-  const validateFolderId = async (_ignored: string) => {
+  const validateFolderId = async (folderId: string) => {
     setIsValidating(true)
     try {
       const response = await fetch('/api/drive/folders/validate', {

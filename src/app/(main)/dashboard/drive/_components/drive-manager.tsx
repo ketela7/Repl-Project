@@ -411,7 +411,7 @@ export function DriveManager() {
 
 
   const handleShortcutFile = useCallback(
-    async (_ignored: DriveItem) => {
+    async (item: DriveItem) => {
       try {
         // Try to get shortcut details and open the target
         const response = await fetch(`/api/drive/files/details`, {

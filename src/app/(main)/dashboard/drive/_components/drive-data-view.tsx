@@ -189,7 +189,7 @@ export function DriveDataView({
 
   // Optimized menu items configuration with condition handling
   const getMenuItems = useMemo(
-    () => (_ignored: DriveItem) => {
+    () => (item: DriveItem) => {
       const menuItems = [
         { key: 'details', label: 'Details', icon: Info, condition: true },
         { key: 'preview', label: 'Preview', icon: Eye, condition: !item.isFolder },

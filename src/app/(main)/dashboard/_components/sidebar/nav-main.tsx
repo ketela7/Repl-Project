@@ -20,6 +20,8 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 
+import { type NavGroup, type NavMainItem } from './sidebar-items'
+
 
 interface NavMainProps {
   readonly items: readonly NavGroup[]
@@ -71,7 +73,7 @@ const NavItemExpanded = ({
         {item.subItems && (
           <CollapsibleContent>
             <SidebarMenuSub>
-              {item.subItems.map(subItem => (
+              {item.subItems.map((subItem: NavMainItem) => (
                 <SidebarMenuSubItem key={subItem.title}>
                   <SidebarMenuSubButton aria-disabled={subItem.comingSoon} isActive={isActive(subItem.url)} asChild>
                     <Link href={subItem.url} target={subItem.newTab ? '_blank' : undefined}>
@@ -112,7 +114,7 @@ const NavItemCollapsed = ({
           </SidebarMenuButton>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-50 space-y-1" side="right" align="start">
-          {item.subItems?.map(subItem => (
+          {item.subItems?.map((subItem: NavMainItem) => (
             <DropdownMenuItem key={subItem.title} asChild>
               <SidebarMenuSubButton
                 key={subItem.title}
@@ -141,13 +143,13 @@ export function NavMain({ items }: NavMainProps) {
 
   const isItemActive = (url: string, subItems?: NavMainItem['subItems']) => {
     if (subItems?.length) {
-      return subItems.some(sub => path.startsWith(sub.url))
+      return subItems.some((sub: NavMainItem) => path.startsWith(sub.url))
     }
     return path === url
   }
 
   const isSubmenuOpen = (subItems?: NavMainItem['subItems']) => {
-    return subItems?.some(sub => path.startsWith(sub.url)) ?? false
+    return subItems?.some((sub: NavMainItem) => path.startsWith(sub.url)) ?? false
   }
 
   return (
@@ -180,7 +182,7 @@ export function NavMain({ items }: NavMainProps) {
           {group.label && <SidebarGroupLabel>{group.label}</SidebarGroupLabel>}
           <SidebarGroupContent className="flex flex-col gap-2">
             <SidebarMenu>
-              {group.items?.map(item =>
+              {group.items?.map((item: NavMainItem) =>
                 state === 'collapsed' && !isMobile ? (
                   <NavItemCollapsed key={item.title} item={item} isActive={isItemActive} />
                 ) : (
