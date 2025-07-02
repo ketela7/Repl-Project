@@ -18,7 +18,13 @@ interface QuotaData {
 
 interface FilesData {
   totalFiles: number
-  filesByType: Record<string, number>
+  totalSizeBytes?: number
+  filesByType: Array<{
+    mimeType: string
+    count: number
+    totalSize?: number
+    averageSize?: number
+  }> | Record<string, number>
   fileSizesByType: Record<string, number>
   largestFiles: Array<{
     name: string
@@ -26,7 +32,18 @@ interface FilesData {
     mimeType: string
     id: string
     webViewLink?: string
+    modifiedTime?: string
   }>
+  categories?: {
+    documents: number
+    images: number
+    videos: number
+    audio: number
+    spreadsheets?: number
+    presentations?: number
+    folders?: number
+    other: number
+  }
   hasMore: boolean
 }
 
@@ -67,7 +84,7 @@ export function ProgressiveStorageAnalytics() {
     return parseFloat((numBytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
   }
 
-  const startAnalysis = () => {
+  const startAnalysis = async () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close()
     }
@@ -75,9 +92,50 @@ export function ProgressiveStorageAnalytics() {
     setIsLoading(true)
     setError(null)
     setIsComplete(false)
-    setConnectionStatus('connecting')
     setProgress({ step: 'initializing', message: 'Starting analysis...' })
 
+    // Try direct API call first for better reliability
+    try {
+      const response = await fetch('/api/drive/storage')
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const data = await response.json()
+      
+      if (data.error) {
+        throw new Error(data.error)
+      }
+
+      // Set quota data
+      if (data.quota) {
+        setQuota(data.quota)
+      }
+
+      // Set files data with proper structure
+      if (data.fileStats) {
+        setFiles({
+          totalFiles: data.fileStats.totalFiles || 0,
+          totalSizeBytes: data.fileStats.totalSizeBytes || 0,
+          filesByType: data.fileStats.filesByType || {},
+          fileSizesByType: {},
+          largestFiles: data.largestFiles || [],
+          hasMore: false,
+          categories: data.fileStats.categories || {},
+        })
+      }
+
+      setIsComplete(true)
+      setIsLoading(false)
+      setProgress({ step: 'complete', message: 'Analysis complete!', isComplete: true })
+      
+      return // Success, no need for SSE
+    } catch (err: any) {
+      console.warn('Direct API failed, falling back to streaming:', err.message)
+    }
+
+    // Fallback to SSE streaming if direct API fails
+    setConnectionStatus('connecting')
     const eventSource = new EventSource('/api/drive/storage/stream')
     eventSourceRef.current = eventSource
 
@@ -178,13 +236,27 @@ export function ProgressiveStorageAnalytics() {
   const getTopFileTypes = () => {
     if (!files?.filesByType) return []
     
+    // Handle new API format (array of objects)
+    if (Array.isArray(files.filesByType)) {
+      return files.filesByType
+        .slice(0, 5)
+        .map(item => ({
+          type: item.mimeType.split('/')[1] || item.mimeType,
+          count: item.count,
+          size: item.totalSize || 0,
+          averageSize: item.averageSize || 0
+        }))
+    }
+    
+    // Fallback for old format (object)
     return Object.entries(files.filesByType)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([type, count]) => ({
         type: type.split('/')[1] || type,
         count,
-        size: files.fileSizesByType?.[type] || 0
+        size: files.fileSizesByType?.[type] || 0,
+        averageSize: 0
       }))
   }
 
@@ -318,13 +390,56 @@ export function ProgressiveStorageAnalytics() {
                 <div className="flex justify-between">
                   <span>Total Size</span>
                   <span className="font-medium">
-                    {formatBytes(files.fileSizesByType ? 
-                      Object.values(files.fileSizesByType).reduce((sum, size) => {
-                        const numSize = typeof size === 'number' ? size : parseInt(String(size || 0), 10) || 0
-                        return sum + numSize
-                      }, 0) : 0)}
+                    {formatBytes(files.totalSizeBytes || 0)}
                   </span>
                 </div>
+                
+                {/* File Categories */}
+                {files.categories && (
+                  <div className="space-y-2 border-t pt-3">
+                    <h4 className="text-sm font-medium">Categories</h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="flex justify-between">
+                        <span>Documents</span>
+                        <span>{files.categories.documents}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Images</span>
+                        <span>{files.categories.images}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Videos</span>
+                        <span>{files.categories.videos}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Audio</span>
+                        <span>{files.categories.audio}</span>
+                      </div>
+                      {files.categories.spreadsheets !== undefined && (
+                        <div className="flex justify-between">
+                          <span>Spreadsheets</span>
+                          <span>{files.categories.spreadsheets}</span>
+                        </div>
+                      )}
+                      {files.categories.presentations !== undefined && (
+                        <div className="flex justify-between">
+                          <span>Presentations</span>
+                          <span>{files.categories.presentations}</span>
+                        </div>
+                      )}
+                      {files.categories.folders !== undefined && (
+                        <div className="flex justify-between">
+                          <span>Folders</span>
+                          <span>{files.categories.folders}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span>Other</span>
+                        <span>{files.categories.other}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
