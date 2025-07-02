@@ -60,10 +60,11 @@ export default [
         'error',
         {
           vars: 'all',
-          varsIgnorePattern: '^_',
+          varsIgnorePattern: '^(_|error$|err$)',
           args: 'after-used',
-          argsIgnorePattern: '^_',
-          destructuredArrayIgnorePattern: '^_'
+          argsIgnorePattern: '^(_|error$|err$)',
+          destructuredArrayIgnorePattern: '^(_|error$|err$)',
+          caughtErrorsIgnorePattern: '^(_|error$|err$)'
         },
       ],
 
