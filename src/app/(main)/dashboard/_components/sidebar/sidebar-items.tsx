@@ -15,6 +15,7 @@ import {
   Archive,
   Cloud,
   Download,
+  Gauge,
 } from 'lucide-react'
 
 export interface NavMainItem {
@@ -98,6 +99,11 @@ export const sidebarItems: SidebarData = {
           title: 'Storage Analytics',
           url: '/dashboard/analytics',
           icon: BarChart3,
+        },
+        {
+          title: 'Performance',
+          url: '/dashboard/performance',
+          icon: Gauge,
         },
         {
           title: 'Activity',
