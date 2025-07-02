@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-
-import { authOptions } from '@/auth'
+import { auth } from '@/auth'
 import { createDriveClient } from '@/lib/google-drive/config'
-import { ComprehensiveStorageAnalyzer } from '@/lib/google-drive/comprehensive-storage'
+import { StorageAnalyzer } from '@/lib/google-drive/storage'
 
 /**
  * Enhanced Storage Analytics API with complete pagination support
@@ -11,7 +9,7 @@ import { ComprehensiveStorageAnalyzer } from '@/lib/google-drive/comprehensive-s
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await auth()
 
     if (!session?.accessToken) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
@@ -23,11 +21,11 @@ export async function GET(request: NextRequest) {
 
     // Create Drive client and analyzer
     const drive = createDriveClient(session.accessToken)
-    const analyzer = new ComprehensiveStorageAnalyzer(drive)
+    const analyzer = new StorageAnalyzer(drive)
 
-    // Get comprehensive analytics
+    // Get analytics
     const startTime = Date.now()
-    const analytics = await analyzer.getComprehensiveAnalytics(strategy)
+    const analytics = await analyzer.getAnalytics(strategy)
     const totalTime = Date.now() - startTime
 
     // Add performance metrics

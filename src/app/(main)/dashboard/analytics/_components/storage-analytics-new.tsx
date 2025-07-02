@@ -26,7 +26,7 @@ import {
   Zap,
 } from 'lucide-react'
 
-interface ComprehensiveStorageData {
+interface StorageData {
   quota: {
     limit: number | null
     used: number
@@ -109,7 +109,7 @@ function getFileTypeIcon(mimeType: string) {
   return FileIcon
 }
 
-function QuotaOverview({ quota }: { quota: ComprehensiveStorageData['quota'] }) {
+function QuotaOverview({ quota }: { quota: StorageData['quota'] }) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -129,14 +129,12 @@ function QuotaOverview({ quota }: { quota: ComprehensiveStorageData['quota'] }) 
               <p className="text-muted-foreground text-xs">
                 of {quota.limit ? formatBytes(quota.limit) : 'Unknown'} used
               </p>
-              {quota.usagePercentage && (
-                <Progress value={quota.usagePercentage} className="mt-2" />
-              )}
+              {quota.usagePercentage && <Progress value={quota.usagePercentage} className="mt-2" />}
             </div>
           )}
-          
+
           <Separator />
-          
+
           <div className="space-y-2 text-xs">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Drive Storage:</span>
@@ -159,7 +157,13 @@ function QuotaOverview({ quota }: { quota: ComprehensiveStorageData['quota'] }) 
   )
 }
 
-function ProcessingStats({ processing, meta }: { processing: ComprehensiveStorageData['processing']; meta: AnalyticsMeta }) {
+function ProcessingStats({
+  processing,
+  meta,
+}: {
+  processing: ComprehensiveStorageData['processing']
+  meta: AnalyticsMeta
+}) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -178,9 +182,9 @@ function ProcessingStats({ processing, meta }: { processing: ComprehensiveStorag
               <p className="text-muted-foreground text-xs">Files Analyzed</p>
             </div>
           </div>
-          
+
           <Separator />
-          
+
           <div className="space-y-2 text-xs">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Strategy:</span>
@@ -209,10 +213,20 @@ function ProcessingStats({ processing, meta }: { processing: ComprehensiveStorag
 
 function StorageByTypeChart({ fileStats }: { fileStats: ComprehensiveStorageData['fileStats'] }) {
   const sizeTypes = [
-    { name: 'Images', size: fileStats.fileSizesByType.images, icon: Image, color: 'text-purple-600' },
+    {
+      name: 'Images',
+      size: fileStats.fileSizesByType.images,
+      icon: Image,
+      color: 'text-purple-600',
+    },
     { name: 'Videos', size: fileStats.fileSizesByType.videos, icon: Video, color: 'text-red-600' },
     { name: 'PDFs', size: fileStats.fileSizesByType.pdfs, icon: FileText, color: 'text-gray-600' },
-    { name: 'Other', size: fileStats.fileSizesByType.other, icon: FileIcon, color: 'text-gray-500' },
+    {
+      name: 'Other',
+      size: fileStats.fileSizesByType.other,
+      icon: FileIcon,
+      color: 'text-gray-500',
+    },
   ]
 
   const totalSize = fileStats.totalSizeBytes
@@ -247,10 +261,8 @@ function StorageByTypeChart({ fileStats }: { fileStats: ComprehensiveStorageData
                     <span className="text-muted-foreground">{percentage}%</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <Progress value={percentage} className="flex-1 mr-2" />
-                    <span className="text-xs font-medium min-w-[60px] text-right">
-                      {formatBytes(type.size)}
-                    </span>
+                    <Progress value={percentage} className="mr-2 flex-1" />
+                    <span className="min-w-[60px] text-right text-xs font-medium">{formatBytes(type.size)}</span>
                   </div>
                 </div>
               )
@@ -341,12 +353,12 @@ export function EnhancedStorageAnalytics() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center space-y-4">
-          <RefreshCw className="h-8 w-8 animate-spin mx-auto text-muted-foreground" />
+      <div className="flex min-h-[400px] items-center justify-center">
+        <div className="space-y-4 text-center">
+          <RefreshCw className="text-muted-foreground mx-auto h-8 w-8 animate-spin" />
           <div>
             <p className="font-medium">Analyzing your Drive storage...</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {strategy === 'complete' ? 'This may take a while for large drives' : 'Processing files...'}
             </p>
           </div>
@@ -358,14 +370,14 @@ export function EnhancedStorageAnalytics() {
   if (error) {
     return (
       <Card>
-        <CardContent className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center space-y-4">
-            <AlertTriangle className="h-12 w-12 text-destructive mx-auto" />
+        <CardContent className="flex min-h-[400px] items-center justify-center">
+          <div className="space-y-4 text-center">
+            <AlertTriangle className="text-destructive mx-auto h-12 w-12" />
             <div>
-              <h3 className="font-semibold text-lg mb-2">Analysis Failed</h3>
+              <h3 className="mb-2 text-lg font-semibold">Analysis Failed</h3>
               <p className="text-muted-foreground mb-4">{error}</p>
               <Button onClick={() => fetchStorageData()}>
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="mr-2 h-4 w-4" />
                 Try Again
               </Button>
             </div>
@@ -378,7 +390,7 @@ export function EnhancedStorageAnalytics() {
   if (!data || !meta) {
     return (
       <Card>
-        <CardContent className="flex items-center justify-center min-h-[400px]">
+        <CardContent className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
             <p className="text-muted-foreground">No storage data available</p>
             <Button onClick={() => fetchStorageData()} className="mt-4">
@@ -408,7 +420,7 @@ export function EnhancedStorageAnalytics() {
               onClick={() => handleStrategyChange('fast')}
               disabled={loading}
             >
-              <Clock className="h-4 w-4 mr-2" />
+              <Clock className="mr-2 h-4 w-4" />
               Fast (~2k files)
             </Button>
             <Button
@@ -417,7 +429,7 @@ export function EnhancedStorageAnalytics() {
               onClick={() => handleStrategyChange('progressive')}
               disabled={loading}
             >
-              <Gauge className="h-4 w-4 mr-2" />
+              <Gauge className="mr-2 h-4 w-4" />
               Progressive (Smart)
             </Button>
             <Button
@@ -426,12 +438,13 @@ export function EnhancedStorageAnalytics() {
               onClick={() => handleStrategyChange('complete')}
               disabled={loading}
             >
-              <Database className="h-4 w-4 mr-2" />
+              <Database className="mr-2 h-4 w-4" />
               Complete (All files)
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Current: {meta.accuracy}% accuracy • {data.processing.filesProcessed.toLocaleString()} files analyzed • {formatDuration(meta.performanceMs)}
+          <p className="text-muted-foreground mt-2 text-xs">
+            Current: {meta.accuracy}% accuracy • {data.processing.filesProcessed.toLocaleString()} files analyzed •{' '}
+            {formatDuration(meta.performanceMs)}
           </p>
         </CardContent>
       </Card>
@@ -461,11 +474,11 @@ export function EnhancedStorageAnalytics() {
               <CardTitle>File Type Distribution</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 {Object.entries(data.fileStats.filesByType).map(([type, count]) => (
-                  <div key={type} className="text-center p-4 border rounded-lg">
+                  <div key={type} className="rounded-lg border p-4 text-center">
                     <div className="text-2xl font-bold">{count.toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground capitalize">{type}</div>
+                    <div className="text-muted-foreground text-sm capitalize">{type}</div>
                   </div>
                 ))}
               </div>
@@ -480,15 +493,18 @@ export function EnhancedStorageAnalytics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
-                    <h4 className="font-medium mb-2">Upload Limits</h4>
+                    <h4 className="mb-2 font-medium">Upload Limits</h4>
                     <p className="text-sm">
-                      Max Upload: {data.systemCapabilities.maxUploadSize ? formatBytes(data.systemCapabilities.maxUploadSize) : 'No limit'}
+                      Max Upload:{' '}
+                      {data.systemCapabilities.maxUploadSize
+                        ? formatBytes(data.systemCapabilities.maxUploadSize)
+                        : 'No limit'}
                     </p>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2">Account Info</h4>
+                    <h4 className="mb-2 font-medium">Account Info</h4>
                     <p className="text-sm">
                       {data.user.displayName} ({data.user.emailAddress})
                     </p>

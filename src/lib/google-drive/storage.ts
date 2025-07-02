@@ -1,98 +1,98 @@
 /**
- * Comprehensive Storage Analytics with Full Pagination Support
+ * Storage Analytics with Full Pagination Support
  * Solves limitation of pageSize 1000 by implementing complete data collection
  */
 
-import { drive_v3 } from 'googleapis';
+import { drive_v3 } from 'googleapis'
 
-interface ComprehensiveStorageData {
+interface StorageData {
   quota: {
-    limit: number | null;
-    used: number;
-    usedInDrive: number;
-    usedInDriveTrash: number;
-    available: number | null;
-    usagePercentage: number | null;
-    hasUnlimitedStorage: boolean;
-  };
+    limit: number | null
+    used: number
+    usedInDrive: number
+    usedInDriveTrash: number
+    available: number | null
+    usagePercentage: number | null
+    hasUnlimitedStorage: boolean
+  }
   fileStats: {
-    totalFiles: number;
-    totalSizeBytes: number;
-    filesByType: Record<string, number>;
-    fileSizesByType: Record<string, number>;
-    sharedFiles: number;
-    starredFiles: number;
-    trashedFiles: number;
-  };
+    totalFiles: number
+    totalSizeBytes: number
+    filesByType: Record<string, number>
+    fileSizesByType: Record<string, number>
+    sharedFiles: number
+    starredFiles: number
+    trashedFiles: number
+  }
   largestFiles: Array<{
-    name: string;
-    size: number;
-    mimeType: string;
-    id: string;
-    webViewLink?: string;
-  }>;
+    name: string
+    size: number
+    mimeType: string
+    id: string
+    webViewLink?: string
+  }>
   systemCapabilities: {
-    maxUploadSize: number | null;
-    canCreateDrives: boolean;
-    maxImportSizes: Record<string, number>;
-    importFormats: Record<string, string[]>;
-    exportFormats: Record<string, string[]>;
-    folderColorPalette: string[];
-    driveThemes: any[];
-    appInstalled: boolean;
-  };
+    maxUploadSize: number | null
+    canCreateDrives: boolean
+    maxImportSizes: Record<string, number>
+    importFormats: Record<string, string[]>
+    exportFormats: Record<string, string[]>
+    folderColorPalette: string[]
+    driveThemes: any[]
+    appInstalled: boolean
+  }
   user: {
-    displayName?: string;
-    emailAddress?: string;
-    photoLink?: string;
-    permissionId?: string;
-  };
+    displayName?: string
+    emailAddress?: string
+    photoLink?: string
+    permissionId?: string
+  }
   processing: {
-    totalApiCalls: number;
-    processingTimeMs: number;
-    filesProcessed: number;
-    estimatedAccuracy: number; // Percentage of complete Drive analyzed
-  };
+    totalApiCalls: number
+    processingTimeMs: number
+    filesProcessed: number
+    estimatedAccuracy: number // Percentage of complete Drive analyzed
+  }
 }
 
-export class ComprehensiveStorageAnalyzer {
-  private drive: drive_v3.Drive;
+export class StorageAnalyzer {
+  private drive: drive_v3.Drive
   private processingStats = {
     totalApiCalls: 0,
     startTime: Date.now(),
     filesProcessed: 0,
-  };
+  }
 
   constructor(driveInstance: drive_v3.Drive) {
-    this.drive = driveInstance;
+    this.drive = driveInstance
   }
 
   /**
    * Get complete storage analytics with progressive loading strategy
    * Uses multiple approaches to balance completeness vs speed
    */
-  async getComprehensiveAnalytics(strategy: 'fast' | 'complete' | 'progressive' = 'progressive'): Promise<ComprehensiveStorageData> {
-    this.processingStats.startTime = Date.now();
-    
+  async getAnalytics(strategy: 'fast' | 'complete' | 'progressive' = 'progressive'): Promise<StorageData> {
+    this.processingStats.startTime = Date.now()
+
     // Step 1: Get system information (fastest)
-    const aboutInfo = await this.getEnhancedAboutInfo();
-    
+    const aboutInfo = await this.getEnhancedAboutInfo()
+
     // Step 2: Choose analysis strategy based on user preference
-    let fileAnalysis;
+    let fileAnalysis
     switch (strategy) {
       case 'fast':
-        fileAnalysis = await this.getFastAnalysis();
-        break;
+        fileAnalysis = await this.getFastAnalysis()
+        break
       case 'complete':
-        fileAnalysis = await this.getCompleteAnalysis();
-        break;
+        fileAnalysis = await this.getCompleteAnalysis()
+        break
       case 'progressive':
       default:
-        fileAnalysis = await this.getProgressiveAnalysis();
-        break;
+        fileAnalysis = await this.getProgressiveAnalysis()
+        break
     }
 
-    const processingTime = Date.now() - this.processingStats.startTime;
+    const processingTime = Date.now() - this.processingStats.startTime
 
     return {
       quota: aboutInfo.quota,
@@ -106,7 +106,7 @@ export class ComprehensiveStorageAnalyzer {
         filesProcessed: this.processingStats.filesProcessed,
         estimatedAccuracy: fileAnalysis.estimatedAccuracy,
       },
-    };
+    }
   }
 
   /**
@@ -115,16 +115,16 @@ export class ComprehensiveStorageAnalyzer {
   private async getEnhancedAboutInfo() {
     const aboutResponse = await this.drive.about.get({
       fields: '*', // Get ALL available fields
-    });
-    this.processingStats.totalApiCalls++;
+    })
+    this.processingStats.totalApiCalls++
 
-    const about = aboutResponse.data;
-    const storageQuota = about.storageQuota;
+    const about = aboutResponse.data
+    const storageQuota = about.storageQuota
 
-    const quotaLimit = storageQuota?.limit ? parseInt(storageQuota.limit) : null;
-    const quotaUsage = storageQuota?.usage ? parseInt(storageQuota.usage) : 0;
-    const quotaUsageInDrive = storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : 0;
-    const quotaUsageInDriveTrash = storageQuota?.usageInDriveTrash ? parseInt(storageQuota.usageInDriveTrash) : 0;
+    const quotaLimit = storageQuota?.limit ? parseInt(storageQuota.limit) : null
+    const quotaUsage = storageQuota?.usage ? parseInt(storageQuota.usage) : 0
+    const quotaUsageInDrive = storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : 0
+    const quotaUsageInDriveTrash = storageQuota?.usageInDriveTrash ? parseInt(storageQuota.usageInDriveTrash) : 0
 
     return {
       quota: {
@@ -152,35 +152,35 @@ export class ComprehensiveStorageAnalyzer {
         photoLink: about.user?.photoLink,
         permissionId: about.user?.permissionId,
       },
-    };
+    }
   }
 
   /**
    * Fast analysis - limited sample for quick results
    */
   private async getFastAnalysis() {
-    const sampleSize = 2000; // Sample first 2000 files for fast estimate
-    
-    const files = await this.getPaginatedFiles(sampleSize);
-    const analysis = this.analyzeFiles(files);
-    
+    const sampleSize = 2000 // Sample first 2000 files for fast estimate
+
+    const files = await this.getPaginatedFiles(sampleSize)
+    const analysis = this.analyzeFiles(files)
+
     return {
       ...analysis,
       estimatedAccuracy: Math.min(100, (files.length / 5000) * 100), // Estimate based on typical Drive sizes
-    };
+    }
   }
 
   /**
    * Complete analysis - get ALL files (may take longer)
    */
   private async getCompleteAnalysis() {
-    const allFiles = await this.getPaginatedFiles(); // No limit = get all files
-    const analysis = this.analyzeFiles(allFiles);
-    
+    const allFiles = await this.getPaginatedFiles() // No limit = get all files
+    const analysis = this.analyzeFiles(allFiles)
+
     return {
       ...analysis,
       estimatedAccuracy: 100, // Complete data
-    };
+    }
   }
 
   /**
@@ -188,49 +188,49 @@ export class ComprehensiveStorageAnalyzer {
    */
   private async getProgressiveAnalysis() {
     // Start with a reasonable sample
-    let files = await this.getPaginatedFiles(5000);
-    
+    let files = await this.getPaginatedFiles(5000)
+
     // If we hit the limit, estimate total and decide strategy
     if (files.length === 5000) {
       // Try to get a rough count estimate (faster query)
-      const estimatedTotal = await this.estimateTotalFiles();
-      
+      const estimatedTotal = await this.estimateTotalFiles()
+
       if (estimatedTotal > 20000) {
         // Large Drive: Use statistical sampling
-        const extraFiles = await this.getStatisticalSample(10000);
-        files = [...files, ...extraFiles];
+        const extraFiles = await this.getStatisticalSample(10000)
+        files = [...files, ...extraFiles]
       } else if (estimatedTotal > 10000) {
         // Medium Drive: Get more data progressively
-        const moreFiles = await this.getPaginatedFiles(10000, files.length);
-        files = [...files, ...moreFiles];
+        const moreFiles = await this.getPaginatedFiles(10000, files.length)
+        files = [...files, ...moreFiles]
       } else {
         // Small Drive: Get everything
-        const remainingFiles = await this.getPaginatedFiles(undefined, files.length);
-        files = [...files, ...remainingFiles];
+        const remainingFiles = await this.getPaginatedFiles(undefined, files.length)
+        files = [...files, ...remainingFiles]
       }
     }
 
-    const analysis = this.analyzeFiles(files);
-    const estimatedAccuracy = files.length >= 20000 ? 95 : 100;
-    
+    const analysis = this.analyzeFiles(files)
+    const estimatedAccuracy = files.length >= 20000 ? 95 : 100
+
     return {
       ...analysis,
       estimatedAccuracy,
-    };
+    }
   }
 
   /**
    * Get files with complete pagination support
    */
   private async getPaginatedFiles(maxFiles?: number, skipFiles = 0): Promise<any[]> {
-    const allFiles: any[] = [];
-    let pageToken: string | undefined;
-    let filesCollected = 0;
+    const allFiles: any[] = []
+    let pageToken: string | undefined
+    let filesCollected = 0
 
     do {
-      const pageSize = Math.min(1000, maxFiles ? maxFiles - filesCollected : 1000);
-      
-      if (pageSize <= 0) break;
+      const pageSize = Math.min(1000, maxFiles ? maxFiles - filesCollected : 1000)
+
+      if (pageSize <= 0) break
 
       const response = await this.drive.files.list({
         q: 'trashed=false',
@@ -240,34 +240,33 @@ export class ComprehensiveStorageAnalyzer {
         orderBy: 'modifiedTime desc',
         supportsAllDrives: true,
         includeItemsFromAllDrives: true,
-      });
+      })
 
-      this.processingStats.totalApiCalls++;
+      this.processingStats.totalApiCalls++
 
-      const files = response.data.files || [];
-      
+      const files = response.data.files || []
+
       // Skip files if we're continuing from a previous batch
-      const filesToAdd = skipFiles > 0 ? files.slice(Math.max(0, skipFiles - filesCollected)) : files;
-      
-      allFiles.push(...filesToAdd);
-      filesCollected += files.length;
-      
-      pageToken = response.data.nextPageToken;
+      const filesToAdd = skipFiles > 0 ? files.slice(Math.max(0, skipFiles - filesCollected)) : files
+
+      allFiles.push(...filesToAdd)
+      filesCollected += files.length
+
+      pageToken = response.data.nextPageToken
 
       // Break if we've collected enough files
       if (maxFiles && allFiles.length >= maxFiles) {
-        break;
+        break
       }
 
       // Add small delay to avoid rate limiting
       if (pageToken) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 100))
       }
+    } while (pageToken)
 
-    } while (pageToken);
-
-    this.processingStats.filesProcessed = allFiles.length;
-    return allFiles;
+    this.processingStats.filesProcessed = allFiles.length
+    return allFiles
   }
 
   /**
@@ -280,15 +279,15 @@ export class ComprehensiveStorageAnalyzer {
         q: 'trashed=false',
         pageSize: 1,
         fields: 'files(id)',
-      });
-      
-      this.processingStats.totalApiCalls++;
-      
+      })
+
+      this.processingStats.totalApiCalls++
+
       // This is a rough estimate - Google doesn't provide exact counts
       // We'll estimate based on typical patterns
-      return 10000; // Conservative estimate for progressive strategy
+      return 10000 // Conservative estimate for progressive strategy
     } catch {
-      return 5000; // Fallback estimate
+      return 5000 // Fallback estimate
     }
   }
 
@@ -301,10 +300,10 @@ export class ComprehensiveStorageAnalyzer {
       "modifiedTime > '2024-01-01T00:00:00'",
       "modifiedTime < '2024-01-01T00:00:00' and modifiedTime > '2023-01-01T00:00:00'",
       "modifiedTime < '2023-01-01T00:00:00'",
-    ];
+    ]
 
-    const allSamples: any[] = [];
-    const samplesPerRange = Math.floor(sampleSize / timeRanges.length);
+    const allSamples: any[] = []
+    const samplesPerRange = Math.floor(sampleSize / timeRanges.length)
 
     for (const timeRange of timeRanges) {
       try {
@@ -314,25 +313,31 @@ export class ComprehensiveStorageAnalyzer {
           fields: 'files(id,name,mimeType,size,webViewLink)',
           orderBy: 'modifiedTime desc',
           supportsAllDrives: true,
-        });
+        })
 
-        this.processingStats.totalApiCalls++;
-        allSamples.push(...(response.data.files || []));
+        this.processingStats.totalApiCalls++
+        allSamples.push(...(response.data.files || []))
       } catch {
         // If query fails, continue with other ranges
-        continue;
+        continue
       }
     }
 
-    return allSamples;
+    return allSamples
   }
 
   /**
    * Analyze files and generate statistics
    */
   private analyzeFiles(files: any[]) {
-    let totalSizeBytes = 0;
-    const largestFiles: Array<{ name: string; size: number; mimeType: string; id: string; webViewLink?: string }> = [];
+    let totalSizeBytes = 0
+    const largestFiles: Array<{
+      name: string
+      size: number
+      mimeType: string
+      id: string
+      webViewLink?: string
+    }> = []
 
     const filesByType = {
       documents: 0,
@@ -343,7 +348,7 @@ export class ComprehensiveStorageAnalyzer {
       pdfs: 0,
       folders: 0,
       other: 0,
-    };
+    }
 
     const fileSizesByType = {
       images: 0,
@@ -351,15 +356,15 @@ export class ComprehensiveStorageAnalyzer {
       pdfs: 0,
       folders: 0,
       other: 0,
-    };
+    }
 
-    files.forEach((file) => {
-      const size = file.size ? parseInt(file.size) : 0;
-      const mimeType = file.mimeType || '';
+    files.forEach(file => {
+      const size = file.size ? parseInt(file.size) : 0
+      const mimeType = file.mimeType || ''
 
       // Only count files with actual storage size toward quota
       if (size > 0) {
-        totalSizeBytes += size;
+        totalSizeBytes += size
 
         // Track largest files
         largestFiles.push({
@@ -368,36 +373,36 @@ export class ComprehensiveStorageAnalyzer {
           mimeType,
           id: file.id,
           webViewLink: file.webViewLink,
-        });
+        })
       }
 
       // Categorize files with more comprehensive types
       if (mimeType === 'application/vnd.google-apps.document') {
-        filesByType.documents++;
+        filesByType.documents++
       } else if (mimeType === 'application/vnd.google-apps.spreadsheet') {
-        filesByType.spreadsheets++;
+        filesByType.spreadsheets++
       } else if (mimeType === 'application/vnd.google-apps.presentation') {
-        filesByType.presentations++;
+        filesByType.presentations++
       } else if (mimeType === 'application/vnd.google-apps.folder') {
-        filesByType.folders++;
+        filesByType.folders++
       } else if (mimeType.startsWith('image/')) {
-        filesByType.images++;
-        fileSizesByType.images += size;
+        filesByType.images++
+        fileSizesByType.images += size
       } else if (mimeType.startsWith('video/')) {
-        filesByType.videos++;
-        fileSizesByType.videos += size;
+        filesByType.videos++
+        fileSizesByType.videos += size
       } else if (mimeType === 'application/pdf') {
-        filesByType.pdfs++;
-        fileSizesByType.pdfs += size;
+        filesByType.pdfs++
+        fileSizesByType.pdfs += size
       } else {
-        filesByType.other++;
-        fileSizesByType.other += size;
+        filesByType.other++
+        fileSizesByType.other += size
       }
-    });
+    })
 
     // Sort largest files by size and get top 20
-    largestFiles.sort((a, b) => b.size - a.size);
-    const topLargestFiles = largestFiles.slice(0, 20);
+    largestFiles.sort((a, b) => b.size - a.size)
+    const topLargestFiles = largestFiles.slice(0, 20)
 
     return {
       fileStats: {
@@ -410,6 +415,6 @@ export class ComprehensiveStorageAnalyzer {
         trashedFiles: 0, // Not included in main analysis
       },
       largestFiles: topLargestFiles,
-    };
+    }
   }
 }
