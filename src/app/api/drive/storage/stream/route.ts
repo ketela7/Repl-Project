@@ -57,11 +57,11 @@ export async function GET(request: NextRequest) {
             const fileSizesByType: Record<string, number> = {}
             const largestFiles: any[] = []
 
-            // Process files in chunks of 200 for smooth updates
+            // Process files in chunks of 1000 (maximum pageSize) to minimize API calls
             do {
               const response = await drive.files.list({
                 q: 'trashed=false',
-                pageSize: 200,
+                pageSize: 1000, // Maximum pageSize to reduce API calls
                 pageToken,
                 fields: 'nextPageToken,files(id,name,mimeType,size,webViewLink,createdTime)',
                 orderBy: 'modifiedTime desc',
@@ -116,8 +116,8 @@ export async function GET(request: NextRequest) {
                 processed: totalProcessed
               })
 
-              // Small delay to prevent overwhelming the client
-              await new Promise(resolve => setTimeout(resolve, 100))
+              // Small delay to prevent overwhelming the client (reduced since we use larger pageSize)
+              await new Promise(resolve => setTimeout(resolve, 50))
 
               // Stop after 10,000 files to prevent timeout
               if (totalProcessed >= 10000) {
