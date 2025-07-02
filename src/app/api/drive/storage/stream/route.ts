@@ -94,10 +94,10 @@ export async function GET() {
                 // Use service function with retry + throttle built-in
                 const listOptions: any = {
                   pageSize: 1000, // Maximum for efficiency  
-                  orderBy: 'modifiedTime desc',
+                //  orderBy: 'modifiedTime desc',
                   includeTeamDriveItems: true,
                   // Force use of LIST_STANDARD fields to get size data
-                  fields: 'nextPageToken,files(id,name,mimeType,size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,thumbnailLink,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive))',
+                  fields: 'nextPageToken,files(id,name,mimeType,size)',
                 }
                 
                 // Only add pageToken if it exists
