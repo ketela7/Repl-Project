@@ -237,5 +237,4 @@ cookies.txt
 # pnpm-lock.yaml
 
 # Local configuration files
-.env.example
 config.local.js

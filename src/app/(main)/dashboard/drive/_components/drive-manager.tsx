@@ -216,15 +216,12 @@ export function DriveManager() {
       const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
 
       // Use getFileActions for consistent capability checking
-      const actions = getFileActions(
-        {
-          ...(item?.capabilities && { capabilities: item.capabilities }),
-          ...(typeof item?.trashed === 'boolean' && { trashed: item.trashed }),
-          ...(item?.mimeType && { mimeType: item.mimeType }),
-          itemType: itemIsFolder ? 'folder' : 'file',
-        },
-        filters.activeView,
-      )
+      const actions = getFileActions({
+        ...(item?.capabilities && { capabilities: item.capabilities }),
+        ...(typeof item?.trashed === 'boolean' && { trashed: item.trashed }),
+        ...(item?.mimeType && { mimeType: item.mimeType }),
+        itemType: itemIsFolder ? 'folder' : 'file',
+      })
 
       return {
         id: itemId,
@@ -414,20 +411,7 @@ export function DriveManager() {
     [fetchFiles],
   )
 
-  const handleBackToParent = useCallback(() => {
-    // // // // // console.log('[DriveManager] Navigating back to root')
 
-    // Force immediate state update
-    setLoading(true)
-    setCurrentFolderId(null)
-    setSelectedItems(new Set())
-    setItems([]) // Clear immediately
-    setFilteredItems([]) // Clear filtered items too
-    setNextPageToken(null)
-
-    // Force fetch root folder
-    fetchFiles()
-  }, [fetchFiles])
 
   const handleShortcutFile = useCallback(
     async (item: DriveItem) => {
@@ -579,15 +563,12 @@ export function DriveManager() {
 
     return sorted.map(item => {
       const isFolder = item.mimeType === 'application/vnd.google-apps.folder'
-      const actions = getFileActions(
-        {
-          capabilities: item.capabilities,
-          trashed: item.trashed,
-          mimeType: item.mimeType,
-          itemType: isFolder ? 'folder' : 'file',
-        },
-        filters.activeView,
-      )
+      const actions = getFileActions({
+        capabilities: item.capabilities,
+        trashed: item.trashed,
+        mimeType: item.mimeType,
+        itemType: isFolder ? 'folder' : 'file',
+      })
 
       return {
         ...item,
@@ -614,11 +595,7 @@ export function DriveManager() {
     }
   }, [sortedDisplayItems, selectedItems.size])
 
-  // Bulk operation completion handler
-  const handleBulkOperationComplete = () => {
-    setSelectedItems(new Set())
-    handleRefresh()
-  }
+  // Bulk operation completion handler removed as unused
 
   if (loading) {
     return <DriveGridSkeleton />
@@ -822,8 +799,7 @@ export function DriveManager() {
             setSelectedItems(new Set())
           }}
           selectedItems={getSelectedItemsForDialog()}
-          allItems={displayItems}
-          onComplete={() => {
+          onConfirm={() => {
             closeDialog('move')
             setSelectedItems(new Set())
             handleRefresh()
@@ -839,8 +815,7 @@ export function DriveManager() {
             setSelectedItems(new Set())
           }}
           selectedItems={getSelectedItemsForDialog()}
-          allItems={displayItems}
-          onComplete={() => {
+          onConfirm={() => {
             closeDialog('copy')
             setSelectedItems(new Set())
             handleRefresh()
@@ -856,7 +831,6 @@ export function DriveManager() {
             setSelectedItems(new Set())
           }}
           selectedItems={getSelectedItemsForDialog()}
-          allItems={displayItems}
           onComplete={() => {
             closeDialog('share')
             setSelectedItems(new Set())
