@@ -6,7 +6,7 @@ import { DriveFile } from '@/lib/google-drive/types'
  * Progressive Storage Analytics with Server-Sent Events
  * Uses existing basecode service functions for efficiency and consistency
  */
-export async function POST() {
+export async function GET() {
   try {
     const session = await auth()
     
@@ -246,7 +246,7 @@ export async function POST() {
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type',
       },
     })
