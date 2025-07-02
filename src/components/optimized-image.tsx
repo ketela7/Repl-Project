@@ -116,15 +116,7 @@ export function OptimizedAvatar({
 }
 
 // File thumbnail optimized image
-export function OptimizedThumbnail({
-  src,
-  alt,
-  className,
-}: {
-  src: string
-  alt: string
-  className?: string
-}) {
+export function OptimizedThumbnail({ src, alt, className }: { src: string; alt: string; className?: string }) {
   return (
     <OptimizedImage
       src={src}

@@ -23,13 +23,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
@@ -37,19 +31,8 @@ import {
   BottomSheetTitle,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
@@ -74,9 +57,7 @@ interface ShareResult {
 
 function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogProps) {
   const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
-  const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>(
-    'anyoneWithLink',
-  )
+  const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>('anyoneWithLink')
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
@@ -282,9 +263,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
   }
 
   const handleExportData = (format: 'csv' | 'txt' | 'json') => {
-    const successfulShares = progress.shareResults.filter(
-      result => result.success && result.shareLink,
-    )
+    const successfulShares = progress.shareResults.filter(result => result.success && result.shareLink)
 
     if (successfulShares.length === 0) {
       toast.error('No successful shares to export')
@@ -299,9 +278,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
       case 'csv':
         // Create CSV content with header
         const csvHeader = 'name,sharelink\n'
-        const csvContent = successfulShares
-          .map(result => `"${result.name}","${result.shareLink}"`)
-          .join('\n')
+        const csvContent = successfulShares.map(result => `"${result.name}","${result.shareLink}"`).join('\n')
         content = csvHeader + csvContent
         mimeType = 'text/csv;charset=utf-8;'
         fileExtension = 'csv'
@@ -339,10 +316,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
-    link.setAttribute(
-      'download',
-      `share-links-${new Date().toISOString().split('T')[0]}.${fileExtension}`,
-    )
+    link.setAttribute('download', `share-links-${new Date().toISOString().split('T')[0]}.${fileExtension}`)
     link.style.visibility = 'hidden'
     document.body.appendChild(link)
     link.click()
@@ -430,9 +404,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
               <Label className="text-xs font-medium">Link Access:</Label>
               <Select
                 value={linkAccess}
-                onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
-                  setLinkAccess(value)
-                }
+                onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') => setLinkAccess(value)}
               >
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue />
@@ -467,10 +439,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
                 {selectedItems.slice(0, 5).map(item => (
-                  <div
-                    key={item.id}
-                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
-                  >
+                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={item.name}>
                       {item.name}
@@ -494,8 +463,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage =
-        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -714,9 +682,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
               <>
                 <Button
                   onClick={handleShare}
-                  className={cn(
-                    'touch-target min-h-[44px] bg-blue-600 text-white hover:bg-blue-700 active:scale-95',
-                  )}
+                  className={cn('touch-target min-h-[44px] bg-blue-600 text-white hover:bg-blue-700 active:scale-95')}
                 >
                   <Share2 className="mr-2 h-4 w-4" />
                   Share Items
@@ -743,18 +709,12 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button
-                    onClick={handleCloseAndRefresh}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
+                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button
-                    onClick={handleClose}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
+                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>
@@ -762,10 +722,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
                 {progress.success > 0 && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn('touch-target min-h-[44px] active:scale-95')}
-                      >
+                      <Button variant="outline" className={cn('touch-target min-h-[44px] active:scale-95')}>
                         <Download className="mr-2 h-4 w-4" />
                         Export
                         <ChevronDown className="ml-2 h-4 w-4" />

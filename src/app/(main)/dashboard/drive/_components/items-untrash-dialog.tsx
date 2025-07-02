@@ -178,9 +178,7 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
 
       if (!isCancelledRef.current) {
         if (successCount > 0) {
-          successToast.generic(
-            `Untrashed ${successCount} item${successCount > 1 ? 's' : ''} from trash`,
-          )
+          successToast.generic(`Untrashed ${successCount} item${successCount > 1 ? 's' : ''} from trash`)
         }
         if (failedCount > 0) {
           errorToast.generic(`Failed to untrash ${failedCount} item${failedCount > 1 ? 's' : ''}`)
@@ -248,18 +246,12 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
           {/* Stats */}
           <div className="flex justify-center gap-2">
             {fileCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-              >
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
                 {fileCount} file{fileCount > 1 ? 's' : ''}
               </Badge>
             )}
             {folderCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-              >
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
@@ -314,8 +306,7 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage =
-        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -517,18 +508,12 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button
-                    onClick={handleCloseAndRefresh}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
+                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button
-                    onClick={handleClose}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
+                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>

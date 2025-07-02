@@ -61,10 +61,7 @@ export interface FieldContext {
   includeCapabilities?: boolean
 }
 
-export function getDynamicFields(
-  baseOperation: keyof typeof FIELD_SETS,
-  context: FieldContext = {},
-): string {
+export function getDynamicFields(baseOperation: keyof typeof FIELD_SETS, context: FieldContext = {}): string {
   const fields = FIELD_SETS[baseOperation].split(',')
 
   // Add optional fields based on context
@@ -131,8 +128,7 @@ class FieldOptimizationMonitor {
     }
 
     const newCount = existing.requestCount + 1
-    const newAvgTime =
-      (existing.averageResponseTime * existing.requestCount + responseTime) / newCount
+    const newAvgTime = (existing.averageResponseTime * existing.requestCount + responseTime) / newCount
 
     // Estimate fields saved (assuming full field set would be ~30 fields)
     const estimatedFullFields = 30

@@ -199,18 +199,14 @@ function StorageQuotaCard({ quota }: { quota: StorageQuota }) {
                 {quota.limit && ` / ${formatBytes(quota.limit)}`}
               </span>
             </div>
-            {quota.usagePercentage !== null && (
-              <Progress value={quota.usagePercentage} className="mt-2" />
-            )}
+            {quota.usagePercentage !== null && <Progress value={quota.usagePercentage} className="mt-2" />}
           </div>
 
           {quota.limit && (
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Available</p>
-                <p className="font-medium text-green-600">
-                  {quota.available ? formatBytes(quota.available) : 'N/A'}
-                </p>
+                <p className="font-medium text-green-600">{quota.available ? formatBytes(quota.available) : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-muted-foreground">Usage</p>
@@ -406,10 +402,7 @@ function LargestFilesCard({ largestFiles }: { largestFiles: LargestFile[] }) {
               const Icon = getFileTypeIcon(file.mimeType)
 
               return (
-                <div
-                  key={index}
-                  className="flex items-center justify-between rounded-lg border p-2"
-                >
+                <div key={index} className="flex items-center justify-between rounded-lg border p-2">
                   <div className="flex min-w-0 flex-1 items-center gap-3">
                     <Icon className="text-muted-foreground h-4 w-4 flex-shrink-0" />
                     <div className="min-w-0 flex-1">

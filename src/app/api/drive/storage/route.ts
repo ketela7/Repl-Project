@@ -152,9 +152,7 @@ export async function GET(request: NextRequest) {
     // Parse storage quota information
     const quotaLimit = storageQuota?.limit ? parseInt(storageQuota.limit) : null
     const quotaUsage = storageQuota?.usage ? parseInt(storageQuota.usage) : totalUsedBytes
-    const quotaUsageInDrive = storageQuota?.usageInDrive
-      ? parseInt(storageQuota.usageInDrive)
-      : totalUsedBytes
+    const quotaUsageInDrive = storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : totalUsedBytes
 
     // Calculate comprehensive storage analytics with all Google Drive API statistics
     const storageAnalytics = {
@@ -162,9 +160,7 @@ export async function GET(request: NextRequest) {
         limit: quotaLimit,
         used: quotaUsage,
         usedInDrive: quotaUsageInDrive,
-        usedInDriveTrash: storageQuota?.usageInDriveTrash
-          ? parseInt(storageQuota.usageInDriveTrash)
-          : 0,
+        usedInDriveTrash: storageQuota?.usageInDriveTrash ? parseInt(storageQuota.usageInDriveTrash) : 0,
         available: quotaLimit ? quotaLimit - quotaUsage : null,
         usagePercentage: quotaLimit ? Math.round((quotaUsage / quotaLimit) * 100) : null,
         hasUnlimitedStorage: !quotaLimit,

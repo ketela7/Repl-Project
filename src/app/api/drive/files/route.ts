@@ -45,9 +45,7 @@ function buildDriveQuery(filters: FileFilter): string {
     case 'recent':
       // Recent view - recently modified files on 30 days ago
       //conditions.push('trashed=false')
-      conditions.push(
-        `modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`,
-      )
+      conditions.push(`modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`)
     //break
     //case 'all':
     //default:
@@ -246,15 +244,11 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'calendar':
-            typeConditions.push(
-              `(${["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ')})`,
-            )
+            typeConditions.push(`(${["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ')})`)
             break
 
           case 'contact':
-            typeConditions.push(
-              `(${["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ')})`,
-            )
+            typeConditions.push(`(${["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ')})`)
             break
 
           case 'other':
@@ -349,12 +343,7 @@ export async function GET(request: NextRequest) {
 
     // If fileId is provided, return single file metadata (used by breadcrumb)
     if (fileId) {
-      const fileMetadata = await driveService!.getFileMetadata(fileId, [
-        'id',
-        'name',
-        'parents',
-        'mimeType',
-      ])
+      const fileMetadata = await driveService!.getFileMetadata(fileId, ['id', 'name', 'parents', 'mimeType'])
 
       // Ensure id is always included in response
       const response = {
