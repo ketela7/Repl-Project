@@ -7,7 +7,7 @@ export function createDriveClient(accessToken: string) {
 
   const auth = new google.auth.OAuth2()
   auth.setCredentials({
-    accesstoken: accessToken.trim(),
+    access_token: accessToken.trim(),
     token_type: 'Bearer',
   })
 

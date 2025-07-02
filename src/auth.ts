@@ -22,7 +22,7 @@ declare module 'next-auth' {
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Google({
-      clientId: process.env.GOOGLECLIENT_ID!,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
@@ -56,7 +56,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const response = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/xwwwformurlencoded' },
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
               client_id: process.env.GOOGLE_CLIENT_ID!,
               client_secret: process.env.GOOGLE_CLIENT_SECRET!,
@@ -82,7 +82,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         }
       }
 
-      // Handle remember me preference updates from clientside session update
+      // Handle remember me preference updates from client-side session update
       if (trigger === 'update' && session?.rememberMe !== undefined) {
         token.rememberMe = session.rememberMe
 
@@ -93,7 +93,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       // Set initial remember me state and expiration during account creation
       if (account && token.exp === undefined) {
-        // Default to false if not set; will be updated by clientside session update
+        // Default to false if not set; will be updated by client-side session update
         token.rememberMe = false
         // Set initial expiration to 1 day (default)
         token.exp = Math.floor(Date.now() / 1000) + 24 * 60 * 60
@@ -137,7 +137,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Securenextauth.sessiontoken' : 'nextauth.sessiontoken',
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
       options: {
         httpOnly: true,
         sameSite: 'lax',
@@ -147,7 +147,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
     state: {
-      name: process.env.NODE_ENV === 'production' ? '__Secureauthjs.state' : 'authjs.state',
+      name: process.env.NODE_ENV === 'production' ? '__Secure-authjs.state' : 'authjs.state',
       options: {
         httpOnly: true,
         sameSite: 'lax',
@@ -157,7 +157,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
     pkceCodeVerifier: {
-      name: process.env.NODE_ENV === 'production' ? '__Secureauthjs.pkce.code_verifier' : 'authjs.pkce.code_verifier',
+      name: process.env.NODE_ENV === 'production' ? '__Secure-authjs.pkce.code_verifier' : 'authjs.pkce.code_verifier',
       options: {
         httpOnly: true,
         sameSite: 'lax',

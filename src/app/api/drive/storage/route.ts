@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { initDriveService, handleApiError } from '@/lib/apiutils'
+import { initDriveService, handleApiError } from '@/lib/api-utils'
 
 export async function GET() {
   try {
@@ -37,19 +37,19 @@ export async function GET() {
       }),
       // Google Docs
       driveService.drive.files.list({
-        q: "trashed=false and mimeType='application/vnd.googleapps.document'",
+        q: "trashed=false and mimeType='application/vnd.google-apps.document'",
         fields: 'files(id)',
         pageSize: 1000,
       }),
       // Google Sheets
       driveService.drive.files.list({
-        q: "trashed=false and mimeType='application/vnd.googleapps.spreadsheet'",
+        q: "trashed=false and mimeType='application/vnd.google-apps.spreadsheet'",
         fields: 'files(id)',
         pageSize: 1000,
       }),
       // Google Slides
       driveService.drive.files.list({
-        q: "trashed=false and mimeType='application/vnd.googleapps.presentation'",
+        q: "trashed=false and mimeType='application/vnd.google-apps.presentation'",
         fields: 'files(id)',
         pageSize: 1000,
       }),
@@ -125,11 +125,11 @@ export async function GET() {
       }
 
       // Categorize files
-      if (mimeType === 'application/vnd.googleapps.document') {
+      if (mimeType === 'application/vnd.google-apps.document') {
         filesByType.documents++
-      } else if (mimeType === 'application/vnd.googleapps.spreadsheet') {
+      } else if (mimeType === 'application/vnd.google-apps.spreadsheet') {
         filesByType.spreadsheets++
-      } else if (mimeType === 'application/vnd.googleapps.presentation') {
+      } else if (mimeType === 'application/vnd.google-apps.presentation') {
         filesByType.presentations++
       } else if (mimeType.startsWith('image/')) {
         filesByType.images++

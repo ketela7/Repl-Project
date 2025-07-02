@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { auth } from '@/auth'
-import { GoogleDriveService } from '@/lib/googledrive/service'
+import { GoogleDriveService } from '@/lib/google-drive/service'
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const session = await auth()
 

@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService, handleApiError } from '@/lib/apiutils'
-import { retryDriveApiCall } from '@/lib/apiretry'
-import { throttledDriveRequest } from '@/lib/apithrottle'
+import { initDriveService, handleApiError } from '@/lib/api-utils'
+import { retryDriveApiCall } from '@/lib/api-retry'
+import { throttledDriveRequest } from '@/lib/api-throttle'
 
 export async function GET(request: NextRequest) {
   try {
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
         headers: {
           'Content-Type': exportFormat,
           'Content-Disposition': `attachment; filename="${exportFileName}"`,
-          'Cache-Control': 'nocache',
+          'Cache-Control': 'no-cache',
         },
       })
     }
@@ -136,10 +136,10 @@ export async function GET(request: NextRequest) {
 
     return new Response(stream, {
       headers: {
-        'Content-Type': mimeType || 'application/octetstream',
+        'Content-Type': mimeType || 'application/octet-stream',
         'Content-Disposition': `attachment; filename="${fileName}"`,
         ...(size && { 'Content-Length': size }),
-        'Cache-Control': 'nocache',
+        'Cache-Control': 'no-cache',
       },
     })
   } catch (error) {
@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
  * Check if file is Google Workspace file that needs export
  */
 function isGoogleWorkspaceFile(mimeType: string): boolean {
-  return mimeType?.startsWith('application/vnd.googleapps.') || false
+  return mimeType?.startsWith('application/vnd.google-apps.') || false
 }
 
 /**
@@ -159,11 +159,11 @@ function isGoogleWorkspaceFile(mimeType: string): boolean {
  */
 function getExportFormat(mimeType: string): string {
   const exportMap: { [key: string]: string } = {
-    'application/vnd.googleapps.document': 'application/pdf',
-    'application/vnd.googleapps.spreadsheet': 'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet',
-    'application/vnd.googleapps.presentation':
-      'application/vnd.openxmlformatsofficedocument.presentationml.presentation',
-    'application/vnd.googleapps.drawing': 'image/png',
+    'application/vnd.google-apps.document': 'application/pdf',
+    'application/vnd.google-apps.spreadsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.google-apps.presentation':
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'application/vnd.google-apps.drawing': 'image/png',
   }
 
   return exportMap[mimeType] || 'application/pdf'
@@ -175,9 +175,9 @@ function getExportFormat(mimeType: string): string {
 function getFileExtension(mimeType: string): string {
   const extensionMap: { [key: string]: string } = {
     'application/pdf': 'pdf',
-    'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet': 'xlsx',
-    'application/vnd.openxmlformatsofficedocument.presentationml.presentation': 'pptx',
-    'application/vnd.openxmlformatsofficedocument.wordprocessingml.document': 'docx',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
     'image/png': 'png',
     'image/jpeg': 'jpg',
     'text/plain': 'txt',

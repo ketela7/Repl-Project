@@ -13,9 +13,9 @@ import {
 } from '@/components/ui/sidebar'
 import { APP_CONFIG } from '@/config/app-config'
 
-import { sidebarItems } from './SidebarItems'
-import { NavMain } from './NavMain'
-import { AuthNavUser } from './AuthNavUser'
+import { sidebarItems } from './sidebar-items'
+import { NavMain } from './nav-main'
+import { AuthNavUser } from './auth-nav-user'
 
 // Timezone is now auto-detected in the background via TimezoneProvider
 

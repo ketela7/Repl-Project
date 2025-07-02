@@ -22,7 +22,7 @@ import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { useIsMobile } from '@/lib/hooks/useMobile'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
   BottomSheet,
   BottomSheetContent,

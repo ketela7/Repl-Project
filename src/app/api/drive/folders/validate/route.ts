@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService, handleApiError } from '@/lib/apiutils'
-import { retryDriveApiCall } from '@/lib/apiretry'
-import { throttledDriveRequest } from '@/lib/apithrottle'
+import { initDriveService, handleApiError } from '@/lib/api-utils'
+import { retryDriveApiCall } from '@/lib/api-retry'
+import { throttledDriveRequest } from '@/lib/api-throttle'
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       const file = response.data
 
       // Check if it's actually a folder
-      if (file.mimeType !== 'application/vnd.googleapps.folder') {
+      if (file.mimeType !== 'application/vnd.google-apps.folder') {
         return NextResponse.json({
           success: false,
           error: 'The provided ID is not a folder',

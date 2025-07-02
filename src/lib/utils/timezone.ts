@@ -1,5 +1,5 @@
 /**
- * Timezone utilities for handling clientserver time synchronization
+ * Timezone utilities for handling client-server time synchronization
  */
 
 /**
@@ -111,7 +111,7 @@ export function formatFileTime(dateString: string, timezone?: string): string {
  */
 export function setTimezone(timezone: string): void {
   if (typeof window !== 'undefined') {
-    localStorage.setItem('preferredtimezone', timezone)
+    localStorage.setItem('preferred-timezone', timezone)
   }
 }
 

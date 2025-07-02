@@ -49,11 +49,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { FileIcon } from '@/components/file-icon'
-import { useIsMobile } from '@/lib/hooks/useMobile'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { successToast } from '@/lib/utils'
 
 // Removed Suspense import - direct render untuk bulk operations
-import { OperationsDialog } from './OperationsDialog'
+import { OperationsDialog } from './operations-dialog'
 import { FiltersDialog } from './filters-dialog'
 
 // Types

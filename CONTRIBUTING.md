@@ -111,22 +111,26 @@ npm run pre-commit
 
 ## File Naming Conventions
 
-### Components (PascalCase)
+**Simple naming**: Use kebab-case without prefixes or suffixesAdd commentMore actions
+- **Examples**: `drive-manager.tsx`, `file-list.tsx`, `user-profile.tsx`
+- **Avoid**: `enhanced-drive-manager.tsx`, `optimized-file-list.new.tsx`, `custom-theme-provider.tsx`
+
+### Components
 ```
-✅ BENAR: UserProfile.tsx, DriveManager.tsx, ItemsDeleteDialog.tsx
-❌ SALAH: userProfile.tsx, drive-manager.tsx, items-delete-dialog.tsx
+✅ BENAR: UserProfile.tsx, DriveManager.tsx, StorageAnalytics.tsx
+❌ SALAH: userProfile.tsx, drive-manager.tsx, storage_analytics.tsx
 ```
 
-### Hooks (camelCase with "use" prefix)
+### Hooks
 ```
-✅ BENAR: useMobile.ts, useTimezone.ts, useSessionDuration.ts
-❌ SALAH: use-mobile.ts, use_timezone.ts, UseMobile.ts
+✅ BENAR: useUserProfile.ts, useDriveManager.ts
+❌ SALAH: UserProfile.hook.ts, user-profile-hook.ts
 ```
 
-### Utilities (camelCase)
+### Utilities
 ```
-✅ BENAR: apiUtils.ts, performanceUtils.ts, requestDeduplication.ts
-❌ SALAH: api-utils.ts, performance_utils.ts, request-deduplication.ts
+✅ BENAR: api-utils.ts, format-helpers.ts
+❌ SALAH: apiUtils.ts, formatHelpers.ts
 ```
 
 ## Security Requirements (TIDAK BOLEH DILANGGAR)

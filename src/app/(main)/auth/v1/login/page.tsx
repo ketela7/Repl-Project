@@ -5,8 +5,8 @@ import { Suspense, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
-import { NextAuthForm } from './_components/NextauthForm'
-import { SearchParamsHandler } from './_components/SearchParamsHandler'
+import { NextAuthForm } from './_components/nextauth-form'
+import { SearchParamsHandler } from './_components/search-params-handler'
 
 export default function LoginV1() {
   const { data: session, status } = useSession()

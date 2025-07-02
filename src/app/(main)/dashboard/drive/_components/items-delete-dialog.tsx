@@ -18,7 +18,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useIsMobile } from '@/lib/hooks/useMobile'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 
 interface ItemsDeleteDialogProps {

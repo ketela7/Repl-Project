@@ -1,5 +1,5 @@
 /**
- * Simple inmemory cache for Google Drive API responses
+ * Simple in-memory cache for Google Drive API responses
  * This helps reduce API calls and improve loading performance
  */
 
@@ -114,7 +114,7 @@ class MemoryCache {
 
   // Generate cache key for folder structure
   generateFolderStructureKey(userId: string): string {
-    return `folderstructure:${userId}`
+    return `folder-structure:${userId}`
   }
 
   // Generate cache key for search results

@@ -19,7 +19,7 @@ import {
   SidebarMenuSubItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { type NavGroup, type NavMainItem } from '@/app/(main)/dashboard/_components/sidebar/SidebarItems'
+import { type NavGroup, type NavMainItem } from '@/app/(main)/dashboard/_components/sidebar/sidebar-items'
 
 interface NavMainProps {
   readonly items: readonly NavGroup[]

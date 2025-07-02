@@ -1,6 +1,6 @@
 import { Readable } from 'stream'
 
-import { drivev3 } from 'googleapis'
+import { drive_v3 } from 'googleapis'
 
 import { createDriveClient } from './config'
 import {
@@ -13,7 +13,7 @@ import {
   DriveUserInfo,
   DriveFileMetadata,
 } from './types'
-import { DetailedDriveFile } from './detailedfiletypes'
+import { DetailedDriveFile } from './detailed-file-types'
 import {
   mapUserInfo,
   mapImageMetadata,
@@ -26,10 +26,10 @@ import {
   mapChecksums,
   mapBooleanProperties,
   mapCollectionProperties,
-} from './filedetailmappers'
-import { validateListFilesOptions } from './validationutils'
-import { validateFileName, handleDriveApiError } from './filevalidation'
-import { getOptimizedFields, fieldOptimizationMonitor } from './fieldoptimization'
+} from './file-detail-mappers'
+import { validateListFilesOptions } from './validation-utils'
+import { validateFileName, handleDriveApiError } from './file-validation'
+import { getOptimizedFields, fieldOptimizationMonitor } from './field-optimization'
 import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
 import { getOptimizedRequestParams, performanceMonitor, requestDeduplicator } from './performance'
 
@@ -180,7 +180,7 @@ export class GoogleDriveService {
         }
       }
 
-      // Rethrow other errors
+      // Re-throw other errors
       throw error
     }
   }
@@ -261,7 +261,7 @@ export class GoogleDriveService {
   async getFolders(parentId?: string): Promise<DriveFolder[]> {
     const query = buildSearchQuery({
       ...(parentId && { parentId }),
-      mimeType: 'application/vnd.googleapps.folder',
+      mimeType: 'application/vnd.google-apps.folder',
       trashed: false,
     })
 
@@ -277,7 +277,7 @@ export class GoogleDriveService {
   async createFolder(name: string, parentId?: string): Promise<DriveFolder> {
     const metadata: DriveFileMetadata = {
       name,
-      mimeType: 'application/vnd.googleapps.folder',
+      mimeType: 'application/vnd.google-apps.folder',
       createdTime: new Date().toISOString(),
       modifiedTime: new Date().toISOString(),
     }
@@ -488,7 +488,7 @@ export class GoogleDriveService {
         throw new Error('Invalid move operation parameters')
       }
 
-      // Rethrow with original error for unexpected cases
+      // Re-throw with original error for unexpected cases
       throw error
     }
   }
@@ -503,7 +503,7 @@ export class GoogleDriveService {
     // First check if this is a folder
     const originalFile = await this.getFile(fileId)
 
-    if (originalFile.mimeType === 'application/vnd.googleapps.folder') {
+    if (originalFile.mimeType === 'application/vnd.google-apps.folder') {
       // For folders, we need to create a new folder and copy contents
       return this.copyFolder(fileId, metadata)
     }
@@ -531,7 +531,7 @@ export class GoogleDriveService {
     return convertGoogleDriveFile({
       id: newFolder.id!,
       name: newFolder.name!,
-      mimeType: 'application/vnd.googleapps.folder',
+      mimeType: 'application/vnd.google-apps.folder',
       createdTime: newFolder.createdTime!,
       modifiedTime: newFolder.modifiedTime!,
       ...(newFolder.parents && { parents: newFolder.parents }),
