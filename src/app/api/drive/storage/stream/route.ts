@@ -20,10 +20,27 @@ export async function GET() {
     const stream = new ReadableStream({
       start(controller) {
         const encoder = new TextEncoder()
+        let isStreamClosed = false
         
         const sendData = (type: string, data: any) => {
-          const message = `data: ${JSON.stringify({ type, data, timestamp: Date.now() })}\n\n`
-          controller.enqueue(encoder.encode(message))
+          if (isStreamClosed) return
+          try {
+            const message = `data: ${JSON.stringify({ type, data, timestamp: Date.now() })}\n\n`
+            controller.enqueue(encoder.encode(message))
+          } catch (error) {
+            isStreamClosed = true
+          }
+        }
+        
+        const closeStream = () => {
+          if (!isStreamClosed) {
+            isStreamClosed = true
+            try {
+              controller.close()
+            } catch (error) {
+              // Stream already closed
+            }
+          }
         }
 
         // Main analysis function using service basecode
@@ -234,7 +251,7 @@ export async function GET() {
               canRetry: true 
             })
           } finally {
-            controller.close()
+            closeStream()
           }
         })()
       },
