@@ -168,7 +168,7 @@ export function FiltersDialog({
       id: 'recent',
       label: 'Recent',
       icon: Clock,
-      description: 'Recently viewed files',
+      description: 'Last seen in 30 days',
     },
     { id: 'trash', label: 'Trash', icon: Trash, description: 'Deleted items' },
   ]
