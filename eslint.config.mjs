@@ -1,4 +1,3 @@
-
 import { FlatCompat } from '@eslint/eslintrc'
 import js from '@eslint/js'
 import typescriptEslint from '@typescript-eslint/eslint-plugin'
@@ -52,13 +51,10 @@ export default [
     },
     rules: {
       // Existing rules
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_'
-      }],
       '@next/next/no-img-element': 'off',
       'react-hooks/exhaustive-deps': 'off',
+
+      // Prioritize ESLint unused detection (with auto-fix)
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': [
         'error',
@@ -67,8 +63,16 @@ export default [
           varsIgnorePattern: '^_',
           args: 'after-used',
           argsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_'
         },
       ],
+
+      // TypeScript rules (complementary)
+      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
+      '@typescript-eslint/prefer-as-const': 'error',
+      // Disable TypeScript unused vars to avoid conflicts with ESLint
+      '@typescript-eslint/no-unused-vars': 'off',
 
       // Code Quality Rules
       'no-console': 'warn',
@@ -132,10 +136,8 @@ export default [
       'react/prop-types': 'off',
 
       // TypeScript Specific Rules (non-type-aware only)
-      '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/no-non-null-assertion': 'warn',
-      '@typescript-eslint/prefer-as-const': 'error',
-      
+
+
       // Explicitly disabled type-aware rules (may be enabled by next/core-web-vitals):
       '@typescript-eslint/prefer-nullish-coalescing': 'off',
       '@typescript-eslint/prefer-optional-chain': 'off', 
@@ -143,12 +145,6 @@ export default [
       '@typescript-eslint/no-unnecessary-type-assertion': 'off',
       '@typescript-eslint/prefer-string-starts-ends-with': 'off',
       '@typescript-eslint/prefer-includes': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_',
-        varsIgnorePattern: '^_',
-        caughtErrorsIgnorePattern: '^_',
-        destructuredArrayIgnorePattern: '^_'
-      }],
 
       // React/JSX Rules
       'jsx-a11y/alt-text': 'error',
