@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev --turbo -p 5000 -H 0.0.0.0",
     "dev:fast": "next dev --turbo -p 5000 -H 0.0.0.0 --experimental-https",
-    "dev:clean": "rm -rf .next && npm run dev",
+    "dev:clean": "rm -rf .next .jest-cache .tsbuildinfo node_modules/.cache coverage dist out build .turbo .swc .eslintcache .nyc_output .parcel-cache .cache && npm run dev",
+    "clean:all": "rm -rf .next .jest-cache .tsbuildinfo node_modules/.cache coverage dist out build .turbo .swc .eslintcache .nyc_output .parcel-cache .cache",
+    "clean:install": "rm -rf node_modules package-lock.json && npm install",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "start": "next start",
