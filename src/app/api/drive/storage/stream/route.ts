@@ -51,14 +51,23 @@ export async function GET() {
             
             const userInfo = await driveService.getUserInfo()
             
+            // Safe number parsing with null checks
+            const parseQuotaNumber = (value: string | undefined | null): number => {
+              if (!value || value === 'null' || value === 'undefined') return 0
+              const parsed = parseInt(value.toString(), 10)
+              return isNaN(parsed) ? 0 : parsed
+            }
+
+            const limit = parseQuotaNumber(userInfo.storageQuota?.limit)
+            const used = parseQuotaNumber(userInfo.storageQuota?.usage)
+            const usedInDrive = parseQuotaNumber(userInfo.storageQuota?.usageInDrive)
+
             const quotaData = {
-              limit: userInfo.storageQuota?.limit ? parseInt(userInfo.storageQuota.limit) : null,
-              used: userInfo.storageQuota?.usage ? parseInt(userInfo.storageQuota.usage) : 0,
-              usedInDrive: userInfo.storageQuota?.usageInDrive ? parseInt(userInfo.storageQuota.usageInDrive) : 0,
-              available: userInfo.storageQuota?.limit ? 
-                parseInt(userInfo.storageQuota.limit) - parseInt(userInfo.storageQuota.usage) : null,
-              usagePercentage: userInfo.storageQuota?.limit ? 
-                Math.round((parseInt(userInfo.storageQuota.usage) / parseInt(userInfo.storageQuota.limit)) * 100) : null,
+              limit: limit > 0 ? limit : null,
+              used,
+              usedInDrive,
+              available: limit > 0 ? limit - used : null,
+              usagePercentage: limit > 0 ? Math.round((used / limit) * 100) : null,
             }
 
             const user = {
@@ -101,10 +110,16 @@ export async function GET() {
                 totalProcessed += files.length
                 pageToken = response.nextPageToken || undefined
 
-                // Process files for statistics
+                // Process files for statistics with safe number parsing
                 files.forEach((file: DriveFile) => {
                   const mimeType = file.mimeType || 'unknown'
-                  const size = file.size ? parseInt(file.size.toString()) : 0
+                  // Safe file size parsing
+                  const sizeValue = file.size
+                  let size = 0
+                  if (sizeValue && sizeValue !== 'null' && sizeValue !== 'undefined') {
+                    const parsed = parseInt(sizeValue.toString(), 10)
+                    size = isNaN(parsed) ? 0 : parsed
+                  }
                   
                   // Count by type
                   filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
@@ -114,8 +129,8 @@ export async function GET() {
                   if (size > 0) {
                     largestFiles.push(file)
                     largestFiles.sort((a, b) => {
-                      const sizeA = a.size ? parseInt(a.size.toString()) : 0
-                      const sizeB = b.size ? parseInt(b.size.toString()) : 0
+                      const sizeA = a.size ? (parseInt(a.size.toString(), 10) || 0) : 0
+                      const sizeB = b.size ? (parseInt(b.size.toString(), 10) || 0) : 0
                       return sizeB - sizeA
                     })
                     

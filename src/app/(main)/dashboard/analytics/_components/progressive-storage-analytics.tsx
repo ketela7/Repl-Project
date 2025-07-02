@@ -50,12 +50,21 @@ export function ProgressiveStorageAnalytics() {
   
   const eventSourceRef = useRef<EventSource | null>(null)
 
-  const formatBytes = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes'
+  const formatBytes = (bytes: number | string | undefined): string => {
+    // Safe number parsing for file sizes
+    let numBytes = 0
+    if (typeof bytes === 'string') {
+      const parsed = parseInt(bytes, 10)
+      numBytes = isNaN(parsed) ? 0 : parsed
+    } else if (typeof bytes === 'number') {
+      numBytes = isNaN(bytes) ? 0 : bytes
+    }
+    
+    if (numBytes === 0) return '0 B'
     const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
+    const i = Math.floor(Math.log(numBytes) / Math.log(k))
+    return parseFloat((numBytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
   }
 
   const startAnalysis = () => {
@@ -304,12 +313,16 @@ export function ProgressiveStorageAnalytics() {
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Total Files</span>
-                  <span className="font-medium">{files.totalFiles?.toLocaleString() || '0'}</span>
+                  <span className="font-medium">{(files.totalFiles || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Total Size</span>
                   <span className="font-medium">
-                    {formatBytes(files.fileSizesByType ? Object.values(files.fileSizesByType).reduce((sum, size) => sum + size, 0) : 0)}
+                    {formatBytes(files.fileSizesByType ? 
+                      Object.values(files.fileSizesByType).reduce((sum, size) => {
+                        const numSize = typeof size === 'number' ? size : parseInt(size?.toString() || '0', 10) || 0
+                        return sum + numSize
+                      }, 0) : 0)}
                   </span>
                 </div>
               </div>
