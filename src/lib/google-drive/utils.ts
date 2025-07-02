@@ -1,4 +1,4 @@
-import { drive_v3 } from 'googleapis'
+import { drivev3 } from 'googleapis'
 
 import { DriveFile, DriveFolder } from './types'
 
@@ -56,33 +56,33 @@ export function isFileSizeInRange(
 export function getFileIconName(mimeType: string, fileName?: string): string {
   const iconMap: Record<string, string> = {
     // Google Workspace Files
-    'application/vnd.google-apps.folder': 'Folder',
-    'application/vnd.google-apps.document': 'FileText',
-    'application/vnd.google-apps.spreadsheet': 'FileSpreadsheet',
-    'application/vnd.google-apps.presentation': 'Presentation',
-    'application/vnd.google-apps.form': 'FileCheck',
-    'application/vnd.google-apps.drawing': 'Palette',
-    'application/vnd.google-apps.map': 'MapPin',
-    'application/vnd.google-apps.site': 'Globe',
-    'application/vnd.google-apps.script': 'FileCode',
-    'application/vnd.google-apps.shortcut': 'Link',
+    'application/vnd.googleapps.folder': 'Folder',
+    'application/vnd.googleapps.document': 'FileText',
+    'application/vnd.googleapps.spreadsheet': 'FileSpreadsheet',
+    'application/vnd.googleapps.presentation': 'Presentation',
+    'application/vnd.googleapps.form': 'FileCheck',
+    'application/vnd.googleapps.drawing': 'Palette',
+    'application/vnd.googleapps.map': 'MapPin',
+    'application/vnd.googleapps.site': 'Globe',
+    'application/vnd.googleapps.script': 'FileCode',
+    'application/vnd.googleapps.shortcut': 'Link',
 
     // PDF and Documents
     'application/pdf': 'BookOpen',
     'text/plain': 'FileText',
     'text/markdown': 'FileText',
     'application/msword': 'FileText',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'FileText',
+    'application/vnd.openxmlformatsofficedocument.wordprocessingml.document': 'FileText',
     'application/rtf': 'FileText',
 
     // Spreadsheets
-    'application/vnd.ms-excel': 'FileSpreadsheet',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'FileSpreadsheet',
+    'application/vnd.msexcel': 'FileSpreadsheet',
+    'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet': 'FileSpreadsheet',
     'text/csv': 'FileSpreadsheet',
 
     // Presentations
-    'application/vnd.ms-powerpoint': 'Presentation',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'Presentation',
+    'application/vnd.mspowerpoint': 'Presentation',
+    'application/vnd.openxmlformatsofficedocument.presentationml.presentation': 'Presentation',
 
     // Images
     'image/jpeg': 'FileImage',
@@ -102,71 +102,71 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'video/wmv': 'FileVideo',
     'video/webm': 'FileVideo',
     'video/mkv': 'FileVideo',
-    'video/x-matroska': 'FileVideo',
+    'video/xmatroska': 'FileVideo',
     'video/flv': 'FileVideo',
-    'video/x-flv': 'FileVideo',
+    'video/xflv': 'FileVideo',
     'video/quicktime': 'FileVideo',
     'video/3gpp': 'FileVideo',
     'video/3gpp2': 'FileVideo',
-    'video/x-msvideo': 'FileVideo',
+    'video/xmsvideo': 'FileVideo',
     'video/mp2t': 'FileVideo',
     'video/mpeg': 'FileVideo',
-    'video/x-ms-wmv': 'FileVideo',
-    'video/x-ms-asf': 'FileVideo',
+    'video/xmswmv': 'FileVideo',
+    'video/xmsasf': 'FileVideo',
     'video/ogg': 'FileVideo',
     'video/divx': 'FileVideo',
-    'video/x-m4v': 'FileVideo',
+    'video/xm4v': 'FileVideo',
 
     // Audio
     'audio/mp3': 'Music',
     'audio/wav': 'Music',
-    'audio/x-wav': 'Music',
+    'audio/xwav': 'Music',
     'audio/m4a': 'Music',
     'audio/flac': 'Music',
-    'audio/x-flac': 'Music',
+    'audio/xflac': 'Music',
     'audio/aac': 'Music',
     'audio/ogg': 'Music',
     'audio/vorbis': 'Music',
     'audio/wma': 'Music',
-    'audio/x-ms-wma': 'Music',
+    'audio/xmswma': 'Music',
     'audio/opus': 'Music',
     'audio/mpeg': 'Music',
     'audio/mp4': 'Music',
-    'audio/x-m4a': 'Music',
+    'audio/xm4a': 'Music',
     'audio/ac3': 'Music',
-    'audio/x-aiff': 'Music',
+    'audio/xaiff': 'Music',
     'audio/aiff': 'Music',
     'audio/midi': 'Music',
-    'audio/x-midi': 'Music',
+    'audio/xmidi': 'Music',
     'audio/amr': 'Music',
     'audio/3gpp': 'Music',
 
     // Archives
     'application/zip': 'Archive',
-    'application/x-zip-compressed': 'Archive',
-    'application/x-rar-compressed': 'Archive',
-    'application/x-rar': 'Archive',
+    'application/xzipcompressed': 'Archive',
+    'application/xrarcompressed': 'Archive',
+    'application/xrar': 'Archive',
     'application/rar': 'Archive',
     'application/vnd.rar': 'Archive',
-    'application/x-7z-compressed': 'Archive',
+    'application/x-7zcompressed': 'Archive',
     'application/x-7zip': 'Archive',
     'application/gzip': 'Archive',
-    'application/x-gzip': 'Archive',
-    'application/x-tar': 'Archive',
-    'application/x-compressed': 'Archive',
-    'application/x-bzip2': 'Archive',
-    'application/x-bzip': 'Archive',
-    'application/x-lzh': 'Archive',
-    'application/x-ace': 'Archive',
-    'application/x-cab': 'Archive',
-    'application/x-iso9660-image': 'Archive',
-    'application/x-stuffit': 'Archive',
-    'application/x-apple-diskimage-old': 'Archive',
+    'application/xgzip': 'Archive',
+    'application/xtar': 'Archive',
+    'application/xcompressed': 'Archive',
+    'application/xbzip2': 'Archive',
+    'application/xbzip': 'Archive',
+    'application/xlzh': 'Archive',
+    'application/xace': 'Archive',
+    'application/xcab': 'Archive',
+    'application/xiso9660-image': 'Archive',
+    'application/xstuffit': 'Archive',
+    'application/xapplediskimageold': 'Archive',
 
     // Code files
     'text/javascript': 'FileCode',
     'application/javascript': 'FileCode',
-    'application/x-javascript': 'FileCode',
+    'application/xjavascript': 'FileCode',
     'application/json': 'FileCode',
     'application/ld+json': 'FileCode',
     'text/html': 'FileCode',
@@ -176,99 +176,99 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'application/xml': 'FileCode',
     'text/typescript': 'FileCode',
     'application/typescript': 'FileCode',
-    'text/x-python': 'FileCode',
-    'application/x-python-code': 'FileCode',
-    'text/x-python-script': 'FileCode',
-    'text/x-java-source': 'FileCode',
-    'application/java-archive': 'Package',
-    'text/x-c': 'FileCode',
-    'text/x-c++': 'FileCode',
-    'text/x-csharp': 'FileCode',
-    'text/x-php': 'FileCode',
-    'application/x-php': 'FileCode',
-    'text/x-ruby': 'FileCode',
-    'application/x-ruby': 'FileCode',
-    'text/x-go': 'FileCode',
-    'text/x-rust': 'FileCode',
-    'text/x-swift': 'FileCode',
-    'text/x-kotlin': 'FileCode',
-    'text/x-scala': 'FileCode',
-    'text/x-perl': 'FileCode',
-    'application/x-perl': 'FileCode',
-    'application/x-sh': 'Terminal',
-    'text/x-shellscript': 'Terminal',
-    'application/x-bash': 'Terminal',
-    'text/x-batch': 'Terminal',
-    'application/x-powershell': 'Terminal',
-    'text/x-dockerfile': 'Box',
-    'text/x-makefile': 'Settings',
-    'text/x-yaml': 'Settings',
-    'application/x-yaml': 'Settings',
+    'text/xpython': 'FileCode',
+    'application/xpythoncode': 'FileCode',
+    'text/xpythonscript': 'FileCode',
+    'text/xjavasource': 'FileCode',
+    'application/javaarchive': 'Package',
+    'text/xc': 'FileCode',
+    'text/xc++': 'FileCode',
+    'text/xcsharp': 'FileCode',
+    'text/xphp': 'FileCode',
+    'application/xphp': 'FileCode',
+    'text/xruby': 'FileCode',
+    'application/xruby': 'FileCode',
+    'text/xgo': 'FileCode',
+    'text/xrust': 'FileCode',
+    'text/xswift': 'FileCode',
+    'text/xkotlin': 'FileCode',
+    'text/xscala': 'FileCode',
+    'text/xperl': 'FileCode',
+    'application/xperl': 'FileCode',
+    'application/xsh': 'Terminal',
+    'text/xshellscript': 'Terminal',
+    'application/xbash': 'Terminal',
+    'text/xbatch': 'Terminal',
+    'application/xpowershell': 'Terminal',
+    'text/xdockerfile': 'Box',
+    'text/xmakefile': 'Settings',
+    'text/xyaml': 'Settings',
+    'application/xyaml': 'Settings',
     'text/yaml': 'Settings',
     'application/yaml': 'Settings',
-    'text/x-toml': 'Settings',
+    'text/xtoml': 'Settings',
     'application/toml': 'Settings',
-    'text/x-ini': 'Settings',
-    'text/x-properties': 'Settings',
-    'text/x-config': 'Settings',
+    'text/xini': 'Settings',
+    'text/xproperties': 'Settings',
+    'text/xconfig': 'Settings',
 
     // Database
-    'application/x-sqlite3': 'Database',
+    'application/xsqlite3': 'Database',
     'application/sql': 'Database',
-    'text/x-sql': 'Database',
+    'text/xsql': 'Database',
 
     // Design files
-    'application/x-photoshop': 'Palette',
+    'application/xphotoshop': 'Palette',
     'image/vnd.adobe.photoshop': 'Palette',
     'image/psd': 'Palette',
     'application/postscript': 'Palette',
     'application/illustrator': 'Palette',
     'image/vnd.adobe.illustrator': 'Palette',
-    'application/x-indesign': 'Palette',
-    'image/x-xcf': 'Palette',
-    'application/x-sketch': 'Palette',
+    'application/xindesign': 'Palette',
+    'image/xxcf': 'Palette',
+    'application/xsketch': 'Palette',
     'application/figma': 'Palette',
-    'image/x-canon-cr2': 'Palette',
-    'image/x-canon-crw': 'Palette',
-    'image/x-nikon-nef': 'Palette',
-    'image/x-adobe-dng': 'Palette',
-    'image/x-sony-arw': 'Palette',
+    'image/xcanoncr2': 'Palette',
+    'image/xcanoncrw': 'Palette',
+    'image/xnikonnef': 'Palette',
+    'image/xadobedng': 'Palette',
+    'image/xsonyarw': 'Palette',
 
     // Font files
     'font/ttf': 'FileText',
     'font/otf': 'FileText',
     'font/woff': 'FileText',
     'font/woff2': 'FileText',
-    'application/font-woff': 'FileText',
-    'application/font-woff2': 'FileText',
-    'application/x-font-ttf': 'FileText',
-    'application/x-font-otf': 'FileText',
-    'application/vnd.ms-fontobject': 'FileText',
+    'application/fontwoff': 'FileText',
+    'application/fontwoff2': 'FileText',
+    'application/xfontttf': 'FileText',
+    'application/xfontotf': 'FileText',
+    'application/vnd.msfontobject': 'FileText',
 
     // E-book formats
     'application/epub+zip': 'BookOpen',
-    'application/x-mobipocket-ebook': 'BookOpen',
-    'application/x-kindle': 'BookOpen',
+    'application/xmobipocketebook': 'BookOpen',
+    'application/xkindle': 'BookOpen',
     'application/vnd.amazon.ebook': 'BookOpen',
-    'text/x-fb2+xml': 'BookOpen',
+    'text/xfb2+xml': 'BookOpen',
 
     // CAD and 3D files
     'application/sla': 'FileImage',
     'model/stl': 'FileImage',
     'model/obj': 'FileImage',
     'model/3mf': 'FileImage',
-    'application/x-autocad': 'FileImage',
+    'application/xautocad': 'FileImage',
     'image/vnd.dwg': 'FileImage',
     'image/vnd.dxf': 'FileImage',
 
     // Executable files
-    'application/x-msdownload': 'File',
-    'application/x-executable': 'File',
-    'application/x-mach-binary': 'File',
-    'application/x-deb': 'Archive',
-    'application/x-rpm': 'Archive',
-    'application/vnd.microsoft.portable-executable': 'File',
-    'application/x-apple-diskimage-dmg': 'Archive',
+    'application/xmsdownload': 'File',
+    'application/xexecutable': 'File',
+    'application/xmachbinary': 'File',
+    'application/xdeb': 'Archive',
+    'application/xrpm': 'Archive',
+    'application/vnd.microsoft.portableexecutable': 'File',
+    'application/xapplediskimagedmg': 'Archive',
 
     // Office formats (additional)
     'application/vnd.oasis.opendocument.text': 'FileText',
@@ -284,38 +284,38 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
     'image/avif': 'FileImage',
     'image/jxl': 'FileImage',
     'image/raw': 'Camera',
-    'audio/x-ms-wax': 'Music',
-    'audio/x-realaudio': 'Music',
-    'video/x-f4v': 'FileVideo',
-    'video/x-ms-vob': 'FileVideo',
-    'application/vnd.rn-realmedia': 'FileVideo',
+    'audio/xmswax': 'Music',
+    'audio/xrealaudio': 'Music',
+    'video/xf4v': 'FileVideo',
+    'video/xmsvob': 'FileVideo',
+    'application/vnd.rnrealmedia': 'FileVideo',
 
     // Mobile app formats
-    'application/vnd.android.package-archive': 'Smartphone',
-    'application/x-ios-app': 'Smartphone',
+    'application/vnd.android.packagearchive': 'Smartphone',
+    'application/xiosapp': 'Smartphone',
     'application/vnd.apple.installer+xml': 'Smartphone',
 
     // System and executable
-    'application/x-sharedlib': 'HardDrive',
-    'application/x-object': 'HardDrive',
-    'application/x-core': 'HardDrive',
-    'application/x-ms-dos-executable': 'Monitor',
+    'application/xsharedlib': 'HardDrive',
+    'application/xobject': 'HardDrive',
+    'application/xcore': 'HardDrive',
+    'application/xmsdosexecutable': 'Monitor',
 
     // Virtual machine and disk images
-    'application/x-virtualbox-vdi': 'HardDrive',
-    'application/x-vmware-vmdk': 'HardDrive',
-    'application/x-qemu-disk': 'HardDrive',
+    'application/xvirtualboxvdi': 'HardDrive',
+    'application/xvmwarevmdk': 'HardDrive',
+    'application/xqemudisk': 'HardDrive',
 
     // Others
-    'application/octet-stream': 'File',
+    'application/octetstream': 'File',
     'text/calendar': 'FileText',
     'text/vcard': 'FileText',
-    'application/x-bittorrent': 'Package',
+    'application/xbittorrent': 'Package',
     'message/rfc822': 'FileText',
-    'application/vnd.ms-cab-compressed': 'Archive',
-    'application/x-lha': 'Archive',
-    'application/x-lzma': 'Archive',
-    'application/x-xz': 'Archive',
+    'application/vnd.mscabcompressed': 'Archive',
+    'application/xlha': 'Archive',
+    'application/xlzma': 'Archive',
+    'application/xxz': 'Archive',
   }
 
   // Check by MIME type first
@@ -513,232 +513,232 @@ export function getFileIconName(mimeType: string, fileName?: string): string {
 export function getFileIconColor(mimeType: string, fileName?: string): string {
   const colorMap: Record<string, string> = {
     // Google Workspace Files
-    'application/vnd.google-apps.folder': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.google-apps.document': 'text-blue-500 dark:text-blue-400',
-    'application/vnd.google-apps.spreadsheet': 'text-green-600 dark:text-green-400',
-    'application/vnd.google-apps.presentation': 'text-orange-600 dark:text-orange-400',
-    'application/vnd.google-apps.form': 'text-purple-600 dark:text-purple-400',
-    'application/vnd.google-apps.drawing': 'text-pink-600 dark:text-pink-400',
-    'application/vnd.google-apps.map': 'text-emerald-600 dark:text-emerald-400',
-    'application/vnd.google-apps.site': 'text-cyan-600 dark:text-cyan-400',
-    'application/vnd.google-apps.script': 'text-amber-600 dark:text-amber-400',
-    'application/vnd.google-apps.shortcut': 'text-slate-600 dark:text-slate-400',
+    'application/vnd.googleapps.folder': 'textblue-600 dark:textblue-400',
+    'application/vnd.googleapps.document': 'textblue-500 dark:textblue-400',
+    'application/vnd.googleapps.spreadsheet': 'textgreen-600 dark:textgreen-400',
+    'application/vnd.googleapps.presentation': 'textorange-600 dark:textorange-400',
+    'application/vnd.googleapps.form': 'textpurple-600 dark:textpurple-400',
+    'application/vnd.googleapps.drawing': 'textpink-600 dark:textpink-400',
+    'application/vnd.googleapps.map': 'textemerald-600 dark:textemerald-400',
+    'application/vnd.googleapps.site': 'textcyan-600 dark:textcyan-400',
+    'application/vnd.googleapps.script': 'textamber-600 dark:textamber-400',
+    'application/vnd.googleapps.shortcut': 'textslate-600 dark:textslate-400',
 
     // PDF and Documents
-    'application/pdf': 'text-red-600 dark:text-red-400',
-    'text/plain': 'text-gray-600 dark:text-gray-400',
-    'text/markdown': 'text-slate-600 dark:text-slate-400',
-    'application/msword': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'text-blue-600 dark:text-blue-400',
-    'application/rtf': 'text-blue-600 dark:text-blue-400',
+    'application/pdf': 'textred-600 dark:textred-400',
+    'text/plain': 'textgray-600 dark:textgray-400',
+    'text/markdown': 'textslate-600 dark:textslate-400',
+    'application/msword': 'textblue-600 dark:textblue-400',
+    'application/vnd.openxmlformatsofficedocument.wordprocessingml.document': 'textblue-600 dark:textblue-400',
+    'application/rtf': 'textblue-600 dark:textblue-400',
 
     // Spreadsheets
-    'application/vnd.ms-excel': 'text-green-600 dark:text-green-400',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'text-green-600 dark:text-green-400',
-    'text/csv': 'text-green-600 dark:text-green-400',
+    'application/vnd.msexcel': 'textgreen-600 dark:textgreen-400',
+    'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet': 'textgreen-600 dark:textgreen-400',
+    'text/csv': 'textgreen-600 dark:textgreen-400',
 
     // Presentations
-    'application/vnd.ms-powerpoint': 'text-orange-600 dark:text-orange-400',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.mspowerpoint': 'textorange-600 dark:textorange-400',
+    'application/vnd.openxmlformatsofficedocument.presentationml.presentation': 'textorange-600 dark:textorange-400',
 
     // Images
-    'image/jpeg': 'text-purple-600 dark:text-purple-400',
-    'image/jpg': 'text-purple-600 dark:text-purple-400',
-    'image/png': 'text-purple-600 dark:text-purple-400',
-    'image/gif': 'text-purple-600 dark:text-purple-400',
-    'image/svg+xml': 'text-purple-600 dark:text-purple-400',
-    'image/webp': 'text-purple-600 dark:text-purple-400',
-    'image/bmp': 'text-purple-600 dark:text-purple-400',
-    'image/tiff': 'text-purple-600 dark:text-purple-400',
-    'image/ico': 'text-purple-600 dark:text-purple-400',
+    'image/jpeg': 'textpurple-600 dark:textpurple-400',
+    'image/jpg': 'textpurple-600 dark:textpurple-400',
+    'image/png': 'textpurple-600 dark:textpurple-400',
+    'image/gif': 'textpurple-600 dark:textpurple-400',
+    'image/svg+xml': 'textpurple-600 dark:textpurple-400',
+    'image/webp': 'textpurple-600 dark:textpurple-400',
+    'image/bmp': 'textpurple-600 dark:textpurple-400',
+    'image/tiff': 'textpurple-600 dark:textpurple-400',
+    'image/ico': 'textpurple-600 dark:textpurple-400',
 
     // Videos
-    'video/mp4': 'text-red-600 dark:text-red-400',
-    'video/avi': 'text-red-600 dark:text-red-400',
-    'video/mov': 'text-red-600 dark:text-red-400',
-    'video/wmv': 'text-red-600 dark:text-red-400',
-    'video/webm': 'text-red-600 dark:text-red-400',
-    'video/mkv': 'text-red-600 dark:text-red-400',
-    'video/x-matroska': 'text-red-600 dark:text-red-400',
-    'video/flv': 'text-red-600 dark:text-red-400',
-    'video/x-flv': 'text-red-600 dark:text-red-400',
-    'video/quicktime': 'text-red-600 dark:text-red-400',
-    'video/3gpp': 'text-red-600 dark:text-red-400',
-    'video/3gpp2': 'text-red-600 dark:text-red-400',
-    'video/x-msvideo': 'text-red-600 dark:text-red-400',
-    'video/mp2t': 'text-red-600 dark:text-red-400',
-    'video/mpeg': 'text-red-600 dark:text-red-400',
-    'video/x-ms-wmv': 'text-red-600 dark:text-red-400',
-    'video/x-ms-asf': 'text-red-600 dark:text-red-400',
-    'video/ogg': 'text-red-600 dark:text-red-400',
-    'video/divx': 'text-red-600 dark:text-red-400',
-    'video/x-m4v': 'text-red-600 dark:text-red-400',
+    'video/mp4': 'textred-600 dark:textred-400',
+    'video/avi': 'textred-600 dark:textred-400',
+    'video/mov': 'textred-600 dark:textred-400',
+    'video/wmv': 'textred-600 dark:textred-400',
+    'video/webm': 'textred-600 dark:textred-400',
+    'video/mkv': 'textred-600 dark:textred-400',
+    'video/xmatroska': 'textred-600 dark:textred-400',
+    'video/flv': 'textred-600 dark:textred-400',
+    'video/xflv': 'textred-600 dark:textred-400',
+    'video/quicktime': 'textred-600 dark:textred-400',
+    'video/3gpp': 'textred-600 dark:textred-400',
+    'video/3gpp2': 'textred-600 dark:textred-400',
+    'video/xmsvideo': 'textred-600 dark:textred-400',
+    'video/mp2t': 'textred-600 dark:textred-400',
+    'video/mpeg': 'textred-600 dark:textred-400',
+    'video/xmswmv': 'textred-600 dark:textred-400',
+    'video/xmsasf': 'textred-600 dark:textred-400',
+    'video/ogg': 'textred-600 dark:textred-400',
+    'video/divx': 'textred-600 dark:textred-400',
+    'video/xm4v': 'textred-600 dark:textred-400',
 
     // Audio
-    'audio/mp3': 'text-indigo-600 dark:text-indigo-400',
-    'audio/wav': 'text-indigo-600 dark:text-indigo-400',
-    'audio/x-wav': 'text-indigo-600 dark:text-indigo-400',
-    'audio/m4a': 'text-indigo-600 dark:text-indigo-400',
-    'audio/flac': 'text-indigo-600 dark:text-indigo-400',
-    'audio/x-flac': 'text-indigo-600 dark:text-indigo-400',
-    'audio/aac': 'text-indigo-600 dark:text-indigo-400',
-    'audio/ogg': 'text-indigo-600 dark:text-indigo-400',
-    'audio/vorbis': 'text-indigo-600 dark:text-indigo-400',
-    'audio/wma': 'text-indigo-600 dark:text-indigo-400',
-    'audio/x-ms-wma': 'text-indigo-600 dark:text-indigo-400',
-    'audio/opus': 'text-indigo-600 dark:text-indigo-400',
-    'audio/mpeg': 'text-indigo-600 dark:text-indigo-400',
-    'audio/mp4': 'text-indigo-600 dark:text-indigo-400',
-    'audio/x-m4a': 'text-indigo-600 dark:text-indigo-400',
-    'audio/ac3': 'text-indigo-600 dark:text-indigo-400',
-    'audio/x-aiff': 'text-indigo-600 dark:text-indigo-400',
-    'audio/aiff': 'text-indigo-600 dark:text-indigo-400',
-    'audio/midi': 'text-indigo-600 dark:text-indigo-400',
-    'audio/x-midi': 'text-indigo-600 dark:text-indigo-400',
-    'audio/amr': 'text-indigo-600 dark:text-indigo-400',
-    'audio/3gpp': 'text-indigo-600 dark:text-indigo-400',
+    'audio/mp3': 'textindigo-600 dark:textindigo-400',
+    'audio/wav': 'textindigo-600 dark:textindigo-400',
+    'audio/xwav': 'textindigo-600 dark:textindigo-400',
+    'audio/m4a': 'textindigo-600 dark:textindigo-400',
+    'audio/flac': 'textindigo-600 dark:textindigo-400',
+    'audio/xflac': 'textindigo-600 dark:textindigo-400',
+    'audio/aac': 'textindigo-600 dark:textindigo-400',
+    'audio/ogg': 'textindigo-600 dark:textindigo-400',
+    'audio/vorbis': 'textindigo-600 dark:textindigo-400',
+    'audio/wma': 'textindigo-600 dark:textindigo-400',
+    'audio/xmswma': 'textindigo-600 dark:textindigo-400',
+    'audio/opus': 'textindigo-600 dark:textindigo-400',
+    'audio/mpeg': 'textindigo-600 dark:textindigo-400',
+    'audio/mp4': 'textindigo-600 dark:textindigo-400',
+    'audio/xm4a': 'textindigo-600 dark:textindigo-400',
+    'audio/ac3': 'textindigo-600 dark:textindigo-400',
+    'audio/xaiff': 'textindigo-600 dark:textindigo-400',
+    'audio/aiff': 'textindigo-600 dark:textindigo-400',
+    'audio/midi': 'textindigo-600 dark:textindigo-400',
+    'audio/xmidi': 'textindigo-600 dark:textindigo-400',
+    'audio/amr': 'textindigo-600 dark:textindigo-400',
+    'audio/3gpp': 'textindigo-600 dark:textindigo-400',
 
     // Archives
-    'application/zip': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-zip-compressed': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-rar-compressed': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-rar': 'text-yellow-600 dark:text-yellow-400',
-    'application/rar': 'text-yellow-600 dark:text-yellow-400',
-    'application/vnd.rar': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-7z-compressed': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-7zip': 'text-yellow-600 dark:text-yellow-400',
-    'application/gzip': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-gzip': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-tar': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-compressed': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-bzip2': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-bzip': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-lzh': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-ace': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-cab': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-iso9660-image': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-stuffit': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-apple-diskimage-old': 'text-yellow-600 dark:text-yellow-400',
+    'application/zip': 'textyellow-600 dark:textyellow-400',
+    'application/xzipcompressed': 'textyellow-600 dark:textyellow-400',
+    'application/xrarcompressed': 'textyellow-600 dark:textyellow-400',
+    'application/xrar': 'textyellow-600 dark:textyellow-400',
+    'application/rar': 'textyellow-600 dark:textyellow-400',
+    'application/vnd.rar': 'textyellow-600 dark:textyellow-400',
+    'application/x-7zcompressed': 'textyellow-600 dark:textyellow-400',
+    'application/x-7zip': 'textyellow-600 dark:textyellow-400',
+    'application/gzip': 'textyellow-600 dark:textyellow-400',
+    'application/xgzip': 'textyellow-600 dark:textyellow-400',
+    'application/xtar': 'textyellow-600 dark:textyellow-400',
+    'application/xcompressed': 'textyellow-600 dark:textyellow-400',
+    'application/xbzip2': 'textyellow-600 dark:textyellow-400',
+    'application/xbzip': 'textyellow-600 dark:textyellow-400',
+    'application/xlzh': 'textyellow-600 dark:textyellow-400',
+    'application/xace': 'textyellow-600 dark:textyellow-400',
+    'application/xcab': 'textyellow-600 dark:textyellow-400',
+    'application/xiso9660-image': 'textyellow-600 dark:textyellow-400',
+    'application/xstuffit': 'textyellow-600 dark:textyellow-400',
+    'application/xapplediskimageold': 'textyellow-600 dark:textyellow-400',
 
     // Code files - More specific colors
-    'text/javascript': 'text-yellow-500 dark:text-yellow-400',
-    'application/json': 'text-amber-500 dark:text-amber-400',
-    'text/html': 'text-orange-500 dark:text-orange-400',
-    'text/css': 'text-sky-500 dark:text-sky-400',
-    'text/xml': 'text-emerald-500 dark:text-emerald-400',
-    'application/javascript': 'text-yellow-500 dark:text-yellow-400',
-    'text/typescript': 'text-blue-500 dark:text-blue-400',
-    'application/typescript': 'text-blue-500 dark:text-blue-400',
-    'text/x-python': 'text-green-500 dark:text-green-400',
-    'application/x-python-code': 'text-green-500 dark:text-green-400',
-    'text/x-java-source': 'text-red-500 dark:text-red-400',
-    'text/x-c': 'text-slate-500 dark:text-slate-400',
-    'text/x-c++': 'text-slate-500 dark:text-slate-400',
-    'application/x-sh': 'text-gray-500 dark:text-gray-400',
-    'text/x-shellscript': 'text-gray-500 dark:text-gray-400',
+    'text/javascript': 'textyellow-500 dark:textyellow-400',
+    'application/json': 'textamber-500 dark:textamber-400',
+    'text/html': 'textorange-500 dark:textorange-400',
+    'text/css': 'textsky-500 dark:textsky-400',
+    'text/xml': 'textemerald-500 dark:textemerald-400',
+    'application/javascript': 'textyellow-500 dark:textyellow-400',
+    'text/typescript': 'textblue-500 dark:textblue-400',
+    'application/typescript': 'textblue-500 dark:textblue-400',
+    'text/xpython': 'textgreen-500 dark:textgreen-400',
+    'application/xpythoncode': 'textgreen-500 dark:textgreen-400',
+    'text/xjavasource': 'textred-500 dark:textred-400',
+    'text/xc': 'textslate-500 dark:textslate-400',
+    'text/xc++': 'textslate-500 dark:textslate-400',
+    'application/xsh': 'textgray-500 dark:textgray-400',
+    'text/xshellscript': 'textgray-500 dark:textgray-400',
 
     // Database
-    'application/x-sqlite3': 'text-slate-600 dark:text-slate-400',
-    'application/sql': 'text-slate-600 dark:text-slate-400',
-    'text/x-sql': 'text-slate-600 dark:text-slate-400',
+    'application/xsqlite3': 'textslate-600 dark:textslate-400',
+    'application/sql': 'textslate-600 dark:textslate-400',
+    'text/xsql': 'textslate-600 dark:textslate-400',
 
     // Design files
-    'application/x-photoshop': 'text-blue-600 dark:text-blue-400',
-    'image/vnd.adobe.photoshop': 'text-blue-600 dark:text-blue-400',
-    'image/psd': 'text-blue-600 dark:text-blue-400',
-    'application/postscript': 'text-pink-600 dark:text-pink-600 dark:text-pink-400',
-    'application/illustrator': 'text-orange-600 dark:text-orange-400',
-    'image/vnd.adobe.illustrator': 'text-orange-600 dark:text-orange-400',
-    'application/x-indesign': 'text-purple-600 dark:text-purple-400',
-    'image/x-xcf': 'text-cyan-600 dark:text-cyan-400',
-    'application/x-sketch': 'text-pink-600 dark:text-pink-400',
-    'application/figma': 'text-violet-600 dark:text-violet-400',
-    'image/x-canon-cr2': 'text-emerald-600 dark:text-emerald-400',
-    'image/x-canon-crw': 'text-emerald-600 dark:text-emerald-400',
-    'image/x-nikon-nef': 'text-emerald-600 dark:text-emerald-400',
-    'image/x-adobe-dng': 'text-emerald-600 dark:text-emerald-400',
-    'image/x-sony-arw': 'text-emerald-600 dark:text-emerald-400',
+    'application/xphotoshop': 'textblue-600 dark:textblue-400',
+    'image/vnd.adobe.photoshop': 'textblue-600 dark:textblue-400',
+    'image/psd': 'textblue-600 dark:textblue-400',
+    'application/postscript': 'textpink-600 dark:textpink-600 dark:textpink-400',
+    'application/illustrator': 'textorange-600 dark:textorange-400',
+    'image/vnd.adobe.illustrator': 'textorange-600 dark:textorange-400',
+    'application/xindesign': 'textpurple-600 dark:textpurple-400',
+    'image/xxcf': 'textcyan-600 dark:textcyan-400',
+    'application/xsketch': 'textpink-600 dark:textpink-400',
+    'application/figma': 'textviolet-600 dark:textviolet-400',
+    'image/xcanoncr2': 'textemerald-600 dark:textemerald-400',
+    'image/xcanoncrw': 'textemerald-600 dark:textemerald-400',
+    'image/xnikonnef': 'textemerald-600 dark:textemerald-400',
+    'image/xadobedng': 'textemerald-600 dark:textemerald-400',
+    'image/xsonyarw': 'textemerald-600 dark:textemerald-400',
 
     // Font files
-    'font/ttf': 'text-slate-600 dark:text-slate-400',
-    'font/otf': 'text-slate-600 dark:text-slate-400',
-    'font/woff': 'text-slate-600 dark:text-slate-400',
-    'font/woff2': 'text-slate-600 dark:text-slate-400',
-    'application/font-woff': 'text-slate-600 dark:text-slate-400',
-    'application/font-woff2': 'text-slate-600 dark:text-slate-400',
-    'application/x-font-ttf': 'text-slate-600 dark:text-slate-400',
-    'application/x-font-otf': 'text-slate-600 dark:text-slate-400',
-    'application/vnd.ms-fontobject': 'text-slate-600 dark:text-slate-400',
+    'font/ttf': 'textslate-600 dark:textslate-400',
+    'font/otf': 'textslate-600 dark:textslate-400',
+    'font/woff': 'textslate-600 dark:textslate-400',
+    'font/woff2': 'textslate-600 dark:textslate-400',
+    'application/fontwoff': 'textslate-600 dark:textslate-400',
+    'application/fontwoff2': 'textslate-600 dark:textslate-400',
+    'application/xfontttf': 'textslate-600 dark:textslate-400',
+    'application/xfontotf': 'textslate-600 dark:textslate-400',
+    'application/vnd.msfontobject': 'textslate-600 dark:textslate-400',
 
     // E-book formats
-    'application/epub+zip': 'text-purple-600 dark:text-purple-400',
-    'application/x-mobipocket-ebook': 'text-purple-600 dark:text-purple-400',
-    'application/x-kindle': 'text-purple-600 dark:text-purple-400',
-    'application/vnd.amazon.ebook': 'text-purple-600 dark:text-purple-400',
-    'text/x-fb2+xml': 'text-purple-600 dark:text-purple-400',
+    'application/epub+zip': 'textpurple-600 dark:textpurple-400',
+    'application/xmobipocketebook': 'textpurple-600 dark:textpurple-400',
+    'application/xkindle': 'textpurple-600 dark:textpurple-400',
+    'application/vnd.amazon.ebook': 'textpurple-600 dark:textpurple-400',
+    'text/xfb2+xml': 'textpurple-600 dark:textpurple-400',
 
     // CAD and 3D files
-    'application/sla': 'text-cyan-600 dark:text-cyan-400',
-    'model/stl': 'text-cyan-600 dark:text-cyan-400',
-    'model/obj': 'text-cyan-600 dark:text-cyan-400',
-    'model/3mf': 'text-cyan-600 dark:text-cyan-400',
-    'application/x-autocad': 'text-cyan-600 dark:text-cyan-400',
-    'image/vnd.dwg': 'text-cyan-600 dark:text-cyan-400',
-    'image/vnd.dxf': 'text-cyan-600 dark:text-cyan-400',
+    'application/sla': 'textcyan-600 dark:textcyan-400',
+    'model/stl': 'textcyan-600 dark:textcyan-400',
+    'model/obj': 'textcyan-600 dark:textcyan-400',
+    'model/3mf': 'textcyan-600 dark:textcyan-400',
+    'application/xautocad': 'textcyan-600 dark:textcyan-400',
+    'image/vnd.dwg': 'textcyan-600 dark:textcyan-400',
+    'image/vnd.dxf': 'textcyan-600 dark:textcyan-400',
 
     // Executable files
-    'application/x-msdownload': 'text-gray-600 dark:text-gray-400',
-    'application/x-executable': 'text-gray-600 dark:text-gray-400',
-    'application/x-mach-binary': 'text-gray-600 dark:text-gray-400',
-    'application/x-deb': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-rpm': 'text-yellow-600 dark:text-yellow-400',
-    'application/vnd.microsoft.portable-executable': 'text-gray-600 dark:text-gray-400',
+    'application/xmsdownload': 'textgray-600 dark:textgray-400',
+    'application/xexecutable': 'textgray-600 dark:textgray-400',
+    'application/xmachbinary': 'textgray-600 dark:textgray-400',
+    'application/xdeb': 'textyellow-600 dark:textyellow-400',
+    'application/xrpm': 'textyellow-600 dark:textyellow-400',
+    'application/vnd.microsoft.portableexecutable': 'textgray-600 dark:textgray-400',
 
     // Office formats (additional)
-    'application/vnd.oasis.opendocument.text': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.oasis.opendocument.spreadsheet': 'text-green-600 dark:text-green-400',
-    'application/vnd.oasis.opendocument.presentation': 'text-orange-600 dark:text-orange-400',
-    'application/vnd.sun.xml.writer': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.sun.xml.calc': 'text-green-600 dark:text-green-400',
-    'application/vnd.sun.xml.impress': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.oasis.opendocument.text': 'textblue-600 dark:textblue-400',
+    'application/vnd.oasis.opendocument.spreadsheet': 'textgreen-600 dark:textgreen-400',
+    'application/vnd.oasis.opendocument.presentation': 'textorange-600 dark:textorange-400',
+    'application/vnd.sun.xml.writer': 'textblue-600 dark:textblue-400',
+    'application/vnd.sun.xml.calc': 'textgreen-600 dark:textgreen-400',
+    'application/vnd.sun.xml.impress': 'textorange-600 dark:textorange-400',
 
     // Media formats (additional)
-    'image/heic': 'text-purple-600 dark:text-purple-400',
-    'image/heif': 'text-purple-600 dark:text-purple-400',
-    'image/avif': 'text-purple-600 dark:text-purple-400',
-    'image/jxl': 'text-purple-600 dark:text-purple-400',
-    'image/raw': 'text-emerald-600 dark:text-emerald-400',
-    'audio/x-ms-wax': 'text-indigo-600 dark:text-indigo-400',
-    'audio/x-realaudio': 'text-indigo-600 dark:text-indigo-400',
-    'video/x-f4v': 'text-red-600 dark:text-red-400',
-    'video/x-ms-vob': 'text-red-600 dark:text-red-400',
-    'application/vnd.rn-realmedia': 'text-red-600 dark:text-red-400',
+    'image/heic': 'textpurple-600 dark:textpurple-400',
+    'image/heif': 'textpurple-600 dark:textpurple-400',
+    'image/avif': 'textpurple-600 dark:textpurple-400',
+    'image/jxl': 'textpurple-600 dark:textpurple-400',
+    'image/raw': 'textemerald-600 dark:textemerald-400',
+    'audio/xmswax': 'textindigo-600 dark:textindigo-400',
+    'audio/xrealaudio': 'textindigo-600 dark:textindigo-400',
+    'video/xf4v': 'textred-600 dark:textred-400',
+    'video/xmsvob': 'textred-600 dark:textred-400',
+    'application/vnd.rnrealmedia': 'textred-600 dark:textred-400',
 
     // Mobile app formats
-    'application/vnd.android.package-archive': 'text-green-600 dark:text-green-400',
-    'application/x-ios-app': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.apple.installer+xml': 'text-blue-600 dark:text-blue-400',
+    'application/vnd.android.packagearchive': 'textgreen-600 dark:textgreen-400',
+    'application/xiosapp': 'textblue-600 dark:textblue-400',
+    'application/vnd.apple.installer+xml': 'textblue-600 dark:textblue-400',
 
     // System and executable
-    'application/x-sharedlib': 'text-gray-600 dark:text-gray-400',
-    'application/x-object': 'text-gray-600 dark:text-gray-400',
-    'application/x-core': 'text-gray-600 dark:text-gray-400',
-    'application/x-ms-dos-executable': 'text-gray-600 dark:text-gray-400',
+    'application/xsharedlib': 'textgray-600 dark:textgray-400',
+    'application/xobject': 'textgray-600 dark:textgray-400',
+    'application/xcore': 'textgray-600 dark:textgray-400',
+    'application/xmsdosexecutable': 'textgray-600 dark:textgray-400',
 
     // Virtual machine and disk images
-    'application/x-virtualbox-vdi': 'text-slate-600 dark:text-slate-400',
-    'application/x-vmware-vmdk': 'text-slate-600 dark:text-slate-400',
-    'application/x-qemu-disk': 'text-slate-600 dark:text-slate-400',
+    'application/xvirtualboxvdi': 'textslate-600 dark:textslate-400',
+    'application/xvmwarevmdk': 'textslate-600 dark:textslate-400',
+    'application/xqemudisk': 'textslate-600 dark:textslate-400',
 
     // Others
-    'text/calendar': 'text-green-600 dark:text-green-400',
-    'text/vcard': 'text-blue-600 dark:text-blue-400',
-    'application/x-bittorrent': 'text-red-600 dark:text-red-400',
-    'message/rfc822': 'text-slate-600 dark:text-slate-400',
-    'application/vnd.ms-cab-compressed': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-lha': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-lzma': 'text-yellow-600 dark:text-yellow-400',
-    'application/x-xz': 'text-yellow-600 dark:text-yellow-400',
+    'text/calendar': 'textgreen-600 dark:textgreen-400',
+    'text/vcard': 'textblue-600 dark:textblue-400',
+    'application/xbittorrent': 'textred-600 dark:textred-400',
+    'message/rfc822': 'textslate-600 dark:textslate-400',
+    'application/vnd.mscabcompressed': 'textyellow-600 dark:textyellow-400',
+    'application/xlha': 'textyellow-600 dark:textyellow-400',
+    'application/xlzma': 'textyellow-600 dark:textyellow-400',
+    'application/xxz': 'textyellow-600 dark:textyellow-400',
   }
 
   // Check by MIME type first
@@ -751,157 +751,157 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     const extension = fileName.split('.').pop()?.toLowerCase()
     const extensionColorMap: Record<string, string> = {
       // Programming languages with specific colors
-      js: 'text-yellow-500 dark:text-yellow-400',
-      ts: 'text-blue-500 dark:text-blue-400',
-      jsx: 'text-cyan-500 dark:text-cyan-400',
-      tsx: 'text-cyan-500 dark:text-cyan-400',
-      vue: 'text-green-500 dark:text-green-400',
-      svelte: 'text-orange-500 dark:text-orange-400',
-      py: 'text-green-500 dark:text-green-400',
-      java: 'text-red-500 dark:text-red-400',
-      kotlin: 'text-purple-500 dark:text-purple-400',
-      kt: 'text-purple-500 dark:text-purple-400',
-      scala: 'text-red-500 dark:text-red-400',
-      cpp: 'text-slate-500 dark:text-slate-400',
-      cc: 'text-slate-500 dark:text-slate-400',
-      cxx: 'text-slate-500 dark:text-slate-400',
-      c: 'text-slate-500 dark:text-slate-400',
-      h: 'text-slate-500 dark:text-slate-400',
-      hpp: 'text-slate-500 dark:text-slate-400',
-      cs: 'text-purple-500 dark:text-purple-400',
-      php: 'text-violet-500 dark:text-violet-400',
-      rb: 'text-red-500 dark:text-red-400',
-      go: 'text-cyan-500 dark:text-cyan-400',
-      rs: 'text-orange-500 dark:text-orange-400',
-      swift: 'text-orange-500 dark:text-orange-400',
-      sh: 'text-gray-500 dark:text-gray-400',
-      bash: 'text-gray-500 dark:text-gray-400',
-      zsh: 'text-gray-500 dark:text-gray-400',
-      fish: 'text-blue-500 dark:text-blue-400',
-      bat: 'text-gray-500 dark:text-gray-400',
-      cmd: 'text-gray-500 dark:text-gray-400',
-      ps1: 'text-blue-500 dark:text-blue-400',
-      pl: 'text-blue-500 dark:text-blue-400',
-      perl: 'text-blue-500 dark:text-blue-400',
-      r: 'text-blue-500 dark:text-blue-400',
-      lua: 'text-blue-500 dark:text-blue-400',
-      dart: 'text-blue-500 dark:text-blue-400',
-      elm: 'text-green-500 dark:text-green-400',
-      ex: 'text-purple-500 dark:text-purple-400',
-      exs: 'text-purple-500 dark:text-purple-400',
-      clj: 'text-green-500 dark:text-green-400',
-      cljs: 'text-green-500 dark:text-green-400',
-      hs: 'text-purple-500 dark:text-purple-400',
-      ml: 'text-orange-500 dark:text-orange-400',
-      fs: 'text-blue-500 dark:text-blue-400',
-      nim: 'text-yellow-500 dark:text-yellow-400',
+      js: 'textyellow-500 dark:textyellow-400',
+      ts: 'textblue-500 dark:textblue-400',
+      jsx: 'textcyan-500 dark:textcyan-400',
+      tsx: 'textcyan-500 dark:textcyan-400',
+      vue: 'textgreen-500 dark:textgreen-400',
+      svelte: 'textorange-500 dark:textorange-400',
+      py: 'textgreen-500 dark:textgreen-400',
+      java: 'textred-500 dark:textred-400',
+      kotlin: 'textpurple-500 dark:textpurple-400',
+      kt: 'textpurple-500 dark:textpurple-400',
+      scala: 'textred-500 dark:textred-400',
+      cpp: 'textslate-500 dark:textslate-400',
+      cc: 'textslate-500 dark:textslate-400',
+      cxx: 'textslate-500 dark:textslate-400',
+      c: 'textslate-500 dark:textslate-400',
+      h: 'textslate-500 dark:textslate-400',
+      hpp: 'textslate-500 dark:textslate-400',
+      cs: 'textpurple-500 dark:textpurple-400',
+      php: 'textviolet-500 dark:textviolet-400',
+      rb: 'textred-500 dark:textred-400',
+      go: 'textcyan-500 dark:textcyan-400',
+      rs: 'textorange-500 dark:textorange-400',
+      swift: 'textorange-500 dark:textorange-400',
+      sh: 'textgray-500 dark:textgray-400',
+      bash: 'textgray-500 dark:textgray-400',
+      zsh: 'textgray-500 dark:textgray-400',
+      fish: 'textblue-500 dark:textblue-400',
+      bat: 'textgray-500 dark:textgray-400',
+      cmd: 'textgray-500 dark:textgray-400',
+      ps1: 'textblue-500 dark:textblue-400',
+      pl: 'textblue-500 dark:textblue-400',
+      perl: 'textblue-500 dark:textblue-400',
+      r: 'textblue-500 dark:textblue-400',
+      lua: 'textblue-500 dark:textblue-400',
+      dart: 'textblue-500 dark:textblue-400',
+      elm: 'textgreen-500 dark:textgreen-400',
+      ex: 'textpurple-500 dark:textpurple-400',
+      exs: 'textpurple-500 dark:textpurple-400',
+      clj: 'textgreen-500 dark:textgreen-400',
+      cljs: 'textgreen-500 dark:textgreen-400',
+      hs: 'textpurple-500 dark:textpurple-400',
+      ml: 'textorange-500 dark:textorange-400',
+      fs: 'textblue-500 dark:textblue-400',
+      nim: 'textyellow-500 dark:textyellow-400',
 
       // Archives
-      rar: 'text-yellow-600 dark:text-yellow-400',
-      zip: 'text-yellow-600 dark:text-yellow-400',
-      '7z': 'text-yellow-600 dark:text-yellow-400',
-      tar: 'text-yellow-600 dark:text-yellow-400',
-      gz: 'text-yellow-600 dark:text-yellow-400',
-      bz2: 'text-yellow-600 dark:text-yellow-400',
-      xz: 'text-yellow-600 dark:text-yellow-400',
-      dmg: 'text-yellow-600 dark:text-yellow-400',
-      iso: 'text-yellow-600 dark:text-yellow-400',
-      deb: 'text-yellow-600 dark:text-yellow-400',
-      rpm: 'text-yellow-600 dark:text-yellow-400',
-      pkg: 'text-yellow-600 dark:text-yellow-400',
-      msi: 'text-yellow-600 dark:text-yellow-400',
+      rar: 'textyellow-600 dark:textyellow-400',
+      zip: 'textyellow-600 dark:textyellow-400',
+      '7z': 'textyellow-600 dark:textyellow-400',
+      tar: 'textyellow-600 dark:textyellow-400',
+      gz: 'textyellow-600 dark:textyellow-400',
+      bz2: 'textyellow-600 dark:textyellow-400',
+      xz: 'textyellow-600 dark:textyellow-400',
+      dmg: 'textyellow-600 dark:textyellow-400',
+      iso: 'textyellow-600 dark:textyellow-400',
+      deb: 'textyellow-600 dark:textyellow-400',
+      rpm: 'textyellow-600 dark:textyellow-400',
+      pkg: 'textyellow-600 dark:textyellow-400',
+      msi: 'textyellow-600 dark:textyellow-400',
 
       // Design files
-      psd: 'text-blue-600 dark:text-blue-400',
-      psb: 'text-blue-600 dark:text-blue-400',
-      ai: 'text-orange-600 dark:text-orange-400',
-      eps: 'text-orange-600 dark:text-orange-400',
-      sketch: 'text-pink-600 dark:text-pink-400',
-      fig: 'text-violet-600 dark:text-violet-400',
-      figma: 'text-violet-600 dark:text-violet-400',
-      xd: 'text-purple-600 dark:text-purple-400',
-      indd: 'text-purple-600 dark:text-purple-400',
-      idml: 'text-purple-600 dark:text-purple-400',
-      xcf: 'text-cyan-600 dark:text-cyan-400',
+      psd: 'textblue-600 dark:textblue-400',
+      psb: 'textblue-600 dark:textblue-400',
+      ai: 'textorange-600 dark:textorange-400',
+      eps: 'textorange-600 dark:textorange-400',
+      sketch: 'textpink-600 dark:textpink-400',
+      fig: 'textviolet-600 dark:textviolet-400',
+      figma: 'textviolet-600 dark:textviolet-400',
+      xd: 'textpurple-600 dark:textpurple-400',
+      indd: 'textpurple-600 dark:textpurple-400',
+      idml: 'textpurple-600 dark:textpurple-400',
+      xcf: 'textcyan-600 dark:textcyan-400',
 
       // Fonts
-      ttf: 'text-slate-600 dark:text-slate-400',
-      otf: 'text-slate-600 dark:text-slate-400',
-      woff: 'text-slate-600 dark:text-slate-400',
-      woff2: 'text-slate-600 dark:text-slate-400',
-      eot: 'text-slate-600 dark:text-slate-400',
+      ttf: 'textslate-600 dark:textslate-400',
+      otf: 'textslate-600 dark:textslate-400',
+      woff: 'textslate-600 dark:textslate-400',
+      woff2: 'textslate-600 dark:textslate-400',
+      eot: 'textslate-600 dark:textslate-400',
 
       // E-books
-      epub: 'text-purple-600 dark:text-purple-400',
-      mobi: 'text-purple-600 dark:text-purple-400',
-      azw: 'text-purple-600 dark:text-purple-400',
-      azw3: 'text-purple-600 dark:text-purple-400',
-      fb2: 'text-purple-600 dark:text-purple-400',
+      epub: 'textpurple-600 dark:textpurple-400',
+      mobi: 'textpurple-600 dark:textpurple-400',
+      azw: 'textpurple-600 dark:textpurple-400',
+      azw3: 'textpurple-600 dark:textpurple-400',
+      fb2: 'textpurple-600 dark:textpurple-400',
 
       // 3D and CAD
-      stl: 'text-cyan-600 dark:text-cyan-400',
-      obj: 'text-cyan-600 dark:text-cyan-400',
-      '3mf': 'text-cyan-600 dark:text-cyan-400',
-      dwg: 'text-cyan-600 dark:text-cyan-400',
-      dxf: 'text-cyan-600 dark:text-cyan-400',
-      step: 'text-cyan-600 dark:text-cyan-400',
-      iges: 'text-cyan-600 dark:text-cyan-400',
+      stl: 'textcyan-600 dark:textcyan-400',
+      obj: 'textcyan-600 dark:textcyan-400',
+      '3mf': 'textcyan-600 dark:textcyan-400',
+      dwg: 'textcyan-600 dark:textcyan-400',
+      dxf: 'textcyan-600 dark:textcyan-400',
+      step: 'textcyan-600 dark:textcyan-400',
+      iges: 'textcyan-600 dark:textcyan-400',
 
       // Raw image formats
-      cr2: 'text-emerald-600 dark:text-emerald-400',
-      crw: 'text-emerald-600 dark:text-emerald-400',
-      nef: 'text-emerald-600 dark:text-emerald-400',
-      dng: 'text-emerald-600 dark:text-emerald-400',
-      arw: 'text-emerald-600 dark:text-emerald-400',
-      orf: 'text-emerald-600 dark:text-emerald-400',
-      rw2: 'text-emerald-600 dark:text-emerald-400',
-      raw: 'text-emerald-600 dark:text-emerald-400',
-      heic: 'text-purple-600 dark:text-purple-400',
-      heif: 'text-purple-600 dark:text-purple-400',
-      avif: 'text-purple-600 dark:text-purple-400',
-      jxl: 'text-purple-600 dark:text-purple-400',
+      cr2: 'textemerald-600 dark:textemerald-400',
+      crw: 'textemerald-600 dark:textemerald-400',
+      nef: 'textemerald-600 dark:textemerald-400',
+      dng: 'textemerald-600 dark:textemerald-400',
+      arw: 'textemerald-600 dark:textemerald-400',
+      orf: 'textemerald-600 dark:textemerald-400',
+      rw2: 'textemerald-600 dark:textemerald-400',
+      raw: 'textemerald-600 dark:textemerald-400',
+      heic: 'textpurple-600 dark:textpurple-400',
+      heif: 'textpurple-600 dark:textpurple-400',
+      avif: 'textpurple-600 dark:textpurple-400',
+      jxl: 'textpurple-600 dark:textpurple-400',
 
       // Mobile app formats
-      apk: 'text-green-600 dark:text-green-400',
-      ipa: 'text-blue-600 dark:text-blue-400',
-      app: 'text-blue-600 dark:text-blue-400',
+      apk: 'textgreen-600 dark:textgreen-400',
+      ipa: 'textblue-600 dark:textblue-400',
+      app: 'textblue-600 dark:textblue-400',
 
       // System files
-      dll: 'text-gray-600 dark:text-gray-400',
-      so: 'text-gray-600 dark:text-gray-400',
-      dylib: 'text-gray-600 dark:text-gray-400',
-      exe: 'text-gray-600 dark:text-gray-400',
-      com: 'text-gray-600 dark:text-gray-400',
-      scr: 'text-gray-600 dark:text-gray-400',
+      dll: 'textgray-600 dark:textgray-400',
+      so: 'textgray-600 dark:textgray-400',
+      dylib: 'textgray-600 dark:textgray-400',
+      exe: 'textgray-600 dark:textgray-400',
+      com: 'textgray-600 dark:textgray-400',
+      scr: 'textgray-600 dark:textgray-400',
 
       // Virtual machine formats
-      vdi: 'text-slate-600 dark:text-slate-400',
-      vmdk: 'text-slate-600 dark:text-slate-400',
-      vhd: 'text-slate-600 dark:text-slate-400',
-      vhdx: 'text-slate-600 dark:text-slate-400',
-      qcow2: 'text-slate-600 dark:text-slate-400',
+      vdi: 'textslate-600 dark:textslate-400',
+      vmdk: 'textslate-600 dark:textslate-400',
+      vhd: 'textslate-600 dark:textslate-400',
+      vhdx: 'textslate-600 dark:textslate-400',
+      qcow2: 'textslate-600 dark:textslate-400',
 
       // Additional archives
-      cab: 'text-yellow-600 dark:text-yellow-400',
-      lha: 'text-yellow-600 dark:text-yellow-400',
-      lzh: 'text-yellow-600 dark:text-yellow-400',
-      ace: 'text-yellow-600 dark:text-yellow-400',
-      arj: 'text-yellow-600 dark:text-yellow-400',
+      cab: 'textyellow-600 dark:textyellow-400',
+      lha: 'textyellow-600 dark:textyellow-400',
+      lzh: 'textyellow-600 dark:textyellow-400',
+      ace: 'textyellow-600 dark:textyellow-400',
+      arj: 'textyellow-600 dark:textyellow-400',
 
       // Torrent and download files
-      torrent: 'text-red-600 dark:text-red-400',
+      torrent: 'textred-600 dark:textred-400',
 
       // Config and markup
-      json: 'text-amber-500 dark:text-amber-400',
-      xml: 'text-emerald-500 dark:text-emerald-400',
-      yaml: 'text-red-500 dark:text-red-400',
-      yml: 'text-red-500 dark:text-red-400',
-      toml: 'text-orange-500 dark:text-orange-400',
-      html: 'text-orange-500 dark:text-orange-400',
-      css: 'text-sky-500 dark:text-sky-400',
-      scss: 'text-pink-500 dark:text-pink-400',
-      sass: 'text-pink-500 dark:text-pink-400',
-      md: 'text-gray-600 dark:text-gray-400',
+      json: 'textamber-500 dark:textamber-400',
+      xml: 'textemerald-500 dark:textemerald-400',
+      yaml: 'textred-500 dark:textred-400',
+      yml: 'textred-500 dark:textred-400',
+      toml: 'textorange-500 dark:textorange-400',
+      html: 'textorange-500 dark:textorange-400',
+      css: 'textsky-500 dark:textsky-400',
+      scss: 'textpink-500 dark:textpink-400',
+      sass: 'textpink-500 dark:textpink-400',
+      md: 'textgray-600 dark:textgray-400',
     }
 
     if (extension && extensionColorMap[extension]) {
@@ -909,11 +909,11 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     }
   }
 
-  return 'text-gray-500 dark:text-gray-400'
+  return 'textgray-500 dark:textgray-400'
 }
 
 export function isGoogleWorkspaceFile(mimeType: string): boolean {
-  return mimeType.startsWith('application/vnd.google-apps.')
+  return mimeType.startsWith('application/vnd.googleapps.')
 }
 
 /**
@@ -936,9 +936,9 @@ export function extractFolderIdFromUrl(input: string): string | null {
 
   // Extract from various Google Drive URL formats
   const urlPatterns = [
-    /\/drive\/folders\/([a-zA-Z0-9_-]+)/, // Standard folder URL
-    /\/drive\/u\/\d+\/folders\/([a-zA-Z0-9_-]+)/, // User-specific folder URL
-    /id=([a-zA-Z0-9_-]+)/, // Query parameter format
+    /\/drive\/folders\/([azA-Z0-9_-]+)/, // Standard folder URL
+    /\/drive\/u\/\d+\/folders\/([azA-Z0-9_-]+)/, // Userspecific folder URL
+    /id=([azA-Z0-9_-]+)/, // Query parameter format
   ]
 
   for (const pattern of urlPatterns) {
@@ -957,7 +957,7 @@ export function extractFolderIdFromUrl(input: string): string | null {
 export function isValidFolderId(id: string): boolean {
   if (!id) return false
   // Google Drive IDs are typically 28-44 characters long and contain letters, numbers, hyphens, and underscores
-  return /^[a-zA-Z0-9_-]{10,50}$/.test(id)
+  return /^[azA-Z0-9_-]{10,50}$/.test(id)
 }
 
 export function isImageFile(mimeType: string): boolean {
@@ -977,14 +977,14 @@ export function isDocumentFile(mimeType: string): boolean {
     'application/pdf',
     'text/plain',
     'application/msword',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'application/vnd.google-apps.document',
+    'application/vnd.openxmlformatsofficedocument.wordprocessingml.document',
+    'application/vnd.googleapps.document',
   ]
   return documentTypes.includes(mimeType)
 }
 
 export function isShortcutFile(mimeType: string): boolean {
-  return mimeType === 'application/vnd.google-apps.shortcut'
+  return mimeType === 'application/vnd.googleapps.shortcut'
 }
 
 // Removed isPreviewable function - simplified to use getPreviewUrl directly
@@ -998,7 +998,7 @@ export function getPreviewUrl(fileId: string): string {
   return `https://drive.google.com/file/d/${fileId}/preview`
 }
 
-export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
+export function convertGoogleDriveFile(file: drivev3.Schema$File): DriveFile {
   return {
     id: file.id!,
     name: file.name!,
@@ -1040,11 +1040,11 @@ export function convertGoogleDriveFile(file: drive_v3.Schema$File): DriveFile {
   }
 }
 
-export function convertGoogleDriveFolder(folder: drive_v3.Schema$File): DriveFolder {
+export function convertGoogleDriveFolder(folder: drivev3.Schema$File): DriveFolder {
   return {
     id: folder.id!,
     name: folder.name!,
-    mimeType: 'application/vnd.google-apps.folder',
+    mimeType: 'application/vnd.googleapps.folder',
     createdTime: folder.createdTime!,
     modifiedTime: folder.modifiedTime!,
     ...(folder.parents && { parents: folder.parents }),
@@ -1145,11 +1145,11 @@ export function getMimeTypeFromFileName(fileName: string): string {
   const mimeTypes: Record<string, string> = {
     pdf: 'application/pdf',
     doc: 'application/msword',
-    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    xls: 'application/vnd.ms-excel',
-    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    ppt: 'application/vnd.ms-powerpoint',
-    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    docx: 'application/vnd.openxmlformatsofficedocument.wordprocessingml.document',
+    xls: 'application/vnd.msexcel',
+    xlsx: 'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet',
+    ppt: 'application/vnd.mspowerpoint',
+    pptx: 'application/vnd.openxmlformatsofficedocument.presentationml.presentation',
     txt: 'text/plain',
     jpg: 'image/jpeg',
     jpeg: 'image/jpeg',
@@ -1162,10 +1162,10 @@ export function getMimeTypeFromFileName(fileName: string): string {
     mp3: 'audio/mpeg',
     wav: 'audio/wav',
     zip: 'application/zip',
-    rar: 'application/x-rar-compressed',
+    rar: 'application/xrarcompressed',
   }
 
-  return mimeTypes[extension || ''] || 'application/octet-stream'
+  return mimeTypes[extension || ''] || 'application/octetstream'
 }
 
 /**
@@ -1188,23 +1188,23 @@ export function getFileActions(fileInfo: {
   canExport: boolean
 } {
   const { capabilities, trashed, mimeType, itemType } = fileInfo
-  const isFolder = mimeType === 'application/vnd.google-apps.folder' || itemType === 'folder'
+  const isFolder = mimeType === 'application/vnd.googleapps.folder' || itemType === 'folder'
 
   // Match the logic from selectedItemsWithDetails that's working correctly
   return {
-    canCopy: !trashed, // Allow copy for non-trashed items
+    canCopy: !trashed, // Allow copy for nontrashed items
     canDelete: capabilities?.canDelete === true, // Only if explicitly allowed
     canDownload: !trashed && !isFolder && capabilities?.canDownload !== false,
     canTrash: !trashed && capabilities?.canTrash !== false,
     canUntrash: Boolean(trashed && capabilities?.canUntrash !== false),
     canRename: !trashed && capabilities?.canRename !== false,
-    canShare: !trashed, // Allow share for non-trashed items
+    canShare: !trashed, // Allow share for nontrashed items
     canMove: !trashed && capabilities?.canMoveItemWithinDrive !== false,
     canExport:
       !trashed &&
       ['document', 'spreadsheet', 'presentation', 'drawing'].some(type =>
-        mimeType?.includes(`application/vnd.google-apps.${type}`),
-      ), // Allow export for non-trashed files
+        mimeType?.includes(`application/vnd.googleapps.${type}`),
+      ), // Allow export for nontrashed files
   }
 }
 
@@ -1259,7 +1259,7 @@ export function getFileIconProps(
 }
 
 /**
- * Get category-based icon for file type filters and badges
+ * Get categorybased icon for file type filters and badges
  */
 export function getCategoryIcon(category: string): string {
   const categoryIconMap: Record<string, string> = {
@@ -1284,27 +1284,27 @@ export function getCategoryIcon(category: string): string {
 }
 
 /**
- * Get category-based color for file type filters and badges
+ * Get categorybased color for file type filters and badges
  */
 export function getCategoryColor(category: string): string {
   const categoryColorMap: Record<string, string> = {
-    folder: 'text-blue-600 dark:text-blue-400',
-    document: 'text-blue-500 dark:text-blue-400',
-    spreadsheet: 'text-green-600 dark:text-green-400',
-    presentation: 'text-orange-600 dark:text-orange-400',
-    image: 'text-purple-600 dark:text-purple-400',
-    video: 'text-red-600 dark:text-red-400',
-    audio: 'text-indigo-600 dark:text-indigo-400',
-    archive: 'text-yellow-600 dark:text-yellow-400',
-    code: 'text-emerald-600 dark:text-emerald-400',
-    pdf: 'text-red-600 dark:text-red-400',
-    text: 'text-gray-600 dark:text-gray-400',
-    design: 'text-pink-600 dark:text-pink-400',
-    database: 'text-slate-600 dark:text-slate-400',
-    other: 'text-gray-500 dark:text-gray-400',
+    folder: 'textblue-600 dark:textblue-400',
+    document: 'textblue-500 dark:textblue-400',
+    spreadsheet: 'textgreen-600 dark:textgreen-400',
+    presentation: 'textorange-600 dark:textorange-400',
+    image: 'textpurple-600 dark:textpurple-400',
+    video: 'textred-600 dark:textred-400',
+    audio: 'textindigo-600 dark:textindigo-400',
+    archive: 'textyellow-600 dark:textyellow-400',
+    code: 'textemerald-600 dark:textemerald-400',
+    pdf: 'textred-600 dark:textred-400',
+    text: 'textgray-600 dark:textgray-400',
+    design: 'textpink-600 dark:textpink-400',
+    database: 'textslate-600 dark:textslate-400',
+    other: 'textgray-500 dark:textgray-400',
   }
 
-  return categoryColorMap[category] || 'text-gray-500 dark:text-gray-400'
+  return categoryColorMap[category] || 'textgray-500 dark:textgray-400'
 }
 
 /**
@@ -1312,7 +1312,7 @@ export function getCategoryColor(category: string): string {
  */
 export function getFileCategory(mimeType: string): string {
   if (!mimeType) return 'other'
-  if (mimeType === 'application/vnd.google-apps.folder') return 'folder'
+  if (mimeType === 'application/vnd.googleapps.folder') return 'folder'
   if (mimeType.startsWith('image/')) return 'image'
   if (mimeType.startsWith('video/')) return 'video'
   if (mimeType.startsWith('audio/')) return 'audio'

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { initDriveService, handleApiError } from '@/lib/api-utils'
-import { retryDriveApiCall } from '@/lib/api-retry'
-import { throttledDriveRequest } from '@/lib/api-throttle'
+import { initDriveService, handleApiError } from '@/lib/apiutils'
+import { retryDriveApiCall } from '@/lib/apiretry'
+import { throttledDriveRequest } from '@/lib/apithrottle'
 import { driveCache } from '@/lib/cache'
 
 /**
@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build query for folders only
-    let query = `mimeType='application/vnd.google-apps.folder' and trashed=false`
+    let query = `mimeType='application/vnd.googleapps.folder' and trashed=false`
 
     if (parentId && parentId !== 'root') {
       query += ` and '${parentId}' in parents`
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
         return await driveService!.drive.files.create({
           requestBody: {
             name: name.trim(),
-            mimeType: 'application/vnd.google-apps.folder',
+            mimeType: 'application/vnd.googleapps.folder',
             parents: parentId === 'root' ? ['root'] : [parentId],
           },
           fields: 'id,name,parents,webViewLink,createdTime',

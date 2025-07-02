@@ -34,7 +34,7 @@ import {
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Label } from '@/components/ui/label'
-import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { useIsMobile } from '@/lib/hooks/useMobile'
 import { cn } from '@/lib/utils'
 
 interface ItemsShareDialogProps {

@@ -3,28 +3,28 @@ import { cn } from '../utils'
 describe('Utils', () => {
   describe('cn (className utility)', () => {
     it('should merge class names correctly', () => {
-      const result = cn('base-class', 'additional-class')
-      expect(result).toContain('base-class')
-      expect(result).toContain('additional-class')
+      const result = cn('baseclass', 'additionalclass')
+      expect(result).toContain('baseclass')
+      expect(result).toContain('additionalclass')
     })
 
     it('should handle conditional classes', () => {
-      const result = cn('base-class', false && 'hidden-class', 'visible-class')
-      expect(result).toContain('base-class')
-      expect(result).toContain('visible-class')
-      expect(result).not.toContain('hidden-class')
+      const result = cn('baseclass', false && 'hiddenclass', 'visibleclass')
+      expect(result).toContain('baseclass')
+      expect(result).toContain('visibleclass')
+      expect(result).not.toContain('hiddenclass')
     })
 
     it('should handle undefined and null values', () => {
-      const result = cn('base-class', undefined, null, 'final-class')
-      expect(result).toContain('base-class')
-      expect(result).toContain('final-class')
+      const result = cn('baseclass', undefined, null, 'finalclass')
+      expect(result).toContain('baseclass')
+      expect(result).toContain('finalclass')
     })
 
     it('should handle empty strings', () => {
-      const result = cn('base-class', '', 'final-class')
-      expect(result).toContain('base-class')
-      expect(result).toContain('final-class')
+      const result = cn('baseclass', '', 'finalclass')
+      expect(result).toContain('baseclass')
+      expect(result).toContain('finalclass')
     })
 
     it('should handle arrays of classes', () => {
@@ -46,17 +46,17 @@ describe('Utils', () => {
     })
 
     it('should merge Tailwind classes correctly', () => {
-      const result = cn('p-4 text-red-500', 'p-2 text-blue-500')
+      const result = cn('p-4 textred-500', 'p-2 textblue-500')
       // Should prioritize the last class when conflicts occur
       expect(result).toContain('p-2')
-      expect(result).toContain('text-blue-500')
+      expect(result).toContain('textblue-500')
     })
 
     it('should handle complex mixed inputs', () => {
       const result = cn(
         'base',
         ['array1', 'array2'],
-        { conditional: true, 'false-conditional': false },
+        { conditional: true, 'falseconditional': false },
         undefined,
         null,
         'final',
@@ -66,7 +66,7 @@ describe('Utils', () => {
       expect(result).toContain('array2')
       expect(result).toContain('conditional')
       expect(result).toContain('final')
-      expect(result).not.toContain('false-conditional')
+      expect(result).not.toContain('falseconditional')
     })
   })
 })

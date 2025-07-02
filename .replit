@@ -40,6 +40,14 @@ args = "Code Standards Enforcer"
 task = "workflow.run"
 args = "Final Code Quality Check"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Apply Simple Naming Rules"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Dev Server"
+
 
 [[workflows.workflow]]
 name = "Cleaner"
@@ -103,5 +111,22 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run type-check && echo \"✅ TypeScript check passed\" && npm run lint:fast && echo \"✅ ESLint check passed\""
+
+[[workflows.workflow]]
+name = "Apply Simple Naming Rules"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/fix-imports.js && npx tsc --noEmit --skipLibCheck && echo \"✅ Naming rules applied successfully\""
+
+[[workflows.workflow]]
+name = "Dev Server"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
 
 

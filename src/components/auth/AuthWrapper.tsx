@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { ReactNode, useEffect, useState } from 'react'
-import { useSessionDuration } from '@/lib/hooks/use-session-duration'
+import { useSessionDuration } from '@/lib/hooks/useSessionDuration'
 
 interface AuthWrapperProps {
   children: ReactNode

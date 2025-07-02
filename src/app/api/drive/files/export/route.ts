@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService, handleApiError } from '@/lib/api-utils'
+import { initDriveService, handleApiError } from '@/lib/apiutils'
 
 export async function POST(request: NextRequest) {
   try {
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
  * Check if file is Google Workspace file that can be exported
  */
 function isGoogleWorkspaceFile(mimeType: string): boolean {
-  return mimeType?.startsWith('application/vnd.google-apps.') || false
+  return mimeType?.startsWith('application/vnd.googleapps.') || false
 }
 
 /**
@@ -99,26 +99,26 @@ function isGoogleWorkspaceFile(mimeType: string): boolean {
 function getExportMimeType(format: string, originalMimeType: string): string {
   const formatMap: { [key: string]: { [key: string]: string } } = {
     pdf: {
-      'application/vnd.google-apps.document': 'application/pdf',
-      'application/vnd.google-apps.spreadsheet': 'application/pdf',
-      'application/vnd.google-apps.presentation': 'application/pdf',
-      'application/vnd.google-apps.drawing': 'application/pdf',
+      'application/vnd.googleapps.document': 'application/pdf',
+      'application/vnd.googleapps.spreadsheet': 'application/pdf',
+      'application/vnd.googleapps.presentation': 'application/pdf',
+      'application/vnd.googleapps.drawing': 'application/pdf',
     },
     docx: {
-      'application/vnd.google-apps.document': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.googleapps.document': 'application/vnd.openxmlformatsofficedocument.wordprocessingml.document',
     },
     xlsx: {
-      'application/vnd.google-apps.spreadsheet': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.googleapps.spreadsheet': 'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet',
     },
     pptx: {
-      'application/vnd.google-apps.presentation':
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.googleapps.presentation':
+        'application/vnd.openxmlformatsofficedocument.presentationml.presentation',
     },
     png: {
-      'application/vnd.google-apps.drawing': 'image/png',
+      'application/vnd.googleapps.drawing': 'image/png',
     },
     txt: {
-      'application/vnd.google-apps.document': 'text/plain',
+      'application/vnd.googleapps.document': 'text/plain',
     },
   }
 

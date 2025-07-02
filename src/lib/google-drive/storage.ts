@@ -3,7 +3,7 @@
  * Solves limitation of pageSize 1000 by implementing complete data collection
  */
 
-import { drive_v3 } from 'googleapis'
+import { drivev3 } from 'googleapis'
 
 interface StorageData {
   quota: {
@@ -387,13 +387,13 @@ export class StorageAnalyzer {
       }
 
       // Categorize files with more comprehensive types
-      if (mimeType === 'application/vnd.google-apps.document') {
+      if (mimeType === 'application/vnd.googleapps.document') {
         filesByType.documents++
-      } else if (mimeType === 'application/vnd.google-apps.spreadsheet') {
+      } else if (mimeType === 'application/vnd.googleapps.spreadsheet') {
         filesByType.spreadsheets++
-      } else if (mimeType === 'application/vnd.google-apps.presentation') {
+      } else if (mimeType === 'application/vnd.googleapps.presentation') {
         filesByType.presentations++
-      } else if (mimeType === 'application/vnd.google-apps.folder') {
+      } else if (mimeType === 'application/vnd.googleapps.folder') {
         filesByType.folders++
       } else if (mimeType.startsWith('image/')) {
         filesByType.images++

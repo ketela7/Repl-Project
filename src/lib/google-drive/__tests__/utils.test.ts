@@ -71,9 +71,9 @@ describe('Google Drive Utils', () => {
     })
 
     it('should handle Google Apps files', () => {
-      expect(getFileTypeCategory('', 'application/vnd.google-apps.document')).toBe('document')
-      expect(getFileTypeCategory('', 'application/vnd.google-apps.spreadsheet')).toBe('document')
-      expect(getFileTypeCategory('', 'application/vnd.google-apps.folder')).toBe('folder')
+      expect(getFileTypeCategory('', 'application/vnd.googleapps.document')).toBe('document')
+      expect(getFileTypeCategory('', 'application/vnd.googleapps.spreadsheet')).toBe('document')
+      expect(getFileTypeCategory('', 'application/vnd.googleapps.folder')).toBe('folder')
     })
   })
 })

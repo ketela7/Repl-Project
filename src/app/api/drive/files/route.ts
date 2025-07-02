@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService } from '@/lib/api-utils'
+import { initDriveService } from '@/lib/apiutils'
 import { driveCache } from '@/lib/cache'
 
 interface FileFilter {
@@ -37,7 +37,7 @@ function buildDriveQuery(filters: FileFilter): string {
       //conditions.push('trashed=false')
       conditions.push('starred=true')
       break
-    case 'my-drive':
+    case 'mydrive':
       // My Drive view - files owned by me
       //conditions.push('trashed=false')
       conditions.push("'me' in owners")
@@ -49,14 +49,14 @@ function buildDriveQuery(filters: FileFilter): string {
     //break
     //case 'all':
     //default:
-    // All files view - show non-trashed files by default
+    // All files view - show nontrashed files by default
     //conditions.push('trashed=false')
     //break
   }
 
   // File type filters - handle both single and multiple types
   if (filters.fileType && filters.fileType !== 'all') {
-    // Handle comma-separated file types from frontend
+    // Handle commaseparated file types from frontend
     const fileTypes = filters.fileType.split(',').filter(type => type && type !== 'all')
 
     if (fileTypes.length > 0) {
@@ -65,21 +65,21 @@ function buildDriveQuery(filters: FileFilter): string {
       fileTypes.forEach(type => {
         switch (type.trim()) {
           case 'folder':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.folder'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.folder'")
             break
 
           case 'shortcut':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.shortcut'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.shortcut'")
             break
 
           case 'document':
             typeConditions.push(
               `(${[
-                "mimeType = 'application/vnd.google-apps.document'",
+                "mimeType = 'application/vnd.googleapps.document'",
                 "mimeType = 'application/pdf'",
                 "mimeType = 'text/plain'",
                 "mimeType = 'application/msword'",
-                "mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'",
+                "mimeType = 'application/vnd.openxmlformatsofficedocument.wordprocessingml.document'",
               ].join(' or ')})`,
             )
             break
@@ -87,9 +87,9 @@ function buildDriveQuery(filters: FileFilter): string {
           case 'spreadsheet':
             typeConditions.push(
               `(${[
-                "mimeType = 'application/vnd.google-apps.spreadsheet'",
-                "mimeType = 'application/vnd.ms-excel'",
-                "mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'",
+                "mimeType = 'application/vnd.googleapps.spreadsheet'",
+                "mimeType = 'application/vnd.msexcel'",
+                "mimeType = 'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet'",
               ].join(' or ')})`,
             )
             break
@@ -97,9 +97,9 @@ function buildDriveQuery(filters: FileFilter): string {
           case 'presentation':
             typeConditions.push(
               `(${[
-                "mimeType = 'application/vnd.google-apps.presentation'",
-                "mimeType = 'application/vnd.ms-powerpoint'",
-                "mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'",
+                "mimeType = 'application/vnd.googleapps.presentation'",
+                "mimeType = 'application/vnd.mspowerpoint'",
+                "mimeType = 'application/vnd.openxmlformatsofficedocument.presentationml.presentation'",
               ].join(' or ')})`,
             )
             break
@@ -120,14 +120,14 @@ function buildDriveQuery(filters: FileFilter): string {
             typeConditions.push(
               `(${[
                 "mimeType = 'application/zip'",
-                "mimeType = 'application/x-zip-compressed'",
-                "mimeType = 'application/x-rar-compressed'",
+                "mimeType = 'application/xzipcompressed'",
+                "mimeType = 'application/xrarcompressed'",
                 "mimeType = 'application/vnd.rar'",
-                "mimeType = 'application/x-7z-compressed'",
-                "mimeType = 'application/x-tar'",
+                "mimeType = 'application/x-7zcompressed'",
+                "mimeType = 'application/xtar'",
                 "mimeType = 'application/gzip'",
-                "mimeType = 'application/x-bzip2'",
-                "mimeType = 'application/x-xz'",
+                "mimeType = 'application/xbzip2'",
+                "mimeType = 'application/xxz'",
               ].join(' or ')})`,
             )
             break
@@ -137,10 +137,10 @@ function buildDriveQuery(filters: FileFilter): string {
               `(${[
                 "mimeType = 'text/javascript'",
                 "mimeType = 'application/javascript'",
-                "mimeType = 'text/x-python'",
-                "mimeType = 'text/x-c'",
-                "mimeType = 'text/x-c++'",
-                "mimeType = 'text/x-java-source'",
+                "mimeType = 'text/xpython'",
+                "mimeType = 'text/xc'",
+                "mimeType = 'text/xc++'",
+                "mimeType = 'text/xjavasource'",
                 "mimeType = 'application/json'",
                 "mimeType = 'application/xml'",
                 "mimeType = 'text/html'",
@@ -152,35 +152,35 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'drawing':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.drawing'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.drawing'")
             break
 
           case 'form':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.form'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.form'")
             break
 
           case 'jamboard':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.jam'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.jam'")
             break
 
           case 'script':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.script'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.script'")
             break
 
           case 'site':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.site'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.site'")
             break
 
           case 'map':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.map'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.map'")
             break
 
           case 'photo':
-            typeConditions.push("mimeType = 'application/vnd.google-apps.photo'")
+            typeConditions.push("mimeType = 'application/vnd.googleapps.photo'")
             break
 
-          case 'google-native':
-            typeConditions.push("mimeType contains 'application/vnd.google-apps'")
+          case 'googlenative':
+            typeConditions.push("mimeType contains 'application/vnd.googleapps'")
             break
 
           case 'pdf':
@@ -193,7 +193,7 @@ function buildDriveQuery(filters: FileFilter): string {
                 "mimeType = 'text/plain'",
                 "mimeType = 'text/markdown'",
                 "mimeType = 'text/csv'",
-                "mimeType = 'text/tab-separated-values'",
+                "mimeType = 'text/tabseparatedvalues'",
               ].join(' or ')})`,
             )
             break
@@ -201,7 +201,7 @@ function buildDriveQuery(filters: FileFilter): string {
           case 'design':
             typeConditions.push(
               `(${[
-                "mimeType = 'application/vnd.google-apps.drawing'",
+                "mimeType = 'application/vnd.googleapps.drawing'",
                 "mimeType = 'image/svg+xml'",
                 "mimeType = 'application/postscript'",
                 "mimeType = 'application/illustrator'",
@@ -212,9 +212,9 @@ function buildDriveQuery(filters: FileFilter): string {
           case 'database':
             typeConditions.push(
               `(${[
-                "mimeType = 'application/x-sqlite3'",
-                "mimeType = 'application/vnd.ms-access'",
-                "mimeType = 'application/x-dbf'",
+                "mimeType = 'application/xsqlite3'",
+                "mimeType = 'application/vnd.msaccess'",
+                "mimeType = 'application/xdbf'",
                 "mimeType contains 'database'",
               ].join(' or ')})`,
             )
@@ -224,9 +224,9 @@ function buildDriveQuery(filters: FileFilter): string {
             typeConditions.push(
               `(${[
                 "mimeType = 'application/epub+zip'",
-                "mimeType = 'application/x-mobipocket-ebook'",
+                "mimeType = 'application/xmobipocketebook'",
                 "mimeType = 'application/vnd.amazon.ebook'",
-                "mimeType = 'application/x-fictionbook+xml'",
+                "mimeType = 'application/xfictionbook+xml'",
               ].join(' or ')})`,
             )
             break
@@ -238,7 +238,7 @@ function buildDriveQuery(filters: FileFilter): string {
                 "mimeType = 'font/otf'",
                 "mimeType = 'font/woff'",
                 "mimeType = 'font/woff2'",
-                "mimeType = 'application/font-woff'",
+                "mimeType = 'application/fontwoff'",
               ].join(' or ')})`,
             )
             break
@@ -248,13 +248,13 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'contact':
-            typeConditions.push(`(${["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ')})`)
+            typeConditions.push(`(${["mimeType = 'text/vcard'", "mimeType = 'text/xvcard'"].join(' or ')})`)
             break
 
           case 'other':
             typeConditions.push(
               `(${[
-                "not mimeType contains 'application/vnd.google-apps'",
+                "not mimeType contains 'application/vnd.googleapps'",
                 "not mimeType contains 'image/'",
                 "not mimeType contains 'video/'",
                 "not mimeType contains 'audio/'",
@@ -308,7 +308,7 @@ function buildDriveQuery(filters: FileFilter): string {
   // We'll handle size filtering on the client side after fetching results
   // Only exclude folders when size filters are specified since they don't have meaningful sizes
   if (filters.sizeMin || filters.sizeMax) {
-    conditions.push("mimeType != 'application/vnd.google-apps.folder'")
+    conditions.push("mimeType != 'application/vnd.googleapps.folder'")
   }
 
   return conditions.join(' and ')
@@ -394,7 +394,7 @@ export async function GET(request: NextRequest) {
       // When navigating to specific folder, always apply parent constraint
       const parentQuery = folderId !== 'root' ? `'${folderId}' in parents` : "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
-    } else if (filters.viewStatus === 'my-drive') {
+    } else if (filters.viewStatus === 'mydrive') {
       // My Drive view without folder navigation - show root folder
       const parentQuery = "'root' in parents"
       query = query ? `${query} and ${parentQuery}` : parentQuery
@@ -438,10 +438,10 @@ export async function GET(request: NextRequest) {
       orderBy,
     })
 
-    // Apply client-side size filtering since Google Drive API doesn't support size operators
+    // Apply clientside size filtering since Google Drive API doesn't support size operators
     if (filters.sizeMin || filters.sizeMax) {
       const sizeMin = filters.sizeMin ? Number(filters.sizeMin) : 0
-      const sizeMax = filters.sizeMax ? Number(filters.sizeMax) : Number.MAX_SAFE_INTEGER
+      const sizeMax = filters.sizeMax ? Number(filters.sizeMax) : Number.MAXSAFE_INTEGER
 
       result.files = result.files.filter((file: any) => {
         const fileSize = file.size ? Number(file.size) : 0

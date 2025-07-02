@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService, handleApiError, validateRenameRequest } from '@/lib/api-utils'
-import { retryDriveApiCall } from '@/lib/api-retry'
-import { throttledDriveRequest } from '@/lib/api-throttle'
+import { initDriveService, handleApiError, validateRenameRequest } from '@/lib/apiutils'
+import { retryDriveApiCall } from '@/lib/apiretry'
+import { throttledDriveRequest } from '@/lib/apithrottle'
 import { driveCache } from '@/lib/cache'
 
 /**
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
         if (error.code) {
           switch (error.code) {
             case 401:
-              errorMessage = 'Authentication expired - please re-login to Google Drive'
+              errorMessage = 'Authentication expired - please relogin to Google Drive'
               break
             case 403:
               errorMessage = "Permission denied - you don't have write access to this file"

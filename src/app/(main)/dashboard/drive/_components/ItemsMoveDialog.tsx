@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
-import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { useIsMobile } from '@/lib/hooks/useMobile'
 import { DriveDestinationSelector } from '@/components/drive-destination-selector'
 import { cn } from '@/lib/utils'
 

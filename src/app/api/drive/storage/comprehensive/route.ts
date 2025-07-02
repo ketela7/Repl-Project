@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
-import { createDriveClient } from '@/lib/google-drive/config'
-import { StorageAnalyzer } from '@/lib/google-drive/storage'
+import { createDriveClient } from '@/lib/googledrive/config'
+import { StorageAnalyzer } from '@/lib/googledrive/storage'
 
 /**
  * Enhanced Storage Analytics API with complete pagination support

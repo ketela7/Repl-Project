@@ -117,7 +117,7 @@ export interface DriveUploadOptions {
   file: File
   metadata: DriveFileMetadata
   parentId?: string
-  onProgress?: (_progress: number) => void
+  onProgress?: (progress: number) => void
 }
 
 export interface DriveSearchOptions {

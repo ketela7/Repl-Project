@@ -7,8 +7,8 @@ describe('Cache', () => {
   })
 
   it('should store and retrieve values', () => {
-    const key = 'test-key'
-    const value = { data: 'test-data' }
+    const key = 'testkey'
+    const value = { data: 'testdata' }
 
     cache.set(key, value)
     const retrieved = cache.get(key)
@@ -16,14 +16,14 @@ describe('Cache', () => {
     expect(retrieved).toEqual(value)
   })
 
-  it('should return undefined for non-existent keys', () => {
-    const result = cache.get('non-existent-key')
+  it('should return undefined for nonexistent keys', () => {
+    const result = cache.get('nonexistentkey')
     expect(result).toBeUndefined()
   })
 
   it('should handle cache expiration', async () => {
-    const key = 'expiring-key'
-    const value = 'expiring-value'
+    const key = 'expiringkey'
+    const value = 'expiringvalue'
     const ttl = 100 // 100ms
 
     cache.set(key, value, ttl)
@@ -35,7 +35,7 @@ describe('Cache', () => {
   })
 
   it('should check if key exists', () => {
-    const key = 'existing-key'
+    const key = 'existingkey'
 
     expect(cache.has(key)).toBe(false)
 
@@ -44,7 +44,7 @@ describe('Cache', () => {
   })
 
   it('should delete specific keys', () => {
-    const key = 'delete-key'
+    const key = 'deletekey'
 
     cache.set(key, 'value')
     expect(cache.has(key)).toBe(true)

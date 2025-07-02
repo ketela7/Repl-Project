@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 
-import { performanceMonitor } from '@/lib/google-drive/performance'
-import { initDriveService } from '@/lib/api-utils'
+import { performanceMonitor } from '@/lib/googledrive/performance'
+import { initDriveService } from '@/lib/apiutils'
 
 export async function GET() {
   try {

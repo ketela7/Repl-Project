@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-import { initDriveService, handleApiError } from '@/lib/api-utils'
+import { initDriveService, handleApiError } from '@/lib/apiutils'
 
 export async function POST(request: NextRequest) {
   try {

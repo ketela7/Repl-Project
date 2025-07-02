@@ -21,7 +21,7 @@ export interface BatchResponse {
  * Optimized field selectors for different use cases
  * Reduces bandwidth by only requesting needed fields
  */
-export const FIELD_SELECTORS = {
+export const FIELDSELECTORS = {
   // Minimal fields for file listing
   LIST_MINIMAL: 'nextPageToken, files(id, name, mimeType)',
 
@@ -44,9 +44,9 @@ export const FIELD_SELECTORS = {
 } as const
 
 /**
- * Performance-optimized request parameters
+ * Performanceoptimized request parameters
  */
-export function getOptimizedRequestParams(operation: keyof typeof FIELD_SELECTORS, baseParams: any = {}): any {
+export function getOptimizedRequestParams(operation: keyof typeof FIELDSELECTORS, baseParams: any = {}): any {
   return {
     ...baseParams,
     fields: FIELD_SELECTORS[operation],

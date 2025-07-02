@@ -23,7 +23,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
-import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { useIsMobile } from '@/lib/hooks/useMobile'
 import { successToast, errorToast } from '@/components/ui/toast'
 import { cn } from '@/lib/utils'
 

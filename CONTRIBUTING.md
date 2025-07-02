@@ -111,22 +111,22 @@ npm run pre-commit
 
 ## File Naming Conventions
 
-### Components
+### Components (PascalCase)
 ```
-✅ BENAR: UserProfile.tsx, DriveManager.tsx, StorageAnalytics.tsx
-❌ SALAH: userProfile.tsx, drive-manager.tsx, storage_analytics.tsx
-```
-
-### Hooks
-```
-✅ BENAR: useUserProfile.ts, useDriveManager.ts
-❌ SALAH: UserProfile.hook.ts, user-profile-hook.ts
+✅ BENAR: UserProfile.tsx, DriveManager.tsx, ItemsDeleteDialog.tsx
+❌ SALAH: userProfile.tsx, drive-manager.tsx, items-delete-dialog.tsx
 ```
 
-### Utilities
+### Hooks (camelCase with "use" prefix)
 ```
-✅ BENAR: api-utils.ts, format-helpers.ts
-❌ SALAH: apiUtils.ts, formatHelpers.ts
+✅ BENAR: useMobile.ts, useTimezone.ts, useSessionDuration.ts
+❌ SALAH: use-mobile.ts, use_timezone.ts, UseMobile.ts
+```
+
+### Utilities (camelCase)
+```
+✅ BENAR: apiUtils.ts, performanceUtils.ts, requestDeduplication.ts
+❌ SALAH: api-utils.ts, performance_utils.ts, request-deduplication.ts
 ```
 
 ## Security Requirements (TIDAK BOLEH DILANGGAR)

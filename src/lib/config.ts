@@ -1,11 +1,11 @@
 /**
- * Server-side configuration for environment variables
+ * Serverside configuration for environment variables
  * Handles both Replit secrets and traditional environment variables
  */
 export const config = {
   google: {
     driveScopes: 'https://www.googleapis.com/auth/drive',
-    clientId: process.env.GOOGLE_CLIENT_ID!,
+    clientId: process.env.GOOGLECLIENT_ID!,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
   },
   nextAuth: {
