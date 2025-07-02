@@ -11,8 +11,6 @@ import { Separator } from '@/components/ui/separator'
 import {
   AlertTriangle,
   BarChart3,
-  Clock,
-  Database,
   FileIcon,
   FileSpreadsheet,
   FileText,
@@ -23,7 +21,6 @@ import {
   RefreshCw,
   TrendingUp,
   Video,
-  Zap,
 } from 'lucide-react'
 import { Avatar } from '@/components/responsive-image'
 
@@ -331,32 +328,21 @@ export function StorageAnalytics() {
   const [meta, setMeta] = useState<AnalyticsMeta | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [strategy, setStrategy] = useState<'fast' | 'complete' | 'progressive'>('fast')
+  const strategy = 'fast' // Always use fast strategy for background processing
 
-  const fetchStorageData = async (selectedStrategy: 'fast' | 'complete' | 'progressive' = strategy) => {
+  const fetchStorageData = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/drive/storage/comprehensive?strategy=${selectedStrategy}`)
+      const response = await fetch(`/api/drive/storage/comprehensive?strategy=${strategy}`)
       const result = await response.json()
 
       if (result.success) {
         setData(result.data)
         setMeta(result.meta)
       } else {
-        // Handle timeout errors with better suggestions
-        if (response.status === 408 && result.suggestion === 'fast') {
-          setError('Analysis timeout. Switching to Fast analysis for better performance.')
-          // Auto-retry with fast strategy
-          if (selectedStrategy !== 'fast') {
-            setStrategy('fast')
-            setTimeout(() => fetchStorageData('fast'), 1000)
-            return
-          }
-        } else {
-          setError(result.error || 'Failed to fetch storage data')
-        }
+        setError(result.error || 'Failed to fetch storage data')
       }
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Network error occurred'
@@ -369,11 +355,6 @@ export function StorageAnalytics() {
   useEffect(() => {
     fetchStorageData()
   }, [])
-
-  const handleStrategyChange = (newStrategy: 'fast' | 'complete' | 'progressive') => {
-    setStrategy(newStrategy)
-    fetchStorageData(newStrategy)
-  }
 
   if (loading) {
     return (
@@ -428,51 +409,6 @@ export function StorageAnalytics() {
 
   return (
     <div className="space-y-6">
-      {/* Strategy Selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Zap className="h-5 w-5" />
-            Analysis Strategy
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-2">
-            <Button
-              variant={strategy === 'fast' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleStrategyChange('fast')}
-              disabled={loading}
-            >
-              <Clock className="mr-2 h-4 w-4" />
-              Fast (~500 files)
-            </Button>
-            <Button
-              variant={strategy === 'progressive' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleStrategyChange('progressive')}
-              disabled={loading}
-            >
-              <Gauge className="mr-2 h-4 w-4" />
-              Progressive (Smart)
-            </Button>
-            <Button
-              variant={strategy === 'complete' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => handleStrategyChange('complete')}
-              disabled={loading}
-            >
-              <Database className="mr-2 h-4 w-4" />
-              Complete (All files)
-            </Button>
-          </div>
-          <p className="text-muted-foreground mt-2 text-xs">
-            Current: {meta.accuracy}% accuracy • {data.processing.filesProcessed.toLocaleString()} files analyzed •{' '}
-            {formatDuration(meta.performanceMs)}
-          </p>
-        </CardContent>
-      </Card>
-
       {/* Overview Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <QuotaOverview quota={data.quota} />
