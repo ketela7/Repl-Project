@@ -13,12 +13,16 @@ runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
-mode = "parallel"
+mode = "sequential"
 author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Check Type"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Test Coverage"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
@@ -28,15 +32,7 @@ args = "Linter & Formatter"
 task = "workflow.run"
 args = "Server"
 
-[[workflows.workflow]]
-name = "Server"
-author = "agent"
-mode = "sequential"
 
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "npm run dev"
-waitForPort = 5000
 
 [[workflows.workflow]]
 name = "Check Type"
@@ -46,6 +42,17 @@ author = "agent"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run type-check"
+
+
+[[workflows.workflow]]
+name = "Test Coverage"
+mode = "sequential"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run test:coverage"
+
 
 [[workflows.workflow]]
 name = "Linter & Formatter"
@@ -57,3 +64,12 @@ task = "shell.exec"
 args = "npm run fix:all"
 
 
+[[workflows.workflow]]
+name = "Server"
+author = "agent"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+waitForPort = 5000
