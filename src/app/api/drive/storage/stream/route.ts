@@ -113,9 +113,23 @@ export async function GET() {
                 // Process files for statistics with safe number parsing
                 files.forEach((file: DriveFile) => {
                   const mimeType = file.mimeType || 'unknown'
-                  // Safe file size parsing
+                  
+                  // Skip folders - they don't have meaningful sizes
+                  if (mimeType === 'application/vnd.google-apps.folder') {
+                    filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
+                    fileSizesByType[mimeType] = (fileSizesByType[mimeType] || 0) + 0
+                    return
+                  }
+                  
+                  // Safe file size parsing - Google Drive returns size as string
                   const sizeValue = file.size
                   let size = 0
+                  
+                  // Debug logging for first few files
+                  if (totalProcessed < 10) {
+                    console.log(`[Storage Debug] File: ${file.name}, Size: ${sizeValue}, Type: ${typeof sizeValue}, MimeType: ${mimeType}`)
+                  }
+                  
                   if (sizeValue && sizeValue !== 'null' && sizeValue !== 'undefined') {
                     const parsed = parseInt(sizeValue.toString(), 10)
                     size = isNaN(parsed) ? 0 : parsed

@@ -320,7 +320,7 @@ export function ProgressiveStorageAnalytics() {
                   <span className="font-medium">
                     {formatBytes(files.fileSizesByType ? 
                       Object.values(files.fileSizesByType).reduce((sum, size) => {
-                        const numSize = typeof size === 'number' ? size : parseInt(size?.toString() || '0', 10) || 0
+                        const numSize = typeof size === 'number' ? size : parseInt(String(size || 0), 10) || 0
                         return sum + numSize
                       }, 0) : 0)}
                   </span>
