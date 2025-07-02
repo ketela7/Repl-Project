@@ -41,6 +41,31 @@ const nextConfig = {
 
   serverExternalPackages: ['googleapis'],
 
+  // Image configuration for external domains
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'drive.google.com',
+        port: '',
+        pathname: '/thumbnail/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'docs.google.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+    domains: ['lh3.googleusercontent.com', 'drive.google.com', 'docs.google.com'],
+  },
+
   // Production TypeScript compilation
   typescript: {
     ignoreBuildErrors: process.env.NODE_ENV === 'production',
