@@ -175,7 +175,7 @@ export function ProgressiveStorageAnalytics() {
       .map(([type, count]) => ({
         type: type.split('/')[1] || type,
         count,
-        size: files.fileSizesByType[type] || 0
+        size: files.fileSizesByType?.[type] || 0
       }))
   }
 
@@ -309,7 +309,7 @@ export function ProgressiveStorageAnalytics() {
                 <div className="flex justify-between">
                   <span>Total Size</span>
                   <span className="font-medium">
-                    {formatBytes(Object.values(files.fileSizesByType).reduce((sum, size) => sum + size, 0))}
+                    {formatBytes(files.fileSizesByType ? Object.values(files.fileSizesByType).reduce((sum, size) => sum + size, 0) : 0)}
                   </span>
                 </div>
               </div>
