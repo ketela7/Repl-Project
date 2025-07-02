@@ -121,7 +121,7 @@ export function DriveDestinationSelector({
       if (data.success) {
         setFolders(data.folders || [])
       }
-    } catch (error) {
+    } catch {
       // console.error('Failed to load folders:', error)
     } finally {
       setIsLoadingFolders(false)
@@ -151,7 +151,7 @@ export function DriveDestinationSelector({
           error: data.error || 'Folder validation failed',
         })
       }
-    } catch (error) {
+    } catch {
       setValidationResult({
         isValid: false,
         error: 'Failed to validate folder ID',
