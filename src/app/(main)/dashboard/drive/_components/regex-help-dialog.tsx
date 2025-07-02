@@ -244,3 +244,4 @@ function RegexHelpDialog({ isOpen, onClose }: RegexHelpDialogProps) {
 }
 
 export { RegexHelpDialog }
+export default RegexHelpDialog

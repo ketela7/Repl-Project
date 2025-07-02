@@ -70,9 +70,7 @@ export function OptimizedImage({
       <Image
         src={src}
         alt={alt}
-        width={fill ? undefined : width}
-        height={fill ? undefined : height}
-        fill={fill}
+        {...(fill ? { fill: true } : { width: width || 200, height: height || 200 })}
         sizes={fill ? sizes : undefined}
         priority={priority}
         quality={85}

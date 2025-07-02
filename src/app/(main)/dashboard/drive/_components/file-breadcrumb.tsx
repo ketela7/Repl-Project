@@ -244,3 +244,5 @@ export function FileBreadcrumb({ currentFolderId, onNavigate, loading: externalL
     </div>
   )
 }
+
+export default FileBreadcrumb

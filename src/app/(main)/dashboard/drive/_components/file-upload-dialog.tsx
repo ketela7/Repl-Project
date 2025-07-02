@@ -220,3 +220,5 @@ export function FileUploadDialog({ isOpen, onClose, onUploadComplete, currentFol
     </Dialog>
   )
 }
+
+export default FileUploadDialog

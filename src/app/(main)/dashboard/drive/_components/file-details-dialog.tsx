@@ -1353,3 +1353,5 @@ export function FileDetailsDialog({ isOpen, onClose, fileId, fileName, fileType 
     </Dialog>
   )
 }
+
+export default FileDetailsDialog

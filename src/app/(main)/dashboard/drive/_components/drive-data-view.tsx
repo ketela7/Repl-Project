@@ -476,3 +476,5 @@ export function DriveDataView({
     </Card>
   )
 }
+
+export default DriveDataView

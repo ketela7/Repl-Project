@@ -1203,7 +1203,7 @@ export function getFileActions(fileInfo: {
     canExport:
       !trashed &&
       ['document', 'spreadsheet', 'presentation', 'drawing'].some(type =>
-        mimeType.includes(`application/vnd.google-apps.${type}`),
+        mimeType?.includes(`application/vnd.google-apps.${type}`),
       ), // Allow export for non-trashed files
   }
 }
@@ -1311,6 +1311,7 @@ export function getCategoryColor(category: string): string {
  * Determine file category from MIME type for consistent categorization
  */
 export function getFileCategory(mimeType: string): string {
+  if (!mimeType) return 'other'
   if (mimeType === 'application/vnd.google-apps.folder') return 'folder'
   if (mimeType.startsWith('image/')) return 'image'
   if (mimeType.startsWith('video/')) return 'video'

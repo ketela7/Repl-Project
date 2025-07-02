@@ -75,3 +75,5 @@ export function DriveConnectionCard() {
     </div>
   )
 }
+
+export default DriveConnectionCard

@@ -82,13 +82,18 @@ export class GoogleDriveService {
     } = options
 
     // Validate and process all options using helper functions
-    const { validPageSize, validPageToken, searchQuery, operationType } = validateListFilesOptions({
+    const validationParams: any = {
       pageSize,
-      pageToken,
       query,
       parentId,
       mimeType,
-    })
+    }
+    
+    if (pageToken) {
+      validationParams.pageToken = pageToken
+    }
+    
+    const { validPageSize, validPageToken, searchQuery, operationType } = validateListFilesOptions(validationParams)
 
     // Use operation type from validation
     const operation = operationType
@@ -239,7 +244,7 @@ export class GoogleDriveService {
       }),
 
       // Content restrictions
-      contentRestrictions: mapContentRestrictions(responseData.contentRestrictions),
+      contentRestrictions: mapContentRestrictions(responseData.contentRestrictions || []),
 
       // Link sharing metadata
       ...(responseData.linkShareMetadata && {

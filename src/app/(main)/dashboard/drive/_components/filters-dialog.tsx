@@ -870,3 +870,5 @@ export function FiltersDialog({
     </Dialog>
   )
 }
+
+export default FiltersDialog

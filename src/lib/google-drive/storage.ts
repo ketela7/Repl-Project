@@ -34,7 +34,7 @@ interface StorageData {
   systemCapabilities: {
     maxUploadSize: number | null
     canCreateDrives: boolean
-    maxImportSizes: Record<string, number>
+    maxImportSizes: Record<string, string>
     importFormats: Record<string, string[]>
     exportFormats: Record<string, string[]>
     folderColorPalette: string[]
@@ -99,7 +99,12 @@ export class StorageAnalyzer {
       fileStats: fileAnalysis.fileStats,
       largestFiles: fileAnalysis.largestFiles,
       systemCapabilities: aboutInfo.systemCapabilities,
-      user: aboutInfo.user,
+      user: {
+        displayName: aboutInfo.user?.displayName || '',
+        emailAddress: aboutInfo.user?.emailAddress || '',
+        photoLink: aboutInfo.user?.photoLink || '',
+        permissionId: aboutInfo.user?.permissionId || '',
+      },
       processing: {
         totalApiCalls: this.processingStats.totalApiCalls,
         processingTimeMs: processingTime,
@@ -232,15 +237,20 @@ export class StorageAnalyzer {
 
       if (pageSize <= 0) break
 
-      const response = await this.drive.files.list({
+      const listParams: any = {
         q: 'trashed=false',
         pageSize,
-        pageToken,
         fields: 'nextPageToken,files(id,name,mimeType,size,webViewLink,createdTime,modifiedTime)',
         orderBy: 'modifiedTime desc',
         supportsAllDrives: true,
         includeItemsFromAllDrives: true,
-      })
+      }
+      
+      if (pageToken) {
+        listParams.pageToken = pageToken
+      }
+
+      const response = await this.drive.files.list(listParams)
 
       this.processingStats.totalApiCalls++
 
@@ -252,7 +262,7 @@ export class StorageAnalyzer {
       allFiles.push(...filesToAdd)
       filesCollected += files.length
 
-      pageToken = response.data.nextPageToken
+      pageToken = response.data.nextPageToken || undefined
 
       // Break if we've collected enough files
       if (maxFiles && allFiles.length >= maxFiles) {

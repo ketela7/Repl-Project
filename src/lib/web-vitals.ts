@@ -3,7 +3,7 @@
  * Tracks LCP, FID, CLS, FCP, and TTFB metrics
  */
 
-import { getCLS, getFCP, getFID, getLCP, getTTFB } from 'web-vitals'
+import { onCLS, onFCP, onINP, onLCP, onTTFB, type Metric } from 'web-vitals'
 
 // Define performance thresholds
 const PERFORMANCE_THRESHOLDS = {
@@ -56,7 +56,7 @@ export function initWebVitals() {
   if (typeof window === 'undefined') return
 
   // Track Core Web Vitals
-  getCLS(metric => {
+  onCLS((metric: Metric) => {
     sendToAnalytics({
       name: 'CLS',
       value: metric.value,
@@ -65,7 +65,7 @@ export function initWebVitals() {
     })
   })
 
-  getFCP(metric => {
+  onFCP((metric: Metric) => {
     sendToAnalytics({
       name: 'FCP',
       value: metric.value,
@@ -74,7 +74,7 @@ export function initWebVitals() {
     })
   })
 
-  getFID(metric => {
+  onINP((metric: Metric) => {
     sendToAnalytics({
       name: 'FID',
       value: metric.value,
@@ -83,7 +83,7 @@ export function initWebVitals() {
     })
   })
 
-  getLCP(metric => {
+  onLCP((metric: Metric) => {
     sendToAnalytics({
       name: 'LCP',
       value: metric.value,
@@ -92,7 +92,7 @@ export function initWebVitals() {
     })
   })
 
-  getTTFB(metric => {
+  onTTFB((metric: Metric) => {
     sendToAnalytics({
       name: 'TTFB',
       value: metric.value,
