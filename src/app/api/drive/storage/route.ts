@@ -55,7 +55,7 @@ export async function GET() {
     }
 
     Object.keys(filesByType).forEach(mimeType => {
-      const count = filesByType[mimeType]
+      const count = filesByType[mimeType] ?? 0
       
       if (mimeType.includes('document') || mimeType.includes('pdf') || mimeType.includes('text')) {
         categories.documents += count

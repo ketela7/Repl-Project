@@ -30,12 +30,6 @@ interface FilesData {
   hasMore: boolean
 }
 
-interface UserData {
-  displayName?: string
-  emailAddress?: string
-  photoLink?: string
-}
-
 interface ProgressData {
   step: string
   message: string
@@ -50,6 +44,7 @@ export function ProgressiveStorageAnalytics() {
   const [progress, setProgress] = useState<ProgressData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isComplete, setIsComplete] = useState(false)
 
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected')
   

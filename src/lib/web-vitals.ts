@@ -39,7 +39,12 @@ function getRating(name: string, value: number): 'good' | 'needs-improvement' | 
 function sendToAnalytics(metric: VitalMetric) {
   // In production, send to your analytics service
   if (process.env.NODE_ENV === 'development') {
-    const icon = metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '❌'
+    let icon = '❌'
+    if (metric.rating === 'good') {
+      icon = '✅'
+    } else if (metric.rating === 'needs-improvement') {
+      icon = '⚠️'
+    }
     // Log web vitals metrics in development only
     // eslint-disable-next-line no-console
     console.log(`${icon} ${metric.name}: ${metric.value}ms (${metric.rating})`)
@@ -151,7 +156,12 @@ export function usePerformanceMonitor(componentName: string) {
 
       if (duration > 100) {
         // Only log slow components
-        const rating = duration > 500 ? 'poor' : duration > 200 ? 'needs-improvement' : 'good'
+        let rating: 'good' | 'needs-improvement' | 'poor' = 'good'
+        if (duration > 500) {
+          rating = 'poor'
+        } else if (duration > 200) {
+          rating = 'needs-improvement'
+        }
         sendToAnalytics({
           name: `Component-${componentName}`,
           value: duration,
@@ -165,7 +175,12 @@ export function usePerformanceMonitor(componentName: string) {
 
 // Track route change performance
 export function trackRouteChange(route: string, duration: number) {
-  const rating = duration > 1000 ? 'poor' : duration > 500 ? 'needs-improvement' : 'good'
+  let rating: 'good' | 'needs-improvement' | 'poor' = 'good'
+  if (duration > 1000) {
+    rating = 'poor'
+  } else if (duration > 500) {
+    rating = 'needs-improvement'
+  }
   sendToAnalytics({
     name: `Route-${route}`,
     value: duration,
