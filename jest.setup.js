@@ -1,5 +1,16 @@
 import '@testing-library/jest-dom'
 
+// Extend Jest matchers
+expect.extend({
+  toBeInTheDocument(received) {
+    const pass = received && received.closest && received.closest('body') !== null
+    return {
+      message: () => `expected element ${pass ? 'not ' : ''}to be in the document`,
+      pass,
+    }
+  },
+})
+
 // Mock Web APIs for Next.js API routes testing
 import { TextEncoder, TextDecoder } from 'util'
 global.TextEncoder = TextEncoder

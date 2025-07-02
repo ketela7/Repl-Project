@@ -14,6 +14,8 @@ const customJestConfig = {
   },
   testMatch: [
     '<rootDir>/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/*.{test,spec}.{js,jsx,ts,tsx}',
   ],
   // setupFiles: ['<rootDir>/src/types/jest-dom.d.ts'], // Disabled to prevent hanging
   collectCoverageFrom: [
@@ -28,10 +30,10 @@ const customJestConfig = {
   ],
   coverageThreshold: {
     global: {
-      branches: 0,
-      functions: 0,
-      lines: 0,
-      statements: 0,
+      branches: 60,
+      functions: 60,
+      lines: 70,
+      statements: 70,
     },
   },
   testTimeout: 60000,
