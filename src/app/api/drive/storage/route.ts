@@ -1,203 +1,91 @@
 import { NextResponse } from 'next/server'
-import { initDriveService, handleApiError } from '@/lib/api-utils'
+import { auth } from '@/auth'
+import { GoogleDriveService } from '@/lib/google-drive/service'
 
 export async function GET() {
   try {
-    const { driveService, response } = await initDriveService()
-    if (response) return response
-    if (!driveService) throw new Error('Drive service not available')
+    const session = await auth()
+    
+    if (!session?.accessToken) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    }
 
-    // Get comprehensive about information including storage quota and system capabilities
-    const aboutResponse = await driveService.drive.about.get({
-      fields:
-        'storageQuota,user,maxUploadSize,maxImportSizes,importFormats,exportFormats,canCreateDrives,folderColorPalette,driveThemes',
+    const driveService = new GoogleDriveService(session.accessToken)
+
+    // Get user info and quota using service
+    const userInfo = await driveService.getUserInfo()
+    
+    const quotaData = {
+      limit: userInfo.storageQuota?.limit ? parseInt(userInfo.storageQuota.limit) : null,
+      used: userInfo.storageQuota?.usage ? parseInt(userInfo.storageQuota.usage) : 0,
+      usedInDrive: userInfo.storageQuota?.usageInDrive ? parseInt(userInfo.storageQuota.usageInDrive) : 0,
+      available: userInfo.storageQuota?.limit ? 
+        parseInt(userInfo.storageQuota.limit) - parseInt(userInfo.storageQuota.usage) : null,
+      usagePercentage: userInfo.storageQuota?.limit ? 
+        Math.round((parseInt(userInfo.storageQuota.usage) / parseInt(userInfo.storageQuota.limit)) * 100) : null,
+    }
+
+    const user = {
+      name: userInfo.name,
+      email: userInfo.email,
+      picture: userInfo.picture || '',
+    }
+
+    // Get basic file statistics
+    const response = await driveService.listFiles({
+      pageSize: 100,
+      orderBy: 'modifiedTime desc',
+      includeTeamDriveItems: true,
     })
 
-    const about = aboutResponse.data
-    const storageQuota = about.storageQuota
-    const user = about.user
+    const files = response.files || []
+    const filesByType: Record<string, number> = {}
+    
+    files.forEach(file => {
+      const mimeType = file.mimeType || 'unknown'
+      filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
+    })
 
-    // Get file statistics by querying files with specific criteria
-    const [
-      allFilesResponse,
-      ,
-      ,
-      ,
-      ,
-      ,
-      ,
-      sharedResponse,
-      starredResponse,
-    ] = await Promise.all([
-      // All files count and basic stats
-      driveService.drive.files.list({
-        q: 'trashed=false',
-        fields: 'files(id,name,size,mimeType,createdTime,modifiedTime,shared,starred)',
-        pageSize: 1000,
-      }),
-      // Google Docs
-      driveService.drive.files.list({
-        q: "trashed=false and mimeType='application/vnd.google-apps.document'",
-        fields: 'files(id)',
-        pageSize: 1000,
-      }),
-      // Google Sheets
-      driveService.drive.files.list({
-        q: "trashed=false and mimeType='application/vnd.google-apps.spreadsheet'",
-        fields: 'files(id)',
-        pageSize: 1000,
-      }),
-      // Google Slides
-      driveService.drive.files.list({
-        q: "trashed=false and mimeType='application/vnd.google-apps.presentation'",
-        fields: 'files(id)',
-        pageSize: 1000,
-      }),
-      // Images
-      driveService.drive.files.list({
-        q: "trashed=false and (mimeType contains 'image/')",
-        fields: 'files(id,size)',
-        pageSize: 1000,
-      }),
-      // Videos
-      driveService.drive.files.list({
-        q: "trashed=false and (mimeType contains 'video/')",
-        fields: 'files(id,size)',
-        pageSize: 1000,
-      }),
-      // PDFs
-      driveService.drive.files.list({
-        q: "trashed=false and mimeType='application/pdf'",
-        fields: 'files(id,size)',
-        pageSize: 1000,
-      }),
-      // Shared files
-      driveService.drive.files.list({
-        q: 'trashed=false and sharedWithMe=true',
-        fields: 'files(id)',
-        pageSize: 1000,
-      }),
-      // Starred files
-      driveService.drive.files.list({
-        q: 'trashed=false and starred=true',
-        fields: 'files(id)',
-        pageSize: 1000,
-      }),
-    ])
-
-    const allFiles = allFilesResponse.data.files || []
-
-    // Calculate total size of files (excluding Google Workspace files which don't count toward quota)
-    let totalUsedBytes = 0
-    let largestFiles: Array<{ name: string; size: number; mimeType: string }> = []
-
-    const filesByType = {
+    const categories = {
       documents: 0,
-      spreadsheets: 0,
-      presentations: 0,
       images: 0,
       videos: 0,
-      pdfs: 0,
+      audio: 0,
       other: 0,
     }
 
-    const fileSizesByType = {
-      images: 0,
-      videos: 0,
-      pdfs: 0,
-      other: 0,
-    }
-
-    allFiles.forEach(file => {
-      const size = file.size ? parseInt(file.size) : 0
-      const mimeType = file.mimeType || ''
-
-      // Only count files with actual storage size toward quota
-      if (size > 0) {
-        totalUsedBytes += size
-
-        // Track largest files
-        largestFiles.push({
-          name: file.name || 'Unnamed',
-          size,
-          mimeType,
-        })
-      }
-
-      // Categorize files
-      if (mimeType === 'application/vnd.google-apps.document') {
-        filesByType.documents++
-      } else if (mimeType === 'application/vnd.google-apps.spreadsheet') {
-        filesByType.spreadsheets++
-      } else if (mimeType === 'application/vnd.google-apps.presentation') {
-        filesByType.presentations++
-      } else if (mimeType.startsWith('image/')) {
-        filesByType.images++
-        fileSizesByType.images += size
-      } else if (mimeType.startsWith('video/')) {
-        filesByType.videos++
-        fileSizesByType.videos += size
-      } else if (mimeType === 'application/pdf') {
-        filesByType.pdfs++
-        fileSizesByType.pdfs += size
+    Object.keys(filesByType).forEach(mimeType => {
+      const count = filesByType[mimeType]
+      
+      if (mimeType.includes('document') || mimeType.includes('pdf') || mimeType.includes('text')) {
+        categories.documents += count
+      } else if (mimeType.includes('image')) {
+        categories.images += count
+      } else if (mimeType.includes('video')) {
+        categories.videos += count
+      } else if (mimeType.includes('audio')) {
+        categories.audio += count
       } else {
-        filesByType.other++
-        fileSizesByType.other += size
+        categories.other += count
       }
     })
-
-    // Sort largest files by size
-    largestFiles.sort((a, b) => b.size - a.size)
-    largestFiles = largestFiles.slice(0, 10) // Top 10 largest files
-
-    // Parse storage quota information
-    const quotaLimit = storageQuota?.limit ? parseInt(storageQuota.limit) : null
-    const quotaUsage = storageQuota?.usage ? parseInt(storageQuota.usage) : totalUsedBytes
-    const quotaUsageInDrive = storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : totalUsedBytes
-
-    // Calculate comprehensive storage analytics with all Google Drive API statistics
-    const storageAnalytics = {
-      quota: {
-        limit: quotaLimit,
-        used: quotaUsage,
-        usedInDrive: quotaUsageInDrive,
-        usedInDriveTrash: storageQuota?.usageInDriveTrash ? parseInt(storageQuota.usageInDriveTrash) : 0,
-        available: quotaLimit ? quotaLimit - quotaUsage : null,
-        usagePercentage: quotaLimit ? Math.round((quotaUsage / quotaLimit) * 100) : null,
-        hasUnlimitedStorage: !quotaLimit,
-      },
-      fileStats: {
-        totalFiles: allFiles.length,
-        totalSizeBytes: totalUsedBytes,
-        filesByType,
-        fileSizesByType,
-        sharedFiles: sharedResponse.data.files?.length || 0,
-        starredFiles: starredResponse.data.files?.length || 0,
-      },
-      largestFiles,
-      systemCapabilities: {
-        maxUploadSize: about.maxUploadSize ? parseInt(about.maxUploadSize) : null,
-        canCreateDrives: about.canCreateDrives || false,
-        maxImportSizes: about.maxImportSizes || {},
-        importFormats: about.importFormats || {},
-        exportFormats: about.exportFormats || {},
-        folderColorPalette: about.folderColorPalette || [],
-        driveThemes: about.driveThemes || [],
-      },
-      user: {
-        displayName: user?.displayName,
-        emailAddress: user?.emailAddress,
-        photoLink: user?.photoLink,
-      },
-      lastUpdated: new Date().toISOString(),
-    }
 
     return NextResponse.json({
-      success: true,
-      data: storageAnalytics,
+      user,
+      quota: quotaData,
+      fileStats: {
+        totalFiles: files.length,
+        categories,
+        filesByType: Object.entries(filesByType)
+          .sort(([,a], [,b]) => b - a)
+          .slice(0, 10),
+      },
     })
-  } catch (error) {
+
+  } catch (error: any) {
     console.error('Storage analytics error:', error)
-    return handleApiError(error)
+    return NextResponse.json({ 
+      error: error.message || 'Failed to get storage analytics' 
+    }, { status: 500 })
   }
 }

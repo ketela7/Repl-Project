@@ -1,22 +1,20 @@
-
 import { auth } from '@/auth'
-import { createDriveClient } from '@/lib/google-drive/config'
-import { throttledDriveRequest } from '@/lib/api-throttle'
-import { retryDriveApiCall } from '@/lib/api-retry'
+import { GoogleDriveService } from '@/lib/google-drive/service'
+import { DriveFile } from '@/lib/google-drive/types'
 
 /**
  * Progressive Storage Analytics with Server-Sent Events
- * Streams data in real-time as it's being processed
+ * Uses existing basecode service functions for efficiency and consistency
  */
-export async function GET() {
+export async function POST() {
   try {
     const session = await auth()
-
+    
     if (!session?.accessToken) {
       return new Response('Authentication required', { status: 401 })
     }
 
-    const drive = createDriveClient(session.accessToken)
+    const driveService = new GoogleDriveService(session.accessToken)
 
     // Setup Server-Sent Events stream
     const stream = new ReadableStream({
@@ -28,169 +26,218 @@ export async function GET() {
           controller.enqueue(encoder.encode(message))
         }
 
-        const loadProgressively = async () => {
+        // Main analysis function using service basecode
+        ;(async () => {
           try {
-            // Step 1: Send basic system info immediately (fastest)
-            sendData('progress', { step: 'system_info', message: 'Getting system information...' })
+            // Step 1: Get user info and quota using service
+            sendData('progress', { step: 'quota', message: 'Getting storage quota...' })
             
-            const aboutResponse = await drive.about.get({
-              fields: 'storageQuota,user,maxUploadSize,canCreateDrives'
-            })
+            const userInfo = await driveService.getUserInfo()
             
-            const storageQuota = aboutResponse.data.storageQuota
-            const basicQuota = {
-              limit: storageQuota?.limit ? parseInt(storageQuota.limit) : null,
-              used: storageQuota?.usage ? parseInt(storageQuota.usage) : 0,
-              usedInDrive: storageQuota?.usageInDrive ? parseInt(storageQuota.usageInDrive) : 0,
-              available: storageQuota?.limit ? parseInt(storageQuota.limit) - parseInt(storageQuota.usage || '0') : null,
-              usagePercentage: storageQuota?.limit ? Math.round((parseInt(storageQuota.usage || '0') / parseInt(storageQuota.limit)) * 100) : null,
+            const quotaData = {
+              limit: userInfo.storageQuota?.limit ? parseInt(userInfo.storageQuota.limit) : null,
+              used: userInfo.storageQuota?.usage ? parseInt(userInfo.storageQuota.usage) : 0,
+              usedInDrive: userInfo.storageQuota?.usageInDrive ? parseInt(userInfo.storageQuota.usageInDrive) : 0,
+              available: userInfo.storageQuota?.limit ? 
+                parseInt(userInfo.storageQuota.limit) - parseInt(userInfo.storageQuota.usage) : null,
+              usagePercentage: userInfo.storageQuota?.limit ? 
+                Math.round((parseInt(userInfo.storageQuota.usage) / parseInt(userInfo.storageQuota.limit)) * 100) : null,
             }
 
-            sendData('quota_update', basicQuota)
+            const user = {
+              name: userInfo.name,
+              email: userInfo.email,
+              picture: userInfo.picture || '',
+            }
 
-            // Step 2: Start file analysis in chunks
+            sendData('quota_update', { user, quota: quotaData })
+
+            // Step 2: Analyze files using service listFiles function
             sendData('progress', { step: 'file_analysis', message: 'Analyzing files...' })
             
-            let allFiles: any[] = []
+            let allFiles: DriveFile[] = []
             let pageToken: string | undefined
             let totalProcessed = 0
             const filesByType: Record<string, number> = {}
             const fileSizesByType: Record<string, number> = {}
-            const largestFiles: any[] = []
+            const largestFiles: DriveFile[] = []
 
-            // Process files in chunks of 1000 (maximum pageSize) to minimize API calls
+            // Use service listFiles with optimized pagination
             do {
-              // Create timeout promise for individual API request (55s per request)
-              const apiTimeout = new Promise<never>((_, reject) => {
-                setTimeout(() => reject(new Error('API request timeout after 55 seconds')), 55000)
-              })
-
-              // Build request parameters with proper type safety
-              const listParams: any = {
-                q: 'trashed=false',
-                pageSize: 1000,
-                fields: 'nextPageToken,files(id,name,mimeType,size,webViewLink,createdTime)',
-                orderBy: 'modifiedTime desc',
-                supportsAllDrives: true,
-                includeItemsFromAllDrives: true,
-              }
-              
-              // Only add pageToken if it exists
-              if (pageToken) {
-                listParams.pageToken = pageToken
-              }
-
-              // Create API call with throttle + retry mechanism
-              const apiCall = () => throttledDriveRequest(() => drive.files.list(listParams))
-
-              let response
               try {
-                // Race between API call with retry/throttle and timeout
-                response = await Promise.race([
-                  retryDriveApiCall(apiCall),
-                  apiTimeout
-                ])
+                // Use service function with retry + throttle built-in
+                const listOptions: any = {
+                  pageSize: 1000, // Maximum for efficiency
+                  orderBy: 'modifiedTime desc',
+                  includeTeamDriveItems: true,
+                }
+                
+                // Only add pageToken if it exists
+                if (pageToken) {
+                  listOptions.pageToken = pageToken
+                }
+                
+                const response = await driveService.listFiles(listOptions)
+
+                const files = response.files || []
+                allFiles = [...allFiles, ...files]
+                totalProcessed += files.length
+                pageToken = response.nextPageToken || undefined
+
+                // Process files for statistics
+                files.forEach((file: DriveFile) => {
+                  const mimeType = file.mimeType || 'unknown'
+                  const size = file.size ? parseInt(file.size.toString()) : 0
+                  
+                  // Count by type
+                  filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
+                  fileSizesByType[mimeType] = (fileSizesByType[mimeType] || 0) + size
+                  
+                  // Track largest files
+                  if (size > 0) {
+                    largestFiles.push(file)
+                    largestFiles.sort((a, b) => {
+                      const sizeA = a.size ? parseInt(a.size.toString()) : 0
+                      const sizeB = b.size ? parseInt(b.size.toString()) : 0
+                      return sizeB - sizeA
+                    })
+                    
+                    // Keep only top 10
+                    if (largestFiles.length > 10) {
+                      largestFiles.splice(10)
+                    }
+                  }
+                })
+
+                // Send progress update
+                sendData('progress_update', {
+                  totalProcessed,
+                  hasMore: !!pageToken,
+                  currentBatch: files.length,
+                })
+
+                // Real-time file stats update
+                const topTypes = Object.entries(filesByType)
+                  .sort(([,a], [,b]) => b - a)
+                  .slice(0, 10)
+                  .map(([type, count]) => ({
+                    type,
+                    count,
+                    totalSize: fileSizesByType[type] || 0,
+                  }))
+
+                sendData('file_stats_update', {
+                  totalFiles: totalProcessed,
+                  topFileTypes: topTypes,
+                  largestFiles: largestFiles.slice(0, 5),
+                })
+
               } catch (error: any) {
-                if (error.message.includes('timeout')) {
+                if (error.message?.includes('timeout') || error.code === 504) {
                   sendData('progress', { 
-                    step: 'api_timeout', 
-                    message: `API request timeout after 55s. Processed ${totalProcessed} files.`,
+                    step: 'timeout_continue', 
+                    message: `Analysis timeout. Processed ${totalProcessed} files. Results available.`,
                     isComplete: true,
                     canContinue: !!pageToken,
                     nextPageToken: pageToken
                   })
                   break
                 }
-                throw error // Re-throw other errors for proper handling
+                throw error
               }
 
-              const files = response.data.files || []
-              allFiles = [...allFiles, ...files]
-              pageToken = response.data.nextPageToken || undefined
-              totalProcessed += files.length
+            } while (pageToken && totalProcessed < 100000) // Reasonable limit
 
-              // Process this chunk
-              files.forEach(file => {
-                const mimeType = file.mimeType || 'unknown'
-                const size = file.size ? parseInt(file.size) : 0
-                
-                // Count by type
-                filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
-                fileSizesByType[mimeType] = (fileSizesByType[mimeType] || 0) + size
+            // Step 3: Final analysis and categorization
+            sendData('progress', { step: 'final_analysis', message: 'Generating final report...' })
 
-                // Track largest files
-                if (size > 0) {
-                  largestFiles.push({
-                    name: file.name,
-                    size,
-                    mimeType,
-                    id: file.id,
-                    webViewLink: file.webViewLink
-                  })
-                  
-                  // Keep only top 20, sorted by size
-                  largestFiles.sort((a, b) => b.size - a.size)
-                  if (largestFiles.length > 20) {
-                    largestFiles.splice(20)
-                  }
-                }
-              })
+            // Categorize files by type
+            const categories = {
+              documents: 0,
+              images: 0,
+              videos: 0,
+              audio: 0,
+              archives: 0,
+              spreadsheets: 0,
+              presentations: 0,
+              other: 0,
+            }
 
-              // Send incremental update
-              sendData('files_update', {
-                totalFiles: totalProcessed,
-                filesByType: { ...filesByType },
-                fileSizesByType: { ...fileSizesByType },
-                largestFiles: [...largestFiles],
-                hasMore: !!pageToken
-              })
+            const categorySizes = {
+              documents: 0,
+              images: 0,
+              videos: 0,
+              audio: 0,
+              archives: 0,
+              spreadsheets: 0,
+              presentations: 0,
+              other: 0,
+            }
 
-              sendData('progress', { 
-                step: 'file_analysis', 
-                message: `Processed ${totalProcessed} files...`,
-                processed: totalProcessed
-              })
-
-              // Small delay to prevent overwhelming the client and rate limiting
-              await new Promise(resolve => setTimeout(resolve, 50))
-
-            } while (pageToken)
-
-            // Final summary
-            const totalSize = Object.values(fileSizesByType).reduce((sum, size) => sum + size, 0)
-            
-            sendData('final_summary', {
-              totalFiles: totalProcessed,
-              totalSizeBytes: totalSize,
-              filesByType,
-              fileSizesByType,
-              largestFiles,
-              processingComplete: true,
-              accuracy: 'Complete'
+            Object.entries(filesByType).forEach(([mimeType, count]) => {
+              const size = fileSizesByType[mimeType] || 0
+              
+              if (mimeType.includes('document') || mimeType.includes('pdf') || mimeType.includes('text')) {
+                categories.documents += count
+                categorySizes.documents += size
+              } else if (mimeType.includes('image')) {
+                categories.images += count
+                categorySizes.images += size
+              } else if (mimeType.includes('video')) {
+                categories.videos += count
+                categorySizes.videos += size
+              } else if (mimeType.includes('audio')) {
+                categories.audio += count
+                categorySizes.audio += size
+              } else if (mimeType.includes('zip') || mimeType.includes('archive')) {
+                categories.archives += count
+                categorySizes.archives += size
+              } else if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) {
+                categories.spreadsheets += count
+                categorySizes.spreadsheets += size
+              } else if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) {
+                categories.presentations += count
+                categorySizes.presentations += size
+              } else {
+                categories.other += count
+                categorySizes.other += size
+              }
             })
 
-            sendData('complete', { message: 'Analysis complete!' })
+            // Send final comprehensive results
+            sendData('analysis_complete', {
+              summary: {
+                totalFiles: totalProcessed,
+                totalCategories: Object.keys(filesByType).length,
+                processedAt: new Date().toISOString(),
+              },
+              categories,
+              categorySizes,
+              filesByType: Object.entries(filesByType)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 20),
+              fileSizesByType: Object.entries(fileSizesByType)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 20),
+              largestFiles: largestFiles.slice(0, 10),
+            })
+
+            sendData('complete', { 
+              message: `Analysis complete! Processed ${totalProcessed} files.`,
+              totalProcessed 
+            })
 
           } catch (error: any) {
-            try {
-              sendData('error', { 
-                message: error.message || 'Analysis failed',
-                canRetry: true 
-              })
-            } catch {
-              // Controller might be closed already
-            }
+            console.error('Storage analysis error:', error)
+            sendData('error', { 
+              message: error.message || 'Analysis failed',
+              canRetry: true 
+            })
           } finally {
-            try {
-              controller.close()
-            } catch {
-              // Controller already closed, ignore
-            }
+            controller.close()
           }
-        }
-
-        loadProgressively()
-      }
+        })()
+      },
     })
 
     return new Response(stream, {
@@ -198,11 +245,16 @@ export async function GET() {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Allow-Headers': 'Content-Type',
       },
     })
-
   } catch (error: any) {
     console.error('Storage stream error:', error)
-    return new Response('Failed to start analysis stream', { status: 500 })
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 }

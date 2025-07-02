@@ -6,7 +6,7 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { RefreshCw, HardDrive, Files, TrendingUp, Users, Play, Pause } from 'lucide-react'
+import { RefreshCw, HardDrive, Files, TrendingUp, Play, Pause } from 'lucide-react'
 
 interface QuotaData {
   limit: number | null
@@ -46,11 +46,11 @@ interface ProgressData {
 export function ProgressiveStorageAnalytics() {
   const [quota, setQuota] = useState<QuotaData | null>(null)
   const [files, setFiles] = useState<FilesData | null>(null)
-  const [user, setUser] = useState<UserData | null>(null)
+
   const [progress, setProgress] = useState<ProgressData | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [isComplete, setIsComplete] = useState(false)
+
   const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected')
   
   const eventSourceRef = useRef<EventSource | null>(null)
