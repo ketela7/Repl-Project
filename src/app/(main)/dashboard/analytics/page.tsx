@@ -3,7 +3,7 @@
 import { Suspense } from 'react'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { StorageAnalytics } from './_components/storage-analytics'
-import { EnhancedStorageAnalytics } from './_components/enhanced-storage-analytics'
+import { EnhancedStorageAnalytics } from './_components/storage-analytics-new'
 
 export default function AnalyticsPage() {
   return (

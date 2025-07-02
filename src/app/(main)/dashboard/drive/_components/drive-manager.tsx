@@ -65,16 +65,13 @@ const initialFilters = {
   advancedFilters: {
     sizeRange: {
       unit: 'MB' as 'B' | 'KB' | 'MB' | 'GB',
-      min: undefined,
-      max: undefined,
     },
     sortBy: 'modified' as 'name' | 'modified' | 'created' | 'size',
     sortOrder: 'desc' as 'asc' | 'desc',
-    createdDateRange: { from: undefined, to: undefined },
-    modifiedDateRange: { from: undefined, to: undefined },
-    owner: undefined,
+    createdDateRange: {},
+    modifiedDateRange: {},
     pageSize: 50,
-  },
+  } as any,
 }
 
 export function DriveManager() {
@@ -565,7 +562,7 @@ export function DriveManager() {
       const isFolder = item.mimeType === 'application/vnd.google-apps.folder'
       const actions = getFileActions({
         capabilities: item.capabilities,
-        trashed: item.trashed,
+        trashed: Boolean(item.trashed),
         mimeType: item.mimeType,
         itemType: isFolder ? 'folder' : 'file',
       })
@@ -680,7 +677,6 @@ export function DriveManager() {
             visibleColumns={visibleColumns}
             sortConfig={sortConfig}
             onSelectItem={handleSelectItem}
-            onSelectModeChange={setIsSelectMode}
             onFolderClick={handleFolderClick}
             onColumnsChange={(changes: any) => {
               if (changes.sortBy) {
@@ -829,13 +825,9 @@ export function DriveManager() {
           onClose={() => {
             closeDialog('share')
             setSelectedItems(new Set())
-          }}
-          selectedItems={getSelectedItemsForDialog()}
-          onComplete={() => {
-            closeDialog('share')
-            setSelectedItems(new Set())
             handleRefresh()
           }}
+          selectedItems={getSelectedItemsForDialog()}
         />
       )}
 

@@ -77,6 +77,17 @@ interface StorageData {
   }
 }
 
+interface ComprehensiveStorageData extends StorageData {
+  // Extended comprehensive data
+  meta?: {
+    strategy: 'fast' | 'complete' | 'progressive'
+    performanceMs: number
+    accuracy: number
+    apiCallsUsed: number
+    timestamp: string
+  }
+}
+
 interface AnalyticsMeta {
   strategy: 'fast' | 'complete' | 'progressive'
   performanceMs: number
@@ -246,7 +257,7 @@ function StorageByTypeChart({ fileStats }: { fileStats: ComprehensiveStorageData
 
           <div className="space-y-3">
             {sizeTypes.map(type => {
-              const percentage = totalSize > 0 ? Math.round((type.size / totalSize) * 100) : 0
+              const percentage = totalSize > 0 && type.size ? Math.round((type.size / totalSize) * 100) : 0
               const Icon = type.icon
 
               if (type.size === 0) return null
@@ -262,7 +273,7 @@ function StorageByTypeChart({ fileStats }: { fileStats: ComprehensiveStorageData
                   </div>
                   <div className="flex items-center justify-between">
                     <Progress value={percentage} className="mr-2 flex-1" />
-                    <span className="min-w-[60px] text-right text-xs font-medium">{formatBytes(type.size)}</span>
+                    <span className="min-w-[60px] text-right text-xs font-medium">{formatBytes(type.size ?? 0)}</span>
                   </div>
                 </div>
               )
@@ -477,7 +488,7 @@ export function EnhancedStorageAnalytics() {
               <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
                 {Object.entries(data.fileStats.filesByType).map(([type, count]) => (
                   <div key={type} className="rounded-lg border p-4 text-center">
-                    <div className="text-2xl font-bold">{count.toLocaleString()}</div>
+                    <div className="text-2xl font-bold">{(count as number).toLocaleString()}</div>
                     <div className="text-muted-foreground text-sm capitalize">{type}</div>
                   </div>
                 ))}
