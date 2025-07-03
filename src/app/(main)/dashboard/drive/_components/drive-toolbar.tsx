@@ -51,6 +51,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { successToast } from '@/lib/utils'
+import { 
+  getCommonFileTypeCategories, 
+  matchesFileType, 
+  countFilesByCategory, 
+  formatCategoryCount 
+} from '@/lib/mime-type-filter'
 
 // Removed Suspense import - direct render untuk bulk operations
 import { OperationsDialog } from './operations-dialog'
@@ -154,279 +160,32 @@ interface DriveToolbarProps {
 }
 
 // Enhanced client-side filtering function using comprehensive mimeType matching
+// Client-side filtering using shared utility for consistency with backend
 const filterByMimeType = (items: DriveItem[], category: string) => {
-  return items.filter((item: DriveItem) => {
-    const mime = item.mimeType?.toLowerCase() || ''
-    const name = item.name?.toLowerCase() || ''
+  // Map category names to our standard file type IDs
+  const categoryMap: Record<string, string> = {
+    'Images': 'image',
+    'Videos': 'video', 
+    'Documents': 'document',
+    'Spreadsheets': 'spreadsheet',
+    'Presentations': 'presentation',
+    'Audio': 'audio',
+    'Archives': 'archive',
+    'Code': 'code',
+    'Design': 'design',
+    'Database': 'database',
+    'Ebooks': 'ebook',
+    'Fonts': 'font',
+    'Shortcuts': 'shortcut',
+    'Folders': 'folder'
+  }
 
-    switch (category) {
-      case 'Images':
-        return (
-          mime.startsWith('image/') ||
-          mime.includes('jpeg') ||
-          mime.includes('jpg') ||
-          mime.includes('png') ||
-          mime.includes('gif') ||
-          mime.includes('bmp') ||
-          mime.includes('svg') ||
-          mime.includes('webp') ||
-          mime.includes('tiff') ||
-          mime.includes('ico') ||
-          mime.includes('heic') ||
-          mime.includes('heif') ||
-          mime.includes('avif') ||
-          name.endsWith('.jpg') ||
-          name.endsWith('.jpeg') ||
-          name.endsWith('.png') ||
-          name.endsWith('.gif') ||
-          name.endsWith('.bmp') ||
-          name.endsWith('.svg') ||
-          name.endsWith('.webp') ||
-          name.endsWith('.tiff') ||
-          name.endsWith('.ico')
-        )
+  const fileTypeId = categoryMap[category]
+  if (!fileTypeId) return items
 
-      case 'Videos':
-        return (
-          mime.startsWith('video/') ||
-          mime.includes('mp4') ||
-          mime.includes('avi') ||
-          mime.includes('mov') ||
-          mime.includes('wmv') ||
-          mime.includes('webm') ||
-          mime.includes('mkv') ||
-          mime.includes('flv') ||
-          mime.includes('m4v') ||
-          mime.includes('3gp') ||
-          mime.includes('quicktime') ||
-          mime.includes('x-matroska') ||
-          name.endsWith('.mp4') ||
-          name.endsWith('.avi') ||
-          name.endsWith('.mov') ||
-          name.endsWith('.wmv') ||
-          name.endsWith('.webm') ||
-          name.endsWith('.mkv') ||
-          name.endsWith('.flv') ||
-          name.endsWith('.m4v') ||
-          name.endsWith('.3gp')
-        )
-
-      case 'Documents':
-        return (
-          mime.includes('document') ||
-          mime.includes('text') ||
-          mime.includes('pdf') ||
-          mime.includes('vnd.google-apps.document') ||
-          mime.includes('msword') ||
-          mime.includes('wordprocessingml') ||
-          mime.includes('rtf') ||
-          mime.includes('opendocument.text') ||
-          mime.includes('plain') ||
-          name.endsWith('.pdf') ||
-          name.endsWith('.doc') ||
-          name.endsWith('.docx') ||
-          name.endsWith('.txt') ||
-          name.endsWith('.rtf') ||
-          name.endsWith('.odt')
-        )
-
-      case 'Spreadsheets':
-        return (
-          mime.includes('spreadsheet') ||
-          mime.includes('excel') ||
-          mime.includes('csv') ||
-          mime.includes('vnd.google-apps.spreadsheet') ||
-          mime.includes('ms-excel') ||
-          mime.includes('spreadsheetml') ||
-          mime.includes('opendocument.spreadsheet') ||
-          name.endsWith('.xls') ||
-          name.endsWith('.xlsx') ||
-          name.endsWith('.csv') ||
-          name.endsWith('.ods') ||
-          name.endsWith('.tsv')
-        )
-
-      case 'Presentations':
-        return (
-          mime.includes('presentation') ||
-          mime.includes('powerpoint') ||
-          mime.includes('vnd.google-apps.presentation') ||
-          mime.includes('ms-powerpoint') ||
-          mime.includes('presentationml') ||
-          mime.includes('opendocument.presentation') ||
-          name.endsWith('.ppt') ||
-          name.endsWith('.pptx') ||
-          name.endsWith('.odp') ||
-          name.endsWith('.key')
-        )
-
-      case 'Audio':
-        return (
-          mime.startsWith('audio/') ||
-          mime.includes('mp3') ||
-          mime.includes('wav') ||
-          mime.includes('flac') ||
-          mime.includes('aac') ||
-          mime.includes('ogg') ||
-          mime.includes('wma') ||
-          mime.includes('m4a') ||
-          mime.includes('opus') ||
-          mime.includes('aiff') ||
-          name.endsWith('.mp3') ||
-          name.endsWith('.wav') ||
-          name.endsWith('.flac') ||
-          name.endsWith('.aac') ||
-          name.endsWith('.ogg') ||
-          name.endsWith('.wma') ||
-          name.endsWith('.m4a') ||
-          name.endsWith('.opus') ||
-          name.endsWith('.aiff')
-        )
-
-      case 'Archives':
-        return (
-          mime.includes('zip') ||
-          mime.includes('rar') ||
-          mime.includes('tar') ||
-          mime.includes('gz') ||
-          mime.includes('7z') ||
-          mime.includes('archive') ||
-          mime.includes('bz2') ||
-          mime.includes('xz') ||
-          mime.includes('cab') ||
-          mime.includes('deb') ||
-          mime.includes('rpm') ||
-          mime.includes('dmg') ||
-          mime.includes('iso') ||
-          mime.includes('apk') ||
-          mime.includes('ipa') ||
-          name.endsWith('.zip') ||
-          name.endsWith('.rar') ||
-          name.endsWith('.tar') ||
-          name.endsWith('.gz') ||
-          name.endsWith('.7z') ||
-          name.endsWith('.bz2') ||
-          name.endsWith('.xz') ||
-          name.endsWith('.cab') ||
-          name.endsWith('.deb') ||
-          name.endsWith('.rpm') ||
-          name.endsWith('.dmg') ||
-          name.endsWith('.iso')
-        )
-
-      case 'Code':
-        return (
-          mime.includes('javascript') ||
-          mime.includes('typescript') ||
-          mime.includes('json') ||
-          mime.includes('html') ||
-          mime.includes('css') ||
-          mime.includes('xml') ||
-          mime.includes('python') ||
-          mime.includes('java') ||
-          mime.includes('php') ||
-          mime.includes('ruby') ||
-          mime.includes('perl') ||
-          mime.includes('shell') ||
-          name.endsWith('.js') ||
-          name.endsWith('.ts') ||
-          name.endsWith('.json') ||
-          name.endsWith('.html') ||
-          name.endsWith('.css') ||
-          name.endsWith('.xml') ||
-          name.endsWith('.py') ||
-          name.endsWith('.java') ||
-          name.endsWith('.php') ||
-          name.endsWith('.rb') ||
-          name.endsWith('.pl') ||
-          name.endsWith('.sh') ||
-          name.endsWith('.jsx') ||
-          name.endsWith('.tsx') ||
-          name.endsWith('.vue') ||
-          name.endsWith('.scss') ||
-          name.endsWith('.sass') ||
-          name.endsWith('.less')
-        )
-
-      case 'Design':
-        return (
-          mime.includes('photoshop') ||
-          mime.includes('illustrator') ||
-          mime.includes('sketch') ||
-          mime.includes('figma') ||
-          mime.includes('adobe') ||
-          mime.includes('x-xcf') ||
-          mime.includes('postscript') ||
-          mime.includes('indesign') ||
-          name.endsWith('.psd') ||
-          name.endsWith('.ai') ||
-          name.endsWith('.sketch') ||
-          name.endsWith('.fig') ||
-          name.endsWith('.xcf') ||
-          name.endsWith('.eps') ||
-          name.endsWith('.indd') ||
-          name.endsWith('.cr2') ||
-          name.endsWith('.nef') ||
-          name.endsWith('.dng') ||
-          name.endsWith('.arw')
-        )
-
-      case 'Database':
-        return (
-          mime.includes('database') ||
-          mime.includes('sql') ||
-          mime.includes('sqlite') ||
-          mime.includes('x-sqlite3') ||
-          mime.includes('x-sql') ||
-          name.endsWith('.db') ||
-          name.endsWith('.sql') ||
-          name.endsWith('.sqlite') ||
-          name.endsWith('.sqlite3') ||
-          name.endsWith('.mdb') ||
-          name.endsWith('.accdb')
-        )
-
-      case 'Ebooks':
-        return (
-          mime.includes('epub') ||
-          mime.includes('mobi') ||
-          mime.includes('kindle') ||
-          mime.includes('x-mobipocket') ||
-          mime.includes('amazon.ebook') ||
-          name.endsWith('.epub') ||
-          name.endsWith('.mobi') ||
-          name.endsWith('.azw') ||
-          name.endsWith('.azw3') ||
-          name.endsWith('.fb2') ||
-          name.endsWith('.lit')
-        )
-
-      case 'Fonts':
-        return (
-          mime.includes('font') ||
-          mime.includes('ttf') ||
-          mime.includes('otf') ||
-          mime.includes('woff') ||
-          mime.includes('eot') ||
-          mime.includes('x-font') ||
-          name.endsWith('.ttf') ||
-          name.endsWith('.otf') ||
-          name.endsWith('.woff') ||
-          name.endsWith('.woff2') ||
-          name.endsWith('.eot') ||
-          name.endsWith('.fon')
-        )
-
-      case 'Shortcuts':
-        return mime === 'application/vnd.google-apps.shortcut'
-
-      case 'Folders':
-        return mime === 'application/vnd.google-apps.folder'
-
-      default:
-        return true
-    }
-  })
+  return items.filter((item: DriveItem) => 
+    matchesFileType(item.mimeType || '', [fileTypeId])
+  )
 }
 
 export function DriveToolbar({
@@ -479,72 +238,9 @@ export function DriveToolbar({
   // Track active filter state
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
 
-  // Memoize category counts to avoid repetitive filtering
+  // Memoize category counts using shared utility for consistency
   const categoryCounts = useMemo(() => {
-    return {
-      images: items.filter(f => f.mimeType?.includes('image')).length,
-      videos: items.filter(f => f.mimeType?.includes('video')).length,
-      documents: items.filter(
-        f =>
-          f.mimeType?.includes('document') ||
-          f.mimeType?.includes('text') ||
-          f.mimeType?.includes('pdf'),
-      ).length,
-      spreadsheets: items.filter(
-        f =>
-          f.mimeType?.includes('spreadsheet') ||
-          f.mimeType?.includes('excel') ||
-          f.mimeType?.includes('csv'),
-      ).length,
-      presentations: items.filter(
-        f => f.mimeType?.includes('presentation') || f.mimeType?.includes('powerpoint'),
-      ).length,
-      audio: items.filter(f => f.mimeType?.startsWith('audio/')).length,
-      archives: items.filter(
-        f =>
-          f.mimeType?.includes('zip') ||
-          f.mimeType?.includes('rar') ||
-          f.mimeType?.includes('tar') ||
-          f.mimeType?.includes('gz') ||
-          f.mimeType?.includes('7z'),
-      ).length,
-      code: items.filter(
-        f =>
-          f.mimeType?.includes('javascript') ||
-          f.mimeType?.includes('json') ||
-          f.mimeType?.includes('html') ||
-          f.mimeType?.includes('css') ||
-          f.mimeType?.includes('xml'),
-      ).length,
-      design: items.filter(
-        f =>
-          f.mimeType?.includes('photoshop') ||
-          f.mimeType?.includes('illustrator') ||
-          f.mimeType?.includes('sketch') ||
-          f.mimeType?.includes('figma'),
-      ).length,
-      database: items.filter(
-        f =>
-          f.mimeType?.includes('database') ||
-          f.mimeType?.includes('sql') ||
-          f.mimeType?.includes('sqlite'),
-      ).length,
-      ebooks: items.filter(
-        f =>
-          f.mimeType?.includes('epub') ||
-          f.mimeType?.includes('mobi') ||
-          f.mimeType?.includes('kindle'),
-      ).length,
-      fonts: items.filter(
-        f =>
-          f.mimeType?.includes('font') ||
-          f.mimeType?.includes('ttf') ||
-          f.mimeType?.includes('otf') ||
-          f.mimeType?.includes('woff'),
-      ).length,
-      shortcuts: items.filter(f => f.mimeType === 'application/vnd.google-apps.shortcut').length,
-      folders: items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').length,
-    }
+    return countFilesByCategory(items.map(item => ({ mimeType: item.mimeType })))
   }, [items])
 
   // Handle badge click for client-side filtering
@@ -554,9 +250,7 @@ export function DriveToolbar({
         const filteredItems = filterByMimeType(items, category)
         onClientSideFilter(filteredItems)
         setActiveFilter(category)
-        successToast.generic(`Filtered to ${filteredItems.length} ${category.toLowerCase()}`, {
-          description: `Showing only ${category.toLowerCase()} from ${items.length} total items`,
-        })
+        successToast(`Filtered to ${filteredItems.length} ${category.toLowerCase()}`)
       }
     },
     [items, onClientSideFilter],
@@ -567,11 +261,9 @@ export function DriveToolbar({
     if (onClearClientSideFilter) {
       onClearClientSideFilter()
       setActiveFilter(null)
-      successToast.generic('Filter cleared', {
-        description: `Showing all ${items.length} items`,
-      })
+      successToast('Filter cleared')
     }
-  }, [onClearClientSideFilter, items.length])
+  }, [onClearClientSideFilter])
 
   return (
     <div
@@ -909,53 +601,12 @@ export function DriveToolbar({
                         >
                           <Folder className="h-4 w-4" />
                         </Button>
-                        {[
-                          {
-                            type: 'document',
-                            mimeType: 'application/vnd.google-apps.document',
-                            title: 'Documents',
-                          },
-                          {
-                            type: 'spreadsheet',
-                            mimeType: 'application/vnd.google-apps.spreadsheet',
-                            title: 'Spreadsheets',
-                          },
-                          {
-                            type: 'presentation',
-                            mimeType: 'application/vnd.google-apps.presentation',
-                            title: 'Presentations',
-                          },
-                          {
-                            type: 'image',
-                            mimeType: 'image/jpeg',
-                            title: 'Images',
-                          },
-                          {
-                            type: 'video',
-                            mimeType: 'video/mp4',
-                            title: 'Videos',
-                          },
-                          {
-                            type: 'audio',
-                            mimeType: 'audio/mp3',
-                            title: 'Audio',
-                          },
-                          {
-                            type: 'archive',
-                            mimeType: 'application/zip',
-                            title: 'Archives',
-                          },
-                          {
-                            type: 'code',
-                            mimeType: 'text/javascript',
-                            title: 'Code Files',
-                          },
-                          {
-                            type: 'shortcut',
-                            mimeType: 'application/vnd.google-apps.shortcut',
-                            title: 'Shortcuts',
-                          },
-                        ].map(filter => {
+                        {getCommonFileTypeCategories().slice(1).map(category => {
+                          const filter = {
+                            type: category.id,
+                            mimeType: category.mimeTypes[0] || 'application/octet-stream',
+                            title: category.label,
+                          }
                           return (
                             <Button
                               key={filter.type}

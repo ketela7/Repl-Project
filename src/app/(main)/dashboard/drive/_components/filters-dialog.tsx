@@ -55,6 +55,7 @@ import {
 import { SimpleDatePicker } from '@/components/ui/simple-date-picker'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
+import { getFileTypeCategories } from '@/lib/mime-type-filter'
 
 interface AdvancedFilters {
   sizeRange?: {
@@ -184,72 +185,8 @@ export function FiltersDialog({
     { id: 'trash', label: 'Trash', icon: Trash, description: 'Deleted items' },
   ]
 
-  // File Type Filters
-  const fileTypeFilter = [
-    { id: 'folder', label: 'Folders', icon: Folder, color: 'text-blue-600' },
-    {
-      id: 'document',
-      label: 'Documents',
-      icon: FileText,
-      color: 'text-blue-600',
-    },
-    {
-      id: 'spreadsheet',
-      label: 'Spreadsheets',
-      icon: FileText,
-      color: 'text-green-600',
-    },
-    {
-      id: 'presentation',
-      label: 'Presentations',
-      icon: FileText,
-      color: 'text-orange-600',
-    },
-    { id: 'image', label: 'Images', icon: Image, color: 'text-purple-600' },
-    { id: 'video', label: 'Videos', icon: Video, color: 'text-red-600' },
-    { id: 'audio', label: 'Audio', icon: Music, color: 'text-blue-600' },
-    {
-      id: 'archive',
-      label: 'Archives',
-      icon: Archive,
-      color: 'text-amber-600',
-    },
-    { id: 'code', label: 'Code Files', icon: Code, color: 'text-slate-600' },
-    { id: 'shortcut', label: 'Shortcuts', icon: Link, color: 'text-blue-700' },
-    { id: 'pdf', label: 'PDF Files', icon: FileText, color: 'text-rose-600' },
-    {
-      id: 'text',
-      label: 'Text Files',
-      icon: FileText,
-      color: 'text-slate-600',
-    },
-    {
-      id: 'design',
-      label: 'Design Files',
-      icon: Image,
-      color: 'text-pink-600',
-    },
-    {
-      id: 'database',
-      label: 'Database Files',
-      icon: FileText,
-      color: 'text-indigo-600',
-    },
-    { id: 'ebook', label: 'E-books', icon: FileText, color: 'text-teal-600' },
-    { id: 'font', label: 'Font Files', icon: FileText, color: 'text-gray-600' },
-    {
-      id: 'calendar',
-      label: 'Calendar Files',
-      icon: Calendar,
-      color: 'text-emerald-600',
-    },
-    {
-      id: 'contact',
-      label: 'Contact Files',
-      icon: User,
-      color: 'text-cyan-600',
-    },
-  ]
+  // File Type Filters - using shared utility for consistency
+  const fileTypeFilter = getFileTypeCategories()
 
   const handleBasicFilter = (viewId: string) => {
     setTempActiveView(viewId)
