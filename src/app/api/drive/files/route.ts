@@ -266,7 +266,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Handle permission errors
-    if (error.name === 'PermissionError' || error.code === 403) {
+    if ((error as { name?: string; code?: number }).name === 'PermissionError' || (error as { code?: number }).code === 403) {
       return NextResponse.json(
         {
           error: 'Insufficient Drive permissions',

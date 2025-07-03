@@ -2,26 +2,18 @@
 
 import { useState, useEffect } from 'react'
 import {
-  Archive,
   Calendar,
   ChevronDown,
   ChevronUp,
   Clock,
-  Code,
-  FileText,
   Filter,
-  Folder,
   HardDrive,
   Home,
-  Image,
-  Link,
-  Music,
   RefreshCw,
   Share,
   Star,
   Trash,
   User,
-  Video,
   X,
 } from 'lucide-react'
 
@@ -56,8 +48,7 @@ import { SimpleDatePicker } from '@/components/ui/simple-date-picker'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { getFileTypeCategories } from '@/lib/mime-type-filter'
-import { formatFileSize } from '@/lib/google-drive/utils'
-import { SIZE_UNIT_OPTIONS } from '@/lib/google-drive/constants'
+
 
 interface AdvancedFilters {
   sizeRange?: {

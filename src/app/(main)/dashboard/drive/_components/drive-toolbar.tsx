@@ -9,29 +9,16 @@ import {
   SquareCheck,
   X,
   CheckSquare,
-  FileText,
   RefreshCw,
   Calendar,
   Settings,
   ChevronDown,
   HardDrive,
   Folder,
-  FileImage,
-  Play,
-  FileSpreadsheet,
-  Presentation,
-  Archive,
-  FileCode,
-  Link,
   Upload,
   FolderPlus,
   ChevronUp,
   MoreVertical,
-  Music,
-  Palette,
-  Database,
-  BookOpen,
-  FileType,
   EllipsisVertical,
 } from 'lucide-react'
 
@@ -55,7 +42,7 @@ import {
   getCommonFileTypeCategories, 
   matchesFileType, 
   countFilesByCategory, 
-  formatCategoryCount,
+
   FILE_TYPE_CATEGORIES 
 } from '@/lib/mime-type-filter'
 
@@ -64,7 +51,7 @@ import { OperationsDialog } from './operations-dialog'
 import { FiltersDialog } from './filters-dialog'
 
 // Types
-import { SIZE_UNIT_OPTIONS } from '@/lib/google-drive/constants'
+
 
 interface DriveItem {
   id: string
@@ -1046,7 +1033,7 @@ export function DriveToolbar({
                   const bgClass = bgColorMap[colorClass] || 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
                   const isActive = activeFilter === category.label
                   const activeBgClass = bgClass.split(' ')[2] // extract border color like 'border-blue-500'
-                  const activeColorClass = activeBgClass.replace('border-', 'bg-').replace('-500', '-500')
+                  const activeColorClass = activeBgClass?.replace('border-', 'bg-').replace('-500', '-500') || 'bg-gray-500'
 
                   return (
                     <div key={category.id} className={`flex items-center justify-between rounded-md p-2 ${bgClass.split(' ').slice(0, 2).join(' ')}`}>

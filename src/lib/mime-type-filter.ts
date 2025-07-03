@@ -533,7 +533,7 @@ export function getCommonFileTypeCategories(): FileTypeCategory[] {
   ]
   return commonTypes
     .map(id => FILE_TYPE_CATEGORIES[id as keyof typeof FILE_TYPE_CATEGORIES])
-    .filter(Boolean)
+    .filter((category): category is FileTypeCategory => Boolean(category))
 }
 
 /**

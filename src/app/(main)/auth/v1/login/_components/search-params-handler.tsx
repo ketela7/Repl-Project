@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation'
 
 interface SearchParamsHandlerProps {
-  children: (isReauth: boolean) => ReactNode
+  children: (isReauth: boolean) => React.ReactNode
 }
 
 export function SearchParamsHandler({ children }: SearchParamsHandlerProps) {

@@ -1,10 +1,7 @@
-import { auth } from '@/auth'
-import { GoogleDriveService } from '@/lib/google-drive/service'
 import { DriveFile } from '@/lib/google-drive/types'
 import { initDriveService } from '@/lib/api-utils'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { withErrorHandling } from '@/lib/error-handler'
-import { formatFileSize } from '@/lib/google-drive/utils'
 import { countFilesByCategory, getFileTypeCategory } from '@/lib/mime-type-filter'
 
 /**
@@ -20,7 +17,7 @@ export async function GET() {
       return new Response('Authentication required', { status: 401 })
     }
 
-    const { session, driveService } = authResult
+    const { driveService } = authResult
 
     // Setup Server-Sent Events stream
     const stream = new ReadableStream({
@@ -114,7 +111,7 @@ export async function GET() {
                   listOptions.pageToken = pageToken
                 }
 
-                const response = await driveService.listFiles(listOptions)
+                const response = await driveService!.listFiles(listOptions)
 
                 const files = response.files || []
                 allFiles = [...allFiles, ...files]
@@ -247,7 +244,7 @@ export async function GET() {
               categorySizes[category] = 0
             })
 
-            Object.entries(filesByType).forEach(([mimeType, count]) => {
+            Object.entries(filesByType).forEach(([mimeType]) => {
               const size = fileSizesByType[mimeType] || 0
               const category = getFileTypeCategory(mimeType)
               categorySizes[category] = (categorySizes[category] || 0) + size

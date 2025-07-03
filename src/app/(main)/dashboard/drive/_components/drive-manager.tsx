@@ -29,7 +29,7 @@ import { ItemsDeleteDialog } from './items-delete-dialog'
 import { ItemsUntrashDialog } from './items-untrash-dialog'
 import ItemsDownloadDialog from './items-download-dialog'
 import ItemsExportDialog from './items-export-dialog'
-import { formatFileSize, getSizeMultiplier } from '@/lib/google-drive/utils'
+import { getSizeMultiplier } from '@/lib/google-drive/utils'
 
 type DriveItem = (DriveFile | DriveFolder) & {
   itemType?: 'file' | 'folder'
@@ -429,7 +429,7 @@ export function DriveManager() {
   )
 
   const handleShortcutFile = useCallback(
-    async (_ignored: DriveItem) => {
+    async (item: DriveItem) => {
       try {
         // Try to get shortcut details and open the target
         const response = await fetch(`/api/drive/files/details`, {

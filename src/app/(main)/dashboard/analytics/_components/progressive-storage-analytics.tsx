@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { RefreshCw, HardDrive, Files, TrendingUp, Play, Pause } from 'lucide-react'
 import { formatFileSize } from '@/lib/google-drive/utils'
-import { getFileTypeCategories, countFilesByCategory, FILE_TYPE_CATEGORIES } from '@/lib/mime-type-filter'
+import { FILE_TYPE_CATEGORIES } from '@/lib/mime-type-filter'
 
 interface QuotaData {
   limit: number | null
@@ -142,7 +142,16 @@ export function ProgressiveStorageAnalytics() {
               filesByType: data.data.topFileTypes || prevFiles?.filesByType || [],
               largestFiles: data.data.largestFiles || prevFiles?.largestFiles || [],
               fileSizesByType: prevFiles?.fileSizesByType || {},
-              categories: prevFiles?.categories,
+              categories: prevFiles?.categories || {
+                documents: 0,
+                images: 0,
+                videos: 0,
+                audio: 0,
+                spreadsheets: 0,
+                presentations: 0,
+                folders: 0,
+                other: 0
+              },
               hasMore: false,
             }))
             break
@@ -155,7 +164,16 @@ export function ProgressiveStorageAnalytics() {
               filesByType: data.data.filesByType || [],
               fileSizesByType: Object.fromEntries(data.data.fileSizesByType || []),
               largestFiles: data.data.largestFiles || [],
-              categories: data.data.categories,
+              categories: data.data.categories || {
+                documents: 0,
+                images: 0,
+                videos: 0,
+                audio: 0,
+                spreadsheets: 0,
+                presentations: 0,
+                folders: 0,
+                other: 0
+              },
               hasMore: false,
             })
             break
@@ -224,7 +242,7 @@ export function ProgressiveStorageAnalytics() {
         'type' in files.filesByType[0]
       ) {
         return files.filesByType.slice(0, 50).map(item => ({
-          type: item.type?.split('/')[1] || item.type || 'unknown',
+          type: item.mimeType?.split('/')[1] || item.mimeType || 'unknown',
           count: item.count || 0,
           size: item.totalSize || 0,
           averageSize: 0,
@@ -232,12 +250,14 @@ export function ProgressiveStorageAnalytics() {
       }
 
       // If it's array of arrays from analysis_complete: [["mimeType", count]]
-      return files.filesByType.slice(0, 50).map(([mimeType, count]) => ({
-        type: mimeType?.split('/')[1] || mimeType || 'unknown',
-        count: count || 0,
-        size: files.fileSizesByType?.[mimeType] || 0,
-        averageSize: 0,
-      }))
+      if (Array.isArray(files.filesByType[0])) {
+        return (files.filesByType as any).slice(0, 50).map(([mimeType, count]: [string, number]) => ({
+          type: mimeType?.split('/')[1] || mimeType || 'unknown',
+          count: count || 0,
+          size: files.fileSizesByType?.[mimeType] || 0,
+          averageSize: 0,
+        }))
+      }
     }
 
     // Fallback for object format
@@ -419,7 +439,7 @@ export function ProgressiveStorageAnalytics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {getTopFileTypes().map(({ type, count, size }) => (
+                {getTopFileTypes().map(({ type, count, size }: { type: string; count: number; size: number }) => (
                   <div key={type} className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">{type}</p>

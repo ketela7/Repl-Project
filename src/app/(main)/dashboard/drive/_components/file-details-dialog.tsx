@@ -308,7 +308,7 @@ export function FileDetailsDialog({
     )
 
     // Group capabilities by category for better organization
-    const groupCapabilities = (_ignored: [string, boolean][]) => {
+    const groupCapabilities = (caps: [string, boolean][]) => {
       const groups = {
         'File Operations': [] as string[],
         'Content Management': [] as string[],

@@ -39,7 +39,7 @@ interface ItemsDeleteDialogProps {
   }>
 }
 
-function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsDeleteDialogProps) {
+function ItemsDeleteDialog({ isOpen, onClose, selectedItems }: ItemsDeleteDialogProps) {
   const [confirmationText, setConfirmationText] = useState('')
   const [acknowledgeWarning, setAcknowledgeWarning] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)

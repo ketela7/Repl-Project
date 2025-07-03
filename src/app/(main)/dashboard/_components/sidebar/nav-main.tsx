@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PlusCircle, Mail, ChevronRight } from 'lucide-react'
+import { type NavMainItem, type NavGroup } from './sidebar-items'
 
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'

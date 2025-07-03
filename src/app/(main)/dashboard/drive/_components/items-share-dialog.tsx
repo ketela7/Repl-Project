@@ -281,7 +281,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     }
   }
 
-  const handleExportData = (_ignored: 'csv' | 'txt' | 'json') => {
+  const handleExportData = (format: 'csv' | 'txt' | 'json') => {
     const successfulShares = progress.shareResults.filter(
       result => result.success && result.shareLink,
     )
