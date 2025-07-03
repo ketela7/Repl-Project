@@ -127,22 +127,45 @@ export function ProgressiveStorageAnalytics() {
             break
             
           case 'quota_update':
-            // API sends { user, quota } but we only need quota
+            // Backend sends { user, quota }
             if (data.data.quota) {
               setQuota(data.data.quota)
-            } else {
-              setQuota(data.data)
             }
             break
             
-          case 'files_update':
-          case 'file_stats_update':
-            setFiles(data.data)
+          case 'progress_update':
+            // Real-time progress updates from backend
+            setProgress({
+              step: 'processing',
+              message: `Processing files... ${data.data.totalProcessed} files analyzed`,
+              processed: data.data.totalProcessed
+            })
             break
             
-          case 'final_summary':
+          case 'file_stats_update':
+            // Real-time file statistics updates
+            setFiles(prevFiles => ({
+              ...prevFiles,
+              totalFiles: data.data.totalFiles,
+              filesByType: data.data.topFileTypes || prevFiles?.filesByType || [],
+              largestFiles: data.data.largestFiles || prevFiles?.largestFiles || [],
+              fileSizesByType: prevFiles?.fileSizesByType || {},
+              categories: prevFiles?.categories,
+              hasMore: false
+            }))
+            break
+            
           case 'analysis_complete':
-            setFiles(data.data)
+            // Final comprehensive results
+            setFiles({
+              totalFiles: data.data.summary?.totalFiles || 0,
+              totalSizeBytes: 0, // Backend doesn't send this in final
+              filesByType: data.data.filesByType || [],
+              fileSizesByType: Object.fromEntries(data.data.fileSizesByType || []),
+              largestFiles: data.data.largestFiles || [],
+              categories: data.data.categories,
+              hasMore: false
+            })
             break
             
           case 'complete':
@@ -150,7 +173,11 @@ export function ProgressiveStorageAnalytics() {
             setIsLoading(false)
             setIsComplete(true)
             setConnectionStatus('disconnected')
-            setProgress({ step: 'complete', message: 'Analysis complete!' })
+            setProgress({ 
+              step: 'complete', 
+              message: data.data.message || 'Analysis complete!',
+              processed: data.data.totalProcessed
+            })
             eventSource.close()
             break
             
@@ -196,25 +223,38 @@ export function ProgressiveStorageAnalytics() {
   const getTopFileTypes = () => {
     if (!files?.filesByType) return []
     
-    // Handle new API format (array of objects)
+    // Backend sends array format: [["mimeType", count], ["mimeType", count]]
     if (Array.isArray(files.filesByType)) {
+      // If it's array of objects from file_stats_update
+      if (files.filesByType.length > 0 && typeof files.filesByType[0] === 'object' && 'type' in files.filesByType[0]) {
+        return files.filesByType
+          .slice(0, 5)
+          .map(item => ({
+            type: item.type?.split('/')[1] || item.type || 'unknown',
+            count: item.count || 0,
+            size: item.totalSize || 0,
+            averageSize: 0
+          }))
+      }
+      
+      // If it's array of arrays from analysis_complete: [["mimeType", count]]
       return files.filesByType
         .slice(0, 5)
-        .map(item => ({
-          type: item.mimeType.split('/')[1] || item.mimeType,
-          count: item.count,
-          size: item.totalSize || 0,
-          averageSize: item.averageSize || 0
+        .map(([mimeType, count]) => ({
+          type: mimeType?.split('/')[1] || mimeType || 'unknown',
+          count: count || 0,
+          size: files.fileSizesByType?.[mimeType] || 0,
+          averageSize: 0
         }))
     }
     
-    // Fallback for old format (object)
+    // Fallback for object format
     return Object.entries(files.filesByType)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 5)
       .map(([type, count]) => ({
         type: type.split('/')[1] || type,
-        count,
+        count: count as number,
         size: files.fileSizesByType?.[type] || 0,
         averageSize: 0
       }))
