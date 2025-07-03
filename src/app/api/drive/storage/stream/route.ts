@@ -4,6 +4,8 @@ import { DriveFile } from '@/lib/google-drive/types'
 import { initDriveService } from '@/lib/api-utils'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { withErrorHandling } from '@/lib/error-handler'
+import { formatFileSize } from '@/lib/google-drive/utils'
+import { countFilesByCategory, getFileTypeCategory } from '@/lib/mime-type-filter'
 
 /**
  * Progressive Storage Analytics with Server-Sent Events
@@ -25,7 +27,7 @@ export async function GET() {
       start(controller) {
         const encoder = new TextEncoder()
         let isStreamClosed = false
-        
+
         const sendData = (type: string, data: any) => {
           if (isStreamClosed) return
           try {
@@ -35,7 +37,7 @@ export async function GET() {
             isStreamClosed = true
           }
         }
-        
+
         const closeStream = () => {
           if (!isStreamClosed) {
             isStreamClosed = true
@@ -52,12 +54,12 @@ export async function GET() {
           try {
             // Step 1: Get user info and quota using service
             sendData('progress', { step: 'quota', message: 'Getting storage quota...' })
-            
+
             const userInfo = await withErrorHandling(
               () => retryDriveApiCall(() => driveService!.getUserInfo()),
-              'SSE Storage Analytics - Get User Info'
+              'SSE Storage Analytics - Get User Info',
             )
-            
+
             // Safe number parsing with null checks
             const parseQuotaNumber = (value: string | undefined | null): number => {
               if (!value || value === 'null' || value === 'undefined') return 0
@@ -87,10 +89,11 @@ export async function GET() {
 
             // Step 2: Analyze files using service listFiles function
             sendData('progress', { step: 'file_analysis', message: 'Analyzing files...' })
-            
+
             let allFiles: DriveFile[] = []
             let pageToken: string | undefined
             let totalProcessed = 0
+            let totalSizeBytes = 0
             const filesByType: Record<string, number> = {}
             const fileSizesByType: Record<string, number> = {}
             const largestFiles: DriveFile[] = []
@@ -105,12 +108,12 @@ export async function GET() {
                 } = {
                   fields: 'nextPageToken,files(name,mimeType,size)',
                 }
-                
+
                 // Only add pageToken if it exists
-                if (pageToken) {  
+                if (pageToken) {
                   listOptions.pageToken = pageToken
                 }
-                
+
                 const response = await driveService.listFiles(listOptions)
 
                 const files = response.files || []
@@ -121,36 +124,44 @@ export async function GET() {
                 // Process files for statistics with safe number parsing
                 files.forEach((file: DriveFile) => {
                   const mimeType = file.mimeType || 'unknown'
-                  
+
                   // Skip folders - they don't have meaningful sizes
                   if (mimeType === 'application/vnd.google-apps.folder') {
                     filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
                     fileSizesByType[mimeType] = (fileSizesByType[mimeType] || 0) + 0
                     return
                   }
-                  
+
                   // Safe file size parsing - Google Drive returns size as string
                   const sizeValue = file.size
                   let size = 0
-                  
-                  // Debug logging for first few files per batch  
+
+                  // Debug logging for first few files per batch
                   const isFirstBatch = totalProcessed <= 10
                   if (isFirstBatch) {
                     console.log(`[Storage Debug] File: ${file.name}`)
                     console.log(`[Storage Debug] - Size: "${sizeValue}" (${typeof sizeValue})`)
                     console.log(`[Storage Debug] - MimeType: ${mimeType}`)
-                    console.log(`[Storage Debug] - Full file object:`, JSON.stringify(file, null, 2))
+                    console.log(
+                      `[Storage Debug] - Full file object:`,
+                      JSON.stringify(file, null, 2),
+                    )
                   }
-                  
+
                   // Parse file size properly - Google Drive API returns it as string
-                  if (sizeValue != null && sizeValue !== '' && sizeValue !== 'null' && sizeValue !== 'undefined') {
+                  if (
+                    sizeValue != null &&
+                    sizeValue !== '' &&
+                    sizeValue !== 'null' &&
+                    sizeValue !== 'undefined'
+                  ) {
                     if (typeof sizeValue === 'string') {
                       const parsed = parseInt(sizeValue, 10)
                       size = isNaN(parsed) ? 0 : parsed
                     } else if (typeof sizeValue === 'number') {
                       size = sizeValue
                     }
-                    
+
                     if (isFirstBatch) {
                       console.log(`[Storage Debug] - Parsed size: ${size} bytes`)
                     }
@@ -159,20 +170,21 @@ export async function GET() {
                       console.log(`[Storage Debug] - No size data available`)
                     }
                   }
-                  
+
                   // Count by type
                   filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
                   fileSizesByType[mimeType] = (fileSizesByType[mimeType] || 0) + size
-                  
+
                   // Track largest files
                   if (size > 0) {
+                    totalSizeBytes += size
                     largestFiles.push(file)
                     largestFiles.sort((a, b) => {
-                      const sizeA = a.size ? (parseInt(a.size.toString(), 10) || 0) : 0
-                      const sizeB = b.size ? (parseInt(b.size.toString(), 10) || 0) : 0
+                      const sizeA = a.size ? parseInt(a.size.toString(), 10) || 0 : 0
+                      const sizeB = b.size ? parseInt(b.size.toString(), 10) || 0 : 0
                       return sizeB - sizeA
                     })
-                    
+
                     // Keep only top 10
                     if (largestFiles.length > 10) {
                       largestFiles.splice(10)
@@ -189,7 +201,7 @@ export async function GET() {
 
                 // Real-time file stats update
                 const topTypes = Object.entries(filesByType)
-                  .sort(([,a], [,b]) => b - a)
+                  .sort(([, a], [, b]) => b - a)
                   .slice(0, 10)
                   .map(([type, count]) => ({
                     type,
@@ -198,111 +210,75 @@ export async function GET() {
                   }))
 
                 sendData('file_stats_update', {
+                  totalSizeBytes: totalSizeBytes,
                   totalFiles: totalProcessed,
                   topFileTypes: topTypes,
-                  largestFiles: largestFiles.slice(0, 5),
+                  largestFiles: largestFiles.slice(0, 25),
                 })
-
               } catch (error: any) {
                 if (error.message?.includes('timeout') || error.code === 504) {
-                  sendData('progress', { 
-                    step: 'timeout_continue', 
+                  sendData('progress', {
+                    step: 'timeout_continue',
                     message: `Analysis timeout. Processed ${totalProcessed} files. Results available.`,
                     isComplete: true,
                     canContinue: !!pageToken,
-                    nextPageToken: pageToken
+                    nextPageToken: pageToken,
                   })
                   break
                 }
                 throw error
               }
-
             } while (pageToken) // Reasonable limit
 
-            // Step 3: Final analysis and categorization
+            // Step 3: Final analysis and categorization using existing basecode functions
             sendData('progress', { step: 'final_analysis', message: 'Generating final report...' })
 
-            // Categorize files by type
-            const categories = {
-              documents: 0,
-              images: 0,
-              videos: 0,
-              audio: 0,
-              archives: 0,
-              spreadsheets: 0,
-              presentations: 0,
-              other: 0,
-            }
+            // Use existing countFilesByCategory function for all 27 categories
+            const fileListForCategorization = Object.entries(filesByType).flatMap(([mimeType, count]) =>
+              Array(count).fill({ mimeType })
+            )
+            const categories = countFilesByCategory(fileListForCategorization)
 
-            const categorySizes = {
-              documents: 0,
-              images: 0,
-              videos: 0,
-              audio: 0,
-              archives: 0,
-              spreadsheets: 0,
-              presentations: 0,
-              other: 0,
-            }
+            // Calculate category sizes using existing file type categorization
+            const categorySizes: Record<string, number> = {}
+            Object.keys(categories).forEach(category => {
+              categorySizes[category] = 0
+            })
 
             Object.entries(filesByType).forEach(([mimeType, count]) => {
               const size = fileSizesByType[mimeType] || 0
-              
-              if (mimeType.includes('document') || mimeType.includes('pdf') || mimeType.includes('text')) {
-                categories.documents += count
-                categorySizes.documents += size
-              } else if (mimeType.includes('image')) {
-                categories.images += count
-                categorySizes.images += size
-              } else if (mimeType.includes('video')) {
-                categories.videos += count
-                categorySizes.videos += size
-              } else if (mimeType.includes('audio')) {
-                categories.audio += count
-                categorySizes.audio += size
-              } else if (mimeType.includes('zip') || mimeType.includes('archive')) {
-                categories.archives += count
-                categorySizes.archives += size
-              } else if (mimeType.includes('spreadsheet') || mimeType.includes('excel')) {
-                categories.spreadsheets += count
-                categorySizes.spreadsheets += size
-              } else if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) {
-                categories.presentations += count
-                categorySizes.presentations += size
-              } else {
-                categories.other += count
-                categorySizes.other += size
-              }
+              const category = getFileTypeCategory(mimeType)
+              categorySizes[category] = (categorySizes[category] || 0) + size
             })
 
             // Send final comprehensive results
             sendData('analysis_complete', {
               summary: {
                 totalFiles: totalProcessed,
+                totalSizeBytes: totalSizeBytes,
                 totalCategories: Object.keys(filesByType).length,
                 processedAt: new Date().toISOString(),
               },
               categories,
               categorySizes,
               filesByType: Object.entries(filesByType)
-                .sort(([,a], [,b]) => b - a)
+                .sort(([, a], [, b]) => b - a)
                 .slice(0, 20),
               fileSizesByType: Object.entries(fileSizesByType)
-                .sort(([,a], [,b]) => b - a)
+                .sort(([, a], [, b]) => b - a)
                 .slice(0, 20),
-              largestFiles: largestFiles.slice(0, 10),
+              largestFiles: largestFiles.slice(0, 20),
             })
 
-            sendData('complete', { 
+            sendData('complete', {
               message: `Analysis complete! Processed ${totalProcessed} files.`,
-              totalProcessed 
+              totalProcessed,
             })
-
           } catch (error: any) {
             console.error('Storage analysis error:', error)
-            sendData('error', { 
+            sendData('error', {
               message: error.message || 'Analysis failed',
-              canRetry: true 
+              canRetry: true,
             })
           } finally {
             closeStream()
@@ -315,7 +291,7 @@ export async function GET() {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
+        Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
         'Access-Control-Allow-Headers': 'Content-Type',

@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { RefreshCw, HardDrive, Files, TrendingUp, Play, Pause } from 'lucide-react'
+import { formatFileSize } from '@/lib/google-drive/utils'
+import { getFileTypeCategories, countFilesByCategory, FILE_TYPE_CATEGORIES } from '@/lib/mime-type-filter'
 
 interface QuotaData {
   limit: number | null
@@ -71,22 +73,7 @@ export function ProgressiveStorageAnalytics() {
 
   const eventSourceRef = useRef<EventSource | null>(null)
 
-  const formatBytes = (bytes: number | string | undefined): string => {
-    // Safe number parsing for file sizes
-    let numBytes = 0
-    if (typeof bytes === 'string') {
-      const parsed = parseInt(bytes, 10)
-      numBytes = isNaN(parsed) ? 0 : parsed
-    } else if (typeof bytes === 'number') {
-      numBytes = isNaN(bytes) ? 0 : bytes
-    }
 
-    if (numBytes === 0) return '0 B'
-    const k = 1024
-    const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
-    const i = Math.floor(Math.log(numBytes) / Math.log(k))
-    return parseFloat((numBytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i]
-  }
 
   const startAnalysis = async () => {
     if (eventSourceRef.current) {
@@ -104,7 +91,7 @@ export function ProgressiveStorageAnalytics() {
     eventSourceRef.current = eventSource
 
     // Auto-close connection after 60 seconds (align with server timeout)
-    const timeoutId = setTimeout(() => {
+    {/*const timeoutId = setTimeout(() => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close()
         eventSourceRef.current = null
@@ -112,7 +99,7 @@ export function ProgressiveStorageAnalytics() {
         setConnectionStatus('disconnected')
         setError('Analysis timeout after 55 seconds. Large drives may require multiple sessions.')
       }
-    }, 55000)
+    }, 55000) */}
 
     eventSource.onopen = () => {
       setConnectionStatus('connected')
@@ -151,6 +138,7 @@ export function ProgressiveStorageAnalytics() {
             setFiles(prevFiles => ({
               ...prevFiles,
               totalFiles: data.data.totalFiles,
+              totalSizeBytes: data.data.totalSizeBytes || prevFiles?.totalSizeBytes || 0,
               filesByType: data.data.topFileTypes || prevFiles?.filesByType || [],
               largestFiles: data.data.largestFiles || prevFiles?.largestFiles || [],
               fileSizesByType: prevFiles?.fileSizesByType || {},
@@ -163,7 +151,7 @@ export function ProgressiveStorageAnalytics() {
             // Final comprehensive results
             setFiles({
               totalFiles: data.data.summary?.totalFiles || 0,
-              totalSizeBytes: 0, // Backend doesn't send this in final
+              totalSizeBytes: data.data.summary?.totalSizeBytes || 0,
               filesByType: data.data.filesByType || [],
               fileSizesByType: Object.fromEntries(data.data.fileSizesByType || []),
               largestFiles: data.data.largestFiles || [],
@@ -346,12 +334,12 @@ export function ProgressiveStorageAnalytics() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Used</span>
-                    <span>{formatBytes(quota.used)}</span>
+                    <span>{formatFileSize(quota.used)}</span>
                   </div>
                   <Progress value={quota.usagePercentage || 0} />
                   <div className="text-muted-foreground flex justify-between text-xs">
-                    <span>{formatBytes(quota.usedInDrive)} in Drive</span>
-                    <span>{quota.available ? formatBytes(quota.available) : '∞'} available</span>
+                    <span>{formatFileSize(quota.usedInDrive)} in Drive</span>
+                    <span>{quota.available ? formatFileSize(quota.available) : '∞'} available</span>
                   </div>
                 </div>
               )}
@@ -359,7 +347,7 @@ export function ProgressiveStorageAnalytics() {
               {!quota.limit && (
                 <div className="py-4 text-center">
                   <p className="text-lg font-medium">Unlimited Storage</p>
-                  <p className="text-muted-foreground">Using {formatBytes(quota.used)} total</p>
+                  <p className="text-muted-foreground">Using {formatFileSize(quota.used)} total</p>
                 </div>
               )}
             </div>
@@ -389,52 +377,27 @@ export function ProgressiveStorageAnalytics() {
                 </div>
                 <div className="flex justify-between">
                   <span>Total Size</span>
-                  <span className="font-medium">{formatBytes(files.totalSizeBytes || 0)}</span>
+                  <span className="font-medium">{formatFileSize(files.totalSizeBytes || 0)}</span>
                 </div>
 
-                {/* File Categories */}
+                {/* File Categories - All 27 Categories */}
                 {files.categories && (
                   <div className="space-y-2 border-t pt-3">
-                    <h4 className="text-sm font-medium">Categories</h4>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="flex justify-between">
-                        <span>Documents</span>
-                        <span>{files.categories.documents}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Images</span>
-                        <span>{files.categories.images}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Videos</span>
-                        <span>{files.categories.videos}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span>Audio</span>
-                        <span>{files.categories.audio}</span>
-                      </div>
-                      {files.categories.spreadsheets !== undefined && (
-                        <div className="flex justify-between">
-                          <span>Spreadsheets</span>
-                          <span>{files.categories.spreadsheets}</span>
-                        </div>
-                      )}
-                      {files.categories.presentations !== undefined && (
-                        <div className="flex justify-between">
-                          <span>Presentations</span>
-                          <span>{files.categories.presentations}</span>
-                        </div>
-                      )}
-                      {files.categories.folders !== undefined && (
-                        <div className="flex justify-between">
-                          <span>Folders</span>
-                          <span>{files.categories.folders}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between">
-                        <span>Other</span>
-                        <span>{files.categories.other}</span>
-                      </div>
+                    <h4 className="text-sm font-medium">File Categories</h4>
+                    <div className="grid grid-cols-2 gap-2 text-xs max-h-64 overflow-y-auto">
+                      {Object.entries(FILE_TYPE_CATEGORIES).map(([categoryId, category]) => {
+                        const count = files.categories[categoryId] || 0
+                        const Icon = category.icon
+                        return count > 0 ? (
+                          <div key={categoryId} className="flex items-center justify-between">
+                            <div className="flex items-center gap-1">
+                              <Icon className="h-3 w-3" />
+                              <span>{category.label}</span>
+                            </div>
+                            <span className="font-medium">{count.toLocaleString()}</span>
+                          </div>
+                        ) : null
+                      })}
                     </div>
                   </div>
                 )}
