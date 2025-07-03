@@ -151,6 +151,7 @@ export function DriveManager() {
   }, [currentFolderId])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
+    console.log('[DriveManager] Filter change received:', newFilters)
     setFilters(prev => {
       const updatedFilters = {
         ...prev,
@@ -161,6 +162,7 @@ export function DriveManager() {
         },
       }
       
+      console.log('[DriveManager] Filter state will be updated to:', updatedFilters)
       return updatedFilters
     })
   }, [])
@@ -396,6 +398,7 @@ export function DriveManager() {
 
   // Manual filter application function - only called when Apply Filter is clicked
   const applyFilters = useCallback(() => {
+    console.log('[DriveManager] Apply Filters clicked - Current filter state:', filters)
     // Use setTimeout to ensure React has finished all state updates
     setTimeout(() => {
       const filterKey = JSON.stringify({
@@ -409,6 +412,7 @@ export function DriveManager() {
         owner: filters.advancedFilters.owner,
       })
 
+      console.log('[DriveManager] Applying filters with key:', filterKey)
       // Update last applied filters and fetch data
       lastFiltersRef.current = filterKey
       fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
