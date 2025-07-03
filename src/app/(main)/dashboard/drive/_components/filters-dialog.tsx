@@ -185,7 +185,7 @@ export function FiltersDialog({
   ]
 
   // File Type Filters
-  const fileTypeFilters = [
+  const fileTypeFilter = [
     { id: 'folder', label: 'Folders', icon: Folder, color: 'text-blue-600' },
     {
       id: 'document',
@@ -396,7 +396,7 @@ export function FiltersDialog({
                 </div>
               )}
               <div className="grid grid-cols-2 gap-2">
-                {fileTypeFilters.map(filter => {
+                {fileTypeFilter.map(filter => {
                   const Icon = filter.icon
                   const currentFilter = tempFileTypeFilter || []
                   const isArray = Array.isArray(currentFilter)
