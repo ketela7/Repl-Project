@@ -483,67 +483,12 @@ export function DriveManager() {
     setFilteredItems([])
   }, [])
 
-  // Apply client-side size filtering
-  const sizeFilteredItems = useMemo(() => {
-    const hasMinSize = filters.advancedFilters.sizeRange?.min
-    const hasMaxSize = filters.advancedFilters.sizeRange?.max
 
-    // // // // // console.log('[DriveManager] Size filtering - items:', items.length, 'hasMinSize:', hasMinSize, 'hasMaxSize:', hasMaxSize)
-
-    if (!hasMinSize && !hasMaxSize) {
-      // // // // // console.log('[DriveManager] No size filters, returning all items:', items.length)
-      return items
-    }
-
-    // // // // // console.log('[DriveManager] Size filtered items:', filtered.length)
-    return items.filter(item => {
-      if (item.mimeType === 'application/vnd.google-apps.folder') return true
-
-      const sizeStr = (item as any).size
-      let sizeBytes = 0
-      if (
-        sizeStr &&
-        sizeStr !== '-' &&
-        sizeStr !== 'undefined' &&
-        sizeStr !== 'null' &&
-        (sizeStr as string).trim() !== ''
-      ) {
-        const parsed = parseInt(sizeStr, 10)
-        if (!isNaN(parsed)) {
-          sizeBytes = parsed
-        }
-      }
-
-      const sizeUnit = filters.advancedFilters.sizeRange?.unit || 'MB'
-      const minSize = filters.advancedFilters.sizeRange?.min
-      const maxSize = filters.advancedFilters.sizeRange?.max
-
-      const getBytes = (size: number, unit: string) => {
-        switch (unit.toUpperCase()) {
-          case 'B':
-            return size
-          case 'KB':
-            return size * 1024
-          case 'MB':
-            return size * 1024 * 1024
-          case 'GB':
-            return size * 1024 * 1024 * 1024
-          default:
-            return size * 1024 * 1024
-        }
-      }
-
-      if (minSize !== undefined && sizeBytes < getBytes(minSize, sizeUnit)) return false
-      if (maxSize !== undefined && sizeBytes > getBytes(maxSize, sizeUnit)) return false
-      return true
-    })
-  }, [items, filters.advancedFilters.sizeRange])
 
   const displayItems = useMemo(() => {
-    // // // // // console.log('[DriveManager] Display items calculation - filteredItems:', filteredItems.length, 'sizeFilteredItems:', sizeFilteredItems.length)
-    // // // // // console.log('[DriveManager] Display items calculated:', result.length, 'items')
-    return filteredItems.length > 0 ? filteredItems : sizeFilteredItems
-  }, [filteredItems, sizeFilteredItems])
+    // Use filteredItems if available (from client-side search), otherwise use items from backend (already filtered)
+    return filteredItems.length > 0 ? filteredItems : items
+  }, [filteredItems, items])
 
   const sortedDisplayItems = useMemo(() => {
     const sorted = [...displayItems].sort((a, b) => {
