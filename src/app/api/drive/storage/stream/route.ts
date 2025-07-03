@@ -185,9 +185,9 @@ export async function GET() {
                       return sizeB - sizeA
                     })
 
-                    // Keep only top 10
-                    if (largestFiles.length > 10) {
-                      largestFiles.splice(10)
+                    // Keep only top 50 for better analysis
+                    if (largestFiles.length > 50) {
+                      largestFiles.splice(50)
                     }
                   }
                 })
@@ -213,7 +213,7 @@ export async function GET() {
                   totalSizeBytes: totalSizeBytes,
                   totalFiles: totalProcessed,
                   topFileTypes: topTypes,
-                  largestFiles: largestFiles.slice(0, 25),
+                  largestFiles: largestFiles.slice(0, 50),
                 })
               } catch (error: any) {
                 if (error.message?.includes('timeout') || error.code === 504) {
@@ -263,11 +263,11 @@ export async function GET() {
               categorySizes,
               filesByType: Object.entries(filesByType)
                 .sort(([, a], [, b]) => b - a)
-                .slice(0, 20),
+                .slice(0, 50), // Increased from 20 to 50
               fileSizesByType: Object.entries(fileSizesByType)
                 .sort(([, a], [, b]) => b - a)
-                .slice(0, 20),
-              largestFiles: largestFiles.slice(0, 20),
+                .slice(0, 50), // Increased from 20 to 50
+              largestFiles: largestFiles.slice(0, 50), // Increased from 20 to 50
             })
 
             sendData('complete', {

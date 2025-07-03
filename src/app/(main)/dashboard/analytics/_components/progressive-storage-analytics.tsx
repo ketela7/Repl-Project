@@ -223,7 +223,7 @@ export function ProgressiveStorageAnalytics() {
         typeof files.filesByType[0] === 'object' &&
         'type' in files.filesByType[0]
       ) {
-        return files.filesByType.slice(0, 20).map(item => ({
+        return files.filesByType.slice(0, 50).map(item => ({
           type: item.type?.split('/')[1] || item.type || 'unknown',
           count: item.count || 0,
           size: item.totalSize || 0,
@@ -232,7 +232,7 @@ export function ProgressiveStorageAnalytics() {
       }
 
       // If it's array of arrays from analysis_complete: [["mimeType", count]]
-      return files.filesByType.slice(0, 20).map(([mimeType, count]) => ({
+      return files.filesByType.slice(0, 50).map(([mimeType, count]) => ({
         type: mimeType?.split('/')[1] || mimeType || 'unknown',
         count: count || 0,
         size: files.fileSizesByType?.[mimeType] || 0,
@@ -243,7 +243,7 @@ export function ProgressiveStorageAnalytics() {
     // Fallback for object format
     return Object.entries(files.filesByType)
       .sort(([, a], [, b]) => (b as number) - (a as number))
-      .slice(0, 20)
+      .slice(0, 50)
       .map(([type, count]) => ({
         type: type.split('/')[1] || type,
         count: count as number,
@@ -296,7 +296,7 @@ export function ProgressiveStorageAnalytics() {
 
               {progress?.processed && (
                 <div className="space-y-1">
-                  <Progress value={Math.min(100, (progress.processed / 10000) * 100)} />
+                  <Progress value={isComplete ? 100 : Math.min(95, (progress.processed / Math.max(progress.processed, 1000)) * 100)} />
                   <p className="text-muted-foreground text-xs">
                     {progress.processed.toLocaleString()} files processed
                   </p>
@@ -384,20 +384,23 @@ export function ProgressiveStorageAnalytics() {
                 {files.categories && (
                   <div className="space-y-2 border-t pt-3">
                     <h4 className="text-sm font-medium">File Categories</h4>
-                    <div className="grid grid-cols-2 gap-2 text-xs max-h-64 overflow-y-auto">
-                      {Object.entries(FILE_TYPE_CATEGORIES).map(([categoryId, category]) => {
-                        const count = files.categories[categoryId] || 0
-                        const Icon = category.icon
-                        return count > 0 ? (
-                          <div key={categoryId} className="flex items-center justify-between">
-                            <div className="flex items-center gap-1">
-                              <Icon className="h-3 w-3" />
-                              <span>{category.label}</span>
+                    <div className="grid grid-cols-2 gap-1 text-xs max-h-80 overflow-y-auto">
+                      {Object.entries(FILE_TYPE_CATEGORIES)
+                        .filter(([categoryId]) => (files.categories?.[categoryId] || 0) > 0)
+                        .sort(([categoryIdA], [categoryIdB]) => (files.categories?.[categoryIdB] || 0) - (files.categories?.[categoryIdA] || 0))
+                        .map(([categoryId, category]) => {
+                          const count = files.categories?.[categoryId] || 0
+                          const Icon = category.icon
+                          return (
+                            <div key={categoryId} className="flex items-center justify-between py-1">
+                              <div className="flex items-center gap-1">
+                                <Icon className="h-3 w-3 text-muted-foreground" />
+                                <span className="truncate">{category.label}</span>
+                              </div>
+                              <span className="font-medium text-primary">{count.toLocaleString()}</span>
                             </div>
-                            <span className="font-medium">{count.toLocaleString()}</span>
-                          </div>
-                        ) : null
-                      })}
+                          )
+                        })}
                     </div>
                   </div>
                 )}
