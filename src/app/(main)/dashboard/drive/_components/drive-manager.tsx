@@ -365,7 +365,7 @@ export function DriveManager() {
         if (callId) activeRequestsRef.current.delete(callId)
       }
     },
-    [], // Remove filters dependency to prevent automatic refetching on filter changes
+    [filters],
   )
 
   // Helper function to convert selected IDs to full objects
