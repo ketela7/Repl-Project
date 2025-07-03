@@ -80,6 +80,7 @@ export function DriveManager() {
   const { timezone } = useTimezoneContext()
   const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState(initialFilters)
+  const filtersRef = useRef(initialFilters)
 
   // Table state
   const [visibleColumns, setVisibleColumns] = useState({
@@ -152,6 +153,8 @@ export function DriveManager() {
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
     console.log('[DriveManager] Filter change received:', newFilters)
+    
+    // Update state untuk UI
     setFilters(prev => {
       const updatedFilters = {
         ...prev,
@@ -162,7 +165,9 @@ export function DriveManager() {
         },
       }
       
-      console.log('[DriveManager] Filter state will be updated to:', updatedFilters)
+      // Update ref juga untuk immediate access
+      filtersRef.current = updatedFilters
+      console.log('[DriveManager] Filter state updated to:', updatedFilters)
       return updatedFilters
     })
   }, [])
@@ -240,16 +245,17 @@ export function DriveManager() {
       try {
         // Handle null/undefined folderId properly
         const actualFolderId = folderId || null
-        const activeView = filters.activeView
+        // Gunakan filtersRef untuk mendapat filter state yang terbaru
+        const currentFilters = filtersRef.current
         const filterKey = JSON.stringify({
-          view: activeView,
-          types: filters.fileTypeFilter,
-          sort: filters.advancedFilters.sortBy,
-          order: filters.advancedFilters.sortOrder,
-          size: filters.advancedFilters.sizeRange,
-          created: filters.advancedFilters.createdDateRange,
-          modified: filters.advancedFilters.modifiedDateRange,
-          owner: filters.advancedFilters.owner,
+          view: currentFilters.activeView,
+          types: currentFilters.fileTypeFilter,
+          sort: currentFilters.advancedFilters.sortBy,
+          order: currentFilters.advancedFilters.sortOrder,
+          size: currentFilters.advancedFilters.sizeRange,
+          created: currentFilters.advancedFilters.createdDateRange,
+          modified: currentFilters.advancedFilters.modifiedDateRange,
+          owner: currentFilters.advancedFilters.owner,
         })
 
         callId = `${actualFolderId}-${searchQuery}-${pageToken}-${filterKey}`
@@ -264,56 +270,56 @@ export function DriveManager() {
         activeRequestsRef.current.add(callId)
 
         const params = new URLSearchParams({
-          sortBy: filters.advancedFilters.sortBy,
-          sortOrder: filters.advancedFilters.sortOrder,
+          sortBy: currentFilters.advancedFilters.sortBy,
+          sortOrder: currentFilters.advancedFilters.sortOrder,
         })
 
         // Only add folderId if it's not null/undefined
         if (actualFolderId) params.append('folderId', actualFolderId)
         if (searchQuery) params.append('search', searchQuery)
         if (pageToken) params.append('pageToken', pageToken)
-        if (filters.activeView && filters.activeView !== 'all')
-          params.append('viewStatus', filters.activeView)
-        if (filters.fileTypeFilter?.length > 0)
-          params.append('fileType', filters.fileTypeFilter.join(','))
-        if (filters.advancedFilters.createdDateRange?.from)
+        if (currentFilters.activeView && currentFilters.activeView !== 'all')
+          params.append('viewStatus', currentFilters.activeView)
+        if (currentFilters.fileTypeFilter?.length > 0)
+          params.append('fileType', currentFilters.fileTypeFilter.join(','))
+        if (currentFilters.advancedFilters.createdDateRange?.from)
           params.append(
             'createdAfter',
-            (filters.advancedFilters.createdDateRange.from as Date).toISOString(),
+            (currentFilters.advancedFilters.createdDateRange.from as Date).toISOString(),
           )
-        if (filters.advancedFilters.createdDateRange?.to)
+        if (currentFilters.advancedFilters.createdDateRange?.to)
           params.append(
             'createdBefore',
-            (filters.advancedFilters.createdDateRange.to as Date).toISOString(),
+            (currentFilters.advancedFilters.createdDateRange.to as Date).toISOString(),
           )
-        if (filters.advancedFilters.modifiedDateRange?.from)
+        if (currentFilters.advancedFilters.modifiedDateRange?.from)
           params.append(
             'modifiedAfter',
-            (filters.advancedFilters.modifiedDateRange.from as Date).toISOString(),
+            (currentFilters.advancedFilters.modifiedDateRange.from as Date).toISOString(),
           )
-        if (filters.advancedFilters.modifiedDateRange?.to)
+        if (currentFilters.advancedFilters.modifiedDateRange?.to)
           params.append(
             'modifiedBefore',
-            (filters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
+            (currentFilters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
           )
-        if (filters.advancedFilters.owner && (filters.advancedFilters.owner as string).trim())
-          params.append('owner', (filters.advancedFilters.owner as string).trim())
+        if (currentFilters.advancedFilters.owner && (currentFilters.advancedFilters.owner as string).trim())
+          params.append('owner', (currentFilters.advancedFilters.owner as string).trim())
 
         // Add size filtering parameters (Google Drive API specification - values in bytes)
-        if (filters.advancedFilters.sizeRange?.min && filters.advancedFilters.sizeRange.min > 0) {
-          const multiplier = getSizeMultiplier(filters.advancedFilters.sizeRange.unit)
-          const minBytes = Math.floor(filters.advancedFilters.sizeRange.min * multiplier)
+        if (currentFilters.advancedFilters.sizeRange?.min && currentFilters.advancedFilters.sizeRange.min > 0) {
+          const multiplier = getSizeMultiplier(currentFilters.advancedFilters.sizeRange.unit)
+          const minBytes = Math.floor(currentFilters.advancedFilters.sizeRange.min * multiplier)
           params.append('sizeMin', String(minBytes))
         }
-        if (filters.advancedFilters.sizeRange?.max && filters.advancedFilters.sizeRange.max > 0) {
-          const multiplier = getSizeMultiplier(filters.advancedFilters.sizeRange.unit)
-          const maxBytes = Math.floor(filters.advancedFilters.sizeRange.max * multiplier)
+        if (currentFilters.advancedFilters.sizeRange?.max && currentFilters.advancedFilters.sizeRange.max > 0) {
+          const multiplier = getSizeMultiplier(currentFilters.advancedFilters.sizeRange.unit)
+          const maxBytes = Math.floor(currentFilters.advancedFilters.sizeRange.max * multiplier)
           params.append('sizeMax', String(maxBytes))
         }
 
         // Add pageSize parameter
-        if (filters.advancedFilters.pageSize && filters.advancedFilters.pageSize !== 50) {
-          params.append('pageSize', String(filters.advancedFilters.pageSize))
+        if (currentFilters.advancedFilters.pageSize && currentFilters.advancedFilters.pageSize !== 50) {
+          params.append('pageSize', String(currentFilters.advancedFilters.pageSize))
         }
 
         const response = await fetch(`/api/drive/files?${params}`, {
@@ -398,26 +404,26 @@ export function DriveManager() {
 
   // Manual filter application function - only called when Apply Filter is clicked
   const applyFilters = useCallback(() => {
-    console.log('[DriveManager] Apply Filters clicked - Current filter state:', filters)
-    // Use setTimeout to ensure React has finished all state updates
-    setTimeout(() => {
-      const filterKey = JSON.stringify({
-        view: filters.activeView,
-        types: filters.fileTypeFilter,
-        sort: filters.advancedFilters.sortBy,
-        order: filters.advancedFilters.sortOrder,
-        size: filters.advancedFilters.sizeRange,
-        created: filters.advancedFilters.createdDateRange,
-        modified: filters.advancedFilters.modifiedDateRange,
-        owner: filters.advancedFilters.owner,
-      })
+    // Gunakan filtersRef untuk mendapat filter state yang paling terbaru
+    const currentFilters = filtersRef.current
+    console.log('[DriveManager] Apply Filters clicked - Using current filters:', currentFilters)
+    
+    const filterKey = JSON.stringify({
+      view: currentFilters.activeView,
+      types: currentFilters.fileTypeFilter,
+      sort: currentFilters.advancedFilters.sortBy,
+      order: currentFilters.advancedFilters.sortOrder,
+      size: currentFilters.advancedFilters.sizeRange,
+      created: currentFilters.advancedFilters.createdDateRange,
+      modified: currentFilters.advancedFilters.modifiedDateRange,
+      owner: currentFilters.advancedFilters.owner,
+    })
 
-      console.log('[DriveManager] Applying filters with key:', filterKey)
-      // Update last applied filters and fetch data
-      lastFiltersRef.current = filterKey
-      fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
-    }, 0)
-  }, [filters, currentFolderId, searchQuery, fetchFiles])
+    console.log('[DriveManager] Applying filters with key:', filterKey)
+    // Update last applied filters and fetch data
+    lastFiltersRef.current = filterKey
+    fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
+  }, [currentFolderId, searchQuery, fetchFiles])
 
   // Navigation handlers
   const handleFolderClick = useCallback(
