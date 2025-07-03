@@ -34,7 +34,7 @@ import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { DriveDestinationSelector } from '@/components/drive-destination-selector'
-import { cn } from '@/lib/utils'
+import { cn, calculateProgress } from '@/lib/utils'
 
 // FileMoveDialog removed - functionality integrated into bulk operations
 
@@ -375,7 +375,7 @@ function ItemsMoveDialog({
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
       const progressPercentage =
-        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+        calculateProgress(progress.current, progress.total)
 
       return (
         <div className="space-y-4">

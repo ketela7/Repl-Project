@@ -36,7 +36,7 @@ import {
   BottomSheetTitle,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import { cn } from '@/lib/utils'
+import { cn, calculateProgress } from '@/lib/utils'
 // Simple error handling without complex recovery
 
 interface ItemsExportDialogProps {
@@ -448,7 +448,7 @@ function ItemsExportDialog({
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
       const progressPercentage =
-        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+        calculateProgress(progress.current, progress.total)
 
       return (
         <div className="space-y-4">

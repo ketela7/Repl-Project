@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { successToast, errorToast } from '@/components/ui/toast'
-import { cn } from '@/lib/utils'
+import { cn, calculateProgress } from '@/lib/utils'
 
 interface ItemsUntrashDialogProps {
   isOpen: boolean
@@ -315,7 +315,7 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
       const progressPercentage =
-        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+        calculateProgress(progress.current, progress.total)
 
       return (
         <div className="space-y-4">

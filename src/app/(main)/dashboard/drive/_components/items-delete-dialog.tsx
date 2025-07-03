@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn } from '@/lib/utils'
+import { cn, calculateProgress } from '@/lib/utils'
 
 interface ItemsDeleteDialogProps {
   isOpen: boolean
@@ -347,7 +347,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
       const progressPercentage =
-        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+        calculateProgress(progress.current, progress.total)
 
       return (
         <div className="space-y-4">

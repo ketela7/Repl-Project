@@ -115,3 +115,48 @@ export const toastUtils = {
   loading: loadingToast,
   info: infoToast,
 }
+
+/**
+ * Calculate progress percentage from current and total values
+ */
+export function calculateProgress(current: number, total: number): number {
+  return total > 0 ? Math.round((current / total) * 100) : 0
+}
+
+/**
+ * Generate timestamp for file naming
+ */
+export function generateTimestamp(): string {
+  return new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
+}
+
+/**
+ * Generate filename with current date
+ */
+export function generateDateFilename(prefix: string, extension: string): string {
+  const date = new Date().toISOString().split('T')[0]
+  return `${prefix}-${date}.${extension}`
+}
+
+/**
+ * Format duration from milliseconds to readable format
+ */
+export function formatDuration(duration: number): string {
+  const minutes = Math.floor(duration / 60000)
+  const seconds = Math.floor((duration % 60000) / 1000)
+  return `${minutes}m ${seconds}s`
+}
+
+/**
+ * Convert size in bytes with multiplier
+ */
+export function convertSizeWithMultiplier(value: number, multiplier: number): number {
+  return Math.floor(value * multiplier)
+}
+
+/**
+ * Get current ISO date string for export data
+ */
+export function getCurrentISODate(): string {
+  return new Date().toISOString()
+}
