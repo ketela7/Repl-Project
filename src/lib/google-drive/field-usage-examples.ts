@@ -109,19 +109,4 @@ export const API_ROUTE_OPTIMIZATIONS = {
   },
 }
 
-/**
- * Performance monitoring integration
- */
-export function logOptimizationBenefits() {
-  console.log('🚀 Google Drive API Field Optimization Benefits:')
-  console.log('📊 Data Transfer Reduction: ~70%')
-  console.log('⚡ Response Time Improvement: ~40-60%')
-  console.log('💰 API Quota Savings: ~50%')
-  console.log('🎯 Bandwidth Savings: ~65%')
-  console.log('')
-  console.log('Field Optimization Examples:')
-  Object.entries(UI_OPTIMIZATION_EXAMPLES).forEach(([name, fields]) => {
-    const fieldCount = fields.split(',').length
-    console.log(`  ${name}: ${fieldCount} fields instead of 50+`)
-  })
-}
+
