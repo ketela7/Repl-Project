@@ -108,6 +108,29 @@ module.exports = {
       }
     ],
 
+    // ASYNC STATE PROTECTION RULES - MENCEGAH RACE CONDITIONS
+    // Existing rules yang help prevent async state issues
+    'react-hooks/exhaustive-deps': 'error', // Prevent stale closures
+    'no-promise-executor-return': 'error', // Prevent promise issues
+    'require-atomic-updates': 'error', // Prevent race conditions in assignments
+    
+    // Custom patterns untuk detect async state issues
+    'no-restricted-syntax': [
+      'error',
+      {
+        'selector': 'CallExpression[callee.name=/^set[A-Z]/] + IfStatement',
+        'message': 'Avoid accessing state immediately after setState. Use functional updates or useRef pattern.'
+      },
+      {
+        'selector': 'CallExpression[callee.name="fetch"]:not([arguments.1.properties.*.key.name="signal"])',
+        'message': 'fetch() calls should include AbortController signal to prevent race conditions.'
+      },
+      {
+        'selector': 'VariableDeclarator[id.type="ArrayPattern"][init.callee.name="useState"][init.arguments.0.callee.name=/Set|Map/]:not(~ VariableDeclarator[init.callee.name="useRef"])',
+        'message': 'useState with Set/Map should have corresponding useRef for immediate access.'
+      }
+    ],
+
     // ACCESSIBILITY
     'jsx-a11y/alt-text': 'error',
     'jsx-a11y/anchor-has-content': 'error',

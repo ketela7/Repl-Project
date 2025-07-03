@@ -35,6 +35,10 @@ args = "Linter & Formatter"
 task = "workflow.run"
 args = "Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "ESLint Rules Test"
+
 
 
 
@@ -84,5 +88,13 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "ESLint Rules Test"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/test-eslint-rules.js"
 
 
