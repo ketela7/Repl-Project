@@ -80,15 +80,6 @@ export function DriveManager() {
   const [filteredItems, setFilteredItems] = useState<DriveItem[]>([])
   const [loading, setLoading] = useState(true)
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null)
-
-  // Debug effect to track items changes
-  useEffect(() => {
-    // // // // // console.log('[DriveManager] Items state changed:', items.length, 'items')
-    // // // // // console.log('[DriveManager] Current folder ID:', currentFolderId)
-    if (items.length > 0) {
-      // // // // // console.log('[DriveManager] First 3 items:', items.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
-    }
-  }, [items, currentFolderId])
   const [refreshing, setRefreshing] = useState(false)
   const [hasAccess, setHasAccess] = useState<boolean | null>(null)
   const [driveAccessError, setDriveAccessError] = useState<any>(null)
