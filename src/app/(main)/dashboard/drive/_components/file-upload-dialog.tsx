@@ -38,6 +38,7 @@ export function FileUploadDialog({
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -52,6 +53,9 @@ export function FileUploadDialog({
       toast.error('Please select a file to upload')
       return
     }
+
+    // Create new abort controller untuk upload
+    abortControllerRef.current = new AbortController()
 
     try {
       setUploading(true)
@@ -69,6 +73,7 @@ export function FileUploadDialog({
       const response = await fetch('/api/drive/files', {
         method: 'POST',
         body: formData,
+        signal: abortControllerRef.current.signal,
       })
 
       // Progress interval would be cleared here if implemented
@@ -94,7 +99,14 @@ export function FileUploadDialog({
       toast.success(`${result.name} uploaded successfully`)
       onUploadComplete()
       handleClose()
-    } catch (error) {
+    } catch (error: unknown) {
+      // Check if abort error (bukan real error)
+      if (error instanceof Error && error.name === 'AbortError') {
+        toast.info('Upload cancelled')
+        setUploadProgress(0)
+        return
+      }
+      
       // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
       }
@@ -106,6 +118,11 @@ export function FileUploadDialog({
   }
 
   const handleClose = () => {
+    // Cancel ongoing upload jika ada
+    if (abortControllerRef.current && uploading) {
+      abortControllerRef.current.abort()
+    }
+    
     if (!uploading) {
       setSelectedFile(null)
       setFileName('')
@@ -116,6 +133,14 @@ export function FileUploadDialog({
       }
       onClose()
     }
+  }
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    setUploading(false)
+    setUploadProgress(0)
   }
 
   return (

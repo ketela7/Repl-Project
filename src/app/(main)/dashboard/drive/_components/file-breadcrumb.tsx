@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, Fragment } from 'react'
+import { useState, useEffect, Fragment, useRef } from 'react'
 import { Home, Folder, ChevronRight, Loader2 } from 'lucide-react'
 
 import {
@@ -33,8 +33,17 @@ export function FileBreadcrumb({
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItemData[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const fetchFolderPath = async (folderId: string) => {
+    // Cancel previous request untuk prevent race condition
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Create new abort controller
+    abortControllerRef.current = new AbortController()
+    
     try {
       // // // // // console.log('[Breadcrumb] Starting fetchFolderPath for:', folderId)
       setLoading(true)
@@ -43,6 +52,7 @@ export function FileBreadcrumb({
       const response = await fetch(`/api/drive/files?fileId=${folderId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
+        signal: abortControllerRef.current.signal,
       })
 
       // // // // // console.log('[Breadcrumb] API Response status:', response.status)
@@ -146,8 +156,14 @@ export function FileBreadcrumb({
       // Reverse path items to show from root to current folder
       pathItems.reverse()
       // // // // // console.log('[Breadcrumb] Final items:', pathItems)
+      // Check if request was aborted
+      if (abortControllerRef.current?.signal.aborted) return
+      
       setBreadcrumbItems(pathItems)
-    } catch (error) {
+    } catch (error: unknown) {
+      // Check if abort error (bukan real error)
+      if (error instanceof Error && error.name === 'AbortError') return
+      
       // Log error for debugging in development only
       // // // // // console.error(`Error fetching folder path: ${folderId}`, error)
 
