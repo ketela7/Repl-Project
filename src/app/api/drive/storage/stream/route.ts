@@ -24,7 +24,7 @@ export async function GET() {
 
     // Setup Server-Sent Events stream
     const stream = new ReadableStream({
-      start(controller) {
+      async start(controller) {
         const encoder = new TextEncoder()
         let isStreamClosed = false
 
