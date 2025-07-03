@@ -223,7 +223,7 @@ export function ProgressiveStorageAnalytics() {
         typeof files.filesByType[0] === 'object' &&
         'type' in files.filesByType[0]
       ) {
-        return files.filesByType.slice(0, 5).map(item => ({
+        return files.filesByType.slice(0, 20).map(item => ({
           type: item.type?.split('/')[1] || item.type || 'unknown',
           count: item.count || 0,
           size: item.totalSize || 0,
@@ -232,7 +232,7 @@ export function ProgressiveStorageAnalytics() {
       }
 
       // If it's array of arrays from analysis_complete: [["mimeType", count]]
-      return files.filesByType.slice(0, 5).map(([mimeType, count]) => ({
+      return files.filesByType.slice(0, 20).map(([mimeType, count]) => ({
         type: mimeType?.split('/')[1] || mimeType || 'unknown',
         count: count || 0,
         size: files.fileSizesByType?.[mimeType] || 0,
@@ -243,7 +243,7 @@ export function ProgressiveStorageAnalytics() {
     // Fallback for object format
     return Object.entries(files.filesByType)
       .sort(([, a], [, b]) => (b as number) - (a as number))
-      .slice(0, 5)
+      .slice(0, 20)
       .map(([type, count]) => ({
         type: type.split('/')[1] || type,
         count: count as number,
@@ -421,7 +421,7 @@ export function ProgressiveStorageAnalytics() {
                       <p className="font-medium">{type}</p>
                       <p className="text-muted-foreground text-xs">{count} files</p>
                     </div>
-                    <span className="text-sm">{formatBytes(size)}</span>
+                    <span className="text-sm">{formatFileSize(size)}</span>
                   </div>
                 ))}
               </div>
@@ -454,7 +454,7 @@ export function ProgressiveStorageAnalytics() {
                       <p className="text-muted-foreground text-xs">{file.mimeType.split('/')[1]}</p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{formatBytes(file.size)}</span>
+                      <span className="text-sm font-medium">{formatFileSize(file.size)}</span>
                       <Badge variant="secondary">#{index + 1}</Badge>
                     </div>
                   </div>
