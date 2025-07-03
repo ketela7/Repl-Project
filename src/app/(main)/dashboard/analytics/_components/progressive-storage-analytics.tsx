@@ -19,12 +19,14 @@ interface QuotaData {
 interface FilesData {
   totalFiles: number
   totalSizeBytes?: number
-  filesByType: Array<{
-    mimeType: string
-    count: number
-    totalSize?: number
-    averageSize?: number
-  }> | Record<string, number>
+  filesByType:
+    | Array<{
+        mimeType: string
+        count: number
+        totalSize?: number
+        averageSize?: number
+      }>
+    | Record<string, number>
   fileSizesByType: Record<string, number>
   largestFiles: Array<{
     name: string
@@ -63,8 +65,10 @@ export function ProgressiveStorageAnalytics() {
   const [error, setError] = useState<string | null>(null)
   const [isComplete, setIsComplete] = useState(false)
 
-  const [connectionStatus, setConnectionStatus] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected')
-  
+  const [connectionStatus, setConnectionStatus] = useState<
+    'disconnected' | 'connecting' | 'connected'
+  >('disconnected')
+
   const eventSourceRef = useRef<EventSource | null>(null)
 
   const formatBytes = (bytes: number | string | undefined): string => {
@@ -76,7 +80,7 @@ export function ProgressiveStorageAnalytics() {
     } else if (typeof bytes === 'number') {
       numBytes = isNaN(bytes) ? 0 : bytes
     }
-    
+
     if (numBytes === 0) return '0 B'
     const k = 1024
     const sizes = ['B', 'KB', 'MB', 'GB', 'TB']
@@ -114,10 +118,10 @@ export function ProgressiveStorageAnalytics() {
       setConnectionStatus('connected')
     }
 
-    eventSource.onmessage = (event) => {
+    eventSource.onmessage = event => {
       try {
         const data = JSON.parse(event.data)
-        
+
         switch (data.type) {
           case 'progress':
             setProgress(data.data)
@@ -125,23 +129,23 @@ export function ProgressiveStorageAnalytics() {
               setIsComplete(true)
             }
             break
-            
+
           case 'quota_update':
             // Backend sends { user, quota }
             if (data.data.quota) {
               setQuota(data.data.quota)
             }
             break
-            
+
           case 'progress_update':
             // Real-time progress updates from backend
             setProgress({
               step: 'processing',
               message: `Processing files... ${data.data.totalProcessed} files analyzed`,
-              processed: data.data.totalProcessed
+              processed: data.data.totalProcessed,
             })
             break
-            
+
           case 'file_stats_update':
             // Real-time file statistics updates
             setFiles(prevFiles => ({
@@ -151,10 +155,10 @@ export function ProgressiveStorageAnalytics() {
               largestFiles: data.data.largestFiles || prevFiles?.largestFiles || [],
               fileSizesByType: prevFiles?.fileSizesByType || {},
               categories: prevFiles?.categories,
-              hasMore: false
+              hasMore: false,
             }))
             break
-            
+
           case 'analysis_complete':
             // Final comprehensive results
             setFiles({
@@ -164,23 +168,23 @@ export function ProgressiveStorageAnalytics() {
               fileSizesByType: Object.fromEntries(data.data.fileSizesByType || []),
               largestFiles: data.data.largestFiles || [],
               categories: data.data.categories,
-              hasMore: false
+              hasMore: false,
             })
             break
-            
+
           case 'complete':
             clearTimeout(timeoutId)
             setIsLoading(false)
             setIsComplete(true)
             setConnectionStatus('disconnected')
-            setProgress({ 
-              step: 'complete', 
+            setProgress({
+              step: 'complete',
               message: data.data.message || 'Analysis complete!',
-              processed: data.data.totalProcessed
+              processed: data.data.totalProcessed,
             })
             eventSource.close()
             break
-            
+
           case 'error':
             clearTimeout(timeoutId)
             setError(data.data.message)
@@ -222,32 +226,32 @@ export function ProgressiveStorageAnalytics() {
 
   const getTopFileTypes = () => {
     if (!files?.filesByType) return []
-    
+
     // Backend sends array format: [["mimeType", count], ["mimeType", count]]
     if (Array.isArray(files.filesByType)) {
       // If it's array of objects from file_stats_update
-      if (files.filesByType.length > 0 && typeof files.filesByType[0] === 'object' && 'type' in files.filesByType[0]) {
-        return files.filesByType
-          .slice(0, 5)
-          .map(item => ({
-            type: item.type?.split('/')[1] || item.type || 'unknown',
-            count: item.count || 0,
-            size: item.totalSize || 0,
-            averageSize: 0
-          }))
-      }
-      
-      // If it's array of arrays from analysis_complete: [["mimeType", count]]
-      return files.filesByType
-        .slice(0, 5)
-        .map(([mimeType, count]) => ({
-          type: mimeType?.split('/')[1] || mimeType || 'unknown',
-          count: count || 0,
-          size: files.fileSizesByType?.[mimeType] || 0,
-          averageSize: 0
+      if (
+        files.filesByType.length > 0 &&
+        typeof files.filesByType[0] === 'object' &&
+        'type' in files.filesByType[0]
+      ) {
+        return files.filesByType.slice(0, 5).map(item => ({
+          type: item.type?.split('/')[1] || item.type || 'unknown',
+          count: item.count || 0,
+          size: item.totalSize || 0,
+          averageSize: 0,
         }))
+      }
+
+      // If it's array of arrays from analysis_complete: [["mimeType", count]]
+      return files.filesByType.slice(0, 5).map(([mimeType, count]) => ({
+        type: mimeType?.split('/')[1] || mimeType || 'unknown',
+        count: count || 0,
+        size: files.fileSizesByType?.[mimeType] || 0,
+        averageSize: 0,
+      }))
     }
-    
+
     // Fallback for object format
     return Object.entries(files.filesByType)
       .sort(([, a], [, b]) => (b as number) - (a as number))
@@ -256,7 +260,7 @@ export function ProgressiveStorageAnalytics() {
         type: type.split('/')[1] || type,
         count: count as number,
         size: files.fileSizesByType?.[type] || 0,
-        averageSize: 0
+        averageSize: 0,
       }))
   }
 
@@ -268,19 +272,23 @@ export function ProgressiveStorageAnalytics() {
           <h2 className="text-2xl font-bold">Live Storage Analytics</h2>
           <p className="text-muted-foreground">Real-time analysis of your Google Drive</p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Badge variant={connectionStatus === 'connected' ? 'default' : 'secondary'}>
             {connectionStatus === 'connected' ? 'Live' : 'Offline'}
           </Badge>
-          
+
           {!isLoading ? (
             <Button onClick={startAnalysis} className="flex items-center gap-2">
               <Play className="h-4 w-4" />
               {isComplete ? 'Restart Analysis' : 'Start Analysis'}
             </Button>
           ) : (
-            <Button onClick={stopAnalysis} variant="destructive" className="flex items-center gap-2">
+            <Button
+              onClick={stopAnalysis}
+              variant="destructive"
+              className="flex items-center gap-2"
+            >
               <Pause className="h-4 w-4" />
               Stop
             </Button>
@@ -294,18 +302,14 @@ export function ProgressiveStorageAnalytics() {
           <CardContent className="pt-6">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">
-                  {progress?.message || 'Processing...'}
-                </span>
-                {isLoading && (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                )}
+                <span className="text-sm font-medium">{progress?.message || 'Processing...'}</span>
+                {isLoading && <RefreshCw className="h-4 w-4 animate-spin" />}
               </div>
-              
+
               {progress?.processed && (
                 <div className="space-y-1">
                   <Progress value={Math.min(100, (progress.processed / 10000) * 100)} />
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     {progress.processed.toLocaleString()} files processed
                   </p>
                 </div>
@@ -345,27 +349,23 @@ export function ProgressiveStorageAnalytics() {
                     <span>{formatBytes(quota.used)}</span>
                   </div>
                   <Progress value={quota.usagePercentage || 0} />
-                  <div className="flex justify-between text-xs text-muted-foreground">
+                  <div className="text-muted-foreground flex justify-between text-xs">
                     <span>{formatBytes(quota.usedInDrive)} in Drive</span>
                     <span>{quota.available ? formatBytes(quota.available) : '∞'} available</span>
                   </div>
                 </div>
               )}
-              
+
               {!quota.limit && (
-                <div className="text-center py-4">
+                <div className="py-4 text-center">
                   <p className="text-lg font-medium">Unlimited Storage</p>
-                  <p className="text-muted-foreground">
-                    Using {formatBytes(quota.used)} total
-                  </p>
+                  <p className="text-muted-foreground">Using {formatBytes(quota.used)} total</p>
                 </div>
               )}
             </div>
           </CardContent>
         </Card>
       )}
-
-
 
       {/* Files Statistics */}
       {files && (
@@ -389,11 +389,9 @@ export function ProgressiveStorageAnalytics() {
                 </div>
                 <div className="flex justify-between">
                   <span>Total Size</span>
-                  <span className="font-medium">
-                    {formatBytes(files.totalSizeBytes || 0)}
-                  </span>
+                  <span className="font-medium">{formatBytes(files.totalSizeBytes || 0)}</span>
                 </div>
-                
+
                 {/* File Categories */}
                 {files.categories && (
                   <div className="space-y-2 border-t pt-3">
@@ -458,7 +456,7 @@ export function ProgressiveStorageAnalytics() {
                   <div key={type} className="flex items-center justify-between">
                     <div>
                       <p className="font-medium">{type}</p>
-                      <p className="text-xs text-muted-foreground">{count} files</p>
+                      <p className="text-muted-foreground text-xs">{count} files</p>
                     </div>
                     <span className="text-sm">{formatBytes(size)}</span>
                   </div>
@@ -474,20 +472,23 @@ export function ProgressiveStorageAnalytics() {
         <Card>
           <CardHeader>
             <CardTitle>Largest Files</CardTitle>
-            <CardDescription>Top {files.largestFiles.length} largest files in your Drive</CardDescription>
+            <CardDescription>
+              Top {files.largestFiles.length} largest files in your Drive
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ScrollArea className="h-64">
               <div className="space-y-2">
                 {files.largestFiles.map((file, index) => (
-                  <div key={file.id} className="flex items-center justify-between rounded-lg border p-3">
+                  <div
+                    key={file.id}
+                    className="flex items-center justify-between rounded-lg border p-3"
+                  >
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium" title={file.name}>
                         {file.name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
-                        {file.mimeType.split('/')[1]}
-                      </p>
+                      <p className="text-muted-foreground text-xs">{file.mimeType.split('/')[1]}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium">{formatBytes(file.size)}</span>

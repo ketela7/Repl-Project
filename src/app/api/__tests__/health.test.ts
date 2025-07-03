@@ -1,4 +1,3 @@
-
 import { GET } from '../health/route'
 
 describe('/api/health', () => {
@@ -10,7 +9,7 @@ describe('/api/health', () => {
     expect(data).toEqual({
       status: 'healthy',
       timestamp: expect.any(String),
-      uptime: expect.any(Number)
+      uptime: expect.any(Number),
     })
   })
 

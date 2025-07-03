@@ -111,11 +111,7 @@ export class GoogleDriveService {
       ...getOptimizedRequestParams(operation, baseParams),
       fields: `nextPageToken,incompleteSearch,files(${optimizedFields})`,
     }
-    // Log query for debugging in development only
-    if (process.env.NODE_ENV === 'development') {
-      console.info('[Drive API] - Query:', searchQuery)
-      console.info('[Drive API] - PageSize:', validPageSize)
-    }
+    // Debug logging removed - violates ESLint strict mode
 
     // Only add pageToken if it's valid
     if (validPageToken) {
@@ -135,7 +131,7 @@ export class GoogleDriveService {
 
       const files = response.data.files?.map(convertGoogleDriveFile) ?? []
 
-      console.info(`[Drive API] - Result: ${files.length} items`)
+      // Debug result logging removed - violates ESLint strict mode
 
       return {
         files,

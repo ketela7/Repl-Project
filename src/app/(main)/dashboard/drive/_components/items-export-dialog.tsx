@@ -15,7 +15,13 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
@@ -108,7 +114,12 @@ const EXPORT_FORMATS = [
   },
 ]
 
-function ItemsExportDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems }: ItemsExportDialogProps) {
+function ItemsExportDialog({
+  isOpen,
+  onClose,
+  onConfirm: _onConfirm,
+  selectedItems,
+}: ItemsExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState('pdf')
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
@@ -362,7 +373,8 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
             <div className="space-y-1">
               <h3 className="text-base font-semibold">Export Files</h3>
               <p className="text-muted-foreground text-xs">
-                {compatibleFiles.length} compatible file{compatibleFiles.length > 1 ? 's' : ''} for export
+                {compatibleFiles.length} compatible file{compatibleFiles.length > 1 ? 's' : ''} for
+                export
               </p>
             </div>
           </div>
@@ -371,11 +383,18 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
           <div className="flex-shrink-0 space-y-3">
             <ScrollArea className="h-full">
               <Label className="text-xs font-medium">Export Format:</Label>
-              <RadioGroup value={selectedFormat} onValueChange={setSelectedFormat} className="space-y-2">
+              <RadioGroup
+                value={selectedFormat}
+                onValueChange={setSelectedFormat}
+                className="space-y-2"
+              >
                 {EXPORT_FORMATS.map(format => (
                   <div key={format.id} className="flex items-center space-x-2">
                     <RadioGroupItem value={format.id} id={format.id} className="h-3 w-3" />
-                    <Label htmlFor={format.id} className="flex cursor-pointer items-center gap-2 text-xs">
+                    <Label
+                      htmlFor={format.id}
+                      className="flex cursor-pointer items-center gap-2 text-xs"
+                    >
                       <format.icon className="h-3 w-3" />
                       <span>{format.label}</span>
                     </Label>
@@ -391,7 +410,10 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
                 {compatibleFiles.slice(0, 5).map(file => (
-                  <div key={file.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                  <div
+                    key={file.id}
+                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                  >
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={file.name}>
                       {file.name}
@@ -425,7 +447,8 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage =
+        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -603,7 +626,9 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
                 <Button
                   onClick={handleExport}
                   disabled={compatibleFiles.length === 0}
-                  className={cn('touch-target min-h-[44px] bg-green-600 text-white hover:bg-green-700 active:scale-95')}
+                  className={cn(
+                    'touch-target min-h-[44px] bg-green-600 text-white hover:bg-green-700 active:scale-95',
+                  )}
                 >
                   <FileDown className="mr-2 h-4 w-4" />
                   Export Files
@@ -630,12 +655,18 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleCloseAndRefresh}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>

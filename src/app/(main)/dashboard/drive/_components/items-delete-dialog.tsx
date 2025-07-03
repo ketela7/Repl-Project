@@ -11,7 +11,13 @@ import {
   BottomSheetTitle,
   BottomSheetFooter,
 } from '@/components/ui/bottom-sheet'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
@@ -33,7 +39,7 @@ interface ItemsDeleteDialogProps {
   }>
 }
 
-function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedItems }: ItemsDeleteDialogProps) {
+function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsDeleteDialogProps) {
   const [confirmationText, setConfirmationText] = useState('')
   const [acknowledgeWarning, setAcknowledgeWarning] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -63,7 +69,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
   const fileCount = selectedItems.filter(item => !item.isFolder).length
   const folderCount = selectedItems.filter(item => item.isFolder).length
 
-  const isConfirmationValid = (confirmationText as string).trim() === 'CONFIRM DELETE' && acknowledgeWarning
+  const isConfirmationValid =
+    (confirmationText as string).trim() === 'CONFIRM DELETE' && acknowledgeWarning
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -243,7 +250,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
             <div className="space-y-1">
               <h3 className="text-base font-semibold text-red-600">Delete Permanently</h3>
               <p className="text-muted-foreground text-xs">
-                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} will be permanently deleted
+                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} will be permanently
+                deleted
               </p>
             </div>
           </div>
@@ -251,12 +259,18 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
           {/* Stats - Compact */}
           <div className="flex flex-shrink-0 justify-center gap-1">
             {fileCount > 0 && (
-              <Badge variant="secondary" className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100">
+              <Badge
+                variant="secondary"
+                className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100"
+              >
                 {fileCount} file{fileCount > 1 ? 's' : ''}
               </Badge>
             )}
             {folderCount > 0 && (
-              <Badge variant="secondary" className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100">
+              <Badge
+                variant="secondary"
+                className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100"
+              >
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
@@ -279,7 +293,10 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
             <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
               <div className="space-y-1 p-2">
                 {selectedItems.slice(0, 5).map(item => (
-                  <div key={item.id} className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2">
+                  <div
+                    key={item.id}
+                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                  >
                     <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-500" />
                     <span className="flex-1 truncate font-mono text-xs" title={item.name}>
                       {item.name}
@@ -301,7 +318,9 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
           {/* Confirmation Form */}
           <div className="flex-shrink-0 space-y-3">
             <div className="space-y-2">
-              <Label className="text-xs font-medium">Type &quot;CONFIRM DELETE&quot; to proceed:</Label>
+              <Label className="text-xs font-medium">
+                Type &quot;CONFIRM DELETE&quot; to proceed:
+              </Label>
               <Input
                 value={confirmationText}
                 onChange={e => setConfirmationText(e.target.value)}
@@ -327,7 +346,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage = progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
+      const progressPercentage =
+        progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0
 
       return (
         <div className="space-y-4">
@@ -490,7 +510,9 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
               </div>
               <div>
                 <div className="text-lg font-semibold">Delete Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Permanent deletion operation</div>
+                <div className="text-muted-foreground text-sm font-normal">
+                  Permanent deletion operation
+                </div>
               </div>
             </BottomSheetTitle>
           </BottomSheetHeader>
@@ -503,7 +525,9 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
                 <Button
                   onClick={handleDelete}
                   disabled={!isConfirmationValid}
-                  className={cn('touch-target min-h-[44px] bg-red-600 text-white hover:bg-red-700 active:scale-95')}
+                  className={cn(
+                    'touch-target min-h-[44px] bg-red-600 text-white hover:bg-red-700 active:scale-95',
+                  )}
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Delete Items
@@ -530,12 +554,18 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
             {isCompleted && (
               <>
                 {progress.success > 0 || progress.failed > 0 ? (
-                  <Button onClick={handleCloseAndRefresh} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleCloseAndRefresh}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Refresh Now
                   </Button>
                 ) : (
-                  <Button onClick={handleClose} className={cn('touch-target min-h-[44px] active:scale-95')}>
+                  <Button
+                    onClick={handleClose}
+                    className={cn('touch-target min-h-[44px] active:scale-95')}
+                  >
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Close
                   </Button>
@@ -567,7 +597,9 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm: _onConfirm, selectedIte
             </div>
             <div>
               <div className="text-lg font-semibold">Delete Items</div>
-              <div className="text-muted-foreground text-sm font-normal">Permanent deletion operation</div>
+              <div className="text-muted-foreground text-sm font-normal">
+                Permanent deletion operation
+              </div>
             </div>
           </DialogTitle>
         </DialogHeader>

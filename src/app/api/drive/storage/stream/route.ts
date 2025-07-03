@@ -99,7 +99,10 @@ export async function GET() {
             do {
               try {
                 // Use service function with retry + throttle built-in
-                const listOptions: any = {
+                const listOptions: {
+                  fields: string
+                  pageToken?: string
+                } = {
                   fields: 'nextPageToken,files(name,mimeType,size)',
                 }
                 

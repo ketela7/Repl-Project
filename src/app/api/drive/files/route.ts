@@ -45,7 +45,9 @@ function buildDriveQuery(filters: FileFilter): string {
     case 'recent':
       // Recent view - recently modified files on 30 days ago
       //conditions.push('trashed=false')
-      conditions.push(`modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`)
+      conditions.push(
+        `modifiedTime > '${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()}'`,
+      )
     //break
     //case 'all':
     //default:
@@ -244,11 +246,15 @@ function buildDriveQuery(filters: FileFilter): string {
             break
 
           case 'calendar':
-            typeConditions.push(`(${["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ')})`)
+            typeConditions.push(
+              `(${["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ')})`,
+            )
             break
 
           case 'contact':
-            typeConditions.push(`(${["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ')})`)
+            typeConditions.push(
+              `(${["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ')})`,
+            )
             break
 
           case 'other':
@@ -343,7 +349,12 @@ export async function GET(request: NextRequest) {
 
     // If fileId is provided, return single file metadata (used by breadcrumb)
     if (fileId) {
-      const fileMetadata = await driveService!.getFileMetadata(fileId, ['id', 'name', 'parents', 'mimeType'])
+      const fileMetadata = await driveService!.getFileMetadata(fileId, [
+        'id',
+        'name',
+        'parents',
+        'mimeType',
+      ])
 
       // Ensure id is always included in response
       const response = {
@@ -424,11 +435,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(cachedData)
     }
 
-    // // // // // console.log('[Drive API] Request details:', {
-    //   folderId,
-    //   viewStatus: filters.viewStatus,
-    //   query,
-    // })
+    // Drive API request processing
 
     // Pass the complete query to the Drive service
     const result = await driveService!.listFiles({
@@ -443,7 +450,7 @@ export async function GET(request: NextRequest) {
       const sizeMin = filters.sizeMin ? Number(filters.sizeMin) : 0
       const sizeMax = filters.sizeMax ? Number(filters.sizeMax) : Number.MAX_SAFE_INTEGER
 
-      result.files = result.files.filter((file: any) => {
+      result.files = result.files.filter((file: { size?: string | number }) => {
         const fileSize = file.size ? Number(file.size) : 0
         return fileSize >= sizeMin && fileSize <= sizeMax
       })
@@ -452,11 +459,12 @@ export async function GET(request: NextRequest) {
     driveCache.set(cacheKey, result)
 
     return NextResponse.json(result)
-  } catch (error: any) {
-    //// // // // // console.error('Drive API Error:', error)
+  } catch (error: unknown) {
+    // Error logging removed - violates ESLint strict mode
 
     // Handle authentication errors
-    if (error.name === 'AuthenticationError' || error.code === 401) {
+    const errorObj = error as { name?: string; code?: number }
+    if (errorObj.name === 'AuthenticationError' || errorObj.code === 401) {
       return NextResponse.json(
         {
           error: 'Authentication expired',

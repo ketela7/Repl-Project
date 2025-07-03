@@ -70,14 +70,17 @@ describe('Error Handler', () => {
       expect(result.data).toBeNull()
     })
 
-    it('should log errors based on severity', () => {
+    it('should handle errors based on severity without console logging', () => {
       const highSeverityError = new AppError('High severity', 500, ErrorSeverity.HIGH)
-      handleError(highSeverityError)
+      const result = handleError(highSeverityError)
 
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[HIGH]'),
-        expect.stringContaining('High severity'),
-      )
+      expect(result.success).toBe(false)
+      expect(result.error).toBe('High severity')
+      expect(result.statusCode).toBe(500)
+      expect(result.data).toBeNull()
+
+      // Console logging removed to comply with ESLint strict mode
+      expect(consoleSpy).not.toHaveBeenCalled()
     })
   })
 })

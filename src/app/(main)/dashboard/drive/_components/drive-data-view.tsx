@@ -19,12 +19,24 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { FileIcon } from '@/components/file-icon'
 import { FileThumbnailPreview } from '@/components/ui/file-thumbnail-preview'
 import { useTimezone } from '@/lib/hooks/use-timezone'
 import { formatFileTime } from '@/lib/utils'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import { toast } from 'sonner'
 import type { DriveFile, DriveFolder } from '@/lib/google-drive/types'
@@ -314,7 +326,10 @@ export function DriveDataView({
                       mimeType={item.mimeType}
                       modifiedTime={item.modifiedTime}
                     >
-                      <FileIcon mimeType={item.mimeType} className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8" />
+                      <FileIcon
+                        mimeType={item.mimeType}
+                        className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8"
+                      />
                     </FileThumbnailPreview>
                   </div>
                   <div onClick={e => e.stopPropagation()}>{renderContent(item)}</div>
@@ -348,7 +363,9 @@ export function DriveDataView({
                     <div className="flex items-center space-x-1">
                       <span>{label}</span>
                       {sortConfig?.key === key && (
-                        <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
+                        <span className="text-xs">
+                          {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                        </span>
                       )}
                     </div>
                   </TableHead>
@@ -365,7 +382,10 @@ export function DriveDataView({
                 >
                   {isSelectMode && (
                     <TableCell onClick={e => e.stopPropagation()}>
-                      <Checkbox checked={selectedItems.has(item.id)} onCheckedChange={() => onSelectItem(item.id)} />
+                      <Checkbox
+                        checked={selectedItems.has(item.id)}
+                        onCheckedChange={() => onSelectItem(item.id)}
+                      />
                     </TableCell>
                   )}
                   {visibleColumns.name && (
@@ -436,7 +456,10 @@ export function DriveDataView({
                     </CopyableCell>
                   )}
                   {visibleColumns.modifiedTime && (
-                    <CopyableCell value={formatFileTime(item.modifiedTime, effectiveTimezone)} label="Modified time">
+                    <CopyableCell
+                      value={formatFileTime(item.modifiedTime, effectiveTimezone)}
+                      label="Modified time"
+                    >
                       <span className="text-muted-foreground text-sm">
                         {formatFileTime(item.modifiedTime, effectiveTimezone)}
                       </span>
@@ -444,11 +467,15 @@ export function DriveDataView({
                   )}
                   {visibleColumns.createdTime && (
                     <CopyableCell
-                      value={item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}
+                      value={
+                        item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'
+                      }
                       label="Created time"
                     >
                       <span className="text-muted-foreground text-sm">
-                        {item.createdTime ? formatFileTime(item.createdTime, effectiveTimezone) : '—'}
+                        {item.createdTime
+                          ? formatFileTime(item.createdTime, effectiveTimezone)
+                          : '—'}
                       </span>
                     </CopyableCell>
                   )}

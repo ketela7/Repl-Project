@@ -1,4 +1,10 @@
-import { formatFileSize, getFileExtension, isImageFile, isVideoFile, getFileTypeCategory } from '../utils'
+import {
+  formatFileSize,
+  getFileExtension,
+  isImageFile,
+  isVideoFile,
+  getFileTypeCategory,
+} from '../utils'
 
 describe('Google Drive Utils', () => {
   describe('formatFileSize', () => {

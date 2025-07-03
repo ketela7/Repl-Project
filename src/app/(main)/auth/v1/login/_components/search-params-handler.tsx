@@ -1,8 +1,6 @@
 'use client'
 
-
 import { useSearchParams } from 'next/navigation'
-
 
 interface SearchParamsHandlerProps {
   children: (isReauth: boolean) => ReactNode

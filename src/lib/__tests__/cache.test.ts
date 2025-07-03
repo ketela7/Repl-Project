@@ -1,4 +1,3 @@
-
 import { driveCache as cache } from '../cache'
 
 describe('Cache', () => {
@@ -25,13 +24,13 @@ describe('Cache', () => {
   it('should handle cache expiration', async () => {
     const key = 'expiring-key'
     const value = 'expiring-value'
-    const ttl = 100 // 100ms
+    const ttl = 0.05 // 50ms in the < 1 range for milliseconds
 
     cache.set(key, value, ttl)
     expect(cache.get(key)).toBe(value)
 
-    // Wait for expiration
-    await new Promise(resolve => setTimeout(resolve, 150))
+    // Wait for expiration with sufficient buffer
+    await new Promise(resolve => setTimeout(resolve, 100))
     expect(cache.get(key)).toBeUndefined()
   })
 

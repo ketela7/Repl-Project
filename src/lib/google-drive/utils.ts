@@ -9,8 +9,11 @@ export function formatFileSize(bytes: string | number): string {
 
   const units = ['B', 'KB', 'MB', 'GB', 'TB']
   const i = Math.floor(Math.log(size) / Math.log(1024))
+  const value = size / Math.pow(1024, i)
 
-  return `${(size / Math.pow(1024, i)).toFixed(1)} ${units[i]}`
+  // For bytes, don't show decimal places; for larger units, show 1 decimal place
+  const formatted = i === 0 ? Math.round(value) : value.toFixed(1)
+  return `${formatted} ${units[i]}`
 }
 
 export function getFileExtension(fileName: string): string {
@@ -51,11 +54,13 @@ export function getFileTypeCategory(fileName: string, mimeType?: string): string
   const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv']
   const audioExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma']
   const documentExtensions = ['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'ppt', 'pptx']
+  const archiveExtensions = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'dmg', 'iso']
 
   if (imageExtensions.includes(extension)) return 'image'
   if (videoExtensions.includes(extension)) return 'video'
   if (audioExtensions.includes(extension)) return 'audio'
   if (documentExtensions.includes(extension)) return 'document'
+  if (archiveExtensions.includes(extension)) return 'archive'
   
   return 'other'
 }

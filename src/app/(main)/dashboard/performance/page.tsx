@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -34,7 +33,7 @@ export default function PerformancePage() {
 
   useEffect(() => {
     refreshMetrics()
-    
+
     // Auto refresh every 5 seconds
     const interval = setInterval(refreshMetrics, 5000)
     return () => clearInterval(interval)
@@ -94,9 +93,9 @@ export default function PerformancePage() {
       FCP: 3000,
       CLS: 0.25,
       TTFB: 1800,
-      INP: 500
+      INP: 500,
     }
-    
+
     const maxValue = thresholds[name as keyof typeof thresholds] || 1000
     return Math.min((value / maxValue) * 100, 100)
   }
@@ -104,21 +103,21 @@ export default function PerformancePage() {
   if (isLoading) {
     return (
       <div className="container mx-auto p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold">Performance Dashboard</h1>
             <p className="text-muted-foreground">Web Vitals monitoring and metrics</p>
           </div>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3, 4, 5].map((i) => (
+          {[1, 2, 3, 4, 5].map(i => (
             <Card key={i}>
               <CardHeader className="animate-pulse">
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 w-1/2 rounded bg-gray-200"></div>
               </CardHeader>
               <CardContent className="animate-pulse">
-                <div className="h-8 bg-gray-200 rounded mb-2"></div>
-                <div className="h-2 bg-gray-200 rounded"></div>
+                <div className="mb-2 h-8 rounded bg-gray-200"></div>
+                <div className="h-2 rounded bg-gray-200"></div>
               </CardContent>
             </Card>
           ))}
@@ -129,7 +128,7 @@ export default function PerformancePage() {
 
   return (
     <div className="container mx-auto p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Performance Dashboard</h1>
           <p className="text-muted-foreground">Real-time Web Vitals monitoring</p>
@@ -139,7 +138,7 @@ export default function PerformancePage() {
             Refresh
           </Button>
           <Button onClick={downloadMetrics} variant="outline">
-            <Download className="h-4 w-4 mr-2" />
+            <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
         </div>
@@ -147,9 +146,9 @@ export default function PerformancePage() {
 
       {Object.keys(metrics).length === 0 ? (
         <Card>
-          <CardContent className="text-center py-12">
-            <Activity className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">No Performance Data</h3>
+          <CardContent className="py-12 text-center">
+            <Activity className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+            <h3 className="mb-2 text-lg font-semibold">No Performance Data</h3>
             <p className="text-muted-foreground">
               Navigate around the app to generate web vitals metrics
             </p>
@@ -160,7 +159,7 @@ export default function PerformancePage() {
           {Object.entries(metrics).map(([metricName, data]) => (
             <Card key={metricName}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium flex items-center gap-2">
+                <CardTitle className="flex items-center gap-2 text-sm font-medium">
                   {getMetricIcon(metricName)}
                   {metricName}
                 </CardTitle>
@@ -169,28 +168,27 @@ export default function PerformancePage() {
                 </Badge>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold mb-2">
-                  {data.latest.value < 1 
-                    ? data.latest.value.toFixed(3) 
-                    : Math.round(data.latest.value)
-                  }
+                <div className="mb-2 text-2xl font-bold">
+                  {data.latest.value < 1
+                    ? data.latest.value.toFixed(3)
+                    : Math.round(data.latest.value)}
                   {metricName === 'CLS' ? '' : 'ms'}
                 </div>
-                <Progress 
-                  value={getProgressValue(metricName, data.latest.value)} 
+                <Progress
+                  value={getProgressValue(metricName, data.latest.value)}
                   className={`mb-2 ${getRatingColor(data.latest.rating)}`}
                 />
-                <div className="flex justify-between text-xs text-muted-foreground">
+                <div className="text-muted-foreground flex justify-between text-xs">
                   <span>Samples: {data.count}</span>
                   <span>
-                    Avg: {data.averageValue < 1 
-                      ? data.averageValue.toFixed(3) 
-                      : Math.round(data.averageValue)
-                    }
+                    Avg:{' '}
+                    {data.averageValue < 1
+                      ? data.averageValue.toFixed(3)
+                      : Math.round(data.averageValue)}
                     {metricName === 'CLS' ? '' : 'ms'}
                   </span>
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">
+                <div className="text-muted-foreground mt-1 text-xs">
                   Last: {new Date(data.latest.timestamp).toLocaleTimeString()}
                 </div>
               </CardContent>
@@ -206,38 +204,38 @@ export default function PerformancePage() {
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-2">
             <div>
-              <h4 className="font-semibold flex items-center gap-2 mb-2">
+              <h4 className="mb-2 flex items-center gap-2 font-semibold">
                 <Eye className="h-4 w-4" />
                 LCP - Largest Contentful Paint
               </h4>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Time to render the largest visible element (Good: &lt;2.5s)
               </p>
             </div>
             <div>
-              <h4 className="font-semibold flex items-center gap-2 mb-2">
+              <h4 className="mb-2 flex items-center gap-2 font-semibold">
                 <Zap className="h-4 w-4" />
                 FCP - First Contentful Paint
               </h4>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Time to first visible content (Good: &lt;1.8s)
               </p>
             </div>
             <div>
-              <h4 className="font-semibold flex items-center gap-2 mb-2">
+              <h4 className="mb-2 flex items-center gap-2 font-semibold">
                 <Activity className="h-4 w-4" />
                 CLS - Cumulative Layout Shift
               </h4>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Visual stability score (Good: &lt;0.1)
               </p>
             </div>
             <div>
-              <h4 className="font-semibold flex items-center gap-2 mb-2">
+              <h4 className="mb-2 flex items-center gap-2 font-semibold">
                 <Gauge className="h-4 w-4" />
                 INP - Interaction to Next Paint
               </h4>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Response time to user interactions (Good: &lt;200ms)
               </p>
             </div>
