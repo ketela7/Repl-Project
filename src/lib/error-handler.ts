@@ -1,6 +1,7 @@
 /**
  * Error handling for Google Drive API
  * Provides retry, fallback, and user-friendly error messages
+ * Based on official Google Drive API error handling documentation
  */
 
 import { toast } from 'sonner'
@@ -12,7 +13,76 @@ export interface DriveError {
   retryable: boolean
   userMessage: string
   action?: 'retry' | 'reconnect' | 'refresh' | 'none'
+  reason?: string
+  domain?: string
+  location?: string
+  locationType?: string
 }
+
+/**
+ * Google Drive API Error Reasons based on official documentation
+ */
+export const DRIVE_ERROR_REASONS = {
+  // Authentication errors (401)
+  AUTH_ERROR: 'authError',
+  FILE_NOT_DOWNLOADABLE: 'fileNotDownloadable',
+  
+  // Authorization errors (403)
+  ACTIVE_ITEM_CREATION_LIMIT_EXCEEDED: 'activeItemCreationLimitExceeded',
+  APP_NOT_AUTHORIZED_TO_FILE: 'appNotAuthorizedToFile',
+  CANNOT_MODIFY_INHERITED_TEAM_DRIVE_PERMISSION: 'cannotModifyInheritedTeamDrivePermission',
+  DAILY_LIMIT_EXCEEDED: 'dailyLimitExceeded',
+  DOMAIN_POLICY: 'domainPolicy',
+  FILE_OWNER_NOT_MEMBER_OF_TEAM_DRIVE: 'fileOwnerNotMemberOfTeamDrive',
+  FILE_WRITER_TEAM_DRIVE_MOVE_IN_DISABLED: 'fileWriterTeamDriveMoveInDisabled',
+  INSUFFICIENT_FILE_PERMISSIONS: 'insufficientFilePermissions',
+  MY_DRIVE_HIERARCHY_DEPTH_LIMIT_EXCEEDED: 'myDriveHierarchyDepthLimitExceeded',
+  NUM_CHILDREN_IN_NON_ROOT_LIMIT_EXCEEDED: 'numChildrenInNonRootLimitExceeded',
+  RATE_LIMIT_EXCEEDED: 'rateLimitExceeded',
+  SHARING_RATE_LIMIT_EXCEEDED: 'sharingRateLimitExceeded',
+  STORAGE_QUOTA_EXCEEDED: 'storageQuotaExceeded',
+  TEAM_DRIVE_FILE_LIMIT_EXCEEDED: 'teamDriveFileLimitExceeded',
+  TEAM_DRIVE_HIERARCHY_TOO_DEEP: 'teamDriveHierarchyTooDeep',
+  TEAM_DRIVE_MEMBERSHIP_REQUIRED: 'teamDriveMembershipRequired',
+  TEAM_DRIVES_FOLDER_MOVE_IN_NOT_SUPPORTED: 'teamDrivesFolderMoveInNotSupported',
+  TEAM_DRIVES_PARENT_LIMIT: 'teamDrivesParentLimit',
+  URL_LEASE_LIMIT_EXCEEDED: 'UrlLeaseLimitExceeded',
+  USER_RATE_LIMIT_EXCEEDED: 'userRateLimitExceeded',
+  
+  // Client errors (400)
+  BAD_REQUEST: 'badRequest',
+  INVALID_SHARING_REQUEST: 'invalidSharingRequest',
+  
+  // Not found errors (404)
+  NOT_FOUND: 'notFound',
+  
+  // Server errors (5xx)
+  BACKEND_ERROR: 'backendError',
+  INTERNAL_ERROR: 'internalError',
+  SERVICE_UNAVAILABLE: 'serviceUnavailable',
+  TIMEOUT: 'timeout'
+} as const
+
+export type DriveErrorReason = typeof DRIVE_ERROR_REASONS[keyof typeof DRIVE_ERROR_REASONS]
+
+/**
+ * Status codes that should be retried according to Google Drive API documentation
+ */
+export const RETRYABLE_STATUS_CODES = [429, 500, 502, 503, 504] as const
+
+/**
+ * Error reasons that should be retried according to Google Drive API documentation
+ */
+export const RETRYABLE_ERROR_REASONS = [
+  DRIVE_ERROR_REASONS.RATE_LIMIT_EXCEEDED,
+  DRIVE_ERROR_REASONS.SHARING_RATE_LIMIT_EXCEEDED,
+  DRIVE_ERROR_REASONS.USER_RATE_LIMIT_EXCEEDED,
+  DRIVE_ERROR_REASONS.BACKEND_ERROR,
+  DRIVE_ERROR_REASONS.INTERNAL_ERROR,
+  DRIVE_ERROR_REASONS.SERVICE_UNAVAILABLE,
+  DRIVE_ERROR_REASONS.TIMEOUT,
+  DRIVE_ERROR_REASONS.ACTIVE_ITEM_CREATION_LIMIT_EXCEEDED
+] as const
 
 class ErrorHandler {
   private errorCounts = new Map<string, number>()
@@ -42,17 +112,30 @@ class ErrorHandler {
     return this.classifyError(errorCode, status, retryable)
   }
 
+  /**
+   * Extract Google Drive API error details according to official documentation
+   */
   private extractErrorCode(error: unknown): string {
     if (typeof error === 'string') return 'UNKNOWN_STRING_ERROR'
     if (!error || typeof error !== 'object') return 'UNKNOWN_ERROR'
 
     const err = error as any
     
-    // Google API specific error codes
+    // Google Drive API error structure: { error: { errors: [{ reason: "...", domain: "...", message: "..." }], code: 403, message: "..." } }
+    if (err.error?.errors?.length > 0) {
+      const firstError = err.error.errors[0]
+      if (firstError.reason) {
+        return firstError.reason
+      }
+    }
+    
+    // Direct Google API error codes
     if (err.code) return err.code
     if (err.error?.code) return err.error.code
     if (err.response?.status) return `HTTP_${err.response.status}`
     if (err.status) return `HTTP_${err.status}`
+    
+    // Parse from message for fallback
     if (err.message?.includes('403')) return 'FORBIDDEN'
     if (err.message?.includes('401')) return 'UNAUTHORIZED'
     if (err.message?.includes('429')) return 'QUOTA_EXCEEDED'
@@ -66,9 +149,22 @@ class ErrorHandler {
     if (currentCount >= this.MAX_RETRY_COUNT) return false
 
     const errorCode = this.extractErrorCode(error)
-    const retryableCodes = [
+    const status = (error as any)?.response?.status || (error as any)?.status || (error as any)?.error?.code || 0
+
+    // Check if status code is retryable according to Google Drive API documentation
+    if (RETRYABLE_STATUS_CODES.includes(status)) {
+      return true
+    }
+
+    // Check if error reason is retryable according to Google Drive API documentation
+    const retryableReasons = RETRYABLE_ERROR_REASONS as readonly string[]
+    if (retryableReasons.includes(errorCode)) {
+      return true
+    }
+
+    // Legacy retryable codes for backward compatibility
+    const legacyRetryableCodes = [
       'QUOTA_EXCEEDED',
-      'RATE_LIMIT_EXCEEDED',
       'INTERNAL_ERROR',
       'BACKEND_ERROR',
       'SERVICE_UNAVAILABLE',
@@ -79,11 +175,141 @@ class ErrorHandler {
       'HTTP_504'
     ]
 
-    return retryableCodes.includes(errorCode)
+    return legacyRetryableCodes.includes(errorCode)
   }
 
   private classifyError(code: string, status: number, retryable: boolean): DriveError {
+    // Comprehensive Google Drive API error handling based on official documentation
     const errorMap: Record<string, Omit<DriveError, 'code' | 'retryable'>> = {
+      // Authentication errors (401)
+      [DRIVE_ERROR_REASONS.AUTH_ERROR]: {
+        message: 'Invalid authentication credentials',
+        status: 401,
+        userMessage: 'Please sign in to access your Google Drive',
+        action: 'reconnect'
+      },
+      [DRIVE_ERROR_REASONS.FILE_NOT_DOWNLOADABLE]: {
+        message: 'File cannot be downloaded',
+        status: 401,
+        userMessage: 'This file cannot be downloaded. Check your permissions',
+        action: 'none'
+      },
+      
+      // Rate limiting errors (403)
+      [DRIVE_ERROR_REASONS.RATE_LIMIT_EXCEEDED]: {
+        message: 'Rate limit exceeded',
+        status: 403,
+        userMessage: 'Too many requests. Please wait and try again',
+        action: 'retry'
+      },
+      [DRIVE_ERROR_REASONS.SHARING_RATE_LIMIT_EXCEEDED]: {
+        message: 'Sharing rate limit exceeded',
+        status: 403,
+        userMessage: 'Too many sharing requests. Please wait and try again',
+        action: 'retry'
+      },
+      [DRIVE_ERROR_REASONS.USER_RATE_LIMIT_EXCEEDED]: {
+        message: 'User rate limit exceeded',
+        status: 403,
+        userMessage: 'Too many requests per user. Please wait and try again',
+        action: 'retry'
+      },
+      [DRIVE_ERROR_REASONS.DAILY_LIMIT_EXCEEDED]: {
+        message: 'Daily API limit exceeded',
+        status: 403,
+        userMessage: 'Daily API quota exceeded. Please try again tomorrow',
+        action: 'none'
+      },
+      
+      // Permission errors (403)
+      [DRIVE_ERROR_REASONS.INSUFFICIENT_FILE_PERMISSIONS]: {
+        message: 'Insufficient file permissions',
+        status: 403,
+        userMessage: 'You do not have permission to access this file',
+        action: 'reconnect'
+      },
+      [DRIVE_ERROR_REASONS.APP_NOT_AUTHORIZED_TO_FILE]: {
+        message: 'App not authorized to access file',
+        status: 403,
+        userMessage: 'This app is not authorized to access the file',
+        action: 'reconnect'
+      },
+      [DRIVE_ERROR_REASONS.DOMAIN_POLICY]: {
+        message: 'Domain policy violation',
+        status: 403,
+        userMessage: 'Operation blocked by domain security policy',
+        action: 'none'
+      },
+      
+      // Storage and limit errors (403)
+      [DRIVE_ERROR_REASONS.STORAGE_QUOTA_EXCEEDED]: {
+        message: 'Storage quota exceeded',
+        status: 403,
+        userMessage: 'Your Google Drive storage is full. Please free up space',
+        action: 'none'
+      },
+      [DRIVE_ERROR_REASONS.ACTIVE_ITEM_CREATION_LIMIT_EXCEEDED]: {
+        message: 'Too many files created',
+        status: 403,
+        userMessage: 'You have created too many files recently. Please try again later',
+        action: 'retry'
+      },
+      [DRIVE_ERROR_REASONS.NUM_CHILDREN_IN_NON_ROOT_LIMIT_EXCEEDED]: {
+        message: 'Folder has too many items',
+        status: 403,
+        userMessage: 'This folder has reached the maximum number of items',
+        action: 'none'
+      },
+      [DRIVE_ERROR_REASONS.MY_DRIVE_HIERARCHY_DEPTH_LIMIT_EXCEEDED]: {
+        message: 'Folder hierarchy too deep',
+        status: 403,
+        userMessage: 'The folder structure is too deep. Please organize your files',
+        action: 'none'
+      },
+      
+      // Shared drive errors (403)
+      [DRIVE_ERROR_REASONS.TEAM_DRIVE_MEMBERSHIP_REQUIRED]: {
+        message: 'Shared drive membership required',
+        status: 403,
+        userMessage: 'You must be a member of this shared drive to access it',
+        action: 'none'
+      },
+      [DRIVE_ERROR_REASONS.TEAM_DRIVE_FILE_LIMIT_EXCEEDED]: {
+        message: 'Shared drive file limit exceeded',
+        status: 403,
+        userMessage: 'This shared drive has reached its file limit',
+        action: 'none'
+      },
+      [DRIVE_ERROR_REASONS.TEAM_DRIVE_HIERARCHY_TOO_DEEP]: {
+        message: 'Shared drive hierarchy too deep',
+        status: 403,
+        userMessage: 'The shared drive folder structure is too deep',
+        action: 'none'
+      },
+      
+      // Client errors (400)
+      [DRIVE_ERROR_REASONS.BAD_REQUEST]: {
+        message: 'Bad request',
+        status: 400,
+        userMessage: 'The request was invalid. Please check your input',
+        action: 'none'
+      },
+      [DRIVE_ERROR_REASONS.INVALID_SHARING_REQUEST]: {
+        message: 'Invalid sharing request',
+        status: 400,
+        userMessage: 'The sharing request was invalid. Check the email address and permissions',
+        action: 'none'
+      },
+      
+      // Not found errors (404)
+      [DRIVE_ERROR_REASONS.NOT_FOUND]: {
+        message: 'File or folder not found',
+        status: 404,
+        userMessage: 'The requested file or folder could not be found',
+        action: 'refresh'
+      },
+      
+      // Legacy error codes for backward compatibility
       'FORBIDDEN': {
         message: 'Access denied to Google Drive',
         status: 403,
@@ -98,12 +324,6 @@ class ErrorHandler {
       },
       'QUOTA_EXCEEDED': {
         message: 'API quota exceeded',
-        status: 429,
-        userMessage: 'Too many requests. Please wait a moment and try again',
-        action: 'retry'
-      },
-      'RATE_LIMIT_EXCEEDED': {
-        message: 'Rate limit exceeded',
         status: 429,
         userMessage: 'Too many requests. Please wait a moment and try again',
         action: 'retry'

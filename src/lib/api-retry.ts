@@ -39,11 +39,33 @@ function isRetryableError(error: any): boolean {
     ) // Gateway Timeout
   }
 
-  // Google API specific errors
+  // Google Drive API specific error structure analysis
+  if (error.error?.errors && Array.isArray(error.error.errors)) {
+    const firstError = error.error.errors[0]
+    if (firstError?.reason) {
+      // Official Google Drive API retryable error reasons
+      const retryableReasons = [
+        'rateLimitExceeded',
+        'userRateLimitExceeded', 
+        'sharingRateLimitExceeded',
+        'backendError',
+        'internalError',
+        'serviceUnavailable',
+        'timeout',
+        'activeItemCreationLimitExceeded'
+      ]
+      
+      return retryableReasons.includes(firstError.reason)
+    }
+  }
+
+  // Legacy Google API error patterns
   return (
     error.message?.includes('Rate Limit Exceeded') ||
     error.message?.includes('Backend Error') ||
     error.message?.includes('Internal error') ||
+    error.message?.includes('Service Unavailable') ||
+    error.message?.includes('Invalid authentication credentials') ||
     false
   )
 }
@@ -121,7 +143,7 @@ export async function retryOperation<T>(operation: () => Promise<T>, config: Par
 export async function retryDriveApiCall<T>(operation: () => Promise<T>): Promise<T> {
   return retryOperation(operation, {
     maxRetries: 3,
-    baseDelay: 2000, // Start with 2 seconds for API calls
+    baseDelay: 3000, // Start with 2 seconds for API calls
     maxDelay: 15000, // Max 15 seconds
   })
 }

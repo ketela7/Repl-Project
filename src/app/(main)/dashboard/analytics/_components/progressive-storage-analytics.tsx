@@ -148,7 +148,7 @@ export function ProgressiveStorageAnalytics() {
         setConnectionStatus('disconnected')
         setError('Analysis timeout after 60 seconds. Large drives may require multiple sessions.')
       }
-    }, 60000)
+    }, 55000)
 
     eventSource.onopen = () => {
       setConnectionStatus('connected')

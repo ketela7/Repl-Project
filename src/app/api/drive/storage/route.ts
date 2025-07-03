@@ -1,20 +1,29 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { GoogleDriveService } from '@/lib/google-drive/service'
+import { initDriveService, handleApiError } from '@/lib/api-utils'
+import { retryDriveApiCall } from '@/lib/api-retry'
+import { withErrorHandling } from '@/lib/error-handler'
 
 export async function GET() {
   try {
     const startTime = Date.now()
-    const session = await auth()
+    console.log('[Storage Analytics] Starting comprehensive analysis...')
     
-    if (!session?.accessToken) {
-      return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+    // Enhanced authentication and service initialization
+    const authResult = await initDriveService()
+    if (!authResult.success) {
+      console.error('[Storage Analytics] Authentication failed')
+      return authResult.response!
     }
 
-    const driveService = new GoogleDriveService(session.accessToken)
+    const { session, driveService } = authResult
 
-    // Get user info and quota using service
-    const userInfo = await driveService.getUserInfo()
+    // Get user info and quota with error handling and retry
+    const userInfo = await withErrorHandling(
+      () => retryDriveApiCall(() => driveService!.getUserInfo()),
+      'Storage Analytics - Get User Info'
+    )
     
     const quotaData = {
       limit: userInfo.storageQuota?.limit ? parseInt(userInfo.storageQuota.limit) : null,
@@ -26,29 +35,32 @@ export async function GET() {
         Math.round((parseInt(userInfo.storageQuota.usage) / parseInt(userInfo.storageQuota.limit)) * 100) : null,
     }
 
-    const user = {
-      name: userInfo.name,
-      email: userInfo.email,
-      picture: userInfo.picture || '',
-    }
+    // const user = {
+    //   name: userInfo.name,
+    //   email: userInfo.email,
+    //   picture: userInfo.picture || '',
+    // }
 
     // Get comprehensive file statistics with pagination
     let allFiles = []
     let pageToken = undefined
     let totalApiCalls = 0
-    const maxFiles = 2000 // Limit for reasonable performance
+  //  const maxFiles = 1000 // Limit for reasonable performance
     
     console.log('[Storage Analytics] Starting file collection...')
     
     do {
       totalApiCalls++
-      const response = await driveService.listFiles({
-        pageSize: 1000, // Maximum allowed
-        pageToken,
-        orderBy: 'modifiedTime desc',
-        includeTeamDriveItems: true,
-        fields: 'nextPageToken,files(id,name,mimeType,size,owners,createdTime,modifiedTime)',
-      })
+      console.log(`[Storage Analytics] API call ${totalApiCalls}, fetching files...`)
+      
+      const response = await withErrorHandling(
+        () => retryDriveApiCall(() => driveService!.listFiles({
+          pageSize: 1000, // Use maximum page size for efficiency
+          pageToken,
+          fields: 'nextPageToken,files(name,mimeType,size)',
+        })),
+        `Storage Analytics - List Files (Page ${totalApiCalls})`
+      )
 
       const files = response.files || []
       allFiles.push(...files)
@@ -56,12 +68,7 @@ export async function GET() {
       
       console.log(`[Storage Analytics] Collected ${files.length} files (total: ${allFiles.length})`)
       
-      // Safety limit to prevent timeout
-      if (allFiles.length >= maxFiles) {
-        console.log(`[Storage Analytics] Reached file limit (${maxFiles}), stopping collection`)
-        break
-      }
-    } while (pageToken && totalApiCalls < 10) // Max 10 API calls for safety
+    } while (pageToken) // Max 10 API calls for safety
 
     console.log(`[Storage Analytics] Final collection: ${allFiles.length} files, ${totalApiCalls} API calls`)
 
@@ -78,7 +85,6 @@ export async function GET() {
       totalSizeBytes += fileSize
     })
 
-    // Enhanced categorization with better MIME type detection
     const categories = {
       documents: 0,
       images: 0,
@@ -113,7 +119,7 @@ export async function GET() {
       }
     })
 
-    // Get top 15 file types with size information
+    // Get top 50 file types with size information
     const topFileTypes = Object.entries(filesByType)
       .map(([mimeType, count]) => ({
         mimeType,
@@ -122,7 +128,7 @@ export async function GET() {
         averageSize: Math.round((fileSizesByType[mimeType] || 0) / count),
       }))
       .sort((a, b) => b.count - a.count)
-      .slice(0, 15)
+      .slice(0, 50)
 
     // Get largest files
     const largestFiles = allFiles
@@ -157,8 +163,6 @@ export async function GET() {
 
   } catch (error: any) {
     console.error('Storage analytics error:', error)
-    return NextResponse.json({ 
-      error: error.message || 'Failed to get storage analytics' 
-    }, { status: 500 })
+    return handleApiError(error)
   }
 }

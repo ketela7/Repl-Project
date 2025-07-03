@@ -1,20 +1,24 @@
 import { auth } from '@/auth'
 import { GoogleDriveService } from '@/lib/google-drive/service'
 import { DriveFile } from '@/lib/google-drive/types'
+import { initDriveService } from '@/lib/api-utils'
+import { retryDriveApiCall } from '@/lib/api-retry'
+import { withErrorHandling } from '@/lib/error-handler'
 
 /**
  * Progressive Storage Analytics with Server-Sent Events
  * Uses existing basecode service functions for efficiency and consistency
+ * Enhanced with comprehensive error handling and retry mechanisms
  */
 export async function GET() {
   try {
-    const session = await auth()
-    
-    if (!session?.accessToken) {
+    // Enhanced authentication and service initialization
+    const authResult = await initDriveService()
+    if (!authResult.success) {
       return new Response('Authentication required', { status: 401 })
     }
 
-    const driveService = new GoogleDriveService(session.accessToken)
+    const { session, driveService } = authResult
 
     // Setup Server-Sent Events stream
     const stream = new ReadableStream({
@@ -49,7 +53,10 @@ export async function GET() {
             // Step 1: Get user info and quota using service
             sendData('progress', { step: 'quota', message: 'Getting storage quota...' })
             
-            const userInfo = await driveService.getUserInfo()
+            const userInfo = await withErrorHandling(
+              () => retryDriveApiCall(() => driveService!.getUserInfo()),
+              'SSE Storage Analytics - Get User Info'
+            )
             
             // Safe number parsing with null checks
             const parseQuotaNumber = (value: string | undefined | null): number => {
