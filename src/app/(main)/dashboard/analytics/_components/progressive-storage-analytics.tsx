@@ -91,7 +91,7 @@ export function ProgressiveStorageAnalytics() {
     eventSourceRef.current = eventSource
 
     // Auto-close connection after 60 seconds (align with server timeout)
-    {/*const timeoutId = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close()
         eventSourceRef.current = null
@@ -99,7 +99,7 @@ export function ProgressiveStorageAnalytics() {
         setConnectionStatus('disconnected')
         setError('Analysis timeout after 55 seconds. Large drives may require multiple sessions.')
       }
-    }, 55000) */}
+    }, 55000)
 
     eventSource.onopen = () => {
       setConnectionStatus('connected')
