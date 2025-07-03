@@ -94,47 +94,7 @@ export function ProgressiveStorageAnalytics() {
     setIsComplete(false)
     setProgress({ step: 'initializing', message: 'Starting analysis...' })
 
-    // Try direct API call first for better reliability
-    try {
-      const response = await fetch('/api/drive/storage')
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      
-      if (data.error) {
-        throw new Error(data.error)
-      }
-
-      // Set quota data
-      if (data.quota) {
-        setQuota(data.quota)
-      }
-
-      // Set files data with proper structure
-      if (data.fileStats) {
-        setFiles({
-          totalFiles: data.fileStats.totalFiles || 0,
-          totalSizeBytes: data.fileStats.totalSizeBytes || 0,
-          filesByType: data.fileStats.filesByType || {},
-          fileSizesByType: {},
-          largestFiles: data.largestFiles || [],
-          hasMore: false,
-          categories: data.fileStats.categories || {},
-        })
-      }
-
-      setIsComplete(true)
-      setIsLoading(false)
-      setProgress({ step: 'complete', message: 'Analysis complete!', isComplete: true })
-      
-      return // Success, no need for SSE
-    } catch (err: any) {
-      console.warn('Direct API failed, falling back to streaming:', err.message)
-    }
-
-    // Fallback to SSE streaming if direct API fails
+    // Direct SSE streaming for real-time updates
     setConnectionStatus('connecting')
     const eventSource = new EventSource('/api/drive/storage/stream')
     eventSourceRef.current = eventSource
