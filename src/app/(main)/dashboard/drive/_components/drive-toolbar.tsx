@@ -55,7 +55,8 @@ import {
   getCommonFileTypeCategories, 
   matchesFileType, 
   countFilesByCategory, 
-  formatCategoryCount 
+  formatCategoryCount,
+  FILE_TYPE_CATEGORIES 
 } from '@/lib/mime-type-filter'
 
 // Removed Suspense import - direct render untuk bulk operations
@@ -162,29 +163,13 @@ interface DriveToolbarProps {
 // Enhanced client-side filtering function using comprehensive mimeType matching
 // Client-side filtering using shared utility for consistency with backend
 const filterByMimeType = (items: DriveItem[], category: string) => {
-  // Map category names to our standard file type IDs
-  const categoryMap: Record<string, string> = {
-    'Images': 'image',
-    'Videos': 'video', 
-    'Documents': 'document',
-    'Spreadsheets': 'spreadsheet',
-    'Presentations': 'presentation',
-    'Audio': 'audio',
-    'Archives': 'archive',
-    'Code': 'code',
-    'Design': 'design',
-    'Database': 'database',
-    'Ebooks': 'ebook',
-    'Fonts': 'font',
-    'Shortcuts': 'shortcut',
-    'Folders': 'folder'
-  }
-
-  const fileTypeId = categoryMap[category]
-  if (!fileTypeId) return items
+  // Use dynamic mapping dari FILE_TYPE_CATEGORIES untuk semua 27 kategori
+  const categoryRecord = Object.values(FILE_TYPE_CATEGORIES).find(cat => cat.label === category)
+  
+  if (!categoryRecord) return items
 
   return items.filter((item: DriveItem) => 
-    matchesFileType(item.mimeType || '', [fileTypeId])
+    matchesFileType(item.mimeType || '', [categoryRecord.id])
   )
 }
 
@@ -1025,299 +1010,62 @@ export function DriveToolbar({
                   </Badge>
                 </div>
 
-                {/* Images */}
-                {categoryCounts.image > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-green-50 p-2 dark:bg-green-950/30">
-                    <div className="flex items-center gap-2">
-                      <FileImage className="h-4 w-4 text-green-500" />
-                      <span className="text-sm">Images</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Images' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Images'
-                          ? 'border-green-500 bg-green-500 text-white'
-                          : 'border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Images')}
-                    >
-                      {categoryCounts.image}
-                    </Badge>
-                  </div>
-                )}
+                {/* Dynamic Badge Generation untuk Semua 27 Kategori */}
+                {Object.values(FILE_TYPE_CATEGORIES).map((category) => {
+                  const count = categoryCounts[category.id] || 0
+                  if (count === 0) return null
 
-                {/* Videos */}
-                {categoryCounts.video > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-red-50 p-2 dark:bg-red-950/30">
-                    <div className="flex items-center gap-2">
-                      <Play className="h-4 w-4 text-red-500" />
-                      <span className="text-sm">Videos</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Videos' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Videos'
-                          ? 'border-red-500 bg-red-500 text-white'
-                          : 'border-red-500 text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Videos')}
-                    >
-                      {categoryCounts.video}
-                    </Badge>
-                  </div>
-                )}
+                  const IconComponent = category.icon
+                  const colorClass = category.color
+                  const bgColorMap: Record<string, string> = {
+                    'text-blue-600': 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
+                    'text-blue-700': 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
+                    'text-green-600': 'bg-green-50 dark:bg-green-950/30 border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50',
+                    'text-orange-600': 'bg-orange-50 dark:bg-orange-950/30 border-orange-500 text-orange-700 hover:bg-orange-100 dark:text-orange-300 dark:hover:bg-orange-900/50',
+                    'text-purple-600': 'bg-purple-50 dark:bg-purple-950/30 border-purple-500 text-purple-700 hover:bg-purple-100 dark:text-purple-300 dark:hover:bg-purple-900/50',
+                    'text-red-600': 'bg-red-50 dark:bg-red-950/30 border-red-500 text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-900/50',
+                    'text-amber-600': 'bg-amber-50 dark:bg-amber-950/30 border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/50',
+                    'text-slate-600': 'bg-slate-50 dark:bg-slate-950/30 border-slate-500 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900/50',
+                    'text-pink-600': 'bg-pink-50 dark:bg-pink-950/30 border-pink-500 text-pink-700 hover:bg-pink-100 dark:text-pink-300 dark:hover:bg-pink-900/50',
+                    'text-indigo-600': 'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-500 text-indigo-700 hover:bg-indigo-100 dark:text-indigo-300 dark:hover:bg-indigo-900/50',
+                    'text-yellow-600': 'bg-yellow-50 dark:bg-yellow-950/30 border-yellow-500 text-yellow-700 hover:bg-yellow-100 dark:text-yellow-300 dark:hover:bg-yellow-900/50',
+                    'text-gray-600': 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50',
+                    'text-blue-500': 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
+                    'text-green-500': 'bg-green-50 dark:bg-green-950/30 border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50',
+                    'text-purple-500': 'bg-purple-50 dark:bg-purple-950/30 border-purple-500 text-purple-700 hover:bg-purple-100 dark:text-purple-300 dark:hover:bg-purple-900/50',
+                    'text-rose-600': 'bg-rose-50 dark:bg-rose-950/30 border-rose-500 text-rose-700 hover:bg-rose-100 dark:text-rose-300 dark:hover:bg-rose-900/50',
+                    'text-teal-600': 'bg-teal-50 dark:bg-teal-950/30 border-teal-500 text-teal-700 hover:bg-teal-100 dark:text-teal-300 dark:hover:bg-teal-900/50',
+                    'text-stone-600': 'bg-stone-50 dark:bg-stone-950/30 border-stone-500 text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900/50',
+                    'text-cyan-600': 'bg-cyan-50 dark:bg-cyan-950/30 border-cyan-500 text-cyan-700 hover:bg-cyan-100 dark:text-cyan-300 dark:hover:bg-cyan-900/50',
+                    'text-sky-600': 'bg-sky-50 dark:bg-sky-950/30 border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50',
+                    'text-gray-500': 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
+                  }
+                  
+                  const bgClass = bgColorMap[colorClass] || 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
+                  const isActive = activeFilter === category.label
+                  const activeBgClass = bgClass.split(' ')[2] // extract border color like 'border-blue-500'
+                  const activeColorClass = activeBgClass.replace('border-', 'bg-').replace('-500', '-500')
 
-                {/* Documents */}
-                {categoryCounts.document > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-orange-50 p-2 dark:bg-orange-950/30">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm">Documents</span>
+                  return (
+                    <div key={category.id} className={`flex items-center justify-between rounded-md p-2 ${bgClass.split(' ').slice(0, 2).join(' ')}`}>
+                      <div className="flex items-center gap-2">
+                        <IconComponent className={`h-4 w-4 ${colorClass.replace('text-', 'text-').replace('-600', '-500').replace('-700', '-500')}`} />
+                        <span className="text-sm">{category.label}</span>
+                      </div>
+                      <Badge
+                        variant={isActive ? 'default' : 'outline'}
+                        className={`cursor-pointer transition-all ${
+                          isActive
+                            ? `${activeColorClass} text-white`
+                            : bgClass.split(' ').slice(2).join(' ')
+                        }`}
+                        onClick={() => handleCategoryClick(category.label)}
+                      >
+                        {count}
+                      </Badge>
                     </div>
-                    <Badge
-                      variant={activeFilter === 'Documents' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Documents'
-                          ? 'border-orange-500 bg-orange-500 text-white'
-                          : 'border-orange-500 text-orange-700 hover:bg-orange-100 dark:text-orange-300 dark:hover:bg-orange-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Documents')}
-                    >
-                      {categoryCounts.document}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Spreadsheets */}
-                {categoryCounts.spreadsheet > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-emerald-50 p-2 dark:bg-emerald-950/30">
-                    <div className="flex items-center gap-2">
-                      <FileSpreadsheet className="h-4 w-4 text-emerald-500" />
-                      <span className="text-sm">Spreadsheets</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Spreadsheets' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Spreadsheets'
-                          ? 'border-emerald-500 bg-emerald-500 text-white'
-                          : 'border-emerald-500 text-emerald-700 hover:bg-emerald-100 dark:text-emerald-300 dark:hover:bg-emerald-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Spreadsheets')}
-                    >
-                      {categoryCounts.spreadsheet}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Presentations */}
-                {categoryCounts.presentation > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-amber-50 p-2 dark:bg-amber-950/30">
-                    <div className="flex items-center gap-2">
-                      <Presentation className="h-4 w-4 text-amber-500" />
-                      <span className="text-sm">Presentations</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Presentations' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Presentations'
-                          ? 'border-amber-500 bg-amber-500 text-white'
-                          : 'border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Presentations')}
-                    >
-                      {categoryCounts.presentation}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Audio */}
-                {categoryCounts.audio > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-indigo-50 p-2 dark:bg-indigo-950/30">
-                    <div className="flex items-center gap-2">
-                      <Music className="h-4 w-4 text-indigo-500" />
-                      <span className="text-sm">Audio</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Audio' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Audio'
-                          ? 'border-indigo-500 bg-indigo-500 text-white'
-                          : 'border-indigo-500 text-indigo-700 hover:bg-indigo-100 dark:text-indigo-300 dark:hover:bg-indigo-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Audio')}
-                    >
-                      {categoryCounts.audio}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Archives */}
-                {categoryCounts.archive > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-gray-50 p-2 dark:bg-gray-950/30">
-                    <div className="flex items-center gap-2">
-                      <Archive className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Archives</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Archives' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Archives'
-                          ? 'border-gray-500 bg-gray-500 text-white'
-                          : 'border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Archives')}
-                    >
-                      {categoryCounts.archive}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Code Files */}
-                {categoryCounts.code > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-cyan-50 p-2 dark:bg-cyan-950/30">
-                    <div className="flex items-center gap-2">
-                      <FileCode className="h-4 w-4 text-cyan-500" />
-                      <span className="text-sm">Code Files</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Code' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Code'
-                          ? 'border-cyan-500 bg-cyan-500 text-white'
-                          : 'border-cyan-500 text-cyan-700 hover:bg-cyan-100 dark:text-cyan-300 dark:hover:bg-cyan-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Code')}
-                    >
-                      {categoryCounts.code}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Design Files */}
-                {categoryCounts.design > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-purple-50 p-2 dark:bg-purple-950/30">
-                    <div className="flex items-center gap-2">
-                      <Palette className="h-4 w-4 text-purple-500" />
-                      <span className="text-sm">Design Files</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Design' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Design'
-                          ? 'border-purple-500 bg-purple-500 text-white'
-                          : 'border-purple-500 text-purple-700 hover:bg-purple-100 dark:text-purple-300 dark:hover:bg-purple-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Design')}
-                    >
-                      {categoryCounts.design}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Database Files */}
-                {categoryCounts.database > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-teal-50 p-2 dark:bg-teal-950/30">
-                    <div className="flex items-center gap-2">
-                      <Database className="h-4 w-4 text-teal-500" />
-                      <span className="text-sm">Database Files</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Database' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Database'
-                          ? 'border-teal-500 bg-teal-500 text-white'
-                          : 'border-teal-500 text-teal-700 hover:bg-teal-100 dark:text-teal-300 dark:hover:bg-teal-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Database')}
-                    >
-                      {categoryCounts.database}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* E-books */}
-                {categoryCounts.ebook > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-rose-50 p-2 dark:bg-rose-950/30">
-                    <div className="flex items-center gap-2">
-                      <BookOpen className="h-4 w-4 text-rose-500" />
-                      <span className="text-sm">E-books</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Ebooks' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Ebooks'
-                          ? 'border-rose-500 bg-rose-500 text-white'
-                          : 'border-rose-500 text-rose-700 hover:bg-rose-100 dark:text-rose-300 dark:hover:bg-rose-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Ebooks')}
-                    >
-                      {categoryCounts.ebook}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Fonts */}
-                {categoryCounts.font > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-stone-50 p-2 dark:bg-stone-950/30">
-                    <div className="flex items-center gap-2">
-                      <FileType className="h-4 w-4 text-stone-500" />
-                      <span className="text-sm">Fonts</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Fonts' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Fonts'
-                          ? 'border-stone-500 bg-stone-500 text-white'
-                          : 'border-stone-500 text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Fonts')}
-                    >
-                      {categoryCounts.font}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Shortcuts */}
-                {categoryCounts.shortcut > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-sky-50 p-2 dark:bg-sky-950/30">
-                    <div className="flex items-center gap-2">
-                      <Link className="h-4 w-4 text-sky-500" />
-                      <span className="text-sm">Shortcuts</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Shortcuts' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Shortcuts'
-                          ? 'border-sky-500 bg-sky-500 text-white'
-                          : 'border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Shortcuts')}
-                    >
-                      {categoryCounts.shortcut}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Folders */}
-                {categoryCounts.folder > 0 && (
-                  <div className="flex items-center justify-between rounded-md bg-blue-50 p-2 dark:bg-blue-950/30">
-                    <div className="flex items-center gap-2">
-                      <Folder className="h-4 w-4 text-blue-500" />
-                      <span className="text-sm">Folders</span>
-                    </div>
-                    <Badge
-                      variant={activeFilter === 'Folders' ? 'default' : 'outline'}
-                      className={`cursor-pointer transition-all ${
-                        activeFilter === 'Folders'
-                          ? 'border-blue-500 bg-blue-500 text-white'
-                          : 'border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50'
-                      }`}
-                      onClick={() => handleCategoryClick('Folders')}
-                    >
-                      {categoryCounts.folder}
-                    </Badge>
-                  </div>
-                )}
+                  )
+                })}
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
