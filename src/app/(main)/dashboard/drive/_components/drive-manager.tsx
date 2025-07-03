@@ -378,7 +378,7 @@ export function DriveManager() {
         if (callId) activeRequestsRef.current.delete(callId)
       }
     },
-    [filters],
+    [], // Remove filters dependency to prevent automatic refetching on filter changes
   )
 
   // Helper function to convert selected IDs to full objects
@@ -402,6 +402,29 @@ export function DriveManager() {
   useEffect(() => {
     fetchFiles()
   }, [])
+
+  // Separate effect for filter changes - triggers manual refetch
+  useEffect(() => {
+    // Skip initial render
+    if (Object.keys(filters).length === 0) return
+    
+    // Only trigger when user actively changes filters, not on component mount
+    const filterKey = JSON.stringify({
+      view: filters.activeView,
+      types: filters.fileTypeFilter,
+      sort: filters.advancedFilters.sortBy,
+      order: filters.advancedFilters.sortOrder,
+      size: filters.advancedFilters.sizeRange,
+      created: filters.advancedFilters.createdDateRange,
+      modified: filters.advancedFilters.modifiedDateRange,
+      owner: filters.advancedFilters.owner,
+    })
+    
+    // Only refetch if filters actually changed
+    if (filterKey !== lastFiltersRef.current) {
+      fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
+    }
+  }, [filters, currentFolderId, searchQuery])
 
   // Navigation handlers
   const handleFolderClick = useCallback(
