@@ -29,6 +29,7 @@ import { ItemsDeleteDialog } from './items-delete-dialog'
 import { ItemsUntrashDialog } from './items-untrash-dialog'
 import ItemsDownloadDialog from './items-download-dialog'
 import ItemsExportDialog from './items-export-dialog'
+import { formatFileSize, getSizeMultiplier } from '@/lib/google-drive/utils'
 
 type DriveItem = (DriveFile | DriveFolder) & {
   itemType?: 'file' | 'folder'
@@ -44,20 +45,7 @@ type DriveItem = (DriveFile | DriveFolder) & {
   canExport?: boolean
 }
 // Helper function to convert size units to bytes (Google Drive API requirement)
-function getSizeMultiplier(unit: string): number {
-  switch (unit) {
-    case 'B':
-      return 1
-    case 'KB':
-      return 1024
-    case 'MB':
-      return 1024 * 1024
-    case 'GB':
-      return 1024 * 1024 * 1024
-    default:
-      return 1024 * 1024 // Default to MB
-  }
-}
+
 
 const initialFilters = {
   activeView: 'all' as 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash',
@@ -415,7 +403,7 @@ export function DriveManager() {
       modified: filters.advancedFilters.modifiedDateRange,
       owner: filters.advancedFilters.owner,
     })
-    
+
     // Update last applied filters and fetch data
     lastFiltersRef.current = filterKey
     fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
@@ -828,7 +816,6 @@ export function DriveManager() {
           onClose={() => {
             closeDialog('trash')
             setSelectedItems(new Set())
-            handleRefresh()
           }}
           selectedItems={getSelectedItemsForDialog()}
           _onConfirm={() => {}}
@@ -857,7 +844,6 @@ export function DriveManager() {
           onClose={() => {
             closeDialog('untrash')
             setSelectedItems(new Set())
-            handleRefresh()
           }}
           selectedItems={getSelectedItemsForDialog()}
           _onConfirm={() => {}}

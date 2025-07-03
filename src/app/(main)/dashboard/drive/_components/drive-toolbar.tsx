@@ -64,6 +64,8 @@ import { OperationsDialog } from './operations-dialog'
 import { FiltersDialog } from './filters-dialog'
 
 // Types
+import { SIZE_UNIT_OPTIONS } from '@/lib/google-drive/constants'
+
 interface DriveItem {
   id: string
   name: string
@@ -165,7 +167,7 @@ interface DriveToolbarProps {
 const filterByMimeType = (items: DriveItem[], category: string) => {
   // Use dynamic mapping dari FILE_TYPE_CATEGORIES untuk semua 27 kategori
   const categoryRecord = Object.values(FILE_TYPE_CATEGORIES).find(cat => cat.label === category)
-  
+
   if (!categoryRecord) return items
 
   return items.filter((item: DriveItem) => 
@@ -1040,7 +1042,7 @@ export function DriveToolbar({
                     'text-sky-600': 'bg-sky-50 dark:bg-sky-950/30 border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50',
                     'text-gray-500': 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
                   }
-                  
+
                   const bgClass = bgColorMap[colorClass] || 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
                   const isActive = activeFilter === category.label
                   const activeBgClass = bgClass.split(' ')[2] // extract border color like 'border-blue-500'
