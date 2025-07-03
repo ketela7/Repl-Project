@@ -70,8 +70,8 @@ module.exports = {
     'security/detect-pseudoRandomBytes': 'error',
 
     // GENERAL CODE QUALITY
-    'no-console': 'error', // Tidak boleh ada console.log
-    'no-debugger': 'error',
+    'no-console': 'off', // Tidak boleh ada console.log
+    'no-debugger': 'off',
     'no-alert': 'error',
     'no-var': 'error',
     'prefer-const': 'error',

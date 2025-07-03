@@ -403,12 +403,8 @@ export function DriveManager() {
     fetchFiles()
   }, [])
 
-  // Separate effect for filter changes - triggers manual refetch
-  useEffect(() => {
-    // Skip initial render
-    if (Object.keys(filters).length === 0) return
-    
-    // Only trigger when user actively changes filters, not on component mount
+  // Manual filter application function - only called when Apply Filter is clicked
+  const applyFilters = useCallback(() => {
     const filterKey = JSON.stringify({
       view: filters.activeView,
       types: filters.fileTypeFilter,
@@ -420,11 +416,10 @@ export function DriveManager() {
       owner: filters.advancedFilters.owner,
     })
     
-    // Only refetch if filters actually changed
-    if (filterKey !== lastFiltersRef.current) {
-      fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
-    }
-  }, [filters, currentFolderId, searchQuery])
+    // Update last applied filters and fetch data
+    lastFiltersRef.current = filterKey
+    fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
+  }, [filters, currentFolderId, searchQuery, fetchFiles])
 
   // Navigation handlers
   const handleFolderClick = useCallback(
@@ -613,9 +608,7 @@ export function DriveManager() {
             onRefreshAfterOp={handleRefresh}
             filters={filters}
             onFilterChange={handleFilter as any}
-            onApplyFilters={() =>
-              fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
-            }
+            onApplyFilters={applyFilters}
             onClearFilters={clearAllFilters}
             hasActiveFilters={hasActiveFilters}
             items={items}

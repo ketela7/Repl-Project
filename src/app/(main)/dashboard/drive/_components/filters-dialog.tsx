@@ -190,12 +190,7 @@ export function FiltersDialog({
 
   const handleBasicFilter = (viewId: string) => {
     setTempActiveView(viewId)
-    // Apply immediately for real-time sync
-    onFilterChange({
-      activeView: viewId,
-      fileTypeFilter: tempFileTypeFilter,
-      advancedFilters: tempAdvancedFilters,
-    })
+    // Only update local state - no automatic backend call
   }
 
   const handleFileTypeFilter = (typeId: string) => {
@@ -213,12 +208,7 @@ export function FiltersDialog({
     }
 
     setTempFileTypeFilter(newFilter)
-    // Apply immediately for real-time sync
-    onFilterChange({
-      activeView: tempActiveView,
-      fileTypeFilter: newFilter,
-      advancedFilters: tempAdvancedFilters,
-    })
+    // Only update local state - no automatic backend call
   }
 
   const handleAdvancedFiltersChange = (newFilters: AdvancedFilters) => {
@@ -240,12 +230,7 @@ export function FiltersDialog({
       setTempFileTypeFilter(updatedFileTypeFilter)
     }
 
-    // Apply immediately for real-time sync
-    onFilterChange({
-      activeView: tempActiveView,
-      fileTypeFilter: updatedFileTypeFilter,
-      advancedFilters: newFilters,
-    })
+    // Only update local state - no automatic backend call
   }
 
   const renderContent = () => (
