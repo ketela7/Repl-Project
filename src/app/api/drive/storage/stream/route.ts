@@ -78,9 +78,9 @@ export async function GET() {
             }
 
             const user = {
-              name: userInfo.name,
-              email: userInfo.email,
-              picture: userInfo.picture || '',
+              // name: userInfo.name,
+              // email: userInfo.email,
+              // picture: userInfo.picture || '',
             }
 
             sendData('quota_update', { user, quota: quotaData })
@@ -100,11 +100,7 @@ export async function GET() {
               try {
                 // Use service function with retry + throttle built-in
                 const listOptions: any = {
-                  pageSize: 1000, // Maximum for efficiency  
-                //  orderBy: 'modifiedTime desc',
-                  includeTeamDriveItems: true,
-                  // Force use of LIST_STANDARD fields to get size data
-                  fields: 'nextPageToken,files(id,name,mimeType,size)',
+                  fields: 'nextPageToken,files(name,mimeType,size)',
                 }
                 
                 // Only add pageToken if it exists
@@ -218,7 +214,7 @@ export async function GET() {
                 throw error
               }
 
-            } while (pageToken && totalProcessed < 100000) // Reasonable limit
+            } while (pageToken) // Reasonable limit
 
             // Step 3: Final analysis and categorization
             sendData('progress', { step: 'final_analysis', message: 'Generating final report...' })

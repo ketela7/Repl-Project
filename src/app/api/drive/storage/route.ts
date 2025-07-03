@@ -35,11 +35,11 @@ export async function GET() {
         Math.round((parseInt(userInfo.storageQuota.usage) / parseInt(userInfo.storageQuota.limit)) * 100) : null,
     }
 
-    // const user = {
-    //   name: userInfo.name,
-    //   email: userInfo.email,
-    //   picture: userInfo.picture || '',
-    // }
+    const user = {
+      name: userInfo.name,
+      email: userInfo.email,
+      picture: userInfo.picture || '',
+    }
 
     // Get comprehensive file statistics with pagination
     let allFiles = []
@@ -55,7 +55,6 @@ export async function GET() {
       
       const response = await withErrorHandling(
         () => retryDriveApiCall(() => driveService!.listFiles({
-          pageSize: 1000, // Use maximum page size for efficiency
           pageToken,
           fields: 'nextPageToken,files(name,mimeType,size)',
         })),
