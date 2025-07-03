@@ -152,8 +152,8 @@ export async function GET(request: NextRequest) {
         id: fileMetadata.id || fileId, // Fallback to requested fileId if id is missing
       }
 
-      // // // // // console.log('[Drive API] Single file response:', response)
-      // // // // // console.log('[Drive API] File ID check:', { requestedId: fileId, responseId: response.id })
+
+
 
       return NextResponse.json(response)
     }

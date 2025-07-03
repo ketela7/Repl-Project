@@ -1026,7 +1026,7 @@ export function DriveToolbar({
                 </div>
 
                 {/* Images */}
-                {categoryCounts.images > 0 && (
+                {categoryCounts.image > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-green-50 p-2 dark:bg-green-950/30">
                     <div className="flex items-center gap-2">
                       <FileImage className="h-4 w-4 text-green-500" />
@@ -1041,13 +1041,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Images')}
                     >
-                      {categoryCounts.images}
+                      {categoryCounts.image}
                     </Badge>
                   </div>
                 )}
 
                 {/* Videos */}
-                {categoryCounts.videos > 0 && (
+                {categoryCounts.video > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-red-50 p-2 dark:bg-red-950/30">
                     <div className="flex items-center gap-2">
                       <Play className="h-4 w-4 text-red-500" />
@@ -1062,13 +1062,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Videos')}
                     >
-                      {categoryCounts.videos}
+                      {categoryCounts.video}
                     </Badge>
                   </div>
                 )}
 
                 {/* Documents */}
-                {categoryCounts.documents > 0 && (
+                {categoryCounts.document > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-orange-50 p-2 dark:bg-orange-950/30">
                     <div className="flex items-center gap-2">
                       <FileText className="h-4 w-4 text-orange-500" />
@@ -1083,13 +1083,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Documents')}
                     >
-                      {categoryCounts.documents}
+                      {categoryCounts.document}
                     </Badge>
                   </div>
                 )}
 
                 {/* Spreadsheets */}
-                {categoryCounts.spreadsheets > 0 && (
+                {categoryCounts.spreadsheet > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-emerald-50 p-2 dark:bg-emerald-950/30">
                     <div className="flex items-center gap-2">
                       <FileSpreadsheet className="h-4 w-4 text-emerald-500" />
@@ -1104,13 +1104,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Spreadsheets')}
                     >
-                      {categoryCounts.spreadsheets}
+                      {categoryCounts.spreadsheet}
                     </Badge>
                   </div>
                 )}
 
                 {/* Presentations */}
-                {categoryCounts.presentations > 0 && (
+                {categoryCounts.presentation > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-amber-50 p-2 dark:bg-amber-950/30">
                     <div className="flex items-center gap-2">
                       <Presentation className="h-4 w-4 text-amber-500" />
@@ -1125,7 +1125,7 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Presentations')}
                     >
-                      {categoryCounts.presentations}
+                      {categoryCounts.presentation}
                     </Badge>
                   </div>
                 )}
@@ -1152,7 +1152,7 @@ export function DriveToolbar({
                 )}
 
                 {/* Archives */}
-                {categoryCounts.archives > 0 && (
+                {categoryCounts.archive > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-gray-50 p-2 dark:bg-gray-950/30">
                     <div className="flex items-center gap-2">
                       <Archive className="h-4 w-4 text-gray-500" />
@@ -1167,7 +1167,7 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Archives')}
                     >
-                      {categoryCounts.archives}
+                      {categoryCounts.archive}
                     </Badge>
                   </div>
                 )}
@@ -1236,7 +1236,7 @@ export function DriveToolbar({
                 )}
 
                 {/* E-books */}
-                {categoryCounts.ebooks > 0 && (
+                {categoryCounts.ebook > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-rose-50 p-2 dark:bg-rose-950/30">
                     <div className="flex items-center gap-2">
                       <BookOpen className="h-4 w-4 text-rose-500" />
@@ -1251,13 +1251,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Ebooks')}
                     >
-                      {categoryCounts.ebooks}
+                      {categoryCounts.ebook}
                     </Badge>
                   </div>
                 )}
 
                 {/* Fonts */}
-                {categoryCounts.fonts > 0 && (
+                {categoryCounts.font > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-stone-50 p-2 dark:bg-stone-950/30">
                     <div className="flex items-center gap-2">
                       <FileType className="h-4 w-4 text-stone-500" />
@@ -1272,13 +1272,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Fonts')}
                     >
-                      {categoryCounts.fonts}
+                      {categoryCounts.font}
                     </Badge>
                   </div>
                 )}
 
                 {/* Shortcuts */}
-                {categoryCounts.shortcuts > 0 && (
+                {categoryCounts.shortcut > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-sky-50 p-2 dark:bg-sky-950/30">
                     <div className="flex items-center gap-2">
                       <Link className="h-4 w-4 text-sky-500" />
@@ -1293,13 +1293,13 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Shortcuts')}
                     >
-                      {categoryCounts.shortcuts}
+                      {categoryCounts.shortcut}
                     </Badge>
                   </div>
                 )}
 
                 {/* Folders */}
-                {categoryCounts.folders > 0 && (
+                {categoryCounts.folder > 0 && (
                   <div className="flex items-center justify-between rounded-md bg-blue-50 p-2 dark:bg-blue-950/30">
                     <div className="flex items-center gap-2">
                       <Folder className="h-4 w-4 text-blue-500" />
@@ -1314,7 +1314,7 @@ export function DriveToolbar({
                       }`}
                       onClick={() => handleCategoryClick('Folders')}
                     >
-                      {categoryCounts.folders}
+                      {categoryCounts.folder}
                     </Badge>
                   </div>
                 )}
