@@ -310,9 +310,6 @@ export function DriveManager() {
           params.append('pageSize', String(filters.advancedFilters.pageSize))
         }
 
-        console.log('[DriveManager] Apply Filter - Fetching files with params:', params.toString())
-        console.log('[DriveManager] Current filters:', JSON.stringify(filters, null, 2))
-        
         const response = await fetch(`/api/drive/files?${params}`, {
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },

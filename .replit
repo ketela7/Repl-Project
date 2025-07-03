@@ -41,7 +41,7 @@ args = "Server"
 [[workflows.workflow]]
 name = "Cleaner"
 mode = "sequential"
-author = "agent"
+#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -51,7 +51,7 @@ args = "npm run clean:all"
 [[workflows.workflow]]
 name = "Check Type"
 mode = "sequential"
-author = "agent"
+#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -60,7 +60,7 @@ args = "npm run type-check"
 [[workflows.workflow]]
 name = "Test Coverage"
 mode = "sequential"
-author = "agent"
+#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -69,7 +69,7 @@ args = "npm run test:coverage"
 [[workflows.workflow]]
 name = "Linter & Formatter"
 mode = "sequential"
-author = "agent"
+#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

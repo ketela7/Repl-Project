@@ -164,8 +164,6 @@ export async function GET(request: NextRequest) {
     const folderIdParam = searchParams.get('folderId')
     const folderId = folderIdParam || 'root'
 
-    console.log('[API] Received search params:', Object.fromEntries(searchParams.entries()))
-    
     const filters: FileFilter = {
       fileType: searchParams.get('fileType') || 'all',
       viewStatus: searchParams.get('viewStatus') || 'all',
@@ -187,9 +185,7 @@ export async function GET(request: NextRequest) {
       ...(searchParams.get('sizeMax') && { sizeMax: searchParams.get('sizeMax')! }),
     }
 
-    console.log('[API] Processed filters:', JSON.stringify(filters, null, 2))
     const baseQuery = buildDriveQuery(filters)
-    console.log('[API] Generated Drive query:', baseQuery)
 
     // Build query with parent constraints
     let query = baseQuery
