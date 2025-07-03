@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Folder,
   Link,
@@ -92,6 +92,7 @@ export function DriveDestinationSelector({
     folderName?: string
     error?: string
   } | null>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   // Folder browsing state
   const [folders, setFolders] = useState<DriveFolder[]>([])
@@ -128,17 +129,31 @@ export function DriveDestinationSelector({
     }
   }
 
-  // Validate parsed folder ID
+  // Validate parsed folder ID dengan abort controller untuk prevent race condition
   const validateFolderId = async (folderId: string) => {
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    
+    // Create new abort controller
+    abortControllerRef.current = new AbortController()
+    
     setIsValidating(true)
+    setValidationResult(null)
+    
     try {
       const response = await fetch('/api/drive/folders/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ folderId }),
+        signal: abortControllerRef.current.signal,
       })
 
       const data = await response.json()
+
+      // Check if request was aborted
+      if (abortControllerRef.current.signal.aborted) return
 
       if (data.success && data.folder) {
         setValidationResult({
@@ -151,7 +166,10 @@ export function DriveDestinationSelector({
           error: data.error || 'Folder validation failed',
         })
       }
-    } catch {
+    } catch (error: unknown) {
+      // Check if abort error (bukan real error)
+      if (error instanceof Error && error.name === 'AbortError') return
+      
       setValidationResult({
         isValid: false,
         error: 'Failed to validate folder ID',

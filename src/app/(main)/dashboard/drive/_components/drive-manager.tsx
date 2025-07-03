@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, useReducer } from 'react'
 import { RefreshCw } from 'lucide-react'
 
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
@@ -62,6 +62,62 @@ const initialFilters = {
   } as any,
 }
 
+// Dialog state management dengan reducer untuk avoid race conditions
+type DialogState = {
+  upload: boolean
+  createFolder: boolean
+  details: boolean
+  preview: boolean
+  mobileFilters: boolean
+  move: boolean
+  copy: boolean
+  share: boolean
+  rename: boolean
+  trash: boolean
+  delete: boolean
+  untrash: boolean
+  download: boolean
+  export: boolean
+}
+
+type DialogAction = 
+  | { type: 'OPEN_DIALOG'; dialog: keyof DialogState }
+  | { type: 'CLOSE_DIALOG'; dialog: keyof DialogState }
+  | { type: 'CLOSE_ALL_DIALOGS' }
+  | { type: 'RESET_DIALOGS' }
+
+const initialDialogState: DialogState = {
+  upload: false,
+  createFolder: false,
+  details: false,
+  preview: false,
+  mobileFilters: false,
+  move: false,
+  copy: false,
+  share: false,
+  rename: false,
+  trash: false,
+  delete: false,
+  untrash: false,
+  download: false,
+  export: false,
+}
+
+function dialogReducer(state: DialogState, action: DialogAction): DialogState {
+  switch (action.type) {
+    case 'OPEN_DIALOG':
+      return { ...state, [action.dialog]: true }
+    case 'CLOSE_DIALOG':
+      return { ...state, [action.dialog]: false }
+    case 'CLOSE_ALL_DIALOGS':
+      return initialDialogState
+    case 'RESET_DIALOGS':
+      return initialDialogState
+    default:
+      return state
+  }
+}
+
 export function DriveManager() {
   // Core state
   const [items, setItems] = useState<DriveItem[]>([])
@@ -81,6 +137,8 @@ export function DriveManager() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filters, setFilters] = useState(initialFilters)
   const filtersRef = useRef(initialFilters)
+  const searchQueryRef = useRef('')
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Table state
   const [visibleColumns, setVisibleColumns] = useState({
@@ -92,23 +150,8 @@ export function DriveManager() {
     modifiedTime: false,
   })
 
-  // Dialog state - consolidated
-  const [dialogs, setDialogs] = useState({
-    upload: false,
-    createFolder: false,
-    details: false,
-    preview: false,
-    mobileFilters: false,
-    move: false,
-    copy: false,
-    share: false,
-    rename: false,
-    trash: false,
-    delete: false,
-    untrash: false,
-    download: false,
-    export: false,
-  })
+  // Dialog state dengan reducer untuk prevent race conditions
+  const [dialogs, dispatchDialog] = useReducer(dialogReducer, initialDialogState)
 
   // Sorting state
   const [sortConfig, setSortConfig] = useState<{
@@ -116,9 +159,11 @@ export function DriveManager() {
     direction: 'asc' | 'desc'
   } | null>(null)
 
-  // Selection state
+  // Selection state dengan ref untuk sync consistency
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [isSelectMode, setIsSelectMode] = useState(false)
+  const selectedItemsRef = useRef<Set<string>>(new Set())
+  const isSelectModeRef = useRef(false)
 
   const [selectedFileForPreview, setSelectedFileForPreview] = useState<DriveFile | null>(null)
   const [selectedFileForDetails, setSelectedFileForDetails] = useState<DriveItem | null>(null)
@@ -137,13 +182,45 @@ export function DriveManager() {
   const activeRequestsRef = useRef<Set<string>>(new Set())
 
   // Helper functions
-  const openDialog = (dialogName: keyof typeof dialogs) => {
-    setDialogs(prev => ({ ...prev, [dialogName]: true }))
+  const openDialog = (dialogName: keyof DialogState) => {
+    dispatchDialog({ type: 'OPEN_DIALOG', dialog: dialogName })
   }
 
-  const closeDialog = (dialogName: keyof typeof dialogs) => {
-    setDialogs(prev => ({ ...prev, [dialogName]: false }))
+  const closeDialog = (dialogName: keyof DialogState) => {
+    dispatchDialog({ type: 'CLOSE_DIALOG', dialog: dialogName })
   }
+
+  const closeAllDialogs = () => {
+    dispatchDialog({ type: 'CLOSE_ALL_DIALOGS' })
+  }
+
+  // Helper functions untuk sync selection state
+  const updateSelectedItems = useCallback((newItems: Set<string>) => {
+    setSelectedItems(newItems)
+    selectedItemsRef.current = newItems
+  }, [])
+
+  const updateSelectMode = useCallback((mode: boolean) => {
+    setIsSelectMode(mode)
+    isSelectModeRef.current = mode
+  }, [])
+
+  // Debounced search untuk prevent race conditions
+  const debouncedSearch = useCallback((query: string) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+    
+    searchTimeoutRef.current = setTimeout(() => {
+      searchQueryRef.current = query
+      fetchFiles(currentFolderId || undefined, query.trim() || undefined)
+    }, 300) // 300ms debounce
+  }, [currentFolderId])
+
+  const handleSearchChange = useCallback((query: string) => {
+    setSearchQuery(query)
+    debouncedSearch(query)
+  }, [debouncedSearch])
 
   const clearAllFilters = useCallback(() => {
     setFilters(initialFilters)
@@ -481,16 +558,15 @@ export function DriveManager() {
 
   // Selection handlers
   const handleSelectItem = useCallback((itemId: string) => {
-    setSelectedItems(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(itemId)) {
-        newSet.delete(itemId)
-      } else {
-        newSet.add(itemId)
-      }
-      return newSet
-    })
-  }, [])
+    const current = selectedItemsRef.current
+    const newSet = new Set(current)
+    if (newSet.has(itemId)) {
+      newSet.delete(itemId)
+    } else {
+      newSet.add(itemId)
+    }
+    updateSelectedItems(newSet)
+  }, [updateSelectedItems])
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true)
@@ -564,12 +640,13 @@ export function DriveManager() {
   }, [displayItems, sortConfig, filters.activeView])
 
   const handleSelectAll = useCallback(() => {
-    if (selectedItems.size === sortedDisplayItems.length) {
-      setSelectedItems(new Set())
+    const currentSelected = selectedItemsRef.current
+    if (currentSelected.size === sortedDisplayItems.length) {
+      updateSelectedItems(new Set())
     } else {
-      setSelectedItems(new Set(sortedDisplayItems.map(item => item.id)))
+      updateSelectedItems(new Set(sortedDisplayItems.map(item => item.id)))
     }
-  }, [sortedDisplayItems, selectedItems.size])
+  }, [sortedDisplayItems, updateSelectedItems])
 
   // Bulk operation completion handler removed as unused
 
@@ -590,10 +667,10 @@ export function DriveManager() {
         <div className="flex flex-1 flex-col overflow-hidden">
           <DriveToolbar
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={handleSearchChange}
             onSearchSubmit={e => {
               e.preventDefault()
-              fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
+              fetchFiles(currentFolderId || undefined, searchQueryRef.current.trim() || undefined)
             }}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
