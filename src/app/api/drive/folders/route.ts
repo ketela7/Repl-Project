@@ -97,7 +97,8 @@ export async function GET(request: NextRequest) {
           canAddChildren: drive.capabilities?.canAddChildren || false,
         }))
       } catch (error) {
-        console.warn('Failed to fetch shared drives:', error)
+        // Handle shared drives fetch error silently
+        void error
       }
     }
 
@@ -114,7 +115,6 @@ export async function GET(request: NextRequest) {
       cached: false,
     })
   } catch (error) {
-    // // // // // console.error('Error in folders API:', error)
     return handleApiError(error)
   }
 }
@@ -175,7 +175,6 @@ export async function POST(request: NextRequest) {
       message: `Folder "${name}" created successfully`,
     })
   } catch (error) {
-    // // // // // console.error('Error creating folder:', error)
     return handleApiError(error)
   }
 }

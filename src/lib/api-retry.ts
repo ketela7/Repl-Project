@@ -103,23 +103,10 @@ export async function retryOperation<T>(
 
   for (let attempt = 0; attempt <= finalConfig.maxRetries; attempt++) {
     try {
-      if (process.env.NODE_ENV === 'development' && attempt > 0) {
-        console.debug(`[Retry] Attempt ${attempt + 1}/${finalConfig.maxRetries + 1}`)
-      }
-
       const result = await operation()
-
-      if (attempt > 0 && process.env.NODE_ENV === 'development') {
-        console.debug(`[Retry] Success after ${attempt + 1} attempts`)
-      }
-
       return result
     } catch (error) {
       lastError = error
-
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Retrying API operation:', { attempt, error })
-      }
 
       // Don't retry if not retryable or on last attempt
       if (!isRetryableError(error) || attempt === finalConfig.maxRetries) {
@@ -127,17 +114,8 @@ export async function retryOperation<T>(
       }
 
       const delay = calculateDelay(attempt, finalConfig)
-      if (process.env.NODE_ENV === 'development') {
-        console.log('Waiting before retry:', { delay })
-      }
-
       await sleep(delay)
     }
-  }
-
-  // All retries exhausted
-  if (process.env.NODE_ENV === 'development') {
-    console.error('All retries exhausted:', lastError)
   }
 
   throw lastError

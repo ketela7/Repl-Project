@@ -38,13 +38,13 @@ export const lazyWithRetry = (componentImport: () => Promise<unknown>) => {
 
 // Optimized loading states for different component sizes
 export const getLoaderClassName = (size: 'small' | 'default' | 'large' = 'default') => {
-  const sizeClasses: Record<string, string> = {
+  const sizeClassMap = {
     small: 'h-4 w-4',
     default: 'h-8 w-8',
     large: 'h-12 w-12',
-  }
+  } as const
 
-  const sizeClass = sizeClasses[size] || sizeClasses.default
+  const sizeClass = sizeClassMap[size] || sizeClassMap.default
   return `animate-pulse bg-gray-200 rounded ${sizeClass}`
 }
 

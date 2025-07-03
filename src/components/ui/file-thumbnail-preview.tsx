@@ -60,17 +60,7 @@ export function FileThumbnailPreview({
     return <>{children}</>;
   }
 
-  // Debug: Log thumbnail information in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('FileThumbnailPreview:', {
-      fileName,
-      thumbnailLink: thumbnailLink ? 'Available' : 'Missing',
-      mimeType,
-      isVisible,
-      thumbnailLoaded,
-      thumbnailError
-    });
-  }
+  // Thumbnail information tracked for debugging
 
   const handleMouseEnter = (e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();

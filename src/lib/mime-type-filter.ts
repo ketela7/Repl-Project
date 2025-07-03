@@ -3,13 +3,26 @@
  * Ensures identical results between Google Drive API queries and client-side filtering
  */
 
-import { FileText, Folder, Image, Video, Music, Archive, Code, Link, Calendar, User, HardDrive } from 'lucide-react'
+import React from 'react'
+import {
+  FileText,
+  Folder,
+  Image,
+  Video,
+  Music,
+  Archive,
+  Code,
+  Link,
+  Calendar,
+  User,
+  HardDrive,
+} from 'lucide-react'
 
 // File type categories with their associated mimeTypes
 export interface FileTypeCategory {
   id: string
   label: string
-  icon: any
+  icon: React.ComponentType<{ className?: string }>
   color: string
   mimeTypes: string[]
   googleDriveQuery: string
@@ -25,7 +38,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-blue-600',
     mimeTypes: ['application/vnd.google-apps.folder'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.folder'",
-    description: 'All folders and directories'
+    description: 'All folders and directories',
   },
 
   shortcut: {
@@ -35,7 +48,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-blue-700',
     mimeTypes: ['application/vnd.google-apps.shortcut'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.shortcut'",
-    description: 'Google Drive shortcuts'
+    description: 'Google Drive shortcuts',
   },
 
   document: {
@@ -48,16 +61,16 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
       'application/pdf',
       'text/plain',
       'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     ],
     googleDriveQuery: `(${[
       "mimeType = 'application/vnd.google-apps.document'",
       "mimeType = 'application/pdf'",
       "mimeType = 'text/plain'",
       "mimeType = 'application/msword'",
-      "mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'"
+      "mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'",
     ].join(' or ')})`,
-    description: 'Text documents, PDFs, Word files'
+    description: 'Text documents, PDFs, Word files',
   },
 
   spreadsheet: {
@@ -68,14 +81,14 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     mimeTypes: [
       'application/vnd.google-apps.spreadsheet',
       'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     ],
     googleDriveQuery: `(${[
       "mimeType = 'application/vnd.google-apps.spreadsheet'",
       "mimeType = 'application/vnd.ms-excel'",
-      "mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'"
+      "mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'",
     ].join(' or ')})`,
-    description: 'Google Sheets, Excel files'
+    description: 'Google Sheets, Excel files',
   },
 
   presentation: {
@@ -86,14 +99,14 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     mimeTypes: [
       'application/vnd.google-apps.presentation',
       'application/vnd.ms-powerpoint',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
     ],
     googleDriveQuery: `(${[
       "mimeType = 'application/vnd.google-apps.presentation'",
       "mimeType = 'application/vnd.ms-powerpoint'",
-      "mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'"
+      "mimeType = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'",
     ].join(' or ')})`,
-    description: 'Google Slides, PowerPoint files'
+    description: 'Google Slides, PowerPoint files',
   },
 
   image: {
@@ -103,7 +116,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-purple-600',
     mimeTypes: [], // Dynamic: any mimeType containing 'image/'
     googleDriveQuery: "mimeType contains 'image/'",
-    description: 'Photos, graphics, screenshots'
+    description: 'Photos, graphics, screenshots',
   },
 
   video: {
@@ -113,7 +126,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-red-600',
     mimeTypes: [], // Dynamic: any mimeType containing 'video/'
     googleDriveQuery: "mimeType contains 'video/'",
-    description: 'Movies, recordings, animations'
+    description: 'Movies, recordings, animations',
   },
 
   audio: {
@@ -123,7 +136,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-blue-600',
     mimeTypes: [], // Dynamic: any mimeType containing 'audio/'
     googleDriveQuery: "mimeType contains 'audio/'",
-    description: 'Music, podcasts, voice recordings'
+    description: 'Music, podcasts, voice recordings',
   },
 
   archive: {
@@ -140,7 +153,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
       'application/x-tar',
       'application/gzip',
       'application/x-bzip2',
-      'application/x-xz'
+      'application/x-xz',
     ],
     googleDriveQuery: `(${[
       "mimeType = 'application/zip'",
@@ -151,9 +164,9 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
       "mimeType = 'application/x-tar'",
       "mimeType = 'application/gzip'",
       "mimeType = 'application/x-bzip2'",
-      "mimeType = 'application/x-xz'"
+      "mimeType = 'application/x-xz'",
     ].join(' or ')})`,
-    description: 'ZIP, RAR, 7Z compressed files'
+    description: 'ZIP, RAR, 7Z compressed files',
   },
 
   code: {
@@ -171,7 +184,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
       'application/json',
       'application/xml',
       'text/html',
-      'text/css'
+      'text/css',
     ],
     googleDriveQuery: `(${[
       "mimeType = 'text/javascript'",
@@ -185,9 +198,9 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
       "mimeType = 'text/html'",
       "mimeType = 'text/css'",
       "mimeType contains 'text/x-'",
-      "mimeType contains 'application/x-'"
+      "mimeType contains 'application/x-'",
     ].join(' or ')})`,
-    description: 'Programming source code files'
+    description: 'Programming source code files',
   },
 
   drawing: {
@@ -197,7 +210,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-pink-600',
     mimeTypes: ['application/vnd.google-apps.drawing'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.drawing'",
-    description: 'Google Drawings'
+    description: 'Google Drawings',
   },
 
   form: {
@@ -207,7 +220,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-indigo-600',
     mimeTypes: ['application/vnd.google-apps.form'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.form'",
-    description: 'Google Forms'
+    description: 'Google Forms',
   },
 
   jamboard: {
@@ -217,7 +230,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-yellow-600',
     mimeTypes: ['application/vnd.google-apps.jam'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.jam'",
-    description: 'Google Jamboard files'
+    description: 'Google Jamboard files',
   },
 
   script: {
@@ -227,7 +240,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-gray-600',
     mimeTypes: ['application/vnd.google-apps.script'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.script'",
-    description: 'Google Apps Scripts'
+    description: 'Google Apps Scripts',
   },
 
   site: {
@@ -237,7 +250,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-blue-500',
     mimeTypes: ['application/vnd.google-apps.site'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.site'",
-    description: 'Google Sites'
+    description: 'Google Sites',
   },
 
   map: {
@@ -247,7 +260,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-green-500',
     mimeTypes: ['application/vnd.google-apps.map'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.map'",
-    description: 'Google My Maps'
+    description: 'Google My Maps',
   },
 
   photo: {
@@ -257,7 +270,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-purple-500',
     mimeTypes: ['application/vnd.google-apps.photo'],
     googleDriveQuery: "mimeType = 'application/vnd.google-apps.photo'",
-    description: 'Google Photos items'
+    description: 'Google Photos items',
   },
 
   'google-native': {
@@ -267,7 +280,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-blue-500',
     mimeTypes: [], // Dynamic: any mimeType containing 'application/vnd.google-apps'
     googleDriveQuery: "mimeType contains 'application/vnd.google-apps'",
-    description: 'All Google Workspace files'
+    description: 'All Google Workspace files',
   },
 
   pdf: {
@@ -277,7 +290,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     color: 'text-rose-600',
     mimeTypes: ['application/pdf'],
     googleDriveQuery: "mimeType = 'application/pdf'",
-    description: 'Portable Document Format files'
+    description: 'Portable Document Format files',
   },
 
   text: {
@@ -285,19 +298,14 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     label: 'Text Files',
     icon: FileText,
     color: 'text-slate-600',
-    mimeTypes: [
-      'text/plain',
-      'text/markdown',
-      'text/csv',
-      'text/tab-separated-values'
-    ],
+    mimeTypes: ['text/plain', 'text/markdown', 'text/csv', 'text/tab-separated-values'],
     googleDriveQuery: `(${[
       "mimeType = 'text/plain'",
       "mimeType = 'text/markdown'",
       "mimeType = 'text/csv'",
-      "mimeType = 'text/tab-separated-values'"
+      "mimeType = 'text/tab-separated-values'",
     ].join(' or ')})`,
-    description: 'Plain text, markdown, CSV files'
+    description: 'Plain text, markdown, CSV files',
   },
 
   design: {
@@ -309,15 +317,15 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
       'application/vnd.google-apps.drawing',
       'image/svg+xml',
       'application/postscript',
-      'application/illustrator'
+      'application/illustrator',
     ],
     googleDriveQuery: `(${[
       "mimeType = 'application/vnd.google-apps.drawing'",
       "mimeType = 'image/svg+xml'",
       "mimeType = 'application/postscript'",
-      "mimeType = 'application/illustrator'"
+      "mimeType = 'application/illustrator'",
     ].join(' or ')})`,
-    description: 'Vector graphics, illustrations'
+    description: 'Vector graphics, illustrations',
   },
 
   database: {
@@ -325,18 +333,14 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     label: 'Database Files',
     icon: HardDrive,
     color: 'text-indigo-600',
-    mimeTypes: [
-      'application/x-sqlite3',
-      'application/vnd.ms-access',
-      'application/x-dbf'
-    ],
+    mimeTypes: ['application/x-sqlite3', 'application/vnd.ms-access', 'application/x-dbf'],
     googleDriveQuery: `(${[
       "mimeType = 'application/x-sqlite3'",
       "mimeType = 'application/vnd.ms-access'",
       "mimeType = 'application/x-dbf'",
-      "mimeType contains 'database'"
+      "mimeType contains 'database'",
     ].join(' or ')})`,
-    description: 'Database and data files'
+    description: 'Database and data files',
   },
 
   ebook: {
@@ -348,15 +352,15 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
       'application/epub+zip',
       'application/x-mobipocket-ebook',
       'application/vnd.amazon.ebook',
-      'application/x-fictionbook+xml'
+      'application/x-fictionbook+xml',
     ],
     googleDriveQuery: `(${[
       "mimeType = 'application/epub+zip'",
       "mimeType = 'application/x-mobipocket-ebook'",
       "mimeType = 'application/vnd.amazon.ebook'",
-      "mimeType = 'application/x-fictionbook+xml'"
+      "mimeType = 'application/x-fictionbook+xml'",
     ].join(' or ')})`,
-    description: 'Electronic books and publications'
+    description: 'Electronic books and publications',
   },
 
   font: {
@@ -364,21 +368,15 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     label: 'Fonts',
     icon: FileText,
     color: 'text-gray-600',
-    mimeTypes: [
-      'font/ttf',
-      'font/otf',
-      'font/woff',
-      'font/woff2',
-      'application/font-woff'
-    ],
+    mimeTypes: ['font/ttf', 'font/otf', 'font/woff', 'font/woff2', 'application/font-woff'],
     googleDriveQuery: `(${[
       "mimeType = 'font/ttf'",
       "mimeType = 'font/otf'",
       "mimeType = 'font/woff'",
       "mimeType = 'font/woff2'",
-      "mimeType = 'application/font-woff'"
+      "mimeType = 'application/font-woff'",
     ].join(' or ')})`,
-    description: 'Typography and font files'
+    description: 'Typography and font files',
   },
 
   calendar: {
@@ -386,15 +384,11 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     label: 'Calendar',
     icon: Calendar,
     color: 'text-blue-500',
-    mimeTypes: [
-      'text/calendar',
-      'application/ics'
-    ],
-    googleDriveQuery: `(${[
-      "mimeType = 'text/calendar'",
-      "mimeType = 'application/ics'"
-    ].join(' or ')})`,
-    description: 'Calendar and event files'
+    mimeTypes: ['text/calendar', 'application/ics'],
+    googleDriveQuery: `(${["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(
+      ' or ',
+    )})`,
+    description: 'Calendar and event files',
   },
 
   contact: {
@@ -402,15 +396,9 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     label: 'Contacts',
     icon: User,
     color: 'text-green-600',
-    mimeTypes: [
-      'text/vcard',
-      'text/x-vcard'
-    ],
-    googleDriveQuery: `(${[
-      "mimeType = 'text/vcard'",
-      "mimeType = 'text/x-vcard'"
-    ].join(' or ')})`,
-    description: 'Contact and address book files'
+    mimeTypes: ['text/vcard', 'text/x-vcard'],
+    googleDriveQuery: `(${["mimeType = 'text/vcard'", "mimeType = 'text/x-vcard'"].join(' or ')})`,
+    description: 'Contact and address book files',
   },
 
   other: {
@@ -427,10 +415,10 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
       "not mimeType contains 'text/'",
       "not mimeType contains 'application/pdf'",
       "not mimeType contains 'zip'",
-      "not mimeType contains 'archive'"
+      "not mimeType contains 'archive'",
     ].join(' and ')})`,
-    description: 'Uncategorized file types'
-  }
+    description: 'Uncategorized file types',
+  },
 }
 
 /**
@@ -479,23 +467,27 @@ export function matchesFileType(mimeType: string, fileTypes: string[]): boolean 
       return mimeType.includes('application/vnd.google-apps')
     }
     if (category.id === 'code') {
-      return category.mimeTypes.includes(mimeType) || 
-             mimeType.includes('text/x-') || 
-             mimeType.includes('application/x-')
+      return (
+        category.mimeTypes.includes(mimeType) ||
+        mimeType.includes('text/x-') ||
+        mimeType.includes('application/x-')
+      )
     }
     if (category.id === 'database') {
       return category.mimeTypes.includes(mimeType) || mimeType.includes('database')
     }
     if (category.id === 'other') {
       // Special logic for "other" category - exclude all known categories
-      return !mimeType.includes('application/vnd.google-apps') &&
-             !mimeType.includes('image/') &&
-             !mimeType.includes('video/') &&
-             !mimeType.includes('audio/') &&
-             !mimeType.includes('text/') &&
-             !mimeType.includes('application/pdf') &&
-             !mimeType.includes('zip') &&
-             !mimeType.includes('archive')
+      return (
+        !mimeType.includes('application/vnd.google-apps') &&
+        !mimeType.includes('image/') &&
+        !mimeType.includes('video/') &&
+        !mimeType.includes('audio/') &&
+        !mimeType.includes('text/') &&
+        !mimeType.includes('application/pdf') &&
+        !mimeType.includes('zip') &&
+        !mimeType.includes('archive')
+      )
     }
 
     // Standard exact match for specific mimeTypes
@@ -508,7 +500,7 @@ export function matchesFileType(mimeType: string, fileTypes: string[]): boolean 
  */
 export function getFileTypeCategory(mimeType: string): string {
   // Check each category to find the matching one
-  for (const [categoryId, category] of Object.entries(FILE_TYPE_CATEGORIES)) {
+  for (const categoryId of Object.keys(FILE_TYPE_CATEGORIES)) {
     if (matchesFileType(mimeType, [categoryId])) {
       return categoryId
     }
@@ -528,10 +520,20 @@ export function getFileTypeCategories(): FileTypeCategory[] {
  */
 export function getCommonFileTypeCategories(): FileTypeCategory[] {
   const commonTypes = [
-    'folder', 'document', 'spreadsheet', 'presentation', 
-    'image', 'video', 'audio', 'archive', 'code', 'pdf'
+    'folder',
+    'document',
+    'spreadsheet',
+    'presentation',
+    'image',
+    'video',
+    'audio',
+    'archive',
+    'code',
+    'pdf',
   ]
-  return commonTypes.map(id => FILE_TYPE_CATEGORIES[id]).filter(Boolean)
+  return commonTypes
+    .map(id => FILE_TYPE_CATEGORIES[id as keyof typeof FILE_TYPE_CATEGORIES])
+    .filter(Boolean)
 }
 
 /**
@@ -539,7 +541,7 @@ export function getCommonFileTypeCategories(): FileTypeCategory[] {
  */
 export function countFilesByCategory(files: Array<{ mimeType: string }>): Record<string, number> {
   const counts: Record<string, number> = {}
-  
+
   // Initialize all categories with 0
   Object.keys(FILE_TYPE_CATEGORIES).forEach(category => {
     counts[category] = 0
@@ -548,7 +550,11 @@ export function countFilesByCategory(files: Array<{ mimeType: string }>): Record
   // Count files in each category
   files.forEach(file => {
     const category = getFileTypeCategory(file.mimeType)
-    counts[category] = (counts[category] || 0) + 1
+    if (Object.prototype.hasOwnProperty.call(counts, category)) {
+      counts[category] = (counts[category] || 0) + 1
+    } else {
+      counts[category] = 1
+    }
   })
 
   return counts

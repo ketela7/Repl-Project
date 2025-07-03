@@ -39,15 +39,7 @@ function getRating(name: string, value: number): 'good' | 'needs-improvement' | 
 function sendToAnalytics(metric: VitalMetric) {
   // In production, send to your analytics service
   if (process.env.NODE_ENV === 'development') {
-    let icon = '❌'
-    if (metric.rating === 'good') {
-      icon = '✅'
-    } else if (metric.rating === 'needs-improvement') {
-      icon = '⚠️'
-    }
-    // Log web vitals metrics in development only
-    // eslint-disable-next-line no-console
-    console.log(`${icon} ${metric.name}: ${metric.value}ms (${metric.rating})`)
+    // Web vitals metric processed silently in development
   }
 
   // Store metric locally

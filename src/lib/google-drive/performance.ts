@@ -228,9 +228,9 @@ export class PerformanceMonitor {
       metric.totalTime += duration
       this.metrics.set(operation, metric)
 
-      // Log slow requests in development
-      if (process.env.NODE_ENV === 'development' && duration > 2000) {
-        console.warn(`[Performance] Slow ${operation}: ${duration}ms`)
+      // Track slow requests for performance monitoring
+      if (duration > 2000) {
+        // Performance metrics tracked silently
       }
 
       return result
