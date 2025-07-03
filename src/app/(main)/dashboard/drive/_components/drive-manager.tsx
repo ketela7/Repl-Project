@@ -151,14 +151,18 @@ export function DriveManager() {
   }, [currentFolderId])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
-    setFilters(prev => ({
-      ...prev,
-      ...newFilters,
-      advancedFilters: {
-        ...prev.advancedFilters,
-        ...newFilters.advancedFilters,
-      },
-    }))
+    setFilters(prev => {
+      const updatedFilters = {
+        ...prev,
+        ...newFilters,
+        advancedFilters: {
+          ...prev.advancedFilters,
+          ...newFilters.advancedFilters,
+        },
+      }
+      
+      return updatedFilters
+    })
   }, [])
 
   // Check if any filters are active
@@ -185,7 +189,7 @@ export function DriveManager() {
     setSortConfig({ key, direction })
   }
 
-  // Sorting logic is handled in sortedDisplayItems
+
 
   // Selected items with details for operations - using getFileActions for consistency
   const selectedItemsWithDetails = useMemo(() => {
@@ -392,20 +396,23 @@ export function DriveManager() {
 
   // Manual filter application function - only called when Apply Filter is clicked
   const applyFilters = useCallback(() => {
-    const filterKey = JSON.stringify({
-      view: filters.activeView,
-      types: filters.fileTypeFilter,
-      sort: filters.advancedFilters.sortBy,
-      order: filters.advancedFilters.sortOrder,
-      size: filters.advancedFilters.sizeRange,
-      created: filters.advancedFilters.createdDateRange,
-      modified: filters.advancedFilters.modifiedDateRange,
-      owner: filters.advancedFilters.owner,
-    })
+    // Use setTimeout to ensure React has finished all state updates
+    setTimeout(() => {
+      const filterKey = JSON.stringify({
+        view: filters.activeView,
+        types: filters.fileTypeFilter,
+        sort: filters.advancedFilters.sortBy,
+        order: filters.advancedFilters.sortOrder,
+        size: filters.advancedFilters.sizeRange,
+        created: filters.advancedFilters.createdDateRange,
+        modified: filters.advancedFilters.modifiedDateRange,
+        owner: filters.advancedFilters.owner,
+      })
 
-    // Update last applied filters and fetch data
-    lastFiltersRef.current = filterKey
-    fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
+      // Update last applied filters and fetch data
+      lastFiltersRef.current = filterKey
+      fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
+    }, 0)
   }, [filters, currentFolderId, searchQuery, fetchFiles])
 
   // Navigation handlers
