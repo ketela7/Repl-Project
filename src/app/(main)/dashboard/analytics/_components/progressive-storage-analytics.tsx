@@ -385,11 +385,12 @@ export function ProgressiveStorageAnalytics() {
                   <div className="space-y-2 border-t pt-3">
                     <h4 className="text-sm font-medium">File Categories</h4>
                     <div className="grid grid-cols-2 gap-1 text-xs max-h-80 overflow-y-auto">
-                      {Object.entries(FILE_TYPE_CATEGORIES)
-                        .filter(([categoryId]) => (files.categories?.[categoryId] || 0) > 0)
-                        .sort(([categoryIdA], [categoryIdB]) => (files.categories?.[categoryIdB] || 0) - (files.categories?.[categoryIdA] || 0))
-                        .map(([categoryId, category]) => {
-                          const count = files.categories?.[categoryId] || 0
+                      {Object.entries(files.categories || {})
+                        .filter(([, count]) => count > 0)
+                        .sort(([, a], [, b]) => b - a)
+                        .map(([categoryId, count]) => {
+                          const category = FILE_TYPE_CATEGORIES[categoryId]
+                          if (!category) return null
                           const Icon = category.icon
                           return (
                             <div key={categoryId} className="flex items-center justify-between py-1">

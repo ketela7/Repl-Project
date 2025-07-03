@@ -238,6 +238,8 @@ export async function GET() {
               Array(count).fill({ mimeType })
             )
             const categories = countFilesByCategory(fileListForCategorization)
+            
+
 
             // Calculate category sizes using existing file type categorization
             const categorySizes: Record<string, number> = {}
