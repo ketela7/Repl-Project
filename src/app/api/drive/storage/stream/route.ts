@@ -49,8 +49,8 @@ export async function GET() {
           }
         }
 
-        // Main analysis function using service basecode
-        ;(async () => {
+        // Progressive analysis with enhanced error handling
+        try {
           try {
             // Step 1: Get user info and quota using service
             sendData('progress', { step: 'quota', message: 'Getting storage quota...' })
@@ -283,7 +283,13 @@ export async function GET() {
           } finally {
             closeStream()
           }
-        })()
+        } catch (error) {
+          console.error('Storage analysis error:', error)
+          sendData('error', {
+            message: 'Analysis failed. Please try again.',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          })
+        }
       },
     })
 
@@ -294,12 +300,11 @@ export async function GET() {
         Connection: 'keep-alive',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET',
-        'Access-Control-Allow-Headers': 'Content-Type',
       },
     })
-  } catch (error: any) {
-    console.error('Storage stream error:', error)
-    return new Response(JSON.stringify({ error: error.message }), {
+  } catch (error) {
+    console.error('Storage analysis error:', error)
+    return new Response(JSON.stringify({ error: 'Analysis failed' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     })

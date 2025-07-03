@@ -367,20 +367,31 @@ class ErrorHandler {
    * Show user-friendly error toast
    */
   showErrorToast(error: DriveError): void {
-    const actionText = this.getActionText(error.action)
+    // Skip toast in server-side context (API routes)
+    if (typeof window === 'undefined') {
+      console.error('Error:', error.userMessage)
+      return
+    }
 
-    toast.error(error.userMessage, {
-      description: actionText ? `Tip: ${actionText}` : undefined,
-      duration: 5000,
-      action:
-        error.action && error.action !== 'none'
-          ? {
-              label: actionText,
-              onClick: () => {
-                // Action will be handled by the calling component
-              },
-            }
-          : undefined,
+    // Dynamic import for client-side only
+    import('sonner').then(({ toast }) => {
+      const actionText = this.getActionText(error.action)
+
+      toast.error(error.userMessage, {
+        description: actionText ? `Tip: ${actionText}` : undefined,
+        duration: 5000,
+        action:
+          error.action && error.action !== 'none'
+            ? {
+                label: actionText,
+                onClick: () => {
+                  // Action will be handled by the calling component
+                },
+              }
+            : undefined,
+      })
+    }).catch(() => {
+      console.error('Error:', error.userMessage)
     })
   }
 
