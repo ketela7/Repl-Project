@@ -160,3 +160,20 @@ export function convertSizeWithMultiplier(value: number, multiplier: number): nu
 export function getCurrentISODate(): string {
   return new Date().toISOString()
 }
+
+/**
+ * Format bytes to human readable format
+ */
+export function formatBytes(bytes: string | number): string {
+  const size = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes
+
+  if (isNaN(size) || size === 0) return '0 B'
+
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  const i = Math.floor(Math.log(size) / Math.log(1024))
+  const value = size / Math.pow(1024, i)
+
+  // For bytes, don't show decimal places; for larger units, show 1 decimal place
+  const formatted = i === 0 ? Math.round(value) : value.toFixed(1)
+  return `${formatted} ${units[i]}`
+}
