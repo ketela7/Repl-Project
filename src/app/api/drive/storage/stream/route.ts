@@ -176,10 +176,11 @@ export async function GET() {
 
                   // Track duplicate files by MD5 hash
                   if (file.md5Checksum && size > 0) {
-                    if (!duplicateMap[file.md5Checksum]) {
-                      duplicateMap[file.md5Checksum] = []
+                    const md5Hash = file.md5Checksum
+                    if (!duplicateMap[md5Hash]) {
+                      duplicateMap[md5Hash] = []
                     }
-                    duplicateMap[file.md5Checksum].push(file)
+                    duplicateMap[md5Hash].push(file)
                   }
 
                   // Track largest files
@@ -264,6 +265,14 @@ export async function GET() {
               message: 'Detecting duplicate files...',
             })
 
+            // Debug: Log duplicate detection process
+            console.log(
+              `[Duplicate Debug] Total MD5 hashes tracked: ${Object.keys(duplicateMap).length}`,
+            )
+            console.log(
+              `[Duplicate Debug] Files with MD5: ${Object.values(duplicateMap).flat().length}`,
+            )
+
             const duplicateGroups = Object.entries(duplicateMap)
               .filter(([, files]) => files.length > 1) // Only groups with duplicates
               .map(([md5Hash, files]) => {
@@ -288,6 +297,13 @@ export async function GET() {
                 }
               })
               .sort((a, b) => b.wastedSpace - a.wastedSpace) // Sort by wasted space (highest first)
+
+            console.log(`[Duplicate Debug] Found ${duplicateGroups.length} duplicate groups`)
+            duplicateGroups.forEach((group, index) => {
+              console.log(
+                `[Duplicate Debug] Group ${index + 1}: ${group.files.length} copies, ${group.wastedSpace} bytes wasted`,
+              )
+            })
 
             // Send final comprehensive results
             sendData('analysis_complete', {

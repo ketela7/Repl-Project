@@ -412,233 +412,407 @@ export function ProgressiveStorageAnalytics() {
       {/* Files Statistics */}
       {files && (
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Files Summary */}
+          {/* Files Summary with Collapsible */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Files className="h-5 w-5" />
-                Files Overview
-              </CardTitle>
-              <CardDescription>
-                {files.hasMore ? 'Sample data (more files available)' : 'Complete analysis'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Total Files</span>
-                  <span className="font-medium">{(files.totalFiles || 0).toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Total Size</span>
-                  <span className="font-medium">{formatFileSize(files.totalSizeBytes || 0)}</span>
-                </div>
-
-                {/* File Categories - All 27 Categories */}
-                {files.categories && (
-                  <div className="space-y-2 border-t pt-3">
-                    <h4 className="text-sm font-medium">File Categories</h4>
-                    <div className="grid max-h-80 grid-cols-2 gap-1 overflow-y-auto text-xs">
-                      {Object.entries(files.categories || {})
-                        .filter(([, count]) => count > 0)
-                        .sort(([, a], [, b]) => b - a)
-                        .map(([categoryId, count]) => {
-                          const category = FILE_TYPE_CATEGORIES[categoryId]
-                          if (!category) return null
-                          const Icon = category.icon
-                          return (
-                            <div
-                              key={categoryId}
-                              className="flex items-center justify-between py-1"
-                            >
-                              <div className="flex items-center gap-1">
-                                <Icon className="text-muted-foreground h-3 w-3" />
-                                <span className="truncate">{category.label}</span>
-                              </div>
-                              <span className="text-primary font-medium">
-                                {count.toLocaleString()}
-                              </span>
-                            </div>
-                          )
-                        })}
-                    </div>
+            <Collapsible defaultOpen={true}>
+              <CardHeader className="pb-2">
+                <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex w-full items-center justify-between rounded-md p-2 transition-colors">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Files className="h-5 w-5" />
+                      Files Overview
+                    </CardTitle>
+                    <CardDescription>
+                      {files.hasMore ? 'Sample data (more files available)' : 'Complete analysis'}
+                    </CardDescription>
                   </div>
-                )}
-              </div>
-            </CardContent>
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+              </CardHeader>
+              <CollapsibleContent>
+                <CardContent className="pt-2">
+                  <div className="space-y-3">
+                    <div className="grid gap-3">
+                      <div className="flex justify-between rounded-lg border p-3">
+                        <span className="font-medium">Total Files</span>
+                        <span className="text-primary font-semibold">
+                          {(files.totalFiles || 0).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="flex justify-between rounded-lg border p-3">
+                        <span className="font-medium">Total Size</span>
+                        <span className="text-primary font-semibold">
+                          {formatFileSize(files.totalSizeBytes || 0)}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* File Categories - All 27 Categories with ScrollArea */}
+                    {files.categories && (
+                      <div className="space-y-2 border-t pt-3">
+                        <h4 className="text-sm font-medium">
+                          File Categories ({Object.keys(files.categories).length})
+                        </h4>
+                        <ScrollArea className="h-64">
+                          <div className="grid gap-2 pr-3">
+                            {Object.entries(files.categories || {})
+                              .filter(([, count]) => count > 0)
+                              .sort(([, a], [, b]) => b - a)
+                              .map(([categoryId, count]) => {
+                                const category = FILE_TYPE_CATEGORIES[categoryId]
+                                if (!category) return null
+                                const Icon = category.icon
+                                return (
+                                  <div
+                                    key={categoryId}
+                                    className="hover:bg-muted/30 flex items-center justify-between rounded-md border p-2 transition-colors"
+                                  >
+                                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                                      <Icon className="text-muted-foreground h-4 w-4 shrink-0" />
+                                      <span className="truncate text-sm">{category.label}</span>
+                                    </div>
+                                    <Badge variant="secondary" className="text-xs">
+                                      {count.toLocaleString()}
+                                    </Badge>
+                                  </div>
+                                )
+                              })}
+                          </div>
+                        </ScrollArea>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
           </Card>
 
-          {/* Top File Types */}
+          {/* Top File Types with Collapsible */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Top File Types
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {getTopFileTypes().map(
-                  ({ type, count, size }: { type: string; count: number; size: number }) => (
-                    <div key={type} className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{type}</p>
-                        <p className="text-muted-foreground text-xs">{count} files</p>
-                      </div>
-                      <span className="text-sm">{formatFileSize(size)}</span>
+            <Collapsible defaultOpen={true}>
+              <CardHeader className="pb-2">
+                <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex w-full items-center justify-between rounded-md p-2 transition-colors">
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Top File Types
+                  </CardTitle>
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+              </CardHeader>
+              <CollapsibleContent>
+                <CardContent className="pt-2">
+                  <ScrollArea className="h-64">
+                    <div className="space-y-3 pr-3">
+                      {getTopFileTypes().map(
+                        ({ type, count, size }: { type: string; count: number; size: number }) => (
+                          <div
+                            key={type}
+                            className="hover:bg-muted/30 flex items-center justify-between rounded-lg border p-3 transition-colors"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate font-medium">{type}</p>
+                              <p className="text-muted-foreground text-xs">
+                                {count.toLocaleString()} files
+                              </p>
+                            </div>
+                            <div className="flex flex-col items-end gap-1">
+                              <span className="text-sm font-medium">{formatFileSize(size)}</span>
+                              <Badge variant="secondary" className="text-xs">
+                                {((size / (files?.totalSizeBytes || 1)) * 100).toFixed(1)}%
+                              </Badge>
+                            </div>
+                          </div>
+                        ),
+                      )}
                     </div>
-                  ),
-                )}
-              </div>
-            </CardContent>
+                  </ScrollArea>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
           </Card>
         </div>
       )}
 
-      {/* Largest Files */}
+      {/* Largest Files with Collapsible */}
       {files?.largestFiles && files.largestFiles.length > 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle>Largest Files</CardTitle>
-            <CardDescription>
-              Top {files.largestFiles.length} largest files in your Drive
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-64">
-              <div className="space-y-2">
-                {files.largestFiles.map((file, index) => (
-                  <div
-                    key={file.id}
-                    className="flex items-center justify-between rounded-lg border p-3"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium" title={file.name}>
-                        {file.name}
-                      </p>
-                      <p className="text-muted-foreground text-xs">{file.mimeType.split('/')[1]}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">{formatFileSize(file.size)}</span>
-                      <Badge variant="secondary">#{index + 1}</Badge>
-                    </div>
+          <Collapsible defaultOpen={true}>
+            <CardHeader className="pb-2">
+              <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex w-full items-center justify-between rounded-md p-2 transition-colors">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <HardDrive className="h-5 w-5" />
+                    Largest Files
+                  </CardTitle>
+                  <CardDescription>
+                    Top {files.largestFiles.length} largest files in your Drive
+                  </CardDescription>
+                </div>
+                <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="pt-2">
+                <ScrollArea className="h-64">
+                  <div className="space-y-2 pr-3">
+                    {files.largestFiles.map((file, index) => (
+                      <div
+                        key={file.id}
+                        className="hover:bg-muted/30 flex items-center justify-between rounded-lg border p-3 transition-colors"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium" title={file.name}>
+                            {file.name}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            {file.mimeType.split('/')[1]}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium">{formatFileSize(file.size)}</span>
+                          <Badge variant="secondary">#{index + 1}</Badge>
+                          {file.webViewLink && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => window.open(file.webViewLink, '_blank')}
+                            >
+                              View
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </CardContent>
+                </ScrollArea>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
       )}
 
-      {/* Duplicate Files Detection */}
-      {files?.duplicateFiles && files.duplicateFiles.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Copy className="h-5 w-5" />
-              Duplicate Files
-            </CardTitle>
-            <CardDescription>
-              Found {files.duplicateFiles.length} duplicate groups •
-              {files.duplicateFiles.reduce((total, group) => total + group.wastedSpace, 0) > 0 && (
-                <span className="text-destructive ml-1">
-                  {formatFileSize(
-                    files.duplicateFiles.reduce((total, group) => total + group.wastedSpace, 0),
-                  )}{' '}
-                  wasted space
-                </span>
-              )}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-96">
-              <div className="space-y-3">
-                {files.duplicateFiles.map((duplicateGroup, groupIndex) => (
-                  <Collapsible key={duplicateGroup.md5Hash} className="rounded-lg border">
-                    <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
-                        <div className="text-left">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="destructive" className="text-xs">
-                              {duplicateGroup.files.length} copies
-                            </Badge>
-                            <span className="text-sm font-medium">
-                              {duplicateGroup.files[0]?.name || 'Unknown File'}
-                            </span>
-                          </div>
-                          <p className="text-muted-foreground text-xs">
-                            {duplicateGroup.files[0]?.mimeType.split('/')[1] || 'Unknown'} •
-                            {formatFileSize(duplicateGroup.files[0]?.size || 0)} each
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs">
-                          {formatFileSize(duplicateGroup.totalSize)} total
-                        </Badge>
-                        {duplicateGroup.wastedSpace > 0 && (
-                          <Badge variant="destructive" className="text-xs">
-                            -{formatFileSize(duplicateGroup.wastedSpace)} wasted
-                          </Badge>
+      {/* Debug Info for Duplicate Detection */}
+      {files && (
+        <Card className="border-amber-200 bg-amber-50/50">
+          <Collapsible defaultOpen={false}>
+            <CardHeader className="pb-2">
+              <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex w-full items-center justify-between rounded-md p-2 transition-colors">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-amber-800">
+                    <RefreshCw className="h-5 w-5" />
+                    Debug Info
+                  </CardTitle>
+                  <CardDescription className="text-amber-700">
+                    Debug information for duplicate detection
+                  </CardDescription>
+                </div>
+                <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="pt-2">
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Duplicate Files Array:</span>
+                    <span className="font-mono">
+                      {files.duplicateFiles ? `${files.duplicateFiles.length} groups` : 'undefined'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Total Files:</span>
+                    <span className="font-mono">{files.totalFiles || 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Has More:</span>
+                    <span className="font-mono">{files.hasMore ? 'true' : 'false'}</span>
+                  </div>
+                  {files.duplicateFiles && (
+                    <div className="mt-3 rounded bg-amber-100 p-2 font-mono text-xs">
+                      <pre>{JSON.stringify(files.duplicateFiles, null, 2)}</pre>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
+        </Card>
+      )}
+
+      {/* Duplicate Files Detection - Enhanced with Better Fallback */}
+      {files && (
+        <Card
+          className={
+            files.duplicateFiles && files.duplicateFiles.length > 0
+              ? ''
+              : 'border-slate-200 bg-slate-50/50'
+          }
+        >
+          <Collapsible defaultOpen={files.duplicateFiles && files.duplicateFiles.length > 0}>
+            <CardHeader className="pb-2">
+              <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex w-full items-center justify-between rounded-md p-2 transition-colors">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Copy className="h-5 w-5" />
+                    Duplicate Files
+                    {files.duplicateFiles && files.duplicateFiles.length > 0 && (
+                      <Badge variant="destructive" className="ml-2">
+                        {files.duplicateFiles.length} groups
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <CardDescription>
+                    {files.duplicateFiles && files.duplicateFiles.length > 0 ? (
+                      <>
+                        Found {files.duplicateFiles.length} duplicate groups •
+                        {files.duplicateFiles.reduce(
+                          (total, group) => total + group.wastedSpace,
+                          0,
+                        ) > 0 && (
+                          <span className="text-destructive ml-1">
+                            {formatFileSize(
+                              files.duplicateFiles.reduce(
+                                (total, group) => total + group.wastedSpace,
+                                0,
+                              ),
+                            )}{' '}
+                            wasted space
+                          </span>
                         )}
-                      </div>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <div className="border-t p-3">
-                        <div className="space-y-2">
-                          {duplicateGroup.files.map((file, fileIndex) => (
-                            <div
-                              key={file.id}
-                              className="bg-muted/30 flex items-center justify-between rounded-md p-2"
-                            >
-                              <div className="min-w-0 flex-1">
-                                <p className="truncate text-sm font-medium" title={file.name}>
-                                  {file.name}
-                                </p>
-                                <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                                  <span>ID: {file.id}</span>
-                                  {file.modifiedTime && (
-                                    <span>
-                                      Modified: {new Date(file.modifiedTime).toLocaleDateString()}
-                                    </span>
-                                  )}
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">
+                        No duplicate files detected or analysis in progress...
+                      </span>
+                    )}
+                  </CardDescription>
+                </div>
+                <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="pt-2">
+                {files.duplicateFiles && files.duplicateFiles.length > 0 ? (
+                  <ScrollArea className="h-96">
+                    <div className="space-y-3 pr-3">
+                      {files.duplicateFiles.map((duplicateGroup, groupIndex) => (
+                        <Collapsible key={duplicateGroup.md5Hash} className="rounded-lg border">
+                          <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors">
+                            <div className="flex items-center gap-3">
+                              <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
+                              <div className="text-left">
+                                <div className="flex items-center gap-2">
+                                  <Badge variant="destructive" className="text-xs">
+                                    {duplicateGroup.files.length} copies
+                                  </Badge>
+                                  <span className="text-sm font-medium">
+                                    {duplicateGroup.files[0]?.name || 'Unknown File'}
+                                  </span>
                                 </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Badge variant="secondary" className="text-xs">
-                                  Copy #{fileIndex + 1}
-                                </Badge>
-                                {file.webViewLink && (
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-6 px-2 text-xs"
-                                    onClick={() => window.open(file.webViewLink, '_blank')}
-                                  >
-                                    View
-                                  </Button>
-                                )}
+                                <p className="text-muted-foreground text-xs">
+                                  {duplicateGroup.files[0]?.mimeType.split('/')[1] || 'Unknown'} •
+                                  {formatFileSize(duplicateGroup.files[0]?.size || 0)} each
+                                </p>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                        <div className="mt-3 border-t pt-2">
-                          <div className="text-muted-foreground flex items-center justify-between text-xs">
-                            <span>MD5 Hash: {duplicateGroup.md5Hash.substring(0, 16)}...</span>
-                            <span>
-                              Keep 1 copy • Delete {duplicateGroup.files.length - 1} to save{' '}
-                              {formatFileSize(duplicateGroup.wastedSpace)}
-                            </span>
-                          </div>
-                        </div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {formatFileSize(duplicateGroup.totalSize)} total
+                              </Badge>
+                              {duplicateGroup.wastedSpace > 0 && (
+                                <Badge variant="destructive" className="text-xs">
+                                  -{formatFileSize(duplicateGroup.wastedSpace)} wasted
+                                </Badge>
+                              )}
+                            </div>
+                          </CollapsibleTrigger>
+                          <CollapsibleContent>
+                            <div className="border-t p-3">
+                              <div className="space-y-2">
+                                {duplicateGroup.files.map((file, fileIndex) => (
+                                  <div
+                                    key={file.id}
+                                    className="bg-muted/30 flex items-center justify-between rounded-md p-2"
+                                  >
+                                    <div className="min-w-0 flex-1">
+                                      <p className="truncate text-sm font-medium" title={file.name}>
+                                        {file.name}
+                                      </p>
+                                      <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                                        <span>ID: {file.id}</span>
+                                        {file.modifiedTime && (
+                                          <span>
+                                            Modified:{' '}
+                                            {new Date(file.modifiedTime).toLocaleDateString()}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                      <Badge variant="secondary" className="text-xs">
+                                        Copy #{fileIndex + 1}
+                                      </Badge>
+                                      {file.webViewLink && (
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 px-2 text-xs"
+                                          onClick={() => window.open(file.webViewLink, '_blank')}
+                                        >
+                                          View
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                              <div className="mt-3 border-t pt-2">
+                                <div className="text-muted-foreground flex items-center justify-between text-xs">
+                                  <span>
+                                    MD5 Hash: {duplicateGroup.md5Hash.substring(0, 16)}...
+                                  </span>
+                                  <span>
+                                    Keep 1 copy • Delete {duplicateGroup.files.length - 1} to save{' '}
+                                    {formatFileSize(duplicateGroup.wastedSpace)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </CollapsibleContent>
+                        </Collapsible>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                ) : (
+                  <div className="py-8 text-center">
+                    <Copy className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+                    <h3 className="mb-2 text-lg font-medium">No Duplicate Files Found</h3>
+                    <p className="text-muted-foreground mb-4 text-sm">
+                      Either your Drive is well-organized or the analysis is still running.
+                    </p>
+                    <div className="text-muted-foreground grid grid-cols-2 gap-4 text-xs">
+                      <div className="text-left">
+                        <p className="mb-1 font-medium">Possible reasons:</p>
+                        <ul className="space-y-1">
+                          <li>• No actual duplicate files</li>
+                          <li>• Files lack MD5 checksums</li>
+                          <li>• Analysis still in progress</li>
+                        </ul>
                       </div>
-                    </CollapsibleContent>
-                  </Collapsible>
-                ))}
-              </div>
-            </ScrollArea>
-          </CardContent>
+                      <div className="text-left">
+                        <p className="mb-1 font-medium">What gets detected:</p>
+                        <ul className="space-y-1">
+                          <li>• Identical file content</li>
+                          <li>• Same MD5 hash</li>
+                          <li>• Files with size {'>'} 0</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </CollapsibleContent>
+          </Collapsible>
         </Card>
       )}
     </div>
