@@ -404,28 +404,25 @@ function ItemsExportDialog({
             </ScrollArea>
           </div>
 
-          {/* Compatible Files Preview */}
+          {/* Compatible Files Preview - ScrollArea */}
           <div className="min-h-0 flex-1 space-y-2">
             <h4 className="text-center text-xs font-medium">Compatible files:</h4>
-            <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
-              <div className="space-y-1 p-2">
-                {compatibleFiles.slice(0, 5).map(file => (
-                  <div
-                    key={file.id}
-                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
-                  >
-                    <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
-                    <span className="flex-1 truncate font-mono text-xs" title={file.name}>
-                      {file.name}
-                    </span>
-                  </div>
-                ))}
-                {compatibleFiles.length > 5 && (
-                  <div className="text-muted-foreground py-1 text-center text-xs">
-                    ... and {compatibleFiles.length - 5} more files
-                  </div>
-                )}
-              </div>
+            <div className="bg-muted/50 flex-1 rounded-lg border">
+              <ScrollArea className="h-[200px] w-full">
+                <div className="space-y-1 p-2">
+                  {compatibleFiles.map(file => (
+                    <div
+                      key={file.id}
+                      className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                    >
+                      <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
+                      <span className="flex-1 truncate font-mono text-xs" title={file.name}>
+                        {file.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
             </div>
           </div>
 
@@ -574,17 +571,19 @@ function ItemsExportDialog({
         {progress.errors.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-red-600">Errors:</h4>
-            <div className="max-h-32 space-y-1 overflow-y-auto">
-              {progress.errors.map((error, index) => (
-                <div
-                  key={`error-${error.file}-${index}`}
-                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
-                >
-                  <div className="font-medium">{error.file}</div>
-                  <div className="text-red-600 dark:text-red-400">{error.error}</div>
-                </div>
-              ))}
-            </div>
+            <ScrollArea className="h-32 w-full">
+              <div className="space-y-1">
+                {progress.errors.map((error, index) => (
+                  <div
+                    key={`error-${error.file}-${index}`}
+                    className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
+                  >
+                    <div className="font-medium">{error.file}</div>
+                    <div className="text-red-600 dark:text-red-400">{error.error}</div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
         )}
 
