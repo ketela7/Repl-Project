@@ -389,7 +389,7 @@ function ItemsExportDialog({
             >
               {EXPORT_FORMATS.map(format => (
                 <div key={format.id} className="flex items-center space-x-2">
-                  <RadioGroupItem value={format.id} id={format.id} className="h-3 w-3" />
+                  <RadioGroupItem value={format.id} id={format.id} className="h-4 w-4" />
                   <Label
                     htmlFor={format.id}
                     className="flex cursor-pointer items-center gap-2 text-xs"
