@@ -304,26 +304,21 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             </div>
           </div>
 
-          <ScrollArea className="max-h-48">
-            <div className="space-y-2">
-              {selectedItems.slice(0, 10).map(item => (
+          <ScrollArea className="max-h-48 w-full">
+            <div className="space-y-2 pr-2">
+              {selectedItems.map(item => (
                 <div
                   key={item.id}
-                  className="flex items-center gap-2 rounded-lg border p-2 text-sm"
+                  className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
                 >
                   {item.isFolder ? (
-                    <Folder className="h-4 w-4 text-blue-600" />
+                    <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
                   ) : (
-                    <FileText className="h-4 w-4 text-gray-600" />
+                    <FileText className="h-4 w-4 flex-shrink-0 text-gray-600" />
                   )}
-                  <span className="truncate">{item.name}</span>
+                  <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
                 </div>
               ))}
-              {selectedItems.length > 10 && (
-                <div className="text-muted-foreground text-center text-sm">
-                  +{selectedItems.length - 10} more items
-                </div>
-              )}
             </div>
           </ScrollArea>
         </div>
@@ -588,23 +583,36 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                 </DropdownMenu>
               </div>
 
-              <ScrollArea className="max-h-48">
-                <div className="space-y-2">
+              <ScrollArea className="max-h-48 w-full">
+                <div className="space-y-2 pr-2">
                   {shareResults.map((result, index) => (
-                    <div key={index} className="text-sm">
+                    <div
+                      key={index}
+                      className={cn(
+                        'rounded-lg border p-3 text-sm transition-colors',
+                        result.success
+                          ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20'
+                          : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20',
+                      )}
+                    >
                       <div className="flex items-center gap-2">
                         {result.success ? (
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 flex-shrink-0 text-green-600" />
                         ) : (
-                          <XCircle className="h-4 w-4 text-red-600" />
+                          <XCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
                         )}
-                        <span className="font-medium">{result.name}</span>
+                        <span className="min-w-0 flex-1 truncate font-medium">{result.name}</span>
                       </div>
                       {result.shareLink && (
-                        <div className="text-muted-foreground ml-6 text-xs">{result.shareLink}</div>
+                        <div className="mt-2 rounded bg-white/50 p-2 dark:bg-black/20">
+                          <div className="text-muted-foreground text-xs">Share Link:</div>
+                          <div className="mt-1 font-mono text-xs break-all">{result.shareLink}</div>
+                        </div>
                       )}
                       {result.error && (
-                        <div className="ml-6 text-xs text-red-600">Error: {result.error}</div>
+                        <div className="mt-2 text-xs text-red-600">
+                          <span className="font-medium">Error:</span> {result.error}
+                        </div>
                       )}
                     </div>
                   ))}
@@ -614,15 +622,25 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           )}
 
           {progress.failed > 0 && (
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-red-600">
-                Failed to share {progress.failed} item(s):
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <XCircle className="h-4 w-4 text-red-600" />
+                <span className="text-sm font-medium text-red-600">
+                  Failed to share {progress.failed} item(s):
+                </span>
               </div>
-              <ScrollArea className="max-h-32">
-                <div className="space-y-1">
+              <ScrollArea className="max-h-32 w-full">
+                <div className="space-y-2 pr-2">
                   {progress.errors.map((error, index) => (
-                    <div key={index} className="text-xs text-red-600">
-                      • {error.file}: {error.error}
+                    <div
+                      key={index}
+                      className="rounded-lg border border-red-200 bg-red-50 p-2 text-sm dark:border-red-800 dark:bg-red-950/20"
+                    >
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-3 w-3 flex-shrink-0 text-red-600" />
+                        <span className="min-w-0 flex-1 truncate font-medium">{error.file}</span>
+                      </div>
+                      <div className="mt-1 text-xs text-red-600">{error.error}</div>
                     </div>
                   ))}
                 </div>
