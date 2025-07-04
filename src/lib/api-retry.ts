@@ -103,8 +103,7 @@ export async function retryOperation<T>(
 
   for (let attempt = 0; attempt <= finalConfig.maxRetries; attempt++) {
     try {
-      const result = await operation()
-      return result
+      return await operation()
     } catch (error) {
       lastError = error
 

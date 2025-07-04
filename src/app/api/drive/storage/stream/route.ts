@@ -207,7 +207,7 @@ export async function GET() {
                   }))
 
                 sendData('file_stats_update', {
-                  totalSizeBytes: totalSizeBytes,
+                  totalSizeBytes,
                   totalFiles: totalProcessed,
                   topFileTypes: topTypes,
                   largestFiles: largestFiles.slice(0, 50),
@@ -252,7 +252,7 @@ export async function GET() {
             sendData('analysis_complete', {
               summary: {
                 totalFiles: totalProcessed,
-                totalSizeBytes: totalSizeBytes,
+                totalSizeBytes,
                 totalCategories: Object.keys(filesByType).length,
                 processedAt: new Date().toISOString(),
               },

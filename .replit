@@ -13,20 +13,9 @@ runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
-mode = "parallel"
+mode = "sequential"
 author = "agent"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Type"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Test"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "Linter"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
@@ -71,6 +60,7 @@ args = "npm run lint:fast"
 [[workflows.workflow]]
 name = "Formatter"
 mode = "sequential"
+author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

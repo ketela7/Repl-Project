@@ -9,7 +9,7 @@ jest.mock('next/server', () => ({
   },
 }))
 
-// Mock the auth module to avoid ES module import issues  
+// Mock the auth module to avoid ES module import issues
 jest.mock('@/auth', () => ({
   auth: jest.fn(),
 }))
@@ -19,12 +19,11 @@ jest.mock('@/lib/google-drive/service', () => ({
   GoogleDriveService: jest.fn(),
 }))
 
-import { 
-  handleApiError, 
-  validateShareRequest, 
-  validateDownloadRequest, 
+import {
+  validateShareRequest,
+  validateDownloadRequest,
   validateRenameRequest,
-  getFileIdFromParams 
+  getFileIdFromParams,
 } from '../api-utils'
 
 describe('API Utils', () => {
@@ -34,25 +33,25 @@ describe('API Utils', () => {
   describe('validateShareRequest', () => {
     it('should validate requests with items array', () => {
       const body = {
-        items: [{ id: 'file1', name: 'test.txt' }]
+        items: [{ id: 'file1', name: 'test.txt' }],
       }
-      
+
       const result = validateShareRequest(body)
       expect(result).toBe(true)
     })
 
     it('should validate legacy requests with fileId', () => {
       const body = {
-        fileId: 'file123'
+        fileId: 'file123',
       }
-      
+
       const result = validateShareRequest(body)
       expect(result).toBe(true)
     })
 
     it('should reject invalid requests', () => {
       const body = {}
-      
+
       const result = validateShareRequest(body)
       expect(result).toBe(false)
     })
@@ -61,16 +60,16 @@ describe('API Utils', () => {
   describe('validateDownloadRequest', () => {
     it('should validate requests with items array', () => {
       const body = {
-        items: [{ id: 'file1', name: 'test.txt' }]
+        items: [{ id: 'file1', name: 'test.txt' }],
       }
-      
+
       const result = validateDownloadRequest(body)
       expect(result).toBe(true)
     })
 
     it('should reject requests without items', () => {
       const body = {}
-      
+
       const result = validateDownloadRequest(body)
       expect(result).toBe(false)
     })
@@ -79,9 +78,9 @@ describe('API Utils', () => {
   describe('validateRenameRequest', () => {
     it('should validate requests with items array', () => {
       const body = {
-        items: [{ id: 'file1', name: 'test.txt' }]
+        items: [{ id: 'file1', name: 'test.txt' }],
       }
-      
+
       const result = validateRenameRequest(body)
       expect(result).toBe(true)
     })
@@ -89,16 +88,16 @@ describe('API Utils', () => {
     it('should validate legacy requests with fileId and newName', () => {
       const body = {
         fileId: 'file123',
-        newName: 'new-name.txt'
+        newName: 'new-name.txt',
       }
-      
+
       const result = validateRenameRequest(body)
       expect(result).toBe(true)
     })
 
     it('should reject invalid requests', () => {
       const body = {}
-      
+
       const result = validateRenameRequest(body)
       expect(result).toBe(false)
     })
@@ -107,7 +106,7 @@ describe('API Utils', () => {
   describe('getFileIdFromParams', () => {
     it('should extract fileId from params', async () => {
       const params = Promise.resolve({ fileId: 'test-file-id' })
-      
+
       const result = await getFileIdFromParams(params)
       expect(result).toBe('test-file-id')
     })

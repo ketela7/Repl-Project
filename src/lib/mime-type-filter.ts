@@ -385,9 +385,7 @@ export const FILE_TYPE_CATEGORIES: Record<string, FileTypeCategory> = {
     icon: Calendar,
     color: 'text-blue-500',
     mimeTypes: ['text/calendar', 'application/ics'],
-    googleDriveQuery: `(${["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(
-      ' or ',
-    )})`,
+    googleDriveQuery: `(${["mimeType = 'text/calendar'", "mimeType = 'application/ics'"].join(' or ')})`,
     description: 'Calendar and event files',
   },
 
