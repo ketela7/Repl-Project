@@ -22,17 +22,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { formatFileSize } from '@/lib/google-drive/utils'
-import {
-  ItemsDeleteDialog,
-  ItemsTrashDialog,
-  ItemsMoveDialog,
-  ItemsCopyDialog,
-  ItemsRenameDialog,
-  ItemsShareDialog,
-  ItemsExportDialog,
-  ItemsDownloadDialog,
-  ItemsUntrashDialog,
-} from '@/components/lazy-imports'
+import { OperationsDialog } from '@/components/lazy-imports'
 
 interface DuplicateFile {
   id: string
@@ -76,17 +66,7 @@ export function DuplicateActionDialog({
   const isMobile = useIsMobile()
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('newest')
   const [selectedFiles, setSelectedFiles] = useState<DuplicateFile[]>([])
-  const [showOperationsMenu, setShowOperationsMenu] = useState(false)
-
-  // Individual operation dialog states
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isTrashDialogOpen, setIsTrashDialogOpen] = useState(false)
-  const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
-  const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false)
-  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
-  const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
-  const [isDownloadDialogOpen, setIsDownloadDialogOpen] = useState(false)
+  const [showOperations, setShowOperations] = useState(false)
 
   // Smart selection logic
   const getSelectedFiles = (mode: SelectionMode): DuplicateFile[] => {
@@ -158,14 +138,10 @@ export function DuplicateActionDialog({
 
     console.log('Selected files for operations:', operationItems)
     setSelectedFiles(operationItems)
-    setShowOperationsMenu(true)
-    console.log('Operations menu opened:', true)
-  }
-
-  // Handler functions for individual operations
-  const handleOperationComplete = () => {
-    setShowOperationsMenu(false)
-    onClose()
+    // Don't close immediately to debug
+    // onClose()
+    setShowOperations(true)
+    console.log('Operations dialog opened:', true)
   }
 
   const getSelectionPreview = () => {
@@ -307,56 +283,6 @@ export function DuplicateActionDialog({
         </div>
       )}
 
-      {/* Operations Menu */}
-      {showOperationsMenu && selectedFiles.length > 0 && (
-        <div className="space-y-3 border-t pt-4">
-          <div>
-            <h4 className="font-medium">Choose Operation</h4>
-            <p className="text-muted-foreground text-sm">
-              Select what to do with {selectedFiles.length} selected files
-            </p>
-          </div>
-
-          <div className="grid gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsMoveDialogOpen(true)}
-              className="justify-start gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Move Files
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => setIsCopyDialogOpen(true)}
-              className="justify-start gap-2"
-            >
-              <Users className="h-4 w-4" />
-              Copy Files
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => setIsTrashDialogOpen(true)}
-              className="justify-start gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              Move to Trash
-            </Button>
-
-            <Button
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(true)}
-              className="text-destructive hover:text-destructive justify-start gap-2"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete Permanently
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* Actions */}
       <div className="flex gap-2 pt-4">
         <Button variant="outline" onClick={onClose} className="flex-1">
@@ -368,7 +294,7 @@ export function DuplicateActionDialog({
           className="flex-1 gap-2"
         >
           <Settings className="h-4 w-4" />
-          Choose Action
+          Open Operations
         </Button>
       </div>
     </div>
@@ -402,80 +328,18 @@ export function DuplicateActionDialog({
         </Dialog>
       )}
 
-      {/* Individual Operation Dialogs */}
-      {selectedFiles.length > 0 && (
-        <>
-          <Suspense fallback={<div>Loading...</div>}>
-            <ItemsMoveDialog
-              isOpen={isMoveDialogOpen}
-              onClose={() => setIsMoveDialogOpen(false)}
-              onConfirm={handleOperationComplete}
-              selectedItems={selectedFiles}
-            />
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <ItemsCopyDialog
-              isOpen={isCopyDialogOpen}
-              onClose={() => setIsCopyDialogOpen(false)}
-              onConfirm={handleOperationComplete}
-              selectedItems={selectedFiles}
-            />
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <ItemsTrashDialog
-              isOpen={isTrashDialogOpen}
-              onClose={() => setIsTrashDialogOpen(false)}
-              _onConfirm={handleOperationComplete}
-              selectedItems={selectedFiles}
-            />
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <ItemsDeleteDialog
-              isOpen={isDeleteDialogOpen}
-              onClose={() => setIsDeleteDialogOpen(false)}
-              onConfirm={handleOperationComplete}
-              selectedItems={selectedFiles}
-            />
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <ItemsRenameDialog
-              isOpen={isRenameDialogOpen}
-              onClose={() => setIsRenameDialogOpen(false)}
-              onConfirm={handleOperationComplete}
-              selectedItems={selectedFiles}
-            />
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <ItemsShareDialog
-              isOpen={isShareDialogOpen}
-              onClose={() => setIsShareDialogOpen(false)}
-              selectedItems={selectedFiles}
-            />
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <ItemsExportDialog
-              isOpen={isExportDialogOpen}
-              onClose={() => setIsExportDialogOpen(false)}
-              onConfirm={handleOperationComplete}
-              selectedItems={selectedFiles}
-            />
-          </Suspense>
-
-          <Suspense fallback={<div>Loading...</div>}>
-            <ItemsDownloadDialog
-              isOpen={isDownloadDialogOpen}
-              onClose={() => setIsDownloadDialogOpen(false)}
-              onConfirm={handleOperationComplete}
-              selectedItems={selectedFiles}
-            />
-          </Suspense>
-        </>
+      {/* Operations Dialog */}
+      {showOperations && selectedFiles.length > 0 && (
+        <Suspense fallback={<div>Loading operations...</div>}>
+          <OperationsDialog
+            isOpen={showOperations}
+            onClose={() => {
+              console.log('Closing operations dialog')
+              setShowOperations(false)
+            }}
+            selectedItems={selectedFiles}
+          />
+        </Suspense>
       )}
     </>
   )
