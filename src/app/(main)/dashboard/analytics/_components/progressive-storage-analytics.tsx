@@ -734,13 +734,13 @@ export function ProgressiveStorageAnalytics() {
                   </div>
                   <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
                 </CollapsibleTrigger>
-                
+
                 {/* Bulk Action Button */}
                 {files.duplicateFiles && files.duplicateFiles.length > 0 && (
                   <Button
                     size="sm"
                     variant="default"
-                    onClick={(e) => {
+                    onClick={e => {
                       e.stopPropagation()
                       handleDuplicateBulkAction()
                     }}
@@ -872,8 +872,6 @@ export function ProgressiveStorageAnalytics() {
                                       : `Keep smallest • Save ${formatFileSize(duplicateGroup.wastedSpace)}`}
                                   </span>
                                 </div>
-
-    
                               </div>
                             </div>
                           </CollapsibleContent>
