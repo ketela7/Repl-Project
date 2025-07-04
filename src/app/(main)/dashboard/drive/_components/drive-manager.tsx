@@ -217,7 +217,7 @@ export function DriveManager() {
     setFilters(initialFilters)
     setSearchQuery('')
     searchQueryRef.current = ''
-    setTimeout(() => fetchFiles(currentFolderId || undefined, undefined), 0)
+    setTimeout(() => fetchFiles(currentFolderId || undefined, undefined), 300)
   }, [currentFolderId])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
