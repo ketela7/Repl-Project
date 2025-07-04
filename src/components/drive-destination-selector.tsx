@@ -216,8 +216,8 @@ export function DriveDestinationSelector({
 
   return (
     <div className={cn('flex h-full min-h-0 w-full flex-col overflow-hidden', className)}>
-      {/* Main Content - Fixed height container with overflow protection */}
-      <Card className="from-background to-muted/20 mx-auto h-full max-h-[450px] min-h-[350px] w-full border-0 bg-gradient-to-br shadow-sm">
+      {/* Main Content - Flexible height container with overflow protection */}
+      <Card className="from-background to-muted/20 mx-auto h-full min-h-[350px] w-full border-0 bg-gradient-to-br shadow-sm">
         <CardContent className="flex h-full flex-col overflow-hidden p-3">
           <Tabs
             value={activeTab}
@@ -293,13 +293,13 @@ export function DriveDestinationSelector({
                 )}
               </div>
 
-              {/* Folder List - Fixed height with proper scrolling */}
+              {/* Folder List - Flexible height with proper scrolling */}
               <Card className="border-muted/50 min-h-0 flex-1 overflow-hidden">
                 <CardContent className="h-full overflow-hidden p-0">
                   <ScrollArea className="h-full">
-                    <div className="min-h-[250px] space-y-1 p-3">
+                    <div className="min-h-[150px] space-y-1 p-3">
                       {isLoadingFolders ? (
-                        <div className="flex min-h-[250px] flex-col items-center justify-center space-y-3">
+                        <div className="flex min-h-[150px] flex-col items-center justify-center space-y-3">
                           <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
                           <div className="space-y-1 text-center">
                             <p className="text-xs font-medium">Loading folders...</p>
@@ -307,7 +307,7 @@ export function DriveDestinationSelector({
                           </div>
                         </div>
                       ) : filteredFolders.length === 0 ? (
-                        <div className="flex min-h-[250px] flex-col items-center justify-center space-y-3">
+                        <div className="flex min-h-[150px] flex-col items-center justify-center space-y-3">
                           <div className="bg-muted/50 rounded-full p-3">
                             <Folder className="text-muted-foreground h-5 w-5" />
                           </div>
