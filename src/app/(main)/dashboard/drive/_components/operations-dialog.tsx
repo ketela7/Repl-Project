@@ -77,12 +77,14 @@ function OperationsDialog({
   // Individual dialog handlers - Fixed timing issue
   const handleMoveClick = () => {
     console.log('Move button clicked, closing main dialog and opening move dialog')
-    handleClose()
-    // Use longer timeout to ensure main dialog fully closes before individual dialog opens
+    // Try immediate opening without closing main dialog first to test
+    console.log('Setting move dialog open to true immediately for testing')
+    setIsMoveDialogOpen(true)
+
+    // Close main dialog after a delay
     setTimeout(() => {
-      console.log('Setting move dialog open to true')
-      setIsMoveDialogOpen(true)
-    }, 300)
+      handleClose()
+    }, 100)
   }
 
   const handleCopyClick = () => {
@@ -452,6 +454,7 @@ function OperationsDialog({
       )}
 
       {/* Individual Items Operation Dialogs - With Suspense for Lazy Loading */}
+      {console.log('Move dialog state:', isMoveDialogOpen, 'selectedItems:', selectedItems.length)}
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsMoveDialog
           isOpen={isMoveDialogOpen}
@@ -461,6 +464,7 @@ function OperationsDialog({
         />
       </Suspense>
 
+      {console.log('Copy dialog state:', isCopyDialogOpen, 'selectedItems:', selectedItems.length)}
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsCopyDialog
           isOpen={isCopyDialogOpen}
