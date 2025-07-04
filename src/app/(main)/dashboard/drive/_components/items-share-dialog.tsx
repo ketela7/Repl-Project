@@ -19,6 +19,7 @@ import {
   Code,
   Folder,
   ArrowRight,
+  ChevronRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -27,6 +28,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   Dialog,
   DialogContent,
@@ -104,6 +106,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     errors: [],
   })
   const [shareResults, setShareResults] = useState<ShareResult[]>([])
+  const [isItemsExpanded, setIsItemsExpanded] = useState(selectedItems.length <= 5)
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
@@ -285,43 +288,57 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           </div>
         </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Selected Items</span>
-            <div className="flex gap-2">
-              {folderCount > 0 && (
-                <Badge variant="secondary" className="gap-1">
-                  <Folder className="h-3 w-3" />
-                  {folderCount} folder{folderCount > 1 ? 's' : ''}
-                </Badge>
-              )}
-              {fileCount > 0 && (
-                <Badge variant="secondary" className="gap-1">
-                  <FileText className="h-3 w-3" />
-                  {fileCount} file{fileCount > 1 ? 's' : ''}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          <ScrollArea className="max-h-48 w-full">
-            <div className="space-y-2 pr-2">
-              {selectedItems.map(item => (
-                <div
-                  key={item.id}
-                  className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
-                >
-                  {item.isFolder ? (
-                    <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
-                  ) : (
-                    <FileText className="h-4 w-4 flex-shrink-0 text-gray-600" />
+        <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
+          <CollapsibleTrigger asChild>
+            <Button variant="outline" className="hover:bg-muted/50 w-full justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium">
+                  {isItemsExpanded ? 'Hide Selected Items' : 'Show Selected Items'}
+                </span>
+                <div className="flex gap-2">
+                  {folderCount > 0 && (
+                    <Badge variant="secondary" className="gap-1">
+                      <Folder className="h-3 w-3" />
+                      {folderCount}
+                    </Badge>
                   )}
-                  <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
+                  {fileCount > 0 && (
+                    <Badge variant="secondary" className="gap-1">
+                      <FileText className="h-3 w-3" />
+                      {fileCount}
+                    </Badge>
+                  )}
+                  <Badge variant="outline">{selectedItems.length} total</Badge>
                 </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
+              </div>
+              <ChevronRight
+                className={cn(
+                  'h-4 w-4 transition-transform duration-200',
+                  isItemsExpanded && 'rotate-90',
+                )}
+              />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-3">
+            <ScrollArea className="max-h-64 w-full">
+              <div className="space-y-2 pr-2">
+                {selectedItems.map(item => (
+                  <div
+                    key={item.id}
+                    className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
+                  >
+                    {item.isFolder ? (
+                      <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
+                    ) : (
+                      <FileText className="h-4 w-4 flex-shrink-0 text-gray-600" />
+                    )}
+                    <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CollapsibleContent>
+        </Collapsible>
 
         <Separator />
 
