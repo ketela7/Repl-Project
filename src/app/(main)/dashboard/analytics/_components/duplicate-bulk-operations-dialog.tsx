@@ -472,6 +472,8 @@ export function DuplicateBulkOperationsDialog({
     }
   }
 
+  const selectedFiles = getSelectedFilesForOperation()
+
   if (isMobile) {
     return (
       <>
@@ -512,8 +514,6 @@ export function DuplicateBulkOperationsDialog({
       </>
     )
   }
-
-  const selectedFiles = getSelectedFilesForOperation()
 
   return (
     <>
