@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import {
   Edit3,
   Hash,
@@ -12,6 +12,13 @@ import {
   XCircle,
   AlertTriangle,
   HelpCircle,
+  ArrowRight,
+  SkipForward,
+  FileText,
+  Folder,
+  Zap,
+  Info,
+  Settings,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -20,6 +27,7 @@ import { RegexHelpDialog } from './regex-help-dialog'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -30,6 +38,7 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
+  BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -37,69 +46,68 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn } from '@/lib/utils'
+import { cn, calculateProgress } from '@/lib/utils'
 
 interface ItemsRenameDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
+  onConfirm?: () => void
   selectedItems: Array<{
     id: string
     name: string
     isFolder: boolean
+    mimeType?: string
   }>
 }
 
-const RENAME_MODES = [
-  {
-    id: 'prefix',
-    label: 'Add Prefix',
-    description: 'Add text before the filename',
-    icon: AlignLeft,
-  },
-  {
-    id: 'suffix',
-    label: 'Add Suffix',
-    description: 'Add text after the filename (before extension)',
-    icon: AlignLeft,
-  },
-  {
-    id: 'numbering',
-    label: 'Sequential Numbering',
-    description: 'Add numbers in sequence (1, 2, 3...)',
-    icon: Hash,
-  },
-  {
-    id: 'timestamp',
-    label: 'Add Timestamp',
-    description: 'Add current date and time',
-    icon: Calendar,
-  },
-  {
-    id: 'replace',
-    label: 'Find & Replace',
-    description: 'Replace specific text in filenames',
-    icon: Edit3,
-  },
-  {
-    id: 'regex',
-    label: 'Regular Expression',
-    description: 'Advanced pattern matching with regex (click help for examples)',
-    icon: Code2,
-  },
-]
+type RenameMode = 'simple' | 'pattern' | 'sequence' | 'regex'
 
-function ItemsRenameDialog({
-  isOpen,
-  onClose,
-  onConfirm: _onConfirm,
-  selectedItems,
-}: ItemsRenameDialogProps) {
-  const [selectedMode, setSelectedMode] = useState('prefix')
+type RenameStep = 'setup' | 'preview' | 'processing' | 'completed'
+
+interface RenameResult {
+  fileId: string
+  originalName: string
+  newName: string
+  success: boolean
+  error?: string
+}
+
+function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsRenameDialogProps) {
+  const [currentStep, setCurrentStep] = useState<RenameStep>('setup')
+  const [renameMode, setRenameMode] = useState<RenameMode>('simple')
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
+  const [showRegexHelp, setShowRegexHelp] = useState(false)
+
+  // Simple rename options
+  const [newName, setNewName] = useState('')
+
+  // Pattern rename options
+  const [prefix, setPrefix] = useState('')
+  const [suffix, setSuffix] = useState('')
+  const [findText, setFindText] = useState('')
+  const [replaceText, setReplaceText] = useState('')
+
+  // Sequence rename options
+  const [baseName, setBaseName] = useState('')
+  const [startNumber, setStartNumber] = useState('1')
+  const [numberFormat, setNumberFormat] = useState('001')
+
+  // Regex rename options
+  const [regexPattern, setRegexPattern] = useState('')
+  const [regexReplacement, setRegexReplacement] = useState('')
+
+  const [previewResults, setPreviewResults] = useState<
+    Array<{
+      original: string
+      preview: string
+      hasChanges: boolean
+    }>
+  >([])
+
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -117,329 +125,35 @@ function ItemsRenameDialog({
     errors: [],
   })
 
-  // Use ref for immediate cancellation control
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
-
-  // Rename parameters
-  const [renameText, setRenameText] = useState('')
-  const [findText, setFindText] = useState('')
-  const [replaceText, setReplaceText] = useState('')
-  const [regexPattern, setRegexPattern] = useState('')
-  const [regexReplace, setRegexReplace] = useState('')
-  const [numberingStart, setNumberingStart] = useState(1)
-  const [numberingPadding, setNumberingPadding] = useState(2)
-
-  // Preview states
-  const [previews, setPreviews] = useState<
-    Array<{ original: string; preview: string; valid: boolean }>
-  >([])
-  const [showRegexHelp, setShowRegexHelp] = useState(false)
-
   const isMobile = useIsMobile()
 
-  const handleCancel = () => {
-    // Immediately set cancellation flags
-    isCancelledRef.current = true
-    setIsCancelled(true)
-
-    // Abort any ongoing network requests
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-
-    // Stop processing immediately
-    setIsProcessing(false)
-
-    toast.info('Rename operation cancelled by user')
-  }
-
-  const generatePreview = () => {
-    const newPreviews = selectedItems.map((item, index) => {
-      let newName = item.name
-      let valid = true
-
-      try {
-        switch (selectedMode) {
-          case 'prefix':
-            if ((renameText as string).trim()) {
-              newName = `${(renameText as string).trim()}${item.name}`
-            }
-            break
-
-          case 'suffix':
-            if ((renameText as string).trim()) {
-              const lastDotIndex = item.name.lastIndexOf('.')
-              if (lastDotIndex > 0) {
-                const nameWithoutExt = item.name.substring(0, lastDotIndex)
-                const extension = item.name.substring(lastDotIndex)
-                newName = `${nameWithoutExt}${(renameText as string).trim()}${extension}`
-              } else {
-                newName = `${item.name}${(renameText as string).trim()}`
-              }
-            }
-            break
-
-          case 'numbering':
-            const number = (numberingStart + index).toString().padStart(numberingPadding, '0')
-            const lastDotIndex2 = item.name.lastIndexOf('.')
-            if (lastDotIndex2 > 0) {
-              const nameWithoutExt = item.name.substring(0, lastDotIndex2)
-              const extension = item.name.substring(lastDotIndex2)
-              newName = `${nameWithoutExt}_${number}${extension}`
-            } else {
-              newName = `${item.name}_${number}`
-            }
-            break
-
-          case 'timestamp':
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5)
-            const lastDotIndex3 = item.name.lastIndexOf('.')
-            if (lastDotIndex3 > 0) {
-              const nameWithoutExt = item.name.substring(0, lastDotIndex3)
-              const extension = item.name.substring(lastDotIndex3)
-              newName = `${nameWithoutExt}_${timestamp}${extension}`
-            } else {
-              newName = `${item.name}_${timestamp}`
-            }
-            break
-
-          case 'replace':
-            if ((findText as string).trim()) {
-              newName = item.name.replace(new RegExp((findText as string).trim(), 'g'), replaceText)
-            }
-            break
-
-          case 'regex':
-            if ((regexPattern as string).trim()) {
-              const regex = new RegExp((regexPattern as string).trim(), 'g')
-              newName = item.name.replace(regex, regexReplace)
-            }
-            break
-        }
-
-        // Validate filename
-        if (!(newName as string).trim() || newName === item.name) {
-          valid = false
-        }
-      } catch {
-        valid = false
-        newName = item.name
-      }
-
-      return {
-        original: item.name,
-        preview: newName,
-        valid,
-      }
-    })
-
-    setPreviews(newPreviews)
-  }
-
-  // Generate preview whenever parameters change
-  React.useEffect(() => {
-    generatePreview()
-  }, [
-    selectedMode,
-    renameText,
-    findText,
-    replaceText,
-    regexPattern,
-    regexReplace,
-    numberingStart,
-    numberingPadding,
-    selectedItems,
-  ])
-
-  const handleConfirm = async () => {
-    if (selectedItems.length === 0) {
-      toast.error('No items selected for renaming')
-      return
-    }
-
-    const validPreviews = previews.filter(p => p.valid)
-    if (validPreviews.length === 0) {
-      toast.error('No valid rename patterns found')
-      return
-    }
-
-    // Reset cancellation flags
-    isCancelledRef.current = false
-    setIsCancelled(false)
-    setIsProcessing(true)
-    setIsCompleted(false)
-
-    // Create new abort controller
-    abortControllerRef.current = new AbortController()
-
-    setProgress({
-      current: 0,
-      total: selectedItems.length,
-      success: 0,
-      skipped: 0,
-      failed: 0,
-      errors: [],
-    })
-
-    try {
-      let successCount = 0
-      let failedCount = 0
-      let skippedCount = 0
-      const errors: Array<{ file: string; error: string }> = []
-
-      for (let i = 0; i < selectedItems.length; i++) {
-        if (isCancelledRef.current) break
-
-        const item = selectedItems[i]
-        const preview = previews[i]
-        if (!item) continue
-
-        setProgress(prev => ({
-          ...prev,
-          current: i + 1,
-          currentFile: item.name,
-        }))
-
-        if (!preview?.valid || preview.preview === item.name) {
-          skippedCount++
-          setProgress(prev => ({
-            ...prev,
-            skipped: skippedCount,
-          }))
-          continue
-        }
-
-        try {
-          const response = await fetch('/api/drive/files/rename', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              items: [
-                {
-                  id: item.id,
-                  name: item.name,
-                },
-              ],
-              newName: preview.preview,
-            }),
-            signal: abortControllerRef.current.signal,
-          })
-
-          if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}))
-            throw new Error(
-              errorData.error ||
-                errorData.message ||
-                `Server error ${response.status}: ${response.statusText}`,
-            )
-          }
-
-          const result = await response.json()
-
-          if (result.success) {
-            successCount++
-          } else {
-            failedCount++
-            // Extract detailed error from API response
-            let errorMessage = 'Unknown error'
-            if (result.errors && result.errors.length > 0) {
-              errorMessage =
-                result.errors[0].error || result.errors[0].message || 'Operation failed'
-            } else if (result.error) {
-              errorMessage = result.error
-            } else if (result.message) {
-              errorMessage = result.message
-            }
-
-            errors.push({
-              file: item.name,
-              error: errorMessage,
-            })
-          }
-        } catch (err: any) {
-          if (abortControllerRef.current?.signal.aborted) {
-            break
-          }
-          failedCount++
-
-          // Provide more detailed error messages
-          let errorMessage = 'Network error'
-          if (err.name === 'AbortError') {
-            errorMessage = 'Operation was cancelled'
-          } else if (err.message) {
-            if (err.message.includes('HTTP 401')) {
-              errorMessage = 'Authentication failed - please re-login to Google Drive'
-            } else if (err.message.includes('HTTP 403')) {
-              errorMessage = 'Permission denied - insufficient Drive access'
-            } else if (err.message.includes('HTTP 404')) {
-              errorMessage = 'File not found - may have been deleted or moved'
-            } else if (err.message.includes('HTTP 429')) {
-              errorMessage = 'Too many requests - please wait and try again'
-            } else if (err.message.includes('HTTP 500')) {
-              errorMessage = 'Google Drive server error - please try again later'
-            } else if (err.message.includes('Failed to fetch')) {
-              errorMessage = 'Network connection failed - check your internet'
-            } else {
-              errorMessage = err.message
-            }
-          }
-
-          errors.push({
-            file: item.name,
-            error: errorMessage,
-          })
-        }
-
-        setProgress(prev => ({
-          ...prev,
-          success: successCount,
-          failed: failedCount,
-          errors,
-        }))
-      }
-
-      if (!isCancelledRef.current) {
-        if (successCount > 0) {
-          const messages = [`${successCount} files renamed successfully`]
-          if (failedCount > 0) messages.push(`${failedCount} failed`)
-          if (skippedCount > 0) messages.push(`${skippedCount} skipped`)
-          toast.success(messages.join(', '))
-        } else if (failedCount > 0) {
-          toast.error(`All rename operations failed`)
-        } else {
-          toast.info('No files were renamed')
-        }
-      }
-    } catch (err) {
-      if (abortControllerRef.current?.signal.aborted) {
-        // Operation was cancelled, don't show error
-        return
-      }
-      // // // // // console.error(err)
-      toast.error('Rename operation failed')
-    } finally {
-      // Clean up only if not cancelled
-      if (!isCancelledRef.current) {
-        setIsCompleted(true)
-      }
-      abortControllerRef.current = null
-      setIsProcessing(false)
-    }
-  }
+  const fileCount = selectedItems.filter(item => !item.isFolder).length
+  const folderCount = selectedItems.filter(item => item.isFolder).length
 
   const handleClose = () => {
-    // If processing, force cancel first
     if (isProcessing) {
       handleCancel()
-      return
     }
+    resetState()
+    onClose()
+  }
 
-    // Reset all states when closing
-    setIsCompleted(false)
-    setIsCancelled(false)
-    isCancelledRef.current = false
-    abortControllerRef.current = null
+  const resetState = () => {
+    setCurrentStep('setup')
+    setRenameMode('simple')
+    setNewName('')
+    setPrefix('')
+    setSuffix('')
+    setFindText('')
+    setReplaceText('')
+    setBaseName('')
+    setStartNumber('1')
+    setNumberFormat('001')
+    setRegexPattern('')
+    setRegexReplacement('')
+    setPreviewResults([])
     setProgress({
       current: 0,
       total: 0,
@@ -448,536 +162,704 @@ function ItemsRenameDialog({
       failed: 0,
       errors: [],
     })
-    setRenameText('')
-    setFindText('')
-    setReplaceText('')
-    setRegexPattern('')
-    setRegexReplace('')
-    setNumberingStart(1)
-    setNumberingPadding(2)
-    setPreviews([])
-    onClose()
   }
 
-  const handleCloseAndRefresh = () => {
-    if (!isProcessing) {
-      // Refresh immediately to show results
-      window.location.reload()
+  const handleCancel = () => {
+    isCancelledRef.current = true
+    setIsCancelled(true)
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    setIsProcessing(false)
+    setCurrentStep('completed')
+    toast.info('Rename operation cancelled')
+  }
+
+  const generatePreview = () => {
+    const results = selectedItems.map((item, index) => {
+      let newFileName = item.name
+
+      try {
+        switch (renameMode) {
+          case 'simple':
+            if (selectedItems.length === 1) {
+              newFileName = newName.trim() || item.name
+            } else {
+              // For multiple items, add numbers
+              const extension = item.name.includes('.') ? item.name.split('.').pop() : ''
+              const baseName = newName.trim() || 'renamed'
+              newFileName = extension
+                ? `${baseName}_${index + 1}.${extension}`
+                : `${baseName}_${index + 1}`
+            }
+            break
+
+          case 'pattern':
+            newFileName = item.name
+            if (findText) {
+              newFileName = newFileName.replace(new RegExp(findText, 'g'), replaceText)
+            }
+            if (prefix) {
+              newFileName = prefix + newFileName
+            }
+            if (suffix) {
+              const lastDotIndex = newFileName.lastIndexOf('.')
+              if (lastDotIndex !== -1) {
+                newFileName =
+                  newFileName.slice(0, lastDotIndex) + suffix + newFileName.slice(lastDotIndex)
+              } else {
+                newFileName = newFileName + suffix
+              }
+            }
+            break
+
+          case 'sequence':
+            const num = parseInt(startNumber) + index
+            const formattedNum = num.toString().padStart(numberFormat.length, '0')
+            const extension = item.name.includes('.') ? item.name.split('.').pop() : ''
+            newFileName = extension
+              ? `${baseName}_${formattedNum}.${extension}`
+              : `${baseName}_${formattedNum}`
+            break
+
+          case 'regex':
+            if (regexPattern) {
+              const regex = new RegExp(regexPattern, 'g')
+              newFileName = item.name.replace(regex, regexReplacement)
+            }
+            break
+        }
+      } catch (error) {
+        // Keep original name if there's an error
+        newFileName = item.name
+      }
+
+      return {
+        original: item.name,
+        preview: newFileName,
+        hasChanges: newFileName !== item.name,
+      }
+    })
+
+    setPreviewResults(results)
+    setCurrentStep('preview')
+  }
+
+  const handleRename = async () => {
+    if (previewResults.length === 0) {
+      toast.error('No preview available. Please generate preview first.')
+      return
+    }
+
+    const itemsToRename = previewResults.filter(result => result.hasChanges)
+    if (itemsToRename.length === 0) {
+      toast.error('No items have changed names. Please modify your rename settings.')
+      return
+    }
+
+    isCancelledRef.current = false
+    setIsCancelled(false)
+    setIsProcessing(true)
+    setCurrentStep('processing')
+
+    abortControllerRef.current = new AbortController()
+
+    const totalItems = itemsToRename.length
+    setProgress({
+      current: 0,
+      total: totalItems,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+
+    let successCount = 0
+    let failedCount = 0
+    let skippedCount = 0
+    const errors: Array<{ file: string; error: string }> = []
+
+    try {
+      for (let i = 0; i < itemsToRename.length; i++) {
+        if (isCancelledRef.current) {
+          break
+        }
+
+        const previewItem = itemsToRename[i]
+        const selectedItem = selectedItems.find(item => item.name === previewItem.original)
+
+        if (!selectedItem) {
+          skippedCount++
+          continue
+        }
+
+        setProgress(prev => ({
+          ...prev,
+          current: i + 1,
+          currentFile: previewItem.original,
+        }))
+
+        try {
+          const response = await fetch('/api/drive/files/rename', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fileId: selectedItem.id,
+              newName: previewItem.preview,
+            }),
+            signal: abortControllerRef.current.signal,
+          })
+
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Rename failed')
+          }
+
+          successCount++
+        } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            break
+          }
+
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          errors.push({ file: previewItem.original, error: errorMessage })
+          failedCount++
+        }
+
+        // Small delay to prevent overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 100))
+      }
+    } catch (error) {
+      console.error('Rename operation failed:', error)
+    } finally {
+      setProgress(prev => ({
+        ...prev,
+        success: successCount,
+        failed: failedCount,
+        skipped: skippedCount,
+        errors,
+      }))
+
+      setIsProcessing(false)
+      setCurrentStep('completed')
+
+      if (isCancelledRef.current) {
+        toast.info('Rename operation cancelled')
+      } else if (successCount > 0) {
+        toast.success(`Successfully renamed ${successCount} item(s)`)
+        onConfirm?.()
+      } else {
+        toast.error('Rename operation failed')
+      }
     }
   }
 
-  // Render different content based on state
-  const renderContent = () => {
-    // 1. Initial State - Show selection and mode options
-    if (!isProcessing && !isCompleted) {
-      return (
-        <div className="space-y-6">
-          {/* File Summary */}
-          <div className="bg-muted/50 rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Selected Items:</span>
-                <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                  {selectedItems.length} items
-                </Badge>
-              </div>
-            </div>
-          </div>
+  const renderSetupStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Settings className="h-5 w-5 text-blue-600" />
+        <h3 className="font-semibold">Rename Settings</h3>
+      </div>
 
-          {/* Rename Mode Selection */}
-          <div className="space-y-4">
-            <Label className="text-base font-medium">Rename Mode</Label>
-            <RadioGroup value={selectedMode} onValueChange={setSelectedMode} className="space-y-3">
-              {RENAME_MODES.map(mode => {
-                const IconComponent = mode.icon
-                return (
-                  <div
-                    key={mode.id}
-                    className={cn(
-                      'flex cursor-pointer items-start space-x-3 rounded-lg border p-4 transition-colors',
-                      selectedMode === mode.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:bg-muted/50',
-                    )}
-                    onClick={() => setSelectedMode(mode.id)}
-                  >
-                    <RadioGroupItem value={mode.id} className="mt-1" />
-                    <div className="flex flex-1 items-start gap-3">
-                      <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                        <IconComponent className="text-primary h-5 w-5" />
-                      </div>
-                      <div className="space-y-1">
-                        <div className="font-medium">{mode.label}</div>
-                        <div className="text-muted-foreground text-sm">{mode.description}</div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </RadioGroup>
-          </div>
-
-          {/* Rename Parameters */}
-          <div className="space-y-4">
-            {selectedMode === 'prefix' && (
-              <div className="space-y-2">
-                <Label htmlFor="prefix-text">Prefix Text</Label>
-                <Input
-                  id="prefix-text"
-                  placeholder="Enter prefix text..."
-                  value={renameText}
-                  onChange={e => setRenameText(e.target.value)}
-                />
-              </div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Selected Items</span>
+          <div className="flex gap-2">
+            {folderCount > 0 && (
+              <Badge variant="secondary" className="gap-1">
+                <Folder className="h-3 w-3" />
+                {folderCount} folder{folderCount > 1 ? 's' : ''}
+              </Badge>
             )}
-
-            {selectedMode === 'suffix' && (
-              <div className="space-y-2">
-                <Label htmlFor="suffix-text">Suffix Text</Label>
-                <Input
-                  id="suffix-text"
-                  placeholder="Enter suffix text..."
-                  value={renameText}
-                  onChange={e => setRenameText(e.target.value)}
-                />
-              </div>
+            {fileCount > 0 && (
+              <Badge variant="secondary" className="gap-1">
+                <FileText className="h-3 w-3" />
+                {fileCount} file{fileCount > 1 ? 's' : ''}
+              </Badge>
             )}
-
-            {selectedMode === 'numbering' && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="number-start">Start Number</Label>
-                  <Input
-                    id="number-start"
-                    type="number"
-                    min="1"
-                    value={numberingStart}
-                    onChange={e => setNumberingStart(parseInt(e.target.value) || 1)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="number-padding">Zero Padding</Label>
-                  <Input
-                    id="number-padding"
-                    type="number"
-                    min="1"
-                    max="10"
-                    value={numberingPadding}
-                    onChange={e => setNumberingPadding(parseInt(e.target.value) || 2)}
-                  />
-                </div>
-              </div>
-            )}
-
-            {selectedMode === 'replace' && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="find-text">Find Text</Label>
-                  <Input
-                    id="find-text"
-                    placeholder="Text to find..."
-                    value={findText}
-                    onChange={e => setFindText(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="replace-text">Replace With</Label>
-                  <Input
-                    id="replace-text"
-                    placeholder="Replacement text..."
-                    value={replaceText}
-                    onChange={e => setReplaceText(e.target.value)}
-                  />
-                </div>
-              </div>
-            )}
-
-            {selectedMode === 'regex' && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-base font-medium">Regular Expression</Label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowRegexHelp(true)}
-                    className="h-8 px-2 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
-                  >
-                    <HelpCircle className="mr-1 h-4 w-4" />
-                    Help & Examples
-                  </Button>
-                </div>
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
-                  <div className="flex items-start gap-2">
-                    <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
-                    <div className="text-sm text-amber-800 dark:text-amber-200">
-                      <div className="font-medium">Advanced Feature</div>
-                      <div className="text-amber-700 dark:text-amber-300">
-                        Use regular expressions for complex pattern matching. Click &quot;Help &amp;
-                        Examples&quot; for guidance.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="regex-pattern">Pattern to Find</Label>
-                  <Input
-                    id="regex-pattern"
-                    placeholder="e.g., \\d+ (finds numbers) or [a-z]+ (finds lowercase letters)"
-                    value={regexPattern}
-                    onChange={e => setRegexPattern(e.target.value)}
-                    className="font-mono"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="regex-replace">Replacement Text</Label>
-                  <Input
-                    id="regex-replace"
-                    placeholder="e.g., $1 (use captured group) or NEW_ (literal text)"
-                    value={regexReplace}
-                    onChange={e => setRegexReplace(e.target.value)}
-                    className="font-mono"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Preview */}
-          {previews.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Preview:</Label>
-              <div className="bg-muted/30 max-h-32 space-y-1 overflow-y-auto rounded-lg border p-3">
-                {previews.slice(0, 5).map((preview, index) => (
-                  <div
-                    key={`preview-${preview.original}-${index}`}
-                    className={cn(
-                      'text-sm',
-                      preview.valid ? 'text-foreground' : 'text-muted-foreground line-through',
-                    )}
-                  >
-                    <span className="text-muted-foreground">{preview.original}</span>
-                    <span className="mx-2">→</span>
-                    <span className={preview.valid ? 'font-medium text-green-600' : 'text-red-500'}>
-                      {preview.preview}
-                    </span>
-                  </div>
-                ))}
-                {previews.length > 5 && (
-                  <div className="text-muted-foreground text-xs">
-                    ... and {previews.length - 5} more items
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      )
-    }
-
-    // 2. Processing State - Show progress
-    if (isProcessing) {
-      return (
-        <div className="space-y-6">
-          {/* Processing Header */}
-          <div className="text-center">
-            <div className="text-lg font-semibold text-blue-600">Renaming Files...</div>
-            <div className="text-muted-foreground text-sm">
-              Please wait while we process your rename operation
-            </div>
-          </div>
-
-          {/* Progress Display */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span>Progress</span>
-                <span>
-                  {progress.current} of {progress.total} items
-                </span>
-              </div>
-              <Progress value={(progress.current / progress.total) * 100} className="h-2" />
-            </div>
-
-            {/* Current File */}
-            {progress.currentFile && (
-              <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-900 dark:bg-blue-950/50">
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                  <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
-                    Currently renaming:
-                  </span>
-                </div>
-                <div className="truncate text-sm text-blue-700 dark:text-blue-300">
-                  {progress.currentFile}
-                </div>
-              </div>
-            )}
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="space-y-1">
-                <div className="text-lg font-semibold text-green-600">{progress.success}</div>
-                <div className="text-muted-foreground text-xs">Success</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-lg font-semibold text-orange-600">{progress.skipped}</div>
-                <div className="text-muted-foreground text-xs">Skipped</div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-lg font-semibold text-red-600">{progress.failed}</div>
-                <div className="text-muted-foreground text-xs">Failed</div>
-              </div>
-            </div>
           </div>
         </div>
-      )
-    }
 
-    // 3. Completed State - Show results
-    if (isCompleted) {
-      const hasErrors = progress.errors.length > 0
-      const wasSuccessful = progress.success > 0
-      const wasCancelled = isCancelled
+        <ScrollArea className="max-h-32">
+          <div className="space-y-1">
+            {selectedItems.slice(0, 5).map(item => (
+              <div key={item.id} className="text-muted-foreground flex items-center gap-2 text-sm">
+                {item.isFolder ? <Folder className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
+                <span className="truncate">{item.name}</span>
+              </div>
+            ))}
+            {selectedItems.length > 5 && (
+              <div className="text-muted-foreground text-center text-sm">
+                +{selectedItems.length - 5} more items
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
 
-      return (
-        <div className="space-y-6">
-          {/* Completion Header */}
-          <div className="text-center">
-            {wasCancelled ? (
-              <div className="space-y-2">
-                <XCircle className="mx-auto h-12 w-12 text-orange-500" />
-                <div className="text-lg font-semibold text-orange-600">Operation Cancelled</div>
-                <div className="text-muted-foreground text-sm">
-                  Rename operation was cancelled by user
-                </div>
-              </div>
-            ) : wasSuccessful ? (
-              <div className="space-y-2">
-                <CheckCircle className="mx-auto h-12 w-12 text-green-500" />
-                <div className="text-lg font-semibold text-green-600">Rename Completed!</div>
-                <div className="text-muted-foreground text-sm">
-                  Your files have been successfully renamed
-                </div>
-              </div>
+      <div className="space-y-4">
+        <Label className="text-sm font-medium">Rename Method</Label>
+        <RadioGroup
+          value={renameMode}
+          onValueChange={value => setRenameMode(value as RenameMode)}
+          className="space-y-3"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="simple" id="simple" />
+            <Label htmlFor="simple" className="flex items-center gap-2">
+              <Edit3 className="h-4 w-4" />
+              Simple Rename
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="pattern" id="pattern" />
+            <Label htmlFor="pattern" className="flex items-center gap-2">
+              <AlignLeft className="h-4 w-4" />
+              Find & Replace / Add Prefix & Suffix
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="sequence" id="sequence" />
+            <Label htmlFor="sequence" className="flex items-center gap-2">
+              <Hash className="h-4 w-4" />
+              Number Sequence
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="regex" id="regex" />
+            <Label htmlFor="regex" className="flex items-center gap-2">
+              <Code2 className="h-4 w-4" />
+              Regular Expression
+            </Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      {/* Rename Method Options */}
+      <div className="space-y-4">
+        {renameMode === 'simple' && (
+          <div className="space-y-3">
+            <Label htmlFor="newName">New Name</Label>
+            {selectedItems.length === 1 ? (
+              <Input
+                id="newName"
+                placeholder="Enter new name"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+              />
             ) : (
               <div className="space-y-2">
-                <XCircle className="mx-auto h-12 w-12 text-red-500" />
-                <div className="text-lg font-semibold text-red-600">Rename Failed</div>
-                <div className="text-muted-foreground text-sm">No files could be renamed</div>
+                <Input
+                  id="newName"
+                  placeholder="Base name (numbers will be added)"
+                  value={newName}
+                  onChange={e => setNewName(e.target.value)}
+                />
+                <div className="text-muted-foreground text-xs">
+                  Multiple items will be renamed as: {newName || 'renamed'}_1,{' '}
+                  {newName || 'renamed'}_2, etc.
+                </div>
               </div>
             )}
           </div>
+        )}
 
-          {/* Final Stats */}
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="space-y-1">
-              <div className="text-lg font-semibold text-green-600">{progress.success}</div>
-              <div className="text-muted-foreground text-xs">Renamed</div>
+        {renameMode === 'pattern' && (
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="prefix">Add Prefix</Label>
+              <Input
+                id="prefix"
+                placeholder="Text to add at beginning"
+                value={prefix}
+                onChange={e => setPrefix(e.target.value)}
+              />
             </div>
-            <div className="space-y-1">
-              <div className="text-lg font-semibold text-blue-600">{progress.current}</div>
-              <div className="text-muted-foreground text-xs">Processed</div>
+            <div className="space-y-2">
+              <Label htmlFor="suffix">Add Suffix (before extension)</Label>
+              <Input
+                id="suffix"
+                placeholder="Text to add before file extension"
+                value={suffix}
+                onChange={e => setSuffix(e.target.value)}
+              />
             </div>
-            <div className="space-y-1">
-              <div className="text-lg font-semibold text-red-600">{progress.failed}</div>
-              <div className="text-muted-foreground text-xs">Failed</div>
+            <div className="space-y-2">
+              <Label htmlFor="findText">Find Text</Label>
+              <Input
+                id="findText"
+                placeholder="Text to find and replace"
+                value={findText}
+                onChange={e => setFindText(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="replaceText">Replace With</Label>
+              <Input
+                id="replaceText"
+                placeholder="Replacement text"
+                value={replaceText}
+                onChange={e => setReplaceText(e.target.value)}
+              />
             </div>
           </div>
+        )}
 
-          {/* Error Details */}
-          {hasErrors && (
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-red-600">
-                Issues found during rename:
-              </Label>
-              <div className="max-h-40 space-y-2 overflow-y-auto rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-900 dark:bg-red-950/50">
-                {progress.errors.map((error, index) => (
-                  <div key={`error-${error.file}-${index}`} className="space-y-1 text-sm">
-                    <div className="flex items-start gap-2">
-                      <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
-                      <div className="space-y-1">
-                        <div className="font-medium text-red-800 dark:text-red-200">
-                          {error.file}
-                        </div>
-                        <div className="text-red-700 dark:text-red-300">{error.error}</div>
-                        {/* Provide helpful suggestions based on error type */}
-                        {error.error.includes('Authentication') && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            → Try refreshing the page and logging in again
-                          </div>
-                        )}
-                        {error.error.includes('Permission denied') && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            → Check if you own this file or have edit access
-                          </div>
-                        )}
-                        {error.error.includes('already exists') && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            → Try a different filename or add a number suffix
-                          </div>
-                        )}
-                        {error.error.includes('invalid characters') && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            → Remove special characters like {'< > : " / \\ | ? *'}
-                          </div>
-                        )}
-                        {error.error.includes('too long') && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            → Use a shorter filename (max 255 characters)
-                          </div>
-                        )}
-                        {error.error.includes('Too many requests') && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            → Wait a few seconds and try again
-                          </div>
-                        )}
-                        {error.error.includes('File not found') && (
-                          <div className="text-xs text-red-600 dark:text-red-400">
-                            → Refresh the file list - file may have been moved or deleted
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+        {renameMode === 'sequence' && (
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="baseName">Base Name</Label>
+              <Input
+                id="baseName"
+                placeholder="Base name for sequence"
+                value={baseName}
+                onChange={e => setBaseName(e.target.value)}
+              />
             </div>
-          )}
+            <div className="space-y-2">
+              <Label htmlFor="startNumber">Start Number</Label>
+              <Input
+                id="startNumber"
+                type="number"
+                placeholder="1"
+                value={startNumber}
+                onChange={e => setStartNumber(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="numberFormat">Number Format</Label>
+              <RadioGroup
+                value={numberFormat}
+                onValueChange={setNumberFormat}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="1" id="format1" />
+                  <Label htmlFor="format1">1, 2, 3</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="01" id="format01" />
+                  <Label htmlFor="format01">01, 02, 03</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="001" id="format001" />
+                  <Label htmlFor="format001">001, 002, 003</Label>
+                </div>
+              </RadioGroup>
+            </div>
+          </div>
+        )}
 
-          {/* Refresh Notice */}
-          {(progress.success > 0 || progress.failed > 0) && (
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                Click the button below to refresh and see your updated files.
-              </p>
+        {renameMode === 'regex' && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <Label>Regular Expression</Label>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowRegexHelp(true)}
+                className="h-8 text-blue-600"
+              >
+                <HelpCircle className="mr-1 h-4 w-4" />
+                Help
+              </Button>
             </div>
-          )}
+            <div className="space-y-2">
+              <Input
+                placeholder="Regex pattern (e.g., \\d+)"
+                value={regexPattern}
+                onChange={e => setRegexPattern(e.target.value)}
+                className="font-mono"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="regexReplacement">Replacement</Label>
+              <Input
+                id="regexReplacement"
+                placeholder="Replacement text (e.g., $1, $2)"
+                value={regexReplacement}
+                onChange={e => setRegexReplacement(e.target.value)}
+                className="font-mono"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  const renderPreviewStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">Preview Changes</h3>
+      </div>
+
+      <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+        <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
+          <div className="flex items-center gap-2 font-medium">
+            <Info className="h-4 w-4" />
+            <span>Review the proposed changes before applying</span>
+          </div>
+          <div>• Only items with changes will be renamed</div>
+          <div>• You can go back to modify settings if needed</div>
+          <div>• The operation can be cancelled during processing</div>
         </div>
-      )
-    }
+      </div>
 
-    return null
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Changes Preview</span>
+          <Badge variant="outline" className="gap-1">
+            <CheckCircle className="h-3 w-3" />
+            {previewResults.filter(r => r.hasChanges).length} changes
+          </Badge>
+        </div>
+
+        <ScrollArea className="max-h-64">
+          <div className="space-y-2">
+            {previewResults.map((result, index) => (
+              <div
+                key={index}
+                className={cn(
+                  'flex items-center gap-2 rounded-lg border p-2 text-sm',
+                  result.hasChanges
+                    ? 'border-green-200 bg-green-50 dark:bg-green-950/20'
+                    : 'border-gray-200 bg-gray-50 dark:bg-gray-950/20',
+                )}
+              >
+                <div className="flex flex-1 items-center gap-2">
+                  {result.hasChanges ? (
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                  ) : (
+                    <XCircle className="h-4 w-4 text-gray-400" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-muted-foreground truncate font-mono text-xs">
+                      {result.original}
+                    </div>
+                    {result.hasChanges && (
+                      <div className="mt-1 flex items-center gap-1">
+                        <ArrowRight className="text-muted-foreground h-3 w-3" />
+                        <div className="truncate font-mono text-xs font-medium text-green-600">
+                          {result.preview}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+
+      {previewResults.filter(r => r.hasChanges).length === 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
+          <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+            <AlertTriangle className="h-4 w-4" />
+            <span className="text-sm">
+              No changes detected. Please modify your rename settings.
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  const renderProcessingStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+        <h3 className="font-semibold">Renaming Items</h3>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <span>Progress</span>
+          <span>
+            {progress.current} of {progress.total}
+          </span>
+        </div>
+
+        <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+
+        {progress.currentFile && (
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <ArrowRight className="h-4 w-4" />
+            <span className="truncate">Renaming: {progress.currentFile}</span>
+          </div>
+        )}
+
+        <div className="flex gap-4 text-sm">
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle className="h-4 w-4" />
+            <span>{progress.success} renamed</span>
+          </div>
+          <div className="flex items-center gap-1 text-red-600">
+            <XCircle className="h-4 w-4" />
+            <span>{progress.failed} failed</span>
+          </div>
+          <div className="flex items-center gap-1 text-yellow-600">
+            <SkipForward className="h-4 w-4" />
+            <span>{progress.skipped} skipped</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderCompletedStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">
+          {isCancelled ? 'Rename Operation Cancelled' : 'Items Renamed Successfully'}
+        </h3>
+      </div>
+
+      {!isCancelled && (
+        <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+          <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+            <div>✓ Successfully renamed {progress.success} item(s)</div>
+            <div>✓ File names updated in Google Drive</div>
+            <div>✓ Changes are immediately visible</div>
+          </div>
+        </div>
+      )}
+
+      {progress.failed > 0 && (
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-red-600">
+            Failed to rename {progress.failed} item(s):
+          </div>
+          <ScrollArea className="max-h-32">
+            <div className="space-y-1">
+              {progress.errors.map((error, index) => (
+                <div key={index} className="text-xs text-red-600">
+                  • {error.file}: {error.error}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+      )}
+
+      {!isCancelled && progress.success > 0 && (
+        <div className="rounded-lg border bg-amber-50 p-3 dark:bg-amber-950/20">
+          <div className="text-sm text-amber-700 dark:text-amber-300">
+            💡 Tip: Refresh the file list to see the updated names
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  const renderContent = () => {
+    switch (currentStep) {
+      case 'setup':
+        return renderSetupStep()
+      case 'preview':
+        return renderPreviewStep()
+      case 'processing':
+        return renderProcessingStep()
+      case 'completed':
+        return renderCompletedStep()
+      default:
+        return null
+    }
+  }
+
+  const renderFooter = () => {
+    switch (currentStep) {
+      case 'setup':
+        return (
+          <>
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button onClick={generatePreview} disabled={selectedItems.length === 0}>
+              Preview Changes
+            </Button>
+          </>
+        )
+      case 'preview':
+        return (
+          <>
+            <Button variant="outline" onClick={() => setCurrentStep('setup')}>
+              Back to Settings
+            </Button>
+            <Button
+              onClick={handleRename}
+              disabled={previewResults.filter(r => r.hasChanges).length === 0}
+            >
+              Rename Items
+            </Button>
+          </>
+        )
+      case 'processing':
+        return (
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+        )
+      case 'completed':
+        return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
+      default:
+        return null
+    }
   }
 
   if (isMobile) {
     return (
-      <BottomSheet open={isOpen} onOpenChange={open => !open && handleClose()}>
-        <BottomSheetContent>
-          <BottomSheetHeader>
-            <BottomSheetTitle>Rename Items</BottomSheetTitle>
-          </BottomSheetHeader>
-          <div className="max-h-[70vh] overflow-y-auto px-4 pb-6">{renderContent()}</div>
-          <BottomSheetFooter>
-            <div className="flex gap-2">
-              {!isProcessing && !isCompleted && (
-                <>
-                  <Button onClick={handleConfirm} className="flex-1">
-                    Rename
-                  </Button>
-                  <Button variant="outline" onClick={handleClose} className="flex-1">
-                    Cancel
-                  </Button>
-                </>
-              )}
-              {isProcessing && (
-                <Button
-                  onClick={handleCancel}
-                  variant="outline"
-                  disabled={isCancelled}
-                  className="flex-1"
-                >
-                  {isCancelled ? 'Cancelling...' : 'Cancel Operation'}
-                </Button>
-              )}
-              {isCompleted && (
-                <>
-                  {progress.success > 0 || progress.failed > 0 ? (
-                    <Button onClick={handleCloseAndRefresh} className="flex-1">
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Refresh Now
-                    </Button>
-                  ) : (
-                    <Button onClick={handleClose} className="flex-1">
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Close
-                    </Button>
-                  )}
-                  {(progress.success > 0 || progress.failed > 0) && (
-                    <Button onClick={handleClose} variant="outline" className="flex-1">
-                      Close Without Refresh
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
-          </BottomSheetFooter>
-        </BottomSheetContent>
+      <>
+        <BottomSheet open={isOpen} onOpenChange={open => !open && handleClose()}>
+          <BottomSheetContent>
+            <BottomSheetHeader>
+              <BottomSheetTitle>Rename Items</BottomSheetTitle>
+              <BottomSheetDescription>
+                Rename selected items using various methods and patterns.
+              </BottomSheetDescription>
+            </BottomSheetHeader>
+
+            <div className="flex-1 overflow-y-auto px-4 py-2">{renderContent()}</div>
+
+            <BottomSheetFooter>
+              <div className="flex gap-2">{renderFooter()}</div>
+            </BottomSheetFooter>
+          </BottomSheetContent>
+        </BottomSheet>
 
         <RegexHelpDialog isOpen={showRegexHelp} onClose={() => setShowRegexHelp(false)} />
-      </BottomSheet>
+      </>
     )
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
-      <DialogContent className="sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>Rename Items</DialogTitle>
-        </DialogHeader>
-        <div className="max-h-[70vh] overflow-y-auto">{renderContent()}</div>
-        <DialogFooter>
-          <div className="flex w-full gap-2">
-            {isProcessing ? (
-              <Button
-                variant="outline"
-                onClick={handleCancel}
-                disabled={isCancelled}
-                className="flex-1"
-              >
-                {isCancelled ? 'Cancelling...' : 'Cancel Operation'}
-              </Button>
-            ) : (
-              <>
-                {!isCompleted && !isCancelled && (
-                  <>
-                    <Button onClick={handleConfirm} className="flex-1">
-                      Rename
-                    </Button>
-                    <Button variant="outline" onClick={handleClose} className="flex-1">
-                      Cancel
-                    </Button>
-                  </>
-                )}
-                {isCompleted && (
-                  <>
-                    {progress.success > 0 || progress.failed > 0 ? (
-                      <Button onClick={handleCloseAndRefresh} className="flex-1">
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        Refresh Now
-                      </Button>
-                    ) : (
-                      <Button onClick={handleClose} className="flex-1">
-                        <CheckCircle className="mr-2 h-4 w-4" />
-                        Close
-                      </Button>
-                    )}
-                    {(progress.success > 0 || progress.failed > 0) && (
-                      <Button onClick={handleClose} variant="outline" className="flex-1">
-                        Close Without Refresh
-                      </Button>
-                    )}
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        </DialogFooter>
-      </DialogContent>
+    <>
+      <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Rename Items</DialogTitle>
+            <DialogDescription>
+              Rename selected items using various methods and patterns.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="max-h-[60vh] overflow-y-auto">{renderContent()}</div>
+
+          <DialogFooter>{renderFooter()}</DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <RegexHelpDialog isOpen={showRegexHelp} onClose={() => setShowRegexHelp(false)} />
-    </Dialog>
+    </>
   )
 }
 
-export { ItemsRenameDialog }
 export default ItemsRenameDialog
+export { ItemsRenameDialog }

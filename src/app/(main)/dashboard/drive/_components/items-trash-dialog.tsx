@@ -280,8 +280,6 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
           </div>
         </ScrollArea>
       </div>
-
-      
     </div>
   )
 

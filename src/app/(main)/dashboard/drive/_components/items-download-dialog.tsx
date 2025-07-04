@@ -1,67 +1,115 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Download, FileText, AlertTriangle, CheckCircle, XCircle, SkipForward } from 'lucide-react'
+import {
+  Download,
+  Archive,
+  FileText,
+  Folder,
+  Image,
+  Video,
+  Music,
+  File,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  ArrowRight,
+  SkipForward,
+  HardDrive,
+  Settings,
+  Info,
+  Clock,
+  Zap,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Progress } from '@/components/ui/progress'
-import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
   BottomSheet,
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
+  BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Switch } from '@/components/ui/switch'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { cn, calculateProgress, formatBytes } from '@/lib/utils'
 
 interface ItemsDownloadDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
+  onConfirm?: () => void
   selectedItems: Array<{
     id: string
     name: string
     isFolder: boolean
+    mimeType?: string
+    size?: number
   }>
 }
 
-const DOWNLOAD_MODES = [
-  {
-    id: 'direct',
-    label: 'Direct Download',
-    description: 'Download files simultaneously with progress tracking',
-    icon: Download,
-  },
-  {
-    id: 'exportLinks',
-    label: 'Export Download Links',
-    description: 'Generate CSV file with download links',
-    icon: FileText,
-  },
-]
+type DownloadStep = 'setup' | 'processing' | 'completed'
+
+type DownloadFormat = 'original' | 'zip' | 'individual'
+
+interface DownloadResult {
+  fileId: string
+  fileName: string
+  success: boolean
+  downloadUrl?: string
+  size?: number
+  error?: string
+}
+
+function getFileIcon(mimeType: string | undefined, isFolder: boolean) {
+  if (isFolder) return <Folder className="h-4 w-4 text-blue-600" />
+  if (!mimeType) return <File className="h-4 w-4 text-gray-600" />
+
+  if (mimeType.startsWith('image/')) return <Image className="h-4 w-4 text-green-600" />
+  if (mimeType.startsWith('video/')) return <Video className="h-4 w-4 text-purple-600" />
+  if (mimeType.startsWith('audio/')) return <Music className="h-4 w-4 text-orange-600" />
+  if (mimeType.includes('zip') || mimeType.includes('archive'))
+    return <Archive className="h-4 w-4 text-yellow-600" />
+
+  return <FileText className="h-4 w-4 text-gray-600" />
+}
 
 function ItemsDownloadDialog({
   isOpen,
   onClose,
-  onConfirm: _onConfirm,
+  onConfirm,
   selectedItems,
 }: ItemsDownloadDialogProps) {
-  const [selectedMode, setSelectedMode] = useState('direct')
+  const [currentStep, setCurrentStep] = useState<DownloadStep>('setup')
+  const [downloadFormat, setDownloadFormat] = useState<DownloadFormat>('original')
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
+
+  // Download options
+  const [includeMetadata, setIncludeMetadata] = useState(false)
+  const [compressFiles, setCompressFiles] = useState(true)
+  const [createManifest, setCreateManifest] = useState(false)
+  const [autoStartDownload, setAutoStartDownload] = useState(true)
+
+  // Results
+  const [downloadResults, setDownloadResults] = useState<DownloadResult[]>([])
+  const [zipDownloadUrl, setZipDownloadUrl] = useState<string>('')
+
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -69,6 +117,8 @@ function ItemsDownloadDialog({
     success: number
     skipped: number
     failed: number
+    totalSize: number
+    downloadedSize: number
     errors: Array<{ file: string; error: string }>
   }>({
     current: 0,
@@ -76,576 +126,682 @@ function ItemsDownloadDialog({
     success: 0,
     skipped: 0,
     failed: 0,
+    totalSize: 0,
+    downloadedSize: 0,
     errors: [],
   })
 
-  // Use ref for immediate cancellation control
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
+  const isMobile = useIsMobile()
 
-  // Filter downloadable files (only files, skip folders)
-  const downloadableFiles = selectedItems.filter(item => !item.isFolder)
-  const skippedFolders = selectedItems.filter(item => item.isFolder)
+  const fileCount = selectedItems.filter(item => !item.isFolder).length
+  const folderCount = selectedItems.filter(item => item.isFolder).length
+  const totalSize = selectedItems.reduce((sum, item) => sum + (item.size || 0), 0)
+
+  const handleClose = () => {
+    if (isProcessing) {
+      handleCancel()
+    }
+    resetState()
+    onClose()
+  }
+
+  const resetState = () => {
+    setCurrentStep('setup')
+    setDownloadFormat('original')
+    setIncludeMetadata(false)
+    setCompressFiles(true)
+    setCreateManifest(false)
+    setAutoStartDownload(true)
+    setDownloadResults([])
+    setZipDownloadUrl('')
+    setProgress({
+      current: 0,
+      total: 0,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      totalSize: 0,
+      downloadedSize: 0,
+      errors: [],
+    })
+  }
 
   const handleCancel = () => {
-    // Immediately set cancellation flags
     isCancelledRef.current = true
     setIsCancelled(true)
 
-    // Abort any ongoing network requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
 
-    // Stop processing
     setIsProcessing(false)
-    setIsCompleted(true)
-
-    toast.info('Download operation cancelled by user')
+    setCurrentStep('completed')
+    toast.info('Download preparation cancelled')
   }
 
-  const handleConfirm = async () => {
-    if (downloadableFiles.length === 0) {
-      toast.error('No files available for download')
+  const triggerDownload = (url: string, filename: string) => {
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.style.display = 'none'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const handleDownload = async () => {
+    if (selectedItems.length === 0) {
+      toast.error('No items selected for download')
       return
     }
 
-    // Reset cancellation flags
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
+    setCurrentStep('processing')
 
-    // Create new AbortController for this operation
     abortControllerRef.current = new AbortController()
 
-    try {
-      const baseUrl = window.location.origin
+    const totalItems = selectedItems.length
+    setProgress({
+      current: 0,
+      total: totalItems,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      totalSize: totalSize,
+      downloadedSize: 0,
+      errors: [],
+    })
 
-      if (selectedMode === 'direct') {
-        // Initialize progress
-        setProgress({
-          current: 0,
-          total: downloadableFiles.length,
-          success: 0,
-          skipped: skippedFolders.length,
-          failed: 0,
-          errors: [],
+    let successCount = 0
+    let failedCount = 0
+    let skippedCount = 0
+    let downloadedSize = 0
+    const errors: Array<{ file: string; error: string }> = []
+    const results: DownloadResult[] = []
+
+    try {
+      if (downloadFormat === 'zip' || (selectedItems.length > 1 && downloadFormat === 'original')) {
+        // Create zip download
+        setProgress(prev => ({
+          ...prev,
+          currentFile: 'Creating archive...',
+        }))
+
+        const response = await fetch('/api/drive/files/download', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            fileIds: selectedItems.map(item => item.id),
+            format: 'zip',
+            includeMetadata: includeMetadata,
+            compress: compressFiles,
+            createManifest: createManifest,
+          }),
+          signal: abortControllerRef.current.signal,
         })
 
-        let successCount = 0
-        let failedCount = 0
-        const errors: Array<{ file: string; error: string }> = []
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to create download archive')
+        }
 
-        // Download files with progress tracking and cancellation support
-        for (let i = 0; i < downloadableFiles.length; i++) {
-          // Check cancellation using ref (immediate)
+        const data = await response.json()
+        setZipDownloadUrl(data.downloadUrl)
+
+        if (autoStartDownload) {
+          triggerDownload(data.downloadUrl, `download_${Date.now()}.zip`)
+        }
+
+        successCount = selectedItems.length
+        downloadedSize = totalSize
+
+        selectedItems.forEach(item => {
+          results.push({
+            fileId: item.id,
+            fileName: item.name,
+            success: true,
+            downloadUrl: data.downloadUrl,
+            size: item.size,
+          })
+        })
+      } else {
+        // Individual file downloads
+        for (let i = 0; i < selectedItems.length; i++) {
           if (isCancelledRef.current) {
-            toast.info(`Download cancelled after ${successCount} files`)
             break
           }
 
-          const file = downloadableFiles[i]
-          if (!file) continue
+          const item = selectedItems[i]
+          setProgress(prev => ({
+            ...prev,
+            current: i + 1,
+            currentFile: item.name,
+          }))
 
           try {
-            setProgress(prev => ({
-              ...prev,
-              current: i + 1,
-              currentFile: file.name,
-            }))
+            const response = await fetch('/api/drive/files/download', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                fileIds: [item.id],
+                format: 'original',
+                includeMetadata: includeMetadata,
+              }),
+              signal: abortControllerRef.current.signal,
+            })
 
-            const url = `${baseUrl}/api/drive/files/download?fileId=${file.id}`
+            if (!response.ok) {
+              const errorData = await response.json()
+              throw new Error(errorData.error || 'Download failed')
+            }
 
-            // Check cancellation before opening download
-            if (isCancelledRef.current) {
+            const data = await response.json()
+
+            const result: DownloadResult = {
+              fileId: item.id,
+              fileName: item.name,
+              success: true,
+              downloadUrl: data.downloadUrl,
+              size: item.size,
+            }
+
+            results.push(result)
+
+            if (autoStartDownload) {
+              triggerDownload(data.downloadUrl, item.name)
+            }
+
+            successCount++
+            downloadedSize += item.size || 0
+          } catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') {
               break
             }
 
-            window.open(url, '_blank')
-            successCount++
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+            errors.push({ file: item.name, error: errorMessage })
 
-            // Interruptible delay with cancellation checks
-            for (let delayStep = 0; delayStep < 10; delayStep++) {
-              if (isCancelledRef.current) {
-                break
-              }
-              await new Promise(resolve => setTimeout(resolve, 500)) // 500ms * 10 = 5 seconds total
-            }
-          } catch (error: any) {
-            if (abortControllerRef.current?.signal.aborted) {
-              break // Operation was cancelled
-            }
-
-            failedCount++
-            errors.push({
-              file: file.name,
-              error: error.message || 'Download failed',
+            results.push({
+              fileId: item.id,
+              fileName: item.name,
+              success: false,
+              error: errorMessage,
             })
+            failedCount++
           }
 
-          // Update progress
           setProgress(prev => ({
             ...prev,
-            success: successCount,
-            failed: failedCount,
-            errors,
+            downloadedSize: downloadedSize,
           }))
 
-          // Final cancellation check
-          if (isCancelledRef.current) {
-            break
-          }
-        }
-
-        // Show results only if not cancelled
-        if (!isCancelledRef.current) {
-          if (successCount > 0) {
-            toast.success(`Started downloading ${successCount} file${successCount > 1 ? 's' : ''}`)
-          }
-          if (failedCount > 0) {
-            toast.error(`Failed to download ${failedCount} file${failedCount > 1 ? 's' : ''}`)
-          }
-        }
-      } else if (selectedMode === 'exportLinks') {
-        // Check cancellation before export
-        if (isCancelledRef.current) {
-          return
-        }
-
-        let csv = 'File Name,Download Link\n'
-        downloadableFiles.forEach(item => {
-          const url = `${baseUrl}/api/drive/files/download?fileId=${item.id}`
-          csv += `"${item.name}","${url}"\n`
-        })
-
-        if (!isCancelledRef.current) {
-          const blob = new Blob([csv], { type: 'text/csv' })
-          const link = document.createElement('a')
-          link.href = URL.createObjectURL(blob)
-          link.download = 'download_links.csv'
-          link.click()
-          toast.success('Download links exported')
+          // Small delay to prevent overwhelming the API
+          await new Promise(resolve => setTimeout(resolve, 100))
         }
       }
-    } catch (err) {
-      if (abortControllerRef.current?.signal.aborted) {
-        // Operation was cancelled, don't show error
-        return
+    } catch (error) {
+      console.error('Download operation failed:', error)
+      if (error instanceof Error && error.name !== 'AbortError') {
+        errors.push({ file: 'Archive creation', error: error.message })
+        failedCount = selectedItems.length
       }
-      // // // // // console.error(err)
-      toast.error('Download failed')
     } finally {
-      // Clean up
-      abortControllerRef.current = null
+      setProgress(prev => ({
+        ...prev,
+        success: successCount,
+        failed: failedCount,
+        skipped: skippedCount,
+        downloadedSize: downloadedSize,
+        errors,
+      }))
+
+      setDownloadResults(results)
       setIsProcessing(false)
-      setIsCompleted(true)
+      setCurrentStep('completed')
+
+      if (isCancelledRef.current) {
+        toast.info('Download preparation cancelled')
+      } else if (successCount > 0) {
+        toast.success(`Successfully prepared ${successCount} item(s) for download`)
+        onConfirm?.()
+      } else {
+        toast.error('Download preparation failed')
+      }
     }
   }
 
-  const handleClose = () => {
-    if (!isProcessing) {
-      setIsCompleted(false)
-      setIsCancelled(false)
-      isCancelledRef.current = false
-      abortControllerRef.current = null
-      setProgress({
-        current: 0,
-        total: 0,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
-      onClose()
-    }
-  }
+  const renderSetupStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Settings className="h-5 w-5 text-blue-600" />
+        <h3 className="font-semibold">Download Settings</h3>
+      </div>
 
-  const handleCloseAndRefresh = () => {
-    if (!isProcessing) {
-      // Close dialog and refresh page
-      handleClose()
-      window.location.reload()
-    }
-  }
-
-  // Render different content based on state
-  const renderContent = () => {
-    // 1. Initial State - Show selection and mode options
-    if (!isProcessing && !isCompleted) {
-      return (
-        <div className="space-y-6">
-          {/* File Summary */}
-          <div className="bg-muted/50 rounded-lg border p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Selected Items:</span>
-                <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                  {downloadableFiles.length} files
-                </Badge>
-                {skippedFolders.length > 0 && (
-                  <Badge variant="outline" className="text-orange-600">
-                    {skippedFolders.length} folders (will be skipped)
-                  </Badge>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Download Mode Selection */}
-          <div className="space-y-4">
-            <Label className="text-base font-medium">Download Mode</Label>
-            <RadioGroup value={selectedMode} onValueChange={setSelectedMode} className="space-y-3">
-              {DOWNLOAD_MODES.map(mode => {
-                const IconComponent = mode.icon
-                return (
-                  <div
-                    key={mode.id}
-                    className={cn(
-                      'flex cursor-pointer items-start space-x-3 rounded-lg border p-4 transition-colors',
-                      selectedMode === mode.id
-                        ? 'border-primary bg-primary/5'
-                        : 'border-border hover:bg-muted/50',
-                    )}
-                    onClick={() => setSelectedMode(mode.id)}
-                  >
-                    <RadioGroupItem value={mode.id} className="mt-1" />
-                    <div className="flex flex-1 items-start gap-3">
-                      <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                        <IconComponent className="text-primary h-5 w-5" />
-                      </div>
-                      <div className="space-y-1">
-                        <div className="font-medium">{mode.label}</div>
-                        <div className="text-muted-foreground text-sm">{mode.description}</div>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </RadioGroup>
-          </div>
-
-          {/* Folders Warning */}
-          {skippedFolders.length > 0 && (
-            <div className="rounded-lg border border-orange-200 bg-orange-50 p-4 dark:border-orange-900 dark:bg-orange-950/50">
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="mt-0.5 h-5 w-5 text-orange-600" />
-                <div className="space-y-1">
-                  <div className="font-medium text-orange-800 dark:text-orange-200">
-                    Folders will be skipped
-                  </div>
-                  <div className="text-sm text-orange-700 dark:text-orange-300">
-                    {skippedFolders.length} folder{skippedFolders.length > 1 ? 's' : ''} cannot be
-                    downloaded and will be automatically skipped
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* File Preview */}
-          {downloadableFiles.length > 0 && (
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Files to download:</Label>
-              <div className="bg-muted/30 max-h-32 space-y-1 overflow-y-auto rounded-lg border p-3">
-                {downloadableFiles.slice(0, 5).map(file => (
-                  <div key={file.id} className="text-muted-foreground text-sm">
-                    {file.name}
-                    {(file as any).size && (
-                      <span className="ml-2 text-xs">({(file as any).size})</span>
-                    )}
-                  </div>
-                ))}
-                {downloadableFiles.length > 5 && (
-                  <div className="text-muted-foreground text-xs">
-                    ... and {downloadableFiles.length - 5} more files
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      )
-    }
-
-    // 2. Processing State - Show progress
-    if (isProcessing) {
-      return (
-        <div className="space-y-6">
-          {/* Processing Header */}
-          <div className="text-center">
-            <div className="text-lg font-semibold text-blue-600">Downloading Files...</div>
-            <div className="text-muted-foreground text-sm">
-              Please wait while we process your download
-            </div>
-          </div>
-
-          {/* Progress Display */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span>Progress</span>
-                <span>
-                  {progress.current} of {progress.total} files
-                </span>
-              </div>
-              <Progress value={(progress.current / progress.total) * 100} className="h-3" />
-              {progress.currentFile && (
-                <div className="text-muted-foreground text-xs">
-                  Processing: {progress.currentFile}
-                </div>
-              )}
-            </div>
-
-            {/* Live Progress Summary */}
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-600">{progress.success}</span>
-                </div>
-                <div className="text-muted-foreground text-xs">Success</div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <SkipForward className="h-4 w-4 text-orange-600" />
-                  <span className="text-sm font-medium text-orange-600">{progress.skipped}</span>
-                </div>
-                <div className="text-muted-foreground text-xs">Skipped</div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <XCircle className="h-4 w-4 text-red-600" />
-                  <span className="text-sm font-medium text-red-600">{progress.failed}</span>
-                </div>
-                <div className="text-muted-foreground text-xs">Failed</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )
-    }
-
-    // 3. Completed State - Show results
-    if (isCompleted) {
-      return (
-        <div className="space-y-6">
-          {/* Header - Different for cancelled vs completed */}
-          <div className="text-center">
-            <div className="mb-3 flex justify-center">
-              {isCancelled ? (
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900/30">
-                  <XCircle className="h-8 w-8 text-orange-600 dark:text-orange-400" />
-                </div>
-              ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
-                </div>
-              )}
-            </div>
-            {isCancelled ? (
-              <>
-                <div className="text-lg font-semibold text-orange-600">Download Cancelled</div>
-                <div className="text-muted-foreground text-sm">
-                  Operation was stopped by user. {progress.success} of {progress.total} files were
-                  processed before cancellation
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="text-lg font-semibold text-green-600">Download Completed!</div>
-                <div className="text-muted-foreground text-sm">
-                  {progress.success} of {progress.total} files processed successfully
-                </div>
-              </>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Selected Items</span>
+          <div className="flex gap-2">
+            {folderCount > 0 && (
+              <Badge variant="secondary" className="gap-1">
+                <Folder className="h-3 w-3" />
+                {folderCount} folder{folderCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+            {fileCount > 0 && (
+              <Badge variant="secondary" className="gap-1">
+                <FileText className="h-3 w-3" />
+                {fileCount} file{fileCount > 1 ? 's' : ''}
+              </Badge>
+            )}
+            {totalSize > 0 && (
+              <Badge variant="outline" className="gap-1">
+                <HardDrive className="h-3 w-3" />
+                {formatBytes(totalSize)}
+              </Badge>
             )}
           </div>
+        </div>
 
-          {/* Final Results */}
-          <div className="space-y-4">
-            {/* Progress Bar - Final State */}
-            <div className="space-y-2">
-              <Progress value={100} className="h-2" />
-              <div className="text-center text-xs font-medium text-green-600 dark:text-green-400">
-                ✓ All operations completed
-              </div>
-            </div>
-
-            {/* Final Summary */}
-            <div className="grid grid-cols-3 gap-4 text-center">
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span className="text-lg font-bold text-green-600">{progress.success}</span>
-                </div>
-                <div className="text-muted-foreground text-sm">Success</div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <SkipForward className="h-5 w-5 text-orange-600" />
-                  <span className="text-lg font-bold text-orange-600">{progress.skipped}</span>
-                </div>
-                <div className="text-muted-foreground text-sm">Skipped</div>
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center justify-center gap-1">
-                  <XCircle className="h-5 w-5 text-red-600" />
-                  <span className="text-lg font-bold text-red-600">{progress.failed}</span>
-                </div>
-                <div className="text-muted-foreground text-sm">Failed</div>
-              </div>
-            </div>
-
-            {/* Success/Cancellation Message */}
-            {progress.success > 0 && (
-              <div
-                className={`rounded-lg border p-4 ${
-                  isCancelled
-                    ? 'border-orange-200 bg-orange-50 dark:border-orange-900 dark:bg-orange-950/50'
-                    : 'border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/50'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  {isCancelled ? (
-                    <XCircle className="mt-0.5 h-5 w-5 text-orange-600" />
-                  ) : (
-                    <CheckCircle className="mt-0.5 h-5 w-5 text-green-600" />
+        <ScrollArea className="max-h-40">
+          <div className="space-y-2">
+            {selectedItems.slice(0, 10).map(item => (
+              <div key={item.id} className="flex items-center gap-2 rounded-lg border p-2 text-sm">
+                {getFileIcon(item.mimeType, item.isFolder)}
+                <div className="min-w-0 flex-1">
+                  <span className="block truncate">{item.name}</span>
+                  {item.size && (
+                    <span className="text-muted-foreground text-xs">{formatBytes(item.size)}</span>
                   )}
-                  <div className="space-y-1">
-                    <div
-                      className={`font-medium ${isCancelled ? 'text-orange-800 dark:text-orange-200' : 'text-green-800 dark:text-green-200'}`}
-                    >
-                      {isCancelled
-                        ? 'Download Operation Cancelled'
-                        : 'Download Operation Successful'}
-                    </div>
-                    <div
-                      className={`text-sm ${isCancelled ? 'text-orange-700 dark:text-orange-300' : 'text-green-700 dark:text-green-300'}`}
-                    >
-                      {progress.success} file{progress.success > 1 ? 's' : ''}{' '}
-                      {isCancelled ? 'processed before cancellation' : 'downloaded successfully'}
-                      {!isCancelled && selectedMode === 'exportLinks'
-                        ? ' and export file generated'
-                        : ''}
-                    </div>
-                  </div>
                 </div>
               </div>
-            )}
-
-            {/* Error Details */}
-            {progress.errors.length > 0 && (
-              <div className="space-y-2">
-                <div className="text-sm font-medium text-red-600">Errors encountered:</div>
-                <div className="max-h-32 space-y-1 overflow-y-auto">
-                  {progress.errors.map((error, index) => (
-                    <div
-                      key={`error-${error.file}-${index}`}
-                      className="rounded bg-red-50 p-2 text-xs text-red-600 dark:bg-red-950/50"
-                    >
-                      <span className="font-medium">{error.file}:</span> {error.error}
-                    </div>
-                  ))}
-                </div>
+            ))}
+            {selectedItems.length > 10 && (
+              <div className="text-muted-foreground text-center text-sm">
+                +{selectedItems.length - 10} more items
               </div>
             )}
           </div>
-        </div>
-      )
-    }
+        </ScrollArea>
+      </div>
 
-    return null
+      <div className="space-y-4">
+        <Label className="text-sm font-medium">Download Format</Label>
+        <RadioGroup
+          value={downloadFormat}
+          onValueChange={value => setDownloadFormat(value as DownloadFormat)}
+          className="space-y-3"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="original" id="original" />
+            <Label htmlFor="original" className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Original Files
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="zip" id="zip" />
+            <Label htmlFor="zip" className="flex items-center gap-2">
+              <Archive className="h-4 w-4" />
+              ZIP Archive
+            </Label>
+          </div>
+          {selectedItems.length > 1 && (
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="individual" id="individual" />
+              <Label htmlFor="individual" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Individual Downloads
+              </Label>
+            </div>
+          )}
+        </RadioGroup>
+      </div>
+
+      <div className="space-y-4">
+        <Label className="text-sm font-medium">Download Options</Label>
+
+        <div className="space-y-3">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="autoStartDownload"
+              checked={autoStartDownload}
+              onCheckedChange={setAutoStartDownload}
+            />
+            <Label htmlFor="autoStartDownload" className="text-sm">
+              Start downloads automatically
+            </Label>
+          </div>
+
+          {downloadFormat === 'zip' && (
+            <>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="compressFiles"
+                  checked={compressFiles}
+                  onCheckedChange={setCompressFiles}
+                />
+                <Label htmlFor="compressFiles" className="text-sm">
+                  Compress files in archive
+                </Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="createManifest"
+                  checked={createManifest}
+                  onCheckedChange={setCreateManifest}
+                />
+                <Label htmlFor="createManifest" className="text-sm">
+                  Include file manifest
+                </Label>
+              </div>
+            </>
+          )}
+
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="includeMetadata"
+              checked={includeMetadata}
+              onCheckedChange={setIncludeMetadata}
+            />
+            <Label htmlFor="includeMetadata" className="text-sm">
+              Include file metadata
+            </Label>
+          </div>
+        </div>
+      </div>
+
+      {downloadFormat === 'zip' && (
+        <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+          <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
+            <div className="flex items-center gap-2 font-medium">
+              <Archive className="h-4 w-4" />
+              <span>ZIP Archive Benefits</span>
+            </div>
+            <div>• Single download for all files</div>
+            <div>• Preserves folder structure</div>
+            <div>• Smaller total download size</div>
+            <div>• Easier to share and organize</div>
+          </div>
+        </div>
+      )}
+
+      {selectedItems.length > 5 && downloadFormat === 'individual' && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
+          <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+            <AlertTriangle className="h-4 w-4" />
+            <span className="text-sm">
+              Individual downloads will trigger {selectedItems.length} separate downloads
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  const renderProcessingStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+        <h3 className="font-semibold">Preparing Downloads</h3>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <span>Progress</span>
+          <span>
+            {progress.current} of {progress.total}
+          </span>
+        </div>
+
+        <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+
+        {progress.currentFile && (
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <ArrowRight className="h-4 w-4" />
+            <span className="truncate">Processing: {progress.currentFile}</span>
+          </div>
+        )}
+
+        {progress.totalSize > 0 && (
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <HardDrive className="h-4 w-4" />
+            <span>
+              {formatBytes(progress.downloadedSize)} / {formatBytes(progress.totalSize)}
+            </span>
+          </div>
+        )}
+
+        <div className="flex gap-4 text-sm">
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle className="h-4 w-4" />
+            <span>{progress.success} prepared</span>
+          </div>
+          <div className="flex items-center gap-1 text-red-600">
+            <XCircle className="h-4 w-4" />
+            <span>{progress.failed} failed</span>
+          </div>
+          <div className="flex items-center gap-1 text-yellow-600">
+            <SkipForward className="h-4 w-4" />
+            <span>{progress.skipped} skipped</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderCompletedStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">
+          {isCancelled ? 'Download Preparation Cancelled' : 'Downloads Ready'}
+        </h3>
+      </div>
+
+      {!isCancelled && (
+        <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+          <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+            <div>✓ Successfully prepared {progress.success} item(s) for download</div>
+            <div>
+              ✓ {autoStartDownload ? 'Downloads started automatically' : 'Download links generated'}
+            </div>
+            <div>✓ Files ready for immediate access</div>
+          </div>
+        </div>
+      )}
+
+      {zipDownloadUrl && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">ZIP Archive</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => triggerDownload(zipDownloadUrl, `download_${Date.now()}.zip`)}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download Archive
+            </Button>
+          </div>
+
+          <div className="rounded-lg border bg-gray-50 p-3 dark:bg-gray-950/50">
+            <div className="flex items-center gap-2 text-sm">
+              <Archive className="h-4 w-4 text-blue-600" />
+              <span className="font-medium">All files bundled in ZIP format</span>
+            </div>
+            <div className="text-muted-foreground mt-1 text-xs">
+              Size: {formatBytes(progress.totalSize)} • Items: {progress.success}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {downloadResults.length > 0 && !zipDownloadUrl && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Individual Downloads</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                downloadResults.forEach(result => {
+                  if (result.success && result.downloadUrl) {
+                    triggerDownload(result.downloadUrl, result.fileName)
+                  }
+                })
+              }}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download All
+            </Button>
+          </div>
+
+          <ScrollArea className="max-h-48">
+            <div className="space-y-2">
+              {downloadResults.map((result, index) => (
+                <div key={index} className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm">
+                    {result.success ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-600" />
+                    )}
+                    <span className="flex-1 truncate font-medium">{result.fileName}</span>
+                    {result.success && result.downloadUrl && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => triggerDownload(result.downloadUrl!, result.fileName)}
+                        className="h-8 px-2"
+                      >
+                        <Download className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+
+                  {!result.success && (
+                    <div className="ml-6 text-xs text-red-600">Error: {result.error}</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+      )}
+
+      {progress.failed > 0 && (
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-red-600">
+            Failed to prepare {progress.failed} item(s):
+          </div>
+          <ScrollArea className="max-h-32">
+            <div className="space-y-1">
+              {progress.errors.map((error, index) => (
+                <div key={index} className="text-xs text-red-600">
+                  • {error.file}: {error.error}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+        </div>
+      )}
+
+      {!isCancelled && progress.success > 0 && (
+        <div className="rounded-lg border bg-amber-50 p-3 dark:bg-amber-950/20">
+          <div className="text-sm text-amber-700 dark:text-amber-300">
+            💡 Tip: Downloads may be blocked by your browser's popup blocker
+          </div>
+        </div>
+      )}
+    </div>
+  )
+
+  const renderContent = () => {
+    switch (currentStep) {
+      case 'setup':
+        return renderSetupStep()
+      case 'processing':
+        return renderProcessingStep()
+      case 'completed':
+        return renderCompletedStep()
+      default:
+        return null
+    }
   }
 
-  const isMobile = useIsMobile()
-  const DialogComponent = isMobile ? BottomSheet : Dialog
-  const DialogContentComponent = isMobile ? BottomSheetContent : DialogContent
-  const DialogHeaderComponent = isMobile ? BottomSheetHeader : DialogHeader
-  const DialogTitleComponent = isMobile ? BottomSheetTitle : DialogTitle
-  const DialogFooterComponent = isMobile ? BottomSheetFooter : DialogFooter
+  const renderFooter = () => {
+    switch (currentStep) {
+      case 'setup':
+        return (
+          <>
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleDownload} disabled={selectedItems.length === 0}>
+              Prepare Downloads
+            </Button>
+          </>
+        )
+      case 'processing':
+        return (
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+        )
+      case 'completed':
+        return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
+      default:
+        return null
+    }
+  }
+
+  if (isMobile) {
+    return (
+      <BottomSheet open={isOpen} onOpenChange={open => !open && handleClose()}>
+        <BottomSheetContent>
+          <BottomSheetHeader>
+            <BottomSheetTitle>Download Items</BottomSheetTitle>
+            <BottomSheetDescription>
+              Download selected items from Google Drive in various formats.
+            </BottomSheetDescription>
+          </BottomSheetHeader>
+
+          <div className="flex-1 overflow-y-auto px-4 py-2">{renderContent()}</div>
+
+          <BottomSheetFooter>
+            <div className="flex gap-2">{renderFooter()}</div>
+          </BottomSheetFooter>
+        </BottomSheetContent>
+      </BottomSheet>
+    )
+  }
 
   return (
-    <DialogComponent open={isOpen} onOpenChange={handleClose}>
-      <DialogContentComponent className="sm:max-w-[600px]">
-        <DialogHeaderComponent>
-          <DialogTitleComponent className="flex items-center gap-3">
-            {!isProcessing && !isCompleted && (
-              <>
-                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                  <Download className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Download Files</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Choose how you want to download the selected files
-                  </p>
-                </div>
-              </>
-            )}
-            {isProcessing && (
-              <>
-                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/30">
-                  <Download className="h-8 w-8 animate-pulse text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Processing Download</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Downloading your selected files...
-                  </p>
-                </div>
-              </>
-            )}
-            {isCompleted && (
-              <>
-                <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/30">
-                  <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Download Results</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Review your download operation results
-                  </p>
-                </div>
-              </>
-            )}
-          </DialogTitleComponent>
-        </DialogHeaderComponent>
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Download Items</DialogTitle>
+          <DialogDescription>
+            Download selected items from Google Drive in various formats.
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Dynamic Content */}
-        <div
-          key={`download-content-${isProcessing ? 'processing' : isCompleted ? 'completed' : 'initial'}`}
-        >
-          {renderContent()}
-        </div>
+        <div className="max-h-[60vh] overflow-y-auto">{renderContent()}</div>
 
-        <DialogFooterComponent className="flex gap-2">
-          <Button variant="outline" onClick={handleClose} disabled={isProcessing}>
-            {isProcessing ? 'Processing...' : isCompleted ? 'Close' : 'Cancel'}
-          </Button>
-          {isProcessing && (
-            <Button variant="destructive" onClick={handleCancel} className="gap-2">
-              <XCircle className="h-4 w-4" />
-              Cancel Download
-            </Button>
-          )}
-          {!isCompleted && !isProcessing && (
-            <Button
-              onClick={handleConfirm}
-              disabled={downloadableFiles.length === 0}
-              className="gap-2"
-            >
-              <Download className="h-4 w-4" />
-              Start Download
-            </Button>
-          )}
-          {isCompleted && (
-            <Button variant="default" onClick={handleCloseAndRefresh}>
-              Close & Refresh
-            </Button>
-          )}
-        </DialogFooterComponent>
-      </DialogContentComponent>
-    </DialogComponent>
+        <DialogFooter>{renderFooter()}</DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
 export default ItemsDownloadDialog
+export { ItemsDownloadDialog }

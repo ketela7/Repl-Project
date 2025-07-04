@@ -3,30 +3,33 @@
 import { useState, useRef } from 'react'
 import {
   Share2,
-  Globe,
   Users,
+  Link,
+  Globe,
+  Lock,
   Eye,
-  Edit,
+  Edit3,
+  UserPlus,
+  Copy,
   Loader2,
   CheckCircle,
   XCircle,
   AlertTriangle,
+  ArrowRight,
   SkipForward,
-  Copy,
-  Download,
-  ChevronDown,
   FileText,
-  Code,
+  Folder,
+  Info,
+  Settings,
+  Shield,
+  Mail,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -37,50 +40,66 @@ import {
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
+  BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn, calculateProgress } from '@/lib/utils'
 
 interface ItemsShareDialogProps {
   isOpen: boolean
   onClose: () => void
+  onConfirm?: () => void
   selectedItems: Array<{
     id: string
     name: string
     isFolder: boolean
+    mimeType?: string
   }>
 }
 
+type ShareStep = 'setup' | 'processing' | 'completed'
+
+type ShareMethod = 'link' | 'email' | 'public'
+
+type Permission = 'viewer' | 'commenter' | 'editor'
+
 interface ShareResult {
-  id: string
-  name: string
+  fileId: string
+  fileName: string
   success: boolean
   shareLink?: string
   error?: string
 }
 
-function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogProps) {
-  const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
-  const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>(
-    'anyoneWithLink',
-  )
+function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsShareDialogProps) {
+  const [currentStep, setCurrentStep] = useState<ShareStep>('setup')
+  const [shareMethod, setShareMethod] = useState<ShareMethod>('link')
+  const [permission, setPermission] = useState<Permission>('viewer')
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
+
+  // Email sharing options
+  const [emailAddresses, setEmailAddresses] = useState('')
+  const [emailMessage, setEmailMessage] = useState('')
+  const [notifyByEmail, setNotifyByEmail] = useState(true)
+
+  // Link sharing options
+  const [requireSignIn, setRequireSignIn] = useState(false)
+  const [allowDownload, setAllowDownload] = useState(true)
+  const [copyLinks, setCopyLinks] = useState(false)
+
+  // Results
+  const [shareResults, setShareResults] = useState<ShareResult[]>([])
+
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -89,7 +108,6 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     skipped: number
     failed: number
     errors: Array<{ file: string; error: string }>
-    shareResults: ShareResult[]
   }>({
     current: 0,
     total: 0,
@@ -97,7 +115,6 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     skipped: 0,
     failed: 0,
     errors: [],
-    shareResults: [],
   })
 
   const abortControllerRef = useRef<AbortController | null>(null)
@@ -106,6 +123,35 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
 
   const fileCount = selectedItems.filter(item => !item.isFolder).length
   const folderCount = selectedItems.filter(item => item.isFolder).length
+
+  const handleClose = () => {
+    if (isProcessing) {
+      handleCancel()
+    }
+    resetState()
+    onClose()
+  }
+
+  const resetState = () => {
+    setCurrentStep('setup')
+    setShareMethod('link')
+    setPermission('viewer')
+    setEmailAddresses('')
+    setEmailMessage('')
+    setNotifyByEmail(true)
+    setRequireSignIn(false)
+    setAllowDownload(true)
+    setCopyLinks(false)
+    setShareResults([])
+    setProgress({
+      current: 0,
+      total: 0,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+  }
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -116,9 +162,26 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     }
 
     setIsProcessing(false)
-    setIsCompleted(true)
+    setCurrentStep('completed')
+    toast.info('Share operation cancelled')
+  }
 
-    toast.info('Share operation cancelled by user')
+  const validateEmailAddresses = (emails: string): string[] => {
+    const emailList = emails
+      .split(/[,;\n]/)
+      .map(email => email.trim())
+      .filter(email => email.length > 0)
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const validEmails = emailList.filter(email => emailRegex.test(email))
+
+    if (validEmails.length !== emailList.length) {
+      const invalidEmails = emailList.filter(email => !emailRegex.test(email))
+      toast.error(`Invalid email addresses: ${invalidEmails.join(', ')}`)
+      return []
+    }
+
+    return validEmails
   }
 
   const handleShare = async () => {
@@ -127,679 +190,573 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
       return
     }
 
+    if (shareMethod === 'email') {
+      const validEmails = validateEmailAddresses(emailAddresses)
+      if (validEmails.length === 0) {
+        return
+      }
+    }
+
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
-    setIsCompleted(false)
+    setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
 
+    const totalItems = selectedItems.length
+    setProgress({
+      current: 0,
+      total: totalItems,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+
+    let successCount = 0
+    let failedCount = 0
+    let skippedCount = 0
+    const errors: Array<{ file: string; error: string }> = []
+    const results: ShareResult[] = []
+
     try {
-      setProgress({
-        current: 0,
-        total: selectedItems.length,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-        shareResults: [],
-      })
-
-      let successCount = 0
-      let failedCount = 0
-      const errors: Array<{ file: string; error: string }> = []
-      const shareResults: ShareResult[] = []
-
       for (let i = 0; i < selectedItems.length; i++) {
         if (isCancelledRef.current) {
-          toast.info(`Share cancelled after ${successCount} items`)
           break
         }
 
         const item = selectedItems[i]
-        if (!item) continue
+        setProgress(prev => ({
+          ...prev,
+          current: i + 1,
+          currentFile: item.name,
+        }))
 
         try {
-          setProgress(prev => ({
-            ...prev,
-            current: i + 1,
-            currentFile: item.name,
-          }))
+          const requestBody: any = {
+            fileId: item.id,
+            permission: permission,
+          }
 
-          if (isCancelledRef.current) {
-            break
+          if (shareMethod === 'email') {
+            requestBody.emailAddresses = validateEmailAddresses(emailAddresses)
+            requestBody.message = emailMessage
+            requestBody.notifyByEmail = notifyByEmail
+          } else if (shareMethod === 'link') {
+            requestBody.createLink = true
+            requestBody.requireSignIn = requireSignIn
+            requestBody.allowDownload = allowDownload
+          } else if (shareMethod === 'public') {
+            requestBody.makePublic = true
+            requestBody.allowDownload = allowDownload
           }
 
           const response = await fetch('/api/drive/files/share', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              items: [{ id: item.id }],
-              accessLevel,
-              linkAccess,
-            }),
-            signal: abortControllerRef.current?.signal,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestBody),
+            signal: abortControllerRef.current.signal,
           })
 
-          if (abortControllerRef.current?.signal.aborted) {
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Share failed')
+          }
+
+          const data = await response.json()
+
+          const result: ShareResult = {
+            fileId: item.id,
+            fileName: item.name,
+            success: true,
+            shareLink: data.shareLink,
+          }
+
+          results.push(result)
+          successCount++
+        } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
             break
           }
 
-          const result = await response.json()
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          errors.push({ file: item.name, error: errorMessage })
 
-          if (result.success) {
-            successCount++
-            shareResults.push({
-              id: item.id,
-              name: item.name,
-              success: true,
-              shareLink: result.shareLink || `https://drive.google.com/file/d/${item.id}/view`,
-            })
-          } else {
-            throw new Error(result.error || 'Failed to share item')
-          }
-
-          if (!isCancelledRef.current) {
-            await new Promise(resolve => setTimeout(resolve, 100))
-          }
-        } catch (error: any) {
-          if (abortControllerRef.current?.signal.aborted) {
-            break
-          }
-
-          failedCount++
-          errors.push({
-            file: item.name,
-            error: error.message || 'Share failed',
-          })
-          shareResults.push({
-            id: item.id,
-            name: item.name,
+          results.push({
+            fileId: item.id,
+            fileName: item.name,
             success: false,
-            error: error.message || 'Share failed',
+            error: errorMessage,
           })
+          failedCount++
         }
 
-        setProgress(prev => ({
-          ...prev,
-          current: i + 1,
-          success: successCount,
-          failed: failedCount,
-          skipped: 0, // Share operation doesn't skip items
-          errors,
-          shareResults,
-        }))
-
-        if (isCancelledRef.current) {
-          break
-        }
+        // Small delay to prevent overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 100))
       }
-
-      if (!isCancelledRef.current) {
-        if (successCount > 0) {
-          toast.success(`Shared ${successCount} item${successCount > 1 ? 's' : ''}`)
-        }
-        if (failedCount > 0) {
-          toast.error(`Failed to share ${failedCount} item${failedCount > 1 ? 's' : ''}`)
-        }
-      }
-    } catch {
-      if (abortControllerRef.current?.signal.aborted) {
-        return
-      }
-      // // // // // console.error(err)
-      toast.error('Share operation failed')
+    } catch (error) {
+      console.error('Share operation failed:', error)
     } finally {
-      abortControllerRef.current = null
+      setProgress(prev => ({
+        ...prev,
+        success: successCount,
+        failed: failedCount,
+        skipped: skippedCount,
+        errors,
+      }))
+
+      setShareResults(results)
       setIsProcessing(false)
-      setIsCompleted(true)
-    }
-  }
+      setCurrentStep('completed')
 
-  const handleClose = () => {
-    if (!isProcessing) {
-      setIsCompleted(false)
-      setIsCancelled(false)
-      isCancelledRef.current = false
-      abortControllerRef.current = null
-      setProgress({
-        current: 0,
-        total: 0,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-        shareResults: [],
-      })
-      onClose()
-    }
-  }
+      if (isCancelledRef.current) {
+        toast.info('Share operation cancelled')
+      } else if (successCount > 0) {
+        toast.success(`Successfully shared ${successCount} item(s)`)
 
-  const handleCloseAndRefresh = () => {
-    if (!isProcessing) {
-      // Refresh immediately to show results
-      window.location.reload()
-    }
-  }
+        // Copy links to clipboard if requested
+        if (copyLinks && shareMethod === 'link') {
+          const links = results
+            .filter(r => r.success && r.shareLink)
+            .map(r => `${r.fileName}: ${r.shareLink}`)
+            .join('\n')
 
-  const handleExportData = (format: 'csv' | 'txt' | 'json') => {
-    const successfulShares = progress.shareResults.filter(
-      result => result.success && result.shareLink,
-    )
-
-    if (successfulShares.length === 0) {
-      toast.error('No successful shares to export')
-      return
-    }
-
-    let content: string
-    let mimeType: string
-    let fileExtension: string
-
-    switch (format) {
-      case 'csv':
-        // Create CSV content with header
-        const csvHeader = 'name,sharelink\n'
-        const csvContent = successfulShares
-          .map(result => `"${result.name}","${result.shareLink}"`)
-          .join('\n')
-        content = csvHeader + csvContent
-        mimeType = 'text/csv;charset=utf-8;'
-        fileExtension = 'csv'
-        break
-
-      case 'txt':
-        // Create plain text content
-        content = successfulShares.map(result => `${result.name}: ${result.shareLink}`).join('\n')
-        mimeType = 'text/plain;charset=utf-8;'
-        fileExtension = 'txt'
-        break
-
-      case 'json':
-        // Create JSON content
-        const jsonData = {
-          exportDate: new Date().toISOString(),
-          totalShares: successfulShares.length,
-          shares: successfulShares.map(result => ({
-            name: result.name,
-            shareLink: result.shareLink,
-            fileId: result.id,
-          })),
+          if (links) {
+            navigator.clipboard.writeText(links)
+            toast.success('Share links copied to clipboard')
+          }
         }
-        content = JSON.stringify(jsonData, null, 2)
-        mimeType = 'application/json;charset=utf-8;'
-        fileExtension = 'json'
-        break
 
-      default:
-        return
+        onConfirm?.()
+      } else {
+        toast.error('Share operation failed')
+      }
     }
-
-    // Create and download the file
-    const blob = new Blob([content], { type: mimeType })
-    const link = document.createElement('a')
-    const url = URL.createObjectURL(blob)
-    link.setAttribute('href', url)
-    link.setAttribute(
-      'download',
-      `share-links-${new Date().toISOString().split('T')[0]}.${fileExtension}`,
-    )
-    link.style.visibility = 'hidden'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-
-    toast.success(`Exported ${successfulShares.length} share links to ${format.toUpperCase()}`)
   }
 
-  // Render different content based on state
-  const renderContent = () => {
-    // 1. Initial State - Show share options and items preview
-    if (!isProcessing && !isCompleted) {
-      return (
-        <div className="flex max-h-[60vh] flex-col space-y-4">
-          {/* Header Info - Compact */}
-          <div className="flex-shrink-0 space-y-2 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                <Share2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-base font-semibold">Share Items</h3>
-              <p className="text-muted-foreground text-xs">
-                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
-              </p>
-            </div>
-          </div>
+  const renderSetupStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Settings className="h-5 w-5 text-blue-600" />
+        <h3 className="font-semibold">Share Settings</h3>
+      </div>
 
-          {/* Stats - Compact */}
-          <div className="flex flex-shrink-0 justify-center gap-1">
-            {fileCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-              >
-                {fileCount} file{fileCount > 1 ? 's' : ''}
-              </Badge>
-            )}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Selected Items</span>
+          <div className="flex gap-2">
             {folderCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-green-100 text-xs text-green-800 dark:bg-green-900 dark:text-green-100"
-              >
+              <Badge variant="secondary" className="gap-1">
+                <Folder className="h-3 w-3" />
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
-          </div>
-
-          {/* Share Options */}
-          <div className="flex-shrink-0">
-            <div className="flex items-start gap-4">
-              {/* Permission Level */}
-              <div className="flex w-1/2 flex-col space-y-2">
-                <Label className="text-xs font-medium">Permission Level:</Label>
-                <Select
-                  value={accessLevel}
-                  onValueChange={(value: 'reader' | 'writer' | 'commenter') =>
-                    setAccessLevel(value)
-                  }
-                >
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="reader">
-                      <div className="flex items-center gap-2">
-                        <Eye className="h-3 w-3" />
-                        <span>View only</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="commenter">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-3 w-3" />
-                        <span>Comment</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="writer">
-                      <div className="flex items-center gap-2">
-                        <Edit className="h-3 w-3" />
-                        <span>Edit</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Link Access */}
-              <div className="flex w-1/2 flex-col space-y-2">
-                <Label className="text-xs font-medium">Link Access:</Label>
-                <Select
-                  value={linkAccess}
-                  onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
-                    setLinkAccess(value)
-                  }
-                >
-                  <SelectTrigger className="h-8 text-xs">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="anyoneWithLink">
-                      <div className="flex items-center gap-2">
-                        <Globe className="h-3 w-3" />
-                        <span>Anyone with link</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="domain">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-3 w-3" />
-                        <span>Domain users</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="anyone">
-                      <div className="flex items-center gap-2">
-                        <Globe className="h-3 w-3" />
-                        <span>Public</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-          {/* Items Preview - ScrollArea */}
-          <div className="min-h-0 flex-1 space-y-2">
-            <h4 className="text-center text-xs font-medium">Items to share:</h4>
-            <div className="bg-muted/50 flex-1 rounded-lg border">
-              <ScrollArea className="h-[120px] w-full">
-                <div className="space-y-1 p-2">
-                  {selectedItems.map(item => (
-                    <div
-                      key={item.id}
-                      className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
-                    >
-                      <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500" />
-                      <span className="flex-1 truncate font-mono text-xs" title={item.name}>
-                        {item.name}
-                      </span>
-                      <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
-                        {item.isFolder ? 'folder' : 'file'}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
+            {fileCount > 0 && (
+              <Badge variant="secondary" className="gap-1">
+                <FileText className="h-3 w-3" />
+                {fileCount} file{fileCount > 1 ? 's' : ''}
+              </Badge>
+            )}
           </div>
         </div>
-      )
-    }
 
-    // 2. Processing State - Show progress with cancellation
-    if (isProcessing) {
-      const progressPercentage = calculateProgress(progress.current, progress.total)
-
-      return (
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="space-y-2 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400" />
+        <ScrollArea className="max-h-32">
+          <div className="space-y-1">
+            {selectedItems.slice(0, 5).map(item => (
+              <div key={item.id} className="text-muted-foreground flex items-center gap-2 text-sm">
+                {item.isFolder ? <Folder className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
+                <span className="truncate">{item.name}</span>
               </div>
-            </div>
-            <div>
-              <h3 className="text-base font-semibold">Sharing Items...</h3>
-              <p className="text-muted-foreground text-sm">
-                {progress.current} of {progress.total} items
-              </p>
-            </div>
-          </div>
-
-          {/* Progress */}
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Progress</span>
-              <span>{progressPercentage}%</span>
-            </div>
-            <Progress value={progressPercentage} className="w-full" />
-          </div>
-
-          {/* Current File */}
-          {progress.currentFile && (
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
-                {progress.currentFile}
+            ))}
+            {selectedItems.length > 5 && (
+              <div className="text-muted-foreground text-center text-sm">
+                +{selectedItems.length - 5} more items
               </div>
-            </div>
-          )}
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-green-600">{progress.success}</div>
-              <div className="text-muted-foreground text-xs">Success</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-              <div className="text-muted-foreground text-xs">Failed</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-blue-600">{progress.current}</div>
-              <div className="text-muted-foreground text-xs">Processed</div>
-            </div>
+            )}
           </div>
-        </div>
-      )
-    }
+        </ScrollArea>
+      </div>
 
-    // 3. Completed State - Show results and share links
-    const totalProcessed = progress.success + progress.failed
-    const wasSuccessful = progress.success > 0
-    const hasErrors = progress.failed > 0
-
-    return (
       <div className="space-y-4">
-        {/* Results Header */}
-        <div className="space-y-2 text-center">
-          <div className="flex justify-center">
-            <div
-              className={cn(
-                'flex h-12 w-12 items-center justify-center rounded-full',
-                isCancelled
-                  ? 'bg-orange-100 dark:bg-orange-900/30'
-                  : wasSuccessful && !hasErrors
-                    ? 'bg-green-100 dark:bg-green-900/30'
-                    : hasErrors
-                      ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30',
-              )}
-            >
-              {isCancelled ? (
-                <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-              ) : wasSuccessful && !hasErrors ? (
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-              ) : hasErrors ? (
-                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-              ) : (
-                <SkipForward className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-              )}
+        <Label className="text-sm font-medium">Share Method</Label>
+        <RadioGroup
+          value={shareMethod}
+          onValueChange={value => setShareMethod(value as ShareMethod)}
+          className="space-y-3"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="link" id="link" />
+            <Label htmlFor="link" className="flex items-center gap-2">
+              <Link className="h-4 w-4" />
+              Share Link
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="email" id="email" />
+            <Label htmlFor="email" className="flex items-center gap-2">
+              <Mail className="h-4 w-4" />
+              Email Invitation
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="public" id="public" />
+            <Label htmlFor="public" className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              Make Public
+            </Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <div className="space-y-4">
+        <Label className="text-sm font-medium">Permission Level</Label>
+        <RadioGroup
+          value={permission}
+          onValueChange={value => setPermission(value as Permission)}
+          className="space-y-3"
+        >
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="viewer" id="viewer" />
+            <Label htmlFor="viewer" className="flex items-center gap-2">
+              <Eye className="h-4 w-4" />
+              Viewer (can view and comment)
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="commenter" id="commenter" />
+            <Label htmlFor="commenter" className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              Commenter (can comment)
+            </Label>
+          </div>
+          <div className="flex items-center space-x-2">
+            <RadioGroupItem value="editor" id="editor" />
+            <Label htmlFor="editor" className="flex items-center gap-2">
+              <Edit3 className="h-4 w-4" />
+              Editor (can edit)
+            </Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      {/* Method-specific options */}
+      <div className="space-y-4">
+        {shareMethod === 'email' && (
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="emailAddresses">Email Addresses</Label>
+              <Textarea
+                id="emailAddresses"
+                placeholder="Enter email addresses (comma or line separated)"
+                value={emailAddresses}
+                onChange={e => setEmailAddresses(e.target.value)}
+                rows={3}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="emailMessage">Message (Optional)</Label>
+              <Textarea
+                id="emailMessage"
+                placeholder="Add a personal message..."
+                value={emailMessage}
+                onChange={e => setEmailMessage(e.target.value)}
+                rows={2}
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="notifyByEmail"
+                checked={notifyByEmail}
+                onCheckedChange={setNotifyByEmail}
+              />
+              <Label htmlFor="notifyByEmail" className="text-sm">
+                Send email notifications
+              </Label>
             </div>
           </div>
-          <div>
-            <h3 className="text-base font-semibold">
-              {isCancelled
-                ? 'Share Cancelled'
-                : wasSuccessful && !hasErrors
-                  ? 'Items Shared'
-                  : hasErrors
-                    ? 'Partially Shared'
-                    : 'No Items Shared'}
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              {totalProcessed} of {selectedItems.length} items processed
-            </p>
+        )}
+
+        {shareMethod === 'link' && (
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="requireSignIn"
+                checked={requireSignIn}
+                onCheckedChange={setRequireSignIn}
+              />
+              <Label htmlFor="requireSignIn" className="text-sm">
+                Require sign-in to access
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="allowDownload"
+                checked={allowDownload}
+                onCheckedChange={setAllowDownload}
+              />
+              <Label htmlFor="allowDownload" className="text-sm">
+                Allow download
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch id="copyLinks" checked={copyLinks} onCheckedChange={setCopyLinks} />
+              <Label htmlFor="copyLinks" className="text-sm">
+                Copy links to clipboard after sharing
+              </Label>
+            </div>
           </div>
+        )}
+
+        {shareMethod === 'public' && (
+          <div className="space-y-3">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
+              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                <AlertTriangle className="h-4 w-4" />
+                <span className="text-sm">
+                  Making files public allows anyone on the internet to access them
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="allowDownloadPublic"
+                checked={allowDownload}
+                onCheckedChange={setAllowDownload}
+              />
+              <Label htmlFor="allowDownloadPublic" className="text-sm">
+                Allow download
+              </Label>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+        <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
+          <div className="flex items-center gap-2 font-medium">
+            <Shield className="h-4 w-4" />
+            <span>Privacy & Security</span>
+          </div>
+          <div>• Shared files retain their original permissions</div>
+          <div>• You can revoke access at any time</div>
+          <div>• Recipients can only access shared items</div>
+          <div>• All sharing activity is logged</div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderProcessingStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+        <h3 className="font-semibold">Sharing Items</h3>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <span>Progress</span>
+          <span>
+            {progress.current} of {progress.total}
+          </span>
         </div>
 
-        {/* Results Summary */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-green-600">{progress.success}</div>
-            <div className="text-muted-foreground text-xs">Shared</div>
+        <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+
+        {progress.currentFile && (
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <ArrowRight className="h-4 w-4" />
+            <span className="truncate">Sharing: {progress.currentFile}</span>
           </div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-            <div className="text-muted-foreground text-xs">Failed</div>
+        )}
+
+        <div className="flex gap-4 text-sm">
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle className="h-4 w-4" />
+            <span>{progress.success} shared</span>
           </div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-            <div className="text-muted-foreground text-xs">Skipped</div>
+          <div className="flex items-center gap-1 text-red-600">
+            <XCircle className="h-4 w-4" />
+            <span>{progress.failed} failed</span>
+          </div>
+          <div className="flex items-center gap-1 text-yellow-600">
+            <SkipForward className="h-4 w-4" />
+            <span>{progress.skipped} skipped</span>
           </div>
         </div>
+      </div>
+    </div>
+  )
 
-        {/* Share Links */}
-        {progress.shareResults.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium">Share Links:</h4>
-            <div className="max-h-32 space-y-1 overflow-y-auto">
-              {progress.shareResults.map((result, index) => (
-                <div
-                  key={`share-result-${result.name}-${index}`}
-                  className={cn(
-                    'rounded border p-2 text-xs',
-                    result.success
-                      ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20'
-                      : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20',
-                  )}
-                >
-                  <div className="font-medium">{result.name}</div>
-                  {result.success && result.shareLink ? (
-                    <div className="mt-1 flex items-center gap-1">
-                      <a
-                        href={result.shareLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 truncate text-xs text-blue-600 hover:underline dark:text-blue-400"
-                      >
-                        {result.shareLink}
-                      </a>
+  const renderCompletedStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">
+          {isCancelled ? 'Share Operation Cancelled' : 'Items Shared Successfully'}
+        </h3>
+      </div>
+
+      {!isCancelled && (
+        <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+          <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+            <div>✓ Successfully shared {progress.success} item(s)</div>
+            <div>
+              ✓ {shareMethod === 'email' ? 'Email invitations sent' : 'Share links generated'}
+            </div>
+            <div>✓ Recipients can access files immediately</div>
+          </div>
+        </div>
+      )}
+
+      {shareResults.length > 0 && shareMethod === 'link' && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Share Links</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const links = shareResults
+                  .filter(r => r.success && r.shareLink)
+                  .map(r => `${r.fileName}: ${r.shareLink}`)
+                  .join('\n')
+
+                if (links) {
+                  navigator.clipboard.writeText(links)
+                  toast.success('Links copied to clipboard')
+                }
+              }}
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              Copy All Links
+            </Button>
+          </div>
+
+          <ScrollArea className="max-h-48">
+            <div className="space-y-2">
+              {shareResults.map((result, index) => (
+                <div key={index} className="space-y-1">
+                  <div className="flex items-center gap-2 text-sm">
+                    {result.success ? (
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <XCircle className="h-4 w-4 text-red-600" />
+                    )}
+                    <span className="truncate font-medium">{result.fileName}</span>
+                  </div>
+
+                  {result.success && result.shareLink && (
+                    <div className="ml-6 flex items-center gap-2">
+                      <Input value={result.shareLink} readOnly className="font-mono text-xs" />
                       <Button
-                        size="sm"
                         variant="ghost"
-                        className="h-4 w-4 p-0"
-                        onClick={() => navigator.clipboard.writeText(result.shareLink || '')}
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(result.shareLink!)
+                          toast.success('Link copied')
+                        }}
+                        className="h-8 w-8 p-0"
                       >
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
-                  ) : (
-                    <div className="text-xs text-red-600 dark:text-red-400">{result.error}</div>
+                  )}
+
+                  {!result.success && (
+                    <div className="ml-6 text-xs text-red-600">Error: {result.error}</div>
                   )}
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </ScrollArea>
+        </div>
+      )}
 
-        {/* Error Details */}
-        {progress.errors.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-red-600">Errors:</h4>
-            <div className="max-h-32 space-y-1 overflow-y-auto">
+      {progress.failed > 0 && (
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-red-600">
+            Failed to share {progress.failed} item(s):
+          </div>
+          <ScrollArea className="max-h-32">
+            <div className="space-y-1">
               {progress.errors.map((error, index) => (
-                <div
-                  key={`error-${error.file}-${index}`}
-                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
-                >
-                  <div className="font-medium">{error.file}</div>
-                  <div className="text-red-600 dark:text-red-400">{error.error}</div>
+                <div key={index} className="text-xs text-red-600">
+                  • {error.file}: {error.error}
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </ScrollArea>
+        </div>
+      )}
 
-        {/* Refresh Notice */}
-        {(progress.success > 0 || progress.failed > 0) && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              Click the button below to refresh and see your updated files.
-            </p>
+      {!isCancelled && progress.success > 0 && (
+        <div className="rounded-lg border bg-amber-50 p-3 dark:bg-amber-950/20">
+          <div className="text-sm text-amber-700 dark:text-amber-300">
+            💡 Tip: You can manage sharing permissions in Google Drive settings
           </div>
-        )}
-      </div>
-    )
+        </div>
+      )}
+    </div>
+  )
+
+  const renderContent = () => {
+    switch (currentStep) {
+      case 'setup':
+        return renderSetupStep()
+      case 'processing':
+        return renderProcessingStep()
+      case 'completed':
+        return renderCompletedStep()
+      default:
+        return null
+    }
+  }
+
+  const renderFooter = () => {
+    switch (currentStep) {
+      case 'setup':
+        return (
+          <>
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleShare} disabled={selectedItems.length === 0}>
+              Share Items
+            </Button>
+          </>
+        )
+      case 'processing':
+        return (
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+        )
+      case 'completed':
+        return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
+      default:
+        return null
+    }
   }
 
   if (isMobile) {
     return (
-      <BottomSheet open={isOpen} onOpenChange={handleClose}>
-        <BottomSheetContent className="max-h-[90vh]">
-          <BottomSheetHeader className="pb-4">
-            <BottomSheetTitle className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
-                <Share2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold">Share Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Share operation</div>
-              </div>
-            </BottomSheetTitle>
+      <BottomSheet open={isOpen} onOpenChange={open => !open && handleClose()}>
+        <BottomSheetContent>
+          <BottomSheetHeader>
+            <BottomSheetTitle>Share Items</BottomSheetTitle>
+            <BottomSheetDescription>
+              Share selected items with others via links, email, or public access.
+            </BottomSheetDescription>
           </BottomSheetHeader>
 
-          <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
+          <div className="flex-1 overflow-y-auto px-4 py-2">{renderContent()}</div>
 
-          <BottomSheetFooter className={cn('grid gap-4')}>
-            {!isProcessing && !isCompleted && (
-              <>
-                <Button
-                  onClick={handleShare}
-                  className={cn(
-                    'touch-target min-h-[44px] bg-blue-600 text-white hover:bg-blue-700 active:scale-95',
-                  )}
-                >
-                  <Share2 className="mr-2 h-4 w-4" />
-                  Share Items
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleClose}
-                  className={cn('touch-target min-h-[44px] active:scale-95')}
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
-            {isProcessing && (
-              <Button
-                onClick={handleCancel}
-                variant="outline"
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
-                <XCircle className="mr-2 h-4 w-4" />
-                Cancel Operation
-              </Button>
-            )}
-            {isCompleted && (
-              <>
-                {progress.success > 0 || progress.failed > 0 ? (
-                  <Button
-                    onClick={handleCloseAndRefresh}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Refresh Now
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleClose}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Close
-                  </Button>
-                )}
-                {progress.success > 0 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn('touch-target min-h-[44px] active:scale-95')}
-                      >
-                        <Download className="mr-2 h-4 w-4" />
-                        Export
-                        <ChevronDown className="ml-2 h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => handleExportData('csv')}>
-                        <FileText className="mr-2 h-4 w-4" />
-                        Export as CSV
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExportData('txt')}>
-                        <FileText className="mr-2 h-4 w-4" />
-                        Export as TXT
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleExportData('json')}>
-                        <Code className="mr-2 h-4 w-4" />
-                        Export as JSON
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-                {(progress.success > 0 || progress.failed > 0) && (
-                  <Button
-                    onClick={handleClose}
-                    variant="outline"
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    Close Without Refresh
-                  </Button>
-                )}
-              </>
-            )}
+          <BottomSheetFooter>
+            <div className="flex gap-2">{renderFooter()}</div>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
@@ -807,93 +764,22 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[85vh] sm:max-w-lg">
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">
-              <Share2 className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div>
-              <div className="text-lg font-semibold">Share Items</div>
-              <div className="text-muted-foreground text-sm font-normal">Share operation</div>
-            </div>
-          </DialogTitle>
+          <DialogTitle>Share Items</DialogTitle>
+          <DialogDescription>
+            Share selected items with others via links, email, or public access.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">{renderContent()}</div>
+        <div className="max-h-[60vh] overflow-y-auto">{renderContent()}</div>
 
-        <DialogFooter className="flex flex-col gap-2 sm:flex-row">
-          {!isProcessing && !isCompleted && (
-            <>
-              <Button
-                onClick={handleShare}
-                className="w-full bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 sm:w-auto dark:bg-blue-700 dark:hover:bg-blue-800"
-              >
-                <Share2 className="mr-2 h-4 w-4" />
-                Share Items
-              </Button>
-              <Button variant="outline" onClick={handleClose} className="w-full sm:w-auto">
-                Cancel
-              </Button>
-            </>
-          )}
-          {isProcessing && (
-            <Button onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
-              <XCircle className="mr-2 h-4 w-4" />
-              Cancel Operation
-            </Button>
-          )}
-          {isCompleted && (
-            <>
-              {progress.success > 0 || progress.failed > 0 ? (
-                <Button onClick={handleCloseAndRefresh} className="w-full sm:w-auto">
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Refresh Now
-                </Button>
-              ) : (
-                <Button onClick={handleClose} className="w-full sm:w-auto">
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Close
-                </Button>
-              )}
-              {progress.success > 0 && (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="w-full sm:w-auto">
-                      <Download className="mr-2 h-4 w-4" />
-                      Export
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => handleExportData('csv')}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      Export as CSV
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExportData('txt')}>
-                      <FileText className="mr-2 h-4 w-4" />
-                      Export as TXT
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleExportData('json')}>
-                      <Code className="mr-2 h-4 w-4" />
-                      Export as JSON
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-              {(progress.success > 0 || progress.failed > 0) && (
-                <Button onClick={handleClose} variant="outline" className="w-full sm:w-auto">
-                  Close Without Refresh
-                </Button>
-              )}
-            </>
-          )}
-        </DialogFooter>
+        <DialogFooter>{renderFooter()}</DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
 
-export { ItemsShareDialog }
 export default ItemsShareDialog
+export { ItemsShareDialog }
