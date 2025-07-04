@@ -27,9 +27,19 @@ function RadioGroupItem({
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
       className={cn(
-        "h-4 w-4 rounded-full border border-input shadow-sm transition-colors outline-none",
-        "focus-visible:ring-1 focus-visible:ring-primary/50 focus-visible:ring-offset-1",
+        // Enhanced cross-platform sizing with consistent 16px (4 * 4px) base
+        "h-4 w-4 min-h-4 min-w-4 max-h-4 max-w-4 shrink-0 flex-none",
+        // Professional rounded and border styling
+        "rounded-full border border-input shadow-sm",
+        // Enhanced transition for smooth interactions
+        "transition-all duration-200 ease-in-out outline-none",
+        // Better focus and hover states for cross-platform compatibility
+        "focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-1",
+        "hover:border-primary/60",
+        // Improved disabled state
         "disabled:cursor-not-allowed disabled:opacity-50",
+        // Touch-friendly sizing for mobile devices
+        "touch-manipulation select-none",
         "aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
         className
       )}
