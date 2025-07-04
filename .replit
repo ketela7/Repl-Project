@@ -39,23 +39,17 @@ args = "Server"
 task = "workflow.run"
 args = "ESLint Rules Test"
 
-
-
-
 [[workflows.workflow]]
 name = "Cleaner"
 mode = "sequential"
-#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run clean:all"
 
-
 [[workflows.workflow]]
 name = "Check Type"
 mode = "sequential"
-#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -64,7 +58,6 @@ args = "npm run type-check"
 [[workflows.workflow]]
 name = "Test Coverage"
 mode = "sequential"
-#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -73,7 +66,6 @@ args = "npm run test:coverage"
 [[workflows.workflow]]
 name = "Linter & Formatter"
 mode = "sequential"
-#author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -92,6 +84,15 @@ waitForPort = 5000
 [[workflows.workflow]]
 name = "ESLint Rules Test"
 author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node scripts/test-eslint-rules.js"
+
+[[workflows.workflow]]
+name = "ESLint Config Test"
+author = 44592010
+mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

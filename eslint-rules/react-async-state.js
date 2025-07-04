@@ -1,193 +1,108 @@
 /**
- * Custom ESLint Rules untuk mendeteksi React Async State Issues
- * Menangkap pola-pola yang menyebabkan race conditions dan state batching problems
+ * Simplified custom ESLint rules for React async state patterns
+ * Focus on practical, working rules that integrate with existing ESLint config
  */
 
 module.exports = {
   rules: {
-    // Rule 1: Detect immediate state access after setState
-    'no-immediate-state-access': {
-      meta: {
-        type: 'problem',
-        docs: {
-          description: 'Prevent accessing state immediately after setState',
-          category: 'Possible Errors',
-          recommended: true,
-        },
-        fixable: 'code',
-        schema: [],
-        messages: {
-          immediateAccess: 'Avoid accessing "{{stateName}}" immediately after "{{setterName}}". Use useRef or callback pattern instead.',
-        },
-      },
-      create(context) {
-        return {
-          CallExpression(node) {
-            // Detect pattern: setX(value); if (x === something)
-            if (node.callee.name && node.callee.name.startsWith('set')) {
-              const stateName = node.callee.name.slice(3).toLowerCase()
-              const parent = node.parent
-              
-              // Check next sibling for immediate state access
-              if (parent && parent.body) {
-                const currentIndex = parent.body.indexOf(node.parent)
-                const nextStatement = parent.body[currentIndex + 1]
-                
-                if (nextStatement && 
-                    nextStatement.test && 
-                    nextStatement.test.left && 
-                    nextStatement.test.left.name === stateName) {
-                  context.report({
-                    node: nextStatement,
-                    messageId: 'immediateAccess',
-                    data: {
-                      stateName,
-                      setterName: node.callee.name,
-                    },
-                  })
-                }
-              }
-            }
-          },
-        }
-      },
-    },
-
-    // Rule 2: Detect missing abort controllers in fetch calls
-    'require-abort-controller': {
+    // Rule: Detect fetch calls without error handling
+    'fetch-needs-error-handling': {
       meta: {
         type: 'suggestion',
         docs: {
-          description: 'Require AbortController for fetch calls in React components',
+          description: 'Fetch calls should include error handling',
           category: 'Best Practices',
           recommended: true,
         },
         schema: [],
         messages: {
-          missingAbortController: 'Fetch call should use AbortController to prevent race conditions. Add signal parameter.',
+          missingErrorHandling: 'Fetch call should include proper error handling (try/catch or .catch())',
         },
       },
       create(context) {
         return {
           CallExpression(node) {
             if (node.callee.name === 'fetch') {
-              const options = node.arguments[1]
-              
-              if (!options || 
-                  !options.properties || 
-                  !options.properties.some(prop => prop.key.name === 'signal')) {
+              // Check if fetch is wrapped in try/catch or has .catch()
+              let parent = node.parent;
+              let hasTryCatch = false;
+              let hasCatch = false;
+
+              // Check for try/catch
+              while (parent) {
+                if (parent.type === 'TryStatement') {
+                  hasTryCatch = true;
+                  break;
+                }
+                parent = parent.parent;
+              }
+
+              // Check for .catch()
+              if (node.parent.type === 'MemberExpression' && 
+                  node.parent.property.name === 'then') {
+                // Look for chained .catch()
+                let current = node.parent.parent;
+                while (current && current.type === 'CallExpression') {
+                  if (current.callee.type === 'MemberExpression' && 
+                      current.callee.property.name === 'catch') {
+                    hasCatch = true;
+                    break;
+                  }
+                  current = current.parent;
+                }
+              }
+
+              if (!hasTryCatch && !hasCatch) {
                 context.report({
                   node,
-                  messageId: 'missingAbortController',
-                })
+                  messageId: 'missingErrorHandling',
+                });
               }
             }
           },
-        }
+        };
       },
     },
 
-    // Rule 3: Detect useState with Set/Map without useRef
-    'state-collection-needs-ref': {
+    // Rule: Detect useEffect without cleanup
+    'useEffect-needs-cleanup': {
       meta: {
         type: 'suggestion',
         docs: {
-          description: 'useState with Set/Map should have corresponding useRef for immediate access',
+          description: 'useEffect with side effects should return cleanup function',
           category: 'Best Practices',
           recommended: true,
         },
         schema: [],
         messages: {
-          needsRef: 'State "{{stateName}}" using {{collectionType}} should have corresponding useRef for immediate access.',
-        },
-      },
-      create(context) {
-        const stateCollections = new Map()
-        const refs = new Set()
-        
-        return {
-          CallExpression(node) {
-            // Track useState with Set/Map
-            if (node.callee.name === 'useState') {
-              const init = node.arguments[0]
-              if (init && init.callee && 
-                  (init.callee.name === 'Set' || init.callee.name === 'Map')) {
-                const parent = node.parent
-                if (parent.id && parent.id.elements) {
-                  const stateName = parent.id.elements[0].name
-                  stateCollections.set(stateName, init.callee.name)
-                }
-              }
-            }
-            
-            // Track useRef calls
-            if (node.callee.name === 'useRef') {
-              const parent = node.parent
-              if (parent.id && parent.id.name) {
-                refs.add(parent.id.name)
-              }
-            }
-          },
-          
-          'Program:exit'() {
-            // Check if Set/Map states have corresponding refs
-            for (const [stateName, collectionType] of stateCollections) {
-              const expectedRefName = `${stateName}Ref`
-              if (!refs.has(expectedRefName)) {
-                context.report({
-                  node: context.getSourceCode().ast,
-                  messageId: 'needsRef',
-                  data: {
-                    stateName,
-                    collectionType,
-                  },
-                })
-              }
-            }
-          },
-        }
-      },
-    },
-
-    
-
-    // Rule 5: Detect complex state that should use useReducer
-    'complex-state-needs-reducer': {
-      meta: {
-        type: 'suggestion',
-        docs: {
-          description: 'Complex state objects should use useReducer instead of useState',
-          category: 'Best Practices',
-          recommended: true,
-        },
-        schema: [],
-        messages: {
-          useReducer: 'Complex state object "{{stateName}}" with {{propertyCount}} properties should use useReducer for atomic updates.',
+          needsCleanup: 'useEffect with timers or async operations should return cleanup function',
         },
       },
       create(context) {
         return {
           CallExpression(node) {
-            if (node.callee.name === 'useState') {
-              const init = node.arguments[0]
-              if (init && init.type === 'ObjectExpression' && init.properties.length >= 3) {
-                const parent = node.parent
-                if (parent.id && parent.id.elements) {
-                  const stateName = parent.id.elements[0].name
-                  context.report({
-                    node,
-                    messageId: 'useReducer',
-                    data: {
-                      stateName,
-                      propertyCount: init.properties.length,
-                    },
-                  })
+            if (node.callee.name === 'useEffect') {
+              const effectCallback = node.arguments[0];
+              if (effectCallback && effectCallback.body) {
+                const effectText = context.getSourceCode().getText(effectCallback.body);
+                const hasSideEffects = effectText.includes('setTimeout') || 
+                                      effectText.includes('setInterval') || 
+                                      effectText.includes('fetch');
+
+                if (hasSideEffects) {
+                  const hasReturn = effectText.includes('return');
+                  if (!hasReturn) {
+                    context.report({
+                      node: effectCallback,
+                      messageId: 'needsCleanup',
+                    });
+                  }
                 }
               }
             }
           },
-        }
+        };
       },
     },
   },
-}
+};
