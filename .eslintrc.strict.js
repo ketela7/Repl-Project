@@ -70,7 +70,6 @@ module.exports = {
     'security/detect-pseudoRandomBytes': 'error',
 
     // GENERAL CODE QUALITY
-    'no-console': 'off', // Tidak boleh ada console.log
     'no-debugger': 'off',
     'no-alert': 'error',
     'no-var': 'error',
@@ -113,7 +112,7 @@ module.exports = {
     'react-hooks/exhaustive-deps': 'error', // Prevent stale closures
     'no-promise-executor-return': 'error', // Prevent promise issues
     'require-atomic-updates': 'error', // Prevent race conditions in assignments
-    
+
     // Custom patterns untuk detect async state issues
     'no-restricted-syntax': [
       'error',
@@ -158,7 +157,6 @@ module.exports = {
       files: ['**/__tests__/**/*', '**/*.test.*', '**/*.spec.*'],
       rules: {
         '@typescript-eslint/no-explicit-any': 'warn',
-        'no-console': 'off'
       }
     }
   ]
