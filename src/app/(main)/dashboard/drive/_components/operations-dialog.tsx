@@ -76,24 +76,15 @@ function OperationsDialog({
 
   // Individual dialog handlers - Fixed timing issue
   const handleMoveClick = () => {
-    console.log('Move button clicked, closing main dialog and opening move dialog')
-    // Try immediate opening without closing main dialog first to test
-    console.log('Setting move dialog open to true immediately for testing')
+    console.log('Move button clicked, opening move dialog and closing main')
     setIsMoveDialogOpen(true)
-
-    // Close main dialog after a delay
-    setTimeout(() => {
-      handleClose()
-    }, 100)
+    handleClose() // Close main dialog immediately
   }
 
   const handleCopyClick = () => {
-    console.log('Copy button clicked, closing main dialog and opening copy dialog')
-    handleClose()
-    setTimeout(() => {
-      console.log('Setting copy dialog open to true')
-      setIsCopyDialogOpen(true)
-    }, 300)
+    console.log('Copy button clicked, opening copy dialog and closing main')
+    setIsCopyDialogOpen(true)
+    handleClose() // Close main dialog immediately
   }
 
   const handleTrashClick = () => {
@@ -149,6 +140,7 @@ function OperationsDialog({
 
   // Standardized close handlers
   const handleMoveClose = () => {
+    console.log('Move dialog close handler called')
     setIsMoveDialogOpen(false)
   }
 
