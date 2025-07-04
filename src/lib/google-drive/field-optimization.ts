@@ -41,6 +41,9 @@ export const FIELD_SETS = {
 
   // Fields for drive info
   DRIVE_INFO: 'storageQuota,user',
+
+  // Fields specifically for storage analytics - includes MD5 and webViewLink for duplicate detection and file access
+  STORAGE_ANALYTICS: `${BASE_FIELDS},size,md5Checksum,webViewLink,modifiedTime`,
 } as const
 
 /**
