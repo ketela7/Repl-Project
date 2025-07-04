@@ -227,11 +227,23 @@ export function ProgressiveStorageAnalytics() {
       }
     }
 
-    eventSource.onerror = () => {
+    eventSource.onerror = async () => {
       clearTimeout(timeoutId)
       setConnectionStatus('disconnected')
       setIsLoading(false)
-      setError('Connection lost. Please try again.')
+
+      // Check if it's a 401 authentication error
+      try {
+        const sessionResponse = await fetch('/api/auth/session')
+        if (sessionResponse.status === 401 || !sessionResponse.ok) {
+          setError('Authentication expired. Please refresh the page and sign in again.')
+        } else {
+          setError('Connection lost. Please try again.')
+        }
+      } catch {
+        setError('Connection lost. Please try again.')
+      }
+
       eventSource.close()
     }
   }
@@ -467,9 +479,14 @@ export function ProgressiveStorageAnalytics() {
                                     key={categoryId}
                                     className="hover:bg-muted/30 flex items-center justify-between rounded-md border p-2 transition-colors"
                                   >
-                                    <div className="flex min-w-0 flex-1 items-center gap-2">
+                                    <div className="flex min-w-0 flex-1 items-center gap-2 pr-2">
                                       <Icon className="text-muted-foreground h-4 w-4 shrink-0" />
-                                      <span className="truncate text-sm">{category.label}</span>
+                                      <span
+                                        className="max-w-[120px] truncate text-sm sm:max-w-[150px]"
+                                        title={category.label}
+                                      >
+                                        {category.label}
+                                      </span>
                                     </div>
                                     <Badge variant="secondary" className="text-xs">
                                       {count.toLocaleString()}
@@ -509,8 +526,13 @@ export function ProgressiveStorageAnalytics() {
                             key={type}
                             className="hover:bg-muted/30 flex items-center justify-between rounded-lg border p-3 transition-colors"
                           >
-                            <div className="min-w-0 flex-1">
-                              <p className="truncate font-medium">{type}</p>
+                            <div className="min-w-0 flex-1 pr-2">
+                              <p
+                                className="max-w-[150px] truncate font-medium sm:max-w-[200px] md:max-w-[250px]"
+                                title={type}
+                              >
+                                {type}
+                              </p>
                               <p className="text-muted-foreground text-xs">
                                 {count.toLocaleString()} files
                               </p>
@@ -560,12 +582,18 @@ export function ProgressiveStorageAnalytics() {
                         key={file.id}
                         className="hover:bg-muted/30 flex items-center justify-between rounded-lg border p-3 transition-colors"
                       >
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-medium" title={file.name}>
+                        <div className="min-w-0 flex-1 pr-2">
+                          <p
+                            className="max-w-[200px] truncate text-sm font-medium sm:max-w-[300px] md:max-w-[400px]"
+                            title={file.name}
+                          >
                             {file.name}
                           </p>
-                          <p className="text-muted-foreground text-xs">
-                            {file.mimeType.split('/')[1]}
+                          <p
+                            className="text-muted-foreground max-w-[150px] truncate text-xs sm:max-w-[200px]"
+                            title={file.mimeType}
+                          >
+                            {file.mimeType.split('/')[1] || 'unknown'}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -697,19 +725,25 @@ export function ProgressiveStorageAnalytics() {
                     <div className="space-y-3 pr-3">
                       {files.duplicateFiles.map((duplicateGroup, groupIndex) => (
                         <Collapsible key={duplicateGroup.md5Hash} className="rounded-lg border">
-                          <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors">
+                          <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-start justify-between gap-2 p-3 transition-colors sm:items-center">
                             <div className="flex items-center gap-3">
                               <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
-                              <div className="text-left">
-                                <div className="flex items-center gap-2">
-                                  <Badge variant="destructive" className="text-xs">
+                              <div className="min-w-0 flex-1 text-left">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <Badge variant="destructive" className="shrink-0 text-xs">
                                     {duplicateGroup.files.length} copies
                                   </Badge>
-                                  <span className="text-sm font-medium">
+                                  <span
+                                    className="max-w-[150px] truncate text-sm font-medium sm:max-w-[200px] md:max-w-[250px]"
+                                    title={duplicateGroup.files[0]?.name || 'Unknown File'}
+                                  >
                                     {duplicateGroup.files[0]?.name || 'Unknown File'}
                                   </span>
                                 </div>
-                                <p className="text-muted-foreground text-xs">
+                                <p
+                                  className="text-muted-foreground max-w-[200px] truncate text-xs sm:max-w-[250px]"
+                                  title={`${duplicateGroup.files[0]?.mimeType || 'unknown'} • ${formatFileSize(duplicateGroup.files[0]?.size || 0)} each`}
+                                >
                                   {duplicateGroup.files[0]?.mimeType.split('/')[1] || 'Unknown'} •
                                   {formatFileSize(duplicateGroup.files[0]?.size || 0)} each
                                 </p>
@@ -734,14 +768,19 @@ export function ProgressiveStorageAnalytics() {
                                     key={file.id}
                                     className="bg-muted/30 flex items-center justify-between rounded-md p-2"
                                   >
-                                    <div className="min-w-0 flex-1">
-                                      <p className="truncate text-sm font-medium" title={file.name}>
+                                    <div className="min-w-0 flex-1 pr-2">
+                                      <p
+                                        className="max-w-[180px] truncate text-sm font-medium sm:max-w-[250px] md:max-w-[300px]"
+                                        title={file.name}
+                                      >
                                         {file.name}
                                       </p>
-                                      <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                                        <span>ID: {file.id}</span>
+                                      <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
+                                        <span className="max-w-[100px] truncate" title={file.id}>
+                                          ID: {file.id.substring(0, 8)}...
+                                        </span>
                                         {file.modifiedTime && (
-                                          <span>
+                                          <span className="shrink-0">
                                             Modified:{' '}
                                             {new Date(file.modifiedTime).toLocaleDateString()}
                                           </span>
