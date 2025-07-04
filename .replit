@@ -1,4 +1,4 @@
-modules = ["web", "nodejs-23"]
+modules = ["nodejs-20", "nodejs-23", "web"]
 
 [nix]
 channel = "stable-24_05"
@@ -35,9 +35,7 @@ args = "Linter & Formatter"
 task = "workflow.run"
 args = "Server"
 
-[[workflows.workflow.tasks]]
-task = "workflow.run"
-args = "ESLint Rules Test"
+
 
 [[workflows.workflow]]
 name = "Cleaner"

@@ -225,6 +225,7 @@ Thumbs.db
 #.replit
 /attached_assets
 cookies.txt
+replit.md
 
 # Additional build artifacts
 *.map
