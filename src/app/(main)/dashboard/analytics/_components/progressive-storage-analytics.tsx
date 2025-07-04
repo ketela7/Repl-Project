@@ -20,8 +20,6 @@ import {
 } from 'lucide-react'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import { FILE_TYPE_CATEGORIES } from '@/lib/mime-type-filter'
-import { EnhancedDuplicateAnalysis } from './enhanced-duplicate-analysis'
-import type { DuplicateFile } from '@/lib/analytics/duplicate-detector'
 
 interface QuotaData {
   limit: number | null
@@ -881,25 +879,6 @@ export function ProgressiveStorageAnalytics() {
             </CollapsibleContent>
           </Collapsible>
         </Card>
-      )}
-
-      {/* Enhanced Duplicate Analysis - Advanced AI-powered duplicate detection */}
-      {files && files.largestFiles && files.largestFiles.length > 0 && (
-        <EnhancedDuplicateAnalysis
-          files={files.largestFiles.map(
-            (file): DuplicateFile => ({
-              id: file.id,
-              name: file.name,
-              size: file.size,
-              md5Checksum: file.md5Checksum,
-              mimeType: file.mimeType,
-              modifiedTime: file.modifiedTime,
-              webViewLink: file.webViewLink,
-              parents: file.parents,
-            }),
-          )}
-          isLoading={isLoading}
-        />
       )}
     </div>
   )
