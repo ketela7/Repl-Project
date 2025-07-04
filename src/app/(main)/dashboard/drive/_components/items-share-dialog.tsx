@@ -425,9 +425,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
                   </SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-
-            <div className="space-y-2">
+            
               <Label className="text-xs font-medium">Link Access:</Label>
               <Select
                 value={linkAccess}
