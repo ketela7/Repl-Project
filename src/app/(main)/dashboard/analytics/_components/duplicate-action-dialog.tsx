@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { Settings, Users, Clock, Trash2 } from 'lucide-react'
 import {
   Dialog,
@@ -22,7 +22,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { formatFileSize } from '@/lib/google-drive/utils'
-import { OperationsDialog } from '@/app/(main)/dashboard/drive/_components/operations-dialog'
+import { OperationsDialog } from '@/components/lazy-imports'
 
 interface DuplicateFile {
   id: string
@@ -66,16 +66,16 @@ export function DuplicateActionDialog({
   const isMobile = useIsMobile()
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('newest')
   const [selectedFiles, setSelectedFiles] = useState<DuplicateFile[]>([])
-  const [isOperationsOpen, setIsOperationsOpen] = useState(false)
+  const [showOperations, setShowOperations] = useState(false)
 
   // Smart selection logic
   const getSelectedFiles = (mode: SelectionMode): DuplicateFile[] => {
     const files = [...duplicateGroup.files]
-    
+
     switch (mode) {
       case 'all':
         return files
-      
+
       case 'newest':
         // Keep newest, select others for deletion
         const sortedByDate = files.sort((a, b) => {
@@ -84,7 +84,7 @@ export function DuplicateActionDialog({
           return dateB - dateA
         })
         return sortedByDate.slice(1) // Skip the newest (first after sort)
-      
+
       case 'oldest':
         // Keep oldest, select others for deletion
         const sortedByDateAsc = files.sort((a, b) => {
@@ -93,17 +93,17 @@ export function DuplicateActionDialog({
           return dateA - dateB
         })
         return sortedByDateAsc.slice(1) // Skip the oldest (first after sort)
-      
+
       case 'largest':
         // Keep largest, select others for deletion
         const sortedBySize = files.sort((a, b) => (b.size || 0) - (a.size || 0))
         return sortedBySize.slice(1) // Skip the largest (first after sort)
-      
+
       case 'smallest':
         // Keep smallest, select others for deletion
         const sortedBySizeAsc = files.sort((a, b) => (a.size || 0) - (b.size || 0))
         return sortedBySizeAsc.slice(1) // Skip the smallest (first after sort)
-      
+
       default:
         return []
     }
@@ -116,7 +116,7 @@ export function DuplicateActionDialog({
 
   const handleProceed = () => {
     const filesToProcess = getSelectedFiles(selectionMode)
-    
+
     // Transform files to match OperationsDialog expected format
     const operationItems = filesToProcess.map(file => ({
       id: file.id,
@@ -135,20 +135,23 @@ export function DuplicateActionDialog({
       canDownload: file.canDownload ?? true,
       isFolder: file.isFolder ?? false,
     }))
-    
+
+    console.log('Selected files for operations:', operationItems)
     setSelectedFiles(operationItems)
-    onClose()
-    setIsOperationsOpen(true)
+    // Don't close immediately to debug
+    // onClose()
+    setShowOperations(true)
+    console.log('Operations dialog opened:', true)
   }
 
   const getSelectionPreview = () => {
     const selected = getSelectedFiles(selectionMode)
     const kept = duplicateGroup.files.filter(f => !selected.find(s => s.id === f.id))
-    
+
     return {
       selected,
       kept,
-      spaceSaved: selected.reduce((sum, file) => sum + (file.size || 0), 0)
+      spaceSaved: selected.reduce((sum, file) => sum + (file.size || 0), 0),
     }
   }
 
@@ -157,18 +160,21 @@ export function DuplicateActionDialog({
   const renderContent = () => (
     <div className="space-y-6">
       {/* Duplicate Group Info */}
-      <div className="rounded-lg border p-4 space-y-2">
+      <div className="space-y-2 rounded-lg border p-4">
         <div className="flex items-center gap-2">
           <Badge variant="destructive" className="text-xs">
             {duplicateGroup.files.length} copies
           </Badge>
-          <Badge variant={duplicateGroup.type === 'md5' ? 'default' : 'secondary'} className="text-xs">
+          <Badge
+            variant={duplicateGroup.type === 'md5' ? 'default' : 'secondary'}
+            className="text-xs"
+          >
             {duplicateGroup.type === 'md5' ? 'Identical' : 'Same Name'}
           </Badge>
         </div>
-        <p className="font-medium truncate">{duplicateGroup.files[0]?.name}</p>
-        <p className="text-sm text-muted-foreground">
-          {formatFileSize(duplicateGroup.totalSize)} total • 
+        <p className="truncate font-medium">{duplicateGroup.files[0]?.name}</p>
+        <p className="text-muted-foreground text-sm">
+          {formatFileSize(duplicateGroup.totalSize)} total •
           {formatFileSize(duplicateGroup.wastedSpace)} wasted
         </p>
       </div>
@@ -177,11 +183,11 @@ export function DuplicateActionDialog({
       <div className="space-y-4">
         <div>
           <Label className="text-base font-medium">Smart Selection</Label>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Choose which files to process (selected files will be available for operations)
           </p>
         </div>
-        
+
         <RadioGroup value={selectionMode} onValueChange={handleSelectionChange}>
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
@@ -191,7 +197,7 @@ export function DuplicateActionDialog({
                 All files ({duplicateGroup.files.length} files)
               </Label>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="newest" id="newest" />
               <Label htmlFor="newest" className="flex items-center gap-2">
@@ -199,7 +205,7 @@ export function DuplicateActionDialog({
                 Keep newest, select others ({duplicateGroup.files.length - 1} files)
               </Label>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="oldest" id="oldest" />
               <Label htmlFor="oldest" className="flex items-center gap-2">
@@ -207,7 +213,7 @@ export function DuplicateActionDialog({
                 Keep oldest, select others ({duplicateGroup.files.length - 1} files)
               </Label>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="largest" id="largest" />
               <Label htmlFor="largest" className="flex items-center gap-2">
@@ -215,7 +221,7 @@ export function DuplicateActionDialog({
                 Keep largest, select others ({duplicateGroup.files.length - 1} files)
               </Label>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="smallest" id="smallest" />
               <Label htmlFor="smallest" className="flex items-center gap-2">
@@ -229,7 +235,7 @@ export function DuplicateActionDialog({
 
       {/* Selection Preview */}
       {preview.selected.length > 0 && (
-        <div className="rounded-lg border p-4 space-y-3">
+        <div className="space-y-3 rounded-lg border p-4">
           <div className="flex items-center gap-2">
             <Badge variant="outline" className="text-xs">
               {preview.selected.length} selected
@@ -241,9 +247,11 @@ export function DuplicateActionDialog({
               {formatFileSize(preview.spaceSaved)} to process
             </Badge>
           </div>
-          
-          <div className="text-sm space-y-1">
-            <p><strong>Will be processed:</strong></p>
+
+          <div className="space-y-1 text-sm">
+            <p>
+              <strong>Will be processed:</strong>
+            </p>
             <ul className="text-muted-foreground space-y-1">
               {preview.selected.slice(0, 3).map((file, index) => (
                 <li key={file.id} className="truncate">
@@ -257,10 +265,12 @@ export function DuplicateActionDialog({
               )}
             </ul>
           </div>
-          
+
           {preview.kept.length > 0 && (
-            <div className="text-sm space-y-1">
-              <p><strong>Will be kept:</strong></p>
+            <div className="space-y-1 text-sm">
+              <p>
+                <strong>Will be kept:</strong>
+              </p>
               <ul className="text-muted-foreground space-y-1">
                 {preview.kept.map((file, index) => (
                   <li key={file.id} className="truncate">
@@ -278,7 +288,7 @@ export function DuplicateActionDialog({
         <Button variant="outline" onClick={onClose} className="flex-1">
           Cancel
         </Button>
-        <Button 
+        <Button
           onClick={handleProceed}
           disabled={preview.selected.length === 0}
           className="flex-1 gap-2"
@@ -301,9 +311,7 @@ export function DuplicateActionDialog({
                 Select which files to process from this duplicate group
               </BottomSheetDescription>
             </BottomSheetHeader>
-            <div className="max-h-[70vh] overflow-y-auto px-4 pb-6">
-              {renderContent()}
-            </div>
+            <div className="max-h-[70vh] overflow-y-auto px-4 pb-6">{renderContent()}</div>
           </BottomSheetContent>
         </BottomSheet>
       ) : (
@@ -315,20 +323,23 @@ export function DuplicateActionDialog({
                 Select which files to process from this duplicate group
               </DialogDescription>
             </DialogHeader>
-            <div className="max-h-[70vh] overflow-y-auto">
-              {renderContent()}
-            </div>
+            <div className="max-h-[70vh] overflow-y-auto">{renderContent()}</div>
           </DialogContent>
         </Dialog>
       )}
 
       {/* Operations Dialog */}
-      {isOperationsOpen && selectedFiles.length > 0 && (
-        <OperationsDialog
-          isOpen={isOperationsOpen}
-          onClose={() => setIsOperationsOpen(false)}
-          selectedItems={selectedFiles}
-        />
+      {showOperations && selectedFiles.length > 0 && (
+        <Suspense fallback={<div>Loading operations...</div>}>
+          <OperationsDialog
+            isOpen={showOperations}
+            onClose={() => {
+              console.log('Closing operations dialog')
+              setShowOperations(false)
+            }}
+            selectedItems={selectedFiles}
+          />
+        </Suspense>
       )}
     </>
   )

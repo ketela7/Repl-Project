@@ -857,13 +857,13 @@ export function ProgressiveStorageAnalytics() {
                                       : `Keep smallest • Save ${formatFileSize(duplicateGroup.wastedSpace)}`}
                                   </span>
                                 </div>
-                                
+
                                 {/* Action Button */}
                                 <div className="mt-3 flex justify-center">
                                   <Button
                                     size="sm"
                                     variant="default"
-                                    onClick={(e) => {
+                                    onClick={e => {
                                       e.stopPropagation()
                                       handleDuplicateAction(duplicateGroup)
                                     }}
