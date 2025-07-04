@@ -20,6 +20,7 @@ import {
 } from 'lucide-react'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import { FILE_TYPE_CATEGORIES } from '@/lib/mime-type-filter'
+import { DuplicateActionDialog } from './duplicate-action-dialog'
 
 interface QuotaData {
   limit: number | null
@@ -98,7 +99,22 @@ export function ProgressiveStorageAnalytics() {
     'disconnected' | 'connecting' | 'connected'
   >('disconnected')
 
+  // Duplicate action dialog state
+  const [selectedDuplicateGroup, setSelectedDuplicateGroup] = useState<any>(null)
+  const [isDuplicateActionOpen, setIsDuplicateActionOpen] = useState(false)
+
   const eventSourceRef = useRef<EventSource | null>(null)
+
+  // Handle duplicate action dialog
+  const handleDuplicateAction = (duplicateGroup: any) => {
+    setSelectedDuplicateGroup(duplicateGroup)
+    setIsDuplicateActionOpen(true)
+  }
+
+  const handleCloseDuplicateAction = () => {
+    setIsDuplicateActionOpen(false)
+    setSelectedDuplicateGroup(null)
+  }
 
   const startAnalysis = async () => {
     if (eventSourceRef.current) {
@@ -841,6 +857,22 @@ export function ProgressiveStorageAnalytics() {
                                       : `Keep smallest • Save ${formatFileSize(duplicateGroup.wastedSpace)}`}
                                   </span>
                                 </div>
+                                
+                                {/* Action Button */}
+                                <div className="mt-3 flex justify-center">
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleDuplicateAction(duplicateGroup)
+                                    }}
+                                    className="w-full gap-2"
+                                  >
+                                    <Copy className="h-4 w-4" />
+                                    Take Action
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           </CollapsibleContent>
@@ -879,6 +911,15 @@ export function ProgressiveStorageAnalytics() {
             </CollapsibleContent>
           </Collapsible>
         </Card>
+      )}
+
+      {/* Duplicate Action Dialog */}
+      {selectedDuplicateGroup && (
+        <DuplicateActionDialog
+          isOpen={isDuplicateActionOpen}
+          onClose={handleCloseDuplicateAction}
+          duplicateGroup={selectedDuplicateGroup}
+        />
       )}
     </div>
   )
