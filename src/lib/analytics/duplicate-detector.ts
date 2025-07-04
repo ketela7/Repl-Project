@@ -30,7 +30,7 @@ export enum DuplicateType {
   VERSION_PATTERN = 'version_pattern',
   SIMILAR_NAME = 'similar_name',
   SIZE_TIME_CLUSTER = 'size_time_cluster',
-  BACKUP_PATTERN = 'backup_pattern'
+  BACKUP_PATTERN = 'backup_pattern',
 }
 
 export enum SuggestedAction {
@@ -38,12 +38,12 @@ export enum SuggestedAction {
   KEEP_ORIGINAL = 'keep_original',
   MANUAL_REVIEW = 'manual_review',
   MERGE_FOLDERS = 'merge_folders',
-  DELETE_BACKUPS = 'delete_backups'
+  DELETE_BACKUPS = 'delete_backups',
 }
 
 export class AdvancedDuplicateDetector {
   private files: DuplicateFile[] = []
-  
+
   constructor(files: DuplicateFile[]) {
     this.files = files
   }
@@ -53,31 +53,31 @@ export class AdvancedDuplicateDetector {
    */
   detectDuplicates(): DuplicateGroup[] {
     const groups: DuplicateGroup[] = []
-    
+
     // Strategy 1: Identical MD5 (highest confidence)
     groups.push(...this.detectIdenticalMD5())
-    
+
     // Strategy 2: Version patterns (Document_v1, Document_v2, etc.)
     groups.push(...this.detectVersionPatterns())
-    
+
     // Strategy 3: Backup patterns (filename_backup, filename_copy)
     groups.push(...this.detectBackupPatterns())
-    
+
     // Strategy 4: Similar names with fuzzy matching
     groups.push(...this.detectSimilarNames())
-    
+
     // Strategy 5: Size and time clustering
     groups.push(...this.detectSizeTimeClusters())
-    
+
     // Strategy 6: Exact filename duplicates (current implementation)
     groups.push(...this.detectExactNames())
-    
+
     return this.rankAndFilterGroups(groups)
   }
 
   private detectIdenticalMD5(): DuplicateGroup[] {
     const md5Groups = new Map<string, DuplicateFile[]>()
-    
+
     this.files.forEach(file => {
       if (file.md5Checksum) {
         if (!md5Groups.has(file.md5Checksum)) {
@@ -86,7 +86,7 @@ export class AdvancedDuplicateDetector {
         md5Groups.get(file.md5Checksum)!.push(file)
       }
     })
-    
+
     return Array.from(md5Groups.entries())
       .filter(([, files]) => files.length > 1)
       .map(([md5, files]) => ({
@@ -96,13 +96,13 @@ export class AdvancedDuplicateDetector {
         wastedBytes: this.calculateWastedBytes(files),
         confidence: 100,
         suggestedAction: SuggestedAction.KEEP_LATEST,
-        canAutoResolve: true
+        canAutoResolve: true,
       }))
   }
 
   private detectVersionPatterns(): DuplicateGroup[] {
     const versionGroups = new Map<string, DuplicateFile[]>()
-    
+
     this.files.forEach(file => {
       const basePattern = this.extractVersionBase(file.name)
       if (basePattern) {
@@ -112,23 +112,25 @@ export class AdvancedDuplicateDetector {
         versionGroups.get(basePattern)!.push(file)
       }
     })
-    
+
     return Array.from(versionGroups.entries())
       .filter(([, files]) => files.length > 1)
       .map(([pattern, files]) => ({
         type: DuplicateType.VERSION_PATTERN,
         reason: `Files following version pattern: ${pattern}`,
-        files: files.sort((a, b) => new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime()),
+        files: files.sort(
+          (a, b) => new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime(),
+        ),
         wastedBytes: this.calculateWastedBytes(files.slice(1)), // Keep latest
         confidence: 85,
         suggestedAction: SuggestedAction.KEEP_LATEST,
-        canAutoResolve: true
+        canAutoResolve: true,
       }))
   }
 
   private detectBackupPatterns(): DuplicateGroup[] {
     const backupGroups = new Map<string, DuplicateFile[]>()
-    
+
     this.files.forEach(file => {
       const basePattern = this.extractBackupBase(file.name)
       if (basePattern) {
@@ -138,36 +140,38 @@ export class AdvancedDuplicateDetector {
         backupGroups.get(basePattern)!.push(file)
       }
     })
-    
+
     return Array.from(backupGroups.entries())
       .filter(([, files]) => files.length > 1)
       .map(([pattern, files]) => ({
         type: DuplicateType.BACKUP_PATTERN,
         reason: `Backup files detected for: ${pattern}`,
-        files: files.sort((a, b) => new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime()),
+        files: files.sort(
+          (a, b) => new Date(b.modifiedTime).getTime() - new Date(a.modifiedTime).getTime(),
+        ),
         wastedBytes: this.calculateWastedBytes(files.slice(1)),
         confidence: 90,
         suggestedAction: SuggestedAction.DELETE_BACKUPS,
-        canAutoResolve: false // Manual review recommended for backups
+        canAutoResolve: false, // Manual review recommended for backups
       }))
   }
 
   private detectSimilarNames(): DuplicateGroup[] {
     const groups: DuplicateGroup[] = []
     const processed = new Set<string>()
-    
+
     this.files.forEach((file1, index) => {
       if (processed.has(file1.id)) return
-      
+
       const similarFiles = [file1]
-      
+
       this.files.slice(index + 1).forEach(file2 => {
         if (!processed.has(file2.id) && this.calculateSimilarity(file1.name, file2.name) > 0.8) {
           similarFiles.push(file2)
           processed.add(file2.id)
         }
       })
-      
+
       if (similarFiles.length > 1) {
         processed.add(file1.id)
         groups.push({
@@ -177,18 +181,18 @@ export class AdvancedDuplicateDetector {
           wastedBytes: this.calculateWastedBytes(similarFiles.slice(1)),
           confidence: 70,
           suggestedAction: SuggestedAction.MANUAL_REVIEW,
-          canAutoResolve: false
+          canAutoResolve: false,
         })
       }
     })
-    
+
     return groups
   }
 
   private detectSizeTimeClusters(): DuplicateGroup[] {
     const groups: DuplicateGroup[] = []
     const sizeGroups = new Map<number, DuplicateFile[]>()
-    
+
     // Group by exact size
     this.files.forEach(file => {
       if (!sizeGroups.has(file.size)) {
@@ -196,12 +200,13 @@ export class AdvancedDuplicateDetector {
       }
       sizeGroups.get(file.size)!.push(file)
     })
-    
+
     // Find size groups with multiple files uploaded within 1 hour
     sizeGroups.forEach((files, size) => {
-      if (files.length > 1 && size > 1024 * 1024) { // Only for files > 1MB
+      if (files.length > 1 && size > 1024 * 1024) {
+        // Only for files > 1MB
         const timeClusters = this.clusterByTime(files, 60 * 60 * 1000) // 1 hour
-        
+
         timeClusters.forEach(cluster => {
           if (cluster.length > 1) {
             groups.push({
@@ -211,26 +216,26 @@ export class AdvancedDuplicateDetector {
               wastedBytes: this.calculateWastedBytes(cluster.slice(1)),
               confidence: 60,
               suggestedAction: SuggestedAction.MANUAL_REVIEW,
-              canAutoResolve: false
+              canAutoResolve: false,
             })
           }
         })
       }
     })
-    
+
     return groups
   }
 
   private detectExactNames(): DuplicateGroup[] {
     const nameGroups = new Map<string, DuplicateFile[]>()
-    
+
     this.files.forEach(file => {
       if (!nameGroups.has(file.name)) {
         nameGroups.set(file.name, [])
       }
       nameGroups.get(file.name)!.push(file)
     })
-    
+
     return Array.from(nameGroups.entries())
       .filter(([, files]) => files.length > 1)
       .map(([name, files]) => ({
@@ -240,7 +245,7 @@ export class AdvancedDuplicateDetector {
         wastedBytes: this.calculateWastedBytes(files.slice(1)),
         confidence: 80,
         suggestedAction: SuggestedAction.KEEP_LATEST,
-        canAutoResolve: false
+        canAutoResolve: false,
       }))
   }
 
@@ -253,16 +258,16 @@ export class AdvancedDuplicateDetector {
       /^(.+?)[-_\s]*(?:v\d+|version\s*\d+)(?:\.\w+)?$/i,
       /^(.+?)[-_\s]*\(\d+\)(?:\.\w+)?$/i,
       /^(.+?)[-_\s]*copy(?:\s*\d+)?(?:\.\w+)?$/i,
-      /^(.+?)[-_\s]*\d+(?:\.\w+)?$/i
+      /^(.+?)[-_\s]*\d+(?:\.\w+)?$/i,
     ]
-    
+
     for (const pattern of patterns) {
       const match = filename.match(pattern)
       if (match && match[1].trim().length > 2) {
         return match[1].trim().toLowerCase()
       }
     }
-    
+
     return null
   }
 
@@ -273,16 +278,16 @@ export class AdvancedDuplicateDetector {
     const patterns = [
       /^(.+?)[-_\s]*(?:backup|bak|old|temp|tmp)(?:\.\w+)?$/i,
       /^(?:backup|bak|old|temp|tmp)[-_\s]*(.+?)(?:\.\w+)?$/i,
-      /^(.+?)[-_\s]*\d{4}-\d{2}-\d{2}(?:\.\w+)?$/i // Date pattern
+      /^(.+?)[-_\s]*\d{4}-\d{2}-\d{2}(?:\.\w+)?$/i, // Date pattern
     ]
-    
+
     for (const pattern of patterns) {
       const match = filename.match(pattern)
       if (match && match[1].trim().length > 2) {
         return match[1].trim().toLowerCase()
       }
     }
-    
+
     return null
   }
 
@@ -292,22 +297,24 @@ export class AdvancedDuplicateDetector {
   private calculateSimilarity(str1: string, str2: string): number {
     const len1 = str1.length
     const len2 = str2.length
-    const matrix = Array(len2 + 1).fill(null).map(() => Array(len1 + 1).fill(null))
-    
+    const matrix = Array(len2 + 1)
+      .fill(null)
+      .map(() => Array(len1 + 1).fill(null))
+
     for (let i = 0; i <= len1; i++) matrix[0][i] = i
     for (let j = 0; j <= len2; j++) matrix[j][0] = j
-    
+
     for (let j = 1; j <= len2; j++) {
       for (let i = 1; i <= len1; i++) {
         const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1
         matrix[j][i] = Math.min(
           matrix[j][i - 1] + 1,
           matrix[j - 1][i] + 1,
-          matrix[j - 1][i - 1] + indicator
+          matrix[j - 1][i - 1] + indicator,
         )
       }
     }
-    
+
     const distance = matrix[len2][len1]
     return 1 - distance / Math.max(len1, len2)
   }
@@ -316,13 +323,16 @@ export class AdvancedDuplicateDetector {
    * Cluster files by upload time
    */
   private clusterByTime(files: DuplicateFile[], maxGapMs: number): DuplicateFile[][] {
-    const sorted = files.sort((a, b) => new Date(a.modifiedTime).getTime() - new Date(b.modifiedTime).getTime())
+    const sorted = files.sort(
+      (a, b) => new Date(a.modifiedTime).getTime() - new Date(b.modifiedTime).getTime(),
+    )
     const clusters: DuplicateFile[][] = []
     let currentCluster: DuplicateFile[] = [sorted[0]]
-    
+
     for (let i = 1; i < sorted.length; i++) {
-      const timeDiff = new Date(sorted[i].modifiedTime).getTime() - new Date(sorted[i - 1].modifiedTime).getTime()
-      
+      const timeDiff =
+        new Date(sorted[i].modifiedTime).getTime() - new Date(sorted[i - 1].modifiedTime).getTime()
+
       if (timeDiff <= maxGapMs) {
         currentCluster.push(sorted[i])
       } else {
@@ -332,11 +342,11 @@ export class AdvancedDuplicateDetector {
         currentCluster = [sorted[i]]
       }
     }
-    
+
     if (currentCluster.length > 1) {
       clusters.push(currentCluster)
     }
-    
+
     return clusters
   }
 
@@ -348,7 +358,7 @@ export class AdvancedDuplicateDetector {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
     if (bytes === 0) return '0 Bytes'
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i]
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i]
   }
 
   /**
@@ -360,11 +370,11 @@ export class AdvancedDuplicateDetector {
       if (a.confidence !== b.confidence) return b.confidence - a.confidence
       return b.wastedBytes - a.wastedBytes
     })
-    
+
     // Remove overlapping groups (files that appear in multiple groups)
     const usedFileIds = new Set<string>()
     const filtered: DuplicateGroup[] = []
-    
+
     sorted.forEach(group => {
       const newFiles = group.files.filter(file => !usedFileIds.has(file.id))
       if (newFiles.length > 1) {
@@ -374,7 +384,7 @@ export class AdvancedDuplicateDetector {
         filtered.push(group)
       }
     })
-    
+
     return filtered
   }
 }
@@ -393,7 +403,7 @@ export interface DuplicateRecommendation {
 
 export function generateRecommendations(groups: DuplicateGroup[]): DuplicateRecommendation[] {
   const recommendations: DuplicateRecommendation[] = []
-  
+
   // High priority: Identical MD5 files
   const identicalGroups = groups.filter(g => g.type === DuplicateType.IDENTICAL_MD5)
   if (identicalGroups.length > 0) {
@@ -404,10 +414,10 @@ export function generateRecommendations(groups: DuplicateGroup[]): DuplicateReco
       description: 'These files have identical content (same MD5 hash) and can be safely removed',
       potentialSavings: totalSavings,
       riskLevel: 'safe',
-      autoExecutable: true
+      autoExecutable: true,
     })
   }
-  
+
   // Medium priority: Version patterns
   const versionGroups = groups.filter(g => g.type === DuplicateType.VERSION_PATTERN)
   if (versionGroups.length > 0) {
@@ -418,10 +428,10 @@ export function generateRecommendations(groups: DuplicateGroup[]): DuplicateReco
       description: 'Keep only the latest version of these files',
       potentialSavings: totalSavings,
       riskLevel: 'moderate',
-      autoExecutable: false
+      autoExecutable: false,
     })
   }
-  
+
   return recommendations.sort((a, b) => {
     const priorityOrder = { high: 3, medium: 2, low: 1 }
     if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {

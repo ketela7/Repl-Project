@@ -192,7 +192,7 @@ export class GoogleDriveService {
   async getFile(fileId: string): Promise<DriveFile> {
     const response = await this.drive.files.get({
       fileId,
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`
+      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
     })
 
     const result = await response
@@ -275,7 +275,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.list({
       q: query,
       orderBy: 'name',
-    fields: `files(${getOptimizedFields('LIST_BASIC')})`
+      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
     })
 
     return response.data.files?.map(convertGoogleDriveFolder) || []
@@ -295,7 +295,7 @@ export class GoogleDriveService {
 
     const response = await this.drive.files.create({
       requestBody: metadata,
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`
+      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
     })
 
     return convertGoogleDriveFolder(response.data)
@@ -326,7 +326,7 @@ export class GoogleDriveService {
       requestBody: fileMetadata,
       media,
       uploadType: 'multipart',
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`
+      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
     })
 
     const result = await response
@@ -356,9 +356,6 @@ export class GoogleDriveService {
       fileId,
       fields: fields.join(','),
     })
-
-
-
 
     return {
       id: response.data.id || fileId, // Ensure id is always present
@@ -408,7 +405,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: true },
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`
+      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
     })
 
     const result = await response
@@ -425,7 +422,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: false },
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`
+      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
     })
 
     const result = await response
@@ -447,7 +444,7 @@ export class GoogleDriveService {
       const response = await this.drive.files.update({
         fileId,
         requestBody: { name: newName.trim() },
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`
+        fields: `files(${getOptimizedFields('LIST_BASIC')})`,
       })
 
       return convertGoogleDriveFile(response.data)
@@ -479,7 +476,7 @@ export class GoogleDriveService {
         fileId,
         addParents: newParentId,
         ...(currentParentId && { removeParents: currentParentId }),
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`
+        fields: `files(${getOptimizedFields('LIST_BASIC')})`,
       }
 
       const response = await this.drive.files.update(updateParams)
@@ -525,7 +522,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.copy({
       fileId,
       requestBody: metadata,
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`
+      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
     })
 
     const result = await response
