@@ -50,7 +50,8 @@ interface FilesData {
     modifiedTime?: string
   }>
   duplicateFiles?: Array<{
-    md5Hash: string
+    identifier: string
+    type: 'md5' | 'filename'
     files: Array<{
       id: string
       name: string
@@ -61,6 +62,8 @@ interface FilesData {
     }>
     totalSize: number
     wastedSpace: number
+    // Legacy support
+    md5Hash?: string
   }>
   categories?: {
     documents: number
@@ -724,7 +727,10 @@ export function ProgressiveStorageAnalytics() {
                   <ScrollArea className="h-96">
                     <div className="space-y-3 pr-3">
                       {files.duplicateFiles.map((duplicateGroup, groupIndex) => (
-                        <Collapsible key={duplicateGroup.md5Hash} className="rounded-lg border">
+                        <Collapsible
+                          key={`${duplicateGroup.type}-${duplicateGroup.identifier || groupIndex}`}
+                          className="rounded-lg border"
+                        >
                           <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-start justify-between gap-2 p-3 transition-colors sm:items-center">
                             <div className="flex items-center gap-3">
                               <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
@@ -733,8 +739,16 @@ export function ProgressiveStorageAnalytics() {
                                   <Badge variant="destructive" className="shrink-0 text-xs">
                                     {duplicateGroup.files.length} copies
                                   </Badge>
+                                  <Badge
+                                    variant={
+                                      duplicateGroup.type === 'md5' ? 'default' : 'secondary'
+                                    }
+                                    className="shrink-0 text-xs"
+                                  >
+                                    {duplicateGroup.type === 'md5' ? 'Identical' : 'Same Name'}
+                                  </Badge>
                                   <span
-                                    className="max-w-[150px] truncate text-sm font-medium sm:max-w-[200px] md:max-w-[250px]"
+                                    className="max-w-[120px] truncate text-sm font-medium sm:max-w-[150px] md:max-w-[200px]"
                                     title={duplicateGroup.files[0]?.name || 'Unknown File'}
                                   >
                                     {duplicateGroup.files[0]?.name || 'Unknown File'}
@@ -766,7 +780,21 @@ export function ProgressiveStorageAnalytics() {
                                 {duplicateGroup.files.map((file, fileIndex) => (
                                   <div
                                     key={file.id}
-                                    className="bg-muted/30 flex items-center justify-between rounded-md p-2"
+                                    className="bg-muted/30 hover:bg-muted/50 flex cursor-pointer items-center justify-between rounded-md p-2 transition-colors"
+                                    onClick={() => {
+                                      if (file.webViewLink) {
+                                        window.open(
+                                          file.webViewLink,
+                                          '_blank',
+                                          'noopener,noreferrer',
+                                        )
+                                      }
+                                    }}
+                                    title={
+                                      file.webViewLink
+                                        ? 'Click to open file in Google Drive'
+                                        : 'File not accessible'
+                                    }
                                   >
                                     <div className="min-w-0 flex-1 pr-2">
                                       <p
@@ -792,14 +820,9 @@ export function ProgressiveStorageAnalytics() {
                                         Copy #{fileIndex + 1}
                                       </Badge>
                                       {file.webViewLink && (
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          className="h-6 px-2 text-xs"
-                                          onClick={() => window.open(file.webViewLink, '_blank')}
-                                        >
-                                          View
-                                        </Button>
+                                        <Badge variant="outline" className="text-xs">
+                                          Click to open
+                                        </Badge>
                                       )}
                                     </div>
                                   </div>
@@ -808,11 +831,14 @@ export function ProgressiveStorageAnalytics() {
                               <div className="mt-3 border-t pt-2">
                                 <div className="text-muted-foreground flex items-center justify-between text-xs">
                                   <span>
-                                    MD5 Hash: {duplicateGroup.md5Hash.substring(0, 16)}...
+                                    {duplicateGroup.type === 'md5'
+                                      ? `MD5: ${duplicateGroup.identifier.substring(0, 16)}...`
+                                      : `Filename: ${duplicateGroup.identifier}`}
                                   </span>
                                   <span>
-                                    Keep 1 copy • Delete {duplicateGroup.files.length - 1} to save{' '}
-                                    {formatFileSize(duplicateGroup.wastedSpace)}
+                                    {duplicateGroup.type === 'md5'
+                                      ? `Keep 1 copy • Delete ${duplicateGroup.files.length - 1} to save ${formatFileSize(duplicateGroup.wastedSpace)}`
+                                      : `Keep smallest • Save ${formatFileSize(duplicateGroup.wastedSpace)}`}
                                   </span>
                                 </div>
                               </div>

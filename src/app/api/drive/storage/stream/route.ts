@@ -95,6 +95,7 @@ export async function GET() {
             const fileSizesByType: Record<string, number> = {}
             const largestFiles: DriveFile[] = []
             const duplicateMap: Record<string, DriveFile[]> = {} // MD5 hash -> files array
+            const fileNameMap: Record<string, DriveFile[]> = {} // filename -> files array
 
             // Use service listFiles with optimized pagination
             do {
@@ -181,6 +182,15 @@ export async function GET() {
                       duplicateMap[md5Hash] = []
                     }
                     duplicateMap[md5Hash].push(file)
+                  }
+
+                  // Track duplicate files by filename (normalize for better matching)
+                  if (file.name && size > 0) {
+                    const normalizedName = file.name.trim().toLowerCase()
+                    if (!fileNameMap[normalizedName]) {
+                      fileNameMap[normalizedName] = []
+                    }
+                    fileNameMap[normalizedName].push(file)
                   }
 
                   // Track largest files
@@ -270,14 +280,26 @@ export async function GET() {
               `[Duplicate Debug] Total MD5 hashes tracked: ${Object.keys(duplicateMap).length}`,
             )
             console.log(
+              `[Duplicate Debug] Total filenames tracked: ${Object.keys(fileNameMap).length}`,
+            )
+            console.log(
               `[Duplicate Debug] Files with MD5: ${Object.values(duplicateMap).flat().length}`,
             )
 
-            const duplicateGroups = Object.entries(duplicateMap)
-              .filter(([, files]) => files.length > 1) // Only groups with duplicates
-              .map(([md5Hash, files]) => {
+            // Comprehensive duplicate detection: MD5 hash + filename matching
+            const duplicateGroups: Array<{
+              identifier: string
+              type: 'md5' | 'filename'
+              files: DriveFile[]
+              totalSize: number
+              wastedSpace: number
+            }> = []
+
+            // Process MD5 hash duplicates
+            Object.entries(duplicateMap)
+              .filter(([, files]) => files.length > 1)
+              .forEach(([md5Hash, files]) => {
                 const sortedFiles = files.sort((a, b) => {
-                  // Sort by modification time (newest first) or by name if no time
                   const timeA = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0
                   const timeB = b.modifiedTime ? new Date(b.modifiedTime).getTime() : 0
                   return timeB - timeA || (a.name || '').localeCompare(b.name || '')
@@ -287,21 +309,75 @@ export async function GET() {
                   ? parseInt(sortedFiles[0].size.toString(), 10) || 0
                   : 0
                 const totalSize = fileSize * sortedFiles.length
-                const wastedSpace = fileSize * (sortedFiles.length - 1) // Keep 1, delete others
+                const wastedSpace = fileSize * (sortedFiles.length - 1)
 
-                return {
-                  md5Hash,
+                duplicateGroups.push({
+                  identifier: md5Hash,
+                  type: 'md5',
                   files: sortedFiles,
                   totalSize,
                   wastedSpace,
+                })
+              })
+
+            // Process filename duplicates (exclude files already found in MD5 duplicates)
+            const md5DuplicateFileIds = new Set(
+              Object.values(duplicateMap)
+                .filter(files => files.length > 1)
+                .flat()
+                .map(file => file.id),
+            )
+
+            Object.entries(fileNameMap)
+              .filter(([, files]) => files.length > 1)
+              .forEach(([filename, files]) => {
+                // Filter out files already included in MD5 duplicates
+                const uniqueFiles = files.filter(file => !md5DuplicateFileIds.has(file.id))
+
+                if (uniqueFiles.length > 1) {
+                  const sortedFiles = uniqueFiles.sort((a, b) => {
+                    const timeA = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0
+                    const timeB = b.modifiedTime ? new Date(b.modifiedTime).getTime() : 0
+                    return timeB - timeA || (a.name || '').localeCompare(b.name || '')
+                  })
+
+                  // Calculate total size and wasted space for filename duplicates
+                  const totalSize = sortedFiles.reduce((sum, file) => {
+                    const size = file.size ? parseInt(file.size.toString(), 10) || 0 : 0
+                    return sum + size
+                  }, 0)
+
+                  // For filename duplicates, we assume the smallest file should be kept
+                  const sizes = sortedFiles.map(file =>
+                    file.size ? parseInt(file.size.toString(), 10) || 0 : 0,
+                  )
+                  const minSize = Math.min(...sizes)
+                  const wastedSpace = totalSize - minSize
+
+                  duplicateGroups.push({
+                    identifier: filename,
+                    type: 'filename',
+                    files: sortedFiles,
+                    totalSize,
+                    wastedSpace,
+                  })
                 }
               })
-              .sort((a, b) => b.wastedSpace - a.wastedSpace) // Sort by wasted space (highest first)
 
-            console.log(`[Duplicate Debug] Found ${duplicateGroups.length} duplicate groups`)
-            duplicateGroups.forEach((group, index) => {
+            // Sort all duplicate groups by wasted space (highest first)
+            duplicateGroups.sort((a, b) => b.wastedSpace - a.wastedSpace)
+
+            console.log(`[Duplicate Debug] Found ${duplicateGroups.length} total duplicate groups`)
+            console.log(
+              `[Duplicate Debug] - MD5 duplicates: ${duplicateGroups.filter(g => g.type === 'md5').length}`,
+            )
+            console.log(
+              `[Duplicate Debug] - Filename duplicates: ${duplicateGroups.filter(g => g.type === 'filename').length}`,
+            )
+
+            duplicateGroups.slice(0, 5).forEach((group, index) => {
               console.log(
-                `[Duplicate Debug] Group ${index + 1}: ${group.files.length} copies, ${group.wastedSpace} bytes wasted`,
+                `[Duplicate Debug] Group ${index + 1} (${group.type}): ${group.files.length} copies, ${group.wastedSpace} bytes wasted`,
               )
             })
 
