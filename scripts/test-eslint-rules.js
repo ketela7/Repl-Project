@@ -75,25 +75,7 @@ const testCases = {
     `
   },
 
-  'require-search-debounce': {
-    bad: `
-      <input 
-        onChange={e => setSearchQuery(e.target.value)}
-        placeholder="Search..."
-      />
-      // Should trigger warning: search without debounce
-    `,
-    good: `
-      <input 
-        onChange={e => {
-          const query = e.target.value;
-          setTimeout(() => setSearchQuery(query), 300);
-        }}
-        placeholder="Search..."
-      />
-      // Good: has setTimeout debounce
-    `
-  },
+  
 
   'complex-state-needs-reducer': {
     bad: `

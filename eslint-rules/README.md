@@ -73,27 +73,6 @@ const [selectedItems, setSelectedItems] = useState(new Set());
 const selectedItemsRef = useRef(new Set());
 ```
 
-#### `require-search-debounce`
-**Severity**: Warning  
-**Deteksi**: Search input tanpa debouncing
-
-```typescript
-// ❌ BAD
-<input 
-  onChange={e => setSearchQuery(e.target.value)}
-  placeholder="Search..."
-/>
-
-// ✅ GOOD
-<input 
-  onChange={e => {
-    const query = e.target.value;
-    setTimeout(() => setSearchQuery(query), 300);
-  }}
-  placeholder="Search..."
-/>
-```
-
 #### `complex-state-needs-reducer`
 **Severity**: Warning  
 **Deteksi**: Complex state object (3+ properties) yang harus pakai useReducer
@@ -168,7 +147,7 @@ useEffect(() => {
   const timer = setTimeout(() => {
     setData('new data');
   }, 1000);
-  
+
   return () => clearTimeout(timer); // Cleanup
 }, []);
 ```
@@ -264,9 +243,9 @@ const fetchData = async () => {
   if (abortControllerRef.current) {
     abortControllerRef.current.abort();
   }
-  
+
   abortControllerRef.current = new AbortController();
-  
+
   try {
     const response = await fetch('/api/data', {
       signal: abortControllerRef.current.signal
@@ -287,7 +266,7 @@ const handleSearchChange = (query: string) => {
   if (searchTimeoutRef.current) {
     clearTimeout(searchTimeoutRef.current);
   }
-  
+
   searchTimeoutRef.current = setTimeout(() => {
     setSearchQuery(query);
     performSearch(query);
@@ -340,4 +319,3 @@ describe('Async State ESLint Rules', () => {
     // Assert rule violation
   });
 });
-```

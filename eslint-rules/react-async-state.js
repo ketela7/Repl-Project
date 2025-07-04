@@ -149,49 +149,7 @@ module.exports = {
       },
     },
 
-    // Rule 4: Detect missing debouncing for search inputs
-    'require-search-debounce': {
-      meta: {
-        type: 'suggestion',
-        docs: {
-          description: 'Search inputs should be debounced to prevent excessive API calls',
-          category: 'Performance',
-          recommended: true,
-        },
-        schema: [],
-        messages: {
-          needsDebounce: 'Search input "{{inputName}}" should be debounced. Consider using setTimeout or debounce library.',
-        },
-      },
-      create(context) {
-        return {
-          JSXAttribute(node) {
-            if (node.name.name === 'onChange' && 
-                node.parent.name && 
-                (node.parent.name.name.toLowerCase().includes('search') || 
-                 node.parent.name.name.toLowerCase().includes('query'))) {
-              
-              // Check if the onChange handler includes debouncing
-              const handler = node.value.expression
-              if (handler && handler.body) {
-                const hasSetTimeout = context.getSourceCode().getText(handler).includes('setTimeout')
-                const hasDebounce = context.getSourceCode().getText(handler).includes('debounce')
-                
-                if (!hasSetTimeout && !hasDebounce) {
-                  context.report({
-                    node,
-                    messageId: 'needsDebounce',
-                    data: {
-                      inputName: node.parent.name.name,
-                    },
-                  })
-                }
-              }
-            }
-          },
-        }
-      },
-    },
+    
 
     // Rule 5: Detect complex state that should use useReducer
     'complex-state-needs-reducer': {
