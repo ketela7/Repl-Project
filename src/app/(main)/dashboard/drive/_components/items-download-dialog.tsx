@@ -48,7 +48,8 @@ import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn, calculateProgress, formatBytes } from '@/lib/utils'
+import { cn, calculateProgress } from '@/lib/utils'
+import { formatFileSize } from '@/lib/google-drive/utils'
 
 interface ItemsDownloadDialogProps {
   isOpen: boolean
@@ -404,7 +405,7 @@ function ItemsDownloadDialog({
             {totalSize > 0 && (
               <Badge variant="outline" className="gap-1">
                 <HardDrive className="h-3 w-3" />
-                {formatBytes(totalSize)}
+                {formatFileSize(totalSize)}
               </Badge>
             )}
           </div>
@@ -418,7 +419,7 @@ function ItemsDownloadDialog({
                 <div className="min-w-0 flex-1">
                   <span className="block truncate">{item.name}</span>
                   {item.size && (
-                    <span className="text-muted-foreground text-xs">{formatBytes(item.size)}</span>
+                    <span className="text-muted-foreground text-xs">{formatFileSize(item.size || 0)}</span>
                   )}
                 </div>
               </div>
@@ -575,7 +576,7 @@ function ItemsDownloadDialog({
           <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <HardDrive className="h-4 w-4" />
             <span>
-              {formatBytes(progress.downloadedSize)} / {formatBytes(progress.totalSize)}
+              {formatFileSize(progress.downloadedSize)} / {formatFileSize(progress.totalSize)}
             </span>
           </div>
         )}
@@ -639,7 +640,7 @@ function ItemsDownloadDialog({
               <span className="font-medium">All files bundled in ZIP format</span>
             </div>
             <div className="text-muted-foreground mt-1 text-xs">
-              Size: {formatBytes(progress.totalSize)} • Items: {progress.success}
+              Size: {formatFileSize(progress.totalSize)} • Items: {progress.success}
             </div>
           </div>
         </div>
