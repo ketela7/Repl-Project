@@ -281,12 +281,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
         </ScrollArea>
       </div>
 
-      <div className="rounded-lg border bg-blue-50 p-3 dark:bg-blue-950/20">
-        <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
-          <RotateCcw className="h-4 w-4" />
-          <span>Items can be restored from trash within 30 days</span>
-        </div>
-      </div>
+      
     </div>
   )
 
