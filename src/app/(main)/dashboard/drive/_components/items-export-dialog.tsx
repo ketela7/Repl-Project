@@ -3,55 +3,45 @@
 import { useState, useRef } from 'react'
 import {
   FileDown,
+  AlertTriangle,
   FileText,
+  FileSpreadsheet,
+  Presentation,
   Image,
-  Table,
-  Code,
-  File,
-  Folder,
   Loader2,
   CheckCircle,
   XCircle,
-  AlertTriangle,
-  ArrowRight,
   SkipForward,
-  Settings,
-  Info,
-  Download,
-  Zap,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { Label } from '@/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
   BottomSheet,
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
-  BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
-import { Button } from '@/components/ui/button'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
-import { Progress } from '@/components/ui/progress'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Switch } from '@/components/ui/switch'
-import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn, calculateProgress } from '@/lib/utils'
 
 interface ItemsExportDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm?: () => void
+  onConfirm: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -60,166 +50,109 @@ interface ItemsExportDialogProps {
   }>
 }
 
-type ExportStep = 'setup' | 'processing' | 'completed'
-
-interface ExportFormat {
-  id: string
-  name: string
-  description: string
-  extension: string
-  icon: React.ComponentType<{ className?: string }>
-  mimeTypes: string[]
-  googleMimeType?: string
-}
-
-const EXPORT_FORMATS: ExportFormat[] = [
+const EXPORT_FORMATS = [
   {
     id: 'pdf',
-    name: 'PDF Document',
-    description: 'Portable Document Format',
-    extension: 'pdf',
+    label: 'PDF Document',
     icon: FileText,
-    mimeTypes: ['application/vnd.google-apps.document', 'application/vnd.google-apps.presentation'],
-    googleMimeType: 'application/pdf',
+    description: 'For Docs, Sheets, and Slides',
+    supportedTypes: [
+      'application/vnd.google-apps.document',
+      'application/vnd.google-apps.spreadsheet',
+      'application/vnd.google-apps.presentation',
+    ],
   },
   {
     id: 'docx',
-    name: 'Microsoft Word',
-    description: 'Word Document (.docx)',
-    extension: 'docx',
+    label: 'Microsoft Word (.docx)',
     icon: FileText,
-    mimeTypes: ['application/vnd.google-apps.document'],
-    googleMimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  },
-  {
-    id: 'odt',
-    name: 'OpenDocument Text',
-    description: 'Open Document Format (.odt)',
-    extension: 'odt',
-    icon: FileText,
-    mimeTypes: ['application/vnd.google-apps.document'],
-    googleMimeType: 'application/vnd.oasis.opendocument.text',
+    description: 'For Google Docs only',
+    supportedTypes: ['application/vnd.google-apps.document'],
   },
   {
     id: 'xlsx',
-    name: 'Microsoft Excel',
-    description: 'Excel Spreadsheet (.xlsx)',
-    extension: 'xlsx',
-    icon: Table,
-    mimeTypes: ['application/vnd.google-apps.spreadsheet'],
-    googleMimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  },
-  {
-    id: 'ods',
-    name: 'OpenDocument Spreadsheet',
-    description: 'Open Document Spreadsheet (.ods)',
-    extension: 'ods',
-    icon: Table,
-    mimeTypes: ['application/vnd.google-apps.spreadsheet'],
-    googleMimeType: 'application/vnd.oasis.opendocument.spreadsheet',
-  },
-  {
-    id: 'csv',
-    name: 'CSV File',
-    description: 'Comma Separated Values',
-    extension: 'csv',
-    icon: Table,
-    mimeTypes: ['application/vnd.google-apps.spreadsheet'],
-    googleMimeType: 'text/csv',
+    label: 'Microsoft Excel (.xlsx)',
+    icon: FileSpreadsheet,
+    description: 'For Google Sheets only',
+    supportedTypes: ['application/vnd.google-apps.spreadsheet'],
   },
   {
     id: 'pptx',
-    name: 'Microsoft PowerPoint',
-    description: 'PowerPoint Presentation (.pptx)',
-    extension: 'pptx',
-    icon: Image,
-    mimeTypes: ['application/vnd.google-apps.presentation'],
-    googleMimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    label: 'Microsoft PowerPoint (.pptx)',
+    icon: Presentation,
+    description: 'For Google Slides only',
+    supportedTypes: ['application/vnd.google-apps.presentation'],
+  },
+  {
+    id: 'odt',
+    label: 'OpenDocument Text (.odt)',
+    icon: FileText,
+    description: 'For Google Docs only',
+    supportedTypes: ['application/vnd.google-apps.document'],
+  },
+  {
+    id: 'ods',
+    label: 'OpenDocument Spreadsheet (.ods)',
+    icon: FileSpreadsheet,
+    description: 'For Google Sheets only',
+    supportedTypes: ['application/vnd.google-apps.spreadsheet'],
   },
   {
     id: 'odp',
-    name: 'OpenDocument Presentation',
-    description: 'Open Document Presentation (.odp)',
-    extension: 'odp',
-    icon: Image,
-    mimeTypes: ['application/vnd.google-apps.presentation'],
-    googleMimeType: 'application/vnd.oasis.opendocument.presentation',
+    label: 'OpenDocument Presentation (.odp)',
+    icon: Presentation,
+    description: 'For Google Slides only',
+    supportedTypes: ['application/vnd.google-apps.presentation'],
   },
   {
-    id: 'jpeg',
-    name: 'JPEG Image',
-    description: 'JPEG Image Format',
-    extension: 'jpg',
-    icon: Image,
-    mimeTypes: ['application/vnd.google-apps.presentation'],
-    googleMimeType: 'image/jpeg',
-  },
-  {
-    id: 'png',
-    name: 'PNG Image',
-    description: 'PNG Image Format',
-    extension: 'png',
-    icon: Image,
-    mimeTypes: ['application/vnd.google-apps.presentation'],
-    googleMimeType: 'image/png',
+    id: 'rtf',
+    label: 'Rich Text Format (.rtf)',
+    icon: FileText,
+    description: 'For Google Docs only',
+    supportedTypes: ['application/vnd.google-apps.document'],
   },
   {
     id: 'txt',
-    name: 'Plain Text',
-    description: 'Text File (.txt)',
-    extension: 'txt',
+    label: 'Plain Text (.txt)',
     icon: FileText,
-    mimeTypes: ['application/vnd.google-apps.document'],
-    googleMimeType: 'text/plain',
+    description: 'For Google Docs only',
+    supportedTypes: ['application/vnd.google-apps.document'],
   },
   {
     id: 'html',
-    name: 'HTML File',
-    description: 'HTML Web Page',
-    extension: 'html',
-    icon: Code,
-    mimeTypes: ['application/vnd.google-apps.document'],
-    googleMimeType: 'text/html',
+    label: 'HTML (.html)',
+    icon: FileText,
+    description: 'For Google Docs only',
+    supportedTypes: ['application/vnd.google-apps.document'],
+  },
+  {
+    id: 'csv',
+    label: 'Comma Separated Values (.csv)',
+    icon: FileSpreadsheet,
+    description: 'For Google Sheets only',
+    supportedTypes: ['application/vnd.google-apps.spreadsheet'],
+  },
+  {
+    id: 'jpeg',
+    label: 'JPEG Image (.jpg)',
+    icon: Image,
+    description: 'For Google Slides only',
+    supportedTypes: ['application/vnd.google-apps.presentation'],
+  },
+  {
+    id: 'png',
+    label: 'PNG Image (.png)',
+    icon: Image,
+    description: 'For Google Slides only',
+    supportedTypes: ['application/vnd.google-apps.presentation'],
   },
 ]
 
-interface ExportResult {
-  fileId: string
-  fileName: string
-  success: boolean
-  exportUrl?: string
-  exportFormat?: string
-  error?: string
-}
-
-function getFileIcon(mimeType: string | undefined, isFolder: boolean) {
-  if (isFolder) return <Folder className="h-4 w-4 text-blue-600" />
-  if (!mimeType) return <File className="h-4 w-4 text-gray-600" />
-
-  if (mimeType === 'application/vnd.google-apps.document')
-    return <FileText className="h-4 w-4 text-blue-600" />
-  if (mimeType === 'application/vnd.google-apps.spreadsheet')
-    return <Table className="h-4 w-4 text-green-600" />
-  if (mimeType === 'application/vnd.google-apps.presentation')
-    return <Image className="h-4 w-4 text-orange-600" />
-
-  return <File className="h-4 w-4 text-gray-600" />
-}
-
 function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsExportDialogProps) {
-  const [currentStep, setCurrentStep] = useState<ExportStep>('setup')
-  const [selectedFormat, setSelectedFormat] = useState<string>('pdf')
+  const [selectedFormat, setSelectedFormat] = useState('pdf')
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
-
-  // Export options
-  const [autoStartDownload, setAutoStartDownload] = useState(true)
-  const [includeComments, setIncludeComments] = useState(false)
-  const [includeSuggestions, setIncludeSuggestions] = useState(false)
-
-  // Results
-  const [exportResults, setExportResults] = useState<ExportResult[]>([])
-
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -239,60 +172,19 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
-  const isMobile = useIsMobile()
 
-  // Filter items that can be exported
-  const exportableItems = selectedItems.filter(
+  // Filter exportable files based on selected format
+  const selectedFormatData = EXPORT_FORMATS.find(f => f.id === selectedFormat)
+  const exportableFiles = selectedItems.filter(
     item =>
-      !item.isFolder &&
-      item.mimeType &&
-      [
-        'application/vnd.google-apps.document',
-        'application/vnd.google-apps.spreadsheet',
-        'application/vnd.google-apps.presentation',
-      ].includes(item.mimeType),
+      !item.isFolder && item.mimeType && selectedFormatData?.supportedTypes.includes(item.mimeType),
   )
-
-  const nonExportableItems = selectedItems.filter(
+  const incompatibleFiles = selectedItems.filter(
     item =>
       item.isFolder ||
       !item.mimeType ||
-      ![
-        'application/vnd.google-apps.document',
-        'application/vnd.google-apps.spreadsheet',
-        'application/vnd.google-apps.presentation',
-      ].includes(item.mimeType),
+      !selectedFormatData?.supportedTypes.includes(item.mimeType),
   )
-
-  // Get available formats based on selected items
-  const availableFormats = EXPORT_FORMATS.filter(format =>
-    exportableItems.some(item => format.mimeTypes.includes(item.mimeType!)),
-  )
-
-  const handleClose = () => {
-    if (isProcessing) {
-      handleCancel()
-    }
-    resetState()
-    onClose()
-  }
-
-  const resetState = () => {
-    setCurrentStep('setup')
-    setSelectedFormat('pdf')
-    setAutoStartDownload(true)
-    setIncludeComments(false)
-    setIncludeSuggestions(false)
-    setExportResults([])
-    setProgress({
-      current: 0,
-      total: 0,
-      success: 0,
-      skipped: 0,
-      failed: 0,
-      errors: [],
-    })
-  }
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -303,11 +195,11 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     }
 
     setIsProcessing(false)
-    setCurrentStep('completed')
+    setIsCompleted(true)
     toast.info('Export operation cancelled')
   }
 
-  const triggerDownload = (url: string, filename: string) => {
+  const downloadFile = (url: string, filename: string) => {
     const link = document.createElement('a')
     link.href = url
     link.download = filename
@@ -317,65 +209,64 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     document.body.removeChild(link)
   }
 
-  const handleExport = async () => {
-    if (exportableItems.length === 0) {
-      toast.error('No exportable Google Workspace files selected')
-      return
+  const getExportMimeType = (formatId: string): string => {
+    const mimeTypeMap: Record<string, string> = {
+      pdf: 'application/pdf',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      odt: 'application/vnd.oasis.opendocument.text',
+      ods: 'application/vnd.oasis.opendocument.spreadsheet',
+      odp: 'application/vnd.oasis.opendocument.presentation',
+      rtf: 'application/rtf',
+      txt: 'text/plain',
+      html: 'text/html',
+      csv: 'text/csv',
+      jpeg: 'image/jpeg',
+      png: 'image/png',
     }
+    return mimeTypeMap[formatId] || 'application/pdf'
+  }
 
-    const format = EXPORT_FORMATS.find(f => f.id === selectedFormat)
-    if (!format) {
-      toast.error('Invalid export format selected')
+  const handleExport = async () => {
+    if (exportableFiles.length === 0) {
+      toast.error('No compatible files selected for this export format')
       return
     }
 
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
-    setCurrentStep('processing')
+    setIsCompleted(false)
 
     abortControllerRef.current = new AbortController()
+    const totalItems = exportableFiles.length
 
-    const totalItems = exportableItems.length
     setProgress({
       current: 0,
       total: totalItems,
       success: 0,
-      skipped: 0,
+      skipped: incompatibleFiles.length,
       failed: 0,
       errors: [],
     })
 
     let successCount = 0
     let failedCount = 0
-    let skippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
-    const results: ExportResult[] = []
 
     try {
-      for (let i = 0; i < exportableItems.length; i++) {
+      for (let i = 0; i < exportableFiles.length; i++) {
         if (isCancelledRef.current) {
           break
         }
 
-        const item = exportableItems[i]
+        const file = exportableFiles[i]
         setProgress(prev => ({
           ...prev,
           current: i + 1,
-          currentFile: item.name,
+          currentFile: file.name,
         }))
-
-        // Check if the item can be exported to this format
-        if (!format.mimeTypes.includes(item.mimeType!)) {
-          skippedCount++
-          results.push({
-            fileId: item.id,
-            fileName: item.name,
-            success: false,
-            error: `Cannot export ${item.mimeType} to ${format.name}`,
-          })
-          continue
-        }
 
         try {
           const response = await fetch('/api/drive/files/export', {
@@ -384,433 +275,267 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              fileId: item.id,
-              mimeType: format.googleMimeType,
-              includeComments: includeComments,
-              includeSuggestions: includeSuggestions,
+              fileId: file.id,
+              mimeType: getExportMimeType(selectedFormat),
             }),
             signal: abortControllerRef.current.signal,
           })
 
           if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.error || 'Export failed')
+            throw new Error('Export failed')
           }
 
           const data = await response.json()
 
-          const result: ExportResult = {
-            fileId: item.id,
-            fileName: item.name,
-            success: true,
-            exportUrl: data.exportUrl,
-            exportFormat: format.name,
+          if (data.exportUrl) {
+            const fileExtension = selectedFormat === 'jpeg' ? 'jpg' : selectedFormat
+            const exportFileName = `${file.name.replace(/\.[^/.]+$/, '')}.${fileExtension}`
+            downloadFile(data.exportUrl, exportFileName)
+            successCount++
+          } else {
+            throw new Error('No export URL received')
           }
-
-          results.push(result)
-
-          if (autoStartDownload && data.exportUrl) {
-            const exportFileName = item.name.replace(/\.[^/.]+$/, '') + '.' + format.extension
-            triggerDownload(data.exportUrl, exportFileName)
-          }
-
-          successCount++
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break
           }
 
           const errorMessage = error instanceof Error ? error.message : 'Unknown error'
-          errors.push({ file: item.name, error: errorMessage })
-
-          results.push({
-            fileId: item.id,
-            fileName: item.name,
-            success: false,
-            error: errorMessage,
-          })
+          errors.push({ file: file.name, error: errorMessage })
           failedCount++
         }
 
-        // Small delay to prevent overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Small delay between exports
+        await new Promise(resolve => setTimeout(resolve, 500))
       }
     } catch (error) {
       console.error('Export operation failed:', error)
-    } finally {
-      setProgress(prev => ({
-        ...prev,
-        success: successCount,
-        failed: failedCount,
-        skipped: skippedCount,
-        errors,
-      }))
+    }
 
-      setExportResults(results)
-      setIsProcessing(false)
-      setCurrentStep('completed')
+    setProgress(prev => ({
+      ...prev,
+      success: successCount,
+      failed: failedCount,
+      errors,
+    }))
 
-      if (isCancelledRef.current) {
-        toast.info('Export operation cancelled')
-      } else if (successCount > 0) {
-        toast.success(`Successfully exported ${successCount} item(s)`)
-        onConfirm?.()
-      } else {
-        toast.error('Export operation failed')
-      }
+    setIsProcessing(false)
+    setIsCompleted(true)
+
+    if (isCancelledRef.current) {
+      toast.info('Export operation cancelled')
+    } else if (successCount > 0) {
+      toast.success(`Successfully exported ${successCount} file(s)`)
+      onConfirm()
+    } else {
+      toast.error('Export operation failed')
     }
   }
 
-  const renderSetupStep = () => (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Settings className="h-5 w-5 text-blue-600" />
-        <h3 className="font-semibold">Export Settings</h3>
-      </div>
+  const handleClose = () => {
+    if (isProcessing) {
+      handleCancel()
+    } else {
+      resetState()
+      onClose()
+    }
+  }
 
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Exportable Items</span>
-          <Badge variant="secondary" className="gap-1">
-            <FileDown className="h-3 w-3" />
-            {exportableItems.length} exportable
-          </Badge>
-        </div>
+  const resetState = () => {
+    setSelectedFormat('pdf')
+    setIsProcessing(false)
+    setIsCompleted(false)
+    setIsCancelled(false)
+    setProgress({
+      current: 0,
+      total: 0,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+  }
 
-        {exportableItems.length > 0 && (
-          <ScrollArea className="max-h-32">
-            <div className="space-y-1">
-              {exportableItems.slice(0, 5).map(item => (
-                <div
-                  key={item.id}
-                  className="text-muted-foreground flex items-center gap-2 text-sm"
-                >
-                  {getFileIcon(item.mimeType, item.isFolder)}
-                  <span className="truncate">{item.name}</span>
-                </div>
-              ))}
-              {exportableItems.length > 5 && (
-                <div className="text-muted-foreground text-center text-sm">
-                  +{exportableItems.length - 5} more items
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-        )}
-
-        {nonExportableItems.length > 0 && (
-          <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
-                <AlertTriangle className="h-4 w-4" />
-                <span className="text-sm font-medium">
-                  {nonExportableItems.length} item(s) cannot be exported
-                </span>
-              </div>
-              <div className="text-xs text-amber-600 dark:text-amber-400">
-                Only Google Docs, Sheets, and Slides can be exported to other formats.
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {exportableItems.length === 0 ? (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
-          <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-            <XCircle className="h-4 w-4" />
-            <span className="text-sm">
-              No Google Workspace files selected. Please select Google Docs, Sheets, or Slides.
-            </span>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="space-y-4">
-            <Label className="text-sm font-medium">Export Format</Label>
-            <RadioGroup
-              value={selectedFormat}
-              onValueChange={setSelectedFormat}
-              className="space-y-2"
-            >
-              {availableFormats.map(format => (
-                <div key={format.id} className="flex items-center space-x-2">
-                  <RadioGroupItem value={format.id} id={format.id} />
-                  <Label htmlFor={format.id} className="flex flex-1 items-center gap-2">
-                    <format.icon className="h-4 w-4" />
-                    <div className="flex-1">
-                      <div className="font-medium">{format.name}</div>
-                      <div className="text-muted-foreground text-xs">{format.description}</div>
-                    </div>
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
-
-          <div className="space-y-4">
-            <Label className="text-sm font-medium">Export Options</Label>
-
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="autoStartDownload"
-                  checked={autoStartDownload}
-                  onCheckedChange={setAutoStartDownload}
-                />
-                <Label htmlFor="autoStartDownload" className="text-sm">
-                  Start downloads automatically
-                </Label>
-              </div>
-
-              {selectedFormat === 'pdf' && (
-                <>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="includeComments"
-                      checked={includeComments}
-                      onCheckedChange={setIncludeComments}
-                    />
-                    <Label htmlFor="includeComments" className="text-sm">
-                      Include comments in export
-                    </Label>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="includeSuggestions"
-                      checked={includeSuggestions}
-                      onCheckedChange={setIncludeSuggestions}
-                    />
-                    <Label htmlFor="includeSuggestions" className="text-sm">
-                      Include suggestions in export
-                    </Label>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
-            <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
-              <div className="flex items-center gap-2 font-medium">
-                <Info className="h-4 w-4" />
-                <span>Export Information</span>
-              </div>
-              <div>• Files will be converted to the selected format</div>
-              <div>• Original files remain unchanged in Google Drive</div>
-              <div>• Some formatting may be lost during conversion</div>
-              <div>• Large files may take longer to export</div>
-            </div>
-          </div>
-        </>
-      )}
-    </div>
-  )
-
-  const renderProcessingStep = () => (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-        <h3 className="font-semibold">Exporting Files</h3>
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center justify-between text-sm">
-          <span>Progress</span>
-          <span>
-            {progress.current} of {progress.total}
-          </span>
-        </div>
-
-        <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
-
-        {progress.currentFile && (
-          <div className="text-muted-foreground flex items-center gap-2 text-sm">
-            <ArrowRight className="h-4 w-4" />
-            <span className="truncate">Exporting: {progress.currentFile}</span>
-          </div>
-        )}
-
-        <div className="flex gap-4 text-sm">
-          <div className="flex items-center gap-1 text-green-600">
-            <CheckCircle className="h-4 w-4" />
-            <span>{progress.success} exported</span>
-          </div>
-          <div className="flex items-center gap-1 text-red-600">
-            <XCircle className="h-4 w-4" />
-            <span>{progress.failed} failed</span>
-          </div>
-          <div className="flex items-center gap-1 text-yellow-600">
-            <SkipForward className="h-4 w-4" />
-            <span>{progress.skipped} skipped</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-
-  const renderCompletedStep = () => (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <CheckCircle className="h-5 w-5 text-green-600" />
-        <h3 className="font-semibold">
-          {isCancelled ? 'Export Operation Cancelled' : 'Files Exported Successfully'}
-        </h3>
-      </div>
-
-      {!isCancelled && (
-        <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
-          <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
-            <div>✓ Successfully exported {progress.success} file(s)</div>
-            <div>
-              ✓ Files converted to {EXPORT_FORMATS.find(f => f.id === selectedFormat)?.name}
-            </div>
-            <div>
-              ✓{' '}
-              {autoStartDownload
-                ? 'Downloads started automatically'
-                : 'Export files ready for download'}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {exportResults.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Exported Files</span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                exportResults.forEach(result => {
-                  if (result.success && result.exportUrl) {
-                    const format = EXPORT_FORMATS.find(f => f.id === selectedFormat)
-                    const exportFileName =
-                      result.fileName.replace(/\.[^/.]+$/, '') +
-                      '.' +
-                      (format?.extension || 'export')
-                    triggerDownload(result.exportUrl, exportFileName)
-                  }
-                })
-              }}
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Download All
-            </Button>
-          </div>
-
-          <ScrollArea className="max-h-48">
-            <div className="space-y-2">
-              {exportResults.map((result, index) => (
-                <div key={index} className="space-y-1">
-                  <div className="flex items-center gap-2 text-sm">
-                    {result.success ? (
-                      <CheckCircle className="h-4 w-4 text-green-600" />
-                    ) : (
-                      <XCircle className="h-4 w-4 text-red-600" />
-                    )}
-                    <span className="flex-1 truncate font-medium">{result.fileName}</span>
-                    {result.success && result.exportUrl && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          const format = EXPORT_FORMATS.find(f => f.id === selectedFormat)
-                          const exportFileName =
-                            result.fileName.replace(/\.[^/.]+$/, '') +
-                            '.' +
-                            (format?.extension || 'export')
-                          triggerDownload(result.exportUrl!, exportFileName)
-                        }}
-                        className="h-8 px-2"
-                      >
-                        <Download className="h-3 w-3" />
-                      </Button>
-                    )}
-                  </div>
-
-                  {result.success && result.exportFormat && (
-                    <div className="text-muted-foreground ml-6 text-xs">
-                      Exported as: {result.exportFormat}
-                    </div>
-                  )}
-
-                  {!result.success && (
-                    <div className="ml-6 text-xs text-red-600">Error: {result.error}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
-      )}
-
-      {progress.failed > 0 && (
-        <div className="space-y-2">
-          <div className="text-sm font-medium text-red-600">
-            Failed to export {progress.failed} item(s):
-          </div>
-          <ScrollArea className="max-h-32">
-            <div className="space-y-1">
-              {progress.errors.map((error, index) => (
-                <div key={index} className="text-xs text-red-600">
-                  • {error.file}: {error.error}
-                </div>
-              ))}
-            </div>
-          </ScrollArea>
-        </div>
-      )}
-
-      {!isCancelled && progress.success > 0 && (
-        <div className="rounded-lg border bg-amber-50 p-3 dark:bg-amber-950/20">
-          <div className="text-sm text-amber-700 dark:text-amber-300">
-            💡 Tip: Exported files retain their original quality and content structure
-          </div>
-        </div>
-      )}
-    </div>
-  )
+  const isMobile = useIsMobile()
 
   const renderContent = () => {
-    switch (currentStep) {
-      case 'setup':
-        return renderSetupStep()
-      case 'processing':
-        return renderProcessingStep()
-      case 'completed':
-        return renderCompletedStep()
-      default:
-        return null
+    if (isProcessing) {
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+            <h3 className="font-semibold">Exporting Files</h3>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between text-sm">
+              <span>Progress</span>
+              <span>
+                {progress.current} of {progress.total}
+              </span>
+            </div>
+
+            <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+
+            {progress.currentFile && (
+              <div className="text-muted-foreground text-sm">Exporting: {progress.currentFile}</div>
+            )}
+
+            <div className="flex gap-4 text-sm">
+              <div className="flex items-center gap-1 text-green-600">
+                <CheckCircle className="h-4 w-4" />
+                <span>{progress.success} exported</span>
+              </div>
+              <div className="flex items-center gap-1 text-red-600">
+                <XCircle className="h-4 w-4" />
+                <span>{progress.failed} failed</span>
+              </div>
+              {progress.skipped > 0 && (
+                <div className="flex items-center gap-1 text-yellow-600">
+                  <SkipForward className="h-4 w-4" />
+                  <span>{progress.skipped} skipped</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )
     }
+
+    if (isCompleted) {
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <h3 className="font-semibold">
+              {isCancelled ? 'Export Operation Cancelled' : 'Export Completed'}
+            </h3>
+          </div>
+
+          {!isCancelled && (
+            <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+              <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+                <div>✓ Successfully exported {progress.success} file(s)</div>
+                <div>✓ Files converted to {selectedFormatData?.label}</div>
+                <div>✓ Downloads started automatically</div>
+              </div>
+            </div>
+          )}
+
+          {progress.failed > 0 && (
+            <div className="space-y-2">
+              <div className="text-sm font-medium text-red-600">
+                Failed to export {progress.failed} item(s):
+              </div>
+              <ScrollArea className="max-h-32">
+                <div className="space-y-1">
+                  {progress.errors.map((error, index) => (
+                    <div key={index} className="text-xs text-red-600">
+                      • {error.file}: {error.error}
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Selected Items</span>
+            <div className="flex gap-2">
+              <Badge variant="secondary">{exportableFiles.length} exportable</Badge>
+              {incompatibleFiles.length > 0 && (
+                <Badge variant="outline">{incompatibleFiles.length} incompatible</Badge>
+              )}
+            </div>
+          </div>
+
+          {incompatibleFiles.length > 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
+              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                <AlertTriangle className="h-4 w-4" />
+                <span className="text-sm">
+                  {incompatibleFiles.length} item(s) are not compatible with{' '}
+                  {selectedFormatData?.label}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <Label className="text-sm font-medium">Export Format</Label>
+          <RadioGroup
+            value={selectedFormat}
+            onValueChange={setSelectedFormat}
+            className="grid grid-cols-1 gap-2"
+          >
+            {EXPORT_FORMATS.map(format => (
+              <div key={format.id} className="flex items-center space-x-2">
+                <RadioGroupItem value={format.id} id={format.id} />
+                <Label htmlFor={format.id} className="flex flex-1 items-center gap-2">
+                  <format.icon className="h-4 w-4" />
+                  <div className="flex-1">
+                    <div className="font-medium">{format.label}</div>
+                    <div className="text-muted-foreground text-xs">{format.description}</div>
+                  </div>
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </div>
+
+        {exportableFiles.length === 0 ? (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
+            <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+              <XCircle className="h-4 w-4" />
+              <span className="text-sm">
+                No compatible Google Workspace files selected for {selectedFormatData?.label}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+            <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
+              <div>• Only Google Docs, Sheets, and Slides can be exported</div>
+              <div>• Files will be converted to {selectedFormatData?.label}</div>
+              <div>• Original files remain unchanged in Google Drive</div>
+              <div>• Some formatting may be lost during conversion</div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
   }
 
   const renderFooter = () => {
-    switch (currentStep) {
-      case 'setup':
-        return (
-          <>
-            <Button variant="outline" onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button onClick={handleExport} disabled={exportableItems.length === 0}>
-              Export Files
-            </Button>
-          </>
-        )
-      case 'processing':
-        return (
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-        )
-      case 'completed':
-        return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
-      default:
-        return null
+    if (isProcessing) {
+      return (
+        <Button variant="outline" onClick={handleCancel}>
+          Cancel
+        </Button>
+      )
     }
+
+    if (isCompleted) {
+      return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
+    }
+
+    return (
+      <>
+        <Button variant="outline" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button onClick={handleExport} disabled={exportableFiles.length === 0}>
+          Export Files
+        </Button>
+      </>
+    )
   }
 
   if (isMobile) {
@@ -819,9 +544,6 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
         <BottomSheetContent>
           <BottomSheetHeader>
             <BottomSheetTitle>Export Files</BottomSheetTitle>
-            <BottomSheetDescription>
-              Export Google Workspace files to various formats like PDF, Word, Excel, etc.
-            </BottomSheetDescription>
           </BottomSheetHeader>
 
           <div className="flex-1 overflow-y-auto px-4 py-2">{renderContent()}</div>
@@ -839,9 +561,6 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Export Files</DialogTitle>
-          <DialogDescription>
-            Export Google Workspace files to various formats like PDF, Word, Excel, etc.
-          </DialogDescription>
         </DialogHeader>
 
         <div className="max-h-[60vh] overflow-y-auto">{renderContent()}</div>
