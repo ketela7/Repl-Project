@@ -106,7 +106,7 @@ export function FileUploadDialog({
         setUploadProgress(0)
         return
       }
-      
+
       // Log error for debugging in development only
       if (process.env.NODE_ENV === 'development') {
       }
@@ -122,7 +122,7 @@ export function FileUploadDialog({
     if (abortControllerRef.current && uploading) {
       abortControllerRef.current.abort()
     }
-    
+
     if (!uploading) {
       setSelectedFile(null)
       setFileName('')

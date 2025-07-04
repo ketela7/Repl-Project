@@ -231,12 +231,10 @@ export async function GET() {
             sendData('progress', { step: 'final_analysis', message: 'Generating final report...' })
 
             // Use existing countFilesByCategory function for all 27 categories
-            const fileListForCategorization = Object.entries(filesByType).flatMap(([mimeType, count]) =>
-              Array(count).fill({ mimeType })
+            const fileListForCategorization = Object.entries(filesByType).flatMap(
+              ([mimeType, count]) => Array(count).fill({ mimeType }),
             )
             const categories = countFilesByCategory(fileListForCategorization)
-            
-
 
             // Calculate category sizes using existing file type categorization
             const categorySizes: Record<string, number> = {}
@@ -286,7 +284,7 @@ export async function GET() {
           console.error('Storage analysis error:', error)
           sendData('error', {
             message: 'Analysis failed. Please try again.',
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
           })
         }
       },

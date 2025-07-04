@@ -108,5 +108,3 @@ export const API_ROUTE_OPTIMIZATIONS = {
     estimatedSpeedUp: '75%',
   },
 }
-
-

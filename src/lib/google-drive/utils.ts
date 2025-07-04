@@ -18,15 +18,15 @@ export function formatFileSize(bytes: string | number): string {
 
 export function getFileExtension(fileName: string): string {
   if (!fileName || fileName === '.') return ''
-  
+
   const parts = fileName.split('.')
   if (parts.length < 2) return ''
-  
+
   // Handle hidden files like .hidden
   if (fileName.startsWith('.') && parts.length === 2) {
     return parts[1] || ''
   }
-  
+
   const lastPart = parts[parts.length - 1]
   return lastPart ? lastPart.toLowerCase() : ''
 }
@@ -35,25 +35,42 @@ export function getFileTypeCategory(fileName: string, mimeType?: string): string
   // Handle Google Apps files by MIME type
   if (mimeType) {
     if (mimeType.includes('vnd.google-apps.folder')) return 'folder'
-    if (mimeType.includes('vnd.google-apps.document') || 
-        mimeType.includes('vnd.google-apps.spreadsheet') ||
-        mimeType.includes('vnd.google-apps.presentation')) return 'document'
+    if (
+      mimeType.includes('vnd.google-apps.document') ||
+      mimeType.includes('vnd.google-apps.spreadsheet') ||
+      mimeType.includes('vnd.google-apps.presentation')
+    )
+      return 'document'
     if (mimeType.includes('image/')) return 'image'
     if (mimeType.includes('video/')) return 'video'
     if (mimeType.includes('audio/')) return 'audio'
-    if (mimeType.includes('application/pdf') || 
-        mimeType.includes('text/') ||
-        mimeType.includes('application/msword') ||
-        mimeType.includes('application/vnd.openxmlformats')) return 'document'
+    if (
+      mimeType.includes('application/pdf') ||
+      mimeType.includes('text/') ||
+      mimeType.includes('application/msword') ||
+      mimeType.includes('application/vnd.openxmlformats')
+    )
+      return 'document'
   }
 
   // Fallback to file extension
   const extension = getFileExtension(fileName)
-  
+
   const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp']
   const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv']
   const audioExtensions = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma']
-  const documentExtensions = ['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt', 'xls', 'xlsx', 'ppt', 'pptx']
+  const documentExtensions = [
+    'pdf',
+    'doc',
+    'docx',
+    'txt',
+    'rtf',
+    'odt',
+    'xls',
+    'xlsx',
+    'ppt',
+    'pptx',
+  ]
   const archiveExtensions = ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz', 'dmg', 'iso']
 
   if (imageExtensions.includes(extension)) return 'image'
@@ -61,7 +78,7 @@ export function getFileTypeCategory(fileName: string, mimeType?: string): string
   if (audioExtensions.includes(extension)) return 'audio'
   if (documentExtensions.includes(extension)) return 'document'
   if (archiveExtensions.includes(extension)) return 'archive'
-  
+
   return 'other'
 }
 
@@ -581,17 +598,20 @@ export function getFileIconColor(mimeType: string, fileName?: string): string {
     'text/plain': 'text-gray-600 dark:text-gray-400',
     'text/markdown': 'text-slate-600 dark:text-slate-400',
     'application/msword': 'text-blue-600 dark:text-blue-400',
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'text-blue-600 dark:text-blue-400',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+      'text-blue-600 dark:text-blue-400',
     'application/rtf': 'text-blue-600 dark:text-blue-400',
 
     // Spreadsheets
     'application/vnd.ms-excel': 'text-green-600 dark:text-green-400',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'text-green-600 dark:text-green-400',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+      'text-green-600 dark:text-green-400',
     'text/csv': 'text-green-600 dark:text-green-400',
 
     // Presentations
     'application/vnd.ms-powerpoint': 'text-orange-600 dark:text-orange-400',
-    'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'text-orange-600 dark:text-orange-400',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+      'text-orange-600 dark:text-orange-400',
 
     // Images
     'image/jpeg': 'text-purple-600 dark:text-purple-400',
@@ -1017,12 +1037,12 @@ export function isImageFile(fileNameOrMimeType: string, mimeType?: string): bool
   if (mimeType) {
     return mimeType.startsWith('image/')
   }
-  
+
   // Check if first parameter is MIME type
   if (fileNameOrMimeType.includes('/')) {
     return fileNameOrMimeType.startsWith('image/')
   }
-  
+
   // Treat as filename and check extension
   const extension = getFileExtension(fileNameOrMimeType)
   const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'tiff', 'ico']
@@ -1034,12 +1054,12 @@ export function isVideoFile(fileNameOrMimeType: string, mimeType?: string): bool
   if (mimeType) {
     return mimeType.startsWith('video/')
   }
-  
+
   // Check if first parameter is MIME type
   if (fileNameOrMimeType.includes('/')) {
     return fileNameOrMimeType.startsWith('video/')
   }
-  
+
   // Treat as filename and check extension
   const extension = getFileExtension(fileNameOrMimeType)
   const videoExtensions = ['mp4', 'avi', 'mov', 'wmv', 'flv', 'webm', 'mkv', 'mp3v', 'mpeg', 'mpg']
@@ -1289,7 +1309,11 @@ export function getFileActions(fileInfo: {
 /**
  * Format Google Drive file dates with user timezone
  */
-export const formatDriveFileDate = (dateString: string, timezone?: string, showRelative: boolean = true): string => {
+export const formatDriveFileDate = (
+  dateString: string,
+  timezone?: string,
+  showRelative: boolean = true,
+): string => {
   if (!dateString) return 'Unknown'
 
   try {
@@ -1398,7 +1422,8 @@ export function getFileCategory(mimeType: string): string {
   if (mimeType.includes('spreadsheet') || mimeType === 'text/csv') return 'spreadsheet'
   if (mimeType.includes('presentation')) return 'presentation'
   if (mimeType.includes('document') || mimeType.startsWith('text/')) return 'document'
-  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive')) return 'archive'
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive'))
+    return 'archive'
   if (
     mimeType.includes('javascript') ||
     mimeType.includes('json') ||

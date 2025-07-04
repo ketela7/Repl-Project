@@ -4,8 +4,6 @@
  * Based on official Google Drive API error handling documentation
  */
 
-
-
 export interface DriveError {
   code: string
   message: string
@@ -374,25 +372,27 @@ class ErrorHandler {
     }
 
     // Dynamic import for client-side only
-    import('sonner').then(({ toast }) => {
-      const actionText = this.getActionText(error.action)
+    import('sonner')
+      .then(({ toast }) => {
+        const actionText = this.getActionText(error.action)
 
-      toast.error(error.userMessage, {
-        description: actionText ? `Tip: ${actionText}` : undefined,
-        duration: 5000,
-        action:
-          error.action && error.action !== 'none'
-            ? {
-                label: actionText,
-                onClick: () => {
-                  // Action will be handled by the calling component
-                },
-              }
-            : undefined,
+        toast.error(error.userMessage, {
+          description: actionText ? `Tip: ${actionText}` : undefined,
+          duration: 5000,
+          action:
+            error.action && error.action !== 'none'
+              ? {
+                  label: actionText,
+                  onClick: () => {
+                    // Action will be handled by the calling component
+                  },
+                }
+              : undefined,
+        })
       })
-    }).catch(() => {
-      console.error('Error:', error.userMessage)
-    })
+      .catch(() => {
+        console.error('Error:', error.userMessage)
+      })
   }
 
   private getActionText(action?: string): string {

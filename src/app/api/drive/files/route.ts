@@ -61,7 +61,7 @@ function buildDriveQuery(filters: FileFilter): string {
   // Handle file type filtering using shared utility
   if (filters.fileType && filters.fileType !== 'all') {
     const fileTypes = filters.fileType.split(',').filter(type => type && type !== 'all')
-    
+
     if (fileTypes.length > 0) {
       const query = getGoogleDriveQuery(fileTypes)
       if (query) {
@@ -151,9 +151,6 @@ export async function GET(request: NextRequest) {
         ...fileMetadata,
         id: fileMetadata.id || fileId, // Fallback to requested fileId if id is missing
       }
-
-
-
 
       return NextResponse.json(response)
     }
@@ -266,7 +263,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Handle permission errors
-    if ((error as { name?: string; code?: number }).name === 'PermissionError' || (error as { code?: number }).code === 403) {
+    if (
+      (error as { name?: string; code?: number }).name === 'PermissionError' ||
+      (error as { code?: number }).code === 403
+    ) {
       return NextResponse.json(
         {
           error: 'Insufficient Drive permissions',

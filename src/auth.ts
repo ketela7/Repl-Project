@@ -5,7 +5,7 @@ import Google from 'next-auth/providers/google'
 function validateEnvVars() {
   const required = ['NEXTAUTH_SECRET', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']
   const missing = required.filter(key => !process.env[key])
-  
+
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`)
   }
@@ -150,7 +150,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-next-auth.session-token'
+          : 'next-auth.session-token',
       options: {
         httpOnly: true,
         sameSite: 'lax',
@@ -170,7 +173,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     },
     pkceCodeVerifier: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-authjs.pkce.code_verifier' : 'authjs.pkce.code_verifier',
+      name:
+        process.env.NODE_ENV === 'production'
+          ? '__Secure-authjs.pkce.code_verifier'
+          : 'authjs.pkce.code_verifier',
       options: {
         httpOnly: true,
         sameSite: 'lax',

@@ -38,12 +38,11 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { FileIcon } from '@/components/file-icon'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { successToast } from '@/lib/utils'
-import { 
-  getCommonFileTypeCategories, 
-  matchesFileType, 
-  countFilesByCategory, 
-
-  FILE_TYPE_CATEGORIES 
+import {
+  getCommonFileTypeCategories,
+  matchesFileType,
+  countFilesByCategory,
+  FILE_TYPE_CATEGORIES,
 } from '@/lib/mime-type-filter'
 
 // Removed Suspense import - direct render untuk bulk operations
@@ -51,7 +50,6 @@ import { OperationsDialog } from './operations-dialog'
 import { FiltersDialog } from './filters-dialog'
 
 // Types
-
 
 interface DriveItem {
   id: string
@@ -157,8 +155,8 @@ const filterByMimeType = (items: DriveItem[], category: string) => {
 
   if (!categoryRecord) return items
 
-  return items.filter((item: DriveItem) => 
-    matchesFileType(item.mimeType || '', [categoryRecord.id])
+  return items.filter((item: DriveItem) =>
+    matchesFileType(item.mimeType || '', [categoryRecord.id]),
   )
 }
 
@@ -575,33 +573,37 @@ export function DriveToolbar({
                         >
                           <Folder className="h-4 w-4" />
                         </Button>
-                        {getCommonFileTypeCategories().slice(1).map(category => {
-                          const filter = {
-                            type: category.id,
-                            mimeType: category.mimeTypes[0] || 'application/octet-stream',
-                            title: category.label,
-                          }
-                          return (
-                            <Button
-                              key={filter.type}
-                              variant={
-                                filters.fileTypeFilter.includes(filter.type) ? 'default' : 'outline'
-                              }
-                              size="sm"
-                              onClick={() => {
-                                const newTypes = filters.fileTypeFilter.includes(filter.type)
-                                  ? filters.fileTypeFilter.filter(t => t !== filter.type)
-                                  : [...filters.fileTypeFilter, filter.type]
+                        {getCommonFileTypeCategories()
+                          .slice(1)
+                          .map(category => {
+                            const filter = {
+                              type: category.id,
+                              mimeType: category.mimeTypes[0] || 'application/octet-stream',
+                              title: category.label,
+                            }
+                            return (
+                              <Button
+                                key={filter.type}
+                                variant={
+                                  filters.fileTypeFilter.includes(filter.type)
+                                    ? 'default'
+                                    : 'outline'
+                                }
+                                size="sm"
+                                onClick={() => {
+                                  const newTypes = filters.fileTypeFilter.includes(filter.type)
+                                    ? filters.fileTypeFilter.filter(t => t !== filter.type)
+                                    : [...filters.fileTypeFilter, filter.type]
 
-                                onFilterChange({ fileTypeFilter: newTypes })
-                              }}
-                              className="justify-center p-2 text-xs"
-                              title={filter.title}
-                            >
-                              <FileIcon mimeType={filter.mimeType} className="h-4 w-4" />
-                            </Button>
-                          )
-                        })}
+                                  onFilterChange({ fileTypeFilter: newTypes })
+                                }}
+                                className="justify-center p-2 text-xs"
+                                title={filter.title}
+                              >
+                                <FileIcon mimeType={filter.mimeType} className="h-4 w-4" />
+                              </Button>
+                            )
+                          })}
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -1000,45 +1002,75 @@ export function DriveToolbar({
                 </div>
 
                 {/* Dynamic Badge Generation untuk Semua 27 Kategori */}
-                {Object.values(FILE_TYPE_CATEGORIES).map((category) => {
+                {Object.values(FILE_TYPE_CATEGORIES).map(category => {
                   const count = categoryCounts[category.id] || 0
                   if (count === 0) return null
 
                   const IconComponent = category.icon
                   const colorClass = category.color
                   const bgColorMap: Record<string, string> = {
-                    'text-blue-600': 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
-                    'text-blue-700': 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
-                    'text-green-600': 'bg-green-50 dark:bg-green-950/30 border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50',
-                    'text-orange-600': 'bg-orange-50 dark:bg-orange-950/30 border-orange-500 text-orange-700 hover:bg-orange-100 dark:text-orange-300 dark:hover:bg-orange-900/50',
-                    'text-purple-600': 'bg-purple-50 dark:bg-purple-950/30 border-purple-500 text-purple-700 hover:bg-purple-100 dark:text-purple-300 dark:hover:bg-purple-900/50',
-                    'text-red-600': 'bg-red-50 dark:bg-red-950/30 border-red-500 text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-900/50',
-                    'text-amber-600': 'bg-amber-50 dark:bg-amber-950/30 border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/50',
-                    'text-slate-600': 'bg-slate-50 dark:bg-slate-950/30 border-slate-500 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900/50',
-                    'text-pink-600': 'bg-pink-50 dark:bg-pink-950/30 border-pink-500 text-pink-700 hover:bg-pink-100 dark:text-pink-300 dark:hover:bg-pink-900/50',
-                    'text-indigo-600': 'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-500 text-indigo-700 hover:bg-indigo-100 dark:text-indigo-300 dark:hover:bg-indigo-900/50',
-                    'text-yellow-600': 'bg-yellow-50 dark:bg-yellow-950/30 border-yellow-500 text-yellow-700 hover:bg-yellow-100 dark:text-yellow-300 dark:hover:bg-yellow-900/50',
-                    'text-gray-600': 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50',
-                    'text-blue-500': 'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
-                    'text-green-500': 'bg-green-50 dark:bg-green-950/30 border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50',
-                    'text-purple-500': 'bg-purple-50 dark:bg-purple-950/30 border-purple-500 text-purple-700 hover:bg-purple-100 dark:text-purple-300 dark:hover:bg-purple-900/50',
-                    'text-rose-600': 'bg-rose-50 dark:bg-rose-950/30 border-rose-500 text-rose-700 hover:bg-rose-100 dark:text-rose-300 dark:hover:bg-rose-900/50',
-                    'text-teal-600': 'bg-teal-50 dark:bg-teal-950/30 border-teal-500 text-teal-700 hover:bg-teal-100 dark:text-teal-300 dark:hover:bg-teal-900/50',
-                    'text-stone-600': 'bg-stone-50 dark:bg-stone-950/30 border-stone-500 text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900/50',
-                    'text-cyan-600': 'bg-cyan-50 dark:bg-cyan-950/30 border-cyan-500 text-cyan-700 hover:bg-cyan-100 dark:text-cyan-300 dark:hover:bg-cyan-900/50',
-                    'text-sky-600': 'bg-sky-50 dark:bg-sky-950/30 border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50',
-                    'text-gray-500': 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
+                    'text-blue-600':
+                      'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
+                    'text-blue-700':
+                      'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
+                    'text-green-600':
+                      'bg-green-50 dark:bg-green-950/30 border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50',
+                    'text-orange-600':
+                      'bg-orange-50 dark:bg-orange-950/30 border-orange-500 text-orange-700 hover:bg-orange-100 dark:text-orange-300 dark:hover:bg-orange-900/50',
+                    'text-purple-600':
+                      'bg-purple-50 dark:bg-purple-950/30 border-purple-500 text-purple-700 hover:bg-purple-100 dark:text-purple-300 dark:hover:bg-purple-900/50',
+                    'text-red-600':
+                      'bg-red-50 dark:bg-red-950/30 border-red-500 text-red-700 hover:bg-red-100 dark:text-red-300 dark:hover:bg-red-900/50',
+                    'text-amber-600':
+                      'bg-amber-50 dark:bg-amber-950/30 border-amber-500 text-amber-700 hover:bg-amber-100 dark:text-amber-300 dark:hover:bg-amber-900/50',
+                    'text-slate-600':
+                      'bg-slate-50 dark:bg-slate-950/30 border-slate-500 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900/50',
+                    'text-pink-600':
+                      'bg-pink-50 dark:bg-pink-950/30 border-pink-500 text-pink-700 hover:bg-pink-100 dark:text-pink-300 dark:hover:bg-pink-900/50',
+                    'text-indigo-600':
+                      'bg-indigo-50 dark:bg-indigo-950/30 border-indigo-500 text-indigo-700 hover:bg-indigo-100 dark:text-indigo-300 dark:hover:bg-indigo-900/50',
+                    'text-yellow-600':
+                      'bg-yellow-50 dark:bg-yellow-950/30 border-yellow-500 text-yellow-700 hover:bg-yellow-100 dark:text-yellow-300 dark:hover:bg-yellow-900/50',
+                    'text-gray-600':
+                      'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50',
+                    'text-blue-500':
+                      'bg-blue-50 dark:bg-blue-950/30 border-blue-500 text-blue-700 hover:bg-blue-100 dark:text-blue-300 dark:hover:bg-blue-900/50',
+                    'text-green-500':
+                      'bg-green-50 dark:bg-green-950/30 border-green-500 text-green-700 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/50',
+                    'text-purple-500':
+                      'bg-purple-50 dark:bg-purple-950/30 border-purple-500 text-purple-700 hover:bg-purple-100 dark:text-purple-300 dark:hover:bg-purple-900/50',
+                    'text-rose-600':
+                      'bg-rose-50 dark:bg-rose-950/30 border-rose-500 text-rose-700 hover:bg-rose-100 dark:text-rose-300 dark:hover:bg-rose-900/50',
+                    'text-teal-600':
+                      'bg-teal-50 dark:bg-teal-950/30 border-teal-500 text-teal-700 hover:bg-teal-100 dark:text-teal-300 dark:hover:bg-teal-900/50',
+                    'text-stone-600':
+                      'bg-stone-50 dark:bg-stone-950/30 border-stone-500 text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-900/50',
+                    'text-cyan-600':
+                      'bg-cyan-50 dark:bg-cyan-950/30 border-cyan-500 text-cyan-700 hover:bg-cyan-100 dark:text-cyan-300 dark:hover:bg-cyan-900/50',
+                    'text-sky-600':
+                      'bg-sky-50 dark:bg-sky-950/30 border-sky-500 text-sky-700 hover:bg-sky-100 dark:text-sky-300 dark:hover:bg-sky-900/50',
+                    'text-gray-500':
+                      'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50',
                   }
 
-                  const bgClass = bgColorMap[colorClass] || 'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
+                  const bgClass =
+                    bgColorMap[colorClass] ||
+                    'bg-gray-50 dark:bg-gray-950/30 border-gray-500 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-900/50'
                   const isActive = activeFilter === category.label
                   const activeBgClass = bgClass.split(' ')[2] // extract border color like 'border-blue-500'
-                  const activeColorClass = activeBgClass?.replace('border-', 'bg-').replace('-500', '-500') || 'bg-gray-500'
+                  const activeColorClass =
+                    activeBgClass?.replace('border-', 'bg-').replace('-500', '-500') ||
+                    'bg-gray-500'
 
                   return (
-                    <div key={category.id} className={`flex items-center justify-between rounded-md p-2 ${bgClass.split(' ').slice(0, 2).join(' ')}`}>
+                    <div
+                      key={category.id}
+                      className={`flex items-center justify-between rounded-md p-2 ${bgClass.split(' ').slice(0, 2).join(' ')}`}
+                    >
                       <div className="flex items-center gap-2">
-                        <IconComponent className={`h-4 w-4 ${colorClass.replace('text-', 'text-').replace('-600', '-500').replace('-700', '-500')}`} />
+                        <IconComponent
+                          className={`h-4 w-4 ${colorClass.replace('text-', 'text-').replace('-600', '-500').replace('-700', '-500')}`}
+                        />
                         <span className="text-sm">{category.label}</span>
                       </div>
                       <Badge

@@ -42,7 +42,13 @@ interface FileIconProps {
   size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
-export function FileIcon({ mimeType, fileName, className, strokeWidth = 2, size = 'md' }: FileIconProps) {
+export function FileIcon({
+  mimeType,
+  fileName,
+  className,
+  strokeWidth = 2,
+  size = 'md',
+}: FileIconProps) {
   const { iconName, colorClass } = getFileIconProps(mimeType, fileName)
 
   // Size mapping for consistency
@@ -104,5 +110,11 @@ export function FileIcon({ mimeType, fileName, className, strokeWidth = 2, size 
 
 // Helper function that can be used in both client and server components
 export function getFileIcon(mimeType: string, fileName?: string, className?: string) {
-  return <FileIcon mimeType={mimeType} {...(fileName && { fileName })} {...(className && { className })} />
+  return (
+    <FileIcon
+      mimeType={mimeType}
+      {...(fileName && { fileName })}
+      {...(className && { className })}
+    />
+  )
 }

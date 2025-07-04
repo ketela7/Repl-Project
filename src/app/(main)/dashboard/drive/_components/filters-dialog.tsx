@@ -49,7 +49,6 @@ import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn } from '@/lib/utils'
 import { getFileTypeCategories } from '@/lib/mime-type-filter'
 
-
 interface AdvancedFilters {
   sizeRange?: {
     min?: number

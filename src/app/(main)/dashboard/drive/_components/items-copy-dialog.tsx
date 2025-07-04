@@ -215,7 +215,7 @@ function ItemsCopyDialog({
         // Ensure completion state is visible for at least 1 second
         setIsCompleted(true)
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         if (successCount > 0) {
           toast.success(
             `Copied ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`,
@@ -334,19 +334,19 @@ function ItemsCopyDialog({
               <ScrollArea className="h-[120px] w-full">
                 <div className="space-y-1 p-2">
                   {selectedItems.map(item => (
-                  <div
-                    key={item.id}
-                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
-                  >
-                    <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
-                    <span className="flex-1 truncate font-mono text-xs" title={item.name}>
-                      {item.name}
-                    </span>
-                    <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
-                      {item.isFolder ? 'folder' : 'file'}
-                    </Badge>
-                  </div>
-                ))}
+                    <div
+                      key={item.id}
+                      className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
+                    >
+                      <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
+                      <span className="flex-1 truncate font-mono text-xs" title={item.name}>
+                        {item.name}
+                      </span>
+                      <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
+                        {item.isFolder ? 'folder' : 'file'}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
               </ScrollArea>
             </div>
@@ -377,8 +377,7 @@ function ItemsCopyDialog({
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage =
-        calculateProgress(progress.current, progress.total)
+      const progressPercentage = calculateProgress(progress.current, progress.total)
 
       return (
         <div className="space-y-4">

@@ -30,7 +30,12 @@ import {
 import { validateListFilesOptions } from './validation-utils'
 import { validateFileName, handleDriveApiError } from './file-validation'
 import { getOptimizedFields, fieldOptimizationMonitor } from './field-optimization'
-import { convertGoogleDriveFile, convertGoogleDriveFolder, buildSearchQuery, getMimeTypeFromFileName } from './utils'
+import {
+  convertGoogleDriveFile,
+  convertGoogleDriveFolder,
+  buildSearchQuery,
+  getMimeTypeFromFileName,
+} from './utils'
 import { getOptimizedRequestParams, performanceMonitor, requestDeduplicator } from './performance'
 
 export class GoogleDriveService {
@@ -93,7 +98,8 @@ export class GoogleDriveService {
       validationParams.pageToken = pageToken
     }
 
-    const { validPageSize, validPageToken, searchQuery, operationType } = validateListFilesOptions(validationParams)
+    const { validPageSize, validPageToken, searchQuery, operationType } =
+      validateListFilesOptions(validationParams)
 
     // Use operation type from validation
     const operation = operationType
@@ -204,7 +210,11 @@ export class GoogleDriveService {
 
     // Track performance improvement
     const responseTime = Date.now() - startTime
-    fieldOptimizationMonitor.trackRequest('getFileDetails', responseTime, optimizedFields.split(',').length)
+    fieldOptimizationMonitor.trackRequest(
+      'getFileDetails',
+      responseTime,
+      optimizedFields.split(',').length,
+    )
 
     const file = convertGoogleDriveFile(response.data)
     const responseData = response.data
@@ -339,7 +349,10 @@ export class GoogleDriveService {
   /**
    * Get file metadata with specific fields
    */
-  async getFileMetadata(fileId: string, fields: string[]): Promise<DriveFileMetadata & { id: string }> {
+  async getFileMetadata(
+    fileId: string,
+    fields: string[],
+  ): Promise<DriveFileMetadata & { id: string }> {
     const response = await this.drive.files.get({
       fileId,
       fields: fields.join(','),
@@ -453,7 +466,11 @@ export class GoogleDriveService {
   }
 
   // Unified move operation for both files and folders with error recovery
-  async moveFile(fileId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
+  async moveFile(
+    fileId: string,
+    newParentId: string,
+    currentParentId?: string,
+  ): Promise<DriveFile> {
     try {
       // According to Drive API docs, we should get current parents if not provided
       if (!currentParentId) {
@@ -491,7 +508,11 @@ export class GoogleDriveService {
   }
 
   // Alias for clarity - same operation works for both files and folders
-  async moveFolder(folderId: string, newParentId: string, currentParentId?: string): Promise<DriveFile> {
+  async moveFolder(
+    folderId: string,
+    newParentId: string,
+    currentParentId?: string,
+  ): Promise<DriveFile> {
     return this.moveFile(folderId, newParentId, currentParentId)
   }
 
@@ -521,7 +542,10 @@ export class GoogleDriveService {
     const originalFolder = await this.getFile(folderId)
 
     // Create new folder with the specified metadata
-    const newFolder = await this.createFolder(metadata.name || `${originalFolder.name} - Copy`, metadata.parents?.[0])
+    const newFolder = await this.createFolder(
+      metadata.name || `${originalFolder.name} - Copy`,
+      metadata.parents?.[0],
+    )
 
     // Note: For full folder copying with contents, we would need recursive copying
     // This creates an empty copy of the folder structure

@@ -218,7 +218,7 @@ function ItemsMoveDialog({
         // Ensure completion state is visible for at least 1 second
         setIsCompleted(true)
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         if (successCount > 0) {
           toast.success(
             `Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`,
@@ -380,8 +380,7 @@ function ItemsMoveDialog({
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage =
-        calculateProgress(progress.current, progress.total)
+      const progressPercentage = calculateProgress(progress.current, progress.total)
 
       return (
         <div className="space-y-4">

@@ -1,11 +1,8 @@
-modules = ["nodejs-20", "nodejs-23", "web"]
+modules = ["web", "nodejs-20"]
 
 [nix]
 channel = "stable-24_05"
 packages = ["nix-output-monitor"]
-
-[[ports]]
-localPort = 3000
 
 [[ports]]
 localPort = 5000
@@ -21,21 +18,23 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Check Type"
+args = "Type"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Test Coverage"
+args = "Test"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Linter & Formatter"
+args = "Linter"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Formatter"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Server"
-
-
 
 [[workflows.workflow]]
 name = "Cleaner"
@@ -46,15 +45,15 @@ task = "shell.exec"
 args = "npm run clean:all"
 
 [[workflows.workflow]]
-name = "Check Type"
+name = "Type"
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run type-check"
+args = "npm run type:fast"
 
 [[workflows.workflow]]
-name = "Test Coverage"
+name = "Test"
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
@@ -62,12 +61,21 @@ task = "shell.exec"
 args = "npm run test:coverage"
 
 [[workflows.workflow]]
-name = "Linter & Formatter"
+name = "Linter"
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm run fix:all"
+args = "npm run lint:fast"
+
+[[workflows.workflow]]
+name = "Formatter"
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run format"
+
 
 [[workflows.workflow]]
 name = "Server"
@@ -78,6 +86,8 @@ mode = "sequential"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+
 
 
 

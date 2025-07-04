@@ -401,7 +401,7 @@ function ItemsExportDialog({
               ))}
             </RadioGroup>
           </div>
-          
+
           {/* Compatible Files Preview - ScrollArea */}
           <div className="min-h-0 flex-1 space-y-2">
             <h4 className="text-center text-xs font-medium">Compatible files:</h4>
@@ -442,8 +442,7 @@ function ItemsExportDialog({
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage =
-        calculateProgress(progress.current, progress.total)
+      const progressPercentage = calculateProgress(progress.current, progress.total)
 
       return (
         <div className="space-y-4">

@@ -73,8 +73,6 @@ export function ProgressiveStorageAnalytics() {
 
   const eventSourceRef = useRef<EventSource | null>(null)
 
-
-
   const startAnalysis = async () => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close()
@@ -150,7 +148,7 @@ export function ProgressiveStorageAnalytics() {
                 spreadsheets: 0,
                 presentations: 0,
                 folders: 0,
-                other: 0
+                other: 0,
               },
               hasMore: false,
             }))
@@ -172,7 +170,7 @@ export function ProgressiveStorageAnalytics() {
                 spreadsheets: 0,
                 presentations: 0,
                 folders: 0,
-                other: 0
+                other: 0,
               },
               hasMore: false,
             })
@@ -251,12 +249,14 @@ export function ProgressiveStorageAnalytics() {
 
       // If it's array of arrays from analysis_complete: [["mimeType", count]]
       if (Array.isArray(files.filesByType[0])) {
-        return (files.filesByType as any).slice(0, 50).map(([mimeType, count]: [string, number]) => ({
-          type: mimeType?.split('/')[1] || mimeType || 'unknown',
-          count: count || 0,
-          size: files.fileSizesByType?.[mimeType] || 0,
-          averageSize: 0,
-        }))
+        return (files.filesByType as any)
+          .slice(0, 50)
+          .map(([mimeType, count]: [string, number]) => ({
+            type: mimeType?.split('/')[1] || mimeType || 'unknown',
+            count: count || 0,
+            size: files.fileSizesByType?.[mimeType] || 0,
+            averageSize: 0,
+          }))
       }
     }
 
@@ -316,7 +316,16 @@ export function ProgressiveStorageAnalytics() {
 
               {progress?.processed && (
                 <div className="space-y-1">
-                  <Progress value={isComplete ? 100 : Math.min(95, (progress.processed / Math.max(progress.processed, 1000)) * 100)} />
+                  <Progress
+                    value={
+                      isComplete
+                        ? 100
+                        : Math.min(
+                            95,
+                            (progress.processed / Math.max(progress.processed, 1000)) * 100,
+                          )
+                    }
+                  />
                   <p className="text-muted-foreground text-xs">
                     {progress.processed.toLocaleString()} files processed
                   </p>
@@ -404,7 +413,7 @@ export function ProgressiveStorageAnalytics() {
                 {files.categories && (
                   <div className="space-y-2 border-t pt-3">
                     <h4 className="text-sm font-medium">File Categories</h4>
-                    <div className="grid grid-cols-2 gap-1 text-xs max-h-80 overflow-y-auto">
+                    <div className="grid max-h-80 grid-cols-2 gap-1 overflow-y-auto text-xs">
                       {Object.entries(files.categories || {})
                         .filter(([, count]) => count > 0)
                         .sort(([, a], [, b]) => b - a)
@@ -413,12 +422,17 @@ export function ProgressiveStorageAnalytics() {
                           if (!category) return null
                           const Icon = category.icon
                           return (
-                            <div key={categoryId} className="flex items-center justify-between py-1">
+                            <div
+                              key={categoryId}
+                              className="flex items-center justify-between py-1"
+                            >
                               <div className="flex items-center gap-1">
-                                <Icon className="h-3 w-3 text-muted-foreground" />
+                                <Icon className="text-muted-foreground h-3 w-3" />
                                 <span className="truncate">{category.label}</span>
                               </div>
-                              <span className="font-medium text-primary">{count.toLocaleString()}</span>
+                              <span className="text-primary font-medium">
+                                {count.toLocaleString()}
+                              </span>
                             </div>
                           )
                         })}
@@ -439,15 +453,17 @@ export function ProgressiveStorageAnalytics() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {getTopFileTypes().map(({ type, count, size }: { type: string; count: number; size: number }) => (
-                  <div key={type} className="flex items-center justify-between">
-                    <div>
-                      <p className="font-medium">{type}</p>
-                      <p className="text-muted-foreground text-xs">{count} files</p>
+                {getTopFileTypes().map(
+                  ({ type, count, size }: { type: string; count: number; size: number }) => (
+                    <div key={type} className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium">{type}</p>
+                        <p className="text-muted-foreground text-xs">{count} files</p>
+                      </div>
+                      <span className="text-sm">{formatFileSize(size)}</span>
                     </div>
-                    <span className="text-sm">{formatFileSize(size)}</span>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             </CardContent>
           </Card>

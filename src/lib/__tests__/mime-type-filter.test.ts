@@ -9,7 +9,7 @@ import {
   getFileTypeCategory,
   countFilesByCategory,
   formatCategoryCount,
-  FILE_TYPE_CATEGORIES
+  FILE_TYPE_CATEGORIES,
 } from '../mime-type-filter'
 
 describe('MimeType Filter Utility', () => {
@@ -106,7 +106,7 @@ describe('MimeType Filter Utility', () => {
       { mimeType: 'application/vnd.google-apps.folder' },
       { mimeType: 'application/zip' },
       { mimeType: 'text/javascript' },
-      { mimeType: 'unknown/type' }
+      { mimeType: 'unknown/type' },
     ]
 
     test('counts files by category correctly', () => {
@@ -150,24 +150,22 @@ describe('MimeType Filter Utility', () => {
   describe('Backend-Frontend Consistency', () => {
     test('backend query and frontend filter produce consistent results', () => {
       const fileTypes = ['document', 'image']
-      
+
       // Backend query generation
       const backendQuery = getGoogleDriveQuery(fileTypes)
       expect(backendQuery).toBeTruthy()
-      
+
       // Frontend filtering
       const testFiles = [
         'application/vnd.google-apps.document',
         'application/pdf',
         'image/jpeg',
         'video/mp4',
-        'text/plain'
+        'text/plain',
       ]
-      
-      const frontendResults = testFiles.filter(mimeType => 
-        matchesFileType(mimeType, fileTypes)
-      )
-      
+
+      const frontendResults = testFiles.filter(mimeType => matchesFileType(mimeType, fileTypes))
+
       // Should match document and image files only
       expect(frontendResults).toContain('application/vnd.google-apps.document')
       expect(frontendResults).toContain('application/pdf')

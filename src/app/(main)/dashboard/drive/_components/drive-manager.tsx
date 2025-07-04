@@ -46,7 +46,6 @@ type DriveItem = (DriveFile | DriveFolder) & {
 }
 // Helper function to convert size units to bytes (Google Drive API requirement)
 
-
 const initialFilters = {
   activeView: 'all' as 'all' | 'my-drive' | 'shared' | 'starred' | 'recent' | 'trash',
   fileTypeFilter: [] as string[],
@@ -80,7 +79,7 @@ type DialogState = {
   export: boolean
 }
 
-type DialogAction = 
+type DialogAction =
   | { type: 'OPEN_DIALOG'; dialog: keyof DialogState }
   | { type: 'CLOSE_DIALOG'; dialog: keyof DialogState }
   | { type: 'CLOSE_ALL_DIALOGS' }
@@ -235,7 +234,7 @@ export function DriveManager() {
           ...newFilters.advancedFilters,
         },
       }
-      
+
       // Update ref juga untuk immediate access
       filtersRef.current = updatedFilters
       return updatedFilters
@@ -265,8 +264,6 @@ export function DriveManager() {
     }
     setSortConfig({ key, direction })
   }
-
-
 
   // Selected items with details for operations - using getFileActions for consistency
   const selectedItemsWithDetails = useMemo(() => {
@@ -372,23 +369,35 @@ export function DriveManager() {
             'modifiedBefore',
             (currentFilters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
           )
-        if (currentFilters.advancedFilters.owner && (currentFilters.advancedFilters.owner as string).trim())
+        if (
+          currentFilters.advancedFilters.owner &&
+          (currentFilters.advancedFilters.owner as string).trim()
+        )
           params.append('owner', (currentFilters.advancedFilters.owner as string).trim())
 
         // Add size filtering parameters (Google Drive API specification - values in bytes)
-        if (currentFilters.advancedFilters.sizeRange?.min && currentFilters.advancedFilters.sizeRange.min > 0) {
+        if (
+          currentFilters.advancedFilters.sizeRange?.min &&
+          currentFilters.advancedFilters.sizeRange.min > 0
+        ) {
           const multiplier = getSizeMultiplier(currentFilters.advancedFilters.sizeRange.unit)
           const minBytes = Math.floor(currentFilters.advancedFilters.sizeRange.min * multiplier)
           params.append('sizeMin', String(minBytes))
         }
-        if (currentFilters.advancedFilters.sizeRange?.max && currentFilters.advancedFilters.sizeRange.max > 0) {
+        if (
+          currentFilters.advancedFilters.sizeRange?.max &&
+          currentFilters.advancedFilters.sizeRange.max > 0
+        ) {
           const multiplier = getSizeMultiplier(currentFilters.advancedFilters.sizeRange.unit)
           const maxBytes = Math.floor(currentFilters.advancedFilters.sizeRange.max * multiplier)
           params.append('sizeMax', String(maxBytes))
         }
 
         // Add pageSize parameter
-        if (currentFilters.advancedFilters.pageSize && currentFilters.advancedFilters.pageSize !== 50) {
+        if (
+          currentFilters.advancedFilters.pageSize &&
+          currentFilters.advancedFilters.pageSize !== 50
+        ) {
           params.append('pageSize', String(currentFilters.advancedFilters.pageSize))
         }
 
@@ -476,7 +485,7 @@ export function DriveManager() {
   const applyFilters = useCallback(() => {
     // Gunakan filtersRef untuk mendapat filter state yang paling terbaru
     const currentFilters = filtersRef.current
-    
+
     const filterKey = JSON.stringify({
       view: currentFilters.activeView,
       types: currentFilters.fileTypeFilter,
@@ -548,16 +557,19 @@ export function DriveManager() {
   )
 
   // Selection handlers
-  const handleSelectItem = useCallback((itemId: string) => {
-    const current = selectedItemsRef.current
-    const newSet = new Set(current)
-    if (newSet.has(itemId)) {
-      newSet.delete(itemId)
-    } else {
-      newSet.add(itemId)
-    }
-    updateSelectedItems(newSet)
-  }, [updateSelectedItems])
+  const handleSelectItem = useCallback(
+    (itemId: string) => {
+      const current = selectedItemsRef.current
+      const newSet = new Set(current)
+      if (newSet.has(itemId)) {
+        newSet.delete(itemId)
+      } else {
+        newSet.add(itemId)
+      }
+      updateSelectedItems(newSet)
+    },
+    [updateSelectedItems],
+  )
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true)
@@ -571,8 +583,6 @@ export function DriveManager() {
   const clearClientSideFilter = useCallback(() => {
     setFilteredItems([])
   }, [])
-
-
 
   const displayItems = useMemo(() => {
     // Use filteredItems if available (from client-side search), otherwise use items from backend (already filtered)

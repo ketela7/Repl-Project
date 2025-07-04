@@ -321,8 +321,7 @@ function ItemsTrashDialog({ isOpen, onClose, selectedItems }: ItemsTrashDialogPr
 
     // 2. Processing State - Show progress with cancellation
     if (isProcessing) {
-      const progressPercentage =
-        calculateProgress(progress.current, progress.total)
+      const progressPercentage = calculateProgress(progress.current, progress.total)
 
       return (
         <div className="space-y-4">
