@@ -1,28 +1,48 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Trash2, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward } from 'lucide-react'
+import {
+  Trash2,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  SkipForward,
+  ArrowRight,
+  FileText,
+  Image,
+  Video,
+  Music,
+  Archive,
+  File,
+  Folder,
+  Shield,
+  AlertOctagon,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
+  BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Progress } from '@/components/ui/progress'
 import { Checkbox } from '@/components/ui/checkbox'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn, calculateProgress } from '@/lib/utils'
@@ -30,7 +50,7 @@ import { cn, calculateProgress } from '@/lib/utils'
 interface ItemsDeleteDialogProps {
   isOpen: boolean
   onClose: () => void
-  onConfirm: () => void
+  onConfirm?: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -39,11 +59,26 @@ interface ItemsDeleteDialogProps {
   }>
 }
 
-function ItemsDeleteDialog({ isOpen, onClose, selectedItems }: ItemsDeleteDialogProps) {
+function getFileIcon(mimeType: string | undefined, isFolder: boolean) {
+  if (isFolder) return <Folder className="h-4 w-4 text-blue-600" />
+  if (!mimeType) return <File className="h-4 w-4 text-gray-600" />
+
+  if (mimeType.startsWith('image/')) return <Image className="h-4 w-4 text-green-600" />
+  if (mimeType.startsWith('video/')) return <Video className="h-4 w-4 text-purple-600" />
+  if (mimeType.startsWith('audio/')) return <Music className="h-4 w-4 text-orange-600" />
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive'))
+    return <Archive className="h-4 w-4 text-yellow-600" />
+
+  return <FileText className="h-4 w-4 text-gray-600" />
+}
+
+function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsDeleteDialogProps) {
+  const [currentStep, setCurrentStep] = useState<
+    'warning' | 'confirmation' | 'processing' | 'completed'
+  >('warning')
   const [confirmationText, setConfirmationText] = useState('')
   const [acknowledgeWarning, setAcknowledgeWarning] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
@@ -68,9 +103,25 @@ function ItemsDeleteDialog({ isOpen, onClose, selectedItems }: ItemsDeleteDialog
 
   const fileCount = selectedItems.filter(item => !item.isFolder).length
   const folderCount = selectedItems.filter(item => item.isFolder).length
+  const isConfirmationValid = confirmationText.trim() === 'CONFIRM DELETE' && acknowledgeWarning
 
-  const isConfirmationValid =
-    (confirmationText as string).trim() === 'CONFIRM DELETE' && acknowledgeWarning
+  const handleClose = () => {
+    if (isProcessing) {
+      handleCancel()
+    }
+    setCurrentStep('warning')
+    setConfirmationText('')
+    setAcknowledgeWarning(false)
+    setProgress({
+      current: 0,
+      total: 0,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+    onClose()
+  }
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -81,9 +132,8 @@ function ItemsDeleteDialog({ isOpen, onClose, selectedItems }: ItemsDeleteDialog
     }
 
     setIsProcessing(false)
-    setIsCompleted(true)
-
-    toast.info('Delete operation cancelled by user')
+    setCurrentStep('completed')
+    toast.info('Delete operation cancelled')
   }
 
   const handleDelete = async () => {
@@ -100,486 +150,346 @@ function ItemsDeleteDialog({ isOpen, onClose, selectedItems }: ItemsDeleteDialog
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
-    setIsCompleted(false)
+    setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
 
+    const totalItems = selectedItems.length
+    setProgress({
+      current: 0,
+      total: totalItems,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+
+    let successCount = 0
+    let failedCount = 0
+    let skippedCount = 0
+    const errors: Array<{ file: string; error: string }> = []
+
     try {
-      setProgress({
-        current: 0,
-        total: selectedItems.length,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
-
-      let successCount = 0
-      let failedCount = 0
-      const errors: Array<{ file: string; error: string }> = []
-
       for (let i = 0; i < selectedItems.length; i++) {
         if (isCancelledRef.current) {
-          toast.info(`Delete cancelled after ${successCount} items`)
           break
         }
 
         const item = selectedItems[i]
-        if (!item) continue
-
-        try {
-          setProgress(prev => ({
-            ...prev,
-            current: i + 1,
-            currentFile: item.name,
-          }))
-
-          if (isCancelledRef.current) {
-            break
-          }
-
-          const response = await fetch('/api/drive/files/delete', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              items: [{ id: item.id }],
-            }),
-            signal: abortControllerRef.current?.signal,
-          })
-
-          if (abortControllerRef.current?.signal.aborted) {
-            break
-          }
-
-          const result = await response.json()
-
-          if (result.success) {
-            successCount++
-          } else {
-            throw new Error(result.error || 'Failed to delete item')
-          }
-
-          if (!isCancelledRef.current) {
-            await new Promise(resolve => setTimeout(resolve, 100))
-          }
-        } catch (error: any) {
-          if (abortControllerRef.current?.signal.aborted) {
-            break
-          }
-
-          failedCount++
-          errors.push({
-            file: item.name,
-            error: error.message || 'Delete failed',
-          })
-        }
-
         setProgress(prev => ({
           ...prev,
-          success: successCount,
-          failed: failedCount,
-          errors,
+          current: i + 1,
+          currentFile: item.name,
         }))
 
-        if (isCancelledRef.current) {
-          break
-        }
-      }
+        try {
+          const response = await fetch(`/api/drive/files/${item.id}`, {
+            method: 'DELETE',
+            signal: abortControllerRef.current.signal,
+          })
 
-      if (!isCancelledRef.current) {
-        if (successCount > 0) {
-          toast.success(`Permanently deleted ${successCount} item${successCount > 1 ? 's' : ''}`)
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Delete failed')
+          }
+
+          successCount++
+        } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            break
+          }
+
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          errors.push({ file: item.name, error: errorMessage })
+          failedCount++
         }
-        if (failedCount > 0) {
-          toast.error(`Failed to delete ${failedCount} item${failedCount > 1 ? 's' : ''}`)
-        }
+
+        // Small delay to prevent overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 150))
       }
-    } catch {
-      if (abortControllerRef.current?.signal.aborted) {
-        return
-      }
-      // // // // // console.error(err)
-      toast.error('Delete operation failed')
+    } catch (error) {
+      console.error('Delete operation failed:', error)
     } finally {
-      abortControllerRef.current = null
+      setProgress(prev => ({
+        ...prev,
+        success: successCount,
+        failed: failedCount,
+        skipped: skippedCount,
+        errors,
+      }))
+
       setIsProcessing(false)
-      setIsCompleted(true)
+      setCurrentStep('completed')
+
+      if (isCancelledRef.current) {
+        toast.info('Delete operation cancelled')
+      } else if (successCount > 0) {
+        toast.success(`Successfully deleted ${successCount} item(s) permanently`)
+        onConfirm?.()
+      } else {
+        toast.error('Delete operation failed')
+      }
     }
   }
 
-  const handleClose = () => {
-    if (!isProcessing) {
-      setIsCompleted(false)
-      setIsCancelled(false)
-      isCancelledRef.current = false
-      abortControllerRef.current = null
-      setConfirmationText('')
-      setAcknowledgeWarning(false)
-      setProgress({
-        current: 0,
-        total: 0,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
-      onClose()
-    }
-  }
+  const renderWarningStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <AlertOctagon className="h-5 w-5 text-red-600" />
+        <h3 className="font-semibold text-red-600">Permanent Deletion Warning</h3>
+      </div>
 
-  const handleCloseAndRefresh = () => {
-    if (!isProcessing) {
-      // Refresh immediately to show results
-      window.location.reload()
-    }
-  }
-
-  // Render different content based on state
-  const renderContent = () => {
-    // 1. Initial State - Show confirmation form and items preview
-    if (!isProcessing && !isCompleted) {
-      return (
-        <div className="flex max-h-[60vh] flex-col space-y-4">
-          {/* Header Info - Compact */}
-          <div className="flex-shrink-0 space-y-2 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-                <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-base font-semibold text-red-600">Delete Permanently</h3>
-              <p className="text-muted-foreground text-xs">
-                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} will be permanently
-                deleted
-              </p>
-            </div>
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/20">
+        <div className="space-y-2 text-sm text-red-700 dark:text-red-300">
+          <div className="flex items-center gap-2 font-medium">
+            <Shield className="h-4 w-4" />
+            <span>This action cannot be undone</span>
           </div>
+          <div>• Files will be permanently deleted from Google Drive</div>
+          <div>• Items will not be moved to trash</div>
+          <div>• Recovery will be impossible</div>
+          <div>• Shared access will be immediately revoked</div>
+        </div>
+      </div>
 
-          {/* Stats - Compact */}
-          <div className="flex flex-shrink-0 justify-center gap-1">
-            {fileCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100"
-              >
-                {fileCount} file{fileCount > 1 ? 's' : ''}
-              </Badge>
-            )}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Items to Delete</span>
+          <div className="flex gap-2">
             {folderCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-red-100 text-xs text-red-800 dark:bg-red-900 dark:text-red-100"
-              >
+              <Badge variant="destructive" className="gap-1">
+                <Folder className="h-3 w-3" />
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
-          </div>
-
-          {/* Warning */}
-          <div className="flex-shrink-0 rounded-lg border border-red-200 bg-red-50 p-3 dark:border-red-800 dark:bg-red-950/20">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600 dark:text-red-400" />
-              <div className="text-sm text-red-800 dark:text-red-200">
-                <p className="font-medium">This action cannot be undone!</p>
-                <p>Items will be permanently deleted from Google Drive and cannot be recovered.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Items Preview - Scrollable */}
-          <div className="min-h-0 flex-1 space-y-2">
-            <h4 className="text-center text-xs font-medium">Items to delete:</h4>
-            <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
-              <div className="space-y-1 p-2">
-                {selectedItems.slice(0, 5).map(item => (
-                  <div
-                    key={item.id}
-                    className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
-                  >
-                    <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-red-500" />
-                    <span className="flex-1 truncate font-mono text-xs" title={item.name}>
-                      {item.name}
-                    </span>
-                    <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
-                      {item.isFolder ? 'folder' : 'file'}
-                    </Badge>
-                  </div>
-                ))}
-                {selectedItems.length > 5 && (
-                  <div className="text-muted-foreground py-1 text-center text-xs">
-                    ... and {selectedItems.length - 5} more items
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Confirmation Form */}
-          <div className="flex-shrink-0 space-y-3">
-            <div className="space-y-2">
-              <Label className="text-xs font-medium">
-                Type &quot;CONFIRM DELETE&quot; to proceed:
-              </Label>
-              <Input
-                value={confirmationText}
-                onChange={e => setConfirmationText(e.target.value)}
-                placeholder="CONFIRM DELETE"
-                className="h-8 font-mono text-xs"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="acknowledge"
-                checked={acknowledgeWarning}
-                onCheckedChange={checked => setAcknowledgeWarning(!!checked)}
-                className="h-3 w-3"
-              />
-              <Label htmlFor="acknowledge" className="text-xs">
-                I understand this action is permanent and cannot be undone
-              </Label>
-            </div>
+            {fileCount > 0 && (
+              <Badge variant="destructive" className="gap-1">
+                <FileText className="h-3 w-3" />
+                {fileCount} file{fileCount > 1 ? 's' : ''}
+              </Badge>
+            )}
           </div>
         </div>
-      )
-    }
 
-    // 2. Processing State - Show progress with cancellation
-    if (isProcessing) {
-      const progressPercentage = calculateProgress(progress.current, progress.total)
-
-      return (
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="space-y-2 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
-                <Loader2 className="h-6 w-6 animate-spin text-red-600 dark:text-red-400" />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-base font-semibold">Deleting Items...</h3>
-              <p className="text-muted-foreground text-sm">
-                {progress.current} of {progress.total} items
-              </p>
-            </div>
-          </div>
-
-          {/* Progress */}
+        <ScrollArea className="max-h-48">
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Progress</span>
-              <span>{progressPercentage}%</span>
-            </div>
-            <Progress value={progressPercentage} className="w-full" />
-          </div>
-
-          {/* Current File */}
-          {progress.currentFile && (
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
-                {progress.currentFile}
+            {selectedItems.slice(0, 10).map(item => (
+              <div
+                key={item.id}
+                className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm dark:border-red-800 dark:bg-red-950/10"
+              >
+                {getFileIcon(item.mimeType, item.isFolder)}
+                <span className="truncate">{item.name}</span>
               </div>
-            </div>
-          )}
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-green-600">{progress.success}</div>
-              <div className="text-muted-foreground text-xs">Success</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-              <div className="text-muted-foreground text-xs">Failed</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-blue-600">{progress.current}</div>
-              <div className="text-muted-foreground text-xs">Processed</div>
-            </div>
+            ))}
+            {selectedItems.length > 10 && (
+              <div className="text-muted-foreground text-center text-sm">
+                +{selectedItems.length - 10} more items
+              </div>
+            )}
           </div>
-        </div>
-      )
-    }
+        </ScrollArea>
+      </div>
+    </div>
+  )
 
-    // 3. Completed State - Show results
-    const totalProcessed = progress.success + progress.failed
-    const wasSuccessful = progress.success > 0
-    const hasErrors = progress.failed > 0
+  const renderConfirmationStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Trash2 className="h-5 w-5 text-red-600" />
+        <h3 className="font-semibold">Confirm Permanent Deletion</h3>
+      </div>
 
-    return (
       <div className="space-y-4">
-        {/* Results Header */}
-        <div className="space-y-2 text-center">
-          <div className="flex justify-center">
-            <div
-              className={cn(
-                'flex h-12 w-12 items-center justify-center rounded-full',
-                isCancelled
-                  ? 'bg-orange-100 dark:bg-orange-900/30'
-                  : wasSuccessful && !hasErrors
-                    ? 'bg-green-100 dark:bg-green-900/30'
-                    : hasErrors
-                      ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30',
-              )}
+        <div className="flex items-start space-x-2">
+          <Checkbox
+            id="acknowledge"
+            checked={acknowledgeWarning}
+            onCheckedChange={checked => setAcknowledgeWarning(checked as boolean)}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <Label
+              htmlFor="acknowledge"
+              className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              {isCancelled ? (
-                <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-              ) : wasSuccessful && !hasErrors ? (
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-              ) : hasErrors ? (
-                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-              ) : (
-                <SkipForward className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-              )}
-            </div>
-          </div>
-          <div>
-            <h3 className="text-base font-semibold">
-              {isCancelled
-                ? 'Delete Cancelled'
-                : wasSuccessful && !hasErrors
-                  ? 'Items Deleted'
-                  : hasErrors
-                    ? 'Partially Deleted'
-                    : 'No Items Deleted'}
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              {totalProcessed} of {selectedItems.length} items processed
-            </p>
+              I understand this action is permanent and cannot be undone
+            </Label>
           </div>
         </div>
 
-        {/* Results Summary */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-green-600">{progress.success}</div>
-            <div className="text-muted-foreground text-xs">Deleted</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-            <div className="text-muted-foreground text-xs">Failed</div>
-          </div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-            <div className="text-muted-foreground text-xs">Skipped</div>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirmation" className="text-sm font-medium">
+            Type "CONFIRM DELETE" to proceed
+          </Label>
+          <Input
+            id="confirmation"
+            placeholder="CONFIRM DELETE"
+            value={confirmationText}
+            onChange={e => setConfirmationText(e.target.value)}
+            className={cn(
+              'font-mono',
+              confirmationText.trim() === 'CONFIRM DELETE' &&
+                'border-green-600 bg-green-50 dark:bg-green-950/20',
+            )}
+          />
         </div>
 
-        {/* Error Details */}
-        {progress.errors.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-red-600">Errors:</h4>
-            <div className="max-h-32 space-y-1 overflow-y-auto">
+        <div className="rounded-lg border bg-amber-50 p-3 dark:bg-amber-950/20">
+          <div className="text-sm text-amber-700 dark:text-amber-300">
+            Deleting {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} permanently
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderProcessingStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Loader2 className="h-5 w-5 animate-spin text-red-600" />
+        <h3 className="font-semibold">Deleting Items Permanently</h3>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <span>Progress</span>
+          <span>
+            {progress.current} of {progress.total}
+          </span>
+        </div>
+
+        <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+
+        {progress.currentFile && (
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <ArrowRight className="h-4 w-4" />
+            <span className="truncate">Deleting: {progress.currentFile}</span>
+          </div>
+        )}
+
+        <div className="flex gap-4 text-sm">
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle className="h-4 w-4" />
+            <span>{progress.success} deleted</span>
+          </div>
+          <div className="flex items-center gap-1 text-red-600">
+            <XCircle className="h-4 w-4" />
+            <span>{progress.failed} failed</span>
+          </div>
+          <div className="flex items-center gap-1 text-yellow-600">
+            <SkipForward className="h-4 w-4" />
+            <span>{progress.skipped} skipped</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderCompletedStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">
+          {isCancelled ? 'Deletion Cancelled' : 'Deletion Complete'}
+        </h3>
+      </div>
+
+      {!isCancelled && (
+        <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+          <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+            <div>✓ Permanently deleted {progress.success} item(s)</div>
+            <div>✓ Items removed from Google Drive</div>
+            <div>✓ Recovery is not possible</div>
+          </div>
+        </div>
+      )}
+
+      {progress.failed > 0 && (
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-red-600">
+            Failed to delete {progress.failed} item(s):
+          </div>
+          <ScrollArea className="max-h-32">
+            <div className="space-y-1">
               {progress.errors.map((error, index) => (
-                <div
-                  key={`error-${error.file}-${index}`}
-                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
-                >
-                  <div className="font-medium">{error.file}</div>
-                  <div className="text-red-600 dark:text-red-400">{error.error}</div>
+                <div key={index} className="text-xs text-red-600">
+                  • {error.file}: {error.error}
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </ScrollArea>
+        </div>
+      )}
+    </div>
+  )
 
-        {/* Refresh Notice */}
-        {(progress.success > 0 || progress.failed > 0) && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              Click the button below to refresh and see your updated files.
-            </p>
-          </div>
-        )}
-      </div>
-    )
+  const renderContent = () => {
+    switch (currentStep) {
+      case 'warning':
+        return renderWarningStep()
+      case 'confirmation':
+        return renderConfirmationStep()
+      case 'processing':
+        return renderProcessingStep()
+      case 'completed':
+        return renderCompletedStep()
+      default:
+        return null
+    }
+  }
+
+  const renderFooter = () => {
+    switch (currentStep) {
+      case 'warning':
+        return (
+          <>
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={() => setCurrentStep('confirmation')}>
+              Continue
+            </Button>
+          </>
+        )
+      case 'confirmation':
+        return (
+          <>
+            <Button variant="outline" onClick={() => setCurrentStep('warning')}>
+              Back
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={!isConfirmationValid}>
+              Delete Permanently
+            </Button>
+          </>
+        )
+      case 'processing':
+        return (
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+        )
+      case 'completed':
+        return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
+      default:
+        return null
+    }
   }
 
   if (isMobile) {
     return (
-      <BottomSheet open={isOpen} onOpenChange={handleClose}>
-        <BottomSheetContent className="max-h-[90vh]">
-          <BottomSheetHeader className="pb-4">
-            <BottomSheetTitle className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
-                <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold">Delete Items</div>
-                <div className="text-muted-foreground text-sm font-normal">
-                  Permanent deletion operation
-                </div>
-              </div>
-            </BottomSheetTitle>
+      <BottomSheet open={isOpen} onOpenChange={open => !open && handleClose()}>
+        <BottomSheetContent>
+          <BottomSheetHeader>
+            <BottomSheetTitle className="text-red-600">Delete Items Permanently</BottomSheetTitle>
+            <BottomSheetDescription>
+              Permanently remove selected items from Google Drive. This action cannot be undone.
+            </BottomSheetDescription>
           </BottomSheetHeader>
 
-          <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
+          <div className="flex-1 overflow-y-auto px-4 py-2">{renderContent()}</div>
 
-          <BottomSheetFooter className={cn('grid gap-4')}>
-            {!isProcessing && !isCompleted && (
-              <>
-                <Button
-                  onClick={handleDelete}
-                  disabled={!isConfirmationValid}
-                  className={cn(
-                    'touch-target min-h-[44px] bg-red-600 text-white hover:bg-red-700 active:scale-95',
-                  )}
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Items
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleClose}
-                  className={cn('touch-target min-h-[44px] active:scale-95')}
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
-            {isProcessing && (
-              <Button
-                onClick={handleCancel}
-                variant="outline"
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
-                <XCircle className="mr-2 h-4 w-4" />
-                Cancel Delete
-              </Button>
-            )}
-            {isCompleted && (
-              <>
-                {progress.success > 0 || progress.failed > 0 ? (
-                  <Button
-                    onClick={handleCloseAndRefresh}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Refresh Now
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleClose}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Close
-                  </Button>
-                )}
-                {(progress.success > 0 || progress.failed > 0) && (
-                  <Button
-                    onClick={handleClose}
-                    variant="outline"
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    Close Without Refresh
-                  </Button>
-                )}
-              </>
-            )}
+          <BottomSheetFooter>
+            <div className="flex gap-2">{renderFooter()}</div>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
@@ -587,71 +497,22 @@ function ItemsDeleteDialog({ isOpen, onClose, selectedItems }: ItemsDeleteDialog
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg">
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/20">
-              <Trash2 className="h-5 w-5 text-red-600 dark:text-red-400" />
-            </div>
-            <div>
-              <div className="text-lg font-semibold">Delete Items</div>
-              <div className="text-muted-foreground text-sm font-normal">
-                Permanent deletion operation
-              </div>
-            </div>
-          </DialogTitle>
+          <DialogTitle className="text-red-600">Delete Items Permanently</DialogTitle>
+          <DialogDescription>
+            Permanently remove selected items from Google Drive. This action cannot be undone.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">{renderContent()}</div>
+        <div className="max-h-[60vh] overflow-y-auto">{renderContent()}</div>
 
-        <DialogFooter className="flex flex-col gap-2 sm:flex-row">
-          {!isProcessing && !isCompleted && (
-            <>
-              <Button
-                onClick={handleDelete}
-                disabled={!isConfirmationValid}
-                className="w-full bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 sm:w-auto dark:bg-red-700 dark:hover:bg-red-800"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete Items
-              </Button>
-              <Button variant="outline" onClick={handleClose} className="w-full sm:w-auto">
-                Cancel
-              </Button>
-            </>
-          )}
-          {isProcessing && (
-            <Button onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
-              <XCircle className="mr-2 h-4 w-4" />
-              Cancel Delete
-            </Button>
-          )}
-          {isCompleted && (
-            <>
-              {progress.success > 0 || progress.failed > 0 ? (
-                <Button onClick={handleCloseAndRefresh} className="w-full sm:w-auto">
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Refresh Now
-                </Button>
-              ) : (
-                <Button onClick={handleClose} className="w-full sm:w-auto">
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Close
-                </Button>
-              )}
-              {(progress.success > 0 || progress.failed > 0) && (
-                <Button onClick={handleClose} variant="outline" className="w-full sm:w-auto">
-                  Close Without Refresh
-                </Button>
-              )}
-            </>
-          )}
-        </DialogFooter>
+        <DialogFooter>{renderFooter()}</DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
 
-export { ItemsDeleteDialog }
 export default ItemsDeleteDialog
+export { ItemsDeleteDialog }

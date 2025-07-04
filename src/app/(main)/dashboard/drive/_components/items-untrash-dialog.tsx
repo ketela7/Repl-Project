@@ -1,36 +1,53 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { RotateCcw, Loader2, CheckCircle, XCircle, AlertTriangle, SkipForward } from 'lucide-react'
+import {
+  RotateCcw,
+  Loader2,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  SkipForward,
+  ArrowRight,
+  FileText,
+  Image,
+  Video,
+  Music,
+  Archive,
+  File,
+  Folder,
+  RefreshCw,
+  Info,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import {
   BottomSheet,
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
+  BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { successToast, errorToast } from '@/components/ui/toast'
 import { cn, calculateProgress } from '@/lib/utils'
 
 interface ItemsUntrashDialogProps {
   isOpen: boolean
   onClose: () => void
-  _onConfirm: () => void
+  onConfirm?: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -39,9 +56,29 @@ interface ItemsUntrashDialogProps {
   }>
 }
 
-function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDialogProps) {
+function getFileIcon(mimeType: string | undefined, isFolder: boolean) {
+  if (isFolder) return <Folder className="h-4 w-4 text-blue-600" />
+  if (!mimeType) return <File className="h-4 w-4 text-gray-600" />
+
+  if (mimeType.startsWith('image/')) return <Image className="h-4 w-4 text-green-600" />
+  if (mimeType.startsWith('video/')) return <Video className="h-4 w-4 text-purple-600" />
+  if (mimeType.startsWith('audio/')) return <Music className="h-4 w-4 text-orange-600" />
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive'))
+    return <Archive className="h-4 w-4 text-yellow-600" />
+
+  return <FileText className="h-4 w-4 text-gray-600" />
+}
+
+function ItemsUntrashDialog({
+  isOpen,
+  onClose,
+  onConfirm,
+  selectedItems,
+}: ItemsUntrashDialogProps) {
+  const [currentStep, setCurrentStep] = useState<'confirmation' | 'processing' | 'completed'>(
+    'confirmation',
+  )
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
@@ -67,6 +104,22 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
   const fileCount = selectedItems.filter(item => !item.isFolder).length
   const folderCount = selectedItems.filter(item => item.isFolder).length
 
+  const handleClose = () => {
+    if (isProcessing) {
+      handleCancel()
+    }
+    setCurrentStep('confirmation')
+    setProgress({
+      current: 0,
+      total: 0,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+    onClose()
+  }
+
   const handleCancel = () => {
     isCancelledRef.current = true
     setIsCancelled(true)
@@ -76,473 +129,315 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
     }
 
     setIsProcessing(false)
-    setIsCompleted(true)
-
-    toast.info('Untrash operation cancelled by user')
+    setCurrentStep('completed')
+    toast.info('Restore operation cancelled')
   }
 
   const handleUntrash = async () => {
     if (selectedItems.length === 0) {
-      toast.error('No items selected for untrashing')
+      toast.error('No items selected for restoring')
       return
     }
 
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
-    setIsCompleted(false)
+    setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
 
+    const totalItems = selectedItems.length
+    setProgress({
+      current: 0,
+      total: totalItems,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+
+    let successCount = 0
+    let failedCount = 0
+    let skippedCount = 0
+    const errors: Array<{ file: string; error: string }> = []
+
     try {
-      setProgress({
-        current: 0,
-        total: selectedItems.length,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
-
-      let successCount = 0
-      let failedCount = 0
-      const errors: Array<{ file: string; error: string }> = []
-
       for (let i = 0; i < selectedItems.length; i++) {
         if (isCancelledRef.current) {
-          toast.info(`Untrash cancelled after ${successCount} items`)
           break
         }
 
         const item = selectedItems[i]
-        if (!item) continue
-
-        try {
-          setProgress(prev => ({
-            ...prev,
-            current: i + 1,
-            currentFile: item.name,
-          }))
-
-          if (isCancelledRef.current) {
-            break
-          }
-
-          const response = await fetch('/api/drive/files/untrash', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              items: [{ id: item.id }],
-            }),
-            signal: abortControllerRef.current?.signal,
-          })
-
-          if (abortControllerRef.current?.signal.aborted) {
-            break
-          }
-
-          const result = await response.json()
-
-          if (result.success) {
-            successCount++
-          } else {
-            throw new Error(result.error || 'Failed to restore item')
-          }
-
-          if (!isCancelledRef.current) {
-            await new Promise(resolve => setTimeout(resolve, 100))
-          }
-        } catch (error: any) {
-          if (abortControllerRef.current?.signal.aborted) {
-            break
-          }
-
-          failedCount++
-          errors.push({
-            file: item.name,
-            error: error.message || 'Restore failed',
-          })
-        }
-
         setProgress(prev => ({
           ...prev,
-          success: successCount,
-          failed: failedCount,
-          errors,
+          current: i + 1,
+          currentFile: item.name,
         }))
 
-        if (isCancelledRef.current) {
-          break
-        }
-      }
+        try {
+          const response = await fetch('/api/drive/untrash', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fileId: item.id,
+            }),
+            signal: abortControllerRef.current.signal,
+          })
 
-      if (!isCancelledRef.current) {
-        if (successCount > 0) {
-          successToast.generic(
-            `Untrashed ${successCount} item${successCount > 1 ? 's' : ''} from trash`,
-          )
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Restore failed')
+          }
+
+          successCount++
+        } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
+            break
+          }
+
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          errors.push({ file: item.name, error: errorMessage })
+          failedCount++
         }
-        if (failedCount > 0) {
-          errorToast.generic(`Failed to untrash ${failedCount} item${failedCount > 1 ? 's' : ''}`)
-        }
+
+        // Small delay to prevent overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 100))
       }
-    } catch {
-      if (abortControllerRef.current?.signal.aborted) {
-        return
-      }
-      // // // // // console.error(err)
-      errorToast.generic('Untrash operation failed')
+    } catch (error) {
+      console.error('Untrash operation failed:', error)
     } finally {
-      abortControllerRef.current = null
+      setProgress(prev => ({
+        ...prev,
+        success: successCount,
+        failed: failedCount,
+        skipped: skippedCount,
+        errors,
+      }))
+
       setIsProcessing(false)
-      setIsCompleted(true)
+      setCurrentStep('completed')
+
+      if (isCancelledRef.current) {
+        toast.info('Restore operation cancelled')
+      } else if (successCount > 0) {
+        toast.success(`Successfully restored ${successCount} item(s) from trash`)
+        onConfirm?.()
+      } else {
+        toast.error('Restore operation failed')
+      }
     }
   }
 
-  const handleClose = () => {
-    if (!isProcessing) {
-      setIsCompleted(false)
-      setIsCancelled(false)
-      isCancelledRef.current = false
-      abortControllerRef.current = null
-      setProgress({
-        current: 0,
-        total: 0,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
-      onClose()
-    }
-  }
+  const renderConfirmationStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <RefreshCw className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">Restore Items from Trash</h3>
+      </div>
 
-  const handleCloseAndRefresh = () => {
-    if (!isProcessing) {
-      // Refresh immediately to show results
-      window.location.reload()
-    }
-  }
-
-  // Render different content based on state
-  const renderContent = () => {
-    // 1. Initial State - Show confirmation and items preview
-    if (!isProcessing && !isCompleted) {
-      return (
-        <div className="space-y-4">
-          {/* Header Info */}
-          <div className="space-y-2 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                <RotateCcw className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-base font-semibold">Untrash Items</h3>
-              <p className="text-muted-foreground text-sm">
-                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} will be restored
-              </p>
-            </div>
+      <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+        <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+          <div className="flex items-center gap-2 font-medium">
+            <Info className="h-4 w-4" />
+            <span>Items will be restored to their original location</span>
           </div>
+          <div>• Files will be moved out of trash</div>
+          <div>• Original folder structure will be maintained</div>
+          <div>• Sharing permissions will be reactivated</div>
+          <div>• Items will be fully accessible again</div>
+        </div>
+      </div>
 
-          {/* Stats */}
-          <div className="flex justify-center gap-2">
-            {fileCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-              >
-                {fileCount} file{fileCount > 1 ? 's' : ''}
-              </Badge>
-            )}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Selected Items</span>
+          <div className="flex gap-2">
             {folderCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100"
-              >
+              <Badge variant="secondary" className="gap-1">
+                <Folder className="h-3 w-3" />
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
-          </div>
-
-          {/* Items Preview */}
-          {selectedItems.length <= 5 ? (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Items to restore:</h4>
-              <div className="max-h-32 overflow-y-auto rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-                <ul className="space-y-1 text-sm">
-                  {selectedItems.map(item => (
-                    <li key={item.id} className="flex items-center gap-2 truncate">
-                      <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                      <span className="truncate">{item.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Preview (first 3 items):</h4>
-              <div className="rounded-md bg-slate-50 p-3 dark:bg-slate-900/50">
-                <ul className="space-y-1 text-sm">
-                  {selectedItems.slice(0, 3).map(item => (
-                    <li key={item.id} className="flex items-center gap-2 truncate">
-                      <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-400" />
-                      <span className="truncate">{item.name}</span>
-                    </li>
-                  ))}
-                  <li className="text-muted-foreground/70 flex items-center gap-2 italic">
-                    <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-slate-300" />
-                    and {selectedItems.length - 3} more items...
-                  </li>
-                </ul>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
-            <div className="mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full bg-blue-500">
-              <div className="h-1.5 w-1.5 rounded-full bg-white" />
-            </div>
-            <div className="text-sm text-blue-800 dark:text-blue-200">
-              Items will be restored to their original location in Google Drive.
-            </div>
+            {fileCount > 0 && (
+              <Badge variant="secondary" className="gap-1">
+                <FileText className="h-3 w-3" />
+                {fileCount} file{fileCount > 1 ? 's' : ''}
+              </Badge>
+            )}
           </div>
         </div>
-      )
-    }
 
-    // 2. Processing State - Show progress with cancellation
-    if (isProcessing) {
-      const progressPercentage = calculateProgress(progress.current, progress.total)
-
-      return (
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="space-y-2 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-600 dark:text-blue-400" />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-base font-semibold">Restoring Items...</h3>
-              <p className="text-muted-foreground text-sm">
-                {progress.current} of {progress.total} items
-              </p>
-            </div>
-          </div>
-
-          {/* Progress */}
+        <ScrollArea className="max-h-48">
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Progress</span>
-              <span>{progressPercentage}%</span>
-            </div>
-            <Progress value={progressPercentage} className="w-full" />
-          </div>
-
-          {/* Current File */}
-          {progress.currentFile && (
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
-                {progress.currentFile}
+            {selectedItems.slice(0, 10).map(item => (
+              <div key={item.id} className="flex items-center gap-2 rounded-lg border p-2 text-sm">
+                {getFileIcon(item.mimeType, item.isFolder)}
+                <span className="truncate">{item.name}</span>
               </div>
-            </div>
-          )}
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-green-600">{progress.success}</div>
-              <div className="text-muted-foreground text-xs">Success</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-              <div className="text-muted-foreground text-xs">Failed</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-              <div className="text-muted-foreground text-xs">Skipped</div>
-            </div>
+            ))}
+            {selectedItems.length > 10 && (
+              <div className="text-muted-foreground text-center text-sm">
+                +{selectedItems.length - 10} more items
+              </div>
+            )}
           </div>
+        </ScrollArea>
+      </div>
+
+      <div className="rounded-lg border bg-blue-50 p-3 dark:bg-blue-950/20">
+        <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+          <RotateCcw className="h-4 w-4" />
+          <span>Items will return to their original folders and become accessible</span>
         </div>
-      )
-    }
+      </div>
+    </div>
+  )
 
-    // 3. Completed State - Show results
-    const totalProcessed = progress.success + progress.failed + progress.skipped
-    const wasSuccessful = progress.success > 0
-    const hasErrors = progress.failed > 0
+  const renderProcessingStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Loader2 className="h-5 w-5 animate-spin text-green-600" />
+        <h3 className="font-semibold">Restoring Items from Trash</h3>
+      </div>
 
-    return (
-      <div className="space-y-4">
-        {/* Results Header */}
-        <div className="space-y-2 text-center">
-          <div className="flex justify-center">
-            <div
-              className={cn(
-                'flex h-12 w-12 items-center justify-center rounded-full',
-                isCancelled
-                  ? 'bg-orange-100 dark:bg-orange-900/30'
-                  : wasSuccessful && !hasErrors
-                    ? 'bg-green-100 dark:bg-green-900/30'
-                    : hasErrors
-                      ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30',
-              )}
-            >
-              {isCancelled ? (
-                <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-              ) : wasSuccessful && !hasErrors ? (
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-              ) : hasErrors ? (
-                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-              ) : (
-                <SkipForward className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-              )}
-            </div>
-          </div>
-          <div>
-            <h3 className="text-base font-semibold">
-              {isCancelled
-                ? 'Untrash Cancelled'
-                : wasSuccessful && !hasErrors
-                  ? 'Items Untrashed'
-                  : hasErrors
-                    ? 'Partially Untrashed'
-                    : 'No Items Untrashed'}
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              {totalProcessed} of {selectedItems.length} items processed
-            </p>
-          </div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <span>Progress</span>
+          <span>
+            {progress.current} of {progress.total}
+          </span>
         </div>
 
-        {/* Results Summary */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-green-600">{progress.success}</div>
-            <div className="text-muted-foreground text-xs">Untrashed</div>
+        <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+
+        {progress.currentFile && (
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <ArrowRight className="h-4 w-4" />
+            <span className="truncate">Restoring: {progress.currentFile}</span>
           </div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-            <div className="text-muted-foreground text-xs">Failed</div>
+        )}
+
+        <div className="flex gap-4 text-sm">
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle className="h-4 w-4" />
+            <span>{progress.success} restored</span>
           </div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-            <div className="text-muted-foreground text-xs">Skipped</div>
+          <div className="flex items-center gap-1 text-red-600">
+            <XCircle className="h-4 w-4" />
+            <span>{progress.failed} failed</span>
+          </div>
+          <div className="flex items-center gap-1 text-yellow-600">
+            <SkipForward className="h-4 w-4" />
+            <span>{progress.skipped} skipped</span>
           </div>
         </div>
+      </div>
+    </div>
+  )
 
-        {/* Error Details */}
-        {progress.errors.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-red-600">Errors:</h4>
-            <div className="max-h-32 space-y-1 overflow-y-auto">
+  const renderCompletedStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">
+          {isCancelled ? 'Restore Operation Cancelled' : 'Items Restored Successfully'}
+        </h3>
+      </div>
+
+      {!isCancelled && (
+        <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+          <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+            <div>✓ Successfully restored {progress.success} item(s) from trash</div>
+            <div>✓ Items returned to their original locations</div>
+            <div>✓ Full access and sharing permissions restored</div>
+          </div>
+        </div>
+      )}
+
+      {progress.failed > 0 && (
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-red-600">
+            Failed to restore {progress.failed} item(s):
+          </div>
+          <ScrollArea className="max-h-32">
+            <div className="space-y-1">
               {progress.errors.map((error, index) => (
-                <div
-                  key={`error-${error.file}-${index}`}
-                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
-                >
-                  <div className="font-medium">{error.file}</div>
-                  <div className="text-red-600 dark:text-red-400">{error.error}</div>
+                <div key={index} className="text-xs text-red-600">
+                  • {error.file}: {error.error}
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </ScrollArea>
+        </div>
+      )}
 
-        {/* Refresh Notice */}
-        {(progress.success > 0 || progress.failed > 0) && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              Click the button below to refresh and see your updated files.
-            </p>
+      {!isCancelled && progress.success > 0 && (
+        <div className="rounded-lg border bg-amber-50 p-3 dark:bg-amber-950/20">
+          <div className="text-sm text-amber-700 dark:text-amber-300">
+            💡 Tip: Check your Google Drive folders to find the restored items in their original
+            locations
           </div>
-        )}
-      </div>
-    )
+        </div>
+      )}
+    </div>
+  )
+
+  const renderContent = () => {
+    switch (currentStep) {
+      case 'confirmation':
+        return renderConfirmationStep()
+      case 'processing':
+        return renderProcessingStep()
+      case 'completed':
+        return renderCompletedStep()
+      default:
+        return null
+    }
+  }
+
+  const renderFooter = () => {
+    switch (currentStep) {
+      case 'confirmation':
+        return (
+          <>
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleUntrash} disabled={selectedItems.length === 0}>
+              Restore Items
+            </Button>
+          </>
+        )
+      case 'processing':
+        return (
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+        )
+      case 'completed':
+        return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
+      default:
+        return null
+    }
   }
 
   if (isMobile) {
     return (
-      <BottomSheet open={isOpen} onOpenChange={handleClose}>
-        <BottomSheetContent className="max-h-[90vh]">
-          <BottomSheetHeader className="pb-4">
-            <BottomSheetTitle className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                <RotateCcw className="h-5 w-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold">Untrash Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Untrash operation</div>
-              </div>
-            </BottomSheetTitle>
+      <BottomSheet open={isOpen} onOpenChange={open => !open && handleClose()}>
+        <BottomSheetContent>
+          <BottomSheetHeader>
+            <BottomSheetTitle>Restore Items from Trash</BottomSheetTitle>
+            <BottomSheetDescription>
+              Restore selected items from Google Drive trash to their original locations.
+            </BottomSheetDescription>
           </BottomSheetHeader>
 
-          <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
+          <div className="flex-1 overflow-y-auto px-4 py-2">{renderContent()}</div>
 
-          <BottomSheetFooter className={cn('grid gap-4')}>
-            {!isProcessing && !isCompleted && (
-              <>
-                <Button
-                  onClick={handleUntrash}
-                  className={`${cn('touch-target min-h-[44px] active:scale-95')} bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 dark:bg-green-700 dark:hover:bg-green-800`}
-                >
-                  <RotateCcw className="mr-2 h-4 w-4" />
-                  Untrash Items
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleClose}
-                  className={cn('touch-target min-h-[44px] active:scale-95')}
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
-            {isProcessing && (
-              <Button
-                onClick={handleCancel}
-                variant="outline"
-                className={cn('touch-target min-h-[44px] active:scale-95')}
-              >
-                <XCircle className="mr-2 h-4 w-4" />
-                Cancel Operation
-              </Button>
-            )}
-            {isCompleted && (
-              <>
-                {progress.success > 0 || progress.failed > 0 ? (
-                  <Button
-                    onClick={handleCloseAndRefresh}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Refresh Now
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handleClose}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Close
-                  </Button>
-                )}
-                {(progress.success > 0 || progress.failed > 0) && (
-                  <Button
-                    onClick={handleClose}
-                    variant="outline"
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    Close Without Refresh
-                  </Button>
-                )}
-              </>
-            )}
+          <BottomSheetFooter>
+            <div className="flex gap-2">{renderFooter()}</div>
           </BottomSheetFooter>
         </BottomSheetContent>
       </BottomSheet>
@@ -550,66 +445,22 @@ function ItemsUntrashDialog({ isOpen, onClose, selectedItems }: ItemsUntrashDial
   }
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={handleClose}>
-      <AlertDialogContent className="sm:max-w-md">
-        <AlertDialogHeader>
-          <AlertDialogTitle className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-              <RotateCcw className="h-5 w-5 text-green-600 dark:text-green-400" />
-            </div>
-            <div>
-              <div className="text-lg font-semibold">Untrash Items</div>
-              <div className="text-muted-foreground text-sm font-normal">Untrash operation</div>
-            </div>
-          </AlertDialogTitle>
-        </AlertDialogHeader>
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Restore Items from Trash</DialogTitle>
+          <DialogDescription>
+            Restore selected items from Google Drive trash to their original locations.
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="space-y-4 px-1">{renderContent()}</div>
+        <div className="max-h-[60vh] overflow-y-auto">{renderContent()}</div>
 
-        <AlertDialogFooter className="flex flex-col gap-2 sm:flex-row">
-          {!isProcessing && !isCompleted && (
-            <>
-              <AlertDialogAction
-                onClick={handleUntrash}
-                className="w-full bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 sm:w-auto dark:bg-green-700 dark:hover:bg-green-800"
-              >
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Untrash Items
-              </AlertDialogAction>
-              <AlertDialogCancel className="w-full sm:w-auto">Cancel</AlertDialogCancel>
-            </>
-          )}
-          {isProcessing && (
-            <Button onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
-              <XCircle className="mr-2 h-4 w-4" />
-              Cancel Operation
-            </Button>
-          )}
-          {isCompleted && (
-            <>
-              {progress.success > 0 || progress.failed > 0 ? (
-                <Button onClick={handleCloseAndRefresh} className="w-full sm:w-auto">
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Refresh Now
-                </Button>
-              ) : (
-                <Button onClick={handleClose} className="w-full sm:w-auto">
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Close
-                </Button>
-              )}
-              {(progress.success > 0 || progress.failed > 0) && (
-                <Button onClick={handleClose} variant="outline" className="w-full sm:w-auto">
-                  Close Without Refresh
-                </Button>
-              )}
-            </>
-          )}
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+        <DialogFooter>{renderFooter()}</DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
-export { ItemsUntrashDialog }
 export default ItemsUntrashDialog
+export { ItemsUntrashDialog }

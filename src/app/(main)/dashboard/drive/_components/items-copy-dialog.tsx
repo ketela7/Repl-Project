@@ -3,13 +3,22 @@
 import { useState, useRef } from 'react'
 import {
   Copy,
-  AlertTriangle,
   Loader2,
   Folder,
-  ArrowLeft,
+  FolderOpen,
   CheckCircle,
   XCircle,
+  AlertTriangle,
   SkipForward,
+  Home,
+  ArrowRight,
+  FileText,
+  Image,
+  Video,
+  Music,
+  Archive,
+  File,
+  Files,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -21,19 +30,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Label } from '@/components/ui/label'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
   BottomSheet,
   BottomSheetContent,
   BottomSheetHeader,
   BottomSheetTitle,
   BottomSheetFooter,
+  BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Progress } from '@/components/ui/progress'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { DriveDestinationSelector } from '@/components/drive-destination-selector'
 import { cn, calculateProgress } from '@/lib/utils'
 
@@ -45,21 +55,31 @@ interface ItemsCopyDialogProps {
     id: string
     name: string
     isFolder: boolean
+    mimeType?: string
   }>
 }
 
-function ItemsCopyDialog({
-  isOpen,
-  onClose,
-  onConfirm: _onConfirm,
-  selectedItems,
-}: ItemsCopyDialogProps) {
-  const [showDestinationSelector, setShowDestinationSelector] = useState(false)
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
-  const [isCancelled, setIsCancelled] = useState(false)
+function getFileIcon(mimeType: string | undefined, isFolder: boolean) {
+  if (isFolder) return <Folder className="h-4 w-4 text-blue-600" />
+  if (!mimeType) return <File className="h-4 w-4 text-gray-600" />
+
+  if (mimeType.startsWith('image/')) return <Image className="h-4 w-4 text-green-600" />
+  if (mimeType.startsWith('video/')) return <Video className="h-4 w-4 text-purple-600" />
+  if (mimeType.startsWith('audio/')) return <Music className="h-4 w-4 text-orange-600" />
+  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive'))
+    return <Archive className="h-4 w-4 text-yellow-600" />
+
+  return <FileText className="h-4 w-4 text-gray-600" />
+}
+
+function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCopyDialogProps) {
+  const [currentStep, setCurrentStep] = useState<
+    'selection' | 'destination' | 'processing' | 'completed'
+  >('selection')
   const [selectedFolderId, setSelectedFolderId] = useState<string>('root')
   const [selectedFolderName, setSelectedFolderName] = useState<string>('My Drive')
+  const [isProcessing, setIsProcessing] = useState(false)
+  const [isCancelled, setIsCancelled] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -77,7 +97,6 @@ function ItemsCopyDialog({
     errors: [],
   })
 
-  // Use ref for immediate cancellation control
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
@@ -85,21 +104,40 @@ function ItemsCopyDialog({
   const fileCount = selectedItems.filter(item => !item.isFolder).length
   const folderCount = selectedItems.filter(item => item.isFolder).length
 
+  const handleClose = () => {
+    if (isProcessing) {
+      handleCancel()
+    }
+    setCurrentStep('selection')
+    setSelectedFolderId('root')
+    setSelectedFolderName('My Drive')
+    setProgress({
+      current: 0,
+      total: 0,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+    onClose()
+  }
+
   const handleCancel = () => {
-    // Immediately set cancellation flags
     isCancelledRef.current = true
     setIsCancelled(true)
 
-    // Abort any ongoing network requests
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()
     }
 
-    // Stop processing
     setIsProcessing(false)
-    setIsCompleted(true)
+    setCurrentStep('completed')
+    toast.info('Copy operation cancelled')
+  }
 
-    toast.info('Copy operation cancelled by user')
+  const handleDestinationSelect = (folderId: string, folderName?: string) => {
+    setSelectedFolderId(folderId)
+    setSelectedFolderName(folderName || 'My Drive')
   }
 
   const handleCopy = async () => {
@@ -108,698 +146,346 @@ function ItemsCopyDialog({
       return
     }
 
-    // Reset cancellation flags
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
-    setIsCompleted(false)
+    setCurrentStep('processing')
 
-    // Create new AbortController for this operation
     abortControllerRef.current = new AbortController()
 
+    const totalItems = selectedItems.length
+    setProgress({
+      current: 0,
+      total: totalItems,
+      success: 0,
+      skipped: 0,
+      failed: 0,
+      errors: [],
+    })
+
+    let successCount = 0
+    let failedCount = 0
+    let skippedCount = 0
+    const errors: Array<{ file: string; error: string }> = []
+
     try {
-      // Initialize progress
-      setProgress({
-        current: 0,
-        total: selectedItems.length,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
-
-      // Ensure progress UI is visible before starting operations
-      await new Promise(resolve => setTimeout(resolve, 300))
-
-      let successCount = 0
-      let failedCount = 0
-      const errors: Array<{ file: string; error: string }> = []
-
-      // Copy items with progress tracking and cancellation support
       for (let i = 0; i < selectedItems.length; i++) {
-        // Check cancellation using ref (immediate)
         if (isCancelledRef.current) {
-          toast.info(`Copy cancelled after ${successCount} items`)
           break
         }
 
         const item = selectedItems[i]
-        if (!item) continue
+        setProgress(prev => ({
+          ...prev,
+          current: i + 1,
+          currentFile: item.name,
+        }))
 
         try {
-          setProgress(prev => ({
-            ...prev,
-            current: i + 1,
-            currentFile: item.name,
-          }))
+          const response = await fetch('/api/drive/copy', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fileId: item.id,
+              destinationId: selectedFolderId,
+              name: `Copy of ${item.name}`,
+            }),
+            signal: abortControllerRef.current.signal,
+          })
 
-          // Check cancellation before API call
-          if (isCancelledRef.current) {
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(errorData.error || 'Copy failed')
+          }
+
+          successCount++
+        } catch (error) {
+          if (error instanceof Error && error.name === 'AbortError') {
             break
           }
 
-          const response = await fetch('/api/drive/files/copy', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              items: [{ id: item.id, name: item.name }],
-              targetFolderId: selectedFolderId,
-            }),
-            signal: abortControllerRef.current?.signal,
-          })
-
-          if (abortControllerRef.current?.signal.aborted) {
-            break // Operation was cancelled
-          }
-
-          const result = await response.json()
-
-          if (result.success) {
-            successCount++
-          } else {
-            throw new Error(result.error || 'Failed to copy item')
-          }
-
-          // Delay between items to show progress and allow cancellation
-          if (!isCancelledRef.current) {
-            await new Promise(resolve => setTimeout(resolve, 500))
-          }
-        } catch (error: any) {
-          if (abortControllerRef.current?.signal.aborted) {
-            break // Operation was cancelled
-          }
-
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          errors.push({ file: item.name, error: errorMessage })
           failedCount++
-          errors.push({
-            file: item.name,
-            error: error.message || 'Copy failed',
-          })
         }
 
-        // Update progress
-        setProgress(prev => ({
-          ...prev,
-          success: successCount,
-          failed: failedCount,
-          errors,
-        }))
-
-        // Final cancellation check
-        if (isCancelledRef.current) {
-          break
-        }
+        // Small delay to prevent overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, 100))
       }
-
-      // Show results only if not cancelled
-      if (!isCancelledRef.current) {
-        // Ensure completion state is visible for at least 1 second
-        setIsCompleted(true)
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        if (successCount > 0) {
-          toast.success(
-            `Copied ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`,
-          )
-        }
-        if (failedCount > 0) {
-          toast.error(`Failed to copy ${failedCount} item${failedCount > 1 ? 's' : ''}`)
-        }
-      }
-    } catch (err) {
-      if (abortControllerRef.current?.signal.aborted) {
-        // Operation was cancelled, don't show error
-        return
-      }
-      toast.error('Copy operation failed')
+    } catch (error) {
+      console.error('Copy operation failed:', error)
     } finally {
-      // Clean up
-      abortControllerRef.current = null
+      setProgress(prev => ({
+        ...prev,
+        success: successCount,
+        failed: failedCount,
+        skipped: skippedCount,
+        errors,
+      }))
+
       setIsProcessing(false)
-      if (!isCompleted) {
-        setIsCompleted(true)
+      setCurrentStep('completed')
+
+      if (isCancelledRef.current) {
+        toast.info('Copy operation cancelled')
+      } else if (successCount > 0) {
+        toast.success(`Successfully copied ${successCount} item(s)`)
+        onConfirm()
+      } else {
+        toast.error('Copy operation failed')
       }
     }
   }
 
-  const handleClose = () => {
-    if (!isProcessing) {
-      // Reset states when closing
-      setIsCompleted(false)
-      setIsCancelled(false)
-      isCancelledRef.current = false
-      abortControllerRef.current = null
-      setShowDestinationSelector(false)
-      setProgress({
-        current: 0,
-        total: 0,
-        success: 0,
-        skipped: 0,
-        failed: 0,
-        errors: [],
-      })
-      onClose()
-    }
-  }
+  const renderSelectionStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Files className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">Copy Items</h3>
+      </div>
 
-  const handleCloseAndRefresh = () => {
-    if (!isProcessing) {
-      // Refresh immediately to show results
-      window.location.reload()
-    }
-  }
+      <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+        <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
+          <Copy className="h-4 w-4" />
+          <span>Copying will create duplicates in the destination folder</span>
+        </div>
+      </div>
 
-  const handleDestinationSelect = (folderId: string, folderName?: string) => {
-    setSelectedFolderId(folderId)
-    setSelectedFolderName(folderName || (folderId === 'root' ? 'My Drive' : 'Selected Folder'))
-  }
-
-  const handleBackToMainDialog = () => {
-    setShowDestinationSelector(false)
-  }
-
-  const handleConfirmDestinationAndCopy = () => {
-    setShowDestinationSelector(false)
-    setIsProcessing(true)
-    // Trigger copy operation immediately
-    setTimeout(() => {
-      handleCopy()
-    }, 100)
-  }
-
-  // Render different content based on state
-  const renderContent = () => {
-    // 1. Initial State - Show selection and destination options
-    if (!isProcessing && !isCompleted) {
-      return (
-        <div className="flex max-h-[60vh] flex-col space-y-4">
-          {/* Header Info - Compact */}
-          <div className="flex-shrink-0 space-y-2 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                <Copy className="h-6 w-6 text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-base font-semibold">Copy Items</h3>
-              <p className="text-muted-foreground text-xs">
-                {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
-              </p>
-            </div>
-          </div>
-
-          {/* Stats - Compact */}
-          <div className="flex flex-shrink-0 justify-center gap-1">
-            {fileCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-green-100 text-xs text-green-800 dark:bg-green-900 dark:text-green-100"
-              >
-                {fileCount} file{fileCount > 1 ? 's' : ''}
-              </Badge>
-            )}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium">Selected Items</span>
+          <div className="flex gap-2">
             {folderCount > 0 && (
-              <Badge
-                variant="secondary"
-                className="bg-amber-100 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-100"
-              >
+              <Badge variant="secondary" className="gap-1">
+                <Folder className="h-3 w-3" />
                 {folderCount} folder{folderCount > 1 ? 's' : ''}
               </Badge>
             )}
-          </div>
-
-          {/* Items Preview - ScrollArea */}
-          <div className="min-h-0 flex-1 space-y-2">
-            <h4 className="text-center text-xs font-medium">Items to copy:</h4>
-            <div className="bg-muted/50 flex-1 rounded-lg border">
-              <ScrollArea className="h-[120px] w-full">
-                <div className="space-y-1 p-2">
-                  {selectedItems.map(item => (
-                    <div
-                      key={item.id}
-                      className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
-                    >
-                      <div className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
-                      <span className="flex-1 truncate font-mono text-xs" title={item.name}>
-                        {item.name}
-                      </span>
-                      <Badge variant="outline" className="flex-shrink-0 px-1 py-0 text-[10px]">
-                        {item.isFolder ? 'folder' : 'file'}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          </div>
-
-          {/* Destination Selection */}
-          <div className="flex-shrink-0 space-y-2">
-            <div className="flex items-center justify-between">
-              <Label className="text-xs font-medium">Destination:</Label>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowDestinationSelector(true)}
-                className="h-7 text-xs"
-              >
-                <Folder className="mr-1 h-3 w-3" />
-                Choose
-              </Button>
-            </div>
-            <div className="bg-muted/30 rounded-md border p-2">
-              <div className="text-muted-foreground text-xs">Copying to:</div>
-              <div className="text-sm font-medium">{selectedFolderName}</div>
-            </div>
+            {fileCount > 0 && (
+              <Badge variant="secondary" className="gap-1">
+                <FileText className="h-3 w-3" />
+                {fileCount} file{fileCount > 1 ? 's' : ''}
+              </Badge>
+            )}
           </div>
         </div>
-      )
-    }
 
-    // 2. Processing State - Show progress with cancellation
-    if (isProcessing) {
-      const progressPercentage = calculateProgress(progress.current, progress.total)
-
-      return (
-        <div className="space-y-4">
-          {/* Header */}
-          <div className="space-y-2 text-center">
-            <div className="flex justify-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
-                <Loader2 className="h-6 w-6 animate-spin text-green-600 dark:text-green-400" />
-              </div>
-            </div>
-            <div>
-              <h3 className="text-base font-semibold">Copying Items...</h3>
-              <p className="text-muted-foreground text-sm">
-                {progress.current} of {progress.total} items
-              </p>
-            </div>
-          </div>
-
-          {/* Progress */}
+        <ScrollArea className="max-h-48">
           <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Progress</span>
-              <span>{progressPercentage}%</span>
-            </div>
-            <Progress value={progressPercentage} className="w-full" />
-          </div>
-
-          {/* Current File */}
-          {progress.currentFile && (
-            <div className="space-y-1">
-              <div className="text-sm font-medium">Current:</div>
-              <div className="text-muted-foreground bg-muted/50 truncate rounded p-2 font-mono text-xs">
-                {progress.currentFile}
+            {selectedItems.slice(0, 10).map(item => (
+              <div key={item.id} className="flex items-center gap-2 rounded-lg border p-2 text-sm">
+                {getFileIcon(item.mimeType, item.isFolder)}
+                <span className="truncate">{item.name}</span>
               </div>
-            </div>
-          )}
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-green-600">{progress.success}</div>
-              <div className="text-muted-foreground text-xs">Success</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-              <div className="text-muted-foreground text-xs">Failed</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-lg font-bold text-orange-600">{progress.skipped}</div>
-              <div className="text-muted-foreground text-xs">Skipped</div>
-            </div>
+            ))}
+            {selectedItems.length > 10 && (
+              <div className="text-muted-foreground text-center text-sm">
+                +{selectedItems.length - 10} more items
+              </div>
+            )}
           </div>
+        </ScrollArea>
+      </div>
+    </div>
+  )
+
+  const renderDestinationStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <FolderOpen className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">Select Destination</h3>
+      </div>
+
+      <div className="rounded-lg border bg-amber-50 p-4 dark:bg-amber-950/20">
+        <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300">
+          <Home className="h-4 w-4" />
+          <span>Copy destination: {selectedFolderName}</span>
         </div>
-      )
-    }
+      </div>
 
-    // 3. Completed State - Show results and allow close
-    const totalProcessed = progress.success + progress.failed + progress.skipped
-    const wasSuccessful = progress.success > 0
-    const hasErrors = progress.failed > 0
+      <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+        <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+          <Copy className="h-4 w-4" />
+          <span>Files will be named "Copy of [original name]"</span>
+        </div>
+      </div>
 
-    return (
-      <div className="space-y-4">
-        {/* Results Header */}
-        <div className="space-y-2 text-center">
-          <div className="flex justify-center">
-            <div
-              className={cn(
-                'flex h-12 w-12 items-center justify-center rounded-full',
-                isCancelled
-                  ? 'bg-orange-100 dark:bg-orange-900/30'
-                  : wasSuccessful && !hasErrors
-                    ? 'bg-green-100 dark:bg-green-900/30'
-                    : hasErrors
-                      ? 'bg-red-100 dark:bg-red-900/30'
-                      : 'bg-gray-100 dark:bg-gray-900/30',
-              )}
-            >
-              {isCancelled ? (
-                <XCircle className="h-6 w-6 text-orange-600 dark:text-orange-400" />
-              ) : wasSuccessful && !hasErrors ? (
-                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
-              ) : hasErrors ? (
-                <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
-              ) : (
-                <SkipForward className="h-6 w-6 text-gray-600 dark:text-gray-400" />
-              )}
-            </div>
-          </div>
-          <div>
-            <h3 className="text-base font-semibold">
-              {isCancelled
-                ? 'Copy Cancelled'
-                : wasSuccessful && !hasErrors
-                  ? 'Copy Completed'
-                  : hasErrors
-                    ? 'Copy Partially Completed'
-                    : 'No Items Copied'}
-            </h3>
-            <p className="text-muted-foreground text-sm">
-              {totalProcessed} of {selectedItems.length} items processed
-            </p>
-          </div>
+      <DriveDestinationSelector
+        onSelect={handleDestinationSelect}
+        selectedFolderId={selectedFolderId}
+        className="border-0 p-0"
+      />
+    </div>
+  )
+
+  const renderProcessingStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <Loader2 className="h-5 w-5 animate-spin text-green-600" />
+        <h3 className="font-semibold">Copying Items</h3>
+      </div>
+
+      <div className="space-y-3">
+        <div className="flex items-center justify-between text-sm">
+          <span>Progress</span>
+          <span>
+            {progress.current} of {progress.total}
+          </span>
         </div>
 
-        {/* Results Summary */}
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-green-600">{progress.success}</div>
-            <div className="text-muted-foreground text-xs">Copied</div>
+        <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+
+        {progress.currentFile && (
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
+            <ArrowRight className="h-4 w-4" />
+            <span className="truncate">Copying: {progress.currentFile}</span>
           </div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-red-600">{progress.failed}</div>
-            <div className="text-muted-foreground text-xs">Failed</div>
+        )}
+
+        <div className="flex gap-4 text-sm">
+          <div className="flex items-center gap-1 text-green-600">
+            <CheckCircle className="h-4 w-4" />
+            <span>{progress.success} success</span>
           </div>
-          <div className="space-y-1">
-            <div className="text-lg font-bold text-blue-600">{progress.current}</div>
-            <div className="text-muted-foreground text-xs">Processed</div>
+          <div className="flex items-center gap-1 text-red-600">
+            <XCircle className="h-4 w-4" />
+            <span>{progress.failed} failed</span>
+          </div>
+          <div className="flex items-center gap-1 text-yellow-600">
+            <SkipForward className="h-4 w-4" />
+            <span>{progress.skipped} skipped</span>
           </div>
         </div>
+      </div>
+    </div>
+  )
 
-        {/* Error Details */}
-        {progress.errors.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-sm font-medium text-red-600">Errors:</h4>
-            <div className="max-h-32 space-y-1 overflow-y-auto">
+  const renderCompletedStep = () => (
+    <div className="space-y-4">
+      <div className="flex items-center gap-2">
+        <CheckCircle className="h-5 w-5 text-green-600" />
+        <h3 className="font-semibold">{isCancelled ? 'Copy Cancelled' : 'Copy Complete'}</h3>
+      </div>
+
+      {!isCancelled && (
+        <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+          <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+            <div>✓ Successfully copied {progress.success} item(s)</div>
+            <div>✓ Destination: {selectedFolderName}</div>
+            <div>✓ Files prefixed with "Copy of"</div>
+          </div>
+        </div>
+      )}
+
+      {progress.failed > 0 && (
+        <div className="space-y-2">
+          <div className="text-sm font-medium text-red-600">
+            Failed to copy {progress.failed} item(s):
+          </div>
+          <ScrollArea className="max-h-32">
+            <div className="space-y-1">
               {progress.errors.map((error, index) => (
-                <div
-                  key={`error-${error.file}-${index}`}
-                  className="rounded border border-red-200 bg-red-50 p-2 text-xs dark:border-red-800 dark:bg-red-900/20"
-                >
-                  <div className="font-medium">{error.file}</div>
-                  <div className="text-red-600 dark:text-red-400">{error.error}</div>
+                <div key={index} className="text-xs text-red-600">
+                  • {error.file}: {error.error}
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          </ScrollArea>
+        </div>
+      )}
+    </div>
+  )
 
-        {/* Refresh Notice */}
-        {(progress.success > 0 || progress.failed > 0) && (
-          <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center dark:border-blue-800 dark:bg-blue-900/20">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              Click the button below to refresh and see your updated files.
-            </p>
-          </div>
-        )}
-      </div>
-    )
+  const renderContent = () => {
+    switch (currentStep) {
+      case 'selection':
+        return renderSelectionStep()
+      case 'destination':
+        return renderDestinationStep()
+      case 'processing':
+        return renderProcessingStep()
+      case 'completed':
+        return renderCompletedStep()
+      default:
+        return null
+    }
+  }
+
+  const renderFooter = () => {
+    switch (currentStep) {
+      case 'selection':
+        return (
+          <>
+            <Button variant="outline" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button onClick={() => setCurrentStep('destination')}>Select Destination</Button>
+          </>
+        )
+      case 'destination':
+        return (
+          <>
+            <Button variant="outline" onClick={() => setCurrentStep('selection')}>
+              Back
+            </Button>
+            <Button onClick={handleCopy} disabled={!selectedFolderId}>
+              Copy Items
+            </Button>
+          </>
+        )
+      case 'processing':
+        return (
+          <Button variant="outline" onClick={handleCancel}>
+            Cancel
+          </Button>
+        )
+      case 'completed':
+        return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
+      default:
+        return null
+    }
   }
 
   if (isMobile) {
     return (
-      <>
-        <BottomSheet open={isOpen} onOpenChange={handleClose}>
-          <BottomSheetContent className="max-h-[90vh]">
-            <BottomSheetHeader className="pb-4">
-              <BottomSheetTitle className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                  <Copy className="h-5 w-5 text-green-600 dark:text-green-400" />
-                </div>
-                <div>
-                  <div className="text-lg font-semibold">Copy Items</div>
-                  <div className="text-muted-foreground text-sm font-normal">Copy operation</div>
-                </div>
-              </BottomSheetTitle>
-            </BottomSheetHeader>
+      <BottomSheet open={isOpen} onOpenChange={open => !open && handleClose()}>
+        <BottomSheetContent>
+          <BottomSheetHeader>
+            <BottomSheetTitle>Copy Items</BottomSheetTitle>
+            <BottomSheetDescription>
+              Create copies of selected items in a different location
+            </BottomSheetDescription>
+          </BottomSheetHeader>
 
-            <div className="space-y-4 px-4 pb-4">{renderContent()}</div>
+          <div className="flex-1 overflow-y-auto px-4 py-2">{renderContent()}</div>
 
-            <BottomSheetFooter className={cn('grid gap-4')}>
-              {!isProcessing && !isCompleted && (
-                <>
-                  <Button
-                    onClick={handleCopy}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    <Copy className="mr-2 h-4 w-4" />
-                    Copy to {selectedFolderName}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleClose}
-                    className={cn('touch-target min-h-[44px] active:scale-95')}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              )}
-              {isProcessing && (
-                <Button
-                  onClick={handleCancel}
-                  variant="outline"
-                  className={cn('touch-target min-h-[44px] active:scale-95')}
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Cancel Copy
-                </Button>
-              )}
-              {isCompleted && (
-                <>
-                  {progress.success > 0 || progress.failed > 0 ? (
-                    <Button
-                      onClick={handleCloseAndRefresh}
-                      className={cn('touch-target min-h-[44px] active:scale-95')}
-                    >
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Refresh Now
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handleClose}
-                      className={cn('touch-target min-h-[44px] active:scale-95')}
-                    >
-                      <CheckCircle className="mr-2 h-4 w-4" />
-                      Close
-                    </Button>
-                  )}
-                  {(progress.success > 0 || progress.failed > 0) && (
-                    <Button
-                      onClick={handleClose}
-                      variant="outline"
-                      className={cn('touch-target min-h-[44px] active:scale-95')}
-                    >
-                      Close Without Refresh
-                    </Button>
-                  )}
-                </>
-              )}
-            </BottomSheetFooter>
-          </BottomSheetContent>
-        </BottomSheet>
-
-        {/* Destination Selector Dialog for Mobile */}
-        <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
-          <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col">
-            <DialogHeader className="flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleBackToMainDialog}
-                  className="h-8 w-8 p-1"
-                >
-                  <ArrowLeft className="h-4 w-4" />
-                </Button>
-                <div>
-                  <DialogTitle>Choose Copy Destination</DialogTitle>
-                  <DialogDescription>
-                    Select where to copy {selectedItems.length} item
-                    {selectedItems.length > 1 ? 's' : ''}
-                  </DialogDescription>
-                </div>
-              </div>
-            </DialogHeader>
-
-            <div className="min-h-0 flex-1 py-2">
-              <DriveDestinationSelector
-                onSelect={handleDestinationSelect}
-                selectedFolderId={selectedFolderId}
-                className="h-full"
-              />
-            </div>
-
-            <DialogFooter className="flex-shrink-0 flex-col gap-2 border-t pt-4 sm:flex-row">
-              <div className="flex-1 text-left">
-                <div className="text-muted-foreground text-sm">
-                  Selected:{' '}
-                  <span className="text-foreground font-medium">{selectedFolderName}</span>
-                </div>
-              </div>
-              <Button onClick={handleConfirmDestinationAndCopy} className="w-full sm:w-auto">
-                <Copy className="mr-2 h-4 w-4" />
-                Confirm & Copy
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleBackToMainDialog}
-                className="w-full sm:w-auto"
-              >
-                Back
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </>
+          <BottomSheetFooter>
+            <div className="flex gap-2">{renderFooter()}</div>
+          </BottomSheetFooter>
+        </BottomSheetContent>
+      </BottomSheet>
     )
   }
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-h-[85vh] sm:max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
-                <Copy className="h-5 w-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <div className="text-lg font-semibold">Copy Items</div>
-                <div className="text-muted-foreground text-sm font-normal">Copy operation</div>
-              </div>
-            </DialogTitle>
-          </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={open => !open && handleClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Copy Items</DialogTitle>
+          <DialogDescription>
+            Create copies of selected items in a different location
+          </DialogDescription>
+        </DialogHeader>
 
-          <div className="space-y-4 py-4">{renderContent()}</div>
+        <div className="max-h-[60vh] overflow-y-auto">{renderContent()}</div>
 
-          <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-            {!isProcessing && !isCompleted && (
-              <>
-                <Button
-                  onClick={handleCopy}
-                  className="w-full text-xs sm:w-auto sm:max-w-[200px]"
-                  title={`Copy to ${selectedFolderName}`}
-                >
-                  <Copy className="mr-1 h-3 w-3" />
-                  <span className="truncate">
-                    Copy to{' '}
-                    {selectedFolderName.length > 12
-                      ? `${selectedFolderName.substring(0, 12)}...`
-                      : selectedFolderName}
-                  </span>
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleClose}
-                  className="w-full text-xs sm:w-auto"
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
-            {isProcessing && (
-              <Button onClick={handleCancel} variant="outline" className="w-full sm:w-auto">
-                <XCircle className="mr-2 h-4 w-4" />
-                Cancel Copy
-              </Button>
-            )}
-            {isCompleted && (
-              <>
-                {progress.success > 0 || progress.failed > 0 ? (
-                  <Button onClick={handleCloseAndRefresh} className="w-full sm:w-auto">
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Refresh Now
-                  </Button>
-                ) : (
-                  <Button onClick={handleClose} className="w-full sm:w-auto">
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Close
-                  </Button>
-                )}
-                {(progress.success > 0 || progress.failed > 0) && (
-                  <Button onClick={handleClose} variant="outline" className="w-full sm:w-auto">
-                    Close Without Refresh
-                  </Button>
-                )}
-              </>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Destination Selector Dialog */}
-      <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
-        <DialogContent className="flex max-h-[75vh] max-w-2xl flex-col">
-          <DialogHeader className="flex-shrink-0">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBackToMainDialog}
-                className="h-8 w-8 p-1"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div>
-                <DialogTitle>Choose Copy Destination</DialogTitle>
-                <DialogDescription>
-                  Select where to copy {selectedItems.length} item
-                  {selectedItems.length > 1 ? 's' : ''}
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-
-          <div className="min-h-0 flex-1 py-2">
-            <DriveDestinationSelector
-              onSelect={handleDestinationSelect}
-              selectedFolderId={selectedFolderId}
-              className="h-full"
-            />
-          </div>
-
-          <DialogFooter className="flex-shrink-0 flex-col gap-2 border-t pt-4 sm:flex-row sm:justify-between">
-            <div className="max-w-full flex-1 overflow-hidden text-left">
-              <div className="text-muted-foreground text-sm">
-                Selected:{' '}
-                <span className="text-foreground truncate font-medium">{selectedFolderName}</span>
-              </div>
-            </div>
-            <div className="flex flex-shrink-0 gap-2">
-              <Button
-                onClick={handleConfirmDestinationAndCopy}
-                className="flex-1 text-xs sm:w-auto sm:flex-initial"
-              >
-                <Copy className="mr-1 h-3 w-3" />
-                Confirm & Copy
-              </Button>
-              <Button
-                variant="outline"
-                onClick={handleBackToMainDialog}
-                className="flex-1 text-xs sm:w-auto sm:flex-initial"
-              >
-                Back
-              </Button>
-            </div>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+        <DialogFooter>{renderFooter()}</DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
-export { ItemsCopyDialog }
 export default ItemsCopyDialog
+export { ItemsCopyDialog }
