@@ -222,7 +222,7 @@ export function DriveManager() {
     // Clear the lastFiltersRef to force a fresh fetch
     lastFiltersRef.current = ''
     setTimeout(() => fetchFiles(currentFolderId || undefined, undefined), 300)
-  }, [currentFolderId, fetchFiles])
+  }, [currentFolderId])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
     // Update state untuk UI

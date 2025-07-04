@@ -81,21 +81,5 @@ task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
 
-[[workflows.workflow]]
-name = "ESLint Rules Test"
-author = "agent"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node scripts/test-eslint-rules.js"
-
-[[workflows.workflow]]
-name = "ESLint Config Test"
-author = 44592010
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "node scripts/test-eslint-rules.js"
 
 
