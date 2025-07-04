@@ -106,7 +106,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     errors: [],
   })
   const [shareResults, setShareResults] = useState<ShareResult[]>([])
-  const [isItemsExpanded, setIsItemsExpanded] = useState(selectedItems.length <= 5)
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false)
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
@@ -477,7 +477,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     ]
 
     return (
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
         {steps.map((step, index) => {
           const Icon = step.icon
           const isActive = currentStep === step.key
@@ -487,10 +487,10 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           const isCurrent = isActive
 
           return (
-            <div key={step.key} className="flex items-center">
+            <div key={step.key} className="flex w-full items-center sm:w-auto">
               <div
                 className={cn(
-                  'flex items-center gap-2 rounded-lg px-3 py-2 text-sm',
+                  'flex min-w-0 flex-1 items-center gap-2 rounded-lg px-3 py-2 text-sm sm:flex-none',
                   isCurrent && 'bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-300',
                   isCompleted &&
                     'bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300',
@@ -499,14 +499,14 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
               >
                 <Icon
                   className={cn(
-                    'h-4 w-4',
+                    'h-4 w-4 flex-shrink-0',
                     isCurrent && (step.key === 'processing' ? 'animate-spin' : ''),
                   )}
                 />
-                <span className="font-medium">{step.label}</span>
+                <span className="truncate font-medium">{step.label}</span>
               </div>
               {index < steps.length - 1 && (
-                <ArrowRight className="text-muted-foreground mx-2 h-4 w-4" />
+                <ArrowRight className="text-muted-foreground mx-2 hidden h-4 w-4 flex-shrink-0 sm:block" />
               )}
             </div>
           )
