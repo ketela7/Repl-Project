@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, Suspense } from 'react'
-import { Settings, Users, Clock, Trash2 } from 'lucide-react'
+import { useState } from 'react'
+import { Users, Clock, Trash2, FileText, Table, Code } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { formatFileSize } from '@/lib/google-drive/utils'
-import { OperationsDialog } from '@/components/lazy-imports'
 
 interface DuplicateFile {
   id: string
@@ -65,8 +64,6 @@ export function DuplicateActionDialog({
 }: DuplicateActionDialogProps) {
   const isMobile = useIsMobile()
   const [selectionMode, setSelectionMode] = useState<SelectionMode>('newest')
-  const [selectedFiles, setSelectedFiles] = useState<DuplicateFile[]>([])
-  const [showOperations, setShowOperations] = useState(false)
 
   // Smart selection logic
   const getSelectedFiles = (mode: SelectionMode): DuplicateFile[] => {
@@ -111,37 +108,97 @@ export function DuplicateActionDialog({
 
   const handleSelectionChange = (mode: SelectionMode) => {
     setSelectionMode(mode)
-    setSelectedFiles(getSelectedFiles(mode))
   }
 
-  const handleProceed = () => {
+  // Export functionality for duplicate reports
+  const exportToCSV = () => {
     const filesToProcess = getSelectedFiles(selectionMode)
+    const headers = ['Name', 'Size (bytes)', 'Size (readable)', 'MIME Type', 'Modified Time', 'ID']
+    const csvContent = [
+      headers.join(','),
+      ...filesToProcess.map(file =>
+        [
+          `"${file.name.replace(/"/g, '""')}"`,
+          file.size || 0,
+          formatFileSize(file.size || 0),
+          `"${file.mimeType.replace(/"/g, '""')}"`,
+          file.modifiedTime || '',
+          file.id,
+        ].join(','),
+      ),
+    ].join('\n')
 
-    // Transform files to match OperationsDialog expected format
-    const operationItems = filesToProcess.map(file => ({
-      id: file.id,
-      name: file.name,
-      size: file.size,
-      mimeType: file.mimeType,
-      modifiedTime: file.modifiedTime,
-      webViewLink: file.webViewLink,
-      canDelete: file.canDelete ?? true,
-      canTrash: file.canTrash ?? true,
-      canMove: file.canMove ?? true,
-      canCopy: file.canCopy ?? true,
-      canShare: file.canShare ?? true,
-      canRename: file.canRename ?? true,
-      canExport: file.canExport ?? true,
-      canDownload: file.canDownload ?? true,
-      isFolder: file.isFolder ?? false,
-    }))
+    const blob = new Blob([csvContent], { type: 'text/csv' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `duplicate-${duplicateGroup.type}-${Date.now()}.csv`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
 
-    console.log('Selected files for operations:', operationItems)
-    setSelectedFiles(operationItems)
-    // Don't close immediately to debug
-    // onClose()
-    setShowOperations(true)
-    console.log('Operations dialog opened:', true)
+  const exportToJSON = () => {
+    const filesToProcess = getSelectedFiles(selectionMode)
+    const exportData = {
+      duplicateGroup: {
+        type: duplicateGroup.type,
+        totalFiles: duplicateGroup.files.length,
+        totalSize: duplicateGroup.totalSize,
+        wastedSpace: duplicateGroup.wastedSpace,
+        exportedAt: new Date().toISOString(),
+      },
+      selectedFiles: filesToProcess.map(file => ({
+        id: file.id,
+        name: file.name,
+        size: file.size,
+        sizeReadable: formatFileSize(file.size || 0),
+        mimeType: file.mimeType,
+        modifiedTime: file.modifiedTime,
+        webViewLink: file.webViewLink,
+      })),
+    }
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `duplicate-${duplicateGroup.type}-${Date.now()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const exportToTXT = () => {
+    const filesToProcess = getSelectedFiles(selectionMode)
+    const txtContent = [
+      `Duplicate Files Report - ${duplicateGroup.type === 'md5' ? 'Identical Files' : 'Same Name Files'}`,
+      `Generated: ${new Date().toLocaleString()}`,
+      `Total Files: ${duplicateGroup.files.length}`,
+      `Total Size: ${formatFileSize(duplicateGroup.totalSize)}`,
+      `Wasted Space: ${formatFileSize(duplicateGroup.wastedSpace)}`,
+      `Selection Mode: ${selectionMode}`,
+      `Selected Files: ${filesToProcess.length}`,
+      '',
+      'Selected Files for Processing:',
+      '=====================================',
+      ...filesToProcess.map((file, index) =>
+        [
+          `${index + 1}. ${file.name}`,
+          `   Size: ${formatFileSize(file.size || 0)}`,
+          `   Type: ${file.mimeType}`,
+          `   Modified: ${file.modifiedTime || 'Unknown'}`,
+          `   ID: ${file.id}`,
+          '',
+        ].join('\n'),
+      ),
+    ].join('\n')
+
+    const blob = new Blob([txtContent], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `duplicate-${duplicateGroup.type}-${Date.now()}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   const getSelectionPreview = () => {
@@ -284,17 +341,46 @@ export function DuplicateActionDialog({
       )}
 
       {/* Actions */}
-      <div className="flex gap-2 pt-4">
-        <Button variant="outline" onClick={onClose} className="flex-1">
-          Cancel
-        </Button>
-        <Button
-          onClick={handleProceed}
-          disabled={preview.selected.length === 0}
-          className="flex-1 gap-2"
-        >
-          <Settings className="h-4 w-4" />
-          Open Operations
+      {/* Export Actions */}
+      <div className="space-y-3 pt-4">
+        <div className="text-center">
+          <p className="text-muted-foreground text-sm">
+            Export selected files ({preview.selected.length} files) as report
+          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            variant="outline"
+            onClick={exportToTXT}
+            disabled={preview.selected.length === 0}
+            className="gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            TXT
+          </Button>
+          <Button
+            variant="outline"
+            onClick={exportToCSV}
+            disabled={preview.selected.length === 0}
+            className="gap-2"
+          >
+            <Table className="h-4 w-4" />
+            CSV
+          </Button>
+          <Button
+            variant="outline"
+            onClick={exportToJSON}
+            disabled={preview.selected.length === 0}
+            className="gap-2"
+          >
+            <Code className="h-4 w-4" />
+            JSON
+          </Button>
+        </div>
+
+        <Button variant="outline" onClick={onClose} className="w-full">
+          Close
         </Button>
       </div>
     </div>
@@ -326,20 +412,6 @@ export function DuplicateActionDialog({
             <div className="max-h-[70vh] overflow-y-auto">{renderContent()}</div>
           </DialogContent>
         </Dialog>
-      )}
-
-      {/* Operations Dialog */}
-      {showOperations && selectedFiles.length > 0 && (
-        <Suspense fallback={<div>Loading operations...</div>}>
-          <OperationsDialog
-            isOpen={showOperations}
-            onClose={() => {
-              console.log('Closing operations dialog')
-              setShowOperations(false)
-            }}
-            selectedItems={selectedFiles}
-          />
-        </Suspense>
       )}
     </>
   )
