@@ -206,31 +206,21 @@ export function DriveManager() {
   }, [])
 
   // Debounced search untuk prevent race conditions
-  const debouncedSearch = useCallback((query: string) => {
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current)
-    }
-    
-    searchTimeoutRef.current = setTimeout(() => {
-      searchQueryRef.current = query
-      fetchFiles(currentFolderId || undefined, query.trim() || undefined)
-    }, 300) // 300ms debounce
-  }, [currentFolderId])
-
+  // Handle search change - only update local state, no auto-search
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query)
-    debouncedSearch(query)
-  }, [debouncedSearch])
+    // Store query in ref for manual search on Enter/Submit
+    searchQueryRef.current = query
+  }, [])
 
   const clearAllFilters = useCallback(() => {
     setFilters(initialFilters)
     setSearchQuery('')
+    searchQueryRef.current = ''
     setTimeout(() => fetchFiles(currentFolderId || undefined, undefined), 0)
   }, [currentFolderId])
 
   const handleFilter = useCallback((newFilters: Partial<typeof filters>) => {
-    console.log('[DriveManager] Filter change received:', newFilters)
-    
     // Update state untuk UI
     setFilters(prev => {
       const updatedFilters = {
@@ -244,7 +234,6 @@ export function DriveManager() {
       
       // Update ref juga untuk immediate access
       filtersRef.current = updatedFilters
-      console.log('[DriveManager] Filter state updated to:', updatedFilters)
       return updatedFilters
     })
   }, [])
@@ -483,7 +472,6 @@ export function DriveManager() {
   const applyFilters = useCallback(() => {
     // Gunakan filtersRef untuk mendapat filter state yang paling terbaru
     const currentFilters = filtersRef.current
-    console.log('[DriveManager] Apply Filters clicked - Using current filters:', currentFilters)
     
     const filterKey = JSON.stringify({
       view: currentFilters.activeView,
@@ -496,7 +484,6 @@ export function DriveManager() {
       owner: currentFilters.advancedFilters.owner,
     })
 
-    console.log('[DriveManager] Applying filters with key:', filterKey)
     // Update last applied filters and fetch data
     lastFiltersRef.current = filterKey
     fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
