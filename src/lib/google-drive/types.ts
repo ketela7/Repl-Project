@@ -24,6 +24,7 @@ export interface DriveFile {
   webViewLink?: string
   webContentLink?: string
   thumbnailLink?: string
+  md5Checksum?: string
   parents?: string[]
   owners?: Array<{
     displayName: string

@@ -6,7 +6,18 @@ import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { RefreshCw, HardDrive, Files, TrendingUp, Play, Pause } from 'lucide-react'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import {
+  RefreshCw,
+  HardDrive,
+  Files,
+  TrendingUp,
+  Play,
+  Pause,
+  Copy,
+  ChevronDown,
+  ChevronRight,
+} from 'lucide-react'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import { FILE_TYPE_CATEGORIES } from '@/lib/mime-type-filter'
 
@@ -37,6 +48,19 @@ interface FilesData {
     id: string
     webViewLink?: string
     modifiedTime?: string
+  }>
+  duplicateFiles?: Array<{
+    md5Hash: string
+    files: Array<{
+      id: string
+      name: string
+      size: number
+      mimeType: string
+      webViewLink?: string
+      modifiedTime?: string
+    }>
+    totalSize: number
+    wastedSpace: number
   }>
   categories?: {
     documents: number
@@ -162,6 +186,7 @@ export function ProgressiveStorageAnalytics() {
               filesByType: data.data.filesByType || [],
               fileSizesByType: Object.fromEntries(data.data.fileSizesByType || []),
               largestFiles: data.data.largestFiles || [],
+              duplicateFiles: data.data.duplicateFiles || [],
               categories: data.data.categories || {
                 documents: 0,
                 images: 0,
@@ -498,6 +523,118 @@ export function ProgressiveStorageAnalytics() {
                       <Badge variant="secondary">#{index + 1}</Badge>
                     </div>
                   </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Duplicate Files Detection */}
+      {files?.duplicateFiles && files.duplicateFiles.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Copy className="h-5 w-5" />
+              Duplicate Files
+            </CardTitle>
+            <CardDescription>
+              Found {files.duplicateFiles.length} duplicate groups •
+              {files.duplicateFiles.reduce((total, group) => total + group.wastedSpace, 0) > 0 && (
+                <span className="text-destructive ml-1">
+                  {formatFileSize(
+                    files.duplicateFiles.reduce((total, group) => total + group.wastedSpace, 0),
+                  )}{' '}
+                  wasted space
+                </span>
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ScrollArea className="h-96">
+              <div className="space-y-3">
+                {files.duplicateFiles.map((duplicateGroup, groupIndex) => (
+                  <Collapsible key={duplicateGroup.md5Hash} className="rounded-lg border">
+                    <CollapsibleTrigger className="hover:bg-muted/50 flex w-full items-center justify-between p-3 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <ChevronRight className="h-4 w-4 transition-transform duration-200 [&[data-state=open]>svg]:rotate-90" />
+                        <div className="text-left">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="destructive" className="text-xs">
+                              {duplicateGroup.files.length} copies
+                            </Badge>
+                            <span className="text-sm font-medium">
+                              {duplicateGroup.files[0]?.name || 'Unknown File'}
+                            </span>
+                          </div>
+                          <p className="text-muted-foreground text-xs">
+                            {duplicateGroup.files[0]?.mimeType.split('/')[1] || 'Unknown'} •
+                            {formatFileSize(duplicateGroup.files[0]?.size || 0)} each
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {formatFileSize(duplicateGroup.totalSize)} total
+                        </Badge>
+                        {duplicateGroup.wastedSpace > 0 && (
+                          <Badge variant="destructive" className="text-xs">
+                            -{formatFileSize(duplicateGroup.wastedSpace)} wasted
+                          </Badge>
+                        )}
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <div className="border-t p-3">
+                        <div className="space-y-2">
+                          {duplicateGroup.files.map((file, fileIndex) => (
+                            <div
+                              key={file.id}
+                              className="bg-muted/30 flex items-center justify-between rounded-md p-2"
+                            >
+                              <div className="min-w-0 flex-1">
+                                <p className="truncate text-sm font-medium" title={file.name}>
+                                  {file.name}
+                                </p>
+                                <div className="text-muted-foreground flex items-center gap-2 text-xs">
+                                  <span>ID: {file.id}</span>
+                                  {file.modifiedTime && (
+                                    <span>
+                                      Modified: {new Date(file.modifiedTime).toLocaleDateString()}
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant="secondary" className="text-xs">
+                                  Copy #{fileIndex + 1}
+                                </Badge>
+                                {file.webViewLink && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 px-2 text-xs"
+                                    onClick={() => window.open(file.webViewLink, '_blank')}
+                                  >
+                                    View
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-3 border-t pt-2">
+                          <div className="text-muted-foreground flex items-center justify-between text-xs">
+                            <span>MD5 Hash: {duplicateGroup.md5Hash.substring(0, 16)}...</span>
+                            <span>
+                              Keep 1 copy • Delete {duplicateGroup.files.length - 1} to save{' '}
+                              {formatFileSize(duplicateGroup.wastedSpace)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
                 ))}
               </div>
             </ScrollArea>

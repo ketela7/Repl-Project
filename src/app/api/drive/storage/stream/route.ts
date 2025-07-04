@@ -94,6 +94,7 @@ export async function GET() {
             const filesByType: Record<string, number> = {}
             const fileSizesByType: Record<string, number> = {}
             const largestFiles: DriveFile[] = []
+            const duplicateMap: Record<string, DriveFile[]> = {} // MD5 hash -> files array
 
             // Use service listFiles with optimized pagination
             do {
@@ -103,7 +104,8 @@ export async function GET() {
                   fields: string
                   pageToken?: string
                 } = {
-                  fields: 'nextPageToken,files(name,mimeType,size)',
+                  fields:
+                    'nextPageToken,files(id,name,mimeType,size,md5Checksum,webViewLink,modifiedTime)',
                 }
 
                 // Only add pageToken if it exists
@@ -171,6 +173,14 @@ export async function GET() {
                   // Count by type
                   filesByType[mimeType] = (filesByType[mimeType] || 0) + 1
                   fileSizesByType[mimeType] = (fileSizesByType[mimeType] || 0) + size
+
+                  // Track duplicate files by MD5 hash
+                  if (file.md5Checksum && size > 0) {
+                    if (!duplicateMap[file.md5Checksum]) {
+                      duplicateMap[file.md5Checksum] = []
+                    }
+                    duplicateMap[file.md5Checksum].push(file)
+                  }
 
                   // Track largest files
                   if (size > 0) {
@@ -248,6 +258,37 @@ export async function GET() {
               categorySizes[category] = (categorySizes[category] || 0) + size
             })
 
+            // Process duplicate files detection
+            sendData('progress', {
+              step: 'duplicate_detection',
+              message: 'Detecting duplicate files...',
+            })
+
+            const duplicateGroups = Object.entries(duplicateMap)
+              .filter(([, files]) => files.length > 1) // Only groups with duplicates
+              .map(([md5Hash, files]) => {
+                const sortedFiles = files.sort((a, b) => {
+                  // Sort by modification time (newest first) or by name if no time
+                  const timeA = a.modifiedTime ? new Date(a.modifiedTime).getTime() : 0
+                  const timeB = b.modifiedTime ? new Date(b.modifiedTime).getTime() : 0
+                  return timeB - timeA || (a.name || '').localeCompare(b.name || '')
+                })
+
+                const fileSize = sortedFiles[0]?.size
+                  ? parseInt(sortedFiles[0].size.toString(), 10) || 0
+                  : 0
+                const totalSize = fileSize * sortedFiles.length
+                const wastedSpace = fileSize * (sortedFiles.length - 1) // Keep 1, delete others
+
+                return {
+                  md5Hash,
+                  files: sortedFiles,
+                  totalSize,
+                  wastedSpace,
+                }
+              })
+              .sort((a, b) => b.wastedSpace - a.wastedSpace) // Sort by wasted space (highest first)
+
             // Send final comprehensive results
             sendData('analysis_complete', {
               summary: {
@@ -265,6 +306,7 @@ export async function GET() {
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 50), // Increased from 20 to 50
               largestFiles: largestFiles.slice(0, 50), // Increased from 20 to 50
+              duplicateFiles: duplicateGroups.slice(0, 100), // Include duplicate files
             })
 
             sendData('complete', {
