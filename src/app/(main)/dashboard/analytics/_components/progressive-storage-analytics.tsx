@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import { FILE_TYPE_CATEGORIES } from '@/lib/mime-type-filter'
-import { DuplicateActionDialog } from './duplicate-action-dialog'
+import { DuplicateBulkOperationsDialog } from './duplicate-bulk-operations-dialog'
 
 interface QuotaData {
   limit: number | null
@@ -99,21 +99,18 @@ export function ProgressiveStorageAnalytics() {
     'disconnected' | 'connecting' | 'connected'
   >('disconnected')
 
-  // Duplicate action dialog state
-  const [selectedDuplicateGroup, setSelectedDuplicateGroup] = useState<any>(null)
-  const [isDuplicateActionOpen, setIsDuplicateActionOpen] = useState(false)
+  // Bulk duplicate action dialog state
+  const [isDuplicateBulkActionOpen, setIsDuplicateBulkActionOpen] = useState(false)
 
   const eventSourceRef = useRef<EventSource | null>(null)
 
-  // Handle duplicate action dialog
-  const handleDuplicateAction = (duplicateGroup: any) => {
-    setSelectedDuplicateGroup(duplicateGroup)
-    setIsDuplicateActionOpen(true)
+  // Handle bulk duplicate actions
+  const handleDuplicateBulkAction = () => {
+    setIsDuplicateBulkActionOpen(true)
   }
 
-  const handleCloseDuplicateAction = () => {
-    setIsDuplicateActionOpen(false)
-    setSelectedDuplicateGroup(null)
+  const handleCloseDuplicateBulkAction = () => {
+    setIsDuplicateBulkActionOpen(false)
   }
 
   const startAnalysis = async () => {
@@ -697,45 +694,63 @@ export function ProgressiveStorageAnalytics() {
         >
           <Collapsible defaultOpen={files.duplicateFiles && files.duplicateFiles.length > 0}>
             <CardHeader className="pb-2">
-              <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex w-full items-center justify-between rounded-md p-2 transition-colors">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Copy className="h-5 w-5" />
-                    Duplicate Files
-                    {files.duplicateFiles && files.duplicateFiles.length > 0 && (
-                      <Badge variant="destructive" className="ml-2">
-                        {files.duplicateFiles.length} groups
-                      </Badge>
-                    )}
-                  </CardTitle>
-                  <CardDescription>
-                    {files.duplicateFiles && files.duplicateFiles.length > 0 ? (
-                      <>
-                        Found {files.duplicateFiles.length} duplicate groups •
-                        {files.duplicateFiles.reduce(
-                          (total, group) => total + group.wastedSpace,
-                          0,
-                        ) > 0 && (
-                          <span className="text-destructive ml-1">
-                            {formatFileSize(
-                              files.duplicateFiles.reduce(
-                                (total, group) => total + group.wastedSpace,
-                                0,
-                              ),
-                            )}{' '}
-                            wasted space
-                          </span>
-                        )}
-                      </>
-                    ) : (
-                      <span className="text-muted-foreground">
-                        No duplicate files detected or analysis in progress...
-                      </span>
-                    )}
-                  </CardDescription>
-                </div>
-                <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
+              <div className="flex items-center justify-between">
+                <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex flex-1 items-center justify-between rounded-md p-2 transition-colors">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Copy className="h-5 w-5" />
+                      Duplicate Files
+                      {files.duplicateFiles && files.duplicateFiles.length > 0 && (
+                        <Badge variant="destructive" className="ml-2">
+                          {files.duplicateFiles.length} groups
+                        </Badge>
+                      )}
+                    </CardTitle>
+                    <CardDescription>
+                      {files.duplicateFiles && files.duplicateFiles.length > 0 ? (
+                        <>
+                          Found {files.duplicateFiles.length} duplicate groups •
+                          {files.duplicateFiles.reduce(
+                            (total, group) => total + group.wastedSpace,
+                            0,
+                          ) > 0 && (
+                            <span className="text-destructive ml-1">
+                              {formatFileSize(
+                                files.duplicateFiles.reduce(
+                                  (total, group) => total + group.wastedSpace,
+                                  0,
+                                ),
+                              )}{' '}
+                              wasted space
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          No duplicate files detected or analysis in progress...
+                        </span>
+                      )}
+                    </CardDescription>
+                  </div>
+                  <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
+                </CollapsibleTrigger>
+                
+                {/* Bulk Action Button */}
+                {files.duplicateFiles && files.duplicateFiles.length > 0 && (
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleDuplicateBulkAction()
+                    }}
+                    className="ml-2 gap-2"
+                  >
+                    <Copy className="h-4 w-4" />
+                    Action
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CollapsibleContent>
               <CardContent className="pt-2">
@@ -858,21 +873,7 @@ export function ProgressiveStorageAnalytics() {
                                   </span>
                                 </div>
 
-                                {/* Action Button */}
-                                <div className="mt-3 flex justify-center">
-                                  <Button
-                                    size="sm"
-                                    variant="default"
-                                    onClick={e => {
-                                      e.stopPropagation()
-                                      handleDuplicateAction(duplicateGroup)
-                                    }}
-                                    className="w-full gap-2"
-                                  >
-                                    <Copy className="h-4 w-4" />
-                                    Take Action
-                                  </Button>
-                                </div>
+    
                               </div>
                             </div>
                           </CollapsibleContent>
@@ -913,12 +914,12 @@ export function ProgressiveStorageAnalytics() {
         </Card>
       )}
 
-      {/* Duplicate Action Dialog */}
-      {selectedDuplicateGroup && (
-        <DuplicateActionDialog
-          isOpen={isDuplicateActionOpen}
-          onClose={handleCloseDuplicateAction}
-          duplicateGroup={selectedDuplicateGroup}
+      {/* Duplicate Bulk Operations Dialog */}
+      {files && files.duplicateFiles && (
+        <DuplicateBulkOperationsDialog
+          isOpen={isDuplicateBulkActionOpen}
+          onClose={handleCloseDuplicateBulkAction}
+          duplicateGroups={files.duplicateFiles}
         />
       )}
     </div>

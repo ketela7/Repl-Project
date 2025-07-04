@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Users, Clock, Trash2, FileText, Table, Code } from 'lucide-react'
+import { Users, Clock, Settings, FileText, Table, Code } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
