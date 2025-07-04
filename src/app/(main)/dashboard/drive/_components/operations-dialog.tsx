@@ -34,17 +34,15 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
-import {
-  ItemsMoveDialog,
-  ItemsCopyDialog,
-  ItemsTrashDialog,
-  ItemsShareDialog,
-  ItemsRenameDialog,
-  ItemsExportDialog,
-  ItemsDeleteDialog,
-  ItemsUntrashDialog,
-  ItemsDownloadDialog,
-} from '@/components/lazy-imports'
+import ItemsMoveDialog from './items-move-dialog'
+import ItemsCopyDialog from './items-copy-dialog'
+import ItemsTrashDialog from './items-trash-dialog'
+import ItemsShareDialog from './items-share-dialog'
+import ItemsRenameDialog from './items-rename-dialog'
+import ItemsExportDialog from './items-export-dialog'
+import ItemsDeleteDialog from './items-delete-dialog'
+import ItemsUntrashDialog from './items-untrash-dialog'
+import ItemsDownloadDialog from './items-download-dialog'
 
 interface OperationsDialogProps {
   isOpen?: boolean
