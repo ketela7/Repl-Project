@@ -222,7 +222,12 @@ function OperationsDialog({
         {canMoveCount > 0 && (
           <Button
             variant="outline"
-            onClick={handleMoveClick}
+            onClick={e => {
+              e.preventDefault()
+              e.stopPropagation()
+              console.log('Move button clicked - direct handler')
+              handleMoveClick()
+            }}
             className="h-12 w-full justify-start gap-3 text-left hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/30"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
@@ -241,7 +246,12 @@ function OperationsDialog({
         {canCopyCount > 0 && (
           <Button
             variant="outline"
-            onClick={handleCopyClick}
+            onClick={e => {
+              e.preventDefault()
+              e.stopPropagation()
+              console.log('Copy button clicked - direct handler')
+              handleCopyClick()
+            }}
             className="h-12 w-full justify-start gap-3 text-left hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-950/30"
           >
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
