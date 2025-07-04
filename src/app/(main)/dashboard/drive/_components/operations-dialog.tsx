@@ -78,11 +78,11 @@ function OperationsDialog({
   const handleMoveClick = () => {
     console.log('Move button clicked, closing main dialog and opening move dialog')
     handleClose()
-    // Use setTimeout to ensure main dialog closes before individual dialog opens
+    // Use longer timeout to ensure main dialog fully closes before individual dialog opens
     setTimeout(() => {
       console.log('Setting move dialog open to true')
       setIsMoveDialogOpen(true)
-    }, 100)
+    }, 300)
   }
 
   const handleCopyClick = () => {
@@ -91,7 +91,7 @@ function OperationsDialog({
     setTimeout(() => {
       console.log('Setting copy dialog open to true')
       setIsCopyDialogOpen(true)
-    }, 100)
+    }, 300)
   }
 
   const handleTrashClick = () => {
