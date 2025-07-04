@@ -19,10 +19,6 @@ author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
-args = "Formatter"
-
-[[workflows.workflow.tasks]]
-task = "workflow.run"
 args = "Server"
 
 [[workflows.workflow]]
