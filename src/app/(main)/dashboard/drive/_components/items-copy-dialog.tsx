@@ -25,6 +25,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
   BottomSheet,
@@ -326,12 +327,13 @@ function ItemsCopyDialog({
             )}
           </div>
 
-          {/* Items Preview - Scrollable */}
+          {/* Items Preview - ScrollArea */}
           <div className="min-h-0 flex-1 space-y-2">
             <h4 className="text-center text-xs font-medium">Items to copy:</h4>
-            <div className="bg-muted/50 flex-1 overflow-y-auto rounded-lg border">
-              <div className="space-y-1 p-2">
-                {selectedItems.slice(0, 5).map(item => (
+            <div className="bg-muted/50 flex-1 rounded-lg border">
+              <ScrollArea className="h-[200px] w-full">
+                <div className="space-y-1 p-2">
+                  {selectedItems.map(item => (
                   <div
                     key={item.id}
                     className="bg-background/50 flex min-w-0 items-center gap-2 rounded-md p-2"
@@ -345,12 +347,8 @@ function ItemsCopyDialog({
                     </Badge>
                   </div>
                 ))}
-                {selectedItems.length > 5 && (
-                  <div className="text-muted-foreground py-1 text-center text-xs">
-                    ... and {selectedItems.length - 5} more items
-                  </div>
-                )}
-              </div>
+                </div>
+              </ScrollArea>
             </div>
           </div>
 
