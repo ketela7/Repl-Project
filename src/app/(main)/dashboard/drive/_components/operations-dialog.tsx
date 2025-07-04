@@ -1,7 +1,20 @@
 'use client'
 
-import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen } from 'lucide-react'
 import { useState, Suspense } from 'react'
+import {
+  Settings,
+  FolderOpen,
+  Copy,
+  Share2,
+  Edit,
+  Download,
+  FileText,
+  RotateCcw,
+  Trash2,
+  Grid3X3,
+  CheckCircle,
+} from 'lucide-react'
+import { useIsMobile } from '@/lib/hooks/use-mobile'
 
 import {
   Dialog,
@@ -18,7 +31,9 @@ import {
   BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
-import { useIsMobile } from '@/lib/hooks/use-mobile'
+import { Badge } from '@/components/ui/badge'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Separator } from '@/components/ui/separator'
 import {
   ItemsMoveDialog,
   ItemsCopyDialog,
@@ -39,6 +54,17 @@ interface OperationsDialogProps {
   selectedItems: any[]
 }
 
+interface Operation {
+  id: string
+  name: string
+  description: string
+  icon: React.ComponentType<{ className?: string }>
+  color: string
+  count: number
+  canPerform: boolean
+  isDestructive?: boolean
+}
+
 function OperationsDialog({
   isOpen,
   open,
@@ -47,17 +73,6 @@ function OperationsDialog({
   selectedItems,
 }: OperationsDialogProps) {
   const isMobile = useIsMobile()
-  const folderCount = selectedItems.filter(item => item.isFolder).length
-  const fileCount = selectedItems.length - folderCount
-  const canDeleteCount = selectedItems.filter(item => item.canDelete).length
-  const canShareCount = selectedItems.filter(item => item.canShare).length
-  const canTrashCount = selectedItems.filter(item => item.canTrash).length
-  const canUntrashCount = selectedItems.filter(item => item.canUntrash).length
-  const canDownloadCount = selectedItems.filter(item => item.canDownload).length
-  const canRenameCount = selectedItems.filter(item => item.canRename).length
-  const canExportCount = selectedItems.filter(item => item.canExport).length
-  const canMoveCount = selectedItems.filter(item => item.canMove).length
-  const canCopyCount = selectedItems.filter(item => item.canCopy).length
 
   // Individual dialog states
   const [isMoveDialogOpen, setIsMoveDialogOpen] = useState(false)
@@ -70,415 +85,407 @@ function OperationsDialog({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [isUntrashDialogOpen, setIsUntrashDialogOpen] = useState(false)
 
-  // Determine dialog open state
+  // Dialog state
   const dialogOpen = open ?? isOpen ?? false
   const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
 
-  // Individual dialog handlers - Fixed timing issue
-  const handleMoveClick = () => {
-    console.log('Move button clicked, opening move dialog and closing main')
-    setIsMoveDialogOpen(true)
-    handleClose() // Close main dialog immediately
-  }
+  // Calculate counts and permissions
+  const folderCount = selectedItems.filter(item => item.isFolder).length
+  const fileCount = selectedItems.length - folderCount
 
-  const handleCopyClick = () => {
-    console.log('Copy button clicked, opening copy dialog and closing main')
-    setIsCopyDialogOpen(true)
-    handleClose() // Close main dialog immediately
-  }
+  const operations: Operation[] = [
+    {
+      id: 'move',
+      name: 'Move',
+      description: `Move ${selectedItems.filter(item => item.canMove).length} items to another location`,
+      icon: FolderOpen,
+      color: 'blue',
+      count: selectedItems.filter(item => item.canMove).length,
+      canPerform: selectedItems.filter(item => item.canMove).length > 0,
+    },
+    {
+      id: 'copy',
+      name: 'Copy',
+      description: `Create copies of ${selectedItems.filter(item => item.canCopy).length} items`,
+      icon: Copy,
+      color: 'green',
+      count: selectedItems.filter(item => item.canCopy).length,
+      canPerform: selectedItems.filter(item => item.canCopy).length > 0,
+    },
+    {
+      id: 'share',
+      name: 'Share',
+      description: `Generate shareable links for ${selectedItems.filter(item => item.canShare).length} items`,
+      icon: Share2,
+      color: 'purple',
+      count: selectedItems.filter(item => item.canShare).length,
+      canPerform: selectedItems.filter(item => item.canShare).length > 0,
+    },
+    {
+      id: 'rename',
+      name: 'Rename',
+      description: `Rename ${selectedItems.filter(item => item.canRename).length} items with patterns`,
+      icon: Edit,
+      color: 'orange',
+      count: selectedItems.filter(item => item.canRename).length,
+      canPerform: selectedItems.filter(item => item.canRename).length > 0,
+    },
+    {
+      id: 'download',
+      name: 'Download',
+      description: `Download ${selectedItems.filter(item => item.canDownload).length} files directly`,
+      icon: Download,
+      color: 'emerald',
+      count: selectedItems.filter(item => item.canDownload).length,
+      canPerform: selectedItems.filter(item => item.canDownload).length > 0,
+    },
+    {
+      id: 'export',
+      name: 'Export',
+      description: `Export ${selectedItems.filter(item => item.canExport).length} files in various formats`,
+      icon: FileText,
+      color: 'indigo',
+      count: selectedItems.filter(item => item.canExport).length,
+      canPerform: selectedItems.filter(item => item.canExport).length > 0,
+    },
+    {
+      id: 'untrash',
+      name: 'Untrash',
+      description: `Restore ${selectedItems.filter(item => item.canUntrash).length} items from trash`,
+      icon: RotateCcw,
+      color: 'teal',
+      count: selectedItems.filter(item => item.canUntrash).length,
+      canPerform: selectedItems.filter(item => item.canUntrash).length > 0,
+    },
+    {
+      id: 'trash',
+      name: 'Move to Trash',
+      description: `Move ${selectedItems.filter(item => item.canTrash).length} items to trash (recoverable)`,
+      icon: Trash2,
+      color: 'yellow',
+      count: selectedItems.filter(item => item.canTrash).length,
+      canPerform: selectedItems.filter(item => item.canTrash).length > 0,
+      isDestructive: true,
+    },
+    {
+      id: 'delete',
+      name: 'Delete Permanently',
+      description: `Delete ${selectedItems.filter(item => item.canDelete).length} items permanently (cannot be undone)`,
+      icon: Trash2,
+      color: 'red',
+      count: selectedItems.filter(item => item.canDelete).length,
+      canPerform: selectedItems.filter(item => item.canDelete).length > 0,
+      isDestructive: true,
+    },
+  ]
 
-  const handleTrashClick = () => {
-    console.log('Trash button clicked, closing main dialog and opening trash dialog')
+  // Get available operations
+  const availableOperations = operations.filter(op => op.canPerform)
+  const regularOperations = availableOperations.filter(op => !op.isDestructive)
+  const destructiveOperations = availableOperations.filter(op => op.isDestructive)
+
+  // Operation handlers
+  const handleOperationClick = (operationId: string) => {
     handleClose()
+
+    // Add slight delay to prevent dialog conflicts
     setTimeout(() => {
-      console.log('Setting trash dialog open to true')
-      setIsTrashDialogOpen(true)
+      switch (operationId) {
+        case 'move':
+          setIsMoveDialogOpen(true)
+          break
+        case 'copy':
+          setIsCopyDialogOpen(true)
+          break
+        case 'share':
+          setIsShareDialogOpen(true)
+          break
+        case 'rename':
+          setIsRenameDialogOpen(true)
+          break
+        case 'download':
+          setIsDownloadDialogOpen(true)
+          break
+        case 'export':
+          setIsExportDialogOpen(true)
+          break
+        case 'untrash':
+          setIsUntrashDialogOpen(true)
+          break
+        case 'trash':
+          setIsTrashDialogOpen(true)
+          break
+        case 'delete':
+          setIsDeleteDialogOpen(true)
+          break
+        default:
+          break
+      }
     }, 100)
   }
 
-  const handleShareClick = () => {
-    handleClose()
-    setTimeout(() => {
-      setIsShareDialogOpen(true)
-    }, 100)
+  // Color variants for operations
+  const getColorClasses = (color: string, isDestructive = false) => {
+    const colorMap = {
+      blue: 'border-blue-200 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-950/50',
+      green:
+        'border-green-200 bg-green-50 hover:bg-green-100 dark:bg-green-950/30 dark:hover:bg-green-950/50',
+      purple:
+        'border-purple-200 bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/30 dark:hover:bg-purple-950/50',
+      orange:
+        'border-orange-200 bg-orange-50 hover:bg-orange-100 dark:bg-orange-950/30 dark:hover:bg-orange-950/50',
+      emerald:
+        'border-emerald-200 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50',
+      indigo:
+        'border-indigo-200 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/30 dark:hover:bg-indigo-950/50',
+      teal: 'border-teal-200 bg-teal-50 hover:bg-teal-100 dark:bg-teal-950/30 dark:hover:bg-teal-950/50',
+      yellow:
+        'border-yellow-200 bg-yellow-50 hover:bg-yellow-100 dark:bg-yellow-950/30 dark:hover:bg-yellow-950/50',
+      red: 'border-red-200 bg-red-50 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-950/50',
+    }
+    return colorMap[color as keyof typeof colorMap] || colorMap.blue
   }
 
-  const handleRenameClick = () => {
-    handleClose()
-    setTimeout(() => {
-      setIsRenameDialogOpen(true)
-    }, 100)
+  const getIconClasses = (color: string) => {
+    const colorMap = {
+      blue: 'text-blue-600 dark:text-blue-400',
+      green: 'text-green-600 dark:text-green-400',
+      purple: 'text-purple-600 dark:text-purple-400',
+      orange: 'text-orange-600 dark:text-orange-400',
+      emerald: 'text-emerald-600 dark:text-emerald-400',
+      indigo: 'text-indigo-600 dark:text-indigo-400',
+      teal: 'text-teal-600 dark:text-teal-400',
+      yellow: 'text-yellow-600 dark:text-yellow-400',
+      red: 'text-red-600 dark:text-red-400',
+    }
+    return colorMap[color as keyof typeof colorMap] || colorMap.blue
   }
 
-  const handleExportClick = () => {
-    handleClose()
-    setTimeout(() => {
-      setIsExportDialogOpen(true)
-    }, 100)
-  }
+  const renderOperationButton = (operation: Operation) => {
+    const IconComponent = operation.icon
 
-  const handleDeleteClick = () => {
-    handleClose()
-    setTimeout(() => {
-      setIsDeleteDialogOpen(true)
-    }, 100)
-  }
-
-  const handleUntrashClick = () => {
-    handleClose()
-    setTimeout(() => {
-      setIsUntrashDialogOpen(true)
-    }, 100)
-  }
-
-  const handleDownloadClick = () => {
-    handleClose()
-    setTimeout(() => {
-      setIsDownloadDialogOpen(true)
-    }, 100)
-  }
-
-  // Standardized close handlers
-  const handleMoveClose = () => {
-    console.log('Move dialog close handler called')
-    setIsMoveDialogOpen(false)
-  }
-
-  const handleCopyClose = () => {
-    setIsCopyDialogOpen(false)
-  }
-
-  const handleTrashClose = () => {
-    setIsTrashDialogOpen(false)
-  }
-
-  const handleShareClose = () => {
-    setIsShareDialogOpen(false)
-  }
-
-  const handleRenameClose = () => {
-    setIsRenameDialogOpen(false)
-  }
-
-  const handleExportClose = () => {
-    setIsExportDialogOpen(false)
-  }
-
-  const handleDeleteClose = () => {
-    setIsDeleteDialogOpen(false)
-  }
-
-  const handleUntrashClose = () => {
-    setIsUntrashDialogOpen(false)
-  }
-
-  const handleDownloadClose = () => {
-    setIsDownloadDialogOpen(false)
-  }
-
-  // Standardized completion handlers - no automatic refresh since dialogs handle their own refresh
-  const handleMoveComplete = () => {
-    setIsMoveDialogOpen(false)
-  }
-
-  const handleCopyComplete = () => {
-    setIsCopyDialogOpen(false)
-  }
-
-  const handleTrashComplete = () => {
-    setIsTrashDialogOpen(false)
-  }
-
-  const handleRenameComplete = () => {
-    setIsRenameDialogOpen(false)
-  }
-
-  const handleExportComplete = () => {
-    setIsExportDialogOpen(false)
-  }
-
-  const handleDeleteComplete = () => {
-    setIsDeleteDialogOpen(false)
-  }
-
-  const handleUntrashComplete = () => {
-    setIsUntrashDialogOpen(false)
-  }
-
-  const handleDownloadComplete = () => {
-    setIsDownloadDialogOpen(false)
+    return (
+      <button
+        key={operation.id}
+        onClick={() => handleOperationClick(operation.id)}
+        className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all hover:scale-[1.02] ${getColorClasses(operation.color, operation.isDestructive)}`}
+      >
+        <div
+          className={`flex h-10 w-10 items-center justify-center rounded-lg ${operation.color === 'red' ? 'bg-red-100 dark:bg-red-900/50' : operation.color === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-900/50' : `bg-${operation.color}-100 dark:bg-${operation.color}-900/50`}`}
+        >
+          <IconComponent className={`h-5 w-5 ${getIconClasses(operation.color)}`} />
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{operation.name}</span>
+            {operation.count > 0 && (
+              <Badge
+                variant={operation.isDestructive ? 'destructive' : 'secondary'}
+                className="text-xs"
+              >
+                {operation.count}
+              </Badge>
+            )}
+          </div>
+          <p className="text-muted-foreground mt-1 text-sm">{operation.description}</p>
+        </div>
+      </button>
+    )
   }
 
   const renderContent = () => (
-    <>
-      <div className="grid gap-3">
-        {/* Move Items */}
-        {canMoveCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={e => {
-              e.preventDefault()
-              e.stopPropagation()
-              console.log('Move button clicked - direct handler')
-              handleMoveClick()
-            }}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-blue-200 hover:bg-blue-50 dark:hover:bg-blue-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
-              <FolderOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Move</span>
-              <span className="text-muted-foreground text-xs">
-                Move {canMoveCount} item{canMoveCount > 1 ? 's' : ''} to another location
-              </span>
-            </div>
-          </Button>
-        )}
-
-        {/* Copy Items */}
-        {canCopyCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={e => {
-              e.preventDefault()
-              e.stopPropagation()
-              console.log('Copy button clicked - direct handler')
-              handleCopyClick()
-            }}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-green-200 hover:bg-green-50 dark:hover:bg-green-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-green-100 dark:bg-green-900/50">
-              <Copy className="h-4 w-4 text-green-600 dark:text-green-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Copy</span>
-              <span className="text-muted-foreground text-xs">
-                Create {canCopyCount} cop{canCopyCount > 1 ? 'ies' : 'y'} in another location
-              </span>
-            </div>
-          </Button>
-        )}
-
-        {/* Share Items */}
-        {canShareCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleShareClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
-              <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Share</span>
-              <span className="text-muted-foreground text-xs">
-                Generate {canShareCount} shareable link{canShareCount > 1 ? 's' : ''}
-              </span>
-            </div>
-          </Button>
-        )}
-
-        {/* Rename */}
-        {canRenameCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleRenameClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-orange-200 hover:bg-orange-50 dark:hover:bg-orange-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-orange-100 dark:bg-orange-900/50">
-              <Edit className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Rename</span>
-              <span className="text-muted-foreground text-xs">
-                Rename {canRenameCount} item{canRenameCount > 1 ? 's' : ''} with patterns
-              </span>
-            </div>
-          </Button>
-        )}
-
-        {/* Download Files */}
-        {canDownloadCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleDownloadClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-              <Download className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Download</span>
-              <span className="text-muted-foreground text-xs">
-                Download {canDownloadCount} file{canDownloadCount > 1 ? 's' : ''} directly
-              </span>
-            </div>
-          </Button>
-        )}
-
-        {/* Export Files */}
-        {canExportCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleExportClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-indigo-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 dark:bg-indigo-900/50">
-              <Download className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Export</span>
-              <span className="text-muted-foreground text-xs">
-                Export {canExportCount} file{canExportCount > 1 ? 's' : ''} in various formats
-              </span>
-            </div>
-          </Button>
-        )}
-
-        {/* Untrash Items */}
-        {canUntrashCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleUntrashClick}
-            className="h-12 w-full justify-start gap-3 text-left hover:border-emerald-200 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
-          >
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 dark:bg-emerald-900/50">
-              <RotateCcw className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="font-medium">Untrash</span>
-              <span className="text-muted-foreground text-xs">
-                Untrash {canUntrashCount} items to original location
-              </span>
-            </div>
-          </Button>
-        )}
-
-        {/* Separator for destructive actions */}
-        {canDeleteCount > 0 ||
-          (canTrashCount > 0 && (
-            <div className="mt-3 border-t pt-3">
-              <p className="text-muted-foreground mb-3 text-xs font-medium">Destructive Actions</p>
-
-              {/* Move to Trash */}
-              {canTrashCount > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={handleTrashClick}
-                  className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-yellow-200 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
-                    <Trash2 className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">Move to Trash</span>
-                    <span className="text-muted-foreground text-xs">
-                      Move {canTrashCount} items to trash (can be untrashed)
-                    </span>
-                  </div>
-                </Button>
-              )}
-
-              {/* Delete Permanently */}
-              {canDeleteCount > 0 && (
-                <Button
-                  variant="outline"
-                  onClick={handleDeleteClick}
-                  className="mb-3 h-12 w-full justify-start gap-3 text-left hover:border-red-200 hover:bg-red-50 dark:hover:bg-red-950/30"
-                >
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-100 dark:bg-red-900/50">
-                    <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
-                  </div>
-                  <div className="flex flex-col items-start">
-                    <span className="font-medium">Delete</span>
-                    <span className="text-muted-foreground text-xs">
-                      Delete {canDeleteCount} items permanently (cannot be undone)
-                    </span>
-                  </div>
-                </Button>
-              )}
-            </div>
-          ))}
+    <div className="space-y-4">
+      {/* Selection Summary */}
+      <div className="bg-muted/50 flex items-center gap-2 rounded-lg p-3">
+        <Grid3X3 className="text-muted-foreground h-5 w-5" />
+        <span className="text-sm font-medium">
+          {selectedItems.length} item{selectedItems.length > 1 ? 's' : ''} selected
+        </span>
+        <Badge variant="outline" className="text-xs">
+          {fileCount} file{fileCount !== 1 ? 's' : ''}
+        </Badge>
+        <Badge variant="outline" className="text-xs">
+          {folderCount} folder{folderCount !== 1 ? 's' : ''}
+        </Badge>
       </div>
-    </>
+
+      {/* Regular Operations */}
+      {regularOperations.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-muted-foreground text-sm font-medium">Operations</h3>
+          <div className="space-y-2">{regularOperations.map(renderOperationButton)}</div>
+        </div>
+      )}
+
+      {/* Destructive Operations */}
+      {destructiveOperations.length > 0 && (
+        <>
+          <Separator />
+          <div className="space-y-3">
+            <h3 className="text-destructive text-sm font-medium">Destructive Actions</h3>
+            <div className="space-y-2">{destructiveOperations.map(renderOperationButton)}</div>
+          </div>
+        </>
+      )}
+
+      {/* No Operations Available */}
+      {availableOperations.length === 0 && (
+        <div className="py-8 text-center">
+          <Settings className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+          <h3 className="mb-2 text-lg font-medium">No Operations Available</h3>
+          <p className="text-muted-foreground text-sm">
+            The selected items don't support any operations at this time.
+          </p>
+        </div>
+      )}
+    </div>
   )
 
-  return (
-    <>
-      {/* Main Operations Dialog */}
-      {isMobile ? (
-        <BottomSheet
-          open={dialogOpen}
-          {...((onOpenChange || onClose) && { onOpenChange: onOpenChange || onClose })}
-        >
+  const getTitle = () => {
+    return availableOperations.length > 0
+      ? `${availableOperations.length} Operation${availableOperations.length > 1 ? 's' : ''} Available`
+      : 'No Operations Available'
+  }
+
+  const getDescription = () => {
+    return `Choose an action for your selected items`
+  }
+
+  if (isMobile) {
+    return (
+      <>
+        <BottomSheet open={dialogOpen} onOpenChange={handleClose}>
           <BottomSheetContent>
             <BottomSheetHeader>
-              <BottomSheetTitle className="text-lg font-semibold">Operations</BottomSheetTitle>
-              <BottomSheetDescription className="text-muted-foreground text-sm">
-                Choose an action for {selectedItems.length} selected item
-                {selectedItems.length > 1 ? 's' : ''} ({fileCount} file
-                {fileCount !== 1 ? 's' : ''}, {folderCount} folder
-                {folderCount !== 1 ? 's' : ''})
-              </BottomSheetDescription>
+              <BottomSheetTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                {getTitle()}
+              </BottomSheetTitle>
+              <BottomSheetDescription>{getDescription()}</BottomSheetDescription>
             </BottomSheetHeader>
             <div className="max-h-[60vh] overflow-y-auto px-4 pb-6">{renderContent()}</div>
           </BottomSheetContent>
         </BottomSheet>
-      ) : (
-        <Dialog
-          open={dialogOpen}
-          {...((onOpenChange || onClose) && { onOpenChange: onOpenChange || onClose })}
-        >
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-semibold">Operations</DialogTitle>
-              <DialogDescription className="text-muted-foreground text-sm">
-                Choose an action for {selectedItems.length} selected item
-                {selectedItems.length > 1 ? 's' : ''} ({fileCount} file
-                {fileCount !== 1 ? 's' : ''}, {folderCount} folder
-                {folderCount !== 1 ? 's' : ''})
-              </DialogDescription>
-            </DialogHeader>
-            <div className="max-h-[70vh] overflow-y-auto py-2">{renderContent()}</div>
-          </DialogContent>
-        </Dialog>
-      )}
 
-      {/* Individual Items Operation Dialogs - With Suspense for Lazy Loading */}
-      {console.log('Move dialog state:', isMoveDialogOpen, 'selectedItems:', selectedItems.length)}
+        {/* Operation Dialogs */}
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsMoveDialog
+            isOpen={isMoveDialogOpen}
+            onClose={() => setIsMoveDialogOpen(false)}
+            selectedItems={selectedItems}
+            onConfirm={() => setIsMoveDialogOpen(false)}
+          />
+        </Suspense>
+
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsCopyDialog
+            isOpen={isCopyDialogOpen}
+            onClose={() => setIsCopyDialogOpen(false)}
+            selectedItems={selectedItems}
+            onConfirm={() => setIsCopyDialogOpen(false)}
+          />
+        </Suspense>
+
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsShareDialog
+            isOpen={isShareDialogOpen}
+            onClose={() => setIsShareDialogOpen(false)}
+            selectedItems={selectedItems}
+          />
+        </Suspense>
+
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsRenameDialog
+            isOpen={isRenameDialogOpen}
+            onClose={() => setIsRenameDialogOpen(false)}
+            selectedItems={selectedItems}
+            onConfirm={() => setIsRenameDialogOpen(false)}
+          />
+        </Suspense>
+
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsDownloadDialog
+            isOpen={isDownloadDialogOpen}
+            onClose={() => setIsDownloadDialogOpen(false)}
+            selectedItems={selectedItems}
+          />
+        </Suspense>
+
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsExportDialog
+            isOpen={isExportDialogOpen}
+            onClose={() => setIsExportDialogOpen(false)}
+            selectedItems={selectedItems}
+          />
+        </Suspense>
+
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsUntrashDialog
+            isOpen={isUntrashDialogOpen}
+            onClose={() => setIsUntrashDialogOpen(false)}
+            selectedItems={selectedItems}
+            onConfirm={() => setIsUntrashDialogOpen(false)}
+          />
+        </Suspense>
+
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsTrashDialog
+            isOpen={isTrashDialogOpen}
+            onClose={() => setIsTrashDialogOpen(false)}
+            selectedItems={selectedItems}
+            onConfirm={() => setIsTrashDialogOpen(false)}
+          />
+        </Suspense>
+
+        <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+          <ItemsDeleteDialog
+            isOpen={isDeleteDialogOpen}
+            onClose={() => setIsDeleteDialogOpen(false)}
+            selectedItems={selectedItems}
+          />
+        </Suspense>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Dialog open={dialogOpen} onOpenChange={handleClose}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              {getTitle()}
+            </DialogTitle>
+            <DialogDescription>{getDescription()}</DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">{renderContent()}</div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Operation Dialogs */}
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsMoveDialog
           isOpen={isMoveDialogOpen}
-          onClose={handleMoveClose}
-          onConfirm={handleMoveComplete}
+          onClose={() => setIsMoveDialogOpen(false)}
           selectedItems={selectedItems}
+          onConfirm={() => setIsMoveDialogOpen(false)}
         />
       </Suspense>
 
-      {console.log('Copy dialog state:', isCopyDialogOpen, 'selectedItems:', selectedItems.length)}
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsCopyDialog
           isOpen={isCopyDialogOpen}
-          onClose={handleCopyClose}
-          onConfirm={handleCopyComplete}
+          onClose={() => setIsCopyDialogOpen(false)}
           selectedItems={selectedItems}
-        />
-      </Suspense>
-
-      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
-        <ItemsTrashDialog
-          isOpen={isTrashDialogOpen}
-          onClose={handleTrashClose}
-          _onConfirm={handleTrashComplete}
-          selectedItems={selectedItems}
+          onConfirm={() => setIsCopyDialogOpen(false)}
         />
       </Suspense>
 
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsShareDialog
           isOpen={isShareDialogOpen}
-          onClose={handleShareClose}
+          onClose={() => setIsShareDialogOpen(false)}
           selectedItems={selectedItems}
         />
       </Suspense>
@@ -486,8 +493,16 @@ function OperationsDialog({
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsRenameDialog
           isOpen={isRenameDialogOpen}
-          onClose={handleRenameClose}
-          onConfirm={handleRenameComplete}
+          onClose={() => setIsRenameDialogOpen(false)}
+          selectedItems={selectedItems}
+          onConfirm={() => setIsRenameDialogOpen(false)}
+        />
+      </Suspense>
+
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsDownloadDialog
+          isOpen={isDownloadDialogOpen}
+          onClose={() => setIsDownloadDialogOpen(false)}
           selectedItems={selectedItems}
         />
       </Suspense>
@@ -495,26 +510,7 @@ function OperationsDialog({
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsExportDialog
           isOpen={isExportDialogOpen}
-          onClose={handleExportClose}
-          onConfirm={handleExportComplete}
-          selectedItems={selectedItems}
-        />
-      </Suspense>
-
-      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
-        <ItemsDownloadDialog
-          isOpen={isDownloadDialogOpen}
-          onClose={handleDownloadClose}
-          onConfirm={handleDownloadComplete}
-          selectedItems={selectedItems}
-        />
-      </Suspense>
-
-      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
-        <ItemsDeleteDialog
-          isOpen={isDeleteDialogOpen}
-          onClose={handleDeleteClose}
-          onConfirm={handleDeleteComplete}
+          onClose={() => setIsExportDialogOpen(false)}
           selectedItems={selectedItems}
         />
       </Suspense>
@@ -522,8 +518,25 @@ function OperationsDialog({
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsUntrashDialog
           isOpen={isUntrashDialogOpen}
-          onClose={handleUntrashClose}
-          _onConfirm={handleUntrashComplete}
+          onClose={() => setIsUntrashDialogOpen(false)}
+          selectedItems={selectedItems}
+          onConfirm={() => setIsUntrashDialogOpen(false)}
+        />
+      </Suspense>
+
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsTrashDialog
+          isOpen={isTrashDialogOpen}
+          onClose={() => setIsTrashDialogOpen(false)}
+          selectedItems={selectedItems}
+          onConfirm={() => setIsTrashDialogOpen(false)}
+        />
+      </Suspense>
+
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsDeleteDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
           selectedItems={selectedItems}
         />
       </Suspense>
@@ -531,5 +544,5 @@ function OperationsDialog({
   )
 }
 
-export { OperationsDialog }
 export default OperationsDialog
+export { OperationsDialog }
