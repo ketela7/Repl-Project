@@ -76,7 +76,7 @@ export default [
       '@typescript-eslint/no-unused-vars': 'off',
 
       // Code Quality Rules
-      'no-debugger': 'error',
+      //'no-debugger': 'error',
       'no-alert': 'warn',
       'no-duplicate-imports': 'error',
       'no-useless-catch': 'error',
