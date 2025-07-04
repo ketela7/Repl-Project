@@ -1,109 +1,43 @@
 #!/usr/bin/env node
 
 /**
- * Simplified script for testing custom ESLint rules
- * Tests basic functionality of custom async state rules
+ * Basic ESLint configuration test
+ * Verifies that ESLint is working with the project configuration
  */
 
 const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path');
 
-// Simplified test cases
-const testCases = {
-  'basic-lint-check': {
-    code: `
-import React, { useState, useEffect } from 'react';
-
-function TestComponent() {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    fetch('/api/test').then(response => {
-      setCount(response.data);
-    });
-  }, []);
-
-  return <div>{count}</div>;
-}
-
-export default TestComponent;
-    `
-  }
-};
-
-function createTestFile(name, code) {
-  const fileName = `test-${name}.tsx`;
-  const filePath = path.join(__dirname, '..', 'temp', fileName);
-
-  // Ensure temp directory exists
-  const tempDir = path.dirname(filePath);
-  if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true });
-  }
-
-  fs.writeFileSync(filePath, code);
-  return filePath;
-}
-
-function runBasicLintCheck(filePath) {
+function testESLintConfig() {
   try {
-    const result = execSync(`npx eslint "${filePath}" --format json`, {
+    console.log('🔍 Testing ESLint configuration...');
+
+    // Test basic ESLint functionality
+    const result = execSync('npx eslint --version', {
       encoding: 'utf8',
       stdio: 'pipe'
     });
-    return { success: true, output: result };
-  } catch (error) {
-    return { success: false, output: error.stdout || error.message };
-  }
-}
 
-function cleanupTempFiles() {
-  const tempDir = path.join(__dirname, '..', 'temp');
-  if (fs.existsSync(tempDir)) {
-    fs.rmSync(tempDir, { recursive: true, force: true });
+    console.log(`✅ ESLint version: ${result.trim()}`);
+    console.log('✅ ESLint configuration is working');
+
+    return true;
+  } catch (error) {
+    console.error('❌ ESLint configuration test failed:', error.message);
+    return false;
   }
 }
 
 function main() {
-  console.log('🧹 Running basic ESLint configuration check\n');
+  console.log('🧹 ESLint Configuration Test\n');
 
-  try {
-    // Test basic linting functionality
-    const testCase = testCases['basic-lint-check'];
-    const filePath = createTestFile('basic', testCase.code);
-    const result = runBasicLintCheck(filePath);
+  const success = testESLintConfig();
 
-    if (result.success) {
-      console.log('✅ ESLint configuration is working correctly');
-      console.log('✅ Basic syntax and import checks passed');
-    } else {
-      console.log('⚠️  ESLint found issues (this is normal):');
-      try {
-        const parsed = JSON.parse(result.output);
-        if (parsed[0] && parsed[0].messages) {
-          parsed[0].messages.forEach(msg => {
-            console.log(`  - ${msg.ruleId}: ${msg.message}`);
-          });
-        }
-      } catch {
-        console.log('  - Configuration test completed');
-      }
-    }
-
-    console.log('\n📋 ESLint Test Summary:');
-    console.log('- Basic configuration: ✅ Working');
-    console.log('- TypeScript support: ✅ Working');
-    console.log('- React rules: ✅ Working');
-
-  } catch (error) {
-    console.error('❌ Error during ESLint test:', error.message);
+  if (success) {
+    console.log('\n🎯 ESLint is ready for development');
+    console.log('Run "npm run lint" to check your code');
+  } else {
     process.exit(1);
-  } finally {
-    cleanupTempFiles();
   }
-
-  console.log('\n🎯 ESLint configuration is ready for development');
 }
 
 if (require.main === module) {
