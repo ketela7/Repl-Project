@@ -389,6 +389,7 @@ function OperationsDialog({
             isOpen={isShareDialogOpen}
             onClose={() => setIsShareDialogOpen(false)}
             selectedItems={selectedItems}
+            onConfirm={() => setIsShareDialogOpen(false)}
           />
         </Suspense>
 

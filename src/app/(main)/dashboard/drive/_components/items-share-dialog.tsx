@@ -58,6 +58,7 @@ import { cn, calculateProgress } from '@/lib/utils'
 interface ItemsShareDialogProps {
   isOpen: boolean
   onClose: () => void
+  onConfirm: () => void
   selectedItems: Array<{
     id: string
     name: string
@@ -73,13 +74,15 @@ interface ShareResult {
   error?: string
 }
 
-function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogProps) {
+function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsShareDialogProps) {
+  const [currentStep, setCurrentStep] = useState<'configuration' | 'processing' | 'completed'>(
+    'configuration',
+  )
   const [accessLevel, setAccessLevel] = useState<'reader' | 'writer' | 'commenter'>('reader')
   const [linkAccess, setLinkAccess] = useState<'anyone' | 'anyoneWithLink' | 'domain'>(
     'anyoneWithLink',
   )
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
@@ -89,7 +92,6 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     skipped: number
     failed: number
     errors: Array<{ file: string; error: string }>
-    shareResults: ShareResult[]
   }>({
     current: 0,
     total: 0,
@@ -97,8 +99,8 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     skipped: 0,
     failed: 0,
     errors: [],
-    shareResults: [],
   })
+  const [shareResults, setShareResults] = useState<ShareResult[]>([])
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
@@ -113,7 +115,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     }
 
     setIsProcessing(false)
-    setIsCompleted(true)
+    setCurrentStep('completed')
     toast.info('Share operation cancelled')
   }
 
@@ -126,7 +128,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
-    setIsCompleted(false)
+    setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
     const totalItems = selectedItems.length
@@ -138,14 +140,14 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
       skipped: 0,
       failed: 0,
       errors: [],
-      shareResults: [],
     })
+    setShareResults([])
 
     let successCount = 0
     let failedCount = 0
     let skippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
-    const shareResults: ShareResult[] = []
+    const results: ShareResult[] = []
 
     try {
       for (let i = 0; i < selectedItems.length; i++) {
@@ -180,7 +182,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
           }
 
           const data = await response.json()
-          shareResults.push({
+          results.push({
             id: item.id,
             name: item.name,
             success: true,
@@ -194,7 +196,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
 
           const errorMessage = error instanceof Error ? error.message : 'Unknown error'
           errors.push({ file: item.name, error: errorMessage })
-          shareResults.push({
+          results.push({
             id: item.id,
             name: item.name,
             success: false,
@@ -214,11 +216,11 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
         failed: failedCount,
         skipped: skippedCount,
         errors,
-        shareResults,
       }))
+      setShareResults(results)
 
       setIsProcessing(false)
-      setIsCompleted(true)
+      setCurrentStep('completed')
 
       if (isCancelledRef.current) {
         toast.info('Share operation cancelled')
@@ -239,11 +241,17 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
     }
   }
 
+  const handleComplete = () => {
+    onConfirm()
+    resetState()
+    onClose()
+  }
+
   const resetState = () => {
+    setCurrentStep('configuration')
     setAccessLevel('reader')
     setLinkAccess('anyoneWithLink')
     setIsProcessing(false)
-    setIsCompleted(false)
     setIsCancelled(false)
     setProgress({
       current: 0,
@@ -252,12 +260,12 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
       skipped: 0,
       failed: 0,
       errors: [],
-      shareResults: [],
     })
+    setShareResults([])
   }
 
   const exportShareResults = (format: 'clipboard' | 'txt' | 'csv' | 'json') => {
-    const successfulShares = progress.shareResults.filter(result => result.success)
+    const successfulShares = shareResults.filter(result => result.success)
 
     if (successfulShares.length === 0) {
       toast.error('No successful shares to export')
@@ -305,7 +313,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
   }
 
   const renderContent = () => {
-    if (isProcessing) {
+    if (currentStep === 'processing') {
       return (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -348,7 +356,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
       )
     }
 
-    if (isCompleted) {
+    if (currentStep === 'completed') {
       return (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -391,7 +399,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
 
               <ScrollArea className="max-h-48">
                 <div className="space-y-2">
-                  {progress.shareResults.map((result, index) => (
+                  {shareResults.map((result, index) => (
                     <div key={index} className="text-sm">
                       <div className="flex items-center gap-2">
                         {result.success ? (
@@ -531,7 +539,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
   }
 
   const renderFooter = () => {
-    if (isProcessing) {
+    if (currentStep === 'processing') {
       return (
         <Button variant="outline" onClick={handleCancel}>
           Cancel
@@ -539,8 +547,12 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
       )
     }
 
-    if (isCompleted) {
-      return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
+    if (currentStep === 'completed') {
+      return (
+        <Button onClick={isCancelled ? handleClose : handleComplete}>
+          {isCancelled ? 'Close' : 'Done'}
+        </Button>
+      )
     }
 
     return (

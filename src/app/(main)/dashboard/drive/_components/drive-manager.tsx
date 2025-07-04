@@ -882,6 +882,10 @@ export function DriveManager() {
           onClose={() => {
             closeDialog('share')
             setSelectedItems(new Set())
+          }}
+          onConfirm={() => {
+            closeDialog('share')
+            setSelectedItems(new Set())
             handleRefresh()
           }}
           selectedItems={getSelectedItemsForDialog()}
