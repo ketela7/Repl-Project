@@ -130,6 +130,9 @@ function ItemsMoveDialog({
         errors: [],
       })
 
+      // Ensure progress UI is visible before starting operations
+      await new Promise(resolve => setTimeout(resolve, 300))
+
       let successCount = 0
       let failedCount = 0
       const errors: Array<{ file: string; error: string }> = []
@@ -179,9 +182,9 @@ function ItemsMoveDialog({
             throw new Error(result.error || 'Failed to move item')
           }
 
-          // Small delay between items to allow cancellation
+          // Delay between items to show progress and allow cancellation
           if (!isCancelledRef.current) {
-            await new Promise(resolve => setTimeout(resolve, 100))
+            await new Promise(resolve => setTimeout(resolve, 500))
           }
         } catch (error: any) {
           if (abortControllerRef.current?.signal.aborted) {
@@ -211,6 +214,10 @@ function ItemsMoveDialog({
 
       // Show results only if not cancelled
       if (!isCancelledRef.current) {
+        // Ensure completion state is visible for at least 1 second
+        setIsCompleted(true)
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
         if (successCount > 0) {
           toast.success(
             `Moved ${successCount} item${successCount > 1 ? 's' : ''} to "${selectedFolderName}"`,
@@ -225,13 +232,14 @@ function ItemsMoveDialog({
         // Operation was cancelled, don't show error
         return
       }
-      // // // // // console.error(err)
       toast.error('Move operation failed')
     } finally {
       // Clean up
       abortControllerRef.current = null
       setIsProcessing(false)
-      setIsCompleted(true)
+      if (!isCompleted) {
+        setIsCompleted(true)
+      }
     }
   }
 
