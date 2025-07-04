@@ -394,72 +394,77 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
           </div>
 
           {/* Share Options */}
-          <div className="flex-shrink-0 space-y-3">
-            <div className="space-y-2">
-              <Label className="text-xs font-medium">Permission Level:</Label>
-              <Select
-                value={accessLevel}
-                onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}
-              >
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="reader">
-                    <div className="flex items-center gap-2">
-                      <Eye className="h-3 w-3" />
-                      <span>View only</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="commenter">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-3 w-3" />
-                      <span>Comment</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="writer">
-                    <div className="flex items-center gap-2">
-                      <Edit className="h-3 w-3" />
-                      <span>Edit</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            
-              <Label className="text-xs font-medium">Link Access:</Label>
-              <Select
-                value={linkAccess}
-                onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
-                  setLinkAccess(value)
-                }
-              >
-                <SelectTrigger className="h-8 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="anyoneWithLink">
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-3 w-3" />
-                      <span>Anyone with link</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="domain">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-3 w-3" />
-                      <span>Domain users</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="anyone">
-                    <div className="flex items-center gap-2">
-                      <Globe className="h-3 w-3" />
-                      <span>Public</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+          <div className="flex-shrink-0">
+            <div className="flex items-start gap-4">
+              {/* Permission Level */}
+              <div className="flex flex-col space-y-2 w-1/2">
+                <Label className="text-xs font-medium">Permission Level:</Label>
+                <Select
+                  value={accessLevel}
+                  onValueChange={(value: 'reader' | 'writer' | 'commenter') => setAccessLevel(value)}
+                >
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="reader">
+                      <div className="flex items-center gap-2">
+                        <Eye className="h-3 w-3" />
+                        <span>View only</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="commenter">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-3 w-3" />
+                        <span>Comment</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="writer">
+                      <div className="flex items-center gap-2">
+                        <Edit className="h-3 w-3" />
+                        <span>Edit</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Link Access */}
+              <div className="flex flex-col space-y-2 w-1/2">
+                <Label className="text-xs font-medium">Link Access:</Label>
+                <Select
+                  value={linkAccess}
+                  onValueChange={(value: 'anyone' | 'anyoneWithLink' | 'domain') =>
+                    setLinkAccess(value)
+                  }
+                >
+                  <SelectTrigger className="h-8 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="anyoneWithLink">
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-3 w-3" />
+                        <span>Anyone with link</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="domain">
+                      <div className="flex items-center gap-2">
+                        <Users className="h-3 w-3" />
+                        <span>Domain users</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="anyone">
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-3 w-3" />
+                        <span>Public</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-
           {/* Items Preview - ScrollArea */}
           <div className="min-h-0 flex-1 space-y-2">
             <h4 className="text-center text-xs font-medium">Items to share:</h4>

@@ -380,30 +380,28 @@ function ItemsExportDialog({
           </div>
 
           {/* Export Format Selection */}
-          <div className="flex-shrink-0 space-y-3">
-            <ScrollArea className="h-full">
-              <Label className="text-xs font-medium">Export Format:</Label>
-              <RadioGroup
-                value={selectedFormat}
-                onValueChange={setSelectedFormat}
-                className="space-y-2"
-              >
-                {EXPORT_FORMATS.map(format => (
-                  <div key={format.id} className="flex items-center space-x-2">
-                    <RadioGroupItem value={format.id} id={format.id} className="h-3 w-3" />
-                    <Label
-                      htmlFor={format.id}
-                      className="flex cursor-pointer items-center gap-2 text-xs"
-                    >
-                      <format.icon className="h-3 w-3" />
-                      <span>{format.label}</span>
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
-            </ScrollArea>
+          <div className="flex flex-col space-y-2">
+            <Label className="text-xs font-medium">Export Format:</Label>
+            <RadioGroup
+              value={selectedFormat}
+              onValueChange={setSelectedFormat}
+              className="grid grid-cols-2 gap-3"
+            >
+              {EXPORT_FORMATS.map(format => (
+                <div key={format.id} className="flex items-center space-x-2">
+                  <RadioGroupItem value={format.id} id={format.id} className="h-3 w-3" />
+                  <Label
+                    htmlFor={format.id}
+                    className="flex cursor-pointer items-center gap-2 text-xs"
+                  >
+                    <format.icon className="h-3 w-3" />
+                    <span>{format.label}</span>
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
           </div>
-
+          
           {/* Compatible Files Preview - ScrollArea */}
           <div className="min-h-0 flex-1 space-y-2">
             <h4 className="text-center text-xs font-medium">Compatible files:</h4>
