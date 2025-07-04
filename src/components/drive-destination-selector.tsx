@@ -216,8 +216,8 @@ export function DriveDestinationSelector({
 
   return (
     <div className={cn('flex h-full min-h-0 w-full flex-col overflow-hidden', className)}>
-      {/* Main Content - Constrained height container with overflow protection */}
-      <Card className="from-background to-muted/20 mx-auto h-full max-h-[500px] min-h-[350px] w-full border-0 bg-gradient-to-br shadow-sm">
+      {/* Main Content - Mobile-optimized height container */}
+      <Card className="from-background to-muted/20 mx-auto max-h-[400px] min-h-[300px] w-full border-0 bg-gradient-to-br shadow-sm">
         <CardContent className="flex h-full flex-col overflow-hidden p-3">
           <Tabs
             value={activeTab}
@@ -242,8 +242,8 @@ export function DriveDestinationSelector({
               </TabsTrigger>
             </TabsList>
 
-            {/* Browse Tab Content - Stable Height with overflow protection */}
-            <TabsContent value="browse" className="mt-0 flex min-h-0 flex-1 flex-col space-y-2 overflow-hidden">
+            {/* Browse Tab Content - Mobile-optimized height with overflow protection */}
+            <TabsContent value="browse" className="mt-0 flex min-h-0 flex-1 flex-col space-y-2 overflow-hidden max-h-[calc(100vh-350px)]">
               {/* Breadcrumb Navigation - Compact with improved overflow handling */}
               <Card className="border-muted/50 bg-muted/20 flex-shrink-0">
                 <CardContent className="p-2">
@@ -293,11 +293,11 @@ export function DriveDestinationSelector({
                 )}
               </div>
 
-              {/* Folder List - Constrained height with proper scrolling */}
-              <Card className="border-muted/50 min-h-0 flex-1 overflow-hidden">
-                <CardContent className="h-full overflow-hidden p-0">
-                  <ScrollArea className="max-h-[300px]">
-                    <div className="min-h-[150px] space-y-1 p-3">
+              {/* Folder List - Mobile-optimized scrolling */}
+              <Card className="border-muted/50 flex-shrink-0 overflow-hidden">
+                <CardContent className="overflow-hidden p-0">
+                  <ScrollArea className="h-[200px] w-full">
+                    <div className="space-y-1 p-3">
                       {isLoadingFolders ? (
                         <div className="flex min-h-[150px] flex-col items-center justify-center space-y-3">
                           <Loader2 className="h-6 w-6 animate-spin text-blue-500" />

@@ -743,7 +743,7 @@ function ItemsCopyDialog({
 
       {/* Destination Selector Dialog */}
       <Dialog open={showDestinationSelector} onOpenChange={setShowDestinationSelector}>
-        <DialogContent className="flex max-h-[85vh] max-w-2xl flex-col">
+        <DialogContent className="flex max-h-[75vh] max-w-2xl flex-col">
           <DialogHeader className="flex-shrink-0">
             <div className="flex items-center gap-3">
               <Button
