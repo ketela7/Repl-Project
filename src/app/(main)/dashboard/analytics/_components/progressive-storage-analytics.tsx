@@ -17,6 +17,8 @@ import {
   Copy,
   ChevronDown,
   ChevronRight,
+  GitBranch,
+  Settings,
 } from 'lucide-react'
 import { formatFileSize } from '@/lib/google-drive/utils'
 import { FILE_TYPE_CATEGORIES } from '@/lib/mime-type-filter'
@@ -636,53 +638,6 @@ export function ProgressiveStorageAnalytics() {
         </Card>
       )}
 
-      {/* Debug Info for Duplicate Detection */}
-      {files && (
-        <Card className="border-amber-200 bg-amber-50/50">
-          <Collapsible defaultOpen={false}>
-            <CardHeader className="pb-2">
-              <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex w-full items-center justify-between rounded-md p-2 transition-colors">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-amber-800">
-                    <RefreshCw className="h-5 w-5" />
-                    Debug Info
-                  </CardTitle>
-                  <CardDescription className="text-amber-700">
-                    Debug information for duplicate detection
-                  </CardDescription>
-                </div>
-                <ChevronDown className="h-4 w-4 transition-transform duration-200 data-[state=open]:rotate-180" />
-              </CollapsibleTrigger>
-            </CardHeader>
-            <CollapsibleContent>
-              <CardContent className="pt-2">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Duplicate Files Array:</span>
-                    <span className="font-mono">
-                      {files.duplicateFiles ? `${files.duplicateFiles.length} groups` : 'undefined'}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Total Files:</span>
-                    <span className="font-mono">{files.totalFiles || 0}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Has More:</span>
-                    <span className="font-mono">{files.hasMore ? 'true' : 'false'}</span>
-                  </div>
-                  {files.duplicateFiles && (
-                    <div className="mt-3 rounded bg-amber-100 p-2 font-mono text-xs">
-                      <pre>{JSON.stringify(files.duplicateFiles, null, 2)}</pre>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </Card>
-      )}
-
       {/* Duplicate Files Detection - Enhanced with Better Fallback */}
       {files && (
         <Card
@@ -698,7 +653,7 @@ export function ProgressiveStorageAnalytics() {
                 <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex flex-1 items-center justify-between rounded-md p-2 transition-colors">
                   <div>
                     <CardTitle className="flex items-center gap-2">
-                      <Copy className="h-5 w-5" />
+                      <GitBranch className="h-5 w-5" />
                       Duplicate Files
                       {files.duplicateFiles && files.duplicateFiles.length > 0 && (
                         <Badge variant="destructive" className="ml-2">
@@ -746,7 +701,7 @@ export function ProgressiveStorageAnalytics() {
                     }}
                     className="ml-2 gap-2"
                   >
-                    <Copy className="h-4 w-4" />
+                    <Settings className="h-4 w-4" />
                     Action
                   </Button>
                 )}
@@ -881,7 +836,7 @@ export function ProgressiveStorageAnalytics() {
                   </ScrollArea>
                 ) : (
                   <div className="py-8 text-center">
-                    <Copy className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
+                    <GitBranch className="text-muted-foreground mx-auto mb-4 h-12 w-12" />
                     <h3 className="mb-2 text-lg font-medium">No Duplicate Files Found</h3>
                     <p className="text-muted-foreground mb-4 text-sm">
                       Either your Drive is well-organized or the analysis is still running.

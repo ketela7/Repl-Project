@@ -1,7 +1,15 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { Copy, FileText, Trash2, Move, CheckCircle, AlertTriangle, ArrowLeft } from 'lucide-react'
+import {
+  Settings,
+  FileText,
+  Trash2,
+  Move,
+  CheckCircle,
+  AlertTriangle,
+  ArrowLeft,
+} from 'lucide-react'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 
 import {
@@ -481,7 +489,7 @@ export function DuplicateBulkOperationsDialog({
           <BottomSheetContent>
             <BottomSheetHeader>
               <BottomSheetTitle className="flex items-center gap-2">
-                <Copy className="h-5 w-5" />
+                <Settings className="h-5 w-5" />
                 {getStepTitle()}
               </BottomSheetTitle>
               <BottomSheetDescription>{getStepDescription()}</BottomSheetDescription>
@@ -521,7 +529,7 @@ export function DuplicateBulkOperationsDialog({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <Copy className="h-5 w-5" />
+              <Settings className="h-5 w-5" />
               {getStepTitle()}
             </DialogTitle>
             <DialogDescription>{getStepDescription()}</DialogDescription>

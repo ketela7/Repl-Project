@@ -398,7 +398,7 @@ export async function GET() {
                 .sort(([, a], [, b]) => b - a)
                 .slice(0, 50), // Increased from 20 to 50
               largestFiles: largestFiles.slice(0, 50), // Increased from 20 to 50
-              duplicateFiles: duplicateGroups.slice(0, 100), // Include duplicate files
+              duplicateFiles: duplicateGroups, // Include all duplicate files
             })
 
             sendData('complete', {
