@@ -466,7 +466,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
           <div className="min-h-0 flex-1 space-y-2">
             <h4 className="text-center text-xs font-medium">Items to share:</h4>
             <div className="bg-muted/50 flex-1 rounded-lg border">
-              <ScrollArea className="h-[200px] w-full">
+              <ScrollArea className="h-[120px] w-full">
                 <div className="space-y-1 p-2">
                   {selectedItems.map(item => (
                   <div
@@ -804,7 +804,7 @@ function ItemsShareDialog({ isOpen, onClose, selectedItems }: ItemsShareDialogPr
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[85vh] sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/20">

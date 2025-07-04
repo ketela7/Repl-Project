@@ -331,7 +331,7 @@ function ItemsCopyDialog({
           <div className="min-h-0 flex-1 space-y-2">
             <h4 className="text-center text-xs font-medium">Items to copy:</h4>
             <div className="bg-muted/50 flex-1 rounded-lg border">
-              <ScrollArea className="h-[200px] w-full">
+              <ScrollArea className="h-[120px] w-full">
                 <div className="space-y-1 p-2">
                   {selectedItems.map(item => (
                   <div
@@ -671,7 +671,7 @@ function ItemsCopyDialog({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="max-h-[85vh] sm:max-w-lg">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/20">
