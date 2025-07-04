@@ -10,7 +10,7 @@ const BASE_FIELDS = 'id,name,mimeType'
 // Optimized field sets for different use cases
 export const FIELD_SETS = {
   // Minimal fields for basic listing (fastest)
-  LIST_BASIC: `${BASE_FIELDS},parents,trashed`,
+  LIST_BASIC: `${BASE_FIELDS},parents`,
 
   // Essential fields for file management operations - now includes owners, createdTime, and thumbnailLink for preview functionality
   LIST_STANDARD: `${BASE_FIELDS},size,createdTime,modifiedTime,parents,owners(displayName,emailAddress),trashed,shared,thumbnailLink,capabilities(canEdit,canShare,canDelete,canDownload,canCopy,canTrash,canUntrash,canRename,canMoveItemWithinDrive)`,
@@ -41,6 +41,9 @@ export const FIELD_SETS = {
 
   // Fields for drive info
   DRIVE_INFO: 'storageQuota,user',
+
+  // Fields specifically for storage analytics - includes MD5 and webViewLink for duplicate detection and file access
+  STORAGE_ANALYTICS: `${BASE_FIELDS},size,md5Checksum,webViewLink,modifiedTime`,
 } as const
 
 /**

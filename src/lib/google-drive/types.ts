@@ -129,6 +129,7 @@ export interface DriveSearchOptions {
   pageToken?: string
   orderBy?: string
   includeTeamDriveItems?: boolean
+  fields?: string // Custom fields parameter for specific operations like storage analytics
 }
 
 export interface BulkOperationItem {

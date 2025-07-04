@@ -84,6 +84,7 @@ export class GoogleDriveService {
       pageToken,
       orderBy = 'modifiedTime desc',
       includeTeamDriveItems = true,
+      fields, // Custom fields for specific operations
     } = options
 
     // Validate and process all options using helper functions
@@ -111,11 +112,11 @@ export class GoogleDriveService {
       supportsAllDrives: includeTeamDriveItems,
     }
 
-    // Use optimized fields based on operation type
-    const optimizedFields = getOptimizedFields('LIST_STANDARD')
+    // Use custom fields if provided, otherwise use optimized fields based on operation type
+    const fieldsToUse = fields || getOptimizedFields('LIST_STANDARD')
     const requestParams = {
       ...getOptimizedRequestParams(operation, baseParams),
-      fields: `nextPageToken,incompleteSearch,files(${optimizedFields})`,
+      fields: `nextPageToken,incompleteSearch,files(${fieldsToUse})`,
     }
     // Debug logging removed - violates ESLint strict mode
 

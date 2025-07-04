@@ -3,6 +3,7 @@ import { initDriveService } from '@/lib/api-utils'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { withErrorHandling } from '@/lib/error-handler'
 import { countFilesByCategory, getFileTypeCategory } from '@/lib/mime-type-filter'
+import { getOptimizedFields } from '@/lib/google-drive/field-optimization'
 
 /**
  * Progressive Storage Analytics with Server-Sent Events
@@ -100,13 +101,12 @@ export async function GET() {
             // Use service listFiles with optimized pagination
             do {
               try {
-                // Use service function with retry + throttle built-in
+                // Use service function with custom fields for storage analytics
                 const listOptions: {
                   fields: string
                   pageToken?: string
                 } = {
-                  fields:
-                    'nextPageToken,files(id,name,mimeType,size,md5Checksum,webViewLink,modifiedTime)',
+                  fields: getOptimizedFields('STORAGE_ANALYTICS'),
                 }
 
                 // Only add pageToken if it exists
