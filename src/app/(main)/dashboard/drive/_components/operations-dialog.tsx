@@ -1,7 +1,7 @@
 'use client'
 
 import { Trash2, Download, Share2, RotateCcw, Copy, Edit, FolderOpen } from 'lucide-react'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 
 import {
   Dialog,
@@ -74,50 +74,75 @@ function OperationsDialog({
   const dialogOpen = open ?? isOpen ?? false
   const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
 
-  // Individual dialog handlers
+  // Individual dialog handlers - Fixed timing issue
   const handleMoveClick = () => {
-    setIsMoveDialogOpen(true)
+    console.log('Move button clicked, closing main dialog and opening move dialog')
     handleClose()
+    // Use setTimeout to ensure main dialog closes before individual dialog opens
+    setTimeout(() => {
+      console.log('Setting move dialog open to true')
+      setIsMoveDialogOpen(true)
+    }, 100)
   }
 
   const handleCopyClick = () => {
-    setIsCopyDialogOpen(true)
+    console.log('Copy button clicked, closing main dialog and opening copy dialog')
     handleClose()
+    setTimeout(() => {
+      console.log('Setting copy dialog open to true')
+      setIsCopyDialogOpen(true)
+    }, 100)
   }
 
   const handleTrashClick = () => {
-    setIsTrashDialogOpen(true)
+    console.log('Trash button clicked, closing main dialog and opening trash dialog')
     handleClose()
+    setTimeout(() => {
+      console.log('Setting trash dialog open to true')
+      setIsTrashDialogOpen(true)
+    }, 100)
   }
 
   const handleShareClick = () => {
-    setIsShareDialogOpen(true)
     handleClose()
+    setTimeout(() => {
+      setIsShareDialogOpen(true)
+    }, 100)
   }
 
   const handleRenameClick = () => {
-    setIsRenameDialogOpen(true)
     handleClose()
+    setTimeout(() => {
+      setIsRenameDialogOpen(true)
+    }, 100)
   }
 
   const handleExportClick = () => {
-    setIsExportDialogOpen(true)
     handleClose()
+    setTimeout(() => {
+      setIsExportDialogOpen(true)
+    }, 100)
   }
 
   const handleDeleteClick = () => {
-    setIsDeleteDialogOpen(true)
     handleClose()
+    setTimeout(() => {
+      setIsDeleteDialogOpen(true)
+    }, 100)
   }
 
   const handleUntrashClick = () => {
-    setIsUntrashDialogOpen(true)
     handleClose()
+    setTimeout(() => {
+      setIsUntrashDialogOpen(true)
+    }, 100)
   }
 
   const handleDownloadClick = () => {
-    setIsDownloadDialogOpen(true)
     handleClose()
+    setTimeout(() => {
+      setIsDownloadDialogOpen(true)
+    }, 100)
   }
 
   // Standardized close handlers
@@ -416,68 +441,86 @@ function OperationsDialog({
         </Dialog>
       )}
 
-      {/* Individual Items Operation Dialogs - Standardized Props Pattern */}
-      <ItemsMoveDialog
-        isOpen={isMoveDialogOpen}
-        onClose={handleMoveClose}
-        onConfirm={handleMoveComplete}
-        selectedItems={selectedItems}
-      />
+      {/* Individual Items Operation Dialogs - With Suspense for Lazy Loading */}
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsMoveDialog
+          isOpen={isMoveDialogOpen}
+          onClose={handleMoveClose}
+          onConfirm={handleMoveComplete}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
 
-      <ItemsCopyDialog
-        isOpen={isCopyDialogOpen}
-        onClose={handleCopyClose}
-        onConfirm={handleCopyComplete}
-        selectedItems={selectedItems}
-      />
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsCopyDialog
+          isOpen={isCopyDialogOpen}
+          onClose={handleCopyClose}
+          onConfirm={handleCopyComplete}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
 
-      <ItemsTrashDialog
-        isOpen={isTrashDialogOpen}
-        onClose={handleTrashClose}
-        _onConfirm={handleTrashComplete}
-        selectedItems={selectedItems}
-      />
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsTrashDialog
+          isOpen={isTrashDialogOpen}
+          onClose={handleTrashClose}
+          _onConfirm={handleTrashComplete}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
 
-      <ItemsShareDialog
-        isOpen={isShareDialogOpen}
-        onClose={handleShareClose}
-        selectedItems={selectedItems}
-      />
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsShareDialog
+          isOpen={isShareDialogOpen}
+          onClose={handleShareClose}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
 
-      <ItemsRenameDialog
-        isOpen={isRenameDialogOpen}
-        onClose={handleRenameClose}
-        onConfirm={handleRenameComplete}
-        selectedItems={selectedItems}
-      />
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsRenameDialog
+          isOpen={isRenameDialogOpen}
+          onClose={handleRenameClose}
+          onConfirm={handleRenameComplete}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
 
-      <ItemsExportDialog
-        isOpen={isExportDialogOpen}
-        onClose={handleExportClose}
-        onConfirm={handleExportComplete}
-        selectedItems={selectedItems}
-      />
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsExportDialog
+          isOpen={isExportDialogOpen}
+          onClose={handleExportClose}
+          onConfirm={handleExportComplete}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
 
-      <ItemsDownloadDialog
-        isOpen={isDownloadDialogOpen}
-        onClose={handleDownloadClose}
-        onConfirm={handleDownloadComplete}
-        selectedItems={selectedItems}
-      />
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsDownloadDialog
+          isOpen={isDownloadDialogOpen}
+          onClose={handleDownloadClose}
+          onConfirm={handleDownloadComplete}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
 
-      <ItemsDeleteDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={handleDeleteClose}
-        onConfirm={handleDeleteComplete}
-        selectedItems={selectedItems}
-      />
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsDeleteDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={handleDeleteClose}
+          onConfirm={handleDeleteComplete}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
 
-      <ItemsUntrashDialog
-        isOpen={isUntrashDialogOpen}
-        onClose={handleUntrashClose}
-        _onConfirm={handleUntrashComplete}
-        selectedItems={selectedItems}
-      />
+      <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
+        <ItemsUntrashDialog
+          isOpen={isUntrashDialogOpen}
+          onClose={handleUntrashClose}
+          _onConfirm={handleUntrashComplete}
+          selectedItems={selectedItems}
+        />
+      </Suspense>
     </>
   )
 }
