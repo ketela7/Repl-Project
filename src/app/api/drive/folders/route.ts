@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
       const searchResult = await driveService.listFiles({
         query: search,
         mimeType: 'application/vnd.google-apps.folder',
-        fields: 'id,name,parents,shared,modifiedTime',
+        fields: 'id,name',
         pageSize: 100,
         orderBy: 'name',
       })
@@ -72,16 +72,13 @@ export async function GET(request: NextRequest) {
         .map(folder => ({
           id: folder.id,
           name: folder.name,
-          isShared: folder.shared || false,
-          path: folder.parents?.length ? `Parent: ${folder.parents[0]}` : 'Root',
-          modifiedTime: folder.modifiedTime,
         }))
     } else {
       // Browse mode: Get folders in specific parent directory
       const browseResult = await driveService.listFiles({
         parentId: parentId || 'root',
         mimeType: 'application/vnd.google-apps.folder',
-        fields: 'id,name,parents,shared,modifiedTime',
+        fields: 'id,name',
         pageSize: 100,
         orderBy: 'name',
       })
@@ -92,9 +89,6 @@ export async function GET(request: NextRequest) {
         .map(folder => ({
           id: folder.id,
           name: folder.name,
-          isShared: folder.shared || false,
-          path: folder.parents?.length ? `Parent: ${folder.parents[0]}` : 'Root',
-          modifiedTime: folder.modifiedTime,
         }))
     }
 

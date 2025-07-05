@@ -9,7 +9,6 @@ import {
   AlertCircle,
   Shield,
   ExternalLink,
-  Users,
   Home,
   ChevronRight,
 } from 'lucide-react'
@@ -17,7 +16,6 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { cn } from '@/lib/utils'
@@ -25,8 +23,6 @@ import { cn } from '@/lib/utils'
 interface DriveFolder {
   id: string
   name: string
-  path?: string
-  isShared?: boolean
 }
 
 interface DriveDestinationSelectorProps {
@@ -286,13 +282,7 @@ export function DriveDestinationSelector({
                         <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
                         <div className="min-w-0 flex-1">
                           <h4 className="truncate text-sm font-medium">{folder.name}</h4>
-                          <p className="text-muted-foreground truncate text-xs">ID: {folder.id}</p>
                         </div>
-                        {folder.isShared && (
-                          <Badge variant="outline" className="flex-shrink-0 text-xs">
-                            <Users className="mr-1 h-2 w-2" />S
-                          </Badge>
-                        )}
                       </div>
                     ))
                   )}
