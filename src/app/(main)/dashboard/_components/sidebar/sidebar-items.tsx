@@ -130,11 +130,6 @@ export const sidebarItems: SidebarData = {
           icon: Settings,
           comingSoon: true,
         },
-        {
-          title: 'Toast Test',
-          url: '/dashboard/toast-test',
-          icon: Settings,
-        },
       ],
     },
   ],
