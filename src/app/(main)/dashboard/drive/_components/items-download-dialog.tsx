@@ -94,11 +94,10 @@ function ItemsDownloadDialog({
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
 
-  // Filter downloadable files (only files, skip folders)
-  const downloadableFiles = selectedItems.filter(item => !item.isFolder)
-  const skippedFolders = selectedItems.filter(item => item.isFolder)
+  // Filter downloadable files based on canDownload capability
+  const downloadableFiles = selectedItems.filter(item => item.canDownload && !item.isFolder)
   const fileCount = downloadableFiles.length
-  const folderCount = skippedFolders.length
+  const folderCount = selectedItems.filter(item => item.isFolder).length
 
   const handleCancel = () => {
     isCancelledRef.current = true

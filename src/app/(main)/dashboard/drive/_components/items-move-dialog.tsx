@@ -144,8 +144,8 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
   }
 
   const handleMove = async () => {
-    if (selectedItems.length === 0) {
-      toast.error('No items selected for moving')
+    if (canMoveItems.length === 0) {
+      toast.error('No items can be moved from the selection')
       return
     }
 
@@ -156,7 +156,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = selectedItems.length
+    const totalItems = canMoveItems.length
     setProgress({
       current: 0,
       total: totalItems,
@@ -168,16 +168,16 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
     let successCount = 0
     let failedCount = 0
-    const skippedCount = 0
+    const skippedCount = selectedItems.length - canMoveItems.length
     const errors: Array<{ file: string; error: string }> = []
 
     try {
-      for (let i = 0; i < selectedItems.length; i++) {
+      for (let i = 0; i < canMoveItems.length; i++) {
         if (isCancelledRef.current) {
           break
         }
 
-        const item = selectedItems[i]
+        const item = canMoveItems[i]
         setProgress(prev => ({
           ...prev,
           current: i + 1,

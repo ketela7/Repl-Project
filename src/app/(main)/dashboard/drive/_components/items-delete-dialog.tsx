@@ -148,8 +148,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
       return
     }
 
-    if (selectedItems.length === 0) {
-      toast.error('No items selected for deletion')
+    if (canDeleteItems.length === 0) {
+      toast.error('No items can be deleted from the selection')
       return
     }
 

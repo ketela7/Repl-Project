@@ -145,8 +145,8 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
   }
 
   const handleCopy = async () => {
-    if (selectedItems.length === 0) {
-      toast.error('No items selected for copying')
+    if (canCopyItems.length === 0) {
+      toast.error('No items can be copied from the selection')
       return
     }
 
@@ -157,7 +157,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = selectedItems.length
+    const totalItems = canCopyItems.length
     setProgress({
       current: 0,
       total: totalItems,
@@ -169,16 +169,16 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
     let successCount = 0
     let failedCount = 0
-    const skippedCount = 0
+    const skippedCount = selectedItems.length - canCopyItems.length
     const errors: Array<{ file: string; error: string }> = []
 
     try {
-      for (let i = 0; i < selectedItems.length; i++) {
+      for (let i = 0; i < canCopyItems.length; i++) {
         if (isCancelledRef.current) {
           break
         }
 
-        const item = selectedItems[i]
+        const item = canCopyItems[i]
         setProgress(prev => ({
           ...prev,
           current: i + 1,

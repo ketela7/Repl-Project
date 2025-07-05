@@ -134,8 +134,8 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
   }
 
   const handleTrash = async () => {
-    if (selectedItems.length === 0) {
-      toast.error('No items selected for moving to trash')
+    if (canTrashItems.length === 0) {
+      toast.error('No items can be moved to trash from the selection')
       return
     }
 
@@ -146,7 +146,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = selectedItems.length
+    const totalItems = canTrashItems.length
     setProgress({
       current: 0,
       total: totalItems,
@@ -158,16 +158,16 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
 
     let successCount = 0
     let failedCount = 0
-    const skippedCount = 0
+    const skippedCount = selectedItems.length - canTrashItems.length
     const errors: Array<{ file: string; error: string }> = []
 
     try {
-      for (let i = 0; i < selectedItems.length; i++) {
+      for (let i = 0; i < canTrashItems.length; i++) {
         if (isCancelledRef.current) {
           break
         }
 
-        const item = selectedItems[i]
+        const item = canTrashItems[i]
         setProgress(prev => ({
           ...prev,
           current: i + 1,
