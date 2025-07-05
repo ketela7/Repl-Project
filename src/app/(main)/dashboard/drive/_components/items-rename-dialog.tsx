@@ -331,6 +331,10 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
           }
 
           successCount++
+          setProgress(prev => ({
+            ...prev,
+            success: successCount,
+          }))
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break
@@ -339,10 +343,15 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
           const errorMessage = error instanceof Error ? error.message : 'Unknown error'
           errors.push({ file: previewItem.original, error: errorMessage })
           failedCount++
+          setProgress(prev => ({
+            ...prev,
+            failed: failedCount,
+            errors: [...errors],
+          }))
         }
 
-        // Small delay to prevent overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Small delay for better visual feedback and API throttling
+        await new Promise(resolve => setTimeout(resolve, 300))
       }
     } catch (error) {
       console.error('Rename operation failed:', error)

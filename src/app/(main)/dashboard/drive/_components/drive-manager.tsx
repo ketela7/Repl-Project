@@ -432,10 +432,7 @@ export function DriveManager() {
               : ('file' as const),
         }))
 
-
-
         setItems(prev => {
-
           return pageToken ? [...prev, ...newItems] : newItems
         })
 
@@ -512,8 +509,6 @@ export function DriveManager() {
   // Navigation handlers
   const handleFolderClick = useCallback(
     (folderId: string) => {
-
-
       // Force immediate state update
       setLoading(true)
       setCurrentFolderId(folderId)
@@ -712,9 +707,7 @@ export function DriveManager() {
           <FileBreadcrumb
             currentFolderId={currentFolderId}
             onNavigate={folderId => {
-
               if (folderId) {
-
                 handleFolderClick(folderId)
               } else {
                 // [icon home] Drive
@@ -724,7 +717,6 @@ export function DriveManager() {
               }
             }}
             onBackToRoot={() => {
-
               setCurrentFolderId(null)
               fetchFiles(undefined, (searchQuery as string).trim() || undefined)
             }}

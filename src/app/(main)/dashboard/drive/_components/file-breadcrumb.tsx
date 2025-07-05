@@ -45,7 +45,6 @@ export function FileBreadcrumb({
     abortControllerRef.current = new AbortController()
 
     try {
-
       setLoading(true)
       setError(null)
 
@@ -55,9 +54,6 @@ export function FileBreadcrumb({
         signal: abortControllerRef.current.signal,
       })
 
-
-
-
       if (!response.ok) {
         const errorText = await response.text()
 
@@ -66,18 +62,11 @@ export function FileBreadcrumb({
 
       const folder = await response.json()
 
-
-
-
-
-
       // Use fileId if id is not available (common in Google Drive API responses)
       const actualId = folder.id || folderId
 
-
       // Validate folder data
       if (!actualId) {
-
         throw new Error('Invalid folder data: missing ID')
       }
 
@@ -95,7 +84,6 @@ export function FileBreadcrumb({
 
       // Traverse up to root
 
-
       while (
         currentFolder.parents &&
         currentFolder.parents.length > 0 &&
@@ -103,55 +91,39 @@ export function FileBreadcrumb({
       ) {
         const parentId = currentFolder.parents[0]
 
-
         // Prevent infinite loops
         if (visitedFolders.has(parentId)) {
-
           break
         }
         try {
-
-
           const parentResponse = await fetch(`/api/drive/files?fileId=${parentId}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
           })
           if (!parentResponse.ok) {
-
             break
           }
 
           const parentFolder = await parentResponse.json()
 
-
-
-
-
           // Use fileId if id is not available
           const actualParentId = parentFolder.id || parentId
 
-
           // Validate parent folder data
           if (!actualParentId) {
-
             break
           }
 
           // Update parent folder object with correct ID
           parentFolder.id = actualParentId
 
-
           pathItems.push({ id: parentFolder.id, name: parentFolder.name })
           visitedFolders.add(actualParentId)
           currentFolder = parentFolder
-
         } catch (err) {
-
           break
         }
       }
-
-
 
       // Reverse path items to show from root to current folder
       pathItems.reverse()
@@ -165,7 +137,6 @@ export function FileBreadcrumb({
       if (error instanceof Error && error.name === 'AbortError') return
 
       // Log error for debugging in development only
-
 
       setError('Failed to load folder path')
       setBreadcrumbItems([])
@@ -223,10 +194,7 @@ export function FileBreadcrumb({
                     onClick={e => {
                       e.preventDefault()
 
-
                       if (!folder.id) {
-
-
                         return
                       }
                       onNavigate(folder.id)

@@ -172,11 +172,9 @@ export function DriveDataView({
   // Memoized handlers for better performance
   const handleItemClick = useCallback(
     (item: DriveItem) => {
-
       if (isSelectMode) {
         onSelectItem(item.id)
       } else if (item.isFolder) {
-
         onFolderClick(item.id)
       } else {
         onItemAction('preview', item)
@@ -436,7 +434,6 @@ export function DriveDataView({
                           } catch (err) {
                             const { errorToast } = await import('@/lib/utils')
                             errorToast.generic('Failed to copy email')
-
                           }
                         }
                       }}

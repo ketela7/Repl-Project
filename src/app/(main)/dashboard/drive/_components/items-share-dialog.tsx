@@ -198,6 +198,10 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             shareLink: data.shareLink,
           })
           successCount++
+          setProgress(prev => ({
+            ...prev,
+            success: successCount,
+          }))
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break
@@ -212,9 +216,14 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             error: errorMessage,
           })
           failedCount++
+          setProgress(prev => ({
+            ...prev,
+            failed: failedCount,
+            errors: [...errors],
+          }))
         }
 
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise(resolve => setTimeout(resolve, 300))
       }
     } catch (error) {
       console.error('Share operation failed:', error)

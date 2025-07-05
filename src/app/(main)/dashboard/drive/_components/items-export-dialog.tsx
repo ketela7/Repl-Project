@@ -322,6 +322,10 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             const exportFileName = `${file.name.replace(/\.[^/.]+$/, '')}.${fileExtension}`
             downloadFile(data.exportUrl, exportFileName)
             successCount++
+            setProgress(prev => ({
+              ...prev,
+              success: successCount,
+            }))
           } else {
             throw new Error('No export URL received')
           }
@@ -333,10 +337,15 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           const errorMessage = error instanceof Error ? error.message : 'Unknown error'
           errors.push({ file: file.name, error: errorMessage })
           failedCount++
+          setProgress(prev => ({
+            ...prev,
+            failed: failedCount,
+            errors: [...errors],
+          }))
         }
 
-        // Small delay between exports
-        await new Promise(resolve => setTimeout(resolve, 500))
+        // Small delay for better visual feedback and API throttling
+        await new Promise(resolve => setTimeout(resolve, 300))
       }
     } catch (error) {
       console.error('Export operation failed:', error)

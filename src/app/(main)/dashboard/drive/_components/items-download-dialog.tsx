@@ -233,6 +233,10 @@ function ItemsDownloadDialog({
             if (data.downloadUrl) {
               downloadFile(data.downloadUrl, file.name)
               successCount++
+              setProgress(prev => ({
+                ...prev,
+                success: successCount,
+              }))
             } else {
               throw new Error('No download URL received')
             }
@@ -244,10 +248,15 @@ function ItemsDownloadDialog({
             const errorMessage = error instanceof Error ? error.message : 'Unknown error'
             errors.push({ file: file.name, error: errorMessage })
             failedCount++
+            setProgress(prev => ({
+              ...prev,
+              failed: failedCount,
+              errors: [...errors],
+            }))
           }
 
-          // Small delay between downloads
-          await new Promise(resolve => setTimeout(resolve, 200))
+          // Small delay for better visual feedback and API throttling
+          await new Promise(resolve => setTimeout(resolve, 300))
         }
       } catch (error) {
         console.error('Download operation failed:', error)
