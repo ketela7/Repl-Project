@@ -505,7 +505,7 @@ export function DriveDestinationSelector({
                                       Folder ID
                                     </span>
                                   </div>
-                                  <code className="block font-mono text-xs break-all text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 p-1 rounded">
+                                  <code className="block rounded bg-green-50 p-1 font-mono text-xs break-all text-green-700 dark:bg-green-900/20 dark:text-green-300">
                                     {parsedResult.folderId}
                                   </code>
                                   <div className="mt-2 text-xs text-green-600 dark:text-green-400">
@@ -602,11 +602,16 @@ export function DriveDestinationSelector({
                                 </h4>
                                 {validationResult.isValid ? (
                                   <div className="mt-2">
-                                    <p className="text-xs text-blue-700 dark:text-blue-300 mb-1">Destination:</p>
-                                    <div className="bg-blue-100 dark:bg-blue-900/40 rounded p-2 border-l-4 border-blue-500">
+                                    <p className="mb-1 text-xs text-blue-700 dark:text-blue-300">
+                                      Destination:
+                                    </p>
+                                    <div className="rounded border-l-4 border-blue-500 bg-blue-100 p-2 dark:bg-blue-900/40">
                                       <div className="flex items-center gap-2">
-                                        <Folder className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                                        <span className="font-medium text-blue-800 dark:text-blue-200 text-sm" title={validationResult.folderName}>
+                                        <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
+                                        <span
+                                          className="text-sm font-medium text-blue-800 dark:text-blue-200"
+                                          title={validationResult.folderName}
+                                        >
                                           {validationResult.folderName}
                                         </span>
                                       </div>
@@ -617,6 +622,7 @@ export function DriveDestinationSelector({
                                     {validationResult.error}
                                   </p>
                                 )}
+                              </div>
 
                               {validationResult.isValid && (
                                 <Card className="border-blue-200 bg-white/60 dark:border-blue-700 dark:bg-blue-900/20">
@@ -656,3 +662,5 @@ export function DriveDestinationSelector({
     </div>
   )
 }
+
+export { DriveDestinationSelector }
