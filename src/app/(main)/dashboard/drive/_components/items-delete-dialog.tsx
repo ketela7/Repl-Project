@@ -116,6 +116,12 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
     if (isProcessing) {
       handleCancel()
     }
+    
+    // If we're in completed step and had successful operations, refresh data
+    if (currentStep === 'completed' && progress.success > 0) {
+      onConfirm?.()
+    }
+    
     setCurrentStep('warning')
     setConfirmationText('')
     setAcknowledgeWarning(false)
@@ -246,7 +252,6 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
         toast.info('Delete operation cancelled')
       } else if (successCount > 0) {
         toast.success(`Successfully deleted ${successCount} item(s) permanently`)
-        onConfirm?.()
       } else {
         toast.error('Delete operation failed')
       }

@@ -108,6 +108,12 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
     if (isProcessing) {
       handleCancel()
     }
+    
+    // If we're in completed step and had successful operations, refresh data
+    if (currentStep === 'completed' && progress.success > 0) {
+      onConfirm?.()
+    }
+    
     setCurrentStep('confirmation')
     setProgress({
       current: 0,
@@ -231,7 +237,6 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
         toast.info('Trash operation cancelled')
       } else if (successCount > 0) {
         toast.success(`Successfully moved ${successCount} item(s) to trash`)
-        onConfirm?.()
       } else {
         toast.error('Trash operation failed')
       }

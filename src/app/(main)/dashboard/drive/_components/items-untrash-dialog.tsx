@@ -112,6 +112,12 @@ function ItemsUntrashDialog({
     if (isProcessing) {
       handleCancel()
     }
+    
+    // If we're in completed step and had successful operations, refresh data
+    if (currentStep === 'completed' && progress.success > 0) {
+      onConfirm?.()
+    }
+    
     setCurrentStep('confirmation')
     setProgress({
       current: 0,
@@ -236,7 +242,6 @@ function ItemsUntrashDialog({
         toast.info('Restore operation cancelled')
       } else if (successCount > 0) {
         toast.success(`Successfully restored ${successCount} item(s) from trash`)
-        onConfirm?.()
       } else {
         toast.error('Restore operation failed')
       }
