@@ -40,26 +40,26 @@ export async function POST(request: NextRequest) {
     for (const id of fileIds) {
       try {
         console.log(`🔄 Copying file ${id} to folder ${targetFolderId}`)
-        
+
         // Get original file info for naming
         const originalFile = await driveService.getFile(id)
-        
+
         // Create copy metadata with proper structure
         const copyMetadata: any = {
           name: namePrefix ? `${namePrefix}${originalFile.name}` : `Copy of ${originalFile.name}`,
         }
-        
+
         // Add parent folder if specified
         if (targetFolderId) {
           copyMetadata.parents = [targetFolderId]
         }
-        
+
         const result = await driveService.copyFile(id, copyMetadata)
         console.log(`✅ Successfully copied file ${id}`)
         results.push({ fileId: id, success: true, result })
       } catch (error: unknown) {
         console.error(`❌ Failed to copy file ${id}:`, error)
-        
+
         // Improved error handling with more detailed messages
         let errorMessage = 'Copy failed'
         let errorCode = 'UNKNOWN_ERROR'

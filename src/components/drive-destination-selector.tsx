@@ -394,14 +394,12 @@ export function DriveDestinationSelector({
                                     </Badge>
                                   )}
                                 </div>
-                                {folder.path && (
-                                  <p
-                                    className="text-muted-foreground mt-0.5 truncate text-xs opacity-70"
-                                    title={folder.path}
-                                  >
-                                    {folder.path}
-                                  </p>
-                                )}
+                                <p
+                                  className="text-muted-foreground mt-0.5 truncate text-xs opacity-70"
+                                  title={folder.id}
+                                >
+                                  ID: {folder.id}
+                                </p>
                               </div>
                             </div>
                           ))}
