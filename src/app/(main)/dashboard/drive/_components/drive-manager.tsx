@@ -581,6 +581,7 @@ export function DriveManager() {
 
   const handleRefresh = useCallback(() => {
     setRefreshing(true)
+    updateSelectedItems(new Set())
     fetchFiles(currentFolderId || undefined, (searchQuery as string).trim() || undefined)
   }, [fetchFiles, currentFolderId, searchQuery])
 
