@@ -356,7 +356,6 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       toast.info('Export operation cancelled')
     } else if (successCount > 0) {
       toast.success(`Successfully exported ${successCount} file(s)`)
-      onConfirm()
     } else {
       toast.error('Export operation failed')
     }
@@ -366,6 +365,10 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     if (isProcessing) {
       handleCancel()
     } else {
+      // If we're in completed step and had successful operations, refresh data
+      if (currentStep === 'completed' && progress.success > 0) {
+        onConfirm?.()
+      }
       resetState()
       onClose()
     }

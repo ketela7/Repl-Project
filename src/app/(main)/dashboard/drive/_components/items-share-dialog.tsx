@@ -245,15 +245,13 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     if (isProcessing) {
       handleCancel()
     } else {
+      // If we're in completed step and had successful operations, refresh data
+      if (currentStep === 'completed' && progress.success > 0) {
+        onConfirm?.()
+      }
       resetState()
       onClose()
     }
-  }
-
-  const handleComplete = () => {
-    onConfirm()
-    resetState()
-    onClose()
   }
 
   const resetState = () => {
@@ -669,11 +667,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     }
 
     if (currentStep === 'completed') {
-      return (
-        <Button onClick={isCancelled ? handleClose : handleComplete}>
-          {isCancelled ? 'Close' : 'Done'}
-        </Button>
-      )
+      return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
     }
 
     return (

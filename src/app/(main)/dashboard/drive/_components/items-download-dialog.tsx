@@ -268,7 +268,6 @@ function ItemsDownloadDialog({
       toast.info('Download operation cancelled')
     } else if (progress.success > 0 || selectedMode === 'exportLinks') {
       toast.success(`Download operation completed`)
-      onConfirm()
     } else {
       toast.error('Download operation failed')
     }
@@ -278,6 +277,10 @@ function ItemsDownloadDialog({
     if (isProcessing) {
       handleCancel()
     } else {
+      // If we're in completed step and had successful operations, refresh data
+      if (currentStep === 'completed' && progress.success > 0) {
+        onConfirm?.()
+      }
       resetState()
       onClose()
     }

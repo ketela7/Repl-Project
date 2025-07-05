@@ -140,6 +140,12 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
     if (isProcessing) {
       handleCancel()
     }
+
+    // If we're in completed step and had successful operations, refresh data
+    if (currentStep === 'completed' && progress.success > 0) {
+      onConfirm?.()
+    }
+
     resetState()
     onClose()
   }
@@ -356,7 +362,6 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         toast.info('Rename operation cancelled')
       } else if (successCount > 0) {
         toast.success(`Successfully renamed ${successCount} item(s)`)
-        onConfirm?.()
       } else {
         toast.error('Rename operation failed')
       }
