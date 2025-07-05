@@ -106,11 +106,6 @@ export function DriveDestinationSelector({
       const result = parseDriveUrl(urlInput)
       setParsedResult(result)
       setValidationResult(null)
-
-      // Auto-validate jika format valid
-      if (result.isValid && result.folderId) {
-        validateFolderId(result.folderId)
-      }
     } else {
       setParsedResult({ folderId: null, isValid: false })
       setValidationResult(null)
@@ -165,14 +160,12 @@ export function DriveDestinationSelector({
           isValid: true,
           folderName: data.folder.name,
         })
-
-        // Auto-select folder setelah validasi berhasil
-        console.log('✅ Auto-selecting validated folder:', parsedResult.folderId, data.folder.name)
-        onSelect(parsedResult.folderId, data.folder.name)
       } else {
         setValidationResult({
           isValid: false,
-          error: data.error || 'Folder validation failed',
+          error:
+            data.error ||
+            'Target folder not found or access denied. Please check the folder ID and permissions.',
         })
       }
     } catch (error: unknown) {
@@ -463,6 +456,31 @@ export function DriveDestinationSelector({
                     )}
                   />
 
+                  {/* Validation Button */}
+                  {parsedResult.isValid && !validationResult && (
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => validateFolderId(parsedResult.folderId)}
+                        disabled={isValidating}
+                        className="h-8 flex-1 bg-blue-600 text-white hover:bg-blue-700"
+                      >
+                        {isValidating ? (
+                          <>
+                            <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                            Validating...
+                          </>
+                        ) : (
+                          <>
+                            <Shield className="mr-1 h-3 w-3" />
+                            Validate Folder Access
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+
                   {/* Format Examples - Compact */}
                   <Card className="border-muted/50 bg-muted/20">
                     <CardContent className="p-3">
@@ -653,7 +671,7 @@ export function DriveDestinationSelector({
                                       className="h-8 w-full bg-blue-600 text-white hover:bg-blue-700"
                                     >
                                       <Check className="mr-1 h-3 w-3" />
-                                      Select This Folder
+                                      Choose This Target
                                     </Button>
                                   </CardContent>
                                 </Card>
