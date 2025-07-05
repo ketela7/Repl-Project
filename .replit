@@ -39,6 +39,7 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "npm run type:fast"
+author = "agent"
 
 [[workflows.workflow]]
 name = "Test"
