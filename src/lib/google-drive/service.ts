@@ -192,7 +192,7 @@ export class GoogleDriveService {
   async getFile(fileId: string): Promise<DriveFile> {
     const response = await this.drive.files.get({
       fileId,
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
+      fields: getOptimizedFields('LIST_BASIC'),
     })
 
     const result = await response
