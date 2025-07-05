@@ -203,7 +203,6 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     }
   }, [availableFormats, selectedFormat])
 
-
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -220,8 +219,6 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     failed: 0,
     errors: [],
   })
-
-
 
   const handleCancel = () => {
     isCancelledRef.current = true
