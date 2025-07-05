@@ -158,8 +158,6 @@ const nextConfig = {
   
   // Development specific configurations
   ...(process.env.NODE_ENV === 'development' && {
-    // Disable static optimization in development
-    optimizeFonts: false,
     // Force fresh builds
     distDir: '.next',
   }),
