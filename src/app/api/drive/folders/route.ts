@@ -1,91 +1,113 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { initDriveService, handleApiError } from '@/lib/api-utils'
+import { driveCache } from '@/lib/cache'
+import { GoogleDriveService } from '@/lib/google-drive/service'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
-import { driveCache } from '@/lib/cache'
 
 /**
  * GET /api/drive/folders
- * Fetch folders from Google Drive with optional parent folder filtering
+ * Search folders from Google Drive with optional filtering and search query
+ * Supports both browsing by parentId and searching across all folders
  */
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const parentId = searchParams.get('parentId') || 'root'
+    const parentId = searchParams.get('parentId') || undefined
     const includeShared = searchParams.get('includeShared') === 'true'
+    const search = searchParams.get('search') || undefined
 
     const authResult = await initDriveService()
     if (!authResult.success) {
       return authResult.response!
     }
 
-    const { session, driveService } = authResult
+    const { session } = authResult
     const userId = session.user?.email || 'unknown'
 
-    // Check cache first
+    // Create GoogleDriveService instance using session tokens
+    const accessToken = (session as any).accessToken
+    if (!accessToken) {
+      return NextResponse.json(
+        { success: false, error: 'No access token available' },
+        { status: 401 },
+      )
+    }
+
+    const driveService = new GoogleDriveService(accessToken)
+
+    // Generate cache key based on search parameters
     const cacheKey = driveCache.generateDriveKey({
-      parentId,
+      parentId: parentId || 'search',
       userId,
-      query: includeShared ? 'includeShared=true' : 'folders',
+      query: `folders-${search || 'browse'}-${includeShared ? 'shared' : 'standard'}`,
     })
 
+    // Check cache first (shorter cache for search results)
+    const cacheMinutes = search ? 2 : 5 // Shorter cache for search results
     const cached = driveCache.get<{ folders: any[] }>(cacheKey)
     if (cached) {
       return NextResponse.json({
         success: true,
         folders: cached.folders,
         cached: true,
+        isSearch: Boolean(search),
       })
     }
 
-    // Build query for folders only
-    let query = `mimeType='application/vnd.google-apps.folder' and trashed=false`
+    let folders: any[] = []
 
-    if (parentId && parentId !== 'root') {
-      query += ` and '${parentId}' in parents`
-    } else if (parentId === 'root') {
-      query += ` and 'root' in parents`
+    if (search) {
+      // Search mode: Find folders matching search query across entire Drive
+      const searchResult = await driveService.listFiles({
+        query: search,
+        mimeType: 'application/vnd.google-apps.folder',
+        fields: 'id,name,parents,shared,webViewLink,modifiedTime',
+        pageSize: 100,
+        orderBy: 'name',
+      })
+
+      // Filter out trashed folders and format results
+      folders = searchResult.files
+        .filter(folder => !folder.trashed)
+        .map(folder => ({
+          id: folder.id,
+          name: folder.name,
+          isShared: folder.shared || false,
+          path: folder.parents?.length ? `Parent: ${folder.parents[0]}` : 'Root',
+          modifiedTime: folder.modifiedTime,
+          webViewLink: folder.webViewLink,
+        }))
+    } else {
+      // Browse mode: Get folders in specific parent directory
+      const browseResult = await driveService.listFiles({
+        parentId: parentId || 'root',
+        mimeType: 'application/vnd.google-apps.folder',
+        fields: 'id,name,parents,shared,webViewLink,modifiedTime',
+        pageSize: 100,
+        orderBy: 'name',
+      })
+
+      // Filter out trashed folders and format results
+      folders = browseResult.files
+        .filter(folder => !folder.trashed)
+        .map(folder => ({
+          id: folder.id,
+          name: folder.name,
+          isShared: folder.shared || false,
+          path: folder.parents?.length ? `Parent: ${folder.parents[0]}` : 'Root',
+          modifiedTime: folder.modifiedTime,
+          webViewLink: folder.webViewLink,
+        }))
     }
 
-    // Fetch folders with retry mechanism
-    const foldersResult = await retryDriveApiCall(async () => {
-      return await throttledDriveRequest(async () => {
-        return await driveService!.drive.files.list({
-          q: query,
-          fields: 'files(id,name,parents,shared,capabilities,owners,webViewLink,modifiedTime)',
-          orderBy: 'name',
-          pageSize: 100,
-          supportsAllDrives: true,
-          includeItemsFromAllDrives: true,
-        })
-      })
-    })
-
-    const folders = foldersResult.data.files || []
-
-    // Format folder data
-    const formattedFolders = folders.map((folder: any) => ({
-      id: folder.id,
-      name: folder.name,
-      isShared: folder.shared || false,
-      path: folder.parents ? `Parent: ${folder.parents[0]}` : 'Root',
-      webViewLink: folder.webViewLink,
-      modifiedTime: folder.modifiedTime,
-      canEdit: folder.capabilities?.canEdit || false,
-      canAddChildren: folder.capabilities?.canAddChildren || false,
-    }))
-
-    // Include shared drives if requested
+    // Include shared drives if requested and in root browse mode
     let sharedDrives: any[] = []
-    if (includeShared && parentId === 'root') {
+    if (includeShared && !search && (!parentId || parentId === 'root')) {
       try {
-        const sharedDrivesResult = await retryDriveApiCall(async () => {
-          return await throttledDriveRequest(async () => {
-            return await driveService!.drive.drives.list({
-              fields: 'drives(id,name,capabilities)',
-              pageSize: 50,
-            })
-          })
+        const sharedDrivesResult = await driveService.drive.drives.list({
+          fields: 'drives(id,name,capabilities)',
+          pageSize: 50,
         })
 
         sharedDrives = (sharedDrivesResult.data.drives || []).map((drive: any) => ({
@@ -95,6 +117,7 @@ export async function GET(request: NextRequest) {
           path: 'Shared Drive',
           canEdit: drive.capabilities?.canAddChildren || false,
           canAddChildren: drive.capabilities?.canAddChildren || false,
+          webViewLink: `https://drive.google.com/drive/folders/${drive.id}`,
         }))
       } catch (error) {
         // Handle shared drives fetch error silently
@@ -102,16 +125,18 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const allFolders = [...formattedFolders, ...sharedDrives]
+    const allFolders = [...folders, ...sharedDrives]
 
     // Cache the result
-    driveCache.set(cacheKey, { folders: allFolders }, 5) // 5 minute cache
+    driveCache.set(cacheKey, { folders: allFolders }, cacheMinutes)
 
     return NextResponse.json({
       success: true,
       folders: allFolders,
       total: allFolders.length,
-      parentId,
+      parentId: parentId || 'root',
+      isSearch: Boolean(search),
+      searchQuery: search,
       cached: false,
     })
   } catch (error) {

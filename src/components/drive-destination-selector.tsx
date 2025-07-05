@@ -106,18 +106,31 @@ export function DriveDestinationSelector({
     }
   }, [urlInput])
 
-  // Load folders from API
-  const loadFolders = async () => {
+  // Load folders from API with search support
+  const loadFolders = async (searchTerm?: string) => {
     setIsLoadingFolders(true)
     try {
       const currentFolderId = currentPath[currentPath.length - 1]?.id || 'root'
-      const response = await fetch(`/api/drive/folders?parentId=${currentFolderId}`)
+
+      // Build API URL with parameters
+      const params = new URLSearchParams()
+
+      if (searchTerm && searchTerm.trim()) {
+        // Search mode: search across all folders
+        params.append('search', searchTerm.trim())
+      } else {
+        // Browse mode: get folders in current directory
+        params.append('parentId', currentFolderId)
+      }
+
+      const response = await fetch(`/api/drive/folders?${params.toString()}`)
       if (response.ok) {
         const data = await response.json()
         setFolders(data.folders || [])
+      } else {
+        setFolders([])
       }
     } catch (error) {
-      console.error('Failed to load folders:', error)
       setFolders([])
     } finally {
       setIsLoadingFolders(false)
@@ -189,7 +202,7 @@ export function DriveDestinationSelector({
   // Navigate to folder
   const navigateToFolder = (folder: DriveFolder) => {
     setCurrentPath(prev => [...prev, folder])
-    setSearchQuery('')
+    setSearchQuery('') // Clear search when navigating
   }
 
   // Load initial folders
@@ -197,10 +210,23 @@ export function DriveDestinationSelector({
     loadFolders()
   }, [currentPath])
 
-  // Filter folders based on search
-  const filteredFolders = searchQuery
-    ? folders.filter(folder => folder.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    : folders
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery.trim()) {
+        // Search mode: search across all folders using API
+        loadFolders(searchQuery.trim())
+      } else {
+        // Browse mode: load folders in current directory
+        loadFolders()
+      }
+    }, 300) // 300ms debounce
+
+    return () => clearTimeout(timer)
+  }, [searchQuery])
+
+  // No client-side filtering needed anymore - server handles search
+  const filteredFolders = folders
 
   // Clear validation result when switching tabs
   const handleTabChange = (value: string) => {
