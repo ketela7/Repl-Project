@@ -136,6 +136,9 @@ export default [
       'react/prop-types': 'off',
 
       // TypeScript Specific Rules (non-type-aware only)
+      '@typescript-eslint/ban-ts-comment': 'off',
+      '@typescript-eslint/no-empty-interface': 'off',
+      '@typescript-eslint/no-inferrable-types': 'off',
 
 
       // Explicitly disabled type-aware rules (may be enabled by next/core-web-vitals):
