@@ -470,47 +470,56 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
   }
 
   const renderStepIndicator = () => {
-    const steps = [
-      { key: 'configuration', label: 'Configuration', icon: Share2 },
-      { key: 'processing', label: 'Processing', icon: Loader2 },
-      { key: 'completed', label: 'Completed', icon: CheckCircle },
-    ]
+    // Simple "Status: Indicator" format
+    const getStatusDisplay = () => {
+      switch (currentStep) {
+        case 'configuration':
+          return {
+            status: 'Configuration',
+            icon: Share2,
+            color: 'text-blue-600',
+            bgColor: 'bg-blue-50 dark:bg-blue-950/20',
+          }
+        case 'processing':
+          return {
+            status: 'Processing',
+            icon: Loader2,
+            color: 'text-orange-600',
+            bgColor: 'bg-orange-50 dark:bg-orange-950/20',
+          }
+        case 'completed':
+          return {
+            status: 'Completed',
+            icon: CheckCircle,
+            color: 'text-green-600',
+            bgColor: 'bg-green-50 dark:bg-green-950/20',
+          }
+        default:
+          return {
+            status: 'Configuration',
+            icon: Share2,
+            color: 'text-blue-600',
+            bgColor: 'bg-blue-50 dark:bg-blue-950/20',
+          }
+      }
+    }
+
+    const { status, icon: Icon, color, bgColor } = getStatusDisplay()
 
     return (
-      <div className="mb-6 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
-        {steps.map((step, index) => {
-          const Icon = step.icon
-          const isActive = currentStep === step.key
-          const isCompleted =
-            (currentStep === 'processing' && step.key === 'configuration') ||
-            (currentStep === 'completed' && step.key !== 'completed')
-          const isCurrent = isActive
-
-          return (
-            <div key={step.key} className="flex w-full items-center sm:w-auto">
-              <div
-                className={cn(
-                  'flex min-w-0 flex-1 items-center gap-2 rounded-lg px-3 py-2 text-sm sm:flex-none',
-                  isCurrent && 'bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-300',
-                  isCompleted &&
-                    'bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-300',
-                  !isCurrent && !isCompleted && 'text-muted-foreground',
-                )}
-              >
-                <Icon
-                  className={cn(
-                    'h-4 w-4 flex-shrink-0',
-                    isCurrent && (step.key === 'processing' ? 'animate-spin' : ''),
-                  )}
-                />
-                <span className="truncate font-medium">{step.label}</span>
-              </div>
-              {index < steps.length - 1 && (
-                <ArrowRight className="text-muted-foreground mx-2 hidden h-4 w-4 flex-shrink-0 sm:block" />
-              )}
-            </div>
-          )
-        })}
+      <div className={cn('mb-4 rounded-lg border p-3', bgColor)}>
+        <div className="flex items-center gap-2">
+          <Icon
+            className={cn(
+              'h-4 w-4 flex-shrink-0',
+              color,
+              currentStep === 'processing' && 'animate-spin',
+            )}
+          />
+          <span className="text-sm font-medium">
+            Status: <span className={color}>{status}</span>
+          </span>
+        </div>
       </div>
     )
   }
