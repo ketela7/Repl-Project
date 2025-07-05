@@ -13,7 +13,7 @@ import { DriveErrorDisplay } from '@/components/drive-error-display'
 import { DrivePermissionRequired } from '@/components/drive-permission-required'
 
 import { FileBreadcrumb } from './file-breadcrumb'
-import { DriveGridSkeleton } from './drive-skeleton'
+import { SkeletonTable } from '@/components/ui/skeleton-table'
 import { FileUploadDialog } from './file-upload-dialog'
 import { CreateFolderDialog } from './create-folder-dialog'
 import { FilePreviewDialog } from './file-preview-dialog'
@@ -671,7 +671,11 @@ export function DriveManager() {
   // Bulk operation completion handler removed as unused
 
   if (loading) {
-    return <DriveGridSkeleton />
+    return (
+      <div className="space-y-4">
+        <SkeletonTable rows={8} />
+      </div>
+    )
   }
 
   if (hasAccess === false && driveAccessError) {
