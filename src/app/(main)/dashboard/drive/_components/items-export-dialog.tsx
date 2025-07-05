@@ -366,21 +366,21 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           status: 'Processing',
           icon: Loader2,
           color: 'text-orange-600',
-          bgColor: 'bg-orange-50 dark:bg-orange-950/20'
+          bgColor: 'bg-orange-50 dark:bg-orange-950/20',
         }
       } else if (isCompleted) {
         return {
           status: 'Completed',
           icon: CheckCircle,
           color: 'text-green-600',
-          bgColor: 'bg-green-50 dark:bg-green-950/20'
+          bgColor: 'bg-green-50 dark:bg-green-950/20',
         }
       } else {
         return {
           status: 'Configuration',
           icon: FileOutput,
           color: 'text-blue-600',
-          bgColor: 'bg-blue-50 dark:bg-blue-950/20'
+          bgColor: 'bg-blue-50 dark:bg-blue-950/20',
         }
       }
     }
@@ -388,15 +388,9 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     const { status, icon: Icon, color, bgColor } = getStatusDisplay()
 
     return (
-      <div className={cn("mb-4 rounded-lg border p-3", bgColor)}>
+      <div className={cn('mb-4 rounded-lg border p-3', bgColor)}>
         <div className="flex items-center gap-2">
-          <Icon 
-            className={cn(
-              "h-4 w-4 flex-shrink-0", 
-              color,
-              isProcessing && 'animate-spin'
-            )} 
-          />
+          <Icon className={cn('h-4 w-4 flex-shrink-0', color, isProcessing && 'animate-spin')} />
           <span className="text-sm font-medium">
             Status: <span className={color}>{status}</span>
           </span>
@@ -410,225 +404,154 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       <>
         {renderStepIndicator()}
         {isProcessing ? (
-      return (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
-            <h3 className="font-semibold">Exporting Files</h3>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span>Progress</span>
-              <span>
-                {progress.current} of {progress.total}
-              </span>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-blue-600" />
+              <h3 className="font-semibold">Exporting Files</h3>
             </div>
 
-            <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span>Progress</span>
+                <span>
+                  {progress.current} of {progress.total}
+                </span>
+              </div>
 
-            {progress.currentFile && (
-              <div className="text-muted-foreground text-sm">Exporting: {progress.currentFile}</div>
+              <Progress
+                value={calculateProgress(progress.current, progress.total)}
+                className="h-2"
+              />
+
+              {progress.currentFile && (
+                <div className="text-muted-foreground text-sm">
+                  Exporting: {progress.currentFile}
+                </div>
+              )}
+
+              <div className="flex gap-4 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>{progress.success} exported</span>
+                </div>
+                <div className="flex items-center gap-1 text-red-600">
+                  <XCircle className="h-4 w-4" />
+                  <span>{progress.failed} failed</span>
+                </div>
+                {progress.skipped > 0 && (
+                  <div className="flex items-center gap-1 text-yellow-600">
+                    <SkipForward className="h-4 w-4" />
+                    <span>{progress.skipped} skipped</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : isCompleted ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <h3 className="font-semibold">
+                {isCancelled ? 'Export Operation Cancelled' : 'Export Completed'}
+              </h3>
+            </div>
+
+            {!isCancelled && (
+              <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+                <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+                  <div>✓ Successfully exported {progress.success} file(s)</div>
+                  <div>✓ Files converted to {selectedFormatData?.label}</div>
+                  <div>✓ Downloads started automatically</div>
+                </div>
+              </div>
             )}
 
-            <div className="flex gap-4 text-sm">
-              <div className="flex items-center gap-1 text-green-600">
-                <CheckCircle className="h-4 w-4" />
-                <span>{progress.success} exported</span>
+            {progress.failed > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-red-600">
+                  Failed to export {progress.failed} item(s):
+                </div>
+                <ScrollArea className="max-h-32">
+                  <div className="space-y-1">
+                    {progress.errors.map((error, index) => (
+                      <div key={index} className="text-xs text-red-600">
+                        • {error.file}: {error.error}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
               </div>
-              <div className="flex items-center gap-1 text-red-600">
-                <XCircle className="h-4 w-4" />
-                <span>{progress.failed} failed</span>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Selected Items</span>
+                <div className="flex gap-2">
+                  <Badge variant="secondary">{exportableFiles.length} exportable</Badge>
+                  {incompatibleFiles.length > 0 && (
+                    <Badge variant="outline">{incompatibleFiles.length} incompatible</Badge>
+                  )}
+                </div>
               </div>
-              {progress.skipped > 0 && (
-                <div className="flex items-center gap-1 text-yellow-600">
-                  <SkipForward className="h-4 w-4" />
-                  <span>{progress.skipped} skipped</span>
+
+              {incompatibleFiles.length > 0 && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
+                  <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span className="text-sm">
+                      {incompatibleFiles.length} item(s) are not compatible with{' '}
+                      {selectedFormatData?.label}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
-          </div>
-        </div>
-      )
-    }
 
-    if (isCompleted) {
-      return (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <h3 className="font-semibold">
-              {isCancelled ? 'Export Operation Cancelled' : 'Export Completed'}
-            </h3>
-          </div>
-
-          {!isCancelled && (
-            <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
-              <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
-                <div>✓ Successfully exported {progress.success} file(s)</div>
-                <div>✓ Files converted to {selectedFormatData?.label}</div>
-                <div>✓ Downloads started automatically</div>
-              </div>
+            <div className="space-y-4">
+              <Label className="text-sm font-medium">Export Format</Label>
+              <RadioGroup
+                value={selectedFormat}
+                onValueChange={setSelectedFormat}
+                className="grid grid-cols-1 gap-2"
+              >
+                {EXPORT_FORMATS.map(format => (
+                  <div key={format.id} className="flex items-center space-x-2">
+                    <RadioGroupItem value={format.id} id={format.id} />
+                    <Label htmlFor={format.id} className="flex flex-1 items-center gap-2">
+                      <format.icon className="h-4 w-4" />
+                      <div className="flex-1">
+                        <div className="font-medium">{format.label}</div>
+                        <div className="text-muted-foreground text-xs">{format.description}</div>
+                      </div>
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
             </div>
-          )}
 
-          {progress.failed > 0 && (
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-red-600">
-                Failed to export {progress.failed} item(s):
-              </div>
-              <ScrollArea className="max-h-32">
-                <div className="space-y-1">
-                  {progress.errors.map((error, index) => (
-                    <div key={index} className="text-xs text-red-600">
-                      • {error.file}: {error.error}
-                    </div>
-                  ))}
+            {exportableFiles.length === 0 ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
+                <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                  <XCircle className="h-4 w-4" />
+                  <span className="text-sm">
+                    No exportable files selected. Please select Google Workspace files.
+                  </span>
                 </div>
-              </ScrollArea>
-            </div>
-          )}
-        </div>
-      )
-    }
-
-    return (
-      <div className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Selected Items</span>
-            <div className="flex gap-2">
-              <Badge variant="secondary">{exportableFiles.length} exportable</Badge>
-              {incompatibleFiles.length > 0 && (
-                <Badge variant="outline">{incompatibleFiles.length} incompatible</Badge>
-              )}
-            </div>
-          </div>
-
-          {incompatibleFiles.length > 0 && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
-              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
-                <AlertTriangle className="h-4 w-4" />
-                <span className="text-sm">
-                  {incompatibleFiles.length} item(s) are not compatible with{' '}
-                  {selectedFormatData?.label}
-                </span>
               </div>
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          <Label className="text-sm font-medium">Export Format</Label>
-          <RadioGroup
-            value={selectedFormat}
-            onValueChange={setSelectedFormat}
-            className="grid grid-cols-1 gap-2"
-          >
-            {EXPORT_FORMATS.map(format => (
-              <div key={format.id} className="flex items-center space-x-2">
-                <RadioGroupItem value={format.id} id={format.id} />
-                <Label htmlFor={format.id} className="flex flex-1 items-center gap-2">
-                  <format.icon className="h-4 w-4" />
-                  <div className="flex-1">
-                    <div className="font-medium">{format.label}</div>
-                    <div className="text-muted-foreground text-xs">{format.description}</div>
-                  </div>
-                </Label>
+            ) : (
+              <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+                <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
+                  <div>• Export converts Google Workspace files to standard formats</div>
+                  <div>• Downloaded files will be saved to your device</div>
+                  <div>• Large files may take longer to process</div>
+                  <div>• Some formatting may be lost during conversion</div>
+                </div>
               </div>
-            ))}
-          </RadioGroup>
-        </div>
-
-        {exportableFiles.length === 0 ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
-            <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-              <XCircle className="h-4 w-4" />
-              <span className="text-sm">
-                No compatible Google Workspace files selected for {selectedFormatData?.label}
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
-            <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
-              <div>• Only Google Docs, Sheets, and Slides can be exported</div>
-              <div>• Files will be converted to {selectedFormatData?.label}</div>
-              <div>• Original files remain unchanged in Google Drive</div>
-              <div>• Some formatting may be lost during conversion</div>
-            </div>
+            )}
           </div>
         )}
-      </div>
-    ) : (
-      <div className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Selected Items</span>
-            <div className="flex gap-2">
-              <Badge variant="secondary">{exportableFiles.length} exportable</Badge>
-              {incompatibleFiles.length > 0 && (
-                <Badge variant="outline">{incompatibleFiles.length} incompatible</Badge>
-              )}
-            </div>
-          </div>
-
-          {incompatibleFiles.length > 0 && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
-              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
-                <AlertTriangle className="h-4 w-4" />
-                <span className="text-sm">
-                  {incompatibleFiles.length} item(s) are not compatible with{' '}
-                  {selectedFormatData?.label}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          <Label className="text-sm font-medium">Export Format</Label>
-          <RadioGroup
-            value={selectedFormat}
-            onValueChange={setSelectedFormat}
-            className="grid grid-cols-1 gap-2"
-          >
-            {EXPORT_FORMATS.map(format => (
-              <div key={format.id} className="flex items-center space-x-2">
-                <RadioGroupItem value={format.id} id={format.id} />
-                <Label htmlFor={format.id} className="flex flex-1 items-center gap-2">
-                  <format.icon className="h-4 w-4" />
-                  <div className="flex-1">
-                    <div className="font-medium">{format.label}</div>
-                    <div className="text-muted-foreground text-xs">{format.description}</div>
-                  </div>
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-
-        {exportableFiles.length === 0 ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
-            <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-              <XCircle className="h-4 w-4" />
-              <span className="text-sm">
-                No exportable files selected. Please select Google Workspace files.
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
-            <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
-              <div>• Export converts Google Workspace files to standard formats</div>
-              <div>• Downloaded files will be saved to your device</div>
-              <div>• Large files may take longer to process</div>
-              <div>• Some formatting may be lost during conversion</div>
-            </div>
-          </div>
-        )}
-      </div>
-    )}
       </>
     )
   }

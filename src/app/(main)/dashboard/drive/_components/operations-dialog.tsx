@@ -39,7 +39,7 @@ import ItemsCopyDialog from './items-copy-dialog'
 import ItemsTrashDialog from './items-trash-dialog'
 import ItemsShareDialog from './items-share-dialog'
 import ItemsRenameDialog from './items-rename-dialog'
-import ItemsExportDialog from './items-export-dialog'
+// import ItemsExportDialog from './items-export-dialog'
 import ItemsDeleteDialog from './items-delete-dialog'
 import ItemsUntrashDialog from './items-untrash-dialog'
 import ItemsDownloadDialog from './items-download-dialog'
@@ -407,6 +407,7 @@ function OperationsDialog({
             isOpen={isDownloadDialogOpen}
             onClose={() => setIsDownloadDialogOpen(false)}
             selectedItems={selectedItems}
+            onConfirm={() => setIsDownloadDialogOpen(false)}
           />
         </Suspense>
 
@@ -417,6 +418,7 @@ function OperationsDialog({
             selectedItems={selectedItems}
           />
         </Suspense>
+        */}
 
         <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
           <ItemsUntrashDialog
@@ -503,6 +505,7 @@ function OperationsDialog({
           isOpen={isDownloadDialogOpen}
           onClose={() => setIsDownloadDialogOpen(false)}
           selectedItems={selectedItems}
+          onConfirm={() => setIsDownloadDialogOpen(false)}
         />
       </Suspense>
 
@@ -513,6 +516,7 @@ function OperationsDialog({
           selectedItems={selectedItems}
         />
       </Suspense>
+      */}
 
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsUntrashDialog

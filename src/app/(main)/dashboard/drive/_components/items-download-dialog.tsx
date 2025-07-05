@@ -295,21 +295,21 @@ function ItemsDownloadDialog({
           status: 'Processing',
           icon: Loader2,
           color: 'text-orange-600',
-          bgColor: 'bg-orange-50 dark:bg-orange-950/20'
+          bgColor: 'bg-orange-50 dark:bg-orange-950/20',
         }
       } else if (isCompleted) {
         return {
           status: 'Completed',
           icon: CheckCircle,
           color: 'text-green-600',
-          bgColor: 'bg-green-50 dark:bg-green-950/20'
+          bgColor: 'bg-green-50 dark:bg-green-950/20',
         }
       } else {
         return {
           status: 'Configuration',
           icon: Download,
           color: 'text-blue-600',
-          bgColor: 'bg-blue-50 dark:bg-blue-950/20'
+          bgColor: 'bg-blue-50 dark:bg-blue-950/20',
         }
       }
     }
@@ -317,15 +317,9 @@ function ItemsDownloadDialog({
     const { status, icon: Icon, color, bgColor } = getStatusDisplay()
 
     return (
-      <div className={cn("mb-4 rounded-lg border p-3", bgColor)}>
+      <div className={cn('mb-4 rounded-lg border p-3', bgColor)}>
         <div className="flex items-center gap-2">
-          <Icon 
-            className={cn(
-              "h-4 w-4 flex-shrink-0", 
-              color,
-              isProcessing && 'animate-spin'
-            )} 
-          />
+          <Icon className={cn('h-4 w-4 flex-shrink-0', color, isProcessing && 'animate-spin')} />
           <span className="text-sm font-medium">
             Status: <span className={color}>{status}</span>
           </span>
@@ -339,165 +333,164 @@ function ItemsDownloadDialog({
       <>
         {renderStepIndicator()}
         {isProcessing ? (
-      return (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Download className="h-5 w-5 text-blue-600" />
-            <h3 className="font-semibold">
-              {selectedMode === 'exportLinks' ? 'Generating Download Links' : 'Downloading Files'}
-            </h3>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-sm">
-              <span>Progress</span>
-              <span>
-                {progress.current} of {progress.total}
-              </span>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Download className="h-5 w-5 text-blue-600" />
+              <h3 className="font-semibold">
+                {selectedMode === 'exportLinks' ? 'Generating Download Links' : 'Downloading Files'}
+              </h3>
             </div>
 
-            <Progress value={calculateProgress(progress.current, progress.total)} className="h-2" />
+            <div className="space-y-3">
+              <div className="flex items-center justify-between text-sm">
+                <span>Progress</span>
+                <span>
+                  {progress.current} of {progress.total}
+                </span>
+              </div>
 
-            {progress.currentFile && (
-              <div className="text-muted-foreground text-sm">
-                Processing: {progress.currentFile}
-              </div>
-            )}
+              <Progress
+                value={calculateProgress(progress.current, progress.total)}
+                className="h-2"
+              />
 
-            <div className="flex gap-4 text-sm">
-              <div className="flex items-center gap-1 text-green-600">
-                <CheckCircle className="h-4 w-4" />
-                <span>{progress.success} completed</span>
-              </div>
-              <div className="flex items-center gap-1 text-red-600">
-                <XCircle className="h-4 w-4" />
-                <span>{progress.failed} failed</span>
-              </div>
-              {progress.skipped > 0 && (
-                <div className="flex items-center gap-1 text-yellow-600">
-                  <SkipForward className="h-4 w-4" />
-                  <span>{progress.skipped} skipped</span>
+              {progress.currentFile && (
+                <div className="text-muted-foreground text-sm">
+                  Processing: {progress.currentFile}
                 </div>
               )}
-            </div>
-          </div>
-        </div>
-      )
-    }
 
-    if (isCompleted) {
-      return (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <h3 className="font-semibold">
-              {isCancelled ? 'Download Operation Cancelled' : 'Download Completed'}
-            </h3>
-          </div>
-
-          {!isCancelled && (
-            <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
-              <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
-                {selectedMode === 'exportLinks' ? (
-                  <>
-                    <div>✓ Download links exported as CSV file</div>
-                    <div>✓ File downloaded to your device</div>
-                    <div>✓ Links are valid for immediate use</div>
-                  </>
-                ) : (
-                  <>
-                    <div>✓ Successfully processed {progress.success} file(s)</div>
-                    <div>✓ Files downloaded to your device</div>
-                    <div>✓ Check your browser downloads folder</div>
-                  </>
+              <div className="flex gap-4 text-sm">
+                <div className="flex items-center gap-1 text-green-600">
+                  <CheckCircle className="h-4 w-4" />
+                  <span>{progress.success} completed</span>
+                </div>
+                <div className="flex items-center gap-1 text-red-600">
+                  <XCircle className="h-4 w-4" />
+                  <span>{progress.failed} failed</span>
+                </div>
+                {progress.skipped > 0 && (
+                  <div className="flex items-center gap-1 text-yellow-600">
+                    <SkipForward className="h-4 w-4" />
+                    <span>{progress.skipped} skipped</span>
+                  </div>
                 )}
               </div>
             </div>
-          )}
-
-          {progress.failed > 0 && (
-            <div className="space-y-2">
-              <div className="text-sm font-medium text-red-600">
-                Failed to download {progress.failed} item(s):
-              </div>
-              <div className="space-y-1">
-                {progress.errors.map((error, index) => (
-                  <div key={index} className="text-xs text-red-600">
-                    • {error.file}: {error.error}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )
-    }
-
-    return (
-      <div className="space-y-4">
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Selected Items</span>
-            <div className="flex gap-2">
-              <Badge variant="secondary">{downloadableFiles.length} files</Badge>
-              {skippedFolders.length > 0 && (
-                <Badge variant="outline">{skippedFolders.length} folders (skipped)</Badge>
-              )}
-            </div>
           </div>
-
-          {skippedFolders.length > 0 && (
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
-              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
-                <AlertTriangle className="h-4 w-4" />
-                <span className="text-sm">
-                  {skippedFolders.length} folder(s) will be skipped (folders cannot be downloaded
-                  directly)
-                </span>
-              </div>
+        ) : isCompleted ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <h3 className="font-semibold">
+                {isCancelled ? 'Download Operation Cancelled' : 'Download Completed'}
+              </h3>
             </div>
-          )}
-        </div>
 
-        <div className="space-y-4">
-          <Label className="text-sm font-medium">Download Mode</Label>
-          <RadioGroup value={selectedMode} onValueChange={setSelectedMode} className="space-y-3">
-            {DOWNLOAD_MODES.map(mode => (
-              <div key={mode.id} className="flex items-center space-x-2">
-                <RadioGroupItem value={mode.id} id={mode.id} />
-                <Label htmlFor={mode.id} className="flex flex-1 items-center gap-2">
-                  <mode.icon className="h-4 w-4" />
-                  <div>
-                    <div className="font-medium">{mode.label}</div>
-                    <div className="text-muted-foreground text-xs">{mode.description}</div>
-                  </div>
-                </Label>
+            {!isCancelled && (
+              <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
+                <div className="space-y-2 text-sm text-green-700 dark:text-green-300">
+                  {selectedMode === 'exportLinks' ? (
+                    <>
+                      <div>✓ Download links exported as CSV file</div>
+                      <div>✓ File downloaded to your device</div>
+                      <div>✓ Links are valid for immediate use</div>
+                    </>
+                  ) : (
+                    <>
+                      <div>✓ Successfully processed {progress.success} file(s)</div>
+                      <div>✓ Files downloaded to your device</div>
+                      <div>✓ Check your browser downloads folder</div>
+                    </>
+                  )}
+                </div>
               </div>
-            ))}
-          </RadioGroup>
-        </div>
+            )}
 
-        {downloadableFiles.length === 0 ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
-            <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
-              <XCircle className="h-4 w-4" />
-              <span className="text-sm">
-                No downloadable files selected. Please select files (not folders).
-              </span>
-            </div>
+            {progress.failed > 0 && (
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-red-600">
+                  Failed to download {progress.failed} item(s):
+                </div>
+                <div className="space-y-1">
+                  {progress.errors.map((error, index) => (
+                    <div key={index} className="text-xs text-red-600">
+                      • {error.file}: {error.error}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
-          <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
-            <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
-              <div>• Direct download will start individual file downloads</div>
-              <div>• Export links creates a CSV file with download URLs</div>
-              <div>• Downloads may be blocked by popup blockers</div>
-              <div>• Large files may take longer to process</div>
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium">Selected Items</span>
+                <div className="flex gap-2">
+                  <Badge variant="secondary">{downloadableFiles.length} files</Badge>
+                  {skippedFolders.length > 0 && (
+                    <Badge variant="outline">{skippedFolders.length} folders (skipped)</Badge>
+                  )}
+                </div>
+              </div>
+
+              {skippedFolders.length > 0 && (
+                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
+                  <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span className="text-sm">
+                      {skippedFolders.length} folder(s) will be skipped (folders cannot be
+                      downloaded directly)
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
+
+            <div className="space-y-4">
+              <Label className="text-sm font-medium">Download Mode</Label>
+              <RadioGroup
+                value={selectedMode}
+                onValueChange={setSelectedMode}
+                className="space-y-3"
+              >
+                {DOWNLOAD_MODES.map(mode => (
+                  <div key={mode.id} className="flex items-center space-x-2">
+                    <RadioGroupItem value={mode.id} id={mode.id} />
+                    <Label htmlFor={mode.id} className="flex flex-1 items-center gap-2">
+                      <mode.icon className="h-4 w-4" />
+                      <div>
+                        <div className="font-medium">{mode.label}</div>
+                        <div className="text-muted-foreground text-xs">{mode.description}</div>
+                      </div>
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            </div>
+
+            {downloadableFiles.length === 0 ? (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
+                <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                  <XCircle className="h-4 w-4" />
+                  <span className="text-sm">
+                    No downloadable files selected. Please select files (not folders).
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+                <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
+                  <div>• Direct download will start individual file downloads</div>
+                  <div>• Export links creates a CSV file with download URLs</div>
+                  <div>• Downloads may be blocked by popup blockers</div>
+                  <div>• Large files may take longer to process</div>
+                </div>
+              </div>
+            )}
           </div>
         )}
-      </div>
-    )}
       </>
     )
   }
