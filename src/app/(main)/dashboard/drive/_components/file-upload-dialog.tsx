@@ -135,14 +135,6 @@ export function FileUploadDialog({
     }
   }
 
-  const handleCancel = () => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
-    }
-    setUploading(false)
-    setUploadProgress(0)
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">

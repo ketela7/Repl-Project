@@ -117,7 +117,7 @@ export function DuplicateBulkOperationsDialog({
   const isMobile = useIsMobile()
   const [step, setStep] = useState<'selection' | 'operation' | 'destination'>('selection')
   const [selectedCriteria, setSelectedCriteria] = useState<string>('newest')
-  const [selectedOperation, setSelectedOperation] = useState<string | null>(null)
+
   const [selectedDestination, setSelectedDestination] = useState<string | null>(null)
 
   // Dialog states for actual operations
@@ -132,7 +132,6 @@ export function DuplicateBulkOperationsDialog({
   const handleClose = () => {
     setStep('selection')
     setSelectedCriteria('newest')
-    setSelectedOperation(null)
     setSelectedDestination(null)
     setIsDeleteDialogOpen(false)
     setIsMoveDialogOpen(false)
@@ -249,8 +248,6 @@ export function DuplicateBulkOperationsDialog({
   }
 
   const handleOperationSelect = (operationId: string) => {
-    setSelectedOperation(operationId)
-
     if (operationId === 'move-destination') {
       setStep('destination')
     } else {
@@ -276,7 +273,7 @@ export function DuplicateBulkOperationsDialog({
     }
   }
 
-  const handleDestinationSelect = (folderId: string, folderName?: string) => {
+  const handleDestinationSelect = (folderId: string) => {
     setSelectedDestination(folderId)
   }
 
@@ -416,7 +413,7 @@ export function DuplicateBulkOperationsDialog({
         <h4 className="font-semibold">Select Destination Folder</h4>
         <DriveDestinationSelector
           onSelect={handleDestinationSelect}
-          selectedFolderId={selectedDestination || undefined}
+          selectedFolderId={selectedDestination ?? undefined}
         />
       </div>
 

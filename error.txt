@@ -1,0 +1,134 @@
+
+> gdrive-pro@1.0.0 type:fast
+> tsc --noEmit --skipLibCheck
+
+src/app/(main)/dashboard/analytics/_components/duplicate-bulk-operations-dialog.tsx(414,10): error TS2375: Type '{ onSelect: (folderId: string) => void; selectedFolderId: string | undefined; }' is not assignable to type 'DriveDestinationSelectorProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'selectedFolderId' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/app/(main)/dashboard/drive/_components/items-copy-dialog.tsx(172,24): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-copy-dialog.tsx(182,23): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-copy-dialog.tsx(209,31): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-delete-dialog.tsx(65,10): error TS6133: 'getFileIcon' is declared but its value is never read.
+src/app/(main)/dashboard/drive/_components/items-delete-dialog.tsx(196,24): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-delete-dialog.tsx(206,23): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-delete-dialog.tsx(222,38): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-delete-dialog.tsx(230,31): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-download-dialog.tsx(233,26): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-download-dialog.tsx(243,27): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-download-dialog.tsx(259,48): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-download-dialog.tsx(272,33): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-download-dialog.tsx(287,33): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-export-dialog.tsx(202,25): error TS2532: Object is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-export-dialog.tsx(243,9): error TS6133: 'getExportMimeType' is declared but its value is never read.
+src/app/(main)/dashboard/drive/_components/items-export-dialog.tsx(277,14): error TS2304: Cannot find name 'totalItems'.
+src/app/(main)/dashboard/drive/_components/items-export-dialog.tsx(298,24): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-export-dialog.tsx(308,23): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-export-dialog.tsx(322,39): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-export-dialog.tsx(338,31): error TS18048: 'file' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-export-dialog.tsx(378,11): error TS2304: Cannot find name 'currentStep'.
+src/app/(main)/dashboard/drive/_components/items-move-dialog.tsx(62,10): error TS6133: 'getFileIcon' is declared but its value is never read.
+src/app/(main)/dashboard/drive/_components/items-move-dialog.tsx(197,24): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-move-dialog.tsx(203,21): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-move-dialog.tsx(207,23): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-move-dialog.tsx(208,21): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-move-dialog.tsx(248,79): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-move-dialog.tsx(268,31): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-rename-dialog.tsx(71,11): error TS6196: 'RenameResult' is declared but never used.
+src/app/(main)/dashboard/drive/_components/items-rename-dialog.tsx(302,71): error TS18048: 'previewItem' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-rename-dialog.tsx(312,24): error TS18048: 'previewItem' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-rename-dialog.tsx(323,24): error TS18048: 'previewItem' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-rename-dialog.tsx(344,31): error TS18048: 'previewItem' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-share-dialog.tsx(171,24): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-share-dialog.tsx(181,23): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-share-dialog.tsx(195,17): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-share-dialog.tsx(196,19): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-share-dialog.tsx(211,31): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-share-dialog.tsx(213,17): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-share-dialog.tsx(214,19): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-trash-dialog.tsx(61,10): error TS6133: 'getFileIcon' is declared but its value is never read.
+src/app/(main)/dashboard/drive/_components/items-trash-dialog.tsx(181,24): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-trash-dialog.tsx(191,23): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-trash-dialog.tsx(207,45): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-trash-dialog.tsx(215,31): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-untrash-dialog.tsx(60,10): error TS6133: 'getFileIcon' is declared but its value is never read.
+src/app/(main)/dashboard/drive/_components/items-untrash-dialog.tsx(186,24): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-untrash-dialog.tsx(196,23): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-untrash-dialog.tsx(212,39): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/items-untrash-dialog.tsx(220,31): error TS18048: 'item' is possibly 'undefined'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(271,153): error TS2554: Expected 1 arguments, but got 2.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(476,11): error TS2322: Type '(() => void) | undefined' is not assignable to type '() => void'.
+  Type 'undefined' is not assignable to type '() => void'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(485,11): error TS2322: Type '(() => void) | undefined' is not assignable to type '() => void'.
+  Type 'undefined' is not assignable to type '() => void'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(490,10): error TS2741: Property 'onConfirm' is missing in type '{ isOpen: boolean; onClose: () => void; selectedItems: any[]; }' but required in type 'ItemsShareDialogProps'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(498,10): error TS2375: Type '{ isOpen: boolean; onClose: () => void; selectedItems: any[]; onConfirm: (() => void) | undefined; }' is not assignable to type 'ItemsRenameDialogProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onConfirm' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(511,11): error TS2322: Type '(() => void) | undefined' is not assignable to type '() => void'.
+  Type 'undefined' is not assignable to type '() => void'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(520,11): error TS2322: Type '(() => void) | undefined' is not assignable to type '() => void'.
+  Type 'undefined' is not assignable to type '() => void'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(525,10): error TS2375: Type '{ isOpen: boolean; onClose: () => void; selectedItems: any[]; onConfirm: (() => void) | undefined; }' is not assignable to type 'ItemsUntrashDialogProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onConfirm' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(534,10): error TS2375: Type '{ isOpen: boolean; onClose: () => void; selectedItems: any[]; onConfirm: (() => void) | undefined; }' is not assignable to type 'ItemsTrashDialogProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onConfirm' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+src/app/(main)/dashboard/drive/_components/operations-dialog.tsx(543,10): error TS2375: Type '{ isOpen: boolean; onClose: () => void; selectedItems: any[]; onConfirm: (() => void) | undefined; }' is not assignable to type 'ItemsDeleteDialogProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onConfirm' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+src/app/api/drive/files/download/route.ts(287,33): error TS6133: 'webViewLink' is declared but its value is never read.
+src/app/api/drive/files/download/route.ts(299,35): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/app/api/drive/files/download/route.ts(300,48): error TS2345: Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+  Type 'undefined' is not assignable to type 'string'.
+src/components/drive-destination-selector.tsx(6,3): error TS6133: 'Search' is declared but its value is never read.
+src/components/drive-destination-selector.tsx(11,3): error TS6133: 'ExternalLink' is declared but its value is never read.
+src/components/drive-destination-selector.tsx(12,3): error TS6133: 'Home' is declared but its value is never read.
+src/components/drive-destination-selector.tsx(13,3): error TS6133: 'ChevronRight' is declared but its value is never read.
+src/components/drive-destination-selector.tsx(68,17): error TS2323: Cannot redeclare exported variable 'DriveDestinationSelector'.
+src/components/drive-destination-selector.tsx(199,9): error TS6133: 'navigateToFolder' is declared but its value is never read.
+src/components/drive-destination-selector.tsx(386,10): error TS2323: Cannot redeclare exported variable 'DriveDestinationSelector'.
+src/components/drive-destination-selector.tsx(386,10): error TS2484: Export declaration conflicts with exported declaration of 'DriveDestinationSelector'.
+src/components/ui/sonner.tsx(12,6): error TS2375: Type '{ invert?: boolean; theme: "system" | "light" | "dark" | undefined; position?: Position; hotkey?: string[]; richColors?: boolean; expand?: boolean; duration?: number; gap?: number; visibleToasts?: number; ... 11 more ...; key?: Key | ... 1 more ... | undefined; }' is not assignable to type 'ToasterProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'theme' are incompatible.
+    Type '"system" | "light" | "dark" | undefined' is not assignable to type '"system" | "light" | "dark"'.
+      Type 'undefined' is not assignable to type '"system" | "light" | "dark"'.
+src/lib/google-drive/service.ts(489,47): error TS2769: No overload matches this call.
+  Overload 1 of 6, '(params?: Params$Resource$Files$Update | undefined, options?: MethodOptions | undefined): Promise<GaxiosResponseWithHTTP2<Schema$File>>', gave the following error.
+    Argument of type '{ fileId: string; addParents: string; removeParents: string | undefined; fields: string; }' is not assignable to parameter of type 'Params$Resource$Files$Update' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+      Types of property 'removeParents' are incompatible.
+        Type 'string | undefined' is not assignable to type 'string'.
+          Type 'undefined' is not assignable to type 'string'.
+  Overload 2 of 6, '(callback: BodyResponseCallback<Schema$File>): void', gave the following error.
+    Object literal may only specify known properties, and 'fileId' does not exist in type 'BodyResponseCallback<Schema$File>'.
+src/lib/google-drive/service.ts(497,46): error TS2339: Property 'data' does not exist on type 'Promise<GaxiosResponseWithHTTP2<Readable>> & Promise<GaxiosResponseWithHTTP2<Schema$File>> & void'.
+src/lib/toast-utils.tsx(38,9): error TS2322: Type '(() => void) | undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+  Type 'undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+src/lib/toast-utils.tsx(65,9): error TS2322: Type '(() => void) | undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+  Type 'undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+src/lib/toast-utils.tsx(91,9): error TS2322: Type '(() => void) | undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+  Type 'undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+src/lib/toast-utils.tsx(117,9): error TS2322: Type '(() => void) | undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+  Type 'undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+src/lib/toast-utils.tsx(132,9): error TS2322: Type '(() => void) | undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+  Type 'undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+src/lib/toast-utils.tsx(142,9): error TS2322: Type '(() => void) | undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+  Type 'undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+src/lib/toast-utils.tsx(152,9): error TS2322: Type '(() => void) | undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+  Type 'undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+src/lib/toast-utils.tsx(162,9): error TS2322: Type '(() => void) | undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+  Type 'undefined' is not assignable to type '(event: MouseEvent<HTMLButtonElement, MouseEvent>) => void'.
+src/lib/toast-utils.tsx(174,37): error TS2379: Argument of type '{ message: string; onUndo: (() => void) | undefined; undoText: string; }' is not assignable to parameter of type 'ToastWithActionsOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onUndo' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.
+src/lib/toast-utils.tsx(183,35): error TS2379: Argument of type '{ message: string; onUndo: (() => void) | undefined; undoText: string; }' is not assignable to parameter of type 'ToastWithActionsOptions' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'onUndo' are incompatible.
+    Type '(() => void) | undefined' is not assignable to type '() => void'.
+      Type 'undefined' is not assignable to type '() => void'.

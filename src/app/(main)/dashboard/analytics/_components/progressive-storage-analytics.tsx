@@ -646,7 +646,9 @@ export function ProgressiveStorageAnalytics() {
               : 'border-slate-200 bg-slate-50/50'
           }
         >
-          <Collapsible defaultOpen={files.duplicateFiles && files.duplicateFiles.length > 0}>
+          <Collapsible
+            defaultOpen={Boolean(files.duplicateFiles && files.duplicateFiles.length > 0)}
+          >
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
                 <CollapsibleTrigger className="hover:bg-muted/50 -m-2 flex flex-1 items-center justify-between rounded-md p-2 transition-colors">

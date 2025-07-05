@@ -6,7 +6,6 @@ import { RefreshCw } from 'lucide-react'
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 import { getFileActions } from '@/lib/google-drive/utils'
 import { errorToast } from '@/lib/utils'
-import { toast } from 'sonner'
 
 import { useTimezoneContext } from '@/components/timezone-provider'
 import { Progress } from '@/components/ui/progress'
@@ -139,7 +138,6 @@ export function DriveManager() {
   const [filters, setFilters] = useState(initialFilters)
   const filtersRef = useRef(initialFilters)
   const searchQueryRef = useRef('')
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Table state
   const [visibleColumns, setVisibleColumns] = useState({
@@ -164,7 +162,6 @@ export function DriveManager() {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set())
   const [isSelectMode, setIsSelectMode] = useState(false)
   const selectedItemsRef = useRef<Set<string>>(new Set())
-  const isSelectModeRef = useRef(false)
 
   const [selectedFileForPreview, setSelectedFileForPreview] = useState<DriveFile | null>(null)
   const [selectedFileForDetails, setSelectedFileForDetails] = useState<DriveItem | null>(null)
@@ -204,19 +201,10 @@ export function DriveManager() {
     dispatchDialog({ type: 'CLOSE_DIALOG', dialog: dialogName })
   }
 
-  const closeAllDialogs = () => {
-    dispatchDialog({ type: 'CLOSE_ALL_DIALOGS' })
-  }
-
   // Helper functions untuk sync selection state
   const updateSelectedItems = useCallback((newItems: Set<string>) => {
     setSelectedItems(newItems)
     selectedItemsRef.current = newItems
-  }, [])
-
-  const updateSelectMode = useCallback((mode: boolean) => {
-    setIsSelectMode(mode)
-    isSelectModeRef.current = mode
   }, [])
 
   // Handle search change - auto-search with debouncing
@@ -490,7 +478,7 @@ export function DriveManager() {
         const item = sortedDisplayItems.find(item => item.id === id)
         return item
       })
-      .filter((item): item is DriveItem => Boolean(item))
+      .filter((item): item is NonNullable<typeof item> => Boolean(item))
       .map(item => ({
         id: item.id,
         name: item.name || 'Unnamed',

@@ -225,7 +225,7 @@ function OperationsDialog({
   }
 
   // Color variants for operations
-  const getColorClasses = (color: string, isDestructive = false) => {
+  const getColorClasses = (color: string) => {
     const colorMap = {
       blue: 'border-blue-200 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-950/50',
       green:
@@ -373,7 +373,7 @@ function OperationsDialog({
             isOpen={isMoveDialogOpen}
             onClose={() => setIsMoveDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
 
@@ -382,7 +382,7 @@ function OperationsDialog({
             isOpen={isCopyDialogOpen}
             onClose={() => setIsCopyDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
 
@@ -391,7 +391,7 @@ function OperationsDialog({
             isOpen={isShareDialogOpen}
             onClose={() => setIsShareDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
 
@@ -400,7 +400,7 @@ function OperationsDialog({
             isOpen={isRenameDialogOpen}
             onClose={() => setIsRenameDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
 
@@ -409,7 +409,7 @@ function OperationsDialog({
             isOpen={isDownloadDialogOpen}
             onClose={() => setIsDownloadDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
 
@@ -418,7 +418,7 @@ function OperationsDialog({
             isOpen={isExportDialogOpen}
             onClose={() => setIsExportDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
 
@@ -427,7 +427,7 @@ function OperationsDialog({
             isOpen={isUntrashDialogOpen}
             onClose={() => setIsUntrashDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
 
@@ -436,7 +436,7 @@ function OperationsDialog({
             isOpen={isTrashDialogOpen}
             onClose={() => setIsTrashDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
 
@@ -445,7 +445,7 @@ function OperationsDialog({
             isOpen={isDeleteDialogOpen}
             onClose={() => setIsDeleteDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={onConfirm}
+            onConfirm={onConfirm || (() => {})}
           />
         </Suspense>
       </>
