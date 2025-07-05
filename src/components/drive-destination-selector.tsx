@@ -191,7 +191,14 @@ export function DriveDestinationSelector({
 
   // Handle URL selection
   const handleUrlSelect = () => {
+    console.log('🔄 handleUrlSelect called:', {
+      parsedResult: parsedResult.folderId,
+      validationResult: validationResult?.isValid,
+      folderName: validationResult?.folderName,
+    })
+
     if (parsedResult.folderId && validationResult?.isValid) {
+      console.log('✅ Calling onSelect with:', parsedResult.folderId, validationResult.folderName)
       onSelect(parsedResult.folderId, validationResult.folderName)
     }
   }
