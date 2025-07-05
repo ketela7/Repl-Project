@@ -202,6 +202,9 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             ...prev,
             success: successCount,
           }))
+
+          // Small delay for better visual feedback
+          await new Promise(resolve => setTimeout(resolve, 300))
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break

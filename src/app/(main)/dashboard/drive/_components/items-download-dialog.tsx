@@ -97,9 +97,10 @@ function ItemsDownloadDialog({
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
 
-  // Filter downloadable files based on canDownload capability
-  const downloadableFiles = selectedItems.filter(item => item.canDownload && !item.isFolder)
-  const skippedFolders = selectedItems.filter(item => item.isFolder)
+  // Filter items that can be downloaded (consistent with other operations)
+  const canDownloadItems = selectedItems.filter(item => item.canDownload)
+  const downloadableFiles = canDownloadItems.filter(item => !item.isFolder)
+  const skippedFolders = canDownloadItems.filter(item => item.isFolder)
   const fileCount = downloadableFiles.length
   const folderCount = skippedFolders.length
   const totalItems = downloadableFiles.length

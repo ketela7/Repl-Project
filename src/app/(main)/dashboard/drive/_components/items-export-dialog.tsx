@@ -160,8 +160,10 @@ const EXPORT_FORMATS = [
 
 function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsExportDialogProps) {
   const [selectedFormat, setSelectedFormat] = useState('pdf')
+  const [currentStep, setCurrentStep] = useState<'configuration' | 'processing' | 'completed'>(
+    'configuration',
+  )
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [isItemsExpanded, setIsItemsExpanded] = useState(false)
   //   const totalItems = exportableFiles.length
@@ -226,7 +228,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     }
 
     setIsProcessing(false)
-    setIsCompleted(true)
+    setCurrentStep('completed')
     // Removed toast notification
   }
 
@@ -268,7 +270,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
-    setIsCompleted(false)
+    setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
 
@@ -359,7 +361,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     }))
 
     setIsProcessing(false)
-    setIsCompleted(true)
+    setCurrentStep('completed')
 
     if (isCancelledRef.current) {
       // Removed toast notification
@@ -386,8 +388,8 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
   const resetState = () => {
     setSelectedFormat('pdf')
     setIsProcessing(false)
-    setIsCompleted(false)
     setIsCancelled(false)
+    setCurrentStep('configuration')
     setProgress({
       current: 0,
       total: 0,
@@ -410,7 +412,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           color: 'text-orange-600',
           bgColor: 'bg-orange-50 dark:bg-orange-950/20',
         }
-      } else if (isCompleted) {
+      } else if (currentStep === 'completed') {
         return {
           status: 'Completed',
           icon: CheckCircle,
@@ -643,7 +645,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
       )
     }
 
-    if (isCompleted) {
+    if (currentStep === 'completed') {
       return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
     }
 
