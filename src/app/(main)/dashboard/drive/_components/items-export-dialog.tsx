@@ -175,6 +175,13 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
 
+  // Calculate available export formats based on selected items
+  const availableFormats = EXPORT_FORMATS.filter(format => {
+    return selectedItems.some(
+      item => !item.isFolder && item.mimeType && format.supportedTypes.includes(item.mimeType),
+    )
+  })
+
   // Auto-select first available format if current selection is not available
   useEffect(() => {
     const isSelectedFormatAvailable = availableFormats.some(format => format.id === selectedFormat)
