@@ -3,6 +3,9 @@ const nextConfig = {
   // Enable gzip compression for all responses
   compress: true,
 
+  // Disable dev indicators
+  devIndicators: false,
+
   // Production optimization
   reactStrictMode: true, // Enable for production stability
 
