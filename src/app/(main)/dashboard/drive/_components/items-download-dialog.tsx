@@ -312,13 +312,16 @@ function ItemsDownloadDialog({
     setIsCompleted(true)
     setCurrentStep('completed')
 
-    if (isCancelledRef.current) {
-      toast.info('Download operation cancelled')
-    } else if (successCount > 0 || selectedMode === 'exportLinks') {
-      toast.success(`Download operation completed`)
-    } else {
-      toast.error('Download operation failed')
-    }
+    // Use setTimeout to ensure progress state is updated before toast check
+    setTimeout(() => {
+      if (isCancelledRef.current) {
+        toast.info('Download operation cancelled')
+      } else if (progress.success > 0 || selectedMode === 'exportLinks') {
+        toast.success(`Download operation completed`)
+      } else {
+        toast.error('Download operation failed')
+      }
+    }, 100)
   }
 
   const handleClose = () => {
