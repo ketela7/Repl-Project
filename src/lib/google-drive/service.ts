@@ -382,6 +382,17 @@ export class GoogleDriveService {
     await this.drive.files.delete({ fileId })
   }
 
+  async restoreFromTrash(fileId: string): Promise<DriveFile> {
+    const response = await this.drive.files.update({
+      fileId,
+      requestBody: { trashed: false },
+      fields: getOptimizedFields('LIST_BASIC'),
+    })
+
+    const result = await response
+    return convertGoogleDriveFile(result.data)
+  }
+
   async exportFile(fileId: string, mimeType: string): Promise<ArrayBuffer> {
     const response = await this.drive.files.export(
       {
@@ -405,7 +416,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.update({
       fileId,
       requestBody: { trashed: true },
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
+      fields: getOptimizedFields('LIST_BASIC'),
     })
 
     const result = await response
