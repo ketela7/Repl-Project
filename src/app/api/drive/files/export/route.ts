@@ -46,8 +46,11 @@ export async function POST(request: NextRequest) {
             continue
           }
 
-          // Create export URL for direct download
-          const exportUrl = `${request.nextUrl.origin}/api/drive/files/export/download?fileId=${id}&format=${exportFormat}`
+          // Create export URL for direct download - use proper origin
+          const origin = request.headers.get('host')
+            ? `${request.nextUrl.protocol}//${request.headers.get('host')}`
+            : request.nextUrl.origin
+          const exportUrl = `${origin}/api/drive/files/export/download?fileId=${id}&format=${exportFormat}`
 
           results.push({
             fileId: id,
