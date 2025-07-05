@@ -179,7 +179,7 @@ function ItemsUntrashDialog({
         }))
 
         try {
-          const response = await fetch('/api/drive/untrash', {
+          const response = await fetch('/api/drive/files/untrash', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

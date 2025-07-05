@@ -174,7 +174,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
         }))
 
         try {
-          const response = await fetch('/api/drive/trash', {
+          const response = await fetch('/api/drive/files/trash', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

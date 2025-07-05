@@ -189,8 +189,14 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
         }))
 
         try {
-          const response = await fetch(`/api/drive/files/${item.id}`, {
-            method: 'DELETE',
+          const response = await fetch('/api/drive/files/delete', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fileId: item.id,
+            }),
             signal: abortControllerRef.current.signal,
           })
 
