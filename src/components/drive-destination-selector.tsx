@@ -65,6 +65,7 @@ function parseDriveUrl(url: string): { folderId: string | null; isValid: boolean
     for (const pattern of patterns) {
       const match = cleanUrl.match(pattern)
       if (match && match[1]) {
+        console.log('Parsed folder ID from URL:', match[1])
         return { folderId: match[1], isValid: true }
       }
     }
@@ -142,6 +143,8 @@ export function DriveDestinationSelector({
     setIsValidating(true)
     setValidationResult(null)
 
+    console.log('Validating folder ID:', folderId)
+
     try {
       const response = await fetch('/api/drive/folders/validate', {
         method: 'POST',
@@ -151,6 +154,7 @@ export function DriveDestinationSelector({
       })
 
       const data = await response.json()
+      console.log('Validation response:', data)
 
       // Check if request was aborted
       if (abortControllerRef.current.signal.aborted) return
