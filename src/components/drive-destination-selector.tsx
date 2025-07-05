@@ -100,12 +100,17 @@ export function DriveDestinationSelector({
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPath, setCurrentPath] = useState<DriveFolder[]>([{ id: 'root', name: 'My Drive' }])
 
-  // Parse URL input in real-time
+  // Parse URL input in real-time dan auto-validate
   useEffect(() => {
     if (urlInput.trim()) {
       const result = parseDriveUrl(urlInput)
       setParsedResult(result)
       setValidationResult(null)
+
+      // Auto-validate jika format valid
+      if (result.isValid && result.folderId) {
+        validateFolderId(result.folderId)
+      }
     } else {
       setParsedResult({ folderId: null, isValid: false })
       setValidationResult(null)

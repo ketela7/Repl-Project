@@ -204,6 +204,14 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
           }
 
           successCount++
+
+          // Update progress after success
+          setProgress(prev => ({
+            ...prev,
+            success: successCount,
+            failed: failedCount,
+            errors: [...errors],
+          }))
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break
@@ -212,10 +220,18 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
           const errorMessage = error instanceof Error ? error.message : 'Unknown error'
           errors.push({ file: item.name, error: errorMessage })
           failedCount++
+
+          // Update progress after failure
+          setProgress(prev => ({
+            ...prev,
+            success: successCount,
+            failed: failedCount,
+            errors: [...errors],
+          }))
         }
 
-        // Small delay to prevent overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Small delay to prevent overwhelming the API and show progress
+        await new Promise(resolve => setTimeout(resolve, 300))
       }
     } catch (error) {
       console.error('Copy operation failed:', error)
