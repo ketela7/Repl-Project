@@ -266,7 +266,12 @@ export function DriveDataView({
             {availableMenuItems.map(({ key, label, icon: Icon, destructive }) => (
               <DropdownMenuItem
                 key={key}
-                onClick={() => onItemAction(key, item)}
+                onClick={e => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  console.log('Dropdown item clicked:', key, item.name)
+                  onItemAction(key, item)
+                }}
                 className={destructive ? 'text-destructive' : ''}
               >
                 <Icon className="mr-2 h-4 w-4" />

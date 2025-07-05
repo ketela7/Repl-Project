@@ -739,6 +739,7 @@ export function DriveManager() {
               }
             }}
             onItemAction={(action: string, item: DriveItem) => {
+              console.log('onItemAction called:', action, item.name)
               // First close all dialogs to prevent interference
               closeDialog('preview')
               closeDialog('details')
