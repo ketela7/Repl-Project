@@ -19,6 +19,7 @@ import {
   Archive,
   File,
   Files,
+  ChevronDown,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -43,6 +44,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { DriveDestinationSelector } from '@/components/drive-destination-selector'
 import { cn, calculateProgress } from '@/lib/utils'
@@ -96,6 +98,8 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
     failed: 0,
     errors: [],
   })
+
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false)
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)

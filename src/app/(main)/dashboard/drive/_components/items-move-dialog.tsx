@@ -18,6 +18,7 @@ import {
   Music,
   Archive,
   File,
+  ChevronDown,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -42,6 +43,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { DriveDestinationSelector } from '@/components/drive-destination-selector'
 import { cn, calculateProgress } from '@/lib/utils'
@@ -95,6 +97,8 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
     failed: 0,
     errors: [],
   })
+
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false)
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
@@ -301,11 +305,6 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
   const renderSelectionStep = () => (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Move className="h-5 w-5 text-blue-600" />
-        <h3 className="font-semibold">Move Items</h3>
-      </div>
-
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">Selected Items</span>
@@ -325,21 +324,44 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           </div>
         </div>
 
-        <ScrollArea className="max-h-48">
-          <div className="space-y-2">
-            {selectedItems.slice(0, 10).map(item => (
-              <div key={item.id} className="flex items-center gap-2 rounded-lg border p-2 text-sm">
-                {getFileIcon(item.mimeType, item.isFolder)}
-                <span className="truncate">{item.name}</span>
+        <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
+          <CollapsibleTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-auto w-full justify-between p-2 text-left font-normal"
+            >
+              <span className="text-sm">
+                {isItemsExpanded ? 'Hide' : 'Show'} Selected Items ({selectedItems.length})
+              </span>
+              <ChevronDown
+                className={cn('h-4 w-4 transition-transform', isItemsExpanded && 'rotate-180')}
+              />
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="max-h-48 overflow-y-auto">
+              <div className="space-y-2 pt-2">
+                {selectedItems.map(item => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-2 rounded-lg border p-2 text-sm"
+                  >
+                    {getFileIcon(item.mimeType, item.isFolder)}
+                    <span className="truncate">{item.name}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-            {selectedItems.length > 10 && (
-              <div className="text-muted-foreground text-center text-sm">
-                +{selectedItems.length - 10} more items
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
+      <div className="rounded-lg border bg-blue-50 p-3 dark:bg-blue-950/20">
+        <div className="space-y-1 text-sm text-blue-700 dark:text-blue-300">
+          <div>• Items will be moved to selected destination folder</div>
+          <div>• Original files will be removed from current location</div>
+        </div>
       </div>
     </div>
   )
@@ -410,11 +432,6 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
   const renderCompletedStep = () => (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <CheckCircle className="h-5 w-5 text-green-600" />
-        <h3 className="font-semibold">{isCancelled ? 'Move Cancelled' : 'Move Complete'}</h3>
-      </div>
-
       {!isCancelled && (
         <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
           <div className="space-y-2 text-sm text-green-700 dark:text-green-300">

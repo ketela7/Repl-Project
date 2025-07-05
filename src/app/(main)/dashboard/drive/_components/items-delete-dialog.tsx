@@ -18,6 +18,7 @@ import {
   Folder,
   Shield,
   AlertOctagon,
+  ChevronDown,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -44,6 +45,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn, calculateProgress } from '@/lib/utils'
 
