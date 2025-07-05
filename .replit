@@ -13,13 +13,16 @@ runButton = "Project"
 
 [[workflows.workflow]]
 name = "Project"
-mode = "sequential"
+mode = "parallel"
 author = "agent"
-
 
 [[workflows.workflow.tasks]]
 task = "workflow.run"
 args = "Server"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Formatter"
 
 [[workflows.workflow]]
 name = "Cleaner"
