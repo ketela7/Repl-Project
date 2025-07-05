@@ -12,6 +12,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { Button } from '@/components/ui/button'
+import { BreadcrumbSkeleton } from '@/components/ui/skeleton-table'
 
 interface BreadcrumbItemData {
   id: string
@@ -155,6 +156,15 @@ export function FileBreadcrumb({
   }, [currentFolderId])
 
   const isLoading = loading || externalLoading
+
+  // Show skeleton while loading folder path
+  if (isLoading && currentFolderId && breadcrumbItems.length === 0) {
+    return (
+      <div className="bg-muted/30 flex items-center gap-2 overflow-x-auto rounded-lg border px-2 py-3">
+        <BreadcrumbSkeleton />
+      </div>
+    )
+  }
 
   return (
     <div className="bg-muted/30 flex items-center gap-2 overflow-x-auto rounded-lg border px-2 py-3">

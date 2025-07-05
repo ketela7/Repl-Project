@@ -113,8 +113,18 @@ class MemoryCache {
   }
 
   // Generate cache key for folder structure
-  generateFolderStructureKey(userId: string): string {
-    return `folder-structure:${userId}`
+  generateFolderStructureKey(userId: string, parentId: string = 'root'): string {
+    return `folder-structure:${userId}:${parentId}`
+  }
+
+  // Generate cache key for folder hierarchy (full tree)
+  generateFolderHierarchyKey(userId: string): string {
+    return `folder-hierarchy:${userId}`
+  }
+
+  // Generate cache key for folder breadcrumb
+  generateBreadcrumbKey(userId: string, folderId: string): string {
+    return `breadcrumb:${userId}:${folderId}`
   }
 
   // Generate cache key for search results
@@ -162,6 +172,37 @@ class MemoryCache {
     }
 
     keysToDelete.forEach(key => this.cache.delete(key))
+
+    // Also clear related folder structure caches
+    const structureKey = this.generateFolderStructureKey(userId, folderId)
+    const hierarchyKey = this.generateFolderHierarchyKey(userId)
+    const breadcrumbKey = this.generateBreadcrumbKey(userId, folderId)
+
+    this.delete(structureKey)
+    this.delete(hierarchyKey)
+    this.delete(breadcrumbKey)
+  }
+
+  // Cache folder hierarchy with long TTL since structure changes less frequently
+  cacheFolderHierarchy<T>(userId: string, data: T, ttlMinutes: number = 240): void {
+    const key = this.generateFolderHierarchyKey(userId)
+    this.set(key, data, ttlMinutes)
+  }
+
+  getFolderHierarchy<T>(userId: string): T | undefined {
+    const key = this.generateFolderHierarchyKey(userId)
+    return this.get<T>(key)
+  }
+
+  // Cache breadcrumb path with medium TTL
+  cacheBreadcrumb<T>(userId: string, folderId: string, data: T, ttlMinutes: number = 120): void {
+    const key = this.generateBreadcrumbKey(userId, folderId)
+    this.set(key, data, ttlMinutes)
+  }
+
+  getBreadcrumb<T>(userId: string, folderId: string): T | undefined {
+    const key = this.generateBreadcrumbKey(userId, folderId)
+    return this.get<T>(key)
   }
 
   // Clear cache entries that match specific filter patterns

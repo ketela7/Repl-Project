@@ -41,7 +41,7 @@ import { formatFileSize } from '@/lib/google-drive/utils'
 import { toast } from 'sonner'
 import type { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 
-import { DriveGridSkeleton } from './drive-skeleton'
+import { DriveTableSkeleton } from '@/components/ui/skeleton-table'
 
 type DriveItem = (DriveFile | DriveFolder) & {
   itemType?: 'file' | 'folder'
@@ -166,7 +166,7 @@ export function DriveDataView({
   const effectiveTimezone = timezone || userTimezone
 
   if (loading) {
-    return <DriveGridSkeleton />
+    return <DriveTableSkeleton className="animate-in fade-in-50 duration-500" />
   }
 
   // Memoized handlers for better performance
