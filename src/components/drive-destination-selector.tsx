@@ -235,7 +235,7 @@ export function DriveDestinationSelector({
 
   return (
     <div className={cn('flex h-full min-h-0 w-full flex-col overflow-hidden', className)}>
-      <Card className="mx-auto max-h-[400px] min-h-[300px] w-full border shadow-sm">
+      <Card className="mx-auto h-[400px] w-full border shadow-sm">
         <CardContent className="flex h-full flex-col overflow-hidden p-3">
           <Tabs
             value={activeTab}
@@ -258,7 +258,7 @@ export function DriveDestinationSelector({
                 className="h-8 flex-shrink-0"
               />
 
-              <ScrollArea className="min-h-0 flex-1">
+              <ScrollArea className="h-[280px] w-full">
                 <div className="space-y-1 pr-4">
                   {isLoadingFolders ? (
                     <div className="flex items-center justify-center py-8">
