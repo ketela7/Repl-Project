@@ -471,13 +471,23 @@ export function DriveManager() {
       .filter((item): item is DriveItem => Boolean(item))
   }
 
-  // Helper function to convert selected items to simplified dialog format
+  // Helper function to convert selected items to dialog format with capabilities
   const getSelectedItemsForDialog = () => {
     return getSelectedItemObjects().map(item => ({
       id: item.id,
       name: item.name || 'Unnamed',
       isFolder: Boolean(item.isFolder || item.mimeType === 'application/vnd.google-apps.folder'),
       mimeType: item.mimeType,
+      // Include all capabilities needed by dialogs
+      canMove: item.canMove || false,
+      canCopy: item.canCopy || false,
+      canTrash: item.canTrash || false,
+      canDelete: item.canDelete || false,
+      canUntrash: item.canUntrash || false,
+      canRename: item.canRename || false,
+      canShare: item.canShare || false,
+      canDownload: item.canDownload || false,
+      canExport: item.canExport || false,
     }))
   }
 
@@ -779,50 +789,26 @@ export function DriveManager() {
                   setTimeout(() => openDialog('rename'), 100)
                   break
                 case 'move':
-                  if (!item.canMove) {
-                    toast.error('This item cannot be moved')
-                    return
-                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('move'), 100)
                   break
                 case 'copy':
-                  if (!item.canCopy) {
-                    toast.error('This item cannot be copied')
-                    return
-                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('copy'), 100)
                   break
                 case 'trash':
-                  if (!item.canTrash) {
-                    toast.error('This item cannot be moved to trash')
-                    return
-                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('trash'), 100)
                   break
                 case 'delete':
-                  if (!item.canDelete) {
-                    toast.error('This item cannot be permanently deleted')
-                    return
-                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('delete'), 100)
                   break
                 case 'untrash':
-                  if (!item.canUntrash) {
-                    toast.error('This item cannot be restored from trash')
-                    return
-                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('untrash'), 100)
                   break
                 case 'export':
-                  if (!item.canExport) {
-                    toast.error('This item cannot be exported')
-                    return
-                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('export'), 100)
                   break
