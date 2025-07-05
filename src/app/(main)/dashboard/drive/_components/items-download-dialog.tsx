@@ -117,16 +117,44 @@ function ItemsDownloadDialog({
     toast.info('Download operation cancelled')
   }
 
-  const downloadFile = (url: string, filename: string) => {
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    link.target = '_blank'
-    link.rel = 'noopener noreferrer'
-    link.style.display = 'none'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const downloadFile = async (url: string, filename: string) => {
+    try {
+      // Check if URL is already a blob URL (for CSV exports)
+      if (url.startsWith('blob:')) {
+        const link = document.createElement('a')
+        link.href = url
+        link.download = filename
+        link.style.display = 'none'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        return
+      }
+      
+      // Fetch the file stream from the API
+      const response = await fetch(url)
+      if (!response.ok) throw new Error('Download failed')
+      
+      // Create blob from response
+      const blob = await response.blob()
+      
+      // Create object URL and trigger download
+      const objectUrl = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = objectUrl
+      link.download = filename
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      
+      // Clean up object URL
+      URL.revokeObjectURL(objectUrl)
+    } catch (error) {
+      console.error('Download error:', error)
+      // Fallback to opening in new tab if direct download fails
+      window.open(url, '_blank')
+    }
   }
 
   const handleDownload = async () => {
@@ -181,7 +209,7 @@ function ItemsDownloadDialog({
         // Download CSV file
         const blob = new Blob([csvContent], { type: 'text/csv' })
         const url = URL.createObjectURL(blob)
-        downloadFile(url, `download-links-${new Date().toISOString().slice(0, 10)}.csv`)
+        await downloadFile(url, `download-links-${new Date().toISOString().slice(0, 10)}.csv`)
         URL.revokeObjectURL(url)
 
         setProgress(prev => ({
@@ -238,7 +266,7 @@ function ItemsDownloadDialog({
             const data = await response.json()
 
             if (data.downloadUrl) {
-              downloadFile(data.downloadUrl, file.name)
+              await downloadFile(data.downloadUrl, file.name)
               successCount++
               setProgress(prev => ({
                 ...prev,
