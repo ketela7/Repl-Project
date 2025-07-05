@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { initDriveService, handleApiError } from '@/lib/api-utils'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
+import { config } from '@/lib/config'
 
 export async function GET(request: NextRequest) {
   try {
@@ -262,10 +263,19 @@ export async function POST(request: NextRequest) {
 
         const { name, mimeType, webViewLink } = metadata.data
 
+        // Get proper origin URL - use Replit domain if available
+        const host = request.headers.get('host')
+        const baseUrl = config.app.baseUrl
+        const origin = host?.includes('replit.dev')
+          ? `https://${host}`
+          : baseUrl.includes('replit.dev')
+            ? `https://${baseUrl}`
+            : `${request.nextUrl.protocol}//${host || 'localhost:5000'}`
+
         // For Google Workspace files, create export URL
         if (isGoogleWorkspaceFile(mimeType)) {
           const exportFormat = getExportFormat(mimeType)
-          const exportUrl = `${request.nextUrl.origin}/api/drive/files/download?fileId=${fileId}`
+          const exportUrl = `${origin}/api/drive/files/download?fileId=${fileId}`
 
           return NextResponse.json({
             success: true,
@@ -276,7 +286,7 @@ export async function POST(request: NextRequest) {
         }
 
         // For regular files, create download URL
-        const downloadUrl = `${request.nextUrl.origin}/api/drive/files/download?fileId=${fileId}`
+        const downloadUrl = `${origin}/api/drive/files/download?fileId=${fileId}`
 
         return NextResponse.json({
           success: true,
