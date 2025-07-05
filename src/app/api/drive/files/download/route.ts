@@ -286,14 +286,10 @@ export async function POST(request: NextRequest) {
 
         const { name, mimeType, webViewLink } = metadata.data
 
-        // Get proper origin URL - use Replit domain if available
-        const host = request.headers.get('host')
-        const baseUrl = config.app.baseUrl
-        const origin = host?.includes('replit.dev')
-          ? `https://${host}`
-          : baseUrl.includes('replit.dev')
-            ? `https://${baseUrl}`
-            : `${request.nextUrl.protocol}//${host || 'localhost:5000'}`
+        // Get proper origin URL - use correct domain
+        const origin = request.headers.get('host')
+          ? `${request.nextUrl.protocol}//${request.headers.get('host')}`
+          : request.nextUrl.origin
 
         // For Google Workspace files, create export URL
         if (isGoogleWorkspaceFile(mimeType)) {
