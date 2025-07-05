@@ -202,13 +202,22 @@ export function DriveDestinationSelector({
     ? folders.filter(folder => folder.name.toLowerCase().includes(searchQuery.toLowerCase()))
     : folders
 
+  // Clear validation result when switching tabs
+  const handleTabChange = (value: string) => {
+    setActiveTab(value as 'browse' | 'url')
+    setValidationResult(null) // Clear validation when switching tabs
+    if (value === 'browse') {
+      setUrlInput('') // Clear URL input when switching to browse
+    }
+  }
+
   return (
     <div className={cn('flex h-full min-h-0 w-full flex-col overflow-hidden', className)}>
       <Card className="mx-auto max-h-[400px] min-h-[300px] w-full border shadow-sm">
         <CardContent className="flex h-full flex-col overflow-hidden p-3">
           <Tabs
             value={activeTab}
-            onValueChange={value => setActiveTab(value as 'browse' | 'url')}
+            onValueChange={handleTabChange}
             className="flex h-full min-h-0 flex-col overflow-hidden"
           >
             <TabsList className="grid w-full grid-cols-2">
@@ -216,38 +225,46 @@ export function DriveDestinationSelector({
               <TabsTrigger value="url">URL/ID</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="browse" className="mt-2 flex-1 space-y-2">
-              <div className="space-y-2">
-                <Input
-                  placeholder="Search folders..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="h-8"
-                />
-              </div>
+            <TabsContent
+              value="browse"
+              className="flex flex-1 flex-col space-y-2 overflow-hidden data-[state=active]:flex"
+            >
+              <Input
+                placeholder="Search folders..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="h-8 flex-shrink-0"
+              />
 
-              <ScrollArea className="flex-1">
-                <div className="space-y-1">
+              <ScrollArea className="min-h-0 flex-1">
+                <div className="space-y-1 pr-4">
                   {isLoadingFolders ? (
-                    <div className="flex items-center justify-center py-4">
+                    <div className="flex items-center justify-center py-8">
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      <span className="ml-2">Loading folders...</span>
+                      <span className="ml-2 text-sm">Loading folders...</span>
+                    </div>
+                  ) : filteredFolders.length === 0 ? (
+                    <div className="flex items-center justify-center py-8">
+                      <span className="text-muted-foreground text-sm">No folders found</span>
                     </div>
                   ) : (
                     filteredFolders.map(folder => (
                       <div
                         key={folder.id}
-                        className="group hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md p-2"
+                        className={cn(
+                          'group hover:bg-accent flex cursor-pointer items-center gap-2 rounded-md p-2 transition-colors',
+                          selectedFolderId === folder.id && 'bg-accent',
+                        )}
                         onClick={() => handleFolderSelect(folder)}
                       >
-                        <Folder className="h-4 w-4 text-blue-600" />
+                        <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
                         <div className="min-w-0 flex-1">
                           <h4 className="truncate text-sm font-medium">{folder.name}</h4>
+                          <p className="text-muted-foreground truncate text-xs">ID: {folder.id}</p>
                         </div>
                         {folder.isShared && (
-                          <Badge variant="outline" className="text-xs">
-                            <Users className="mr-1 h-2 w-2" />
-                            Shared
+                          <Badge variant="outline" className="flex-shrink-0 text-xs">
+                            <Users className="mr-1 h-2 w-2" />S
                           </Badge>
                         )}
                       </div>
@@ -257,8 +274,11 @@ export function DriveDestinationSelector({
               </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="url" className="mt-2 flex-1 space-y-3">
-              <div className="space-y-2">
+            <TabsContent
+              value="url"
+              className="flex flex-1 flex-col space-y-3 overflow-hidden data-[state=active]:flex"
+            >
+              <div className="space-y-3">
                 <Input
                   placeholder="Paste Google Drive URL or folder ID here..."
                   value={urlInput}
@@ -287,62 +307,62 @@ export function DriveDestinationSelector({
                     )}
                   </Button>
                 )}
+
+                {/* Validation Results - Only show in URL tab */}
+                {validationResult && activeTab === 'url' && (
+                  <div
+                    className={cn(
+                      'rounded-lg border-2 p-3',
+                      validationResult.isValid
+                        ? 'border-blue-300 bg-blue-50'
+                        : 'border-red-300 bg-red-50',
+                    )}
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      {validationResult.isValid ? (
+                        <Check className="h-4 w-4 text-blue-600" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 text-red-600" />
+                      )}
+                      <h4
+                        className={cn(
+                          'text-sm font-semibold',
+                          validationResult.isValid ? 'text-blue-800' : 'text-red-800',
+                        )}
+                      >
+                        {validationResult.isValid ? 'Folder Found' : 'Validation Failed'}
+                      </h4>
+                    </div>
+
+                    {validationResult.isValid ? (
+                      <div className="space-y-2">
+                        <div className="rounded border bg-blue-100 p-2">
+                          <div className="flex items-center gap-2">
+                            <Folder className="h-3 w-3 text-blue-600" />
+                            <span className="text-sm font-medium text-blue-800">
+                              {validationResult.folderName}
+                            </span>
+                          </div>
+                        </div>
+                        <Button
+                          onClick={handleUrlSelect}
+                          size="sm"
+                          className="w-full bg-blue-600 text-white hover:bg-blue-700"
+                        >
+                          <Check className="mr-1 h-3 w-3" />
+                          Choose This Target
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-red-700">{validationResult.error}</p>
+                    )}
+                  </div>
+                )}
               </div>
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
-
-      {/* Validation Results - Prominent Display Outside Card */}
-      {validationResult && (
-        <div
-          className="mt-4 rounded-lg border-2 p-4 shadow-lg"
-          style={{
-            backgroundColor: validationResult.isValid ? '#ebf8ff' : '#fef2f2',
-            borderColor: validationResult.isValid ? '#3b82f6' : '#ef4444',
-          }}
-        >
-          <div className="mb-3 flex items-center gap-3">
-            {validationResult.isValid ? (
-              <Check className="h-6 w-6 text-blue-600" />
-            ) : (
-              <AlertCircle className="h-6 w-6 text-red-600" />
-            )}
-            <h3
-              className="text-lg font-bold"
-              style={{
-                color: validationResult.isValid ? '#1e40af' : '#dc2626',
-              }}
-            >
-              {validationResult.isValid ? 'FOLDER FOUND ✓' : 'VALIDATION FAILED ❌'}
-            </h3>
-          </div>
-
-          {validationResult.isValid ? (
-            <div className="space-y-3">
-              <div className="rounded-lg border border-blue-300 bg-blue-100 p-3">
-                <div className="flex items-center gap-2">
-                  <Folder className="h-5 w-5 text-blue-600" />
-                  <span className="text-base font-semibold text-blue-800">
-                    {validationResult.folderName}
-                  </span>
-                </div>
-              </div>
-              <Button
-                onClick={handleUrlSelect}
-                className="w-full rounded-lg bg-blue-600 px-4 py-3 text-lg font-bold text-white hover:bg-blue-700"
-              >
-                <Check className="mr-2 h-5 w-5" />
-                CHOOSE THIS TARGET
-              </Button>
-            </div>
-          ) : (
-            <div className="rounded-lg border border-red-300 bg-red-100 p-3">
-              <p className="text-base font-semibold text-red-800">{validationResult.error}</p>
-            </div>
-          )}
-        </div>
-      )}
     </div>
   )
 }
