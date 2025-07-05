@@ -484,15 +484,34 @@ export function DriveManager() {
 
   // Get selected items with all required data for dialogs
   const getSelectedItemsForDialog = () => {
-    return Array.from(selectedItems)
-      .map(id => displayItems.find(item => item.id === id))
+    console.log(
+      'getSelectedItemsForDialog called, selectedItems:',
+      selectedItems,
+      'size:',
+      selectedItems.size,
+    )
+    console.log('sortedDisplayItems length:', sortedDisplayItems.length)
+
+    const result = Array.from(selectedItems)
+      .map(id => {
+        // Use sortedDisplayItems instead of displayItems to get proper capabilities
+        const item = sortedDisplayItems.find(item => item.id === id)
+        console.log(
+          'Finding item with id:',
+          id,
+          'found:',
+          !!item,
+          item ? 'canMove: ' + item.canMove : 'not found',
+        )
+        return item
+      })
       .filter((item): item is DriveItem => Boolean(item))
       .map(item => ({
         id: item.id,
         name: item.name || 'Unnamed',
         isFolder: Boolean(item.isFolder || item.mimeType === 'application/vnd.google-apps.folder'),
         mimeType: item.mimeType,
-        // Include all capabilities needed by dialogs
+        // Use capabilities directly from sortedDisplayItems (already calculated)
         canMove: item.canMove || false,
         canCopy: item.canCopy || false,
         canTrash: item.canTrash || false,
@@ -503,6 +522,9 @@ export function DriveManager() {
         canDownload: item.canDownload || false,
         canExport: item.canExport || false,
       }))
+
+    console.log('getSelectedItemsForDialog result:', result, 'length:', result.length)
+    return result
   }
 
   // Effects for initial load and dependencies
