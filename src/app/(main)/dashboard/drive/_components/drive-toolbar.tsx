@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useMemo, useCallback, useState } from 'react'
+import React, { useMemo, useCallback, useState, useEffect, useRef } from 'react'
 import {
   Search,
   List,
@@ -207,6 +207,10 @@ export function DriveToolbar({
   // Track active filter state
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
 
+  // Extended search state
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+
   // Memoize category counts using shared utility for consistency
   const categoryCounts = useMemo(() => {
     return countFilesByCategory(items.map(item => ({ mimeType: item.mimeType })))
@@ -234,6 +238,42 @@ export function DriveToolbar({
     }
   }, [onClearClientSideFilter])
 
+  // Handle search toggle
+  const handleSearchToggle = useCallback(() => {
+    setIsSearchExpanded(!isSearchExpanded)
+  }, [isSearchExpanded])
+
+  // Handle search clear
+  const handleSearchClear = useCallback(() => {
+    onSearchChange('')
+    setIsSearchExpanded(false)
+    onRefresh()
+  }, [onSearchChange, onRefresh])
+
+  // Auto-collapse search when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setIsSearchExpanded(false)
+      }
+    }
+
+    if (isSearchExpanded) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [isSearchExpanded])
+
+  // Auto-expand search if there's an active query
+  useEffect(() => {
+    if (searchQuery && !isSearchExpanded) {
+      setIsSearchExpanded(true)
+    }
+  }, [searchQuery, isSearchExpanded])
+
   return (
     <div
       className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b shadow-sm backdrop-blur transition-transform duration-200 ease-in-out"
@@ -245,29 +285,39 @@ export function DriveToolbar({
       >
         {/* Main Menu - 4 Items - Horizontal Scrollable */}
         <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
-          {/* Search Input - Always visible */}
-          <div className="relative max-w-[300px] min-w-[200px]">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-            <Input
-              type="text"
-              placeholder="Search files and folders..."
-              value={searchQuery}
-              onChange={e => onSearchChange(e.target.value)}
-              className="h-8 pr-8 pl-10 text-sm"
-            />
-            {searchQuery && (
+          {/* Search - Extended on Click */}
+          <div className="relative" ref={searchRef}>
+            {!isSearchExpanded ? (
               <Button
                 variant="ghost"
                 size="sm"
-                className="hover:bg-muted absolute top-1/2 right-1 h-6 w-6 -translate-y-1/2 transform p-0"
-                onClick={() => {
-                  onSearchChange('')
-                  onRefresh()
-                }}
-                title="Clear search"
+                className={`h-8 w-8 p-0 ${searchQuery ? 'bg-primary text-primary-foreground' : ''}`}
+                onClick={handleSearchToggle}
+                title="Search files and folders"
               >
-                <X className="h-3 w-3" />
+                <Search className="h-4 w-4" />
               </Button>
+            ) : (
+              <div className="relative max-w-[300px] min-w-[200px]">
+                <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+                <Input
+                  type="text"
+                  placeholder="Search files and folders..."
+                  value={searchQuery}
+                  onChange={e => onSearchChange(e.target.value)}
+                  className="h-8 pr-8 pl-10 text-sm"
+                  autoFocus
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hover:bg-muted absolute top-1/2 right-1 h-6 w-6 -translate-y-1/2 transform p-0"
+                  onClick={handleSearchClear}
+                  title="Clear search"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
             )}
           </div>
 
