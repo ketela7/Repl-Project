@@ -28,6 +28,8 @@ import { ItemsRenameDialog } from './items-rename-dialog'
 import { ItemsTrashDialog } from './items-trash-dialog'
 import { ItemsDeleteDialog } from './items-delete-dialog'
 import { ItemsUntrashDialog } from './items-untrash-dialog'
+import { ItemsDownloadDialog } from './items-download-dialog'
+import { ItemsExportDialog } from './items-export-dialog'
 
 import { getSizeMultiplier } from '@/lib/google-drive/utils'
 
@@ -464,31 +466,27 @@ export function DriveManager() {
     [filters],
   )
 
-  // Helper function to convert selected IDs to full objects
-  const getSelectedItemObjects = () => {
+  // Get selected items with all required data for dialogs
+  const getSelectedItemsForDialog = () => {
     return Array.from(selectedItems)
       .map(id => displayItems.find(item => item.id === id))
       .filter((item): item is DriveItem => Boolean(item))
-  }
-
-  // Helper function to convert selected items to dialog format with capabilities
-  const getSelectedItemsForDialog = () => {
-    return getSelectedItemObjects().map(item => ({
-      id: item.id,
-      name: item.name || 'Unnamed',
-      isFolder: Boolean(item.isFolder || item.mimeType === 'application/vnd.google-apps.folder'),
-      mimeType: item.mimeType,
-      // Include all capabilities needed by dialogs
-      canMove: item.canMove || false,
-      canCopy: item.canCopy || false,
-      canTrash: item.canTrash || false,
-      canDelete: item.canDelete || false,
-      canUntrash: item.canUntrash || false,
-      canRename: item.canRename || false,
-      canShare: item.canShare || false,
-      canDownload: item.canDownload || false,
-      canExport: item.canExport || false,
-    }))
+      .map(item => ({
+        id: item.id,
+        name: item.name || 'Unnamed',
+        isFolder: Boolean(item.isFolder || item.mimeType === 'application/vnd.google-apps.folder'),
+        mimeType: item.mimeType,
+        // Include all capabilities needed by dialogs
+        canMove: item.canMove || false,
+        canCopy: item.canCopy || false,
+        canTrash: item.canTrash || false,
+        canDelete: item.canDelete || false,
+        canUntrash: item.canUntrash || false,
+        canRename: item.canRename || false,
+        canShare: item.canShare || false,
+        canDownload: item.canDownload || false,
+        canExport: item.canExport || false,
+      }))
   }
 
   // Effects for initial load and dependencies
