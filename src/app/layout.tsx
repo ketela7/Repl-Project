@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 
 import { CustomThemeProvider } from '@/components/providers/theme-provider'
-import { Toaster } from '@/components/ui/sonner'
+import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/components/providers/auth-provider'
 import { TimezoneProvider } from '@/components/timezone-provider'
 import { ErrorBoundary } from '@/components/error-boundary'

@@ -1,9 +1,11 @@
 /**
- * Enhanced toast notification utilities for better user feedback
+ * Enhanced toast notification utilities using shadcn toast system
+ * Migration from Sonner to Radix UI based toasts
  */
 import React from 'react'
-import { toast } from 'sonner'
 import { CheckCircle, XCircle, AlertTriangle, Info, Copy, Download, Trash2, FolderPlus, Share2, Upload } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
+import { ToastAction } from '@/components/ui/toast-new'
 
 export interface ToastAction {
   label: string
@@ -22,67 +24,136 @@ export interface ToastOptions {
 export const successToast = {
   // File operations
   copied: (count?: number) =>
-    toast.success(count && count > 1 ? `${count} items copied to clipboard` : 'Copied to clipboard', {
-      icon: React.createElement(Copy, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <Copy className="h-4 w-4" />
+          {count && count > 1 ? `${count} items copied to clipboard` : 'Copied to clipboard'}
+        </div>
+      ),
       duration: 2000,
     }),
 
   downloaded: (fileName?: string) =>
-    toast.success(fileName ? `Downloaded: ${fileName}` : 'Download started', {
-      icon: React.createElement(Download, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <Download className="h-4 w-4" />
+          {fileName ? `Downloaded: ${fileName}` : 'Download started'}
+        </div>
+      ),
       duration: 3000,
     }),
 
   uploaded: (count: number = 1) =>
-    toast.success(count > 1 ? `${count} files uploaded successfully` : 'File uploaded successfully', {
-      icon: React.createElement(Upload, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <Upload className="h-4 w-4" />
+          {count > 1 ? `${count} files uploaded successfully` : 'File uploaded successfully'}
+        </div>
+      ),
       duration: 3000,
     }),
 
   deleted: (count: number = 1) =>
-    toast.success(count > 1 ? `${count} items moved to trash` : 'Item moved to trash', {
-      icon: React.createElement(Trash2, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <Trash2 className="h-4 w-4" />
+          {count > 1 ? `${count} items moved to trash` : 'Item moved to trash'}
+        </div>
+      ),
       duration: 3000,
     }),
 
   folderCreated: (name: string) =>
-    toast.success(`Folder "${name}" created`, {
-      icon: React.createElement(FolderPlus, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <FolderPlus className="h-4 w-4" />
+          Folder created
+        </div>
+      ),
+      description: `"${name}" has been created successfully`,
       duration: 3000,
     }),
 
   shared: (count: number = 1) =>
-    toast.success(count > 1 ? `${count} items shared successfully` : 'Item shared successfully', {
-      icon: React.createElement(Share2, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <Share2 className="h-4 w-4" />
+          {count > 1 ? `${count} items shared successfully` : 'Item shared successfully'}
+        </div>
+      ),
       duration: 3000,
     }),
 
   // Bulk operations
   bulkOperation: (operation: string, successCount: number, totalCount: number) =>
-    toast.success(`${operation} completed: ${successCount}/${totalCount} items processed`, {
-      icon: React.createElement(CheckCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4" />
+          {operation} completed
+        </div>
+      ),
+      description: `${successCount}/${totalCount} items processed successfully`,
       duration: 4000,
     }),
 
   // Authentication
   signedIn: () =>
-    toast.success('Successfully signed in', {
-      icon: React.createElement(CheckCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4" />
+          Successfully signed in
+        </div>
+      ),
       duration: 2000,
     }),
 
   signedOut: () =>
-    toast.success('Successfully signed out', {
-      icon: React.createElement(CheckCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4" />
+          Successfully signed out
+        </div>
+      ),
       duration: 2000,
     }),
 
   // Generic success
   generic: (message: string, options?: ToastOptions) =>
-    toast.success(message, {
-      icon: React.createElement(CheckCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'success',
+      title: (
+        <div className="flex items-center gap-2">
+          <CheckCircle className="h-4 w-4" />
+          {message}
+        </div>
+      ),
       description: options?.description,
-      action: options?.action,
+      action: options?.action ? (
+        <ToastAction
+          altText={options.action.label}
+          onClick={options.action.onClick}
+        >
+          {options.action.label}
+        </ToastAction>
+      ) : undefined,
       duration: options?.duration || 3000,
     }),
 }
@@ -93,66 +164,130 @@ export const successToast = {
 export const errorToast = {
   // File operations
   uploadFailed: (fileName?: string) =>
-    toast.error(fileName ? `Failed to upload: ${fileName}` : 'Upload failed', {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Upload failed
+        </div>
+      ),
+      description: fileName ? `Failed to upload: ${fileName}` : 'Upload operation failed',
       duration: 5000,
     }),
 
   downloadFailed: (fileName?: string) =>
-    toast.error(fileName ? `Failed to download: ${fileName}` : 'Download failed', {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Download failed
+        </div>
+      ),
+      description: fileName ? `Failed to download: ${fileName}` : 'Download operation failed',
       duration: 5000,
     }),
 
   deleteFailed: (count: number = 1) =>
-    toast.error(count > 1 ? `Failed to delete ${count} items` : 'Failed to delete item', {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Delete failed
+        </div>
+      ),
+      description: count > 1 ? `Failed to delete ${count} items` : 'Failed to delete item',
       duration: 5000,
     }),
 
   // Authentication & permissions
   authRequired: () =>
-    toast.error('Authentication required', {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Authentication required
+        </div>
+      ),
       description: 'Please sign in to continue',
       duration: 4000,
     }),
 
   permissionDenied: () =>
-    toast.error('Permission denied', {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Permission denied
+        </div>
+      ),
       description: "You don't have permission to perform this action",
       duration: 4000,
     }),
 
   driveAccessDenied: () =>
-    toast.error('Google Drive access required', {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Google Drive access required
+        </div>
+      ),
       description: 'Please grant Drive permissions to continue',
       duration: 5000,
     }),
 
   // Network & API
   networkError: () =>
-    toast.error('Network error', {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Network error
+        </div>
+      ),
       description: 'Please check your connection and try again',
       duration: 5000,
     }),
 
   apiError: (message?: string) =>
-    toast.error('Operation failed', {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Operation failed
+        </div>
+      ),
       description: message || 'An unexpected error occurred',
       duration: 5000,
     }),
 
   // Generic error
   generic: (message: string, options?: ToastOptions) =>
-    toast.error(message, {
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'destructive',
+      title: (
+        <div className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          {message}
+        </div>
+      ),
       description: options?.description,
-      action: options?.action,
+      action: options?.action ? (
+        <ToastAction
+          altText={options.action.label}
+          onClick={options.action.onClick}
+        >
+          {options.action.label}
+        </ToastAction>
+      ) : undefined,
       duration: options?.duration || 5000,
     }),
 }
@@ -163,32 +298,63 @@ export const errorToast = {
 export const warningToast = {
   // File operations
   partialSuccess: (successCount: number, totalCount: number, operation: string) =>
-    toast.warning(`${operation} partially completed`, {
-      icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'warning',
+      title: (
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4" />
+          {operation} partially completed
+        </div>
+      ),
       description: `${successCount} of ${totalCount} items processed`,
       duration: 4000,
     }),
 
   largeFileWarning: (fileName: string) =>
-    toast.warning('Large file detected', {
-      icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'warning',
+      title: (
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4" />
+          Large file detected
+        </div>
+      ),
       description: `${fileName} may take longer to process`,
       duration: 4000,
     }),
 
   quotaWarning: () =>
-    toast.warning('Storage quota running low', {
-      icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'warning',
+      title: (
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4" />
+          Storage quota running low
+        </div>
+      ),
       description: 'Consider cleaning up old files',
       duration: 5000,
     }),
 
   // Generic warning
   generic: (message: string, options?: ToastOptions) =>
-    toast.warning(message, {
-      icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'warning',
+      title: (
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="h-4 w-4" />
+          {message}
+        </div>
+      ),
       description: options?.description,
-      action: options?.action,
+      action: options?.action ? (
+        <ToastAction
+          altText={options.action.label}
+          onClick={options.action.onClick}
+        >
+          {options.action.label}
+        </ToastAction>
+      ) : undefined,
       duration: options?.duration || 4000,
     }),
 }
@@ -199,30 +365,62 @@ export const warningToast = {
 export const infoToast = {
   // File operations
   processing: (operation: string, count?: number) =>
-    toast.info(count && count > 1 ? `Processing ${count} items...` : `${operation} in progress...`, {
-      icon: React.createElement(Info, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'info',
+      title: (
+        <div className="flex items-center gap-2">
+          <Info className="h-4 w-4" />
+          Processing
+        </div>
+      ),
+      description: count && count > 1 ? `Processing ${count} items...` : `${operation} in progress...`,
       duration: 2000,
     }),
 
   syncStarted: () =>
-    toast.info('Syncing with Google Drive...', {
-      icon: React.createElement(Info, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'info',
+      title: (
+        <div className="flex items-center gap-2">
+          <Info className="h-4 w-4" />
+          Syncing with Google Drive
+        </div>
+      ),
       duration: 2000,
     }),
 
   offlineMode: () =>
-    toast.info("You're currently offline", {
-      icon: React.createElement(Info, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'info',
+      title: (
+        <div className="flex items-center gap-2">
+          <Info className="h-4 w-4" />
+          You're currently offline
+        </div>
+      ),
       description: 'Some features may be limited',
       duration: 4000,
     }),
 
   // Generic info
   generic: (message: string, options?: ToastOptions) =>
-    toast.info(message, {
-      icon: React.createElement(Info, { className: 'h-4 w-4' }),
+    toast({
+      variant: 'info',
+      title: (
+        <div className="flex items-center gap-2">
+          <Info className="h-4 w-4" />
+          {message}
+        </div>
+      ),
       description: options?.description,
-      action: options?.action,
+      action: options?.action ? (
+        <ToastAction
+          altText={options.action.label}
+          onClick={options.action.onClick}
+        >
+          {options.action.label}
+        </ToastAction>
+      ) : undefined,
       duration: options?.duration || 3000,
     }),
 }
@@ -231,33 +429,68 @@ export const infoToast = {
  * Loading toast for long operations
  */
 export const loadingToast = {
-  start: (message: string, id?: string) =>
-    toast.loading(message, {
-      id: id || 'loading',
+  start: (message: string, id?: string) => {
+    const toastRef = toast({
+      variant: 'default',
+      title: (
+        <div className="flex items-center gap-2">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+          {message}
+        </div>
+      ),
       duration: Infinity,
-    }),
+    })
+    return toastRef
+  },
 
-  update: (message: string, id: string = 'loading') =>
-    toast.loading(message, {
-      id,
-      duration: Infinity,
-    }),
+  update: (message: string, toastRef: any) => {
+    if (toastRef && toastRef.update) {
+      toastRef.update({
+        title: (
+          <div className="flex items-center gap-2">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+            {message}
+          </div>
+        ),
+      })
+    }
+  },
 
-  success: (message: string, id: string = 'loading') =>
-    toast.success(message, {
-      id,
-      icon: React.createElement(CheckCircle, { className: 'h-4 w-4' }),
-      duration: 3000,
-    }),
+  success: (message: string, toastRef: any) => {
+    if (toastRef && toastRef.update) {
+      toastRef.update({
+        variant: 'success',
+        title: (
+          <div className="flex items-center gap-2">
+            <CheckCircle className="h-4 w-4" />
+            {message}
+          </div>
+        ),
+        duration: 3000,
+      })
+    }
+  },
 
-  error: (message: string, id: string = 'loading') =>
-    toast.error(message, {
-      id,
-      icon: React.createElement(XCircle, { className: 'h-4 w-4' }),
-      duration: 5000,
-    }),
+  error: (message: string, toastRef: any) => {
+    if (toastRef && toastRef.update) {
+      toastRef.update({
+        variant: 'destructive',
+        title: (
+          <div className="flex items-center gap-2">
+            <XCircle className="h-4 w-4" />
+            {message}
+          </div>
+        ),
+        duration: 5000,
+      })
+    }
+  },
 
-  dismiss: (id: string = 'loading') => toast.dismiss(id),
+  dismiss: (toastRef: any) => {
+    if (toastRef && toastRef.dismiss) {
+      toastRef.dismiss()
+    }
+  },
 }
 
 /**
@@ -287,14 +520,13 @@ export const toastUtils = {
    * Download utility with progress feedback
    */
   download: async (downloadFn: () => Promise<void>, fileName?: string) => {
-    const loadingId = 'download'
-    loadingToast.start(`Downloading${fileName ? ` ${fileName}` : ''}...`, loadingId)
+    const toastRef = loadingToast.start(`Downloading${fileName ? ` ${fileName}` : ''}...`)
 
     try {
       await downloadFn()
-      loadingToast.success(`Download completed${fileName ? `: ${fileName}` : ''}`, loadingId)
+      loadingToast.success(`Download completed${fileName ? `: ${fileName}` : ''}`, toastRef)
     } catch (error) {
-      loadingToast.error(`Download failed${fileName ? `: ${fileName}` : ''}`, loadingId)
+      loadingToast.error(`Download failed${fileName ? `: ${fileName}` : ''}`, toastRef)
       throw error
     }
   },
@@ -310,28 +542,23 @@ export const toastUtils = {
       failed?: string[]
     }>
   ) => {
-    const loadingId = 'operation'
-    loadingToast.start(`Starting ${operation}...`, loadingId)
+    const toastRef = loadingToast.start(`Starting ${operation}...`)
 
     try {
       const result = await operationFn()
 
       if (result.success === result.total) {
-        loadingToast.success(`${operation} completed successfully (${result.success}/${result.total})`, loadingId)
+        loadingToast.success(`${operation} completed successfully (${result.success}/${result.total})`, toastRef)
       } else if (result.success > 0) {
-        toast.warning(`${operation} partially completed`, {
-          id: loadingId,
-          icon: React.createElement(AlertTriangle, { className: 'h-4 w-4' }),
-          description: `${result.success} of ${result.total} items processed`,
-          duration: 4000,
-        })
+        warningToast.partialSuccess(result.success, result.total, operation)
+        loadingToast.dismiss(toastRef)
       } else {
-        loadingToast.error(`${operation} failed`, loadingId)
+        loadingToast.error(`${operation} failed`, toastRef)
       }
 
       return result
     } catch (error) {
-      loadingToast.error(`${operation} failed`, loadingId)
+      loadingToast.error(`${operation} failed`, toastRef)
       throw error
     }
   },
