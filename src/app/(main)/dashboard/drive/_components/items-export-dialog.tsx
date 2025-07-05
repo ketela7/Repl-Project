@@ -166,7 +166,44 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [isItemsExpanded, setIsItemsExpanded] = useState(false)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const isCancelledRef = useRef(false)
+
+  // Filter items that can be exported
+  const canExportItems = selectedItems.filter(item => item.canExport)
+
+  // Calculate available export formats based on exportable items
+  const availableFormats = EXPORT_FORMATS.filter(format => {
+    return canExportItems.some(
+      item => !item.isFolder && item.mimeType && format.supportedTypes.includes(item.mimeType),
+    )
+  })
+
+  // Filter exportable files based on selected format from canExportItems
+  const selectedFormatData = EXPORT_FORMATS.find(f => f.id === selectedFormat)
+  const exportableFiles = canExportItems.filter(
+    item =>
+      !item.isFolder && item.mimeType && selectedFormatData?.supportedTypes.includes(item.mimeType),
+  )
+  const incompatibleFiles = selectedItems.filter(
+    item =>
+      !item.canExport ||
+      item.isFolder ||
+      !item.mimeType ||
+      !selectedFormatData?.supportedTypes.includes(item.mimeType),
+  )
+
   const totalItems = exportableFiles.length
+
+  // Auto-select first available format if current selection is not available
+  useEffect(() => {
+    const isSelectedFormatAvailable = availableFormats.some(format => format.id === selectedFormat)
+    if (!isSelectedFormatAvailable && availableFormats.length > 0) {
+      setSelectedFormat(availableFormats[0].id)
+    }
+  }, [availableFormats, selectedFormat])
+
+
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -184,40 +221,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     errors: [],
   })
 
-  const abortControllerRef = useRef<AbortController | null>(null)
-  const isCancelledRef = useRef(false)
 
-  // Filter items that can be exported
-  const canExportItems = selectedItems.filter(item => item.canExport)
-
-  // Calculate available export formats based on exportable items
-  const availableFormats = EXPORT_FORMATS.filter(format => {
-    return canExportItems.some(
-      item => !item.isFolder && item.mimeType && format.supportedTypes.includes(item.mimeType),
-    )
-  })
-
-  // Auto-select first available format if current selection is not available
-  useEffect(() => {
-    const isSelectedFormatAvailable = availableFormats.some(format => format.id === selectedFormat)
-    if (!isSelectedFormatAvailable && availableFormats.length > 0) {
-      setSelectedFormat(availableFormats[0].id)
-    }
-  }, [availableFormats, selectedFormat])
-
-  // Filter exportable files based on selected format from canExportItems
-  const selectedFormatData = EXPORT_FORMATS.find(f => f.id === selectedFormat)
-  const exportableFiles = canExportItems.filter(
-    item =>
-      !item.isFolder && item.mimeType && selectedFormatData?.supportedTypes.includes(item.mimeType),
-  )
-  const incompatibleFiles = selectedItems.filter(
-    item =>
-      !item.canExport ||
-      item.isFolder ||
-      !item.mimeType ||
-      !selectedFormatData?.supportedTypes.includes(item.mimeType),
-  )
 
   const handleCancel = () => {
     isCancelledRef.current = true
