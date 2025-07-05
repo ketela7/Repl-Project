@@ -487,7 +487,7 @@ export class GoogleDriveService {
 
       // Use the correct Google Drive API update method
       const response = await this.drive.files.update({
-        fileId: fileId,
+        fileId,
         addParents: newParentId,
         removeParents: currentParentId,
         fields: getOptimizedFields('LIST_BASIC'),

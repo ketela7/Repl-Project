@@ -475,8 +475,7 @@ export function DriveManager() {
     return Array.from(selectedItems)
       .map(id => {
         // Use sortedDisplayItems instead of displayItems to get proper capabilities
-        const item = sortedDisplayItems.find(item => item.id === id)
-        return item
+        return sortedDisplayItems.find(item => item.id === id)
       })
       .filter((item): item is NonNullable<typeof item> => Boolean(item))
       .map(item => ({

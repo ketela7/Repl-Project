@@ -1,17 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import {
-  Folder,
-  Search,
-  Loader2,
-  Check,
-  AlertCircle,
-  Shield,
-  ExternalLink,
-  Home,
-  ChevronRight,
-} from 'lucide-react'
+import { Folder, Loader2, Check, AlertCircle, Shield } from 'lucide-react'
 
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'

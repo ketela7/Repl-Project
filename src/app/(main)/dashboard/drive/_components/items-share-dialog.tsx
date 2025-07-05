@@ -179,8 +179,8 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             },
             body: JSON.stringify({
               fileId: item.id,
-              accessLevel: accessLevel,
-              linkAccess: linkAccess,
+              accessLevel,
+              linkAccess,
             }),
             signal: abortControllerRef.current.signal,
           })
