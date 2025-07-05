@@ -445,8 +445,9 @@ export function DriveManager() {
 
   // Get selected items with all required data for dialogs
   const getSelectedItemsForDialog = () => {
+    const safeDisplayItems = Array.isArray(displayItems) ? displayItems : []
     return Array.from(selectedItems)
-      .map(id => displayItems.find(item => item.id === id))
+      .map(id => safeDisplayItems.find(item => item.id === id))
       .filter((item): item is DriveItem => Boolean(item))
       .map(item => ({
         id: item.id,
@@ -571,12 +572,17 @@ export function DriveManager() {
   }, [])
 
   const displayItems = useMemo(() => {
+    // Ensure arrays exist before checking length
+    const safeFilteredItems = Array.isArray(filteredItems) ? filteredItems : []
+    const safeItems = Array.isArray(items) ? items : []
     // Use filteredItems if available (from client-side search), otherwise use items from backend (already filtered)
-    return filteredItems.length > 0 ? filteredItems : items
+    return safeFilteredItems.length > 0 ? safeFilteredItems : safeItems
   }, [filteredItems, items])
 
   const sortedDisplayItems = useMemo(() => {
-    const sorted = [...displayItems].sort((a, b) => {
+    // Ensure displayItems is an array before spreading
+    const safeDisplayItems = Array.isArray(displayItems) ? displayItems : []
+    const sorted = [...safeDisplayItems].sort((a, b) => {
       if (!sortConfig) return 0
 
       let aValue: any
