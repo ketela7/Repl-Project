@@ -166,7 +166,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [isItemsExpanded, setIsItemsExpanded] = useState(false)
-  //   const totalItems = exportableFiles.length
+  const totalItems = exportableFiles.length
   const [progress, setProgress] = useState<{
     current: number
     total: number

@@ -56,6 +56,7 @@ import {
 import { Label } from '@/components/ui/label'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn, calculateProgress } from '@/lib/utils'
+import { copyToClipboard } from '@/lib/clipboard'
 
 interface ItemsShareDialogProps {
   isOpen: boolean
@@ -426,9 +427,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     switch (format) {
       case 'clipboard':
         content = successfulShares.map(share => `${share.name}: ${share.shareLink}`).join('\n')
-        navigator.clipboard.writeText(content).then(() => {
-          // Removed toast notification
-        })
+        copyToClipboard(content)
         return
 
       case 'txt':
