@@ -233,14 +233,38 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     // Removed toast notification
   }
 
-  const downloadFile = (url: string, filename: string) => {
-    const link = document.createElement('a')
-    link.href = url
-    link.download = filename
-    link.style.display = 'none'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  const downloadFile = async (url: string, filename: string) => {
+    try {
+      // Use fetch to download the file and create a blob
+      const response = await fetch(url)
+      if (!response.ok) {
+        throw new Error(`Failed to download: ${response.status}`)
+      }
+
+      const blob = await response.blob()
+      const downloadUrl = URL.createObjectURL(blob)
+
+      const link = document.createElement('a')
+      link.href = downloadUrl
+      link.download = filename
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Clean up the blob URL
+      URL.revokeObjectURL(downloadUrl)
+    } catch (error) {
+      // Fallback to direct URL if blob approach fails
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
+      link.target = '_blank'
+      link.style.display = 'none'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+    }
   }
 
   const getExportMimeType = (formatId: string): string => {
@@ -323,7 +347,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           if (data.exportUrl) {
             const fileExtension = selectedFormat === 'jpeg' ? 'jpg' : selectedFormat
             const exportFileName = `${file.name.replace(/\.[^/.]+$/, '')}.${fileExtension}`
-            downloadFile(data.exportUrl, exportFileName)
+            await downloadFile(data.exportUrl, exportFileName)
             successCount++
             setProgress(prev => ({
               ...prev,

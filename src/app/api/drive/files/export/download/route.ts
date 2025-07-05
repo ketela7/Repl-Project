@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
     const fileId = searchParams.get('fileId')
     const format = searchParams.get('format') || 'pdf'
 
+    console.log(`Export download request: fileId=${fileId}, format=${format}`)
+
     if (!fileId) {
       return NextResponse.json({ error: 'File ID is required' }, { status: 400 })
     }
@@ -17,6 +19,7 @@ export async function GET(request: NextRequest) {
     // Initialize Drive service with authentication
     const authResult = await initDriveService()
     if (!authResult.success) {
+      console.error('Authentication failed for export download')
       return authResult.response!
     }
 
@@ -38,8 +41,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'File metadata incomplete' }, { status: 500 })
     }
 
+    console.log(`File metadata: name=${fileName}, mimeType=${mimeType}`)
+
     // Check if it's a Google Workspace file that can be exported
     if (!isGoogleWorkspaceFile(mimeType)) {
+      console.log(`File is not a Google Workspace document: ${mimeType}`)
       return NextResponse.json(
         { error: 'File is not a Google Workspace document' },
         { status: 400 },
@@ -48,6 +54,7 @@ export async function GET(request: NextRequest) {
 
     // Get export MIME type
     const exportMimeType = getExportMimeType(format, mimeType)
+    console.log(`Export MIME type: ${exportMimeType} for format: ${format}`)
 
     // Export the file
     const response = await throttledDriveRequest(async () => {

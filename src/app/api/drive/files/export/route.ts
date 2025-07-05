@@ -36,6 +36,16 @@ export async function POST(request: NextRequest) {
         if (isGoogleWorkspaceFile(mimeType)) {
           const exportMimeType = getExportMimeType(exportFormat, mimeType)
 
+          // Validate that the export format is supported for this file type
+          if (!exportMimeType) {
+            errors.push({
+              fileId: id,
+              success: false,
+              error: `Export format '${exportFormat}' not supported for file type '${mimeType}'`,
+            })
+            continue
+          }
+
           // Create export URL for direct download
           const exportUrl = `${request.nextUrl.origin}/api/drive/files/export/download?fileId=${id}&format=${exportFormat}`
 
