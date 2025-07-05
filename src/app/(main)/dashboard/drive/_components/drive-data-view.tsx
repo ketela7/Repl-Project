@@ -269,7 +269,6 @@ export function DriveDataView({
                 onClick={e => {
                   e.preventDefault()
                   e.stopPropagation()
-                  console.log('Dropdown item clicked:', key, item.name)
                   onItemAction(key, item)
                 }}
                 className={destructive ? 'text-destructive' : ''}

@@ -6,6 +6,7 @@ import { RefreshCw } from 'lucide-react'
 import { DriveFile, DriveFolder } from '@/lib/google-drive/types'
 import { getFileActions } from '@/lib/google-drive/utils'
 import { errorToast } from '@/lib/utils'
+import { toast } from 'sonner'
 
 import { useTimezoneContext } from '@/components/timezone-provider'
 import { Progress } from '@/components/ui/progress'
@@ -739,7 +740,6 @@ export function DriveManager() {
               }
             }}
             onItemAction={(action: string, item: DriveItem) => {
-              console.log('onItemAction called:', action, item.name)
               // First close all dialogs to prevent interference
               closeDialog('preview')
               closeDialog('details')
@@ -779,26 +779,50 @@ export function DriveManager() {
                   setTimeout(() => openDialog('rename'), 100)
                   break
                 case 'move':
+                  if (!item.canMove) {
+                    toast.error('This item cannot be moved')
+                    return
+                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('move'), 100)
                   break
                 case 'copy':
+                  if (!item.canCopy) {
+                    toast.error('This item cannot be copied')
+                    return
+                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('copy'), 100)
                   break
                 case 'trash':
+                  if (!item.canTrash) {
+                    toast.error('This item cannot be moved to trash')
+                    return
+                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('trash'), 100)
                   break
                 case 'delete':
+                  if (!item.canDelete) {
+                    toast.error('This item cannot be permanently deleted')
+                    return
+                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('delete'), 100)
                   break
                 case 'untrash':
+                  if (!item.canUntrash) {
+                    toast.error('This item cannot be restored from trash')
+                    return
+                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('untrash'), 100)
                   break
                 case 'export':
+                  if (!item.canExport) {
+                    toast.error('This item cannot be exported')
+                    return
+                  }
                   setSelectedItems(new Set([item.id]))
                   setTimeout(() => openDialog('export'), 100)
                   break

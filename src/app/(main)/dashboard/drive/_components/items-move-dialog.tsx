@@ -159,6 +159,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
   const handleMove = async () => {
     if (canMoveItems.length === 0) {
       console.error('❌ No items can be moved from the selection')
+      toast.error('No items can be moved from the current selection')
       return
     }
 
