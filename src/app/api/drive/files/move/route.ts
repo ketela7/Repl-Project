@@ -15,8 +15,22 @@ export async function POST(request: NextRequest) {
     // Handle both single and bulk operations
     const { fileId, targetFolderId, items } = body
 
+    // Debug: Log received request data
+    const requestInfo = {
+      fileId,
+      targetFolderId,
+      itemsCount: items?.length || 0,
+      timestamp: new Date().toISOString(),
+    }
+
     if (!targetFolderId) {
-      return NextResponse.json({ error: 'Target folder ID is required' }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: 'Target folder ID is required',
+          debug: { received: requestInfo },
+        },
+        { status: 400 },
+      )
     }
 
     // Determine operation type based on items array or single fileId
@@ -74,6 +88,14 @@ export async function POST(request: NextRequest) {
       targetFolderId,
       results,
       errors: errors.length > 0 ? errors : undefined,
+      debug: {
+        request: requestInfo,
+        processedFileIds: fileIds,
+        resultsSummary: {
+          successful: results.map(r => r.fileId),
+          failed: errors.map(e => e.fileId),
+        },
+      },
     }
 
     return NextResponse.json(response, {

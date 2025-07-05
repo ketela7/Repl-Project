@@ -142,6 +142,9 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
   const handleDestinationSelect = (folderId: string, folderName?: string) => {
     setSelectedFolderId(folderId)
     setSelectedFolderName(folderName || 'My Drive')
+
+    // Debug: Show selected destination info
+    toast.info(`Debug: Selected destination - ID: ${folderId}, Name: ${folderName || 'My Drive'}`)
   }
 
   const handleMove = async () => {
@@ -185,15 +188,19 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         }))
 
         try {
+          // Debug: Show what we're sending to API
+          const requestBody = {
+            fileId: item.id,
+            targetFolderId: selectedFolderId,
+          }
+          toast.info(`Debug: Moving ${item.name} (${item.id}) to folder ${selectedFolderId}`)
+
           const response = await fetch('/api/drive/files/move', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-              fileId: item.id,
-              targetFolderId: selectedFolderId,
-            }),
+            body: JSON.stringify(requestBody),
             signal: abortControllerRef.current.signal,
           })
 
@@ -203,7 +210,22 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           }
 
           const result = await response.json()
+
+          // Debug: Show API response
+          toast.info(
+            `Debug API Response: ${JSON.stringify({
+              success: result.success,
+              processed: result.processed,
+              failed: result.failed,
+              errorsCount: result.errors?.length || 0,
+            })}`,
+          )
+
           if (!result.success) {
+            // Show debug info with error
+            if (result.debug) {
+              toast.error(`Debug Error Details: ${JSON.stringify(result.debug)}`)
+            }
             throw new Error(result.error || 'Move failed')
           }
 
@@ -211,6 +233,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           if (result.errors && result.errors.length > 0) {
             const fileError = result.errors.find((err: any) => err.fileId === item.id)
             if (fileError) {
+              toast.error(`Debug File Error: ${JSON.stringify(fileError)}`)
               throw new Error(fileError.error || 'Move failed')
             }
           }
