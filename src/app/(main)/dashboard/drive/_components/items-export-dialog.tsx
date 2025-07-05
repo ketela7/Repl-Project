@@ -306,7 +306,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             },
             body: JSON.stringify({
               fileId: file.id,
-              mimeType: getExportMimeType(selectedFormat),
+              exportFormat: selectedFormat,
             }),
             signal: abortControllerRef.current.signal,
           })

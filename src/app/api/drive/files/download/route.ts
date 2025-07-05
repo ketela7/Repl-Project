@@ -187,3 +187,117 @@ function getFileExtension(mimeType: string): string {
 
   return extensionMap[mimeType] || 'pdf'
 }
+
+/**
+ * Handle bulk download requests
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const authResult = await initDriveService()
+    if (!authResult.success) {
+      return authResult.response!
+    }
+
+    const { driveService } = authResult
+    const body = await request.json()
+    const { fileIds, exportLinks } = body
+
+    if (!fileIds || !Array.isArray(fileIds) || fileIds.length === 0) {
+      return NextResponse.json({ error: 'File IDs are required' }, { status: 400 })
+    }
+
+    // If requesting export links, return CSV data
+    if (exportLinks) {
+      const links = []
+      const errors = []
+
+      for (const fileId of fileIds) {
+        try {
+          const metadata = await throttledDriveRequest(async () => {
+            return await retryDriveApiCall(async () => {
+              return await driveService!.drive.files.get({
+                fileId,
+                fields: 'name,mimeType,webViewLink',
+              })
+            })
+          })
+
+          const { name, mimeType, webViewLink } = metadata.data
+          const downloadUrl = webViewLink || `https://drive.google.com/file/d/${fileId}/view`
+
+          links.push({
+            id: fileId,
+            name: name || 'Unknown',
+            url: downloadUrl,
+            mimeType: mimeType || 'application/octet-stream',
+          })
+        } catch (error: any) {
+          errors.push({
+            fileId,
+            error: error.message || 'Failed to get file metadata',
+          })
+        }
+      }
+
+      return NextResponse.json({
+        success: errors.length === 0,
+        links,
+        errors: errors.length > 0 ? errors : undefined,
+      })
+    }
+
+    // For single file download, return download URL
+    if (fileIds.length === 1) {
+      const fileId = fileIds[0]
+
+      try {
+        const metadata = await throttledDriveRequest(async () => {
+          return await retryDriveApiCall(async () => {
+            return await driveService!.drive.files.get({
+              fileId,
+              fields: 'name,mimeType,webViewLink',
+            })
+          })
+        })
+
+        const { name, mimeType, webViewLink } = metadata.data
+
+        // For Google Workspace files, create export URL
+        if (isGoogleWorkspaceFile(mimeType)) {
+          const exportFormat = getExportFormat(mimeType)
+          const exportUrl = `${request.nextUrl.origin}/api/drive/files/download?fileId=${fileId}`
+
+          return NextResponse.json({
+            success: true,
+            downloadUrl: exportUrl,
+            fileName: name,
+            mimeType: exportFormat,
+          })
+        }
+
+        // For regular files, create download URL
+        const downloadUrl = `${request.nextUrl.origin}/api/drive/files/download?fileId=${fileId}`
+
+        return NextResponse.json({
+          success: true,
+          downloadUrl,
+          fileName: name,
+          mimeType,
+        })
+      } catch (error: any) {
+        return NextResponse.json(
+          { error: error.message || 'Failed to get file metadata' },
+          { status: 500 },
+        )
+      }
+    }
+
+    // For multiple files, return error as we don't support bulk download streams
+    return NextResponse.json(
+      { error: 'Multiple file downloads not supported. Use exportLinks mode.' },
+      { status: 400 },
+    )
+  } catch (error) {
+    return handleApiError(error)
+  }
+}

@@ -35,7 +35,9 @@ export async function POST(request: NextRequest) {
         // Check if it's a Google Workspace file that can be exported
         if (isGoogleWorkspaceFile(mimeType)) {
           const exportMimeType = getExportMimeType(exportFormat, mimeType)
-          await driveService.exportFile(id, exportMimeType)
+
+          // Create export URL for direct download
+          const exportUrl = `${request.nextUrl.origin}/api/drive/files/export/download?fileId=${id}&format=${exportFormat}`
 
           results.push({
             fileId: id,
@@ -45,6 +47,7 @@ export async function POST(request: NextRequest) {
             exportMimeType,
             exportFormat,
             fileName: metadata.name,
+            exportUrl,
           })
         } else {
           // Regular file - provide download URL
