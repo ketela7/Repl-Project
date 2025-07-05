@@ -182,6 +182,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
         }
 
         const item = canDeleteItems[i]
+
+        // Update progress before starting
         setProgress(prev => ({
           ...prev,
           current: i + 1,
@@ -206,6 +208,13 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           }
 
           successCount++
+
+          // Update progress after success
+          setProgress(prev => ({
+            ...prev,
+            success: successCount,
+            currentFile: `Deleted: ${item.name}`,
+          }))
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break
@@ -216,8 +225,8 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           failedCount++
         }
 
-        // Small delay to prevent overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 150))
+        // Delay for better progress visibility
+        await new Promise(resolve => setTimeout(resolve, 300))
       }
     } catch (error) {
       console.error('Delete operation failed:', error)

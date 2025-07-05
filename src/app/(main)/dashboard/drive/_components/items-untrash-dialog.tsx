@@ -172,6 +172,8 @@ function ItemsUntrashDialog({
         }
 
         const item = canUntrashItems[i]
+
+        // Update progress before starting
         setProgress(prev => ({
           ...prev,
           current: i + 1,
@@ -196,6 +198,13 @@ function ItemsUntrashDialog({
           }
 
           successCount++
+
+          // Update progress after success
+          setProgress(prev => ({
+            ...prev,
+            success: successCount,
+            currentFile: `Restored: ${item.name}`,
+          }))
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break
@@ -206,8 +215,8 @@ function ItemsUntrashDialog({
           failedCount++
         }
 
-        // Small delay to prevent overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Delay for better progress visibility
+        await new Promise(resolve => setTimeout(resolve, 300))
       }
     } catch (error) {
       console.error('Untrash operation failed:', error)

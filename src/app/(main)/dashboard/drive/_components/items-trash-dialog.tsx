@@ -167,6 +167,8 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
         }
 
         const item = canTrashItems[i]
+
+        // Update progress before starting
         setProgress(prev => ({
           ...prev,
           current: i + 1,
@@ -191,6 +193,13 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
           }
 
           successCount++
+
+          // Update progress after success
+          setProgress(prev => ({
+            ...prev,
+            success: successCount,
+            currentFile: `Moved to trash: ${item.name}`,
+          }))
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break
@@ -201,8 +210,8 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
           failedCount++
         }
 
-        // Small delay to prevent overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 100))
+        // Delay for better progress visibility
+        await new Promise(resolve => setTimeout(resolve, 300))
       }
     } catch (error) {
       console.error('Trash operation failed:', error)
