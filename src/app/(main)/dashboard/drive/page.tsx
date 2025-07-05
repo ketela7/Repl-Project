@@ -26,7 +26,13 @@ export default function DrivePage() {
   return (
     <div className="min-h-screen w-full">
       <EnhancedErrorBoundary showDetails={process.env.NODE_ENV === 'development'}>
-        <Suspense fallback={<div className="space-y-4"><SkeletonTable rows={8} /></div>}>
+        <Suspense
+          fallback={
+            <div className="space-y-4">
+              <SkeletonTable rows={8} />
+            </div>
+          }
+        >
           <DriveManager />
         </Suspense>
       </EnhancedErrorBoundary>

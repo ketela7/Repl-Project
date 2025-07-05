@@ -267,25 +267,6 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     }
   }
 
-  const getExportMimeType = (formatId: string): string => {
-    const mimeTypeMap: Record<string, string> = {
-      pdf: 'application/pdf',
-      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      odt: 'application/vnd.oasis.opendocument.text',
-      ods: 'application/vnd.oasis.opendocument.spreadsheet',
-      odp: 'application/vnd.oasis.opendocument.presentation',
-      rtf: 'application/rtf',
-      txt: 'text/plain',
-      html: 'text/html',
-      csv: 'text/csv',
-      jpeg: 'image/jpeg',
-      png: 'image/png',
-    }
-    return mimeTypeMap[formatId] || 'application/pdf'
-  }
-
   const handleExport = async () => {
     if (exportableFiles.length === 0) {
       // Removed toast notification

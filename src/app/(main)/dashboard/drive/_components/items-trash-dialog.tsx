@@ -58,19 +58,6 @@ interface ItemsTrashDialogProps {
   }>
 }
 
-function getFileIcon(mimeType: string | undefined, isFolder: boolean) {
-  if (isFolder) return <Folder className="h-4 w-4 text-blue-600" />
-  if (!mimeType) return <File className="h-4 w-4 text-gray-600" />
-
-  if (mimeType.startsWith('image/')) return <Image className="h-4 w-4 text-green-600" />
-  if (mimeType.startsWith('video/')) return <Video className="h-4 w-4 text-purple-600" />
-  if (mimeType.startsWith('audio/')) return <Music className="h-4 w-4 text-orange-600" />
-  if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('archive'))
-    return <Archive className="h-4 w-4 text-yellow-600" />
-
-  return <FileText className="h-4 w-4 text-gray-600" />
-}
-
 function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTrashDialogProps) {
   const [currentStep, setCurrentStep] = useState<'confirmation' | 'processing' | 'completed'>(
     'confirmation',

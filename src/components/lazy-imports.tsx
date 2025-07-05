@@ -19,8 +19,10 @@ export const DriveToolbar = lazy(
 export const DriveConnectionCard = lazy(
   () => import('@/app/(main)/dashboard/drive/_components/drive-connection-card'),
 )
-export const DriveSkeleton = lazy(
-  () => import('@/app/(main)/dashboard/drive/_components/drive-skeleton'),
+export const BreadcrumbSkeleton = lazy(
+  () => import('@/app/(main)/dashboard/drive/_components/drive-skeleton').then(mod => ({
+    default: mod.BreadcrumbSkeleton
+  })),
 )
 export const FileBreadcrumb = lazy(
   () => import('@/app/(main)/dashboard/drive/_components/file-breadcrumb'),

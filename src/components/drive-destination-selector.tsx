@@ -185,11 +185,7 @@ export function DriveDestinationSelector({
     }
   }
 
-  // Navigate to folder
-  const navigateToFolder = (folder: DriveFolder) => {
-    setCurrentPath(prev => [...prev, folder])
-    setSearchQuery('') // Clear search when navigating
-  }
+
 
   // Load initial folders
   useEffect(() => {
@@ -372,5 +368,3 @@ export function DriveDestinationSelector({
     </div>
   )
 }
-
-export { DriveDestinationSelector }

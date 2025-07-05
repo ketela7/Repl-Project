@@ -268,7 +268,7 @@ function OperationsDialog({
       <button
         key={operation.id}
         onClick={() => handleOperationClick(operation.id)}
-        className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all hover:scale-[1.02] ${getColorClasses(operation.color, operation.isDestructive)}`}
+        className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-all hover:scale-[1.02] ${getColorClasses(operation.color)}`}
       >
         <div
           className={`flex h-10 w-10 items-center justify-center rounded-lg ${operation.color === 'red' ? 'bg-red-100 dark:bg-red-900/50' : operation.color === 'yellow' ? 'bg-yellow-100 dark:bg-yellow-900/50' : `bg-${operation.color}-100 dark:bg-${operation.color}-900/50`}`}
@@ -491,6 +491,7 @@ function OperationsDialog({
           isOpen={isShareDialogOpen}
           onClose={() => setIsShareDialogOpen(false)}
           selectedItems={selectedItems}
+          onConfirm={onConfirm}
         />
       </Suspense>
 

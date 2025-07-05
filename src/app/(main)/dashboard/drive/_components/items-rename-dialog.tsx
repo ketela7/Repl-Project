@@ -68,14 +68,6 @@ type RenameMode = 'simple' | 'pattern' | 'sequence' | 'regex'
 
 type RenameStep = 'setup' | 'preview' | 'processing' | 'completed'
 
-interface RenameResult {
-  fileId: string
-  originalName: string
-  newName: string
-  success: boolean
-  error?: string
-}
-
 function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsRenameDialogProps) {
   const [currentStep, setCurrentStep] = useState<RenameStep>('setup')
   const [renameMode, setRenameMode] = useState<RenameMode>('simple')

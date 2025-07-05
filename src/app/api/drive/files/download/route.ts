@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { initDriveService, handleApiError } from '@/lib/api-utils'
 import { retryDriveApiCall } from '@/lib/api-retry'
 import { throttledDriveRequest } from '@/lib/api-throttle'
-import { config } from '@/lib/config'
+// Config import removed as unused
 
 export async function GET(request: NextRequest) {
   try {
@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
           })
         })
 
-        const { name, mimeType, webViewLink } = metadata.data
+        const { name, mimeType } = metadata.data
 
         // Get proper origin URL - use correct domain
         const origin = request.headers.get('host')
