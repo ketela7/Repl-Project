@@ -343,18 +343,33 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           }
 
           const data = await response.json()
+          console.log('Export API response:', data)
 
-          if (data.exportUrl) {
-            const fileExtension = selectedFormat === 'jpeg' ? 'jpg' : selectedFormat
-            const exportFileName = `${file.name.replace(/\.[^/.]+$/, '')}.${fileExtension}`
-            await downloadFile(data.exportUrl, exportFileName)
-            successCount++
-            setProgress(prev => ({
-              ...prev,
-              success: successCount,
-            }))
+          // Handle the correct response structure - results array
+          if (data.results && data.results.length > 0) {
+            const result = data.results[0] // Single file export
+            if (result.success && result.exportUrl) {
+              const fileExtension = selectedFormat === 'jpeg' ? 'jpg' : selectedFormat
+              const exportFileName = `${file.name.replace(/\.[^/.]+$/, '')}.${fileExtension}`
+              await downloadFile(result.exportUrl, exportFileName)
+              successCount++
+              setProgress(prev => ({
+                ...prev,
+                success: successCount,
+              }))
+            } else if (result.downloadUrl) {
+              // Handle non-Google Workspace files
+              await downloadFile(result.downloadUrl, file.name)
+              successCount++
+              setProgress(prev => ({
+                ...prev,
+                success: successCount,
+              }))
+            } else {
+              throw new Error(result.error || 'Export failed for this file')
+            }
           } else {
-            throw new Error('No export URL received')
+            throw new Error('No export results received')
           }
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {

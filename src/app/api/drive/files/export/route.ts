@@ -91,6 +91,8 @@ export async function POST(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     }
 
+    console.log('Export API response:', JSON.stringify(response, null, 2))
+
     return NextResponse.json(response, {
       status: errors.length === 0 ? 200 : 207,
     })
