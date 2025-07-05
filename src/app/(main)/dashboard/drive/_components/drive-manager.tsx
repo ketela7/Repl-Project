@@ -220,7 +220,7 @@ export function DriveManager() {
     }, 300) // 300ms debounce
 
     return () => clearTimeout(timer)
-  }, [searchQuery, currentFolderId])
+  }, [searchQuery, currentFolderId, fetchFiles])
 
   const clearAllFilters = useCallback(() => {
     setFilters(initialFilters)
@@ -322,6 +322,7 @@ export function DriveManager() {
       try {
         // Handle null/undefined folderId properly
         const actualFolderId = folderId || null
+        console.log('🔍 fetchFiles called:', { folderId: actualFolderId, searchQuery, pageToken })
         // Gunakan filtersRef untuk mendapat filter state yang terbaru
         const currentFilters = filtersRef.current
         const filterKey = JSON.stringify({
@@ -489,10 +490,7 @@ export function DriveManager() {
       }))
   }
 
-  // Effects for initial load and dependencies
-  useEffect(() => {
-    fetchFiles()
-  }, [])
+  // Initial load handled by debounced search useEffect above
 
   // Manual filter application function - only called when Apply Filter is clicked
   const applyFilters = useCallback(() => {
