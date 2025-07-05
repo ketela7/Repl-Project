@@ -281,13 +281,6 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           <h3 className="font-semibold">Configure Share Settings</h3>
         </div>
 
-        <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
-          <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
-            <AlertTriangle className="h-4 w-4" />
-            <span>Configure sharing permissions and access levels for selected items</span>
-          </div>
-        </div>
-
         <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
           <CollapsibleTrigger asChild>
             <Button variant="outline" className="hover:bg-muted/50 w-full justify-between">
@@ -320,8 +313,8 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-3">
-            <ScrollArea className="max-h-64 w-full">
-              <div className="space-y-2 pr-2">
+            <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
+              <div className="space-y-2">
                 {selectedItems.map(item => (
                   <div
                     key={item.id}
@@ -336,7 +329,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                   </div>
                 ))}
               </div>
-            </ScrollArea>
+            </div>
           </CollapsibleContent>
         </Collapsible>
 
