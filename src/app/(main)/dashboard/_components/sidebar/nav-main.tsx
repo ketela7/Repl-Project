@@ -38,10 +38,12 @@ const NavItemExpanded = ({
   item,
   isActive,
   isSubmenuOpen,
+  onMenuItemClick,
 }: {
   item: NavMainItem
   isActive: (url: string, subItems?: NavMainItem['subItems']) => boolean
   isSubmenuOpen: (subItems?: NavMainItem['subItems']) => boolean
+  onMenuItemClick: () => void
 }) => {
   return (
     <Collapsible
@@ -70,7 +72,11 @@ const NavItemExpanded = ({
               isActive={isActive(item.url)}
               tooltip={item.title}
             >
-              <Link href={item.url} target={item.newTab ? '_blank' : undefined}>
+              <Link
+                href={item.url}
+                target={item.newTab ? '_blank' : undefined}
+                onClick={onMenuItemClick}
+              >
                 {item.icon && <item.icon />}
                 <span>{item.title}</span>
                 {item.comingSoon && <IsComingSoon />}
@@ -88,7 +94,11 @@ const NavItemExpanded = ({
                     isActive={isActive(subItem.url)}
                     asChild
                   >
-                    <Link href={subItem.url} target={subItem.newTab ? '_blank' : undefined}>
+                    <Link
+                      href={subItem.url}
+                      target={subItem.newTab ? '_blank' : undefined}
+                      onClick={onMenuItemClick}
+                    >
                       {subItem.icon && <subItem.icon />}
                       <span>{subItem.title}</span>
                       {subItem.comingSoon && <IsComingSoon />}
@@ -107,9 +117,11 @@ const NavItemExpanded = ({
 const NavItemCollapsed = ({
   item,
   isActive,
+  onMenuItemClick,
 }: {
   item: NavMainItem
   isActive: (url: string, subItems?: NavMainItem['subItems']) => boolean
+  onMenuItemClick: () => void
 }) => {
   return (
     <SidebarMenuItem key={item.title}>
@@ -135,7 +147,11 @@ const NavItemCollapsed = ({
                 aria-disabled={subItem.comingSoon}
                 isActive={isActive(subItem.url)}
               >
-                <Link href={subItem.url} target={subItem.newTab ? '_blank' : undefined}>
+                <Link
+                  href={subItem.url}
+                  target={subItem.newTab ? '_blank' : undefined}
+                  onClick={onMenuItemClick}
+                >
                   {subItem.icon && <subItem.icon className="[&>svg]:text-sidebar-foreground" />}
                   <span>{subItem.title}</span>
                   {subItem.comingSoon && <IsComingSoon />}
@@ -151,7 +167,7 @@ const NavItemCollapsed = ({
 
 export function NavMain({ items }: NavMainProps) {
   const path = usePathname()
-  const { state, isMobile } = useSidebar()
+  const { state, isMobile, setOpenMobile } = useSidebar()
 
   const isItemActive = (url: string, subItems?: NavMainItem['subItems']) => {
     if (subItems?.length) {
@@ -162,6 +178,13 @@ export function NavMain({ items }: NavMainProps) {
 
   const isSubmenuOpen = (subItems?: NavMainItem['subItems']) => {
     return subItems?.some((sub: NavMainItem) => path.startsWith(sub.url)) ?? false
+  }
+
+  const handleMenuItemClick = () => {
+    // Close sidebar on mobile when menu item is clicked
+    if (isMobile) {
+      setOpenMobile(false)
+    }
   }
 
   return (
@@ -196,13 +219,19 @@ export function NavMain({ items }: NavMainProps) {
             <SidebarMenu>
               {group.items?.map((item: NavMainItem) =>
                 state === 'collapsed' && !isMobile ? (
-                  <NavItemCollapsed key={item.title} item={item} isActive={isItemActive} />
+                  <NavItemCollapsed
+                    key={item.title}
+                    item={item}
+                    isActive={isItemActive}
+                    onMenuItemClick={handleMenuItemClick}
+                  />
                 ) : (
                   <NavItemExpanded
                     key={item.title}
                     item={item}
                     isActive={isItemActive}
                     isSubmenuOpen={isSubmenuOpen}
+                    onMenuItemClick={handleMenuItemClick}
                   />
                 ),
               )}
