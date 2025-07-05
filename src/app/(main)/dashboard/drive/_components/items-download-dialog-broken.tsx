@@ -18,9 +18,6 @@ import {
   SkipForward,
   HardDrive,
   Settings,
-  Info,
-  Clock,
-  Zap,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -48,7 +45,7 @@ import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn, calculateProgress } from '@/lib/utils'
+import { calculateProgress } from '@/lib/utils'
 import { formatFileSize } from '@/lib/google-drive/utils'
 
 interface ItemsDownloadDialogProps {
@@ -212,14 +209,14 @@ function ItemsDownloadDialog({
       success: 0,
       skipped: 0,
       failed: 0,
-      totalSize: totalSize,
+      totalSize,
       downloadedSize: 0,
       errors: [],
     })
 
     let successCount = 0
     let failedCount = 0
-    let skippedCount = 0
+    const skippedCount = 0
     let downloadedSize = 0
     const errors: Array<{ file: string; error: string }> = []
     const results: DownloadResult[] = []
@@ -240,9 +237,9 @@ function ItemsDownloadDialog({
           body: JSON.stringify({
             fileIds: selectedItems.map(item => item.id),
             format: 'zip',
-            includeMetadata: includeMetadata,
+            includeMetadata,
             compress: compressFiles,
-            createManifest: createManifest,
+            createManifest,
           }),
           signal: abortControllerRef.current.signal,
         })
@@ -294,7 +291,7 @@ function ItemsDownloadDialog({
               body: JSON.stringify({
                 fileIds: [item.id],
                 format: 'original',
-                includeMetadata: includeMetadata,
+                includeMetadata,
               }),
               signal: abortControllerRef.current.signal,
             })
@@ -341,7 +338,7 @@ function ItemsDownloadDialog({
 
           setProgress(prev => ({
             ...prev,
-            downloadedSize: downloadedSize,
+            downloadedSize,
           }))
 
           // Small delay to prevent overwhelming the API
@@ -360,7 +357,7 @@ function ItemsDownloadDialog({
         success: successCount,
         failed: failedCount,
         skipped: skippedCount,
-        downloadedSize: downloadedSize,
+        downloadedSize,
         errors,
       }))
 

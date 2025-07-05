@@ -1,15 +1,7 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import {
-  Settings,
-  FileText,
-  Trash2,
-  Move,
-  CheckCircle,
-  AlertTriangle,
-  ArrowLeft,
-} from 'lucide-react'
+import { Settings, FileText, Trash2, Move, AlertTriangle, ArrowLeft } from 'lucide-react'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 
 import {
@@ -27,8 +19,6 @@ import {
   BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
 import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Label } from '@/components/ui/label'

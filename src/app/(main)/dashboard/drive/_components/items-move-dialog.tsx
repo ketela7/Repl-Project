@@ -8,7 +8,6 @@ import {
   FolderOpen,
   CheckCircle,
   XCircle,
-  AlertTriangle,
   SkipForward,
   Home,
   ArrowRight,
@@ -18,7 +17,7 @@ import {
   Music,
   Archive,
   File,
-  ChevronDown,
+  ChevronRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -42,7 +41,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { DriveDestinationSelector } from '@/components/drive-destination-selector'
@@ -168,7 +166,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
     let successCount = 0
     let failedCount = 0
-    let skippedCount = 0
+    const skippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
 
     try {
@@ -305,57 +303,57 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
   const renderSelectionStep = () => (
     <div className="space-y-4">
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Selected Items</span>
-          <div className="flex gap-2">
-            {folderCount > 0 && (
-              <Badge variant="secondary" className="gap-1">
-                <Folder className="h-3 w-3" />
-                {folderCount} folder{folderCount > 1 ? 's' : ''}
-              </Badge>
-            )}
-            {fileCount > 0 && (
-              <Badge variant="secondary" className="gap-1">
-                <FileText className="h-3 w-3" />
-                {fileCount} file{fileCount > 1 ? 's' : ''}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto w-full justify-between p-2 text-left font-normal"
-            >
-              <span className="text-sm">
-                {isItemsExpanded ? 'Hide' : 'Show'} Selected Items ({selectedItems.length})
+      <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
+        <CollapsibleTrigger asChild>
+          <Button variant="outline" className="hover:bg-muted/50 w-full justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">
+                {isItemsExpanded ? 'Hide Selected Items' : 'Show Selected Items'}
               </span>
-              <ChevronDown
-                className={cn('h-4 w-4 transition-transform', isItemsExpanded && 'rotate-180')}
-              />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className="max-h-48 overflow-y-auto">
-              <div className="space-y-2 pt-2">
-                {selectedItems.map(item => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-2 rounded-lg border p-2 text-sm"
-                  >
-                    {getFileIcon(item.mimeType, item.isFolder)}
-                    <span className="truncate">{item.name}</span>
-                  </div>
-                ))}
+              <div className="flex gap-2">
+                {folderCount > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Folder className="h-3 w-3" />
+                    {folderCount}
+                  </Badge>
+                )}
+                {fileCount > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <FileText className="h-3 w-3" />
+                    {fileCount}
+                  </Badge>
+                )}
+                <Badge variant="outline">{selectedItems.length} total</Badge>
               </div>
             </div>
-          </CollapsibleContent>
-        </Collapsible>
-      </div>
+            <ChevronRight
+              className={cn(
+                'h-4 w-4 transition-transform duration-200',
+                isItemsExpanded && 'rotate-90',
+              )}
+            />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-3">
+          <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
+            <div className="space-y-2">
+              {selectedItems.map(item => (
+                <div
+                  key={item.id}
+                  className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
+                >
+                  {item.isFolder ? (
+                    <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
+                  ) : (
+                    <FileText className="h-4 w-4 flex-shrink-0 text-gray-600" />
+                  )}
+                  <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <div className="rounded-lg border bg-blue-50 p-3 dark:bg-blue-950/20">
         <div className="space-y-1 text-sm text-blue-700 dark:text-blue-300">
@@ -368,11 +366,6 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
   const renderDestinationStep = () => (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <FolderOpen className="h-5 w-5 text-blue-600" />
-        <h3 className="font-semibold">Select Destination</h3>
-      </div>
-
       <div className="rounded-lg border bg-amber-50 p-4 dark:bg-amber-950/20">
         <div className="flex items-center gap-2 text-sm text-amber-700 dark:text-amber-300">
           <Home className="h-4 w-4" />

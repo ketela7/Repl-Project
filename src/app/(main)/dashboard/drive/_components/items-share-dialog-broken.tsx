@@ -2,14 +2,11 @@
 
 import { useState, useRef } from 'react'
 import {
-  Share2,
   Users,
   Link,
   Globe,
-  Lock,
   Eye,
   Edit3,
-  UserPlus,
   Copy,
   Loader2,
   CheckCircle,
@@ -19,7 +16,6 @@ import {
   SkipForward,
   FileText,
   Folder,
-  Info,
   Settings,
   Shield,
   Mail,
@@ -52,7 +48,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn, calculateProgress } from '@/lib/utils'
+import { calculateProgress } from '@/lib/utils'
 
 interface ItemsShareDialogProps {
   isOpen: boolean
@@ -216,7 +212,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
     let successCount = 0
     let failedCount = 0
-    let skippedCount = 0
+    const skippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
     const results: ShareResult[] = []
 
@@ -236,7 +232,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
         try {
           const requestBody: any = {
             fileId: item.id,
-            permission: permission,
+            permission,
           }
 
           if (shareMethod === 'email') {

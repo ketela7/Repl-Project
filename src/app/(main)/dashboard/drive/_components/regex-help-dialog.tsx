@@ -132,7 +132,7 @@ function RegexHelpDialog({ isOpen, onClose }: RegexHelpDialogProps) {
         const result = filename.replace(regex, testReplacement)
         return {
           original: filename,
-          result: result,
+          result,
           success: true,
         }
       } catch (error) {

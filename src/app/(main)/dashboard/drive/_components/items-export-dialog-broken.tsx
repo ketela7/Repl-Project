@@ -18,7 +18,6 @@ import {
   Settings,
   Info,
   Download,
-  Zap,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -46,7 +45,7 @@ import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Switch } from '@/components/ui/switch'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
-import { cn, calculateProgress } from '@/lib/utils'
+import { calculateProgress } from '@/lib/utils'
 
 interface ItemsExportDialogProps {
   isOpen: boolean
@@ -386,8 +385,8 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
             body: JSON.stringify({
               fileId: item.id,
               mimeType: format.googleMimeType,
-              includeComments: includeComments,
-              includeSuggestions: includeSuggestions,
+              includeComments,
+              includeSuggestions,
             }),
             signal: abortControllerRef.current.signal,
           })
@@ -410,7 +409,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           results.push(result)
 
           if (autoStartDownload && data.exportUrl) {
-            const exportFileName = item.name.replace(/\.[^/.]+$/, '') + '.' + format.extension
+            const exportFileName = `${item.name.replace(/\.[^/.]+$/, '')}.${format.extension}`
             triggerDownload(data.exportUrl, exportFileName)
           }
 
@@ -687,10 +686,9 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
                 exportResults.forEach(result => {
                   if (result.success && result.exportUrl) {
                     const format = EXPORT_FORMATS.find(f => f.id === selectedFormat)
-                    const exportFileName =
-                      result.fileName.replace(/\.[^/.]+$/, '') +
-                      '.' +
-                      (format?.extension || 'export')
+                    const exportFileName = `${result.fileName.replace(/\.[^/.]+$/, '')}.${
+                      format?.extension || 'export'
+                    }`
                     triggerDownload(result.exportUrl, exportFileName)
                   }
                 })
@@ -718,10 +716,9 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
                         size="sm"
                         onClick={() => {
                           const format = EXPORT_FORMATS.find(f => f.id === selectedFormat)
-                          const exportFileName =
-                            result.fileName.replace(/\.[^/.]+$/, '') +
-                            '.' +
-                            (format?.extension || 'export')
+                          const exportFileName = `${result.fileName.replace(/\.[^/.]+$/, '')}.${
+                            format?.extension || 'export'
+                          }`
                           triggerDownload(result.exportUrl!, exportFileName)
                         }}
                         className="h-8 px-2"

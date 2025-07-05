@@ -14,7 +14,6 @@ import {
   TrendingUp,
   Play,
   Pause,
-  Copy,
   ChevronDown,
   ChevronRight,
   GitBranch,

@@ -1,9 +1,7 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
-  FileDown,
-  AlertTriangle,
   FileText,
   FileOutput,
   FileSpreadsheet,
@@ -13,6 +11,8 @@ import {
   CheckCircle,
   XCircle,
   SkipForward,
+  Folder,
+  ChevronRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -27,7 +27,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
@@ -154,6 +154,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -173,6 +174,14 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
+
+  // Auto-select first available format if current selection is not available
+  useEffect(() => {
+    const isSelectedFormatAvailable = availableFormats.some(format => format.id === selectedFormat)
+    if (!isSelectedFormatAvailable && availableFormats.length > 0) {
+      setSelectedFormat(availableFormats[0].id)
+    }
+  }, [availableFormats, selectedFormat])
 
   // Filter exportable files based on selected format
   const selectedFormatData = EXPORT_FORMATS.find(f => f.id === selectedFormat)
@@ -486,50 +495,86 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Selected Items</span>
-                <div className="flex gap-2">
-                  <Badge variant="secondary">{exportableFiles.length} exportable</Badge>
-                  {incompatibleFiles.length > 0 && (
-                    <Badge variant="outline">{incompatibleFiles.length} incompatible</Badge>
-                  )}
+            <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" className="hover:bg-muted/50 w-full justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">
+                      {isItemsExpanded ? 'Hide Selected Items' : 'Show Selected Items'}
+                    </span>
+                    <div className="flex gap-2">
+                      <Badge variant="secondary">{exportableFiles.length} exportable</Badge>
+                      {incompatibleFiles.length > 0 && (
+                        <Badge variant="outline">{incompatibleFiles.length} incompatible</Badge>
+                      )}
+                    </div>
+                  </div>
+                  <ChevronRight
+                    className={cn(
+                      'h-4 w-4 transition-transform duration-200',
+                      isItemsExpanded && 'rotate-90',
+                    )}
+                  />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-3">
+                <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
+                  <div className="space-y-2">
+                    {incompatibleFiles.map(item => (
+                      <div
+                        key={item.id}
+                        className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
+                      >
+                        {item.isFolder ? (
+                          <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
+                        ) : (
+                          <FileText className="h-4 w-4 flex-shrink-0 text-gray-600" />
+                        )}
+                        <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </CollapsibleContent>
+            </Collapsible>
 
-              {incompatibleFiles.length > 0 && (
+            <div className="space-y-4">
+              <Label className="text-sm font-medium">Export Format</Label>
+              <Select value={selectedFormat} onValueChange={setSelectedFormat}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select export format" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableFormats.map(format => {
+                    const Icon = format.icon
+                    return (
+                      <SelectItem key={format.id} value={format.id}>
+                        <div className="flex items-center gap-2">
+                          <Icon className="h-4 w-4" />
+                          <div className="flex-1">
+                            <div className="font-medium">{format.label}</div>
+                            <div className="text-muted-foreground text-xs">
+                              {format.description}
+                            </div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    )
+                  })}
+                </SelectContent>
+              </Select>
+
+              {availableFormats.length === 0 && (
                 <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
                   <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
                     <AlertTriangle className="h-4 w-4" />
                     <span className="text-sm">
-                      {incompatibleFiles.length} item(s) are not compatible with{' '}
-                      {selectedFormatData?.label}
+                      No export formats available for selected files. Please select Google Workspace
+                      files.
                     </span>
                   </div>
                 </div>
               )}
-            </div>
-
-            <div className="space-y-4">
-              <Label className="text-sm font-medium">Export Format</Label>
-              <RadioGroup
-                value={selectedFormat}
-                onValueChange={setSelectedFormat}
-                className="grid grid-cols-1 gap-2"
-              >
-                {EXPORT_FORMATS.map(format => (
-                  <div key={format.id} className="flex items-center space-x-2">
-                    <RadioGroupItem value={format.id} id={format.id} />
-                    <Label htmlFor={format.id} className="flex flex-1 items-center gap-2">
-                      <format.icon className="h-4 w-4" />
-                      <div className="flex-1">
-                        <div className="font-medium">{format.label}</div>
-                        <div className="text-muted-foreground text-xs">{format.description}</div>
-                      </div>
-                    </Label>
-                  </div>
-                ))}
-              </RadioGroup>
             </div>
 
             {exportableFiles.length === 0 ? (

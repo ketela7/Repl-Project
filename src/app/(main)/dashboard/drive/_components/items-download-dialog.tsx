@@ -1,7 +1,16 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { Download, FileText, AlertTriangle, CheckCircle, XCircle, SkipForward } from 'lucide-react'
+import {
+  Download,
+  FileText,
+  CheckCircle,
+  XCircle,
+  SkipForward,
+  Loader2,
+  Folder,
+  ChevronRight,
+} from 'lucide-react'
 import { toast } from 'sonner'
 
 import {
@@ -15,6 +24,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { Progress } from '@/components/ui/progress'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import {
@@ -62,6 +72,7 @@ function ItemsDownloadDialog({
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false)
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -85,6 +96,8 @@ function ItemsDownloadDialog({
   // Filter downloadable files (only files, skip folders)
   const downloadableFiles = selectedItems.filter(item => !item.isFolder)
   const skippedFolders = selectedItems.filter(item => item.isFolder)
+  const fileCount = downloadableFiles.length
+  const folderCount = skippedFolders.length
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -154,9 +167,9 @@ function ItemsDownloadDialog({
         const data = await response.json()
 
         // Create CSV content
-        const csvContent =
-          'Name,Download Link\n' +
-          data.links.map((link: any) => `"${link.name}","${link.url}"`).join('\n')
+        const csvContent = `Name,Download Link\n${data.links
+          .map((link: any) => `"${link.name}","${link.url}"`)
+          .join('\n')}`
 
         // Download CSV file
         const blob = new Blob([csvContent], { type: 'text/csv' })
@@ -424,29 +437,57 @@ function ItemsDownloadDialog({
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">Selected Items</span>
-                <div className="flex gap-2">
-                  <Badge variant="secondary">{downloadableFiles.length} files</Badge>
-                  {skippedFolders.length > 0 && (
-                    <Badge variant="outline">{skippedFolders.length} folders (skipped)</Badge>
-                  )}
-                </div>
-              </div>
-
-              {skippedFolders.length > 0 && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
-                  <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
-                    <AlertTriangle className="h-4 w-4" />
-                    <span className="text-sm">
-                      {skippedFolders.length} folder(s) will be skipped (folders cannot be
-                      downloaded directly)
+            <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
+              <CollapsibleTrigger asChild>
+                <Button variant="outline" className="hover:bg-muted/50 w-full justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">
+                      {isItemsExpanded ? 'Hide Selected Items' : 'Show Selected Items'}
                     </span>
+                    <div className="flex gap-2">
+                      {folderCount > 0 && (
+                        <Badge variant="secondary" className="gap-1">
+                          <Folder className="h-3 w-3" />
+                          {folderCount}
+                        </Badge>
+                      )}
+                      {fileCount > 0 && (
+                        <Badge variant="secondary" className="gap-1">
+                          <FileText className="h-3 w-3" />
+                          {fileCount}
+                        </Badge>
+                      )}
+                      <Badge variant="outline">{selectedItems.length} total</Badge>
+                    </div>
+                  </div>
+                  <ChevronRight
+                    className={cn(
+                      'h-4 w-4 transition-transform duration-200',
+                      isItemsExpanded && 'rotate-90',
+                    )}
+                  />
+                </Button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-3">
+                <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
+                  <div className="space-y-2">
+                    {selectedItems.map(item => (
+                      <div
+                        key={item.id}
+                        className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
+                      >
+                        {item.isFolder ? (
+                          <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
+                        ) : (
+                          <FileText className="h-4 w-4 flex-shrink-0 text-gray-600" />
+                        )}
+                        <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
-            </div>
+              </CollapsibleContent>
+            </Collapsible>
 
             <div className="space-y-4">
               <Label className="text-sm font-medium">Download Mode</Label>

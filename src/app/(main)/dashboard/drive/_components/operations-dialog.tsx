@@ -12,7 +12,6 @@ import {
   RotateCcw,
   Trash2,
   Grid3X3,
-  CheckCircle,
 } from 'lucide-react'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 
@@ -30,9 +29,7 @@ import {
   BottomSheetTitle,
   BottomSheetDescription,
 } from '@/components/ui/bottom-sheet'
-import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import ItemsMoveDialog from './items-move-dialog'
 import ItemsCopyDialog from './items-copy-dialog'

@@ -6,7 +6,6 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
-  AlertTriangle,
   SkipForward,
   ArrowRight,
   FileText,
@@ -18,7 +17,7 @@ import {
   Folder,
   Shield,
   AlertOctagon,
-  ChevronDown,
+  ChevronRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -46,6 +45,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn, calculateProgress } from '@/lib/utils'
 
@@ -80,6 +80,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
   >('warning')
   const [confirmationText, setConfirmationText] = useState('')
   const [acknowledgeWarning, setAcknowledgeWarning] = useState(false)
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [progress, setProgress] = useState<{
@@ -168,7 +169,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
 
     let successCount = 0
     let failedCount = 0
-    let skippedCount = 0
+    const skippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
 
     try {
@@ -298,10 +299,57 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
 
   const renderWarningStep = () => (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <AlertOctagon className="h-5 w-5 text-red-600" />
-        <h3 className="font-semibold text-red-600">Permanent Deletion Warning</h3>
-      </div>
+      <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
+        <CollapsibleTrigger asChild>
+          <Button variant="outline" className="hover:bg-muted/50 w-full justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">
+                {isItemsExpanded ? 'Hide Selected Items' : 'Show Selected Items'}
+              </span>
+              <div className="flex gap-2">
+                {folderCount > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Folder className="h-3 w-3" />
+                    {folderCount}
+                  </Badge>
+                )}
+                {fileCount > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <FileText className="h-3 w-3" />
+                    {fileCount}
+                  </Badge>
+                )}
+                <Badge variant="outline">{selectedItems.length} total</Badge>
+              </div>
+            </div>
+            <ChevronRight
+              className={cn(
+                'h-4 w-4 transition-transform duration-200',
+                isItemsExpanded && 'rotate-90',
+              )}
+            />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-3">
+          <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
+            <div className="space-y-2">
+              {selectedItems.map(item => (
+                <div
+                  key={item.id}
+                  className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
+                >
+                  {item.isFolder ? (
+                    <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
+                  ) : (
+                    <FileText className="h-4 w-4 flex-shrink-0 text-gray-600" />
+                  )}
+                  <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/20">
         <div className="space-y-2 text-sm text-red-700 dark:text-red-300">
@@ -314,45 +362,6 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
           <div>• Recovery will be impossible</div>
           <div>• Shared access will be immediately revoked</div>
         </div>
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Items to Delete</span>
-          <div className="flex gap-2">
-            {folderCount > 0 && (
-              <Badge variant="destructive" className="gap-1">
-                <Folder className="h-3 w-3" />
-                {folderCount} folder{folderCount > 1 ? 's' : ''}
-              </Badge>
-            )}
-            {fileCount > 0 && (
-              <Badge variant="destructive" className="gap-1">
-                <FileText className="h-3 w-3" />
-                {fileCount} file{fileCount > 1 ? 's' : ''}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        <ScrollArea className="max-h-48">
-          <div className="space-y-2">
-            {selectedItems.slice(0, 10).map(item => (
-              <div
-                key={item.id}
-                className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 p-2 text-sm dark:border-red-800 dark:bg-red-950/10"
-              >
-                {getFileIcon(item.mimeType, item.isFolder)}
-                <span className="truncate">{item.name}</span>
-              </div>
-            ))}
-            {selectedItems.length > 10 && (
-              <div className="text-muted-foreground text-center text-sm">
-                +{selectedItems.length - 10} more items
-              </div>
-            )}
-          </div>
-        </ScrollArea>
       </div>
     </div>
   )

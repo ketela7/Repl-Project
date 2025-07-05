@@ -4,7 +4,6 @@ import { useState, useRef } from 'react'
 import {
   Edit3,
   Hash,
-  Calendar,
   AlignLeft,
   Code2,
   Loader2,
@@ -13,10 +12,11 @@ import {
   AlertTriangle,
   HelpCircle,
   ArrowRight,
+  ChevronRight,
+  Eye,
   SkipForward,
   FileText,
   Folder,
-  Zap,
   Info,
   Settings,
 } from 'lucide-react'
@@ -47,7 +47,7 @@ import { Badge } from '@/components/ui/badge'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import { useIsMobile } from '@/lib/hooks/use-mobile'
 import { cn, calculateProgress } from '@/lib/utils'
 
@@ -81,6 +81,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
   const [isProcessing, setIsProcessing] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [showRegexHelp, setShowRegexHelp] = useState(false)
+  const [isItemsExpanded, setIsItemsExpanded] = useState(false)
 
   // Simple rename options
   const [newName, setNewName] = useState('')
@@ -422,46 +423,57 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
 
   const renderSetupStep = () => (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Settings className="h-5 w-5 text-blue-600" />
-        <h3 className="font-semibold">Rename Settings</h3>
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Selected Items</span>
-          <div className="flex gap-2">
-            {folderCount > 0 && (
-              <Badge variant="secondary" className="gap-1">
-                <Folder className="h-3 w-3" />
-                {folderCount} folder{folderCount > 1 ? 's' : ''}
-              </Badge>
-            )}
-            {fileCount > 0 && (
-              <Badge variant="secondary" className="gap-1">
-                <FileText className="h-3 w-3" />
-                {fileCount} file{fileCount > 1 ? 's' : ''}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        <ScrollArea className="max-h-32">
-          <div className="space-y-1">
-            {selectedItems.slice(0, 5).map(item => (
-              <div key={item.id} className="text-muted-foreground flex items-center gap-2 text-sm">
-                {item.isFolder ? <Folder className="h-3 w-3" /> : <FileText className="h-3 w-3" />}
-                <span className="truncate">{item.name}</span>
+      <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
+        <CollapsibleTrigger asChild>
+          <Button variant="outline" className="hover:bg-muted/50 w-full justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium">
+                {isItemsExpanded ? 'Hide Selected Items' : 'Show Selected Items'}
+              </span>
+              <div className="flex gap-2">
+                {folderCount > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <Folder className="h-3 w-3" />
+                    {folderCount}
+                  </Badge>
+                )}
+                {fileCount > 0 && (
+                  <Badge variant="secondary" className="gap-1">
+                    <FileText className="h-3 w-3" />
+                    {fileCount}
+                  </Badge>
+                )}
+                <Badge variant="outline">{selectedItems.length} total</Badge>
               </div>
-            ))}
-            {selectedItems.length > 5 && (
-              <div className="text-muted-foreground text-center text-sm">
-                +{selectedItems.length - 5} more items
-              </div>
-            )}
+            </div>
+            <ChevronRight
+              className={cn(
+                'h-4 w-4 transition-transform duration-200',
+                isItemsExpanded && 'rotate-90',
+              )}
+            />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-3">
+          <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
+            <div className="space-y-2">
+              {selectedItems.map(item => (
+                <div
+                  key={item.id}
+                  className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
+                >
+                  {item.isFolder ? (
+                    <Folder className="h-4 w-4 flex-shrink-0 text-blue-600" />
+                  ) : (
+                    <FileText className="h-4 w-4 flex-shrink-0 text-gray-600" />
+                  )}
+                  <span className="min-w-0 flex-1 truncate font-medium">{item.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </ScrollArea>
-      </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <div className="space-y-4">
         <Label className="text-sm font-medium">Rename Method</Label>

@@ -13,12 +13,10 @@ import {
   AlertTriangle,
   SkipForward,
   Copy,
-  Download,
   ChevronDown,
   FileText,
   Code,
   Folder,
-  ArrowRight,
   ChevronRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -27,7 +25,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import {
   Dialog,
@@ -151,7 +148,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
     let successCount = 0
     let failedCount = 0
-    let skippedCount = 0
+    const skippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
     const results: ShareResult[] = []
 
@@ -328,14 +325,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
           </CollapsibleContent>
         </Collapsible>
 
-        <Separator />
-
         <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Globe className="h-5 w-5 text-green-600" />
-            <h4 className="font-medium">Share Configuration</h4>
-          </div>
-
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="shareMethod">Share Method</Label>
@@ -434,9 +424,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
         break
 
       case 'csv':
-        content =
-          'Name,Share Link\n' +
-          successfulShares.map(share => `"${share.name}","${share.shareLink}"`).join('\n')
+        content = `Name,Share Link\n${successfulShares.map(share => `"${share.name}","${share.shareLink}"`).join('\n')}`
         filename = `share-links-${new Date().toISOString().slice(0, 10)}.csv`
         break
 
