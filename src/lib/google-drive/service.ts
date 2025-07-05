@@ -472,18 +472,21 @@ export class GoogleDriveService {
         currentParentId = fileInfo.parents?.[0]
       }
 
-      const updateParams: any = {
-        fileId,
+      console.log('🔧 Move operation:', { fileId, newParentId, currentParentId })
+
+      // Use the correct Google Drive API update method
+      const response = await this.drive.files.update({
+        fileId: fileId,
         addParents: newParentId,
-        ...(currentParentId && { removeParents: currentParentId }),
-        fields: `files(${getOptimizedFields('LIST_BASIC')})`,
-      }
+        removeParents: currentParentId,
+        fields: getOptimizedFields('LIST_BASIC'),
+      })
 
-      const response = await this.drive.files.update(updateParams)
-
-      const result = await response
-      return convertGoogleDriveFile(result.data)
+      console.log('✅ Move operation successful')
+      return convertGoogleDriveFile(response.data)
     } catch (error: any) {
+      console.error('❌ Google Drive API Error:', error)
+
       // Handle specific Google API errors according to documentation
       if (error.code === 403) {
         throw new Error('Insufficient permissions to move this file')
@@ -492,7 +495,7 @@ export class GoogleDriveService {
       } else if (error.code === 429) {
         throw new Error('Rate limit exceeded. Please try again later')
       } else if (error.code === 400) {
-        throw new Error('Invalid move operation parameters')
+        throw new Error(`Invalid move operation parameters: ${error.message || 'Unknown error'}`)
       }
 
       // Re-throw with original error for unexpected cases

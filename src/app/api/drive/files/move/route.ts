@@ -23,6 +23,8 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     }
 
+    console.log('🔄 Move API Request:', requestInfo)
+
     if (!targetFolderId) {
       return NextResponse.json(
         {
@@ -46,9 +48,12 @@ export async function POST(request: NextRequest) {
 
     for (const id of fileIds) {
       try {
+        console.log(`🔄 Moving file ${id} to folder ${targetFolderId}`)
         const result = await driveService.moveFile(id, targetFolderId)
+        console.log(`✅ Successfully moved file ${id}`)
         results.push({ fileId: id, success: true, result })
       } catch (error: unknown) {
+        console.error(`❌ Failed to move file ${id}:`, error)
         // Improved error handling with more detailed messages
         let errorMessage = 'Move failed'
         let errorCode = 'UNKNOWN_ERROR'
@@ -97,6 +102,14 @@ export async function POST(request: NextRequest) {
         },
       },
     }
+
+    console.log('📤 Move API Response:', {
+      success: response.success,
+      processed: response.processed,
+      failed: response.failed,
+      errorsCount: response.errors?.length || 0,
+      hasErrors: errors.length > 0,
+    })
 
     return NextResponse.json(response, {
       status: errors.length === 0 ? 200 : 207,
