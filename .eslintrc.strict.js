@@ -71,6 +71,7 @@ module.exports = {
 
     // GENERAL CODE QUALITY
     'no-debugger': 'off',
+    'no-console': 'off', // Allow console.log for development debugging
     'no-alert': 'error',
     'no-var': 'error',
     'prefer-const': 'error',

@@ -136,7 +136,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
     setIsProcessing(false)
     setCurrentStep('completed')
-    toast.info('Move operation cancelled')
+    console.log('⏹️ Move operation cancelled')
   }
 
   const handleDestinationSelect = (folderId: string, folderName?: string) => {
@@ -144,12 +144,15 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
     setSelectedFolderName(folderName || 'My Drive')
 
     // Debug: Show selected destination info
-    toast.info(`Debug: Selected destination - ID: ${folderId}, Name: ${folderName || 'My Drive'}`)
+    console.log('🎯 Selected destination:', {
+      folderId,
+      folderName: folderName || 'My Drive',
+    })
   }
 
   const handleMove = async () => {
     if (canMoveItems.length === 0) {
-      toast.error('No items can be moved from the selection')
+      console.error('❌ No items can be moved from the selection')
       return
     }
 
@@ -193,7 +196,12 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
             fileId: item.id,
             targetFolderId: selectedFolderId,
           }
-          toast.info(`Debug: Moving ${item.name} (${item.id}) to folder ${selectedFolderId}`)
+          console.log('📁 Moving file:', {
+            fileName: item.name,
+            fileId: item.id,
+            targetFolderId: selectedFolderId,
+            requestBody,
+          })
 
           const response = await fetch('/api/drive/files/move', {
             method: 'POST',
@@ -212,19 +220,18 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           const result = await response.json()
 
           // Debug: Show API response
-          toast.info(
-            `Debug API Response: ${JSON.stringify({
-              success: result.success,
-              processed: result.processed,
-              failed: result.failed,
-              errorsCount: result.errors?.length || 0,
-            })}`,
-          )
+          console.log('📡 API Response:', {
+            success: result.success,
+            processed: result.processed,
+            failed: result.failed,
+            errorsCount: result.errors?.length || 0,
+            fullResponse: result,
+          })
 
           if (!result.success) {
             // Show debug info with error
             if (result.debug) {
-              toast.error(`Debug Error Details: ${JSON.stringify(result.debug)}`)
+              console.error('❌ API Error Details:', result.debug)
             }
             throw new Error(result.error || 'Move failed')
           }
@@ -233,7 +240,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           if (result.errors && result.errors.length > 0) {
             const fileError = result.errors.find((err: any) => err.fileId === item.id)
             if (fileError) {
-              toast.error(`Debug File Error: ${JSON.stringify(fileError)}`)
+              console.error('❌ File Error:', fileError)
               throw new Error(fileError.error || 'Move failed')
             }
           }
@@ -269,7 +276,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
     } catch (error) {
       // Handle unexpected errors
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      toast.error(`Move operation failed: ${errorMessage}`)
+      console.error('❌ Move operation failed:', errorMessage)
     } finally {
       setProgress(prev => ({
         ...prev,
@@ -283,11 +290,13 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
       setCurrentStep('completed')
 
       if (isCancelledRef.current) {
-        toast.info('Move operation cancelled')
+        console.log('⏹️ Move operation cancelled')
       } else if (successCount > 0) {
+        console.log(`✅ Successfully moved ${successCount} item(s)`)
         toast.success(`Successfully moved ${successCount} item(s)`)
         onConfirm()
       } else {
+        console.error('❌ Move operation failed')
         toast.error('Move operation failed')
       }
     }
