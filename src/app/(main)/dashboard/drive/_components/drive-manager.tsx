@@ -128,6 +128,7 @@ export function DriveManager() {
   const [refreshing, setRefreshing] = useState(false)
   const [hasAccess, setHasAccess] = useState<boolean | null>(null)
   const [driveAccessError, setDriveAccessError] = useState<any>(null)
+  const [error, setError] = useState<string | null>(null)
   const [nextPageToken, setNextPageToken] = useState<string | null>(null)
   const [loadingMore, setLoadingMore] = useState(false)
   const [needsReauth, setNeedsReauth] = useState(false)
@@ -219,7 +220,7 @@ export function DriveManager() {
       try {
         // Handle null/undefined folderId properly
         const actualFolderId = folderId || null
-        console.log('🔍 fetchFiles called:', { folderId: actualFolderId, searchQuery, pageToken })
+
         // Gunakan filtersRef untuk mendapat filter state yang terbaru
         const currentFilters = filtersRef.current
         const filterKey = JSON.stringify({
