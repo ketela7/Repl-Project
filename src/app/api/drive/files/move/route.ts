@@ -34,11 +34,33 @@ export async function POST(request: NextRequest) {
       try {
         const result = await driveService.moveFile(id, targetFolderId)
         results.push({ fileId: id, success: true, result })
-      } catch (error: any) {
+      } catch (error: unknown) {
+        // Improved error handling with more detailed messages
+        let errorMessage = 'Move failed'
+        let errorCode = 'UNKNOWN_ERROR'
+
+        if (error instanceof Error) {
+          errorMessage = error.message
+
+          // Extract Google API error codes if available
+          if ('code' in error) {
+            errorCode = `API_ERROR_${error.code}`
+          }
+        } else if (typeof error === 'object' && error !== null) {
+          // Handle Google API error structure
+          if ('code' in error) {
+            errorCode = `API_ERROR_${error.code}`
+            if ('message' in error) {
+              errorMessage = `${error.message} (Code: ${error.code})`
+            }
+          }
+        }
+
         errors.push({
           fileId: id,
           success: false,
-          error: error.message || 'Move failed',
+          error: errorMessage,
+          errorCode,
         })
       }
     }

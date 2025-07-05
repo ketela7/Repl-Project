@@ -207,13 +207,27 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
             throw new Error(result.error || 'Move failed')
           }
 
+          // Check for partial success with errors
+          if (result.errors && result.errors.length > 0) {
+            const fileError = result.errors.find((err: any) => err.fileId === item.id)
+            if (fileError) {
+              throw new Error(fileError.error || 'Move failed')
+            }
+          }
+
           successCount++
         } catch (error) {
           if (error instanceof Error && error.name === 'AbortError') {
             break
           }
 
-          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          let errorMessage = 'Unknown error'
+          if (error instanceof Error) {
+            errorMessage = error.message
+          } else if (typeof error === 'string') {
+            errorMessage = error
+          }
+
           errors.push({ file: item.name, error: errorMessage })
           failedCount++
         }
