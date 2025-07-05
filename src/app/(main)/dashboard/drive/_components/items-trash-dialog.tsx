@@ -54,6 +54,7 @@ interface ItemsTrashDialogProps {
     name: string
     isFolder: boolean
     mimeType?: string
+    canTrash: boolean
   }>
 }
 
@@ -99,6 +100,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
+  const canTrashItems = selectedItems.filter(item => item.canTrash)
   const fileCount = selectedItems.filter(item => !item.isFolder).length
   const folderCount = selectedItems.filter(item => item.isFolder).length
 
@@ -149,7 +151,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
       current: 0,
       total: totalItems,
       success: 0,
-      skipped: 0,
+      skipped: totalItems - canTrashItems.length,
       failed: 0,
       errors: [],
     })

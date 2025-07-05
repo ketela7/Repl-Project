@@ -60,6 +60,7 @@ interface ItemsRenameDialogProps {
     name: string
     isFolder: boolean
     mimeType?: string
+    canRename: boolean
   }>
 }
 
@@ -130,8 +131,9 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter(item => !item.isFolder).length
-  const folderCount = selectedItems.filter(item => item.isFolder).length
+  const canRenameItems = selectedItems.filter(item => item.canRename)
+  const fileCount = canRenameItems.filter(item => !item.isFolder).length
+  const folderCount = canRenameItems.filter(item => item.isFolder).length
 
   const handleClose = () => {
     if (isProcessing) {
@@ -268,18 +270,19 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
     abortControllerRef.current = new AbortController()
 
     const totalItems = itemsToRename.length
+    const initialSkippedCount = selectedItems.length - canRenameItems.length
     setProgress({
       current: 0,
       total: totalItems,
       success: 0,
-      skipped: 0,
+      skipped: initialSkippedCount,
       failed: 0,
       errors: [],
     })
 
     let successCount = 0
     let failedCount = 0
-    let skippedCount = 0
+    let dynamicSkippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
 
     try {
@@ -292,7 +295,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         const selectedItem = selectedItems.find(item => item.name === previewItem.original)
 
         if (!selectedItem) {
-          skippedCount++
+          dynamicSkippedCount++
           continue
         }
 
@@ -341,7 +344,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         ...prev,
         success: successCount,
         failed: failedCount,
-        skipped: skippedCount,
+        skipped: initialSkippedCount + dynamicSkippedCount,
         errors,
       }))
 
@@ -457,7 +460,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
         <CollapsibleContent className="mt-3">
           <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
             <div className="space-y-2">
-              {selectedItems.map(item => (
+              {canRenameItems.map(item => (
                 <div
                   key={item.id}
                   className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"

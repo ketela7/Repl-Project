@@ -53,6 +53,7 @@ interface ItemsUntrashDialogProps {
     name: string
     isFolder: boolean
     mimeType?: string
+    canUntrash: boolean
   }>
 }
 

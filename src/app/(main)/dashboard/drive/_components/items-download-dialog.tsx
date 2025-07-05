@@ -44,6 +44,7 @@ interface ItemsDownloadDialogProps {
     id: string
     name: string
     isFolder: boolean
+    canDownload: boolean
   }>
 }
 
@@ -471,7 +472,7 @@ function ItemsDownloadDialog({
               <CollapsibleContent className="mt-3">
                 <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
                   <div className="space-y-2">
-                    {selectedItems.map(item => (
+                    {downloadableFiles.map(item => (
                       <div
                         key={item.id}
                         className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"

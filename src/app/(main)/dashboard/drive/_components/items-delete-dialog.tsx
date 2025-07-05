@@ -58,6 +58,7 @@ interface ItemsDeleteDialogProps {
     name: string
     isFolder: boolean
     mimeType?: string
+    canDelete: boolean
   }>
 }
 
@@ -104,8 +105,10 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter(item => !item.isFolder).length
-  const folderCount = selectedItems.filter(item => item.isFolder).length
+  // Filter items that can be deleted
+  const canDeleteItems = selectedItems.filter(item => item.canDelete)
+  const fileCount = canDeleteItems.filter(item => !item.isFolder).length
+  const folderCount = canDeleteItems.filter(item => item.isFolder).length
   const isConfirmationValid = confirmationText.trim() === 'CONFIRM DELETE' && acknowledgeWarning
 
   const handleClose = () => {
@@ -157,28 +160,28 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = selectedItems.length
+    const totalItems = canDeleteItems.length
+    const skippedCount = selectedItems.length - canDeleteItems.length
     setProgress({
       current: 0,
       total: totalItems,
       success: 0,
-      skipped: 0,
+      skipped: skippedCount,
       failed: 0,
       errors: [],
     })
 
     let successCount = 0
     let failedCount = 0
-    const skippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
 
     try {
-      for (let i = 0; i < selectedItems.length; i++) {
+      for (let i = 0; i < canDeleteItems.length; i++) {
         if (isCancelledRef.current) {
           break
         }
 
-        const item = selectedItems[i]
+        const item = canDeleteItems[i]
         setProgress(prev => ({
           ...prev,
           current: i + 1,

@@ -13,6 +13,7 @@ import {
   SkipForward,
   Folder,
   ChevronRight,
+  AlertTriangle,
 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -25,6 +26,13 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Progress } from '@/components/ui/progress'
 import { Label } from '@/components/ui/label'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
@@ -48,6 +56,7 @@ interface ItemsExportDialogProps {
     name: string
     isFolder: boolean
     mimeType?: string
+    canExport: boolean
   }>
 }
 
@@ -175,9 +184,12 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
   const abortControllerRef = useRef<AbortController | null>(null)
   const isCancelledRef = useRef(false)
 
-  // Calculate available export formats based on selected items
+  // Filter items that can be exported
+  const canExportItems = selectedItems.filter(item => item.canExport)
+
+  // Calculate available export formats based on exportable items
   const availableFormats = EXPORT_FORMATS.filter(format => {
-    return selectedItems.some(
+    return canExportItems.some(
       item => !item.isFolder && item.mimeType && format.supportedTypes.includes(item.mimeType),
     )
   })
@@ -190,14 +202,15 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     }
   }, [availableFormats, selectedFormat])
 
-  // Filter exportable files based on selected format
+  // Filter exportable files based on selected format from canExportItems
   const selectedFormatData = EXPORT_FORMATS.find(f => f.id === selectedFormat)
-  const exportableFiles = selectedItems.filter(
+  const exportableFiles = canExportItems.filter(
     item =>
       !item.isFolder && item.mimeType && selectedFormatData?.supportedTypes.includes(item.mimeType),
   )
   const incompatibleFiles = selectedItems.filter(
     item =>
+      !item.canExport ||
       item.isFolder ||
       !item.mimeType ||
       !selectedFormatData?.supportedTypes.includes(item.mimeType),
@@ -527,7 +540,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
               <CollapsibleContent className="mt-3">
                 <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
                   <div className="space-y-2">
-                    {incompatibleFiles.map(item => (
+                    {exportableFiles.map(item => (
                       <div
                         key={item.id}
                         className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"

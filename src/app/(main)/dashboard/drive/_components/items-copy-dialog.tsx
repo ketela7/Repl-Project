@@ -56,6 +56,7 @@ interface ItemsCopyDialogProps {
     name: string
     isFolder: boolean
     mimeType?: string
+    canCopy: boolean
   }>
 }
 
@@ -103,8 +104,9 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter(item => !item.isFolder).length
-  const folderCount = selectedItems.filter(item => item.isFolder).length
+  const canCopyItems = selectedItems.filter(item => item.canCopy)
+  const fileCount = canCopyItems.filter(item => !item.isFolder).length
+  const folderCount = canCopyItems.filter(item => item.isFolder).length
 
   const handleClose = () => {
     if (isProcessing) {
@@ -339,7 +341,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         <CollapsibleContent className="mt-3">
           <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
             <div className="space-y-2">
-              {selectedItems.map(item => (
+              {canCopyItems.map(item => (
                 <div
                   key={item.id}
                   className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"

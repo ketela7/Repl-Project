@@ -65,6 +65,7 @@ interface ItemsShareDialogProps {
     id: string
     name: string
     isFolder: boolean
+    canShare: boolean
   }>
 }
 
@@ -109,6 +110,11 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
+  // Filter items that can be shared
+  const canShareItems = selectedItems.filter(item => item.canShare)
+  const fileCount = canShareItems.filter(item => !item.isFolder).length
+  const folderCount = canShareItems.filter(item => item.isFolder).length
+
   const handleCancel = () => {
     isCancelledRef.current = true
     setIsCancelled(true)
@@ -123,8 +129,8 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
   }
 
   const handleShare = async () => {
-    if (selectedItems.length === 0) {
-      toast.error('No items selected for sharing')
+    if (canShareItems.length === 0) {
+      toast.error('No shareable items selected')
       return
     }
 
@@ -134,13 +140,14 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
-    const totalItems = selectedItems.length
+    const totalItems = canShareItems.length
+    const skippedCount = selectedItems.length - canShareItems.length
 
     setProgress({
       current: 0,
       total: totalItems,
       success: 0,
-      skipped: 0,
+      skipped: skippedCount,
       failed: 0,
       errors: [],
     })
@@ -148,17 +155,16 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
     let successCount = 0
     let failedCount = 0
-    const skippedCount = 0
     const errors: Array<{ file: string; error: string }> = []
     const results: ShareResult[] = []
 
     try {
-      for (let i = 0; i < selectedItems.length; i++) {
+      for (let i = 0; i < canShareItems.length; i++) {
         if (isCancelledRef.current) {
           break
         }
 
-        const item = selectedItems[i]
+        const item = canShareItems[i]
         setProgress(prev => ({
           ...prev,
           current: i + 1,

@@ -55,6 +55,7 @@ interface ItemsMoveDialogProps {
     name: string
     isFolder: boolean
     mimeType?: string
+    canMove: boolean
   }>
 }
 
@@ -102,8 +103,9 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter(item => !item.isFolder).length
-  const folderCount = selectedItems.filter(item => item.isFolder).length
+  const canMoveItems = selectedItems.filter(item => item.canMove)
+  const fileCount = canMoveItems.filter(item => !item.isFolder).length
+  const folderCount = canMoveItems.filter(item => item.isFolder).length
 
   const handleClose = () => {
     if (isProcessing) {
@@ -337,7 +339,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         <CollapsibleContent className="mt-3">
           <div className="bg-muted/5 max-h-64 overflow-y-auto rounded-lg border p-2">
             <div className="space-y-2">
-              {selectedItems.map(item => (
+              {canMoveItems.map(item => (
                 <div
                   key={item.id}
                   className="bg-muted/20 hover:bg-muted/40 flex items-center gap-2 rounded-lg border p-3 text-sm transition-colors"
