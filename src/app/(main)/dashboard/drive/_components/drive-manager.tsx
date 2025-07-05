@@ -291,7 +291,7 @@ export function DriveManager() {
   // Selected items with details for operations - using getFileActions for consistency
   const selectedItemsWithDetails = useMemo(() => {
     console.log('drive-manager selectedItems:', selectedItems, 'size:', selectedItems.size)
-    return Array.from(selectedItems).map(itemId => {
+    const result = Array.from(selectedItems).map(itemId => {
       const item = items.find(i => i.id === itemId)
       const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
 
@@ -327,6 +327,8 @@ export function DriveManager() {
         canExport: actions.canExport,
       }
     })
+    console.log('selectedItemsWithDetails result:', result, 'length:', result.length)
+    return result
   }, [selectedItems, items, filters.activeView])
 
   // API call function - Remove dependency on currentFolderId to prevent stale closures
