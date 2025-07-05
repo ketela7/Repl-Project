@@ -411,6 +411,7 @@ function OperationsDialog({
           />
         </Suspense>
 
+        {/* Export dialog temporarily disabled due to syntax errors
         <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
           <ItemsExportDialog
             isOpen={isExportDialogOpen}
@@ -418,6 +419,7 @@ function OperationsDialog({
             selectedItems={selectedItems}
           />
         </Suspense>
+        */}
         */}
 
         <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
@@ -509,6 +511,7 @@ function OperationsDialog({
         />
       </Suspense>
 
+      {/* Export dialog temporarily disabled due to syntax errors
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
         <ItemsExportDialog
           isOpen={isExportDialogOpen}
@@ -516,6 +519,7 @@ function OperationsDialog({
           selectedItems={selectedItems}
         />
       </Suspense>
+      */}
       */}
 
       <Suspense fallback={<div className="sr-only">Loading dialog...</div>}>
