@@ -40,15 +40,52 @@ export async function POST(request: NextRequest) {
     for (const id of fileIds) {
       try {
         console.log(`🔄 Copying file ${id} to folder ${targetFolderId}`)
-        const result = await driveService.copyFile(id, targetFolderId)
+        
+        // Get original file info for naming
+        const originalFile = await driveService.getFile(id)
+        
+        // Create copy metadata with proper structure
+        const copyMetadata: any = {
+          name: namePrefix ? `${namePrefix}${originalFile.name}` : `Copy of ${originalFile.name}`,
+        }
+        
+        // Add parent folder if specified
+        if (targetFolderId) {
+          copyMetadata.parents = [targetFolderId]
+        }
+        
+        const result = await driveService.copyFile(id, copyMetadata)
         console.log(`✅ Successfully copied file ${id}`)
         results.push({ fileId: id, success: true, result })
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error(`❌ Failed to copy file ${id}:`, error)
+        
+        // Improved error handling with more detailed messages
+        let errorMessage = 'Copy failed'
+        let errorCode = 'UNKNOWN_ERROR'
+
+        if (error instanceof Error) {
+          errorMessage = error.message
+
+          // Extract Google API error codes if available
+          if ('code' in error) {
+            errorCode = `API_ERROR_${error.code}`
+          }
+        } else if (typeof error === 'object' && error !== null) {
+          // Handle Google API error structure
+          if ('code' in error) {
+            errorCode = `API_ERROR_${error.code}`
+            if ('message' in error) {
+              errorMessage = `${error.message} (Code: ${error.code})`
+            }
+          }
+        }
+
         errors.push({
           fileId: id,
           success: false,
-          error: error.message || 'Copy failed',
+          error: errorMessage,
+          errorCode,
         })
       }
     }
@@ -63,7 +100,23 @@ export async function POST(request: NextRequest) {
       namePrefix,
       results,
       errors: errors.length > 0 ? errors : undefined,
+      debug: {
+        request: requestInfo,
+        processedFileIds: fileIds,
+        resultsSummary: {
+          successful: results.map(r => r.fileId),
+          failed: errors.map(e => e.fileId),
+        },
+      },
     }
+
+    console.log('📤 Copy API Response:', {
+      success: response.success,
+      processed: response.processed,
+      failed: response.failed,
+      errorsCount: response.errors?.length || 0,
+      hasErrors: errors.length > 0,
+    })
 
     return NextResponse.json(response, {
       status: errors.length === 0 ? 200 : 207,
