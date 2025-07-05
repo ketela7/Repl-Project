@@ -74,7 +74,9 @@ function ItemsDownloadDialog({
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [isItemsExpanded, setIsItemsExpanded] = useState(false)
-  const [currentStep, setCurrentStep] = useState<'configuration' | 'processing' | 'completed'>('configuration')
+  const [currentStep, setCurrentStep] = useState<'configuration' | 'processing' | 'completed'>(
+    'configuration',
+  )
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -119,6 +121,8 @@ function ItemsDownloadDialog({
     const link = document.createElement('a')
     link.href = url
     link.download = filename
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
     link.style.display = 'none'
     document.body.appendChild(link)
     link.click()
