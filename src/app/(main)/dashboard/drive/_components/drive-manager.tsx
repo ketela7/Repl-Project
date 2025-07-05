@@ -27,8 +27,7 @@ import { ItemsRenameDialog } from './items-rename-dialog'
 import { ItemsTrashDialog } from './items-trash-dialog'
 import { ItemsDeleteDialog } from './items-delete-dialog'
 import { ItemsUntrashDialog } from './items-untrash-dialog'
-// import ItemsDownloadDialog from './items-download-dialog'
-// import ItemsExportDialog from './items-export-dialog'
+
 import { getSizeMultiplier } from '@/lib/google-drive/utils'
 
 type DriveItem = (DriveFile | DriveFolder) & {
@@ -433,10 +432,10 @@ export function DriveManager() {
               : ('file' as const),
         }))
 
-        // // // // // console.log('[DriveManager] Received items:', newItems.length, 'items for folder:', folderId)
-        // // // // // console.log('[DriveManager] Items preview:', newItems.slice(0, 3).map(item => ({ name: item.name, id: item.id })))
+
+
         setItems(prev => {
-          // // // // // console.log('[DriveManager] Setting items to:', result.length, 'items')
+
           return pageToken ? [...prev, ...newItems] : newItems
         })
 
@@ -513,7 +512,7 @@ export function DriveManager() {
   // Navigation handlers
   const handleFolderClick = useCallback(
     (folderId: string) => {
-      // // // // // console.log('[DriveManager] Navigating to folder:', folderId)
+
 
       // Force immediate state update
       setLoading(true)
@@ -713,19 +712,19 @@ export function DriveManager() {
           <FileBreadcrumb
             currentFolderId={currentFolderId}
             onNavigate={folderId => {
-              // // // // // console.log('[DriveManager] Breadcrumb navigation called with folderId:', folderId)
+
               if (folderId) {
-                // // // // // console.log('[DriveManager] Navigating to folder:', folderId)
+
                 handleFolderClick(folderId)
               } else {
                 // [icon home] Drive
-                // // // // // console.log('[DriveManager] Navigating to root (My Drive)')
+
                 setCurrentFolderId(null)
                 fetchFiles(undefined, (searchQuery as string).trim() || undefined)
               }
             }}
             onBackToRoot={() => {
-              // // // // // console.log('[DriveManager] Back to root called')
+
               setCurrentFolderId(null)
               fetchFiles(undefined, (searchQuery as string).trim() || undefined)
             }}
@@ -921,7 +920,6 @@ export function DriveManager() {
             setSelectedItems(new Set())
           }}
           selectedItems={getSelectedItemsForDialog()}
-          _onConfirm={() => {}}
         />
       )}
 
@@ -949,7 +947,6 @@ export function DriveManager() {
             setSelectedItems(new Set())
           }}
           selectedItems={getSelectedItemsForDialog()}
-          _onConfirm={() => {}}
         />
       )}
 
