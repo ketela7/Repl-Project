@@ -269,7 +269,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         }
 
         // Small delay to prevent overwhelming the API
-        await new Promise(resolve => setTimeout(resolve, 100))
+        await new Promise(resolve => setTimeout(resolve, 300))
 
         setProgress(prev => ({
           ...prev,

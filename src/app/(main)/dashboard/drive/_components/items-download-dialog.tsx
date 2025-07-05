@@ -74,6 +74,7 @@ function ItemsDownloadDialog({
   const [isCompleted, setIsCompleted] = useState(false)
   const [isCancelled, setIsCancelled] = useState(false)
   const [isItemsExpanded, setIsItemsExpanded] = useState(false)
+  const [currentStep, setCurrentStep] = useState<'configuration' | 'processing' | 'completed'>('configuration')
   const [progress, setProgress] = useState<{
     current: number
     total: number
@@ -96,8 +97,9 @@ function ItemsDownloadDialog({
 
   // Filter downloadable files based on canDownload capability
   const downloadableFiles = selectedItems.filter(item => item.canDownload && !item.isFolder)
+  const skippedFolders = selectedItems.filter(item => item.isFolder)
   const fileCount = downloadableFiles.length
-  const folderCount = downloadableFiles.filter(item => item.isFolder).length
+  const folderCount = skippedFolders.length
   const totalItems = downloadableFiles.length
 
   const handleCancel = () => {
@@ -133,6 +135,7 @@ function ItemsDownloadDialog({
     setIsCancelled(false)
     setIsProcessing(true)
     setIsCompleted(false)
+    setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
 
@@ -272,6 +275,7 @@ function ItemsDownloadDialog({
 
     setIsProcessing(false)
     setIsCompleted(true)
+    setCurrentStep('completed')
 
     if (isCancelledRef.current) {
       toast.info('Download operation cancelled')
@@ -300,6 +304,7 @@ function ItemsDownloadDialog({
     setIsProcessing(false)
     setIsCompleted(false)
     setIsCancelled(false)
+    setCurrentStep('configuration')
     setProgress({
       current: 0,
       total: 0,
