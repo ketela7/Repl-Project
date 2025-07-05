@@ -106,6 +106,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
   const canMoveItems = selectedItems.filter(item => item.canMove)
   const fileCount = canMoveItems.filter(item => !item.isFolder).length
   const folderCount = canMoveItems.filter(item => item.isFolder).length
+  const totalItems = canMoveItems.length
 
   const handleClose = () => {
     if (isProcessing) {
@@ -156,7 +157,6 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = canMoveItems.length
     setProgress({
       current: 0,
       total: totalItems,
@@ -185,14 +185,14 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         }))
 
         try {
-          const response = await fetch('/api/drive/move', {
+          const response = await fetch('/api/drive/files/move', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               fileId: item.id,
-              destinationId: selectedFolderId,
+              targetFolderId: selectedFolderId,
             }),
             signal: abortControllerRef.current.signal,
           })
@@ -200,6 +200,11 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
           if (!response.ok) {
             const errorData = await response.json()
             throw new Error(errorData.error || 'Move failed')
+          }
+
+          const result = await response.json()
+          if (!result.success) {
+            throw new Error(result.error || 'Move failed')
           }
 
           successCount++
@@ -215,9 +220,19 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
 
         // Small delay to prevent overwhelming the API
         await new Promise(resolve => setTimeout(resolve, 100))
+
+        setProgress(prev => ({
+          ...prev,
+          success: successCount,
+          failed: failedCount,
+          skipped: skippedCount,
+          errors,
+        }))
       }
     } catch (error) {
-      console.error('Move operation failed:', error)
+      // Handle unexpected errors
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      toast.error(`Move operation failed: ${errorMessage}`)
     } finally {
       setProgress(prev => ({
         ...prev,
@@ -325,7 +340,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
                     {fileCount}
                   </Badge>
                 )}
-                <Badge variant="outline">{selectedItems.length} total</Badge>
+                <Badge variant="outline">{totalItems} total</Badge>
               </div>
             </div>
             <ChevronRight

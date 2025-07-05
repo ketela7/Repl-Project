@@ -134,6 +134,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
   const canRenameItems = selectedItems.filter(item => item.canRename)
   const fileCount = canRenameItems.filter(item => !item.isFolder).length
   const folderCount = canRenameItems.filter(item => item.isFolder).length
+  const totalItems = canRenameItems.length
 
   const handleClose = () => {
     if (isProcessing) {
@@ -446,7 +447,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
                     {fileCount}
                   </Badge>
                 )}
-                <Badge variant="outline">{selectedItems.length} total</Badge>
+                <Badge variant="outline">{totalItems} total</Badge>
               </div>
             </div>
             <ChevronRight

@@ -97,7 +97,8 @@ function ItemsDownloadDialog({
   // Filter downloadable files based on canDownload capability
   const downloadableFiles = selectedItems.filter(item => item.canDownload && !item.isFolder)
   const fileCount = downloadableFiles.length
-  const folderCount = selectedItems.filter(item => item.isFolder).length
+  const folderCount = downloadableFiles.filter(item => item.isFolder).length
+  const totalItems = downloadableFiles.length
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -134,7 +135,6 @@ function ItemsDownloadDialog({
     setIsCompleted(false)
 
     abortControllerRef.current = new AbortController()
-    const totalItems = downloadableFiles.length
 
     setProgress({
       current: 0,
@@ -457,7 +457,7 @@ function ItemsDownloadDialog({
                           {fileCount}
                         </Badge>
                       )}
-                      <Badge variant="outline">{selectedItems.length} total</Badge>
+                      <Badge variant="outline">{totalItems} total</Badge>
                     </div>
                   </div>
                   <ChevronRight

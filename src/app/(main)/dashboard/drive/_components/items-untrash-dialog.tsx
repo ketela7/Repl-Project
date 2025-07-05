@@ -107,7 +107,7 @@ function ItemsUntrashDialog({
   const canUntrashItems = selectedItems.filter(item => item.canUntrash)
   const fileCount = canUntrashItems.filter(item => !item.isFolder).length
   const folderCount = canUntrashItems.filter(item => item.isFolder).length
-
+  const totalItems = canUntrashItems.length
   const handleClose = () => {
     if (isProcessing) {
       handleCancel()
@@ -311,7 +311,7 @@ function ItemsUntrashDialog({
                     {fileCount}
                   </Badge>
                 )}
-                <Badge variant="outline">{selectedItems.length} total</Badge>
+                <Badge variant="outline">{totalItems} total</Badge>
               </div>
             </div>
             <ChevronRight

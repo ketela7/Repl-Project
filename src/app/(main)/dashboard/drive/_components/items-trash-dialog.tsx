@@ -101,9 +101,9 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
   const isMobile = useIsMobile()
 
   const canTrashItems = selectedItems.filter(item => item.canTrash)
-  const fileCount = selectedItems.filter(item => !item.isFolder).length
-  const folderCount = selectedItems.filter(item => item.isFolder).length
-
+  const fileCount = canTrashItems.filter(item => !item.isFolder).length
+  const folderCount = canTrashItems.filter(item => item.isFolder).length
+  const totalItems = canTrashItems.length
   const handleClose = () => {
     if (isProcessing) {
       handleCancel()
@@ -134,7 +134,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
   }
 
   const handleTrash = async () => {
-    if (canTrashItems.length === 0) {
+    if (totalItems === 0) {
       toast.error('No items can be moved to trash from the selection')
       return
     }
@@ -146,7 +146,6 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = canTrashItems.length
     setProgress({
       current: 0,
       total: totalItems,
@@ -307,7 +306,7 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
                     {fileCount}
                   </Badge>
                 )}
-                <Badge variant="outline">{selectedItems.length} total</Badge>
+                <Badge variant="outline">{totalItems} total</Badge>
               </div>
             </div>
             <ChevronRight

@@ -107,7 +107,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
   const canCopyItems = selectedItems.filter(item => item.canCopy)
   const fileCount = canCopyItems.filter(item => !item.isFolder).length
   const folderCount = canCopyItems.filter(item => item.isFolder).length
-
+  const totalItems = canCopyItems.length
   const handleClose = () => {
     if (isProcessing) {
       handleCancel()
@@ -157,7 +157,6 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = canCopyItems.length
     setProgress({
       current: 0,
       total: totalItems,
@@ -327,7 +326,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
                     {fileCount}
                   </Badge>
                 )}
-                <Badge variant="outline">{selectedItems.length} total</Badge>
+                <Badge variant="outline">{totalItems} total</Badge>
               </div>
             </div>
             <ChevronRight

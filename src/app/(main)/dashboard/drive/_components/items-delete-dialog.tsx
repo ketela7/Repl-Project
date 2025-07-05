@@ -109,6 +109,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
   const canDeleteItems = selectedItems.filter(item => item.canDelete)
   const fileCount = canDeleteItems.filter(item => !item.isFolder).length
   const folderCount = canDeleteItems.filter(item => item.isFolder).length
+  const totalItems = canDeleteItems.length
   const isConfirmationValid = confirmationText.trim() === 'CONFIRM DELETE' && acknowledgeWarning
 
   const handleClose = () => {
@@ -160,7 +161,6 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = canDeleteItems.length
     const skippedCount = selectedItems.length - canDeleteItems.length
     setProgress({
       current: 0,
@@ -322,7 +322,7 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
                     {fileCount}
                   </Badge>
                 )}
-                <Badge variant="outline">{selectedItems.length} total</Badge>
+                <Badge variant="outline">{totalItems} total</Badge>
               </div>
             </div>
             <ChevronRight

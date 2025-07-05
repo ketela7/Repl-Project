@@ -114,6 +114,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
   const canShareItems = selectedItems.filter(item => item.canShare)
   const fileCount = canShareItems.filter(item => !item.isFolder).length
   const folderCount = canShareItems.filter(item => item.isFolder).length
+  const totalItems = canShareItems.length
 
   const handleCancel = () => {
     isCancelledRef.current = true
@@ -140,7 +141,6 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
-    const totalItems = canShareItems.length
     const skippedCount = selectedItems.length - canShareItems.length
 
     setProgress({
@@ -274,9 +274,6 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
   }
 
   const renderConfigurationStep = () => {
-    const folderCount = selectedItems.filter(item => item.isFolder).length
-    const fileCount = selectedItems.length - folderCount
-
     return (
       <div className="space-y-4">
         <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
@@ -299,7 +296,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
                       {fileCount}
                     </Badge>
                   )}
-                  <Badge variant="outline">{selectedItems.length} total</Badge>
+                  <Badge variant="outline">{totalItems} total</Badge>
                 </div>
               </div>
               <ChevronRight
