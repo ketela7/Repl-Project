@@ -525,7 +525,7 @@ export class GoogleDriveService {
     const response = await this.drive.files.copy({
       fileId,
       requestBody: metadata,
-      fields: `files(${getOptimizedFields('LIST_BASIC')})`,
+      fields: getOptimizedFields('LIST_BASIC'),
     })
 
     const result = await response
