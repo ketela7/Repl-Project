@@ -86,6 +86,9 @@ function OperationsDialog({
   const dialogOpen = open ?? isOpen ?? false
   const handleClose = onOpenChange ? () => onOpenChange(false) : onClose || (() => {})
 
+  // Debug logging to understand selectedItems issue
+  console.log('Operations Dialog selectedItems:', selectedItems, 'length:', selectedItems.length)
+
   // Calculate counts and permissions
   const folderCount = selectedItems.filter(item => item.isFolder).length
   const fileCount = selectedItems.length - folderCount

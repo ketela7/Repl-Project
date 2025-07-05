@@ -290,6 +290,7 @@ export function DriveManager() {
 
   // Selected items with details for operations - using getFileActions for consistency
   const selectedItemsWithDetails = useMemo(() => {
+    console.log('drive-manager selectedItems:', selectedItems, 'size:', selectedItems.size)
     return Array.from(selectedItems).map(itemId => {
       const item = items.find(i => i.id === itemId)
       const itemIsFolder = item?.mimeType === 'application/vnd.google-apps.folder'
@@ -788,39 +789,39 @@ export function DriveManager() {
                   }, 100)
                   break
                 case 'download':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('download')
                   break
                 case 'share':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('share')
                   break
                 case 'rename':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('rename')
                   break
                 case 'move':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('move')
                   break
                 case 'copy':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('copy')
                   break
                 case 'trash':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('trash')
                   break
                 case 'delete':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('delete')
                   break
                 case 'untrash':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('untrash')
                   break
                 case 'export':
-                  setSelectedItems(new Set([item.id]))
+                  updateSelectedItems(new Set([item.id]))
                   setPendingAction('export')
                   break
               }
