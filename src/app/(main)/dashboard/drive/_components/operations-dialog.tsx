@@ -47,6 +47,7 @@ interface OperationsDialogProps {
   onClose?: () => void
   onOpenChange?: (open: boolean) => void
   selectedItems: any[]
+  onConfirm?: () => void
 }
 
 interface Operation {
@@ -66,6 +67,7 @@ function OperationsDialog({
   onClose,
   onOpenChange,
   selectedItems,
+  onConfirm,
 }: OperationsDialogProps) {
   const isMobile = useIsMobile()
 
@@ -368,7 +370,7 @@ function OperationsDialog({
             isOpen={isMoveDialogOpen}
             onClose={() => setIsMoveDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={() => setIsMoveDialogOpen(false)}
+            onConfirm={onConfirm}
           />
         </Suspense>
 
@@ -377,7 +379,7 @@ function OperationsDialog({
             isOpen={isCopyDialogOpen}
             onClose={() => setIsCopyDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={() => setIsCopyDialogOpen(false)}
+            onConfirm={onConfirm}
           />
         </Suspense>
 
@@ -386,7 +388,7 @@ function OperationsDialog({
             isOpen={isShareDialogOpen}
             onClose={() => setIsShareDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={() => setIsShareDialogOpen(false)}
+            onConfirm={onConfirm}
           />
         </Suspense>
 
@@ -395,7 +397,7 @@ function OperationsDialog({
             isOpen={isRenameDialogOpen}
             onClose={() => setIsRenameDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={() => setIsRenameDialogOpen(false)}
+            onConfirm={onConfirm}
           />
         </Suspense>
 
@@ -404,7 +406,7 @@ function OperationsDialog({
             isOpen={isDownloadDialogOpen}
             onClose={() => setIsDownloadDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={() => setIsDownloadDialogOpen(false)}
+            onConfirm={onConfirm}
           />
         </Suspense>
 
@@ -413,7 +415,7 @@ function OperationsDialog({
             isOpen={isExportDialogOpen}
             onClose={() => setIsExportDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={() => setIsExportDialogOpen(false)}
+            onConfirm={onConfirm}
           />
         </Suspense>
 
@@ -422,7 +424,7 @@ function OperationsDialog({
             isOpen={isUntrashDialogOpen}
             onClose={() => setIsUntrashDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={() => setIsUntrashDialogOpen(false)}
+            onConfirm={onConfirm}
           />
         </Suspense>
 
@@ -431,7 +433,7 @@ function OperationsDialog({
             isOpen={isTrashDialogOpen}
             onClose={() => setIsTrashDialogOpen(false)}
             selectedItems={selectedItems}
-            onConfirm={() => setIsTrashDialogOpen(false)}
+            onConfirm={onConfirm}
           />
         </Suspense>
 
@@ -440,6 +442,7 @@ function OperationsDialog({
             isOpen={isDeleteDialogOpen}
             onClose={() => setIsDeleteDialogOpen(false)}
             selectedItems={selectedItems}
+            onConfirm={onConfirm}
           />
         </Suspense>
       </>
@@ -467,7 +470,7 @@ function OperationsDialog({
           isOpen={isMoveDialogOpen}
           onClose={() => setIsMoveDialogOpen(false)}
           selectedItems={selectedItems}
-          onConfirm={() => setIsMoveDialogOpen(false)}
+          onConfirm={onConfirm}
         />
       </Suspense>
 
@@ -476,7 +479,7 @@ function OperationsDialog({
           isOpen={isCopyDialogOpen}
           onClose={() => setIsCopyDialogOpen(false)}
           selectedItems={selectedItems}
-          onConfirm={() => setIsCopyDialogOpen(false)}
+          onConfirm={onConfirm}
         />
       </Suspense>
 
@@ -493,7 +496,7 @@ function OperationsDialog({
           isOpen={isRenameDialogOpen}
           onClose={() => setIsRenameDialogOpen(false)}
           selectedItems={selectedItems}
-          onConfirm={() => setIsRenameDialogOpen(false)}
+          onConfirm={onConfirm}
         />
       </Suspense>
 
@@ -502,7 +505,7 @@ function OperationsDialog({
           isOpen={isDownloadDialogOpen}
           onClose={() => setIsDownloadDialogOpen(false)}
           selectedItems={selectedItems}
-          onConfirm={() => setIsDownloadDialogOpen(false)}
+          onConfirm={onConfirm}
         />
       </Suspense>
 
@@ -511,7 +514,7 @@ function OperationsDialog({
           isOpen={isExportDialogOpen}
           onClose={() => setIsExportDialogOpen(false)}
           selectedItems={selectedItems}
-          onConfirm={() => setIsExportDialogOpen(false)}
+          onConfirm={onConfirm}
         />
       </Suspense>
 
@@ -520,7 +523,7 @@ function OperationsDialog({
           isOpen={isUntrashDialogOpen}
           onClose={() => setIsUntrashDialogOpen(false)}
           selectedItems={selectedItems}
-          onConfirm={() => setIsUntrashDialogOpen(false)}
+          onConfirm={onConfirm}
         />
       </Suspense>
 
@@ -529,7 +532,7 @@ function OperationsDialog({
           isOpen={isTrashDialogOpen}
           onClose={() => setIsTrashDialogOpen(false)}
           selectedItems={selectedItems}
-          onConfirm={() => setIsTrashDialogOpen(false)}
+          onConfirm={onConfirm}
         />
       </Suspense>
 
@@ -538,6 +541,7 @@ function OperationsDialog({
           isOpen={isDeleteDialogOpen}
           onClose={() => setIsDeleteDialogOpen(false)}
           selectedItems={selectedItems}
+          onConfirm={onConfirm}
         />
       </Suspense>
     </>

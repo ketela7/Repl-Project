@@ -112,6 +112,12 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
     if (isProcessing) {
       handleCancel()
     }
+
+    // If we're in completed step and had successful operations, refresh data
+    if (currentStep === 'completed' && progress.success > 0) {
+      onConfirm?.()
+    }
+
     setCurrentStep('selection')
     setSelectedFolderId('root')
     setSelectedFolderName('My Drive')
@@ -251,7 +257,6 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         toast.info('Copy operation cancelled')
       } else if (successCount > 0) {
         toast.success(`Successfully copied ${successCount} item(s)`)
-        onConfirm()
       } else {
         toast.error('Copy operation failed')
       }

@@ -112,6 +112,12 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
     if (isProcessing) {
       handleCancel()
     }
+
+    // If we're in completed step and had successful operations, refresh data
+    if (currentStep === 'completed' && progress.success > 0) {
+      onConfirm?.()
+    }
+
     setCurrentStep('selection')
     setSelectedFolderId('root')
     setSelectedFolderName('My Drive')
@@ -294,7 +300,6 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
       } else if (successCount > 0) {
         console.log(`✅ Successfully moved ${successCount} item(s)`)
         toast.success(`Successfully moved ${successCount} item(s)`)
-        onConfirm()
       } else {
         console.error('❌ Move operation failed')
         toast.error('Move operation failed')

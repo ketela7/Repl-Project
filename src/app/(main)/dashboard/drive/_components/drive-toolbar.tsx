@@ -173,6 +173,7 @@ export function DriveToolbar({
   onCreateFolder,
   selectedItems,
   onDeselectAll,
+  onRefreshAfterOp,
 
   filters,
   onFilterChange,
@@ -1248,6 +1249,7 @@ export function DriveToolbar({
         isOpen={isOperationsOpen}
         onClose={() => setIsOperationsOpen(false)}
         selectedItems={selectedItems}
+        onConfirm={onRefreshAfterOp}
       />
 
       {/* Filters Dialog */}
