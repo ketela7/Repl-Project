@@ -239,18 +239,73 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
     }
   }
 
+  const renderStepIndicator = () => {
+    // Simple "Status: Indicator" format
+    const getStatusDisplay = () => {
+      switch (currentStep) {
+        case 'selection':
+          return {
+            status: 'Selection',
+            icon: Files,
+            color: 'text-green-600',
+            bgColor: 'bg-green-50 dark:bg-green-950/20',
+          }
+        case 'destination':
+          return {
+            status: 'Destination',
+            icon: FolderOpen,
+            color: 'text-purple-600',
+            bgColor: 'bg-purple-50 dark:bg-purple-950/20',
+          }
+        case 'processing':
+          return {
+            status: 'Processing',
+            icon: Loader2,
+            color: 'text-orange-600',
+            bgColor: 'bg-orange-50 dark:bg-orange-950/20',
+          }
+        case 'completed':
+          return {
+            status: 'Completed',
+            icon: CheckCircle,
+            color: 'text-green-600',
+            bgColor: 'bg-green-50 dark:bg-green-950/20',
+          }
+        default:
+          return {
+            status: 'Selection',
+            icon: Files,
+            color: 'text-green-600',
+            bgColor: 'bg-green-50 dark:bg-green-950/20',
+          }
+      }
+    }
+
+    const { status, icon: Icon, color, bgColor } = getStatusDisplay()
+
+    return (
+      <div className={cn('mb-4 rounded-lg border p-3', bgColor)}>
+        <div className="flex items-center gap-2">
+          <Icon
+            className={cn(
+              'h-4 w-4 flex-shrink-0',
+              color,
+              currentStep === 'processing' && 'animate-spin',
+            )}
+          />
+          <span className="text-sm font-medium">
+            Status: <span className={color}>{status}</span>
+          </span>
+        </div>
+      </div>
+    )
+  }
+
   const renderSelectionStep = () => (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
         <Files className="h-5 w-5 text-green-600" />
         <h3 className="font-semibold">Copy Items</h3>
-      </div>
-
-      <div className="rounded-lg border bg-green-50 p-4 dark:bg-green-950/20">
-        <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-300">
-          <Copy className="h-4 w-4" />
-          <span>Copying will create duplicates in the destination folder</span>
-        </div>
       </div>
 
       <div className="space-y-3">
@@ -399,18 +454,25 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
   )
 
   const renderContent = () => {
-    switch (currentStep) {
-      case 'selection':
-        return renderSelectionStep()
-      case 'destination':
-        return renderDestinationStep()
-      case 'processing':
-        return renderProcessingStep()
-      case 'completed':
-        return renderCompletedStep()
-      default:
-        return null
-    }
+    return (
+      <>
+        {renderStepIndicator()}
+        {(() => {
+          switch (currentStep) {
+            case 'selection':
+              return renderSelectionStep()
+            case 'destination':
+              return renderDestinationStep()
+            case 'processing':
+              return renderProcessingStep()
+            case 'completed':
+              return renderCompletedStep()
+            default:
+              return null
+          }
+        })()}
+      </>
+    )
   }
 
   const renderFooter = () => {

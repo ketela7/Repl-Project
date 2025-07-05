@@ -276,11 +276,6 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
     return (
       <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Share2 className="h-5 w-5 text-blue-600" />
-          <h3 className="font-semibold">Configure Share Settings</h3>
-        </div>
-
         <Collapsible open={isItemsExpanded} onOpenChange={setIsItemsExpanded}>
           <CollapsibleTrigger asChild>
             <Button variant="outline" className="hover:bg-muted/50 w-full justify-between">

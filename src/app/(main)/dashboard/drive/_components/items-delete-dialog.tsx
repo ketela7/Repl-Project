@@ -232,6 +232,68 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
     }
   }
 
+  const renderStepIndicator = () => {
+    // Simple "Status: Indicator" format
+    const getStatusDisplay = () => {
+      switch (currentStep) {
+        case 'warning':
+          return {
+            status: 'Warning',
+            icon: AlertOctagon,
+            color: 'text-red-600',
+            bgColor: 'bg-red-50 dark:bg-red-950/20',
+          }
+        case 'confirmation':
+          return {
+            status: 'Confirmation',
+            icon: Shield,
+            color: 'text-amber-600',
+            bgColor: 'bg-amber-50 dark:bg-amber-950/20',
+          }
+        case 'processing':
+          return {
+            status: 'Processing',
+            icon: Loader2,
+            color: 'text-orange-600',
+            bgColor: 'bg-orange-50 dark:bg-orange-950/20',
+          }
+        case 'completed':
+          return {
+            status: 'Completed',
+            icon: CheckCircle,
+            color: 'text-green-600',
+            bgColor: 'bg-green-50 dark:bg-green-950/20',
+          }
+        default:
+          return {
+            status: 'Warning',
+            icon: AlertOctagon,
+            color: 'text-red-600',
+            bgColor: 'bg-red-50 dark:bg-red-950/20',
+          }
+      }
+    }
+
+    const { status, icon: Icon, color, bgColor } = getStatusDisplay()
+
+    return (
+      <div className={cn('mb-4 rounded-lg border p-3', bgColor)}>
+        <div className="flex items-center gap-2">
+          <Icon
+            className={cn(
+              'h-4 w-4 flex-shrink-0',
+              color,
+              currentStep === 'processing' && 'animate-spin',
+            )}
+          />
+          <span className="text-sm font-medium">
+            Status: <span className={color}>{status}</span>
+          </span>
+        </div>
+      </div>
+    )
+  }
+
   const renderWarningStep = () => (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -424,18 +486,25 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
   )
 
   const renderContent = () => {
-    switch (currentStep) {
-      case 'warning':
-        return renderWarningStep()
-      case 'confirmation':
-        return renderConfirmationStep()
-      case 'processing':
-        return renderProcessingStep()
-      case 'completed':
-        return renderCompletedStep()
-      default:
-        return null
-    }
+    return (
+      <>
+        {renderStepIndicator()}
+        {(() => {
+          switch (currentStep) {
+            case 'warning':
+              return renderWarningStep()
+            case 'confirmation':
+              return renderConfirmationStep()
+            case 'processing':
+              return renderProcessingStep()
+            case 'completed':
+              return renderCompletedStep()
+            default:
+              return null
+          }
+        })()}
+      </>
+    )
   }
 
   const renderFooter = () => {

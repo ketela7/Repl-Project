@@ -287,8 +287,59 @@ function ItemsDownloadDialog({
 
   const isMobile = useIsMobile()
 
+  const renderStepIndicator = () => {
+    // Simple "Status: Indicator" format
+    const getStatusDisplay = () => {
+      if (isProcessing) {
+        return {
+          status: 'Processing',
+          icon: Loader2,
+          color: 'text-orange-600',
+          bgColor: 'bg-orange-50 dark:bg-orange-950/20'
+        }
+      } else if (isCompleted) {
+        return {
+          status: 'Completed',
+          icon: CheckCircle,
+          color: 'text-green-600',
+          bgColor: 'bg-green-50 dark:bg-green-950/20'
+        }
+      } else {
+        return {
+          status: 'Configuration',
+          icon: Download,
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50 dark:bg-blue-950/20'
+        }
+      }
+    }
+
+    const { status, icon: Icon, color, bgColor } = getStatusDisplay()
+
+    return (
+      <div className={cn("mb-4 rounded-lg border p-3", bgColor)}>
+        <div className="flex items-center gap-2">
+          <Icon 
+            className={cn(
+              "h-4 w-4 flex-shrink-0", 
+              color,
+              isProcessing && 'animate-spin'
+            )} 
+          />
+          <span className="text-sm font-medium">
+            Status: <span className={color}>{status}</span>
+          </span>
+        </div>
+      </div>
+    )
+  }
+
   const renderContent = () => {
-    if (isProcessing) {
+    return (
+      <>
+        {renderStepIndicator()}
+        {(() => {
+          if (isProcessing) {
       return (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
