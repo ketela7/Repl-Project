@@ -212,6 +212,133 @@ export function DriveManager() {
     searchQueryRef.current = query
   }, [])
 
+  // API call function - moved here to avoid hoisting issues
+  const fetchFiles = useCallback(
+    async (folderId?: string, searchQuery?: string, pageToken?: string) => {
+      let callId = ''
+      try {
+        // Handle null/undefined folderId properly
+        const actualFolderId = folderId || null
+        console.log('🔍 fetchFiles called:', { folderId: actualFolderId, searchQuery, pageToken })
+        // Gunakan filtersRef untuk mendapat filter state yang terbaru
+        const currentFilters = filtersRef.current
+        const filterKey = JSON.stringify({
+          view: currentFilters.activeView,
+          types: currentFilters.fileTypeFilter,
+          sort: currentFilters.advancedFilters.sortBy,
+          order: currentFilters.advancedFilters.sortOrder,
+          size: currentFilters.advancedFilters.sizeRange,
+          created: currentFilters.advancedFilters.createdDateRange,
+          modified: currentFilters.advancedFilters.modifiedDateRange,
+          owner: currentFilters.advancedFilters.owner,
+        })
+
+        callId = `${actualFolderId}-${searchQuery}-${pageToken}-${filterKey}`
+
+        if (activeRequestsRef.current.has(callId)) return
+        if (filterKey !== lastFiltersRef.current && pageToken) return
+        lastFiltersRef.current = filterKey
+
+        setLoading(!pageToken)
+        setLoadingMore(!!pageToken)
+
+        activeRequestsRef.current.add(callId)
+
+        const params = new URLSearchParams({
+          sortBy: currentFilters.advancedFilters.sortBy,
+          sortOrder: currentFilters.advancedFilters.sortOrder,
+        })
+
+        // Only add folderId if it's not null/undefined
+        if (actualFolderId) params.append('folderId', actualFolderId)
+        if (searchQuery) params.append('search', searchQuery)
+        if (pageToken) params.append('pageToken', pageToken)
+        if (currentFilters.activeView && currentFilters.activeView !== 'all')
+          params.append('viewStatus', currentFilters.activeView)
+        if (currentFilters.fileTypeFilter?.length > 0)
+          params.append('fileType', currentFilters.fileTypeFilter.join(','))
+        if (currentFilters.advancedFilters.createdDateRange?.from)
+          params.append(
+            'createdAfter',
+            (currentFilters.advancedFilters.createdDateRange.from as Date).toISOString(),
+          )
+        if (currentFilters.advancedFilters.createdDateRange?.to)
+          params.append(
+            'createdBefore',
+            (currentFilters.advancedFilters.createdDateRange.to as Date).toISOString(),
+          )
+        if (currentFilters.advancedFilters.modifiedDateRange?.from)
+          params.append(
+            'modifiedAfter',
+            (currentFilters.advancedFilters.modifiedDateRange.from as Date).toISOString(),
+          )
+        if (currentFilters.advancedFilters.modifiedDateRange?.to)
+          params.append(
+            'modifiedBefore',
+            (currentFilters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
+          )
+        if (
+          currentFilters.advancedFilters.owner &&
+          (currentFilters.advancedFilters.owner as string).trim()
+        )
+          params.append('owner', (currentFilters.advancedFilters.owner as string).trim())
+
+        // Add size filtering parameters (Google Drive API specification - values in bytes)
+        if (
+          currentFilters.advancedFilters.sizeRange?.min &&
+          currentFilters.advancedFilters.sizeRange.min > 0
+        ) {
+          const multiplier = getSizeMultiplier(currentFilters.advancedFilters.sizeRange.unit)
+          const minBytes = Math.floor(currentFilters.advancedFilters.sizeRange.min * multiplier)
+          params.append('sizeMin', String(minBytes))
+        }
+        if (
+          currentFilters.advancedFilters.sizeRange?.max &&
+          currentFilters.advancedFilters.sizeRange.max > 0
+        ) {
+          const multiplier = getSizeMultiplier(currentFilters.advancedFilters.sizeRange.unit)
+          const maxBytes = Math.floor(currentFilters.advancedFilters.sizeRange.max * multiplier)
+          params.append('sizeMax', String(maxBytes))
+        }
+
+        const response = await fetch(`/api/drive/files?${params.toString()}`)
+        const data = await response.json()
+
+        if (response.ok) {
+          setError(null)
+          setDriveAccessError(null)
+          setNeedsReauth(false)
+
+          if (pageToken) {
+            setItems(prev => [...prev, ...data.items])
+          } else {
+            setItems(data.items)
+          }
+
+          setNextPageToken(data.nextPageToken || null)
+          setRefreshing(false)
+        } else {
+          if (response.status === 401) {
+            setDriveAccessError(data.error)
+            setNeedsReauth(true)
+          } else {
+            setError(data.error)
+          }
+          setRefreshing(false)
+        }
+      } catch (error) {
+        console.error('Error fetching files:', error)
+        setError(error instanceof Error ? error.message : 'An unexpected error occurred')
+        setRefreshing(false)
+      } finally {
+        activeRequestsRef.current.delete(callId)
+        setLoading(false)
+        setLoadingMore(false)
+      }
+    },
+    [], // Empty dependency array to prevent re-creation
+  )
+
   // Debounced search effect - auto-search like destination selector
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -314,158 +441,6 @@ export function DriveManager() {
       }
     })
   }, [selectedItems, items, filters.activeView])
-
-  // API call function - Remove dependency on currentFolderId to prevent stale closures
-  const fetchFiles = useCallback(
-    async (folderId?: string, searchQuery?: string, pageToken?: string) => {
-      let callId = ''
-      try {
-        // Handle null/undefined folderId properly
-        const actualFolderId = folderId || null
-        console.log('🔍 fetchFiles called:', { folderId: actualFolderId, searchQuery, pageToken })
-        // Gunakan filtersRef untuk mendapat filter state yang terbaru
-        const currentFilters = filtersRef.current
-        const filterKey = JSON.stringify({
-          view: currentFilters.activeView,
-          types: currentFilters.fileTypeFilter,
-          sort: currentFilters.advancedFilters.sortBy,
-          order: currentFilters.advancedFilters.sortOrder,
-          size: currentFilters.advancedFilters.sizeRange,
-          created: currentFilters.advancedFilters.createdDateRange,
-          modified: currentFilters.advancedFilters.modifiedDateRange,
-          owner: currentFilters.advancedFilters.owner,
-        })
-
-        callId = `${actualFolderId}-${searchQuery}-${pageToken}-${filterKey}`
-
-        if (activeRequestsRef.current.has(callId)) return
-        if (filterKey !== lastFiltersRef.current && pageToken) return
-        lastFiltersRef.current = filterKey
-
-        setLoading(!pageToken)
-        setLoadingMore(!!pageToken)
-
-        activeRequestsRef.current.add(callId)
-
-        const params = new URLSearchParams({
-          sortBy: currentFilters.advancedFilters.sortBy,
-          sortOrder: currentFilters.advancedFilters.sortOrder,
-        })
-
-        // Only add folderId if it's not null/undefined
-        if (actualFolderId) params.append('folderId', actualFolderId)
-        if (searchQuery) params.append('search', searchQuery)
-        if (pageToken) params.append('pageToken', pageToken)
-        if (currentFilters.activeView && currentFilters.activeView !== 'all')
-          params.append('viewStatus', currentFilters.activeView)
-        if (currentFilters.fileTypeFilter?.length > 0)
-          params.append('fileType', currentFilters.fileTypeFilter.join(','))
-        if (currentFilters.advancedFilters.createdDateRange?.from)
-          params.append(
-            'createdAfter',
-            (currentFilters.advancedFilters.createdDateRange.from as Date).toISOString(),
-          )
-        if (currentFilters.advancedFilters.createdDateRange?.to)
-          params.append(
-            'createdBefore',
-            (currentFilters.advancedFilters.createdDateRange.to as Date).toISOString(),
-          )
-        if (currentFilters.advancedFilters.modifiedDateRange?.from)
-          params.append(
-            'modifiedAfter',
-            (currentFilters.advancedFilters.modifiedDateRange.from as Date).toISOString(),
-          )
-        if (currentFilters.advancedFilters.modifiedDateRange?.to)
-          params.append(
-            'modifiedBefore',
-            (currentFilters.advancedFilters.modifiedDateRange.to as Date).toISOString(),
-          )
-        if (
-          currentFilters.advancedFilters.owner &&
-          (currentFilters.advancedFilters.owner as string).trim()
-        )
-          params.append('owner', (currentFilters.advancedFilters.owner as string).trim())
-
-        // Add size filtering parameters (Google Drive API specification - values in bytes)
-        if (
-          currentFilters.advancedFilters.sizeRange?.min &&
-          currentFilters.advancedFilters.sizeRange.min > 0
-        ) {
-          const multiplier = getSizeMultiplier(currentFilters.advancedFilters.sizeRange.unit)
-          const minBytes = Math.floor(currentFilters.advancedFilters.sizeRange.min * multiplier)
-          params.append('sizeMin', String(minBytes))
-        }
-        if (
-          currentFilters.advancedFilters.sizeRange?.max &&
-          currentFilters.advancedFilters.sizeRange.max > 0
-        ) {
-          const multiplier = getSizeMultiplier(currentFilters.advancedFilters.sizeRange.unit)
-          const maxBytes = Math.floor(currentFilters.advancedFilters.sizeRange.max * multiplier)
-          params.append('sizeMax', String(maxBytes))
-        }
-
-        // Add pageSize parameter
-        if (
-          currentFilters.advancedFilters.pageSize &&
-          currentFilters.advancedFilters.pageSize !== 50
-        ) {
-          params.append('pageSize', String(currentFilters.advancedFilters.pageSize))
-        }
-
-        const response = await fetch(`/api/drive/files?${params}`, {
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        })
-
-        if (!response.ok) {
-          if (response.status === 401) {
-            setNeedsReauth(true)
-            throw new Error('Authentication required')
-          }
-          throw new Error(`Failed to fetch files: ${response.statusText}`)
-        }
-
-        const data = await response.json()
-        if (data.error) throw new Error(data.error)
-
-        const newItems = (data.files || data || []).map((item: any) => ({
-          ...item,
-          itemType:
-            item.mimeType === 'application/vnd.google-apps.folder'
-              ? ('folder' as const)
-              : ('file' as const),
-        }))
-
-        setItems(prev => {
-          return pageToken ? [...prev, ...newItems] : newItems
-        })
-
-        setNextPageToken(data.nextPageToken || null)
-        setHasAccess(true)
-        setDriveAccessError(null)
-      } catch (error: any) {
-        if (
-          error.message?.includes('Authentication') ||
-          error.message?.includes('401') ||
-          error.status === 401
-        ) {
-          setNeedsReauth(true)
-          setDriveAccessError(error)
-          window.location.href = '/auth/v1/login'
-        } else {
-          setDriveAccessError(error)
-          errorToast.apiError('Failed to load files')
-        }
-        setHasAccess(false)
-      } finally {
-        setLoading(false)
-        setLoadingMore(false)
-        setRefreshing(false)
-        if (callId) activeRequestsRef.current.delete(callId)
-      }
-    },
-    [filters],
-  )
 
   // Get selected items with all required data for dialogs
   const getSelectedItemsForDialog = () => {
