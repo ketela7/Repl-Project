@@ -409,8 +409,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     return (
       <>
         {renderStepIndicator()}
-        {(() => {
-          if (isProcessing) {
+        {isProcessing ? (
       return (
         <div className="space-y-4">
           <div className="flex items-center gap-2">
@@ -561,6 +560,76 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
           </div>
         )}
       </div>
+    ) : (
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Selected Items</span>
+            <div className="flex gap-2">
+              <Badge variant="secondary">{exportableFiles.length} exportable</Badge>
+              {incompatibleFiles.length > 0 && (
+                <Badge variant="outline">{incompatibleFiles.length} incompatible</Badge>
+              )}
+            </div>
+          </div>
+
+          {incompatibleFiles.length > 0 && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-800 dark:bg-amber-950/30">
+              <div className="flex items-center gap-2 text-amber-700 dark:text-amber-300">
+                <AlertTriangle className="h-4 w-4" />
+                <span className="text-sm">
+                  {incompatibleFiles.length} item(s) are not compatible with{' '}
+                  {selectedFormatData?.label}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-4">
+          <Label className="text-sm font-medium">Export Format</Label>
+          <RadioGroup
+            value={selectedFormat}
+            onValueChange={setSelectedFormat}
+            className="grid grid-cols-1 gap-2"
+          >
+            {EXPORT_FORMATS.map(format => (
+              <div key={format.id} className="flex items-center space-x-2">
+                <RadioGroupItem value={format.id} id={format.id} />
+                <Label htmlFor={format.id} className="flex flex-1 items-center gap-2">
+                  <format.icon className="h-4 w-4" />
+                  <div className="flex-1">
+                    <div className="font-medium">{format.label}</div>
+                    <div className="text-muted-foreground text-xs">{format.description}</div>
+                  </div>
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+        </div>
+
+        {exportableFiles.length === 0 ? (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
+            <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+              <XCircle className="h-4 w-4" />
+              <span className="text-sm">
+                No exportable files selected. Please select Google Workspace files.
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-lg border bg-blue-50 p-4 dark:bg-blue-950/20">
+            <div className="space-y-2 text-sm text-blue-700 dark:text-blue-300">
+              <div>• Export converts Google Workspace files to standard formats</div>
+              <div>• Downloaded files will be saved to your device</div>
+              <div>• Large files may take longer to process</div>
+              <div>• Some formatting may be lost during conversion</div>
+            </div>
+          </div>
+        )}
+      </div>
+    )}
+      </>
     )
   }
 
