@@ -103,8 +103,10 @@ function ItemsUntrashDialog({
   const isCancelledRef = useRef(false)
   const isMobile = useIsMobile()
 
-  const fileCount = selectedItems.filter(item => !item.isFolder).length
-  const folderCount = selectedItems.filter(item => item.isFolder).length
+  // Filter items that can be untrashed
+  const canUntrashItems = selectedItems.filter(item => item.canUntrash)
+  const fileCount = canUntrashItems.filter(item => !item.isFolder).length
+  const folderCount = canUntrashItems.filter(item => item.isFolder).length
 
   const handleClose = () => {
     if (isProcessing) {
@@ -136,8 +138,8 @@ function ItemsUntrashDialog({
   }
 
   const handleUntrash = async () => {
-    if (selectedItems.length === 0) {
-      toast.error('No items selected for restoring')
+    if (canUntrashItems.length === 0) {
+      toast.error('No items can be restored from the selection')
       return
     }
 
@@ -148,7 +150,7 @@ function ItemsUntrashDialog({
 
     abortControllerRef.current = new AbortController()
 
-    const totalItems = selectedItems.length
+    const totalItems = canUntrashItems.length
     setProgress({
       current: 0,
       total: totalItems,
@@ -160,16 +162,16 @@ function ItemsUntrashDialog({
 
     let successCount = 0
     let failedCount = 0
-    const skippedCount = 0
+    const skippedCount = selectedItems.length - canUntrashItems.length
     const errors: Array<{ file: string; error: string }> = []
 
     try {
-      for (let i = 0; i < selectedItems.length; i++) {
+      for (let i = 0; i < canUntrashItems.length; i++) {
         if (isCancelledRef.current) {
           break
         }
 
-        const item = selectedItems[i]
+        const item = canUntrashItems[i]
         setProgress(prev => ({
           ...prev,
           current: i + 1,
