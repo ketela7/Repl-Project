@@ -115,23 +115,46 @@ export async function GET(request: NextRequest) {
 
         response.data.on('data', (chunk: Buffer) => {
           if (!closed) {
-            controller.enqueue(new Uint8Array(chunk))
+            try {
+              controller.enqueue(new Uint8Array(chunk))
+            } catch (err) {
+              // Controller might already be closed
+              if (!closed) {
+                closed = true
+              }
+            }
           }
         })
 
         response.data.on('end', () => {
           if (!closed) {
             closed = true
-            controller.close()
+            try {
+              controller.close()
+            } catch (err) {
+              // Controller might already be closed
+              console.log('Controller already closed on end')
+            }
           }
         })
 
         response.data.on('error', (err: Error) => {
           if (!closed) {
             closed = true
-            controller.error(err)
+            try {
+              controller.error(err)
+            } catch (closeErr) {
+              // Controller might already be closed
+              console.log('Controller already closed on error')
+            }
           }
         })
+      },
+      cancel() {
+        // Clean up when stream is cancelled
+        if (response.data && typeof response.data.destroy === 'function') {
+          response.data.destroy()
+        }
       },
     })
 

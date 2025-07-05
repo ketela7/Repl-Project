@@ -249,17 +249,34 @@ function ItemsDownloadDialog({
               throw new Error('Download failed')
             }
 
-            const data = await response.json()
+            // Check if response is JSON (bulk download) or streaming (single download)
+            const contentType = response.headers.get('content-type')
 
-            if (data.downloadUrl) {
-              downloadFile(data.downloadUrl, file.name)
+            if (contentType && contentType.includes('application/json')) {
+              // Bulk download - get download links
+              const data = await response.json()
+              if (data.downloadUrl) {
+                downloadFile(data.downloadUrl, file.name)
+                successCount++
+                setProgress(prev => ({
+                  ...prev,
+                  success: successCount,
+                }))
+              } else {
+                throw new Error('No download URL received')
+              }
+            } else {
+              // Direct streaming download
+              const blob = await response.blob()
+              const url = URL.createObjectURL(blob)
+              downloadFile(url, file.name)
               successCount++
               setProgress(prev => ({
                 ...prev,
                 success: successCount,
               }))
-            } else {
-              throw new Error('No download URL received')
+              // Clean up blob URL after a delay
+              setTimeout(() => URL.revokeObjectURL(url), 5000)
             }
           } catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {
