@@ -314,7 +314,7 @@ function ItemsDownloadDialog({
 
     if (isCancelledRef.current) {
       toast.info('Download operation cancelled')
-    } else if (progress.success > 0 || selectedMode === 'exportLinks') {
+    } else if (successCount > 0 || selectedMode === 'exportLinks') {
       toast.success(`Download operation completed`)
     } else {
       toast.error('Download operation failed')
