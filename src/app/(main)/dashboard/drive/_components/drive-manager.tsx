@@ -168,6 +168,7 @@ export function DriveManager() {
 
   const [selectedFileForPreview, setSelectedFileForPreview] = useState<DriveFile | null>(null)
   const [selectedFileForDetails, setSelectedFileForDetails] = useState<DriveItem | null>(null)
+  const [pendingAction, setPendingAction] = useState<string | null>(null)
 
   // Progress states
   const [operationsProgress] = useState<{
@@ -181,6 +182,18 @@ export function DriveManager() {
   // Refs for optimization
   const lastFiltersRef = useRef<string>('')
   const activeRequestsRef = useRef<Set<string>>(new Set())
+
+  // Handle pending actions after selectedItems update
+  useEffect(() => {
+    if (pendingAction && selectedItems.size > 0) {
+      const actionToExecute = pendingAction
+      setPendingAction(null)
+      // Delay to ensure state is fully updated
+      setTimeout(() => {
+        openDialog(actionToExecute as keyof DialogState)
+      }, 10)
+    }
+  }, [selectedItems, pendingAction])
 
   // Helper functions
   const openDialog = (dialogName: keyof DialogState) => {
@@ -490,9 +503,9 @@ export function DriveManager() {
   }
 
   // Effects for initial load and dependencies
-  useEffect(() => {
-    fetchFiles()
-  }, [])
+  // useEffect(() => {
+  //   fetchFiles()
+  // }, [])
 
   // Manual filter application function - only called when Apply Filter is clicked
   const applyFilters = useCallback(() => {
@@ -776,39 +789,39 @@ export function DriveManager() {
                   break
                 case 'download':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('download'), 100)
+                  setPendingAction('download')
                   break
                 case 'share':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('share'), 100)
+                  setPendingAction('share')
                   break
                 case 'rename':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('rename'), 100)
+                  setPendingAction('rename')
                   break
                 case 'move':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('move'), 100)
+                  setPendingAction('move')
                   break
                 case 'copy':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('copy'), 100)
+                  setPendingAction('copy')
                   break
                 case 'trash':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('trash'), 100)
+                  setPendingAction('trash')
                   break
                 case 'delete':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('delete'), 100)
+                  setPendingAction('delete')
                   break
                 case 'untrash':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('untrash'), 100)
+                  setPendingAction('untrash')
                   break
                 case 'export':
                   setSelectedItems(new Set([item.id]))
-                  setTimeout(() => openDialog('export'), 100)
+                  setPendingAction('export')
                   break
               }
             }}
