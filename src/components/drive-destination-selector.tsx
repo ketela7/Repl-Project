@@ -502,12 +502,15 @@ export function DriveDestinationSelector({
                                   <div className="mb-1 flex items-center gap-1">
                                     <Shield className="h-2.5 w-2.5 text-green-600" />
                                     <span className="text-xs font-medium text-green-800 dark:text-green-200">
-                                      Extracted Folder ID
+                                      Folder ID
                                     </span>
                                   </div>
-                                  <code className="block font-mono text-xs break-all text-green-700 dark:text-green-300">
+                                  <code className="block font-mono text-xs break-all text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20 p-1 rounded">
                                     {parsedResult.folderId}
                                   </code>
+                                  <div className="mt-2 text-xs text-green-600 dark:text-green-400">
+                                    🔍 Auto-validating folder access...
+                                  </div>
                                 </CardContent>
                               </Card>
 
@@ -594,22 +597,26 @@ export function DriveDestinationSelector({
                                   )}
                                 >
                                   {validationResult.isValid
-                                    ? 'Folder Access Confirmed'
+                                    ? 'Target Folder Found ✓'
                                     : 'Access Validation Failed'}
                                 </h4>
-                                <p
-                                  className={cn(
-                                    'mt-0.5 text-xs',
-                                    validationResult.isValid
-                                      ? 'text-blue-700 dark:text-blue-300'
-                                      : 'text-red-700 dark:text-red-300',
-                                  )}
-                                >
-                                  {validationResult.isValid
-                                    ? `Successfully connected to: "${validationResult.folderName}"`
-                                    : validationResult.error}
-                                </p>
-                              </div>
+                                {validationResult.isValid ? (
+                                  <div className="mt-2">
+                                    <p className="text-xs text-blue-700 dark:text-blue-300 mb-1">Destination:</p>
+                                    <div className="bg-blue-100 dark:bg-blue-900/40 rounded p-2 border-l-4 border-blue-500">
+                                      <div className="flex items-center gap-2">
+                                        <Folder className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                                        <span className="font-medium text-blue-800 dark:text-blue-200 text-sm" title={validationResult.folderName}>
+                                          {validationResult.folderName}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="mt-0.5 text-xs text-red-700 dark:text-red-300">
+                                    {validationResult.error}
+                                  </p>
+                                )}
 
                               {validationResult.isValid && (
                                 <Card className="border-blue-200 bg-white/60 dark:border-blue-700 dark:bg-blue-900/20">
