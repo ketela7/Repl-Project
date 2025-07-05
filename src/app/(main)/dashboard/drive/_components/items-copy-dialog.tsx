@@ -140,10 +140,8 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
   }
 
   const handleDestinationSelect = (folderId: string, folderName?: string) => {
-    console.log('🎯 handleDestinationSelect received:', { folderId, folderName })
     setSelectedFolderId(folderId)
     setSelectedFolderName(folderName || 'My Drive')
-    console.log('✅ Updated selectedFolderName to:', folderName || 'My Drive')
   }
 
   const handleCopy = async () => {

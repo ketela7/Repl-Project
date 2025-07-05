@@ -165,6 +165,10 @@ export function DriveDestinationSelector({
           isValid: true,
           folderName: data.folder.name,
         })
+
+        // Auto-select folder setelah validasi berhasil
+        console.log('✅ Auto-selecting validated folder:', parsedResult.folderId, data.folder.name)
+        onSelect(parsedResult.folderId, data.folder.name)
       } else {
         setValidationResult({
           isValid: false,
