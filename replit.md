@@ -131,6 +131,7 @@ This is a Next.js-based professional Google Drive management application that pr
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Preferred language: Indonesian/Bahasa Indonesia when user communicates in Indonesian.
 
 ## Changelog
 
