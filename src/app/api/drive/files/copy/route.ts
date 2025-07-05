@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
       itemsCount: items?.length || 0,
       timestamp: new Date().toISOString(),
     }
-    
+
     console.log('🔄 Copy API Request:', requestInfo)
 
     // Determine operation type based on items array or single fileId
