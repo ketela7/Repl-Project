@@ -185,15 +185,15 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
         }))
 
         try {
-          const response = await fetch('/api/drive/copy', {
+          const response = await fetch('/api/drive/files/copy', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
               fileId: item.id,
-              destinationId: selectedFolderId,
-              name: `Copy of ${item.name}`,
+              targetFolderId: selectedFolderId,
+              namePrefix: 'Copy of ',
             }),
             signal: abortControllerRef.current.signal,
           })
