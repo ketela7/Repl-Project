@@ -491,7 +491,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
               </div>
             </div>
           </div>
-        ) : isCompleted ? (
+        ) : currentStep === 'completed' ? (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-600" />

@@ -71,7 +71,7 @@ function ItemsDownloadDialog({
 }: ItemsDownloadDialogProps) {
   const [selectedMode, setSelectedMode] = useState('direct')
   const [isProcessing, setIsProcessing] = useState(false)
-  const [isCompleted, setIsCompleted] = useState(false)
+
   const [isCancelled, setIsCancelled] = useState(false)
   const [isItemsExpanded, setIsItemsExpanded] = useState(false)
   const [currentStep, setCurrentStep] = useState<'configuration' | 'processing' | 'completed'>(
@@ -114,7 +114,7 @@ function ItemsDownloadDialog({
     }
 
     setIsProcessing(false)
-    setIsCompleted(true)
+    setCurrentStep('completed')
     // Removed toast notification
   }
 
@@ -153,7 +153,6 @@ function ItemsDownloadDialog({
     isCancelledRef.current = false
     setIsCancelled(false)
     setIsProcessing(true)
-    setIsCompleted(false)
     setCurrentStep('processing')
 
     abortControllerRef.current = new AbortController()
@@ -310,7 +309,6 @@ function ItemsDownloadDialog({
     }
 
     setIsProcessing(false)
-    setIsCompleted(true)
     setCurrentStep('completed')
 
     // Use setTimeout to ensure progress state is updated before toast check
@@ -341,7 +339,6 @@ function ItemsDownloadDialog({
   const resetState = () => {
     setSelectedMode('direct')
     setIsProcessing(false)
-    setIsCompleted(false)
     setIsCancelled(false)
     setCurrentStep('configuration')
     setProgress({
@@ -366,7 +363,7 @@ function ItemsDownloadDialog({
           color: 'text-orange-600',
           bgColor: 'bg-orange-50 dark:bg-orange-950/20',
         }
-      } else if (isCompleted) {
+      } else if (currentStep === 'completed') {
         return {
           status: 'Completed',
           icon: CheckCircle,
@@ -447,7 +444,7 @@ function ItemsDownloadDialog({
               </div>
             </div>
           </div>
-        ) : isCompleted ? (
+        ) : currentStep === 'completed' ? (
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-5 w-5 text-green-600" />
@@ -601,7 +598,7 @@ function ItemsDownloadDialog({
       )
     }
 
-    if (isCompleted) {
+    if (currentStep === 'completed') {
       return <Button onClick={handleClose}>{isCancelled ? 'Close' : 'Done'}</Button>
     }
 
