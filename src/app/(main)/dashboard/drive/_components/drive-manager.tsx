@@ -204,13 +204,21 @@ export function DriveManager() {
     isSelectModeRef.current = mode
   }, [])
 
-  // Debounced search untuk prevent race conditions
-  // Handle search change - only update local state, no auto-search
+  // Handle search change - auto-search with debouncing
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query)
-    // Store query in ref for manual search on Enter/Submit
     searchQueryRef.current = query
   }, [])
+
+  // Debounced search effect - auto-search like destination selector
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const trimmedQuery = searchQueryRef.current.trim()
+      fetchFiles(currentFolderId || undefined, trimmedQuery || undefined)
+    }, 300) // 300ms debounce
+
+    return () => clearTimeout(timer)
+  }, [searchQuery, currentFolderId])
 
   const clearAllFilters = useCallback(() => {
     setFilters(initialFilters)
@@ -669,10 +677,6 @@ export function DriveManager() {
           <DriveToolbar
             searchQuery={searchQuery}
             onSearchChange={handleSearchChange}
-            onSearchSubmit={e => {
-              e.preventDefault()
-              fetchFiles(currentFolderId || undefined, searchQueryRef.current.trim() || undefined)
-            }}
             viewMode={viewMode}
             onViewModeChange={setViewMode}
             isSelectMode={isSelectMode}

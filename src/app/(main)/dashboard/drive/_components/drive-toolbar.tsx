@@ -17,7 +17,6 @@ import {
   Folder,
   Upload,
   FolderPlus,
-  ChevronUp,
   MoreVertical,
   EllipsisVertical,
 } from 'lucide-react'
@@ -96,7 +95,6 @@ interface VisibleColumns {
 interface DriveToolbarProps {
   searchQuery: string
   onSearchChange: (_query: string) => void
-  onSearchSubmit: (_e: React.FormEvent) => void
   viewMode: 'grid' | 'table'
   onViewModeChange: (_mode: 'grid' | 'table') => void
   isSelectMode: boolean
@@ -163,7 +161,6 @@ const filterByMimeType = (items: DriveItem[], category: string) => {
 export function DriveToolbar({
   searchQuery,
   onSearchChange,
-  onSearchSubmit,
   viewMode,
   onViewModeChange,
   isSelectMode,
@@ -246,34 +243,33 @@ export function DriveToolbar({
         className="scrollbar-hide flex items-center justify-between overflow-x-auto scroll-smooth p-3"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {/* Main Menu - 5 Items - Horizontal Scrollable */}
+        {/* Main Menu - 4 Items - Horizontal Scrollable */}
         <div className="flex min-w-0 flex-shrink-0 items-center gap-2">
-          {/* Search */}
-          <Button
-            variant={searchQuery ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => {
-              const searchExpanded = document.querySelector('#search-expanded') as HTMLElement
-              if (searchExpanded) {
-                searchExpanded.style.display =
-                  searchExpanded.style.display === 'none' ? 'block' : 'none'
-                if (searchExpanded.style.display === 'block') {
-                  setTimeout(() => {
-                    const input = searchExpanded.querySelector('input') as HTMLInputElement
-                    if (input) input.focus()
-                  }, 100)
-                }
-              }
-            }}
-            className="h-8 px-2"
-          >
-            <Search className="h-4 w-4" />
+          {/* Search Input - Always visible */}
+          <div className="relative max-w-[300px] min-w-[200px]">
+            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
+            <Input
+              type="text"
+              placeholder="Search files and folders..."
+              value={searchQuery}
+              onChange={e => onSearchChange(e.target.value)}
+              className="h-8 pr-8 pl-10 text-sm"
+            />
             {searchQuery && (
-              <Badge variant="secondary" className="ml-1 h-4 px-1 text-xs">
-                •
-              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hover:bg-muted absolute top-1/2 right-1 h-6 w-6 -translate-y-1/2 transform p-0"
+                onClick={() => {
+                  onSearchChange('')
+                  onRefresh()
+                }}
+                title="Clear search"
+              >
+                <X className="h-3 w-3" />
+              </Button>
             )}
-          </Button>
+          </div>
 
           {/* View Toggle - More prominent */}
           <Button
@@ -1195,73 +1191,6 @@ export function DriveToolbar({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
-
-      {/* Search Expanded - Hidden by default */}
-      <div
-        id="search-expanded"
-        style={{ display: 'none' }}
-        className="bg-muted/30 border-t p-3 md:p-4"
-      >
-        <div className="flex items-center gap-2 md:gap-4">
-          <div className="relative flex-1">
-            <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
-            <Input
-              type="text"
-              placeholder="Search files and folders..."
-              value={searchQuery}
-              onChange={e => onSearchChange(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && onSearchSubmit(e)}
-              className="h-10 pr-20 pl-10"
-              disabled={false}
-            />
-            <div className="absolute top-1/2 right-1 flex -translate-y-1/2 transform items-center gap-1">
-              {searchQuery && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="hover:bg-muted h-8 w-8 p-0"
-                  onClick={() => {
-                    onSearchChange('')
-                    onRefresh()
-                  }}
-                  title="Clear search"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hover:bg-muted h-8 w-8 p-0"
-                onClick={() => {
-                  const searchExpanded = document.querySelector('#search-expanded') as HTMLElement
-                  if (searchExpanded) {
-                    searchExpanded.style.display = 'none'
-                  }
-                }}
-                title="Close search"
-              >
-                <ChevronUp className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <Button
-            variant="default"
-            size="sm"
-            onClick={e => onSearchSubmit(e)}
-            disabled={!(searchQuery as string).trim()}
-            className="h-10 px-4"
-          >
-            {refreshing ? (
-              <RefreshCw className="h-4 w-4 animate-spin" />
-            ) : (
-              <>
-                <Search className="h-4 w-4" />
-              </>
-            )}
-          </Button>
-        </div>
       </div>
 
       {/* Operations Dialog */}
