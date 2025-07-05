@@ -484,25 +484,10 @@ export function DriveManager() {
 
   // Get selected items with all required data for dialogs
   const getSelectedItemsForDialog = () => {
-    console.log(
-      'getSelectedItemsForDialog called, selectedItems:',
-      selectedItems,
-      'size:',
-      selectedItems.size,
-    )
-    console.log('sortedDisplayItems length:', sortedDisplayItems.length)
-
-    const result = Array.from(selectedItems)
+    return Array.from(selectedItems)
       .map(id => {
         // Use sortedDisplayItems instead of displayItems to get proper capabilities
         const item = sortedDisplayItems.find(item => item.id === id)
-        console.log(
-          'Finding item with id:',
-          id,
-          'found:',
-          !!item,
-          item ? 'canMove: ' + item.canMove : 'not found',
-        )
         return item
       })
       .filter((item): item is DriveItem => Boolean(item))
@@ -522,9 +507,6 @@ export function DriveManager() {
         canDownload: item.canDownload || false,
         canExport: item.canExport || false,
       }))
-
-    console.log('getSelectedItemsForDialog result:', result, 'length:', result.length)
-    return result
   }
 
   // Effects for initial load and dependencies
