@@ -9,6 +9,13 @@ export default auth((req) => {
   // Apply security headers
   const securityResponse = securityMiddleware()
   
+  // Add no-cache headers in development
+  if (process.env.NODE_ENV === 'development') {
+    securityResponse.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+    securityResponse.headers.set('Pragma', 'no-cache')
+    securityResponse.headers.set('Expires', '0')
+  }
+  
   // Allow access to auth pages without token
   if (pathname.startsWith('/auth/')) {
     return securityResponse

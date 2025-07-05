@@ -84,21 +84,31 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
 
-  // Production security headers
+  // Security headers with proper cache control for development
   async headers() {
+    const isDev = process.env.NODE_ENV === 'development'
+    
     return [
       {
         source: '/_next/:path*',
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            value: isDev 
+              ? 'no-cache, no-store, must-revalidate' 
+              : 'public, max-age=31536000, immutable',
           },
         ],
       },
       {
         source: '/(.*)',
         headers: [
+          {
+            key: 'Cache-Control',
+            value: isDev 
+              ? 'no-cache, no-store, must-revalidate' 
+              : 'public, max-age=0, must-revalidate',
+          },
           {
             key: 'X-Frame-Options',
             value: 'DENY',
@@ -115,6 +125,16 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), geolocation=()',
           },
+          ...(isDev ? [
+            {
+              key: 'Pragma',
+              value: 'no-cache',
+            },
+            {
+              key: 'Expires',
+              value: '0',
+            },
+          ] : []),
         ],
       },
     ]
@@ -126,9 +146,20 @@ const nextConfig = {
 
   // Development optimizations
   onDemandEntries: {
-  //  maxInactiveAge: 60 * 1000,
+    maxInactiveAge: 25 * 1000, // Shorter cache time in dev
     pagesBufferLength: 2,
   },
+
+  // Disable caching in development
+  generateEtags: process.env.NODE_ENV !== 'development',
+  
+  // Development specific configurations
+  ...(process.env.NODE_ENV === 'development' && {
+    // Disable static optimization in development
+    optimizeFonts: false,
+    // Force fresh builds
+    distDir: '.next',
+  }),
 
   // Webpack optimizations for production
   webpack: (config, { dev, isServer }) => {
