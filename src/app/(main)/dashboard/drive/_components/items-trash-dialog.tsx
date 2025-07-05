@@ -18,7 +18,7 @@ import {
   Info,
   ChevronRight,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// import { toast } from 'sonner' // Removed toast notifications
 
 import {
   Dialog,
@@ -136,12 +136,12 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
 
     setIsProcessing(false)
     setCurrentStep('completed')
-    toast.info('Trash operation cancelled')
+    // Removed toast notification
   }
 
   const handleTrash = async () => {
     if (totalItems === 0) {
-      toast.error('No items can be moved to trash from the selection')
+      // Removed toast notification
       return
     }
 
@@ -234,11 +234,11 @@ function ItemsTrashDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsTr
       setCurrentStep('completed')
 
       if (isCancelledRef.current) {
-        toast.info('Trash operation cancelled')
+        // Removed toast notification
       } else if (successCount > 0) {
-        toast.success(`Successfully moved ${successCount} item(s) to trash`)
+        // Removed toast notification to trash`)
       } else {
-        toast.error('Trash operation failed')
+        // Removed toast notification
       }
     }
   }

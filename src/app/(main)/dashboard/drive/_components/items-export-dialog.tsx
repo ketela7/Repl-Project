@@ -15,7 +15,7 @@ import {
   ChevronRight,
   AlertTriangle,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// import { toast } from 'sonner' // Removed toast notifications
 
 import {
   Dialog,
@@ -227,7 +227,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
     setIsProcessing(false)
     setIsCompleted(true)
-    toast.info('Export operation cancelled')
+    // Removed toast notification
   }
 
   const downloadFile = (url: string, filename: string) => {
@@ -261,7 +261,7 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
 
   const handleExport = async () => {
     if (exportableFiles.length === 0) {
-      toast.error('No compatible files selected for this export format')
+      // Removed toast notification
       return
     }
 
@@ -362,11 +362,11 @@ function ItemsExportDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsE
     setIsCompleted(true)
 
     if (isCancelledRef.current) {
-      toast.info('Export operation cancelled')
+      // Removed toast notification
     } else if (successCount > 0) {
-      toast.success(`Successfully exported ${successCount} file(s)`)
+      // Removed toast notification`)
     } else {
-      toast.error('Export operation failed')
+      // Removed toast notification
     }
   }
 

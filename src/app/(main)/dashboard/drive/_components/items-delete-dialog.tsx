@@ -19,7 +19,7 @@ import {
   AlertOctagon,
   ChevronRight,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// // import { toast } from 'sonner' // Removed toast notifications // Removed toast notifications
 
 import {
   Dialog,
@@ -146,17 +146,17 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
 
     setIsProcessing(false)
     setCurrentStep('completed')
-    toast.info('Delete operation cancelled')
+    // Removed toast notification
   }
 
   const handleDelete = async () => {
     if (!isConfirmationValid) {
-      toast.error('Please confirm the deletion')
+      // Removed toast notification
       return
     }
 
     if (canDeleteItems.length === 0) {
-      toast.error('No items can be deleted from the selection')
+      // Removed toast notification
       return
     }
 
@@ -249,11 +249,11 @@ function ItemsDeleteDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsD
       setCurrentStep('completed')
 
       if (isCancelledRef.current) {
-        toast.info('Delete operation cancelled')
+        // Removed toast notification
       } else if (successCount > 0) {
-        toast.success(`Successfully deleted ${successCount} item(s) permanently`)
+        // Removed toast notification permanently`)
       } else {
-        toast.error('Delete operation failed')
+        // Removed toast notification
       }
     }
   }

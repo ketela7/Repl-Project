@@ -20,7 +20,7 @@ import {
   Info,
   Settings,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// import { toast } from 'sonner' // Removed toast notifications
 
 import { RegexHelpDialog } from './regex-help-dialog'
 
@@ -184,7 +184,7 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
 
     setIsProcessing(false)
     setCurrentStep('completed')
-    toast.info('Rename operation cancelled')
+    // Removed toast notification
   }
 
   const generatePreview = () => {
@@ -259,13 +259,13 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
 
   const handleRename = async () => {
     if (previewResults.length === 0) {
-      toast.error('No preview available. Please generate preview first.')
+      // Removed toast notification
       return
     }
 
     const itemsToRename = previewResults.filter(result => result.hasChanges)
     if (itemsToRename.length === 0) {
-      toast.error('No items have changed names. Please modify your rename settings.')
+      // Removed toast notification
       return
     }
 
@@ -368,11 +368,11 @@ function ItemsRenameDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsR
       setCurrentStep('completed')
 
       if (isCancelledRef.current) {
-        toast.info('Rename operation cancelled')
+        // Removed toast notification
       } else if (successCount > 0) {
-        toast.success(`Successfully renamed ${successCount} item(s)`)
+        // Removed toast notification`)
       } else {
-        toast.error('Rename operation failed')
+        // Removed toast notification
       }
     }
   }

@@ -19,7 +19,7 @@ import {
   File,
   ChevronRight,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// // import { toast } from 'sonner' // Removed toast notifications // Removed toast notifications
 
 import {
   Dialog,
@@ -159,7 +159,7 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
   const handleMove = async () => {
     if (canMoveItems.length === 0) {
       console.error('❌ No items can be moved from the selection')
-      toast.error('No items can be moved from the current selection')
+      // Removed toast notification
       return
     }
 
@@ -300,10 +300,10 @@ function ItemsMoveDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsMov
         console.log('⏹️ Move operation cancelled')
       } else if (successCount > 0) {
         console.log(`✅ Successfully moved ${successCount} item(s)`)
-        toast.success(`Successfully moved ${successCount} item(s)`)
+        // Removed success toast notification
       } else {
         console.error('❌ Move operation failed')
-        toast.error('Move operation failed')
+        // Removed error toast notification
       }
     }
   }

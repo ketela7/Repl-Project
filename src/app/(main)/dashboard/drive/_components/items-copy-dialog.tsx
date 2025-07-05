@@ -20,7 +20,7 @@ import {
   Files,
   ChevronRight,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// // import { toast } from 'sonner' // Removed toast notifications // Removed toast notifications
 
 import {
   Dialog,
@@ -142,7 +142,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
     setIsProcessing(false)
     setCurrentStep('completed')
-    toast.info('Copy operation cancelled')
+    // Removed toast notification
   }
 
   const handleDestinationSelect = (folderId: string, folderName?: string) => {
@@ -152,7 +152,7 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
 
   const handleCopy = async () => {
     if (canCopyItems.length === 0) {
-      toast.error('No items can be copied from the selection')
+      // Removed toast notification
       return
     }
 
@@ -254,11 +254,11 @@ function ItemsCopyDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsCop
       setCurrentStep('completed')
 
       if (isCancelledRef.current) {
-        toast.info('Copy operation cancelled')
+        // Removed toast notification
       } else if (successCount > 0) {
-        toast.success(`Successfully copied ${successCount} item(s)`)
+        // Removed toast notification`)
       } else {
-        toast.error('Copy operation failed')
+        // Removed toast notification
       }
     }
   }

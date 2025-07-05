@@ -11,7 +11,7 @@ import {
   Folder,
   ChevronRight,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// import { toast } from 'sonner' // Removed toast notifications
 
 import {
   Dialog,
@@ -114,7 +114,7 @@ function ItemsDownloadDialog({
 
     setIsProcessing(false)
     setIsCompleted(true)
-    toast.info('Download operation cancelled')
+    // Removed toast notification
   }
 
   const downloadFile = (url: string, filename: string) => {
@@ -145,7 +145,7 @@ function ItemsDownloadDialog({
 
   const handleDownload = async () => {
     if (downloadableFiles.length === 0) {
-      toast.error('No downloadable files selected (folders cannot be downloaded)')
+      // Removed toast notification')
       return
     }
 
@@ -204,7 +204,7 @@ function ItemsDownloadDialog({
           success: totalItems,
         }))
 
-        toast.success('Download links exported successfully')
+        // Removed toast notification
       } catch (error) {
         console.error('Export failed:', error)
         setProgress(prev => ({
@@ -212,7 +212,7 @@ function ItemsDownloadDialog({
           failed: totalItems,
           errors: [{ file: 'Export', error: 'Failed to generate download links' }],
         }))
-        toast.error('Failed to export download links')
+        // Removed toast notification
       }
     } else {
       // Direct download mode
@@ -315,11 +315,11 @@ function ItemsDownloadDialog({
     // Use setTimeout to ensure progress state is updated before toast check
     setTimeout(() => {
       if (isCancelledRef.current) {
-        toast.info('Download operation cancelled')
+        // Removed toast notification
       } else if (progress.success > 0 || selectedMode === 'exportLinks') {
-        toast.success(`Download operation completed`)
+        // Removed toast notification
       } else {
-        toast.error('Download operation failed')
+        // Removed toast notification
       }
     }, 100)
   }

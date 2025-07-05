@@ -18,7 +18,7 @@ import {
   Info,
   ChevronRight,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// import { toast } from 'sonner' // Removed toast notifications
 
 import {
   Dialog,
@@ -140,12 +140,12 @@ function ItemsUntrashDialog({
 
     setIsProcessing(false)
     setCurrentStep('completed')
-    toast.info('Restore operation cancelled')
+    // Removed toast notification
   }
 
   const handleUntrash = async () => {
     if (canUntrashItems.length === 0) {
-      toast.error('No items can be restored from the selection')
+      // Removed toast notification
       return
     }
 
@@ -239,11 +239,11 @@ function ItemsUntrashDialog({
       setCurrentStep('completed')
 
       if (isCancelledRef.current) {
-        toast.info('Restore operation cancelled')
+        // Removed toast notification
       } else if (successCount > 0) {
-        toast.success(`Successfully restored ${successCount} item(s) from trash`)
+        // Removed toast notification from trash`)
       } else {
-        toast.error('Restore operation failed')
+        // Removed toast notification
       }
     }
   }

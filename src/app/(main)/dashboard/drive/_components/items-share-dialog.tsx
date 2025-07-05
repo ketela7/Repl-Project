@@ -19,7 +19,7 @@ import {
   Folder,
   ChevronRight,
 } from 'lucide-react'
-import { toast } from 'sonner'
+// import { toast } from 'sonner' // Removed toast notifications
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -126,12 +126,12 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
 
     setIsProcessing(false)
     setCurrentStep('completed')
-    toast.info('Share operation cancelled')
+    // Removed toast notification
   }
 
   const handleShare = async () => {
     if (canShareItems.length === 0) {
-      toast.error('No shareable items selected')
+      // Removed toast notification
       return
     }
 
@@ -241,11 +241,11 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
       setCurrentStep('completed')
 
       if (isCancelledRef.current) {
-        toast.info('Share operation cancelled')
+        // Removed toast notification
       } else if (successCount > 0) {
-        toast.success(`Successfully shared ${successCount} item(s)`)
+        // Removed toast notification`)
       } else {
-        toast.error('Share operation failed')
+        // Removed toast notification
       }
     }
   }
@@ -413,7 +413,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     const successfulShares = shareResults.filter(result => result.success)
 
     if (successfulShares.length === 0) {
-      toast.error('No successful shares to export')
+      // Removed toast notification
       return
     }
 
@@ -424,7 +424,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
       case 'clipboard':
         content = successfulShares.map(share => `${share.name}: ${share.shareLink}`).join('\n')
         navigator.clipboard.writeText(content).then(() => {
-          toast.success('Share links copied to clipboard')
+          // Removed toast notification
         })
         return
 
@@ -452,7 +452,7 @@ function ItemsShareDialog({ isOpen, onClose, onConfirm, selectedItems }: ItemsSh
     link.click()
     URL.revokeObjectURL(url)
 
-    toast.success(`Exported as ${format.toUpperCase()}`)
+    // Removed toast notification}`)
   }
 
   const renderStepIndicator = () => {
